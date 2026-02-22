@@ -70,7 +70,7 @@ pub struct NextBranchDef {
 }
 
 /// Typed effect, deserialised from `type = "..."` tagged TOML.
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum EffectDef {
     ChangeStress { amount: i32 },
@@ -101,7 +101,7 @@ pub enum EffectDef {
 use undone_expr::parser::Expr;
 
 /// Resolved action — conditions parsed, ready for runtime evaluation.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Action {
     pub id: String,
     pub label: String,
@@ -113,14 +113,14 @@ pub struct Action {
     pub next: Vec<NextBranch>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NextBranch {
     pub condition: Option<Expr>,
     pub goto: Option<String>,
     pub finish: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NpcAction {
     pub id: String,
     pub condition: Option<Expr>,
