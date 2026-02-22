@@ -1,0 +1,132 @@
+# Undone — Project Instructions
+
+## What This Is
+
+**Undone** is a life-simulation adult text game engine with a transgender/transformation
+premise. Built from scratch in Rust. Inspired by Newlife (Splendid Ostrich Games) but
+fully redesigned: new engine, new content format, complete ownership.
+
+The engine is a **platform**. The first release is set in contemporary Britain. Other
+settings, stories, and cultural contexts are first-class citizens — not afterthoughts.
+Extensibility is a core design constraint, not a future enhancement.
+
+### The Premise (shared across all stories)
+
+A player character navigates adult life — relationships, work, social dynamics. She may
+have started life as a man. The transformation is not backstory; it is a lens that
+changes how every socially-gendered experience lands. She knows how men think because
+she was one. Different story packs will use this premise in different settings.
+
+### The Three PC Types
+
+| Type | `always_female` | Description |
+|---|---|---|
+| Male-start (transformed) | `false` | Definitively transformed from male. The primary experience. |
+| Female-start (variant) | `true`, no `NOT_TRANSFORMED` | Female from birth with a transformation element |
+| Always female | `true` + `NOT_TRANSFORMED` | No transformation frame at all |
+
+The `FEMININITY` skill (0–100+) tracks adaptation. Male-start begins low; always-female
+begins at 75. The richest transformation writing lives in the 0–50 range.
+
+## Key Documents (Read Before Working)
+
+- `docs/plans/2026-02-21-engine-design.md` — Living architecture document. The
+  authoritative design reference. **Update it when implementation reveals surprises.**
+- `docs/plans/2026-02-21-scaffold.md` — 13-task implementation plan. The current
+  work target.
+- `HANDOFF.md` — Current state and session log.
+
+## Tech Stack
+
+| Concern | Choice |
+|---|---|
+| Language | Rust (workspace, 7 crates) |
+| GUI | egui / eframe (immediate mode, single binary) |
+| Template rendering | minijinja (Jinja2 syntax) |
+| Scene conditions | Custom recursive descent parser (validated at load time) |
+| Serialisation | serde + serde_json + toml |
+| NPC storage | slotmap (stable typed keys) |
+| String interning | lasso (TraitId/SkillId/etc as u32) |
+
+## Workspace Structure
+
+```
+undone/
+├── Cargo.toml               # workspace root
+├── src/main.rs              # entry point
+├── crates/
+│   ├── undone-domain/       # pure types — no IO, no game logic
+│   ├── undone-world/        # World struct, all mutable game state
+│   ├── undone-packs/        # pack loading, manifest parsing, content registry
+│   ├── undone-expr/         # custom expression parser & evaluator
+│   ├── undone-scene/        # scene execution engine
+│   ├── undone-save/         # serde save / load
+│   └── undone-ui/           # egui/eframe views and widgets
+└── packs/
+    └── base/                # base game content (is itself a pack)
+```
+
+## Design Philosophy
+
+- **Platform, not product.** The engine is setting-agnostic. All content — traits,
+  skills, stats, scenes, NPC personalities, cultural references — lives in packs.
+  The base game is the British pack. Nothing British is hardcoded into the engine.
+
+- **Redesign, not port.** The Java source is obfuscated. We reverse-engineered the
+  API surface for reference only. The Rust engine is designed from scratch.
+
+- **Data-driven everywhere.** Traits, skills, stats — TOML data files in each pack.
+  The engine reasons about enums for closed sets (arousal, alcohol, relationship
+  status); content-level IDs are interned strings validated at pack load time.
+
+- **Pack system is the extensibility mechanism.** Community packs, alternate settings,
+  and future first-party stories all drop into `packs/`. The scheduler, NPC spawner,
+  and scene registry are all pack-aware.
+
+- **Content validated at load time.** Unknown trait/skill names in scene files fail
+  fast with a clear error before the game runs.
+
+- **Writing is everything.** The engine exists to serve the prose.
+
+- **Transformation is structurally present.** Every scene that involves gendered
+  social dynamics should ask: does this feel different for a woman who used to be
+  a man? If yes, write the branch. This is not optional flavour — it is the
+  game's distinctive register.
+
+## UI Direction
+
+The UI is a significant open design question. We are not replicating the original
+Newlife layout. A dedicated design session will determine what makes this the most
+engaging experience — typography, layout, how choices are presented, how the world
+and character state are surfaced.
+
+The scaffold (Tasks 1–13) produces only a minimal eframe window to confirm the
+stack compiles. Do not design the full UI during the scaffold.
+
+## Writing and Content
+
+Original prose from the companion `newlife-plus` project will be ported and improved,
+but not until the engine can run scenes end-to-end. Do not work on prose content
+during the scaffold or engine sessions.
+
+## Expression Parser Notes
+
+The scaffold implements the expression lexer, parser, and evaluator (Tasks 9–11).
+The evaluator will have `todo!()` stubs for `hasTrait()`, `getSkill()`, etc. at
+the end of the scaffold phase. **This is intentional.** These stubs get wired to
+`PackRegistry` in the scene engine session (after the scaffold). Do not try to
+complete them during the scaffold.
+
+## Dependency Direction (enforced, no cycles)
+
+```
+undone-domain
+    ↑
+undone-world ← undone-packs
+    ↑               ↑
+undone-expr    undone-save
+    ↑
+undone-scene
+    ↑
+undone-ui
+```
