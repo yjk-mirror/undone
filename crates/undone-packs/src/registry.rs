@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
-use undone_domain::{NpcTraitId, SkillId, StatId, TraitId};
+use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, TraitId};
 
 use crate::data::{NpcTraitDef, SkillDef, TraitDef};
 
@@ -24,6 +24,8 @@ pub struct PackRegistry {
     pub trait_defs: HashMap<TraitId, TraitDef>,
     pub npc_trait_defs: HashMap<NpcTraitId, NpcTraitDef>,
     pub skill_defs: HashMap<SkillId, SkillDef>,
+    male_names: Vec<String>,
+    female_names: Vec<String>,
 }
 
 impl PackRegistry {
@@ -33,6 +35,8 @@ impl PackRegistry {
             trait_defs: HashMap::new(),
             npc_trait_defs: HashMap::new(),
             skill_defs: HashMap::new(),
+            male_names: Vec::new(),
+            female_names: Vec::new(),
         }
     }
 
@@ -120,6 +124,40 @@ impl PackRegistry {
         self.rodeo.resolve(&spur)
     }
 
+    /// Intern a personality name, returning a PersonalityId.
+    /// Personalities don't require registered definitions — any string is valid.
+    pub fn intern_personality(&mut self, id: &str) -> PersonalityId {
+        PersonalityId(self.intern(id))
+    }
+
+    /// Resolve a PersonalityId to the engine Personality enum.
+    /// Returns None for custom/unknown personalities.
+    pub fn core_personality(&self, id: PersonalityId) -> Option<undone_domain::Personality> {
+        use undone_domain::Personality;
+        match self.rodeo.resolve(&id.0) {
+            "ROMANTIC" => Some(Personality::Romantic),
+            "JERK" => Some(Personality::Jerk),
+            "FRIEND" => Some(Personality::Friend),
+            "INTELLECTUAL" => Some(Personality::Intellectual),
+            "LAD" => Some(Personality::Lad),
+            _ => None,
+        }
+    }
+
+    /// Store male and female NPC name lists from a pack's names file.
+    pub fn register_names(&mut self, male: Vec<String>, female: Vec<String>) {
+        self.male_names.extend(male);
+        self.female_names.extend(female);
+    }
+
+    pub fn male_names(&self) -> &[String] {
+        &self.male_names
+    }
+
+    pub fn female_names(&self) -> &[String] {
+        &self.female_names
+    }
+
     /// Return all interned strings in Spur-index order (index 0 first).
     /// The save system records these so it can detect if the pack load order changed
     /// between saving and loading.
@@ -182,5 +220,33 @@ mod tests {
         let a = reg.resolve_trait("SHY").unwrap();
         let b = reg.resolve_trait("SHY").unwrap();
         assert_eq!(a, b);
+    }
+
+    #[test]
+    fn intern_and_resolve_personality() {
+        let mut reg = PackRegistry::new();
+        let id = reg.intern_personality("ROMANTIC");
+        assert_eq!(
+            reg.core_personality(id),
+            Some(undone_domain::Personality::Romantic)
+        );
+    }
+
+    #[test]
+    fn unknown_personality_returns_none() {
+        let mut reg = PackRegistry::new();
+        let id = reg.intern_personality("CUSTOM_PACK_PERSONALITY");
+        assert_eq!(reg.core_personality(id), None);
+    }
+
+    #[test]
+    fn register_names_accumulates() {
+        let mut reg = PackRegistry::new();
+        reg.register_names(
+            vec!["James".into(), "Thomas".into()],
+            vec!["Emma".into()],
+        );
+        assert_eq!(reg.male_names(), &["James", "Thomas"]);
+        assert_eq!(reg.female_names(), &["Emma"]);
     }
 }
