@@ -7,3 +7,6 @@ edition = "2021"
 serde    = { workspace = true }
 slotmap  = { workspace = true }
 lasso    = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
