@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "rust": {
+      "type": "stdio",
+      "command": "C:/Users/YJK/.claude/mcp-servers/rust-mcp/target/release/rustmcp.exe",
+      "args": [],
+      "env": {}
+    },
+    "rhai": {
+      "type": "stdio",
+      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/rhai-mcp-server.exe",
+      "args": [],
+      "env": {}
+    },
+    "minijinja": {
+      "type": "stdio",
+      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/minijinja-mcp-server.exe",
+      "args": [],
+      "env": {}
+    }
+  }
+}

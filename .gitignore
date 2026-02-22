@@ -6,5 +6,6 @@ Thumbs.db
 
 # Override global gitignore — track docs and dot folders in this repo
 !*.md
+!.mcp.json
 !.claude/
 !.claude/**

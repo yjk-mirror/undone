@@ -2,10 +2,11 @@
 
 ## Current State
 
-**Phase:** Design complete. Ready to scaffold.
+**Phase:** Agent tooling complete. Ready to scaffold.
 
-No Rust code exists yet. The workspace has not been initialised. The git repo contains
-only the design doc, scaffold plan, and configuration.
+No Rust game code exists yet. The workspace has not been initialised.
+MCP servers, PostToolUse hook, and skills are all wired — start a session from this
+directory and run `/mcp` to confirm `rust`, `rhai`, `minijinja` are all connected.
 
 ## Next Action
 
@@ -19,8 +20,12 @@ Use the `superpowers:executing-plans` skill. Work through Tasks 1–13 in order,
 committing at each task step.
 
 **Prerequisites before starting:**
-- Rust toolchain installed (`rustup`, `cargo`)
-- Rust LSP available (rust-analyzer)
+- Rust toolchain installed (`rustup`, `cargo`) ✅
+- Rust LSP available (rust-analyzer) ✅
+- MCP servers running (verify with `/mcp`) — rebuild if binaries are stale:
+  ```bash
+  cd C:/Users/YJK/dev/mirror/undone-tools && cargo build --release
+  ```
 
 ## What Was Completed (Design Session, 2026-02-21)
 
@@ -70,3 +75,4 @@ intentional. They get wired to `PackRegistry` in the scene engine session.
 | Date | Summary |
 |---|---|
 | 2026-02-21 | Design session: decompiled Newlife, designed Undone engine, wrote scaffold plan |
+| 2026-02-21 | Tooling session: built rhai-mcp-server (4 tools) + minijinja-mcp-server (3 tools) in undone-tools/, wired .mcp.json + PostToolUse hook + skills here. Smoke test pending (restart required for MCP). |
