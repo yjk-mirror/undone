@@ -22,6 +22,8 @@ pub struct PackContent {
     pub npc_traits: String,
     pub skills: String,
     pub scenes_dir: String,
+    #[serde(default)]
+    pub schedule_file: Option<String>,
 }
 
 #[cfg(test)]

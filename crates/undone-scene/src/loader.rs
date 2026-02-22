@@ -169,10 +169,7 @@ fn resolve_npc_action(
     })
 }
 
-fn resolve_next_branch(
-    raw: NextBranchDef,
-    scene_id: &str,
-) -> Result<NextBranch, SceneLoadError> {
+fn resolve_next_branch(raw: NextBranchDef, scene_id: &str) -> Result<NextBranch, SceneLoadError> {
     let condition = raw
         .condition
         .as_deref()

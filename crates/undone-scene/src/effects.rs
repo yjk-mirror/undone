@@ -35,10 +35,7 @@ fn step_liking(current: LikingLevel, delta: i8) -> LikingLevel {
         LikingLevel::Like,
         LikingLevel::Close,
     ];
-    let idx = LEVELS
-        .iter()
-        .position(|&l| l == current)
-        .unwrap_or(0) as i32;
+    let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
     LEVELS[(idx + delta as i32).clamp(0, 3) as usize]
 }
 
@@ -50,10 +47,7 @@ fn step_love(current: LoveLevel, delta: i8) -> LoveLevel {
         LoveLevel::Crush,
         LoveLevel::Love,
     ];
-    let idx = LEVELS
-        .iter()
-        .position(|&l| l == current)
-        .unwrap_or(0) as i32;
+    let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
 }
 
@@ -65,10 +59,7 @@ fn step_arousal(current: ArousalLevel, delta: i8) -> ArousalLevel {
         ArousalLevel::Close,
         ArousalLevel::Orgasm,
     ];
-    let idx = LEVELS
-        .iter()
-        .position(|&l| l == current)
-        .unwrap_or(0) as i32;
+    let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
 }
 
@@ -133,11 +124,10 @@ pub fn apply_effect(
             let sid = registry
                 .resolve_skill(skill)
                 .map_err(|_| EffectError::UnknownSkill(skill.clone()))?;
-            let entry = world
-                .player
-                .skills
-                .entry(sid)
-                .or_insert(SkillValue { value: 0, modifier: 0 });
+            let entry = world.player.skills.entry(sid).or_insert(SkillValue {
+                value: 0,
+                modifier: 0,
+            });
             entry.value += amount;
         }
         EffectDef::AddNpcLiking { npc, delta } => {

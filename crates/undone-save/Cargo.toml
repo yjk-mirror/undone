@@ -6,6 +6,10 @@ edition = "2021"
 [dependencies]
 undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
+undone-packs  = { path = "../undone-packs" }
 serde         = { workspace = true }
 serde_json    = { workspace = true }
 thiserror     = { workspace = true }
+
+[dev-dependencies]
+slotmap = { workspace = true }

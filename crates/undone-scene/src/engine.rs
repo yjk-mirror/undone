@@ -68,12 +68,7 @@ impl SceneEngine {
     }
 
     /// Dispatch a command. The engine may push zero or more events.
-    pub fn send(
-        &mut self,
-        cmd: EngineCommand,
-        world: &mut World,
-        registry: &PackRegistry,
-    ) {
+    pub fn send(&mut self, cmd: EngineCommand, world: &mut World, registry: &PackRegistry) {
         match cmd {
             EngineCommand::StartScene(id) => {
                 self.start_scene(id, world, registry);
@@ -193,8 +188,7 @@ impl SceneEngine {
             }
         }
 
-        self.events
-            .push_back(EngineEvent::ActionsAvailable(views));
+        self.events.push_back(EngineEvent::ActionsAvailable(views));
     }
 
     fn run_npc_actions(&mut self, world: &mut World, registry: &PackRegistry) {
@@ -273,12 +267,7 @@ impl SceneEngine {
         }
     }
 
-    fn evaluate_next(
-        &mut self,
-        branches: Vec<NextBranch>,
-        world: &World,
-        registry: &PackRegistry,
-    ) {
+    fn evaluate_next(&mut self, branches: Vec<NextBranch>, world: &World, registry: &PackRegistry) {
         if branches.is_empty() {
             // No next branches — re-emit actions (loop)
             self.emit_actions(world, registry);
@@ -485,7 +474,11 @@ mod tests {
             &registry,
         );
 
-        assert_eq!(world.player.stress, stress_before - 1, "stress should have decreased by 1");
+        assert_eq!(
+            world.player.stress,
+            stress_before - 1,
+            "stress should have decreased by 1"
+        );
     }
 
     #[test]

@@ -1,0 +1,11 @@
+# Base pack schedule
+# Each [[slot]] defines a named timeslot available during the week.
+# The scheduler evaluates conditions and does weighted random selection.
+
+[[slot]]
+name = "free_time"
+
+  [[slot.events]]
+  scene     = "base::rain_shelter"
+  condition = "gd.week() > 0"
+  weight    = 10

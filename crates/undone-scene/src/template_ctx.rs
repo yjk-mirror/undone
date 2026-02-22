@@ -1,8 +1,4 @@
-use std::{
-    collections::HashSet,
-    fmt,
-    sync::Arc,
-};
+use std::{collections::HashSet, fmt, sync::Arc};
 
 use minijinja::{
     value::{Object, ObjectRepr, Value},
@@ -278,7 +274,10 @@ mod tests {
         let template = r#"{% if w.hasTrait("SHY") %}shy{% else %}bold{% endif %}"#;
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert!(result.contains("shy"), "expected 'shy' in '{result}'");
-        assert!(!result.contains("bold"), "did not expect 'bold' in '{result}'");
+        assert!(
+            !result.contains("bold"),
+            "did not expect 'bold' in '{result}'"
+        );
     }
 
     #[test]

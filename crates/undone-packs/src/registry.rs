@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use lasso::{Rodeo, Spur};
+use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
 use undone_domain::{NpcTraitId, SkillId, StatId, TraitId};
 
@@ -112,6 +112,24 @@ impl PackRegistry {
     /// Resolve a TraitId back to its string ID (spur → str). Used for template rendering.
     pub fn trait_id_to_str(&self, id: undone_domain::TraitId) -> &str {
         self.rodeo.resolve(&id.0)
+    }
+
+    /// Resolve any Spur back to its string. Used by the save system to build the id_strings
+    /// validation table.
+    pub fn resolve_spur(&self, spur: Spur) -> &str {
+        self.rodeo.resolve(&spur)
+    }
+
+    /// Return all interned strings in Spur-index order (index 0 first).
+    /// The save system records these so it can detect if the pack load order changed
+    /// between saving and loading.
+    pub fn all_interned_strings(&self) -> Vec<String> {
+        (0..self.rodeo.len())
+            .map(|i| {
+                let spur = Spur::try_from_usize(i).expect("valid spur index");
+                self.rodeo.resolve(&spur).to_string()
+            })
+            .collect()
     }
 }
 

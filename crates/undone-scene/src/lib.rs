@@ -1,13 +1,15 @@
 pub mod effects;
 pub mod engine;
 pub mod loader;
+pub mod scheduler;
 pub mod template_ctx;
 pub mod types;
 
 pub use effects::{apply_effect, EffectError};
 pub use engine::{ActionView, EngineCommand, EngineEvent, SceneEngine};
 pub use loader::{load_scenes, SceneLoadError};
-pub use types::{Action, EffectDef, NpcAction, NextBranch, SceneDefinition, SceneMeta, SceneToml};
+pub use scheduler::{load_schedule, Scheduler, SchedulerError};
+pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
 
 #[cfg(test)]
 mod integration_tests {
@@ -177,7 +179,10 @@ mod integration_tests {
 
         let mut world = make_world_with_shy(&registry);
         let npc_key = world.male_npcs.insert(make_male_npc());
-        assert_eq!(world.male_npcs[npc_key].core.pc_liking, LikingLevel::Neutral);
+        assert_eq!(
+            world.male_npcs[npc_key].core.pc_liking,
+            LikingLevel::Neutral
+        );
 
         let mut engine = SceneEngine::new(scenes);
 
@@ -187,11 +192,7 @@ mod integration_tests {
             &mut world,
             &registry,
         );
-        engine.send(
-            EngineCommand::SetActiveMale(npc_key),
-            &mut world,
-            &registry,
-        );
+        engine.send(EngineCommand::SetActiveMale(npc_key), &mut world, &registry);
         engine.drain();
 
         // Pick "main" (allow_npc_actions = true) — NPC should fire and set umbrella_offered.

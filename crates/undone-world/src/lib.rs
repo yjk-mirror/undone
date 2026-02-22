@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;
 use undone_domain::{FemaleNpc, FemaleNpcKey, MaleNpc, MaleNpcKey, Player};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct World {
     pub player: Player,
     pub male_npcs: SlotMap<MaleNpcKey, MaleNpc>,
