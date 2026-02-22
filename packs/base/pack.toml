@@ -1,0 +1,12 @@
+[pack]
+id       = "base"
+name     = "Base Game"
+version  = "0.1.0"
+author   = "Undone"
+requires = []
+
+[content]
+traits     = "data/traits.toml"
+npc_traits = "data/npc_traits.toml"
+skills     = "data/skills.toml"
+scenes_dir = "scenes/"

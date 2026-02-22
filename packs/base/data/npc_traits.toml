@@ -1,0 +1,83 @@
+[[trait]]
+id          = "CHARMING"
+name        = "Charming"
+description = "Reads the room well. Can fake warmth convincingly."
+hidden      = false
+
+[[trait]]
+id          = "SLEAZY"
+name        = "Sleazy"
+description = "Pushes past comfort faster."
+hidden      = false
+
+[[trait]]
+id          = "BOASTFUL"
+name        = "Boastful"
+description = "Redirects everything to himself."
+hidden      = false
+
+[[trait]]
+id          = "CRUDE"
+name        = "Crude"
+description = "Less filter between thought and mouth."
+hidden      = false
+
+[[trait]]
+id          = "TACITURN"
+name        = "Taciturn"
+description = "Minimal dialogue, communicates through implication."
+hidden      = false
+
+[[trait]]
+id          = "INTERESTING"
+name        = "Interesting"
+description = "Very interesting to talk to."
+hidden      = false
+
+[[trait]]
+id          = "DULL"
+name        = "Dull"
+description = "Really boring."
+hidden      = false
+
+[[trait]]
+id          = "HATES_CONDOMS"
+name        = "Hates Condoms"
+description = "Hates the thought of wearing a condom."
+hidden      = false
+
+[[trait]]
+id          = "CONSCIENTIOUS"
+name        = "Conscientious"
+description = "Can usually be trusted to use protection."
+hidden      = false
+
+[[trait]]
+id          = "WANTS_KIDS"
+name        = "Wants Kids"
+description = "Wants to have children."
+hidden      = false
+
+[[trait]]
+id          = "DOESNT_WANT_KIDS"
+name        = "Doesn't Want Kids"
+description = "Hates the thought of being responsible for children."
+hidden      = false
+
+[[trait]]
+id          = "VIRILE"
+name        = "Virile"
+description = "Unprotected sex with him is more likely to have consequences."
+hidden      = true
+
+[[trait]]
+id          = "INFERTILE"
+name        = "Infertile"
+description = "Cannot get anyone pregnant."
+hidden      = true
+
+[[trait]]
+id          = "IMPREGNATOR"
+name        = "Impregnator"
+description = "Likes getting girls pregnant."
+hidden      = true

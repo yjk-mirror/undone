@@ -1,0 +1,62 @@
+[[skill]]
+id          = "FITNESS"
+name        = "Fitness"
+description = "Physical health and capability."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "CHARM"
+name        = "Charm"
+description = "Social grace and likability."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "FASHION"
+name        = "Fashion"
+description = "Dress sense and style awareness."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "DANCE"
+name        = "Dance"
+description = "Ability to dance well."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "COOKING"
+name        = "Cooking"
+description = "Ability to prepare food."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "FEMININITY"
+name        = "Femininity"
+description = "Adaptation to female identity. Low = still adjusting."
+min         = -100
+max         = 100
+
+[[skill]]
+id          = "ADMIN"
+name        = "Paperwork"
+description = "Office and administrative competence."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "MANAGEMENT"
+name        = "Management"
+description = "Leadership and organisational ability."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "CHILDCARE"
+name        = "Childcare"
+description = "Skill at looking after children."
+min         = 0
+max         = 100

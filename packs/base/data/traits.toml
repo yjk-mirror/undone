@@ -1,0 +1,101 @@
+[[trait]]
+id          = "SHY"
+name        = "Shy"
+description = "Avoids eye contact, defers, gets flustered."
+hidden      = false
+
+[[trait]]
+id          = "POSH"
+name        = "Posh"
+description = "Notices class signals. Faintly superior."
+hidden      = false
+
+[[trait]]
+id          = "CUTE"
+name        = "Cute"
+description = "Genuine enthusiasm, easily delighted."
+hidden      = false
+
+[[trait]]
+id          = "SULTRY"
+name        = "Sultry"
+description = "Aware of her effect on people."
+hidden      = false
+
+[[trait]]
+id          = "BITCHY"
+name        = "Bitchy"
+description = "Low tolerance for nonsense."
+hidden      = false
+
+[[trait]]
+id          = "DOWN_TO_EARTH"
+name        = "Down to Earth"
+description = "Practical, unselfconscious."
+hidden      = false
+
+[[trait]]
+id          = "REFINED"
+name        = "Refined"
+description = "Sensitive to vulgarity."
+hidden      = false
+
+[[trait]]
+id          = "ROMANTIC"
+name        = "Romantic"
+description = "Takes things slightly more seriously than warranted."
+hidden      = false
+
+[[trait]]
+id          = "FLIRTY"
+name        = "Flirty"
+description = "Can't entirely help it."
+hidden      = false
+
+[[trait]]
+id          = "AMBITIOUS"
+name        = "Ambitious"
+description = "Goal-focused. Impatient with things that don't advance anything."
+hidden      = false
+
+[[trait]]
+id          = "OVERACTIVE_IMAGINATION"
+name        = "Overactive Imagination"
+description = "Takes situations to their logical conclusion."
+hidden      = false
+
+[[trait]]
+id          = "PLAIN"
+name        = "Plain"
+description = "A modelling career is out of the question."
+hidden      = false
+
+[[trait]]
+id          = "BEAUTIFUL"
+name        = "Beautiful"
+description = "Draws attention wherever she goes."
+hidden      = false
+
+[[trait]]
+id          = "BLOCK_ROUGH"
+name        = "Block Rough Content"
+description = "Player preference: no rough or non-consensual content."
+hidden      = true
+
+[[trait]]
+id          = "LIKES_ROUGH"
+name        = "Likes Rough Content"
+description = "Player preference: include rough content paths."
+hidden      = true
+
+[[trait]]
+id          = "ALWAYS_FEMALE"
+name        = "Always Female"
+description = "PC was never transformed — born female."
+hidden      = true
+
+[[trait]]
+id          = "NOT_TRANSFORMED"
+name        = "Not Transformed"
+description = "PC started as a woman (quickstart)."
+hidden      = true
