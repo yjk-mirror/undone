@@ -1,0 +1,149 @@
+use std::path::{Path, PathBuf};
+
+use thiserror::Error;
+
+use crate::{
+    data::{NpcTraitFile, SkillFile, TraitFile},
+    manifest::PackManifest,
+    registry::PackRegistry,
+};
+
+#[derive(Debug, Error)]
+pub enum PackLoadError {
+    #[error("io error reading {path}: {source}")]
+    Io {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+    #[error("toml parse error in {path}: {message}")]
+    Toml { path: PathBuf, message: String },
+    #[error("packs directory not found: {0}")]
+    PacksDirNotFound(PathBuf),
+}
+
+pub struct LoadedPackMeta {
+    pub manifest: PackManifest,
+    pub pack_dir: PathBuf,
+}
+
+pub fn load_packs(packs_dir: &Path) -> Result<(PackRegistry, Vec<LoadedPackMeta>), PackLoadError> {
+    if !packs_dir.exists() {
+        return Err(PackLoadError::PacksDirNotFound(packs_dir.to_path_buf()));
+    }
+
+    let mut registry = PackRegistry::new();
+    let mut metas = Vec::new();
+
+    let entries = std::fs::read_dir(packs_dir).map_err(|e| PackLoadError::Io {
+        path: packs_dir.to_path_buf(),
+        source: e,
+    })?;
+
+    for entry in entries {
+        let entry = entry.map_err(|e| PackLoadError::Io {
+            path: packs_dir.to_path_buf(),
+            source: e,
+        })?;
+        let pack_dir = entry.path();
+        if !pack_dir.is_dir() {
+            continue;
+        }
+        let manifest_path = pack_dir.join("pack.toml");
+        if !manifest_path.exists() {
+            continue;
+        }
+        let meta = load_one_pack(&mut registry, &pack_dir)?;
+        metas.push(meta);
+    }
+
+    Ok((registry, metas))
+}
+
+fn load_one_pack(
+    registry: &mut PackRegistry,
+    pack_dir: &Path,
+) -> Result<LoadedPackMeta, PackLoadError> {
+    let manifest_path = pack_dir.join("pack.toml");
+    let src = read_file(&manifest_path)?;
+    let manifest: PackManifest = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+        path: manifest_path.clone(),
+        message: e.to_string(),
+    })?;
+
+    let traits_path = pack_dir.join(&manifest.content.traits);
+    let src = read_file(&traits_path)?;
+    let trait_file: TraitFile = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+        path: traits_path.clone(),
+        message: e.to_string(),
+    })?;
+    registry.register_traits(trait_file.traits);
+
+    let npc_traits_path = pack_dir.join(&manifest.content.npc_traits);
+    let src = read_file(&npc_traits_path)?;
+    let npc_trait_file: NpcTraitFile = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+        path: npc_traits_path.clone(),
+        message: e.to_string(),
+    })?;
+    registry.register_npc_traits(npc_trait_file.traits);
+
+    let skills_path = pack_dir.join(&manifest.content.skills);
+    let src = read_file(&skills_path)?;
+    let skill_file: SkillFile = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+        path: skills_path.clone(),
+        message: e.to_string(),
+    })?;
+    registry.register_skills(skill_file.skill);
+
+    Ok(LoadedPackMeta {
+        manifest,
+        pack_dir: pack_dir.to_path_buf(),
+    })
+}
+
+fn read_file(path: &Path) -> Result<String, PackLoadError> {
+    std::fs::read_to_string(path).map_err(|e| PackLoadError::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    fn packs_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap() // exits crates/undone-packs/
+            .parent()
+            .unwrap() // exits crates/
+            .join("packs")
+    }
+
+    #[test]
+    fn loads_base_pack_traits() {
+        let (registry, metas) = load_packs(&packs_dir()).unwrap();
+        assert!(!metas.is_empty(), "should have at least one pack");
+        assert!(
+            registry.resolve_trait("SHY").is_ok(),
+            "SHY trait should be registered"
+        );
+    }
+
+    #[test]
+    fn loads_base_pack_skills() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert!(
+            registry.resolve_skill("FEMININITY").is_ok(),
+            "FEMININITY skill should be registered"
+        );
+    }
+
+    #[test]
+    fn error_on_nonexistent_dir() {
+        let result = load_packs(std::path::Path::new("/nonexistent/packs"));
+        assert!(result.is_err(), "should error on missing directory");
+    }
+}
