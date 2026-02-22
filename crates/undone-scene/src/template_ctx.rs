@@ -147,7 +147,13 @@ impl Object for SceneCtxView {
 
 fn string_arg(method: &str, args: &[Value], idx: usize) -> Result<String, Error> {
     match args.get(idx) {
-        Some(v) => Ok(v.to_string()),
+        Some(v) => match v.as_str() {
+            Some(s) => Ok(s.to_owned()),
+            None => Err(Error::new(
+                ErrorKind::InvalidOperation,
+                format!("'{method}' expects a string argument, got {v:?}"),
+            )),
+        },
         None => Err(Error::new(
             ErrorKind::MissingArgument,
             format!("'{method}' requires a string argument"),

@@ -114,7 +114,7 @@ mod integration_tests {
 
         // 2. Load scenes
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, "base", &registry).unwrap();
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
         assert!(scenes.contains_key("base::rain_shelter"));
 
         // 3. Create world with SHY player
@@ -173,7 +173,7 @@ mod integration_tests {
     fn rain_shelter_npc_fires_and_umbrella_becomes_available() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, "base", &registry).unwrap();
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
 
         let mut world = make_world_with_shy(&registry);
         let npc_key = world.male_npcs.insert(make_male_npc());

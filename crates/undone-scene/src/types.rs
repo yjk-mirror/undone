@@ -21,8 +21,6 @@ pub struct SceneMeta {
 #[derive(Debug, Deserialize)]
 pub struct IntroDef {
     pub prose: String,
-    #[serde(default)]
-    pub next: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -36,8 +34,6 @@ pub struct ActionDef {
     pub prose: String,
     #[serde(default)]
     pub allow_npc_actions: bool,
-    #[serde(default)]
-    pub use_default_actions: bool,
     #[serde(default)]
     pub effects: Vec<EffectDef>,
     #[serde(default)]

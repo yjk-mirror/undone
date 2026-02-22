@@ -40,7 +40,6 @@ pub enum SceneLoadError {
 /// Each file is parsed, validated and resolved against the pack registry.
 pub fn load_scenes(
     scenes_dir: &Path,
-    _pack_id: &str,
     registry: &PackRegistry,
 ) -> Result<HashMap<String, Arc<SceneDefinition>>, SceneLoadError> {
     if !scenes_dir.exists() {
@@ -122,10 +121,11 @@ fn resolve_action(
     registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<Action, SceneLoadError> {
-    let condition = match raw.condition {
-        Some(ref s) => Some(parse_condition(s, scene_id)?),
-        None => None,
-    };
+    let condition = raw
+        .condition
+        .as_deref()
+        .map(|s| parse_condition(s, scene_id))
+        .transpose()?;
 
     let mut next = Vec::with_capacity(raw.next.len());
     for nb in raw.next {
@@ -152,10 +152,11 @@ fn resolve_npc_action(
     registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<NpcAction, SceneLoadError> {
-    let condition = match raw.condition {
-        Some(ref s) => Some(parse_condition(s, scene_id)?),
-        None => None,
-    };
+    let condition = raw
+        .condition
+        .as_deref()
+        .map(|s| parse_condition(s, scene_id))
+        .transpose()?;
 
     validate_effects(&raw.effects, registry, scene_id)?;
 
@@ -172,10 +173,11 @@ fn resolve_next_branch(
     raw: NextBranchDef,
     scene_id: &str,
 ) -> Result<NextBranch, SceneLoadError> {
-    let condition = match raw.condition {
-        Some(ref s) => Some(parse_condition(s, scene_id)?),
-        None => None,
-    };
+    let condition = raw
+        .condition
+        .as_deref()
+        .map(|s| parse_condition(s, scene_id))
+        .transpose()?;
 
     Ok(NextBranch {
         condition,
@@ -195,6 +197,14 @@ fn validate_effects(
             EffectDef::AddTrait { trait_id } | EffectDef::RemoveTrait { trait_id } => {
                 registry
                     .resolve_trait(trait_id)
+                    .map_err(|_| SceneLoadError::UnknownTrait {
+                        scene_id: scene_id.to_string(),
+                        id: trait_id.clone(),
+                    })?;
+            }
+            EffectDef::AddNpcTrait { trait_id, .. } => {
+                registry
+                    .resolve_npc_trait(trait_id)
                     .map_err(|_| SceneLoadError::UnknownTrait {
                         scene_id: scene_id.to_string(),
                         id: trait_id.clone(),
@@ -236,7 +246,7 @@ mod tests {
     fn loads_rain_shelter_scene() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, "base", &registry).unwrap();
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
         assert!(scenes.contains_key("base::rain_shelter"));
     }
 
@@ -244,7 +254,7 @@ mod tests {
     fn rain_shelter_has_expected_actions() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, "base", &registry).unwrap();
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
         let scene = &scenes["base::rain_shelter"];
         let action_ids: Vec<&str> = scene.actions.iter().map(|a| a.id.as_str()).collect();
         assert!(action_ids.contains(&"main"));
@@ -255,7 +265,7 @@ mod tests {
     #[test]
     fn error_on_nonexistent_scenes_dir() {
         let registry = undone_packs::PackRegistry::new();
-        let result = load_scenes(std::path::Path::new("/no/such/dir"), "test", &registry);
+        let result = load_scenes(std::path::Path::new("/no/such/dir"), &registry);
         assert!(result.is_err());
     }
 }

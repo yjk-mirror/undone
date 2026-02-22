@@ -31,6 +31,7 @@ struct SceneFrame {
     ctx: SceneCtx,
 }
 
+#[derive(Debug)]
 pub enum EngineCommand {
     StartScene(String),
     ChooseAction(String),
@@ -38,6 +39,7 @@ pub enum EngineCommand {
     SetActiveFemale(FemaleNpcKey),
 }
 
+#[derive(Debug)]
 pub enum EngineEvent {
     ProseAdded(String),
     ActionsAvailable(Vec<ActionView>),
@@ -105,7 +107,7 @@ impl SceneEngine {
         let def = match self.scenes.get(&id) {
             Some(d) => Arc::clone(d),
             None => {
-                // Unknown scene — emit nothing, silently fail (could log)
+                eprintln!("[scene-engine] unknown scene: {id}");
                 return;
             }
         };
@@ -120,10 +122,7 @@ impl SceneEngine {
                 .push_back(EngineEvent::ProseAdded(format!("[template error: {e}]"))),
         }
 
-        self.stack.push(SceneFrame {
-            def: Arc::clone(&def),
-            ctx,
-        });
+        self.stack.push(SceneFrame { def, ctx });
 
         self.emit_actions(world, registry);
     }
@@ -157,7 +156,9 @@ impl SceneEngine {
         {
             let frame = self.stack.last_mut().unwrap();
             for effect in &action.effects {
-                let _ = apply_effect(effect, world, &mut frame.ctx, registry);
+                if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
+                    eprintln!("[scene-engine] effect error: {e}");
+                }
             }
         }
 
@@ -225,6 +226,9 @@ impl SceneEngine {
 
         // Weighted random selection
         let total_weight: u32 = npc_actions.iter().map(|(_, w)| w).sum();
+        if total_weight == 0 {
+            return;
+        }
         let mut roll = self.rng.gen_range(0..total_weight);
         let selected_idx = npc_actions
             .iter()
@@ -262,7 +266,9 @@ impl SceneEngine {
         {
             let frame = self.stack.last_mut().unwrap();
             for effect in &effects {
-                let _ = apply_effect(effect, world, &mut frame.ctx, registry);
+                if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
+                    eprintln!("[scene-engine] npc effect error: {e}");
+                }
             }
         }
     }
