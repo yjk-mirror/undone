@@ -4,7 +4,9 @@
       "type": "stdio",
       "command": "C:/Users/YJK/.claude/mcp-servers/rust-mcp/target/release/rustmcp.exe",
       "args": [],
-      "env": {}
+      "env": {
+        "RUST_ANALYZER_PATH": "C:/Users/YJK/.cargo/bin/rust-analyzer.exe"
+      }
     },
     "rhai": {
       "type": "stdio",
