@@ -2,18 +2,21 @@
 
 ## Current State
 
-**Phase:** Scene engine complete (branch `feature/scene-engine`).
+**Phase:** Scene engine merged to master. Ready for Scheduler.
 
-58 tests pass, zero clippy warnings.
+58 tests pass, zero clippy warnings. All work on `master`.
 
 Pack disk loader, expression evaluator wired to registry, typed effect system,
 minijinja prose rendering, and SceneEngine with event queue all implemented and tested.
+Code audit cleanup applied (effect error logging, zero-weight guard, dead code removal,
+loader validation, template correctness).
+
 Rain shelter scene demonstrates full end-to-end flow: load packs → load scene →
 start scene → NPC fires → condition gating → prose branching on traits → finish.
 
 ## Next Action
 
-Merge `feature/scene-engine` into `main`, then design and implement the **Scheduler** —
+Design and implement the **Scheduler** —
 weekly timeslots, weighted scene selection, pack-contributed event pools.
 
 ## Planned Future Sessions
@@ -40,3 +43,4 @@ weekly timeslots, weighted scene selection, pack-contributed event pools.
 | 2026-02-22 | Scaffold session: Tasks 4–13 complete. Parallel agents for Tasks 7–11. 30 tests pass. Scaffold done. |
 | 2026-02-22 | Scene engine: brainstorm + design. Flat pool model, event queue API, full backend scope. |
 | 2026-02-22 | Scene engine: 10-task implementation. Pack loader, eval wiring, effect system, minijinja templates, SceneEngine, rain shelter scene. 58 tests, 0 warnings. |
+| 2026-02-22 | Scene engine: code audit + cleanup. Merged to master, worktree removed. |
