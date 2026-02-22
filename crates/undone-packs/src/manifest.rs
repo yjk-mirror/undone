@@ -24,6 +24,8 @@ pub struct PackContent {
     pub scenes_dir: String,
     #[serde(default)]
     pub schedule_file: Option<String>,
+    #[serde(default)]
+    pub names_file: Option<String>,
 }
 
 #[cfg(test)]

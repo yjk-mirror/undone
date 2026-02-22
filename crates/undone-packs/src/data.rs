@@ -43,3 +43,9 @@ pub struct SkillDef {
     pub min: i32,
     pub max: i32,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct NamesFile {
+    pub male_names: Vec<String>,
+    pub female_names: Vec<String>,
+}

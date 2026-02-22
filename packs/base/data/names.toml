@@ -1,0 +1,15 @@
+male_names = [
+    "James", "Thomas", "William", "Oliver", "Harry", "Charlie", "George",
+    "Jack", "Henry", "Edward", "Arthur", "Frederick", "Albert", "Robert",
+    "John", "Michael", "David", "Richard", "Peter", "Samuel", "Daniel",
+    "Matthew", "Andrew", "Patrick", "Christopher", "Adam", "Benjamin",
+    "Joseph", "Luke", "Nathan"
+]
+
+female_names = [
+    "Emma", "Sophie", "Charlotte", "Grace", "Lily", "Olivia", "Emily",
+    "Amelia", "Chloe", "Hannah", "Mia", "Holly", "Jessica", "Isabelle",
+    "Lucy", "Ava", "Ellie", "Kate", "Daisy", "Poppy", "Abigail",
+    "Victoria", "Natalie", "Claire", "Rachel", "Laura", "Amy",
+    "Eleanor", "Zoe", "Jasmine"
+]

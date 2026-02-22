@@ -95,6 +95,17 @@ fn load_one_pack(
     })?;
     registry.register_skills(skill_file.skill);
 
+    if let Some(ref names_rel) = manifest.content.names_file {
+        let names_path = pack_dir.join(names_rel);
+        let src = read_file(&names_path)?;
+        let names_file: crate::data::NamesFile =
+            toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+                path: names_path.clone(),
+                message: e.to_string(),
+            })?;
+        registry.register_names(names_file.male_names, names_file.female_names);
+    }
+
     Ok(LoadedPackMeta {
         manifest,
         pack_dir: pack_dir.to_path_buf(),
@@ -145,5 +156,22 @@ mod tests {
     fn error_on_nonexistent_dir() {
         let result = load_packs(std::path::Path::new("/nonexistent/packs"));
         assert!(result.is_err(), "should error on missing directory");
+    }
+
+    #[test]
+    fn loads_base_pack_names() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert!(
+            !registry.male_names().is_empty(),
+            "should have loaded male names"
+        );
+        assert!(
+            !registry.female_names().is_empty(),
+            "should have loaded female names"
+        );
+        assert!(
+            registry.male_names().contains(&"James".to_string()),
+            "should include James"
+        );
     }
 }
