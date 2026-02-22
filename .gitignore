@@ -3,3 +3,8 @@ Cargo.lock
 *.DS_Store
 Thumbs.db
 .claude/settings.local.json
+
+# Override global gitignore — track docs and dot folders in this repo
+!*.md
+!.claude/
+!.claude/**
