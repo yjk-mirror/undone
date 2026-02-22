@@ -2,30 +2,47 @@
 
 ## Current State
 
-**Phase:** Scene engine merged to master. Ready for Scheduler.
+**Phase:** Scheduler + Save/Load merged to master. Backend complete.
 
-58 tests pass, zero clippy warnings. All work on `master`.
+70 tests pass, zero clippy warnings. All work on `master`.
 
-Pack disk loader, expression evaluator wired to registry, typed effect system,
-minijinja prose rendering, and SceneEngine with event queue all implemented and tested.
-Code audit cleanup applied (effect error logging, zero-weight guard, dead code removal,
-loader validation, template correctness).
+**Scheduler** (`undone-scene/src/scheduler.rs`):
+- `load_schedule(pack_metas)` → `Scheduler` — loads `schedule.toml` from each pack
+- `Scheduler::pick(slot, world, registry, rng)` → `Option<String>` — weighted random selection
+- Conditions use the existing expr evaluator with an empty SceneCtx
+- Base pack defines `free_time` slot with `rain_shelter` event (condition: `gd.week() > 0`)
+- 6 scheduler tests
 
-Rain shelter scene demonstrates full end-to-end flow: load packs → load scene →
-start scene → NPC fires → condition gating → prose branching on traits → finish.
+**Save/Load** (`undone-save/src/lib.rs`):
+- `save_game(world, registry, path)` — writes `SaveFile { version, id_strings, world }` as JSON
+- `load_game(path, registry)` — validates ID stability before returning `World`
+- ID validation: saved `id_strings` (Spur-index order) must match current registry
+- Errors: `IdMismatch` (pack content changed), `TooManyIds` (pack removed), `VersionMismatch`
+- 6 save tests including full round-trip
+
+**Supporting changes**:
+- `PackContent.schedule_file: Option<String>` in pack manifests
+- `PackRegistry::all_interned_strings()` for save ID validation
+- `World: Clone`
 
 ## Next Action
 
-Design and implement the **Scheduler** —
-weekly timeslots, weighted scene selection, pack-contributed event pools.
+**UI design session** — dedicated session. Typography, layout, choice presentation.
+The backend is complete. See UI Direction in engine-design.md.
+
+Note on open questions (from engine-design.md):
+- NPC spawning / pool seeding at game start — not yet designed
+- Character creation flow — not yet designed
+- `w.hasStuff()` returns false (StuffId registry stub) — needed when inventory matters
 
 ## Planned Future Sessions
 
 1. ~~Scene engine~~ ✅
-2. **Scheduler** — Weekly timeslots, weighted scene selection ← next
-3. **UI design** — Dedicated session; typography, layout, choice presentation (gtk4/relm4, slint, or floem — NOT egui)
-4. **Save / load** — serde JSON save format, versioning
-5. **Writing import** — Port and improve original prose from `newlife-plus`
+2. ~~Scheduler~~ ✅
+3. ~~Save / load~~ ✅
+4. **UI design** — Dedicated session; typography, layout, choice presentation (NOT egui — see engine-design.md)
+5. **NPC spawning + character creation** — needs design session first
+6. **Writing import** — Port and improve original prose from `newlife-plus`
 
 ## Agentic Workflow Reminder
 
@@ -44,3 +61,4 @@ weekly timeslots, weighted scene selection, pack-contributed event pools.
 | 2026-02-22 | Scene engine: brainstorm + design. Flat pool model, event queue API, full backend scope. |
 | 2026-02-22 | Scene engine: 10-task implementation. Pack loader, eval wiring, effect system, minijinja templates, SceneEngine, rain shelter scene. 58 tests, 0 warnings. |
 | 2026-02-22 | Scene engine: code audit + cleanup. Merged to master, worktree removed. |
+| 2026-02-22 | Autonomous session: Scheduler + Save/Load. 70 tests, 0 warnings. Merged to master. |
