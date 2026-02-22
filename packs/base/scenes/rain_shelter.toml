@@ -1,0 +1,67 @@
+[scene]
+id          = "base::rain_shelter"
+pack        = "base"
+description = "Caught in the rain at a bus shelter."
+
+[intro]
+prose = """
+The rain started ten minutes from home, a proper downpour that has soaked through your jacket.
+{% if w.hasTrait("SHY") %}
+You find a spot at the far end of the shelter and stare at the pavement, shoulders hunched.
+{% else %}
+You step into the shelter with a quick nod at the man already there. He nods back.
+{% endif %}
+"""
+
+[[actions]]
+id                = "main"
+label             = "Wait it out"
+detail            = "Stand here until it eases off."
+allow_npc_actions = true
+
+[[actions]]
+id        = "leave"
+label     = "Make a run for it"
+detail    = "Get soaked. At least you'll be moving."
+condition = "!scene.hasFlag('umbrella_offered')"
+prose     = "You pull your jacket over your head and step back out into it."
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "accept_umbrella"
+label     = "Share his umbrella"
+detail    = "Step closer. It's dry under there."
+condition = "scene.hasFlag('umbrella_offered')"
+prose     = """
+{% if w.hasTrait("SHY") %}
+"Thanks," you manage, stepping under with as little eye contact as possible.
+{% else %}
+"Cheers," you say, stepping in. He smells of coffee and damp wool.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[npc_actions]]
+id        = "offers_umbrella"
+condition = "!scene.hasFlag('umbrella_offered')"
+prose     = """
+The man clears his throat. "Want to share?" He tilts his umbrella slightly in your direction.
+"""
+weight = 10
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "umbrella_offered"
