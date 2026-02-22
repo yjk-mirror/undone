@@ -10,7 +10,12 @@
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy --workspace -- -D warnings 2>&1)",
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all -- --check 2>&1)",
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all 2>&1)",
-      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all -- --check 2>&1 && cargo clippy --workspace -- -D warnings 2>&1)"
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all -- --check 2>&1 && cargo clippy --workspace -- -D warnings 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test -p undone-packs 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy -p undone-packs -- -D warnings 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test -p undone-expr 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy -p undone-expr -p undone-packs -- -D warnings 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test --workspace 2>&1)"
     ]
   },
   "enableAllProjectMcpServers": true,
