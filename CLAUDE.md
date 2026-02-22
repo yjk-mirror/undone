@@ -35,6 +35,7 @@ begins at 75. The richest transformation writing lives in the 0–50 range.
 - `docs/plans/2026-02-21-scaffold.md` — 13-task implementation plan. The current
   work target.
 - `HANDOFF.md` — Current state and session log.
+- `docs/status.md` — Living scaffold progress tracker. Update after each task.
 
 ## Tech Stack
 
@@ -116,6 +117,56 @@ The evaluator will have `todo!()` stubs for `hasTrait()`, `getSkill()`, etc. at
 the end of the scaffold phase. **This is intentional.** These stubs get wired to
 `PackRegistry` in the scene engine session (after the scaffold). Do not try to
 complete them during the scaffold.
+
+## Agentic Workflow
+
+### Skills — required invocations
+
+| Situation | Required skill |
+|---|---|
+| Starting a plan | `superpowers:executing-plans` |
+| Before touching code on a plan | `superpowers:using-git-worktrees` (worktree per plan) |
+| Debugging any failure | `superpowers:systematic-debugging` |
+| About to claim done | `superpowers:verification-before-completion` |
+| Finishing a branch | `superpowers:finishing-a-development-branch` |
+
+### MCP Tools — use these instead of raw Bash
+
+**Rust** (prefer over `cargo` in Bash for per-file work):
+
+| Task | Tool |
+|---|---|
+| Check compilation errors | `mcp__rust__run_cargo_check` |
+| Diagnostics on a specific file after writing it | `mcp__rust__get_diagnostics` |
+| Format a file after writing it | `mcp__rust__format_code` |
+| Find references / definitions | `mcp__rust__find_references`, `mcp__rust__find_definition` |
+
+Still use `cargo test` / `cargo build --release` via Bash for workspace-wide commands
+and release builds — those don't have MCP equivalents.
+
+**Minijinja** (use after writing any `.j2` template):
+
+| Task | Tool |
+|---|---|
+| Validate template syntax | `mcp__minijinja__jinja_validate_template` |
+| Preview render with test data | `mcp__minijinja__jinja_render_preview` |
+
+**Rhai** (use after writing any `.rhai` script):
+
+| Task | Tool |
+|---|---|
+| Syntax check | `mcp__rhai__rhai_check_syntax` |
+| Full diagnostics with runtime errors | `mcp__rhai__rhai_get_diagnostics` |
+| Validate a file | `mcp__rhai__rhai_validate_script` |
+
+### Workflow for implementing a plan
+
+1. Invoke `superpowers:executing-plans`
+2. Invoke `superpowers:using-git-worktrees` — create a worktree for the plan
+3. Execute tasks in batches of ~3, reporting between batches
+4. After writing each `.rs` file: call `mcp__rust__get_diagnostics` + `mcp__rust__format_code`
+5. After writing each `.j2` file: call `mcp__minijinja__jinja_validate_template`
+6. When all tasks done: invoke `superpowers:finishing-a-development-branch`
 
 ## Dependency Direction (enforced, no cycles)
 

@@ -2,30 +2,26 @@
 
 ## Current State
 
-**Phase:** Agent tooling complete. Ready to scaffold.
+**Phase:** Scaffold in progress — Tasks 1–3 of 13 complete.
 
-No Rust game code exists yet. The workspace has not been initialised.
-MCP servers, PostToolUse hook, and skills are all wired — start a session from this
-directory and run `/mcp` to confirm `rust`, `rhai`, `minijinja` are all connected.
+Workspace initialised, domain enums and ID types exist. Rust code compiles.
+See `docs/status.md` for full task-by-task status.
 
 ## Next Action
 
-Execute the scaffold implementation plan:
+Continue scaffold — Tasks 4–13 remaining.
 
 ```
-docs/plans/2026-02-21-scaffold.md
+docs/plans/2026-02-21-scaffold.md   (plan)
+docs/status.md                       (progress tracker — update after each task)
 ```
 
-Use the `superpowers:executing-plans` skill. Work through Tasks 1–13 in order,
-committing at each task step.
+Use `superpowers:executing-plans`. Resume from **Task 4** (Player struct).
 
-**Prerequisites before starting:**
-- Rust toolchain installed (`rustup`, `cargo`) ✅
-- Rust LSP available (rust-analyzer) ✅
-- MCP servers running (verify with `/mcp`) — rebuild if binaries are stale:
-  ```bash
-  cd C:/Users/YJK/dev/mirror/undone-tools && cargo build --release
-  ```
+**Before starting implementation:**
+- MCP servers confirmed working (`rust`, `rhai`, `minijinja`) ✅
+- Use `mcp__rust__get_diagnostics` + `mcp__rust__format_code` after writing each `.rs` file
+- See CLAUDE.md "Agentic Workflow" section for full tooling rules
 
 ## What Was Completed (Design Session, 2026-02-21)
 
@@ -76,3 +72,4 @@ intentional. They get wired to `PackRegistry` in the scene engine session.
 |---|---|
 | 2026-02-21 | Design session: decompiled Newlife, designed Undone engine, wrote scaffold plan |
 | 2026-02-21 | Tooling session: built rhai-mcp-server (4 tools) + minijinja-mcp-server (3 tools) in undone-tools/, wired .mcp.json + PostToolUse hook + skills here. Smoke test pending (restart required for MCP). |
+| 2026-02-22 | Scaffold session: Tasks 1–3 complete (workspace, enums, ID types). MCP tooling confirmed working. Added agentic workflow rules to CLAUDE.md and docs/status.md as living tracker. |
