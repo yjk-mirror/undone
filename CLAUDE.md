@@ -32,10 +32,9 @@ begins at 75. The richest transformation writing lives in the 0–50 range.
 
 - `docs/plans/2026-02-21-engine-design.md` — Living architecture document. The
   authoritative design reference. **Update it when implementation reveals surprises.**
-- `docs/plans/2026-02-21-scaffold.md` — 13-task implementation plan. The current
-  work target.
-- `HANDOFF.md` — Current state and session log.
-- `docs/status.md` — Living scaffold progress tracker. Update after each task.
+- `docs/plans/2026-02-21-scaffold.md` — 13-task scaffold plan. ✅ Complete.
+- `HANDOFF.md` — Current state and session log. **Always read this first.**
+- `docs/status.md` — Scaffold progress history (all 13 tasks done).
 
 ## Tech Stack
 
@@ -101,8 +100,8 @@ Newlife layout. A dedicated design session will determine what makes this the mo
 engaging experience — typography, layout, how choices are presented, how the world
 and character state are surfaced.
 
-The scaffold (Tasks 1–13) produces only a minimal eframe window to confirm the
-stack compiles. Do not design the full UI during the scaffold.
+The scaffold produced a minimal eframe window (900×600, placeholder text, no logic).
+Do not iterate on the UI until the scene engine can run scenes end-to-end.
 
 ## Writing and Content
 
@@ -112,11 +111,13 @@ during the scaffold or engine sessions.
 
 ## Expression Parser Notes
 
-The scaffold implements the expression lexer, parser, and evaluator (Tasks 9–11).
-The evaluator will have `todo!()` stubs for `hasTrait()`, `getSkill()`, etc. at
-the end of the scaffold phase. **This is intentional.** These stubs get wired to
-`PackRegistry` in the scene engine session (after the scaffold). Do not try to
-complete them during the scaffold.
+The expression system (lexer + recursive descent parser + evaluator) is complete.
+The evaluator returns stub values (`false`/`0`) for `hasTrait()`, `getSkill()`,
+`hasStuff()`, `getStat()` — these are wired to `PackRegistry` in the scene engine
+session. The stubs are marked `// TODO: wire to registry` in `undone-expr/src/eval.rs`.
+
+One deviation from the original plan: `gd.week` was changed to `gd.week()` — the
+parser requires method-call syntax everywhere, and the original plan had an inconsistency.
 
 ## Agentic Workflow
 
@@ -167,6 +168,16 @@ and release builds — those don't have MCP equivalents.
 4. After writing each `.rs` file: call `mcp__rust__get_diagnostics` + `mcp__rust__format_code`
 5. After writing each `.j2` file: call `mcp__minijinja__jinja_validate_template`
 6. When all tasks done: invoke `superpowers:finishing-a-development-branch`
+
+### Dispatching background agents
+
+When using parallel background subagents (Task tool with `run_in_background: true`):
+- **Always** include `mode: "bypassPermissions"` — background agents cannot answer
+  permission prompts and will silently block on every Bash/Write/Edit call without it
+- **Never** have background agents commit to git — they may run concurrently and will
+  corrupt the index. Have them implement + test only; the lead commits after review.
+- Scope safety comes from the prompt, not the permission gate — be precise about
+  which files/crates each agent owns
 
 ## Dependency Direction (enforced, no cycles)
 
