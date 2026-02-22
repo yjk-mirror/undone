@@ -2,31 +2,25 @@
 
 ## Current State
 
-**Phase:** Scaffold complete. All 13 tasks done.
+**Phase:** Scene engine complete (branch `feature/scene-engine`).
 
-30 tests pass, zero clippy warnings, eframe window builds.
-See `docs/status.md` for full task-by-task history.
+58 tests pass, zero clippy warnings.
+
+Pack disk loader, expression evaluator wired to registry, typed effect system,
+minijinja prose rendering, and SceneEngine with event queue all implemented and tested.
+Rain shelter scene demonstrates full end-to-end flow: load packs → load scene →
+start scene → NPC fires → condition gating → prose branching on traits → finish.
 
 ## Next Action
 
-Design and implement the **scene engine** — the first post-scaffold session.
-
-Start with `superpowers:brainstorming` to design the scene engine, then
-`superpowers:writing-plans` for the implementation plan, then
-`superpowers:using-git-worktrees` before touching code.
-
-Key design questions for that session (pre-thought):
-- TOML scene format → `SceneDefinition` structs (already partially designed in engine-design.md)
-- Effect enum deserialization and execution against `&mut World`
-- Scene execution loop (action selection → prose rendering → effect application)
-- Wiring expression evaluator stubs to `PackRegistry` (hasTrait, getSkill)
-- Pack loader: walk `packs/` directory, load manifests, build registry
+Merge `feature/scene-engine` into `main`, then design and implement the **Scheduler** —
+weekly timeslots, weighted scene selection, pack-contributed event pools.
 
 ## Planned Future Sessions
 
-1. **Scene engine** ← next
-2. **Scheduler** — Weekly timeslots, weighted scene selection
-3. **UI design** — Dedicated session; typography, layout, choice presentation
+1. ~~Scene engine~~ ✅
+2. **Scheduler** — Weekly timeslots, weighted scene selection ← next
+3. **UI design** — Dedicated session; typography, layout, choice presentation (gtk4/relm4, slint, or floem — NOT egui)
 4. **Save / load** — serde JSON save format, versioning
 5. **Writing import** — Port and improve original prose from `newlife-plus`
 
@@ -44,3 +38,5 @@ Key design questions for that session (pre-thought):
 | 2026-02-21 | Tooling session: built rhai-mcp-server + minijinja-mcp-server, wired MCP + hooks |
 | 2026-02-22 | Scaffold session: Tasks 1–3 complete. MCP confirmed working. Added agentic workflow rules. |
 | 2026-02-22 | Scaffold session: Tasks 4–13 complete. Parallel agents for Tasks 7–11. 30 tests pass. Scaffold done. |
+| 2026-02-22 | Scene engine: brainstorm + design. Flat pool model, event queue API, full backend scope. |
+| 2026-02-22 | Scene engine: 10-task implementation. Pack loader, eval wiring, effect system, minijinja templates, SceneEngine, rain shelter scene. 58 tests, 0 warnings. |
