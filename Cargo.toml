@@ -37,6 +37,9 @@ anyhow      = "1"
 tracing            = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
+# RNG
+rand = { version = "0.8", features = ["small_rng"] }
+
 [package]
 name    = "undone"
 version = "0.1.0"

@@ -13,3 +13,4 @@ toml          = { workspace = true }
 minijinja     = { workspace = true }
 thiserror     = { workspace = true }
 anyhow        = { workspace = true }
+rand          = { workspace = true }

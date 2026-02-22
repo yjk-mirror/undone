@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
+undone-packs  = { path = "../undone-packs" }
 thiserror     = { workspace = true }
 
 [dev-dependencies]
