@@ -31,7 +31,7 @@ pub struct StatId(pub Spur);
 
 /// A scene ID — e.g. "base::rain_shelter"
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct SceneId(pub String);   // scene IDs are not interned (too varied)
+pub struct SceneId(pub String); // scene IDs are not interned (too varied)
 
 impl SceneId {
     pub fn new(s: impl Into<String>) -> Self {

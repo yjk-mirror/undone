@@ -121,7 +121,7 @@ mod tests {
     #[test]
     fn serde_roundtrip() {
         let level = ArousalLevel::Close;
-        let json  = serde_json::to_string(&level).unwrap();
+        let json = serde_json::to_string(&level).unwrap();
         let back: ArousalLevel = serde_json::from_str(&json).unwrap();
         assert_eq!(level, back);
     }

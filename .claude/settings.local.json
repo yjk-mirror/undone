@@ -1,13 +1,22 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo build 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test -p undone-domain 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo build -p undone-domain 2>&1)",
+      "mcp__rust__get_diagnostics",
+      "mcp__rust__format_code",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo build -p undone-world 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy --workspace -- -D warnings 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all -- --check 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo fmt --all -- --check 2>&1 && cargo clippy --workspace -- -D warnings 2>&1)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "rust",
     "rhai",
     "minijinja"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo build 2>&1)"
-    ]
-  }
+  ]
 }

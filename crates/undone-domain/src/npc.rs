@@ -1,7 +1,7 @@
 use crate::{
     Age, AlcoholLevel, ArousalLevel, AttractionLevel, Behaviour, BreastSize, CharTypeId,
-    LikingLevel, LoveLevel, MaleFigure, NpcTraitId, PersonalityId, PlayerFigure,
-    PregnancyState, RelationshipStatus,
+    LikingLevel, LoveLevel, MaleFigure, NpcTraitId, PersonalityId, PlayerFigure, PregnancyState,
+    RelationshipStatus,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -18,8 +18,8 @@ pub struct NpcCore {
 
     // Relationship state
     pub relationship: RelationshipStatus,
-    pub pc_liking: LikingLevel,     // PC's liking of NPC
-    pub npc_liking: LikingLevel,    // NPC's liking of PC
+    pub pc_liking: LikingLevel,  // PC's liking of NPC
+    pub npc_liking: LikingLevel, // NPC's liking of PC
     pub pc_love: LoveLevel,
     pub npc_love: LoveLevel,
     pub pc_attraction: AttractionLevel,
