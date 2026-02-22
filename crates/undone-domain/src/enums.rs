@@ -100,6 +100,23 @@ pub enum Age {
     Old,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Sexuality {
+    StraightMale,  // was attracted to women; now attracted to men = new territory
+    GayMale,       // was attracted to men; now attracted to men = familiar desire, new position
+    BiMale,        // was attracted to both
+    AlwaysFemale,  // always_female=true; before_sexuality is not applicable
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Personality {
+    Romantic,
+    Jerk,
+    Friend,
+    Intellectual,
+    Lad,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -124,5 +141,19 @@ mod tests {
         let json = serde_json::to_string(&level).unwrap();
         let back: ArousalLevel = serde_json::from_str(&json).unwrap();
         assert_eq!(level, back);
+    }
+
+    #[test]
+    fn sexuality_serde_roundtrip() {
+        let s = Sexuality::StraightMale;
+        let json = serde_json::to_string(&s).unwrap();
+        let back: Sexuality = serde_json::from_str(&json).unwrap();
+        assert_eq!(s, back);
+    }
+
+    #[test]
+    fn personality_is_eq() {
+        assert_eq!(Personality::Romantic, Personality::Romantic);
+        assert_ne!(Personality::Jerk, Personality::Friend);
     }
 }
