@@ -7,3 +7,6 @@ edition = "2021"
 undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
 thiserror     = { workspace = true }
+
+[dev-dependencies]
+slotmap = { workspace = true }
