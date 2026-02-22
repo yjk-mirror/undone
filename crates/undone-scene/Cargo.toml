@@ -14,3 +14,7 @@ minijinja     = { workspace = true }
 thiserror     = { workspace = true }
 anyhow        = { workspace = true }
 rand          = { workspace = true }
+
+[dev-dependencies]
+slotmap = { workspace = true }
+lasso   = { workspace = true }
