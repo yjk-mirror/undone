@@ -1,4 +1,4 @@
-use crate::{Age, AlcoholLevel, ArousalLevel, BreastSize, PlayerFigure, SkillId, StuffId, TraitId};
+use crate::{Age, AlcoholLevel, ArousalLevel, BreastSize, PlayerFigure, Sexuality, SkillId, StuffId, TraitId};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
@@ -36,8 +36,10 @@ pub struct PregnancyState {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
-    // Identity
-    pub name: String,
+    // Identity — three-name system (Lilith's Throne pattern)
+    pub name_fem: String,
+    pub name_androg: String,
+    pub name_masc: String,
     pub age: Age,
     pub race: String,
     pub figure: PlayerFigure,
@@ -77,9 +79,26 @@ pub struct Player {
     // Transformation axis
     pub always_female: bool, // false = male-start PC
     pub femininity: i32,     // 0–100, starts low for male-start
+
+    // Before-transformation data
+    pub before_age: u32,
+    pub before_race: String,
+    pub before_sexuality: Sexuality,
 }
 
 impl Player {
+    /// Returns the currently active display name based on femininity score.
+    /// 0–30 → masculine name, 31–69 → androgynous name, 70+ → feminine name.
+    pub fn active_name(&self) -> &str {
+        if self.femininity >= 70 {
+            &self.name_fem
+        } else if self.femininity >= 31 {
+            &self.name_androg
+        } else {
+            &self.name_masc
+        }
+    }
+
     pub fn has_trait(&self, id: TraitId) -> bool {
         self.traits.contains(&id)
     }
@@ -107,7 +126,12 @@ mod tests {
 
     fn make_player() -> Player {
         Player {
-            name: "Eva".into(),
+            name_fem: "Eva".into(),
+            name_androg: "Evan".into(),
+            name_masc: "Evan".into(),
+            before_age: 30,
+            before_race: "white".into(),
+            before_sexuality: crate::Sexuality::StraightMale,
             age: Age::LateTeen,
             race: "east_asian".into(),
             figure: PlayerFigure::Slim,
@@ -134,6 +158,32 @@ mod tests {
             always_female: false,
             femininity: 10,
         }
+    }
+
+    #[test]
+    fn active_name_picks_correct_variant() {
+        let mut p = make_player();
+        p.name_masc = "Evan".into();
+        p.name_androg = "Ev".into();
+        p.name_fem = "Eva".into();
+
+        p.femininity = 0;
+        assert_eq!(p.active_name(), "Evan");
+
+        p.femininity = 30;
+        assert_eq!(p.active_name(), "Evan");
+
+        p.femininity = 31;
+        assert_eq!(p.active_name(), "Ev");
+
+        p.femininity = 69;
+        assert_eq!(p.active_name(), "Ev");
+
+        p.femininity = 70;
+        assert_eq!(p.active_name(), "Eva");
+
+        p.femininity = 100;
+        assert_eq!(p.active_name(), "Eva");
     }
 
     #[test]

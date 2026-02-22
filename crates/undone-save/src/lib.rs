@@ -180,7 +180,12 @@ mod tests {
 
         World {
             player: Player {
-                name: "Eva".into(),
+                name_fem: "Eva".into(),
+                name_androg: "Ev".into(),
+                name_masc: "Evan".into(),
+                before_age: 30,
+                before_race: "white".into(),
+                before_sexuality: Sexuality::StraightMale,
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -225,7 +230,7 @@ mod tests {
         assert!(path.exists(), "save file should exist");
 
         let loaded = load_game(&path, &registry).expect("load should succeed");
-        assert_eq!(loaded.player.name, world.player.name);
+        assert_eq!(loaded.player.name_fem, world.player.name_fem);
         assert_eq!(loaded.player.stress, world.player.stress);
         assert_eq!(loaded.player.money, world.player.money);
         assert_eq!(loaded.player.femininity, world.player.femininity);
