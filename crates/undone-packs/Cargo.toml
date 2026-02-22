@@ -1,0 +1,13 @@
+[package]
+name    = "undone-packs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "../undone-domain" }
+undone-world  = { path = "../undone-world" }
+serde         = { workspace = true }
+toml          = { workspace = true }
+lasso         = { workspace = true }
+thiserror     = { workspace = true }
+anyhow        = { workspace = true }

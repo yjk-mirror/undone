@@ -1,0 +1,13 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "rust",
+    "rhai",
+    "minijinja"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo build 2>&1)"
+    ]
+  }
+}

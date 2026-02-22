@@ -1,0 +1,12 @@
+[package]
+name    = "undone-ui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "../undone-domain" }
+undone-world  = { path = "../undone-world" }
+undone-scene  = { path = "../undone-scene" }
+undone-packs  = { path = "../undone-packs" }
+egui          = { workspace = true }
+eframe        = { workspace = true }

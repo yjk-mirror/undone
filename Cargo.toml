@@ -1,0 +1,53 @@
+[workspace]
+members = [
+    "crates/undone-domain",
+    "crates/undone-world",
+    "crates/undone-packs",
+    "crates/undone-expr",
+    "crates/undone-scene",
+    "crates/undone-save",
+    "crates/undone-ui",
+    ".",
+]
+resolver = "2"
+
+[workspace.dependencies]
+# Serialisation
+serde       = { version = "1",    features = ["derive"] }
+serde_json  = "1"
+toml        = "0.8"
+
+# Data structures
+slotmap     = { version = "1",    features = ["serde"] }
+lasso       = { version = "0.7",  features = ["serialize"] }
+indexmap    = "2"
+
+# Template rendering
+minijinja   = "2"
+
+# GUI
+eframe      = "0.31"
+egui        = "0.31"
+
+# Error handling
+thiserror   = "2"
+anyhow      = "1"
+
+# Logging
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[package]
+name    = "undone"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "crates/undone-domain" }
+undone-world  = { path = "crates/undone-world" }
+undone-packs  = { path = "crates/undone-packs" }
+undone-scene  = { path = "crates/undone-scene" }
+undone-ui     = { path = "crates/undone-ui" }
+eframe        = { workspace = true }
+anyhow        = { workspace = true }
+tracing-subscriber = { workspace = true }

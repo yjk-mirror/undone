@@ -1,0 +1,9 @@
+[package]
+name    = "undone-world"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "../undone-domain" }
+serde         = { workspace = true }
+slotmap       = { workspace = true }

@@ -1,0 +1,15 @@
+[package]
+name    = "undone-scene"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "../undone-domain" }
+undone-world  = { path = "../undone-world" }
+undone-packs  = { path = "../undone-packs" }
+undone-expr   = { path = "../undone-expr" }
+serde         = { workspace = true }
+toml          = { workspace = true }
+minijinja     = { workspace = true }
+thiserror     = { workspace = true }
+anyhow        = { workspace = true }

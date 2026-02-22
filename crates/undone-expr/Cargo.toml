@@ -1,0 +1,9 @@
+[package]
+name    = "undone-expr"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+undone-domain = { path = "../undone-domain" }
+undone-world  = { path = "../undone-world" }
+thiserror     = { workspace = true }
