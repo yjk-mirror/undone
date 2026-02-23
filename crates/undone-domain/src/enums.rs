@@ -133,7 +133,10 @@ impl PcOrigin {
 
     /// Did this PC have a male body before transformation?
     pub fn was_male_bodied(self) -> bool {
-        matches!(self, PcOrigin::CisMaleTransformed | PcOrigin::TransWomanTransformed)
+        matches!(
+            self,
+            PcOrigin::CisMaleTransformed | PcOrigin::TransWomanTransformed
+        )
     }
 
     /// Should the "before" section show in character creation?
@@ -144,7 +147,10 @@ impl PcOrigin {
     /// For backward compat: equivalent to the old `always_female` bool.
     /// True for CisFemaleTransformed and AlwaysFemale.
     pub fn is_always_female(self) -> bool {
-        matches!(self, PcOrigin::CisFemaleTransformed | PcOrigin::AlwaysFemale)
+        matches!(
+            self,
+            PcOrigin::CisFemaleTransformed | PcOrigin::AlwaysFemale
+        )
     }
 }
 
@@ -263,7 +269,6 @@ impl std::fmt::Display for Age {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

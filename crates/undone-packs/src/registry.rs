@@ -26,6 +26,8 @@ pub struct PackRegistry {
     pub skill_defs: HashMap<SkillId, SkillDef>,
     male_names: Vec<String>,
     female_names: Vec<String>,
+    opening_scene: Option<String>,
+    default_slot: Option<String>,
 }
 
 impl PackRegistry {
@@ -37,6 +39,8 @@ impl PackRegistry {
             skill_defs: HashMap::new(),
             male_names: Vec::new(),
             female_names: Vec::new(),
+            opening_scene: None,
+            default_slot: None,
         }
     }
 
@@ -147,6 +151,11 @@ impl PackRegistry {
         PersonalityId(self.intern(id))
     }
 
+    /// Resolve a PersonalityId back to its string name.
+    pub fn personality_name(&self, id: PersonalityId) -> &str {
+        self.rodeo.resolve(&id.0)
+    }
+
     /// Resolve a PersonalityId to the engine Personality enum.
     /// Returns None for custom/unknown personalities.
     pub fn core_personality(&self, id: PersonalityId) -> Option<undone_domain::Personality> {
@@ -173,6 +182,32 @@ impl PackRegistry {
 
     pub fn female_names(&self) -> &[String] {
         &self.female_names
+    }
+
+    /// Set the opening scene ID for the first pack that declares one.
+    /// Subsequent packs cannot override it (first-writer wins).
+    pub fn set_opening_scene(&mut self, id: String) {
+        if self.opening_scene.is_none() {
+            self.opening_scene = Some(id);
+        }
+    }
+
+    /// Set the default scheduler slot for the first pack that declares one.
+    /// Subsequent packs cannot override it (first-writer wins).
+    pub fn set_default_slot(&mut self, slot: String) {
+        if self.default_slot.is_none() {
+            self.default_slot = Some(slot);
+        }
+    }
+
+    /// Return the opening scene ID declared by the pack, if any.
+    pub fn opening_scene(&self) -> Option<&str> {
+        self.opening_scene.as_deref()
+    }
+
+    /// Return the default scheduler slot declared by the pack, if any.
+    pub fn default_slot(&self) -> Option<&str> {
+        self.default_slot.as_deref()
     }
 
     /// Return all interned strings in Spur-index order (index 0 first).
@@ -254,6 +289,13 @@ mod tests {
         let mut reg = PackRegistry::new();
         let id = reg.intern_personality("CUSTOM_PACK_PERSONALITY");
         assert_eq!(reg.core_personality(id), None);
+    }
+
+    #[test]
+    fn personality_name_returns_string() {
+        let mut reg = PackRegistry::new();
+        let id = reg.intern_personality("ROMANTIC");
+        assert_eq!(reg.personality_name(id), "ROMANTIC");
     }
 
     #[test]

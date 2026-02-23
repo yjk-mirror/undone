@@ -15,6 +15,10 @@ use crate::{
     types::{Action, NextBranch, SceneDefinition},
 };
 
+/// Maximum scene transitions per command. Prevents both deep sub-scene stacks
+/// and flat goto cycles (where the stack stays at depth 1 but transitions loop).
+const MAX_TRANSITIONS_PER_COMMAND: usize = 32;
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -24,6 +28,9 @@ pub struct SceneEngine {
     stack: Vec<SceneFrame>,
     events: VecDeque<EngineEvent>,
     rng: SmallRng,
+    /// Counts scene transitions within a single `send()` call.
+    /// Reset at the start of each command. Guards against goto cycles.
+    transition_count: usize,
 }
 
 struct SceneFrame {
@@ -51,18 +58,18 @@ pub enum EngineEvent {
 pub struct NpcActivatedData {
     pub name: String,
     pub age: undone_domain::Age,
-    pub personality: undone_domain::PersonalityId,
+    pub personality: String,
     pub relationship: undone_domain::RelationshipStatus,
     pub pc_liking: undone_domain::LikingLevel,
     pub pc_attraction: undone_domain::AttractionLevel,
 }
 
-impl From<&undone_domain::NpcCore> for NpcActivatedData {
-    fn from(npc: &undone_domain::NpcCore) -> Self {
+impl NpcActivatedData {
+    pub fn from_npc(npc: &undone_domain::NpcCore, registry: &PackRegistry) -> Self {
         Self {
             name: npc.name.clone(),
             age: npc.age,
-            personality: npc.personality,
+            personality: registry.personality_name(npc.personality).to_owned(),
             relationship: npc.relationship.clone(),
             pc_liking: npc.pc_liking,
             pc_attraction: npc.pc_attraction,
@@ -88,11 +95,13 @@ impl SceneEngine {
             stack: Vec::new(),
             events: VecDeque::new(),
             rng: SmallRng::from_entropy(),
+            transition_count: 0,
         }
     }
 
     /// Dispatch a command. The engine may push zero or more events.
     pub fn send(&mut self, cmd: EngineCommand, world: &mut World, registry: &PackRegistry) {
+        self.transition_count = 0;
         match cmd {
             EngineCommand::StartScene(id) => {
                 self.start_scene(id, world, registry);
@@ -105,10 +114,9 @@ impl SceneEngine {
                     frame.ctx.active_male = Some(key);
                 }
                 if let Some(npc) = world.male_npc(key) {
-                    self.events
-                        .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from(
-                            &npc.core,
-                        ))));
+                    self.events.push_back(EngineEvent::NpcActivated(Some(
+                        NpcActivatedData::from_npc(&npc.core, registry),
+                    )));
                 }
             }
             EngineCommand::SetActiveFemale(key) => {
@@ -116,10 +124,9 @@ impl SceneEngine {
                     frame.ctx.active_female = Some(key);
                 }
                 if let Some(npc) = world.female_npc(key) {
-                    self.events
-                        .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from(
-                            &npc.core,
-                        ))));
+                    self.events.push_back(EngineEvent::NpcActivated(Some(
+                        NpcActivatedData::from_npc(&npc.core, registry),
+                    )));
                 }
             }
         }
@@ -131,14 +138,59 @@ impl SceneEngine {
     }
 
     // -----------------------------------------------------------------------
+    // Private: condition evaluation helper
+    // -----------------------------------------------------------------------
+
+    /// Evaluate a condition expression, logging errors and defaulting to false.
+    fn eval_condition(
+        expr: &undone_expr::parser::Expr,
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+        scene_id: &str,
+        context: &str,
+    ) -> bool {
+        match eval(expr, world, ctx, registry) {
+            Ok(val) => val,
+            Err(e) => {
+                eprintln!(
+                    "[scene-engine] condition error in scene '{}' ({}): {}",
+                    scene_id, context, e
+                );
+                false
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // Private: scene lifecycle
     // -----------------------------------------------------------------------
 
     fn start_scene(&mut self, id: String, world: &World, registry: &PackRegistry) {
+        self.transition_count += 1;
+        if self.transition_count > MAX_TRANSITIONS_PER_COMMAND {
+            eprintln!(
+                "[scene-engine] transition limit: {} transitions reached starting '{id}'",
+                self.transition_count
+            );
+            self.events.push_back(EngineEvent::ProseAdded(format!(
+                "[Engine error: exceeded {} scene transitions — possible cycle involving '{id}']",
+                MAX_TRANSITIONS_PER_COMMAND
+            )));
+            self.stack.clear();
+            self.events.push_back(EngineEvent::NpcActivated(None));
+            self.events.push_back(EngineEvent::SceneFinished);
+            return;
+        }
+
         let def = match self.scenes.get(&id) {
             Some(d) => Arc::clone(d),
             None => {
                 eprintln!("[scene-engine] unknown scene: {id}");
+                self.events.push_back(EngineEvent::ProseAdded(format!(
+                    "[Error: scene not found: '{id}']"
+                )));
+                self.events.push_back(EngineEvent::SceneFinished);
                 return;
             }
         };
@@ -215,7 +267,14 @@ impl SceneEngine {
         let mut views = Vec::new();
         for action in &frame.def.actions {
             let visible = match &action.condition {
-                Some(expr) => eval(expr, world, &frame.ctx, registry).unwrap_or(false),
+                Some(expr) => Self::eval_condition(
+                    expr,
+                    world,
+                    &frame.ctx,
+                    registry,
+                    &frame.def.id,
+                    &format!("action '{}'", action.id),
+                ),
                 None => true,
             };
             if visible {
@@ -241,7 +300,14 @@ impl SceneEngine {
                 .enumerate()
                 .filter_map(|(i, na)| {
                     let eligible = match &na.condition {
-                        Some(expr) => eval(expr, world, &frame.ctx, registry).unwrap_or(false),
+                        Some(expr) => Self::eval_condition(
+                            expr,
+                            world,
+                            &frame.ctx,
+                            registry,
+                            &frame.def.id,
+                            &format!("npc_action '{}'", na.id),
+                        ),
                         None => true,
                     };
                     if eligible {
@@ -320,7 +386,14 @@ impl SceneEngine {
             let condition_passes = match &branch.condition {
                 Some(expr) => {
                     let frame = self.stack.last().expect("engine stack must not be empty");
-                    eval(expr, world, &frame.ctx, registry).unwrap_or(false)
+                    Self::eval_condition(
+                        expr,
+                        world,
+                        &frame.ctx,
+                        registry,
+                        &frame.def.id,
+                        "next branch",
+                    )
                 }
                 None => true,
             };
@@ -359,7 +432,6 @@ mod tests {
     use super::*;
     use std::collections::{HashMap, HashSet};
 
-    use lasso::Key;
     use slotmap::SlotMap;
     use undone_domain::*;
     use undone_world::{GameData, World};
@@ -625,7 +697,8 @@ mod tests {
         let scene = make_simple_scene();
         let mut engine = make_engine_with(scene);
         let mut world = make_world();
-        let registry = undone_packs::PackRegistry::new();
+        let mut registry = undone_packs::PackRegistry::new();
+        let personality_id = registry.intern_personality("ROMANTIC");
 
         let npc = MaleNpc {
             core: NpcCore {
@@ -634,7 +707,7 @@ mod tests {
                 race: "white".into(),
                 eye_colour: "blue".into(),
                 hair_colour: "brown".into(),
-                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                personality: personality_id,
                 traits: HashSet::new(),
                 relationship: RelationshipStatus::Stranger,
                 pc_liking: LikingLevel::Neutral,
@@ -702,6 +775,134 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::NpcActivated(None))),
             "expected NpcActivated(None) on scene finish"
+        );
+    }
+
+    #[test]
+    fn goto_transition_works_normally() {
+        // Verify that a single goto transition (the common case) works
+        // correctly and is not blocked by the transition guard.
+        let scene_a = SceneDefinition {
+            id: "test::a".into(),
+            pack: "test".into(),
+            intro_prose: "A".into(),
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: Some("test::b".into()),
+                    finish: false,
+                }],
+            }],
+            npc_actions: vec![],
+        };
+        let scene_b = SceneDefinition {
+            id: "test::b".into(),
+            pack: "test".into(),
+            intro_prose: "B".into(),
+            actions: vec![Action {
+                id: "wait".into(),
+                label: "Wait".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![],
+            }],
+            npc_actions: vec![],
+        };
+
+        let mut scenes = HashMap::new();
+        scenes.insert("test::a".into(), Arc::new(scene_a));
+        scenes.insert("test::b".into(), Arc::new(scene_b));
+        let mut engine = SceneEngine::new(scenes);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::a".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("go".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        // Should have transitioned to scene B: intro prose + actions
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::ProseAdded(s) if s == "B")),
+            "expected scene B intro prose"
+        );
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::ActionsAvailable(v) if v.iter().any(|a| a.id == "wait"))),
+            "expected scene B actions"
+        );
+        // No error prose
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::ProseAdded(s) if s.contains("exceeded"))),
+            "normal goto should not trigger transition guard"
+        );
+    }
+
+    #[test]
+    fn transition_guard_constant_is_reasonable() {
+        // Verify the transition guard constant exists and is bounded.
+        // The guard protects against future code paths that could cause
+        // recursive transitions (currently the engine architecture only
+        // allows one transition per command via goto). This is defensive
+        // programming per engineering principle #5 (bounded resources).
+        assert!(
+            MAX_TRANSITIONS_PER_COMMAND >= 8,
+            "limit too low — would block legitimate scene chains"
+        );
+        assert!(
+            MAX_TRANSITIONS_PER_COMMAND <= 128,
+            "limit too high — would allow runaway before tripping"
+        );
+    }
+
+    #[test]
+    fn start_unknown_scene_emits_error_and_finishes() {
+        let mut engine = SceneEngine::new(HashMap::new());
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("nonexistent::scene".into()),
+            &mut world,
+            &registry,
+        );
+
+        let events = engine.drain();
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::ProseAdded(s) if s.contains("not found"))),
+            "expected error prose for unknown scene"
+        );
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::SceneFinished)),
+            "expected SceneFinished for unknown scene"
         );
     }
 }

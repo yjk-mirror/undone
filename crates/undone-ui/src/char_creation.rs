@@ -197,7 +197,11 @@ fn section_who_you_are(signals: AppSignals, form: CharFormSignals) -> impl View 
             signals,
             Dropdown::new_rw(
                 form.figure,
-                vec![PlayerFigure::Slim, PlayerFigure::Toned, PlayerFigure::Womanly],
+                vec![
+                    PlayerFigure::Slim,
+                    PlayerFigure::Toned,
+                    PlayerFigure::Womanly,
+                ],
             )
             .style(dropdown_style(signals)),
         ),
@@ -309,8 +313,7 @@ fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
         },
     );
 
-    v_stack((section_title("Your Past", signals), step1, step2_and_fields))
-        .style(section_style())
+    v_stack((section_title("Your Past", signals), step1, step2_and_fields)).style(section_style())
 }
 
 // ── section: Personality ──────────────────────────────────────────────────────
@@ -365,7 +368,11 @@ fn section_personality(signals: AppSignals, form: CharFormSignals) -> impl View 
             trait_checkbox("Sultry", form.trait_sultry, signals),
             trait_checkbox("Down to Earth", form.trait_down_to_earth, signals),
         ))
-        .style(|s| s.gap(16.0).margin_bottom(8.0).flex_wrap(floem::style::FlexWrap::Wrap)),
+        .style(|s| {
+            s.gap(16.0)
+                .margin_bottom(8.0)
+                .flex_wrap(floem::style::FlexWrap::Wrap)
+        }),
         h_stack((
             trait_checkbox("Bitchy", form.trait_bitchy, signals),
             trait_checkbox("Refined", form.trait_refined, signals),
@@ -413,17 +420,16 @@ fn section_content_prefs(signals: AppSignals, form: CharFormSignals) -> impl Vie
                 .margin_bottom(10.0)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
-        Checkbox::labeled_rw(form.likes_rough, || {
-            "I enjoy rougher content".to_string()
-        })
-        .style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.items_center()
-                .gap(8.0)
-                .font_size(14.0)
-                .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
-        }),
+        Checkbox::labeled_rw(form.likes_rough, || "I enjoy rougher content".to_string()).style(
+            move |s| {
+                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                s.items_center()
+                    .gap(8.0)
+                    .font_size(14.0)
+                    .color(colors.ink)
+                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+            },
+        ),
     ))
     .style(section_style())
 }
@@ -464,11 +470,7 @@ fn build_begin_button(
             );
 
             // Resolve before_age
-            let before_age: u32 = form
-                .before_age_str
-                .get_untracked()
-                .parse()
-                .unwrap_or(28);
+            let before_age: u32 = form.before_age_str.get_untracked().parse().unwrap_or(28);
 
             // before_sexuality only set for male-bodied origins
             let before_sexuality = if origin.was_male_bodied() {
@@ -624,8 +626,16 @@ fn radio_opt(
 ) -> impl View {
     let indicator = empty().style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        let bg = if is_active() { colors.lamp } else { colors.page_raised };
-        let border_col = if is_active() { colors.lamp } else { colors.seam };
+        let bg = if is_active() {
+            colors.lamp
+        } else {
+            colors.page_raised
+        };
+        let border_col = if is_active() {
+            colors.lamp
+        } else {
+            colors.seam
+        };
         s.width(13.0)
             .height(13.0)
             .border_radius(7.0)

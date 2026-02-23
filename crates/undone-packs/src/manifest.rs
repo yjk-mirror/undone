@@ -14,6 +14,10 @@ pub struct PackMeta {
     pub author: String,
     #[serde(default)]
     pub requires: Vec<String>,
+    #[serde(default)]
+    pub opening_scene: Option<String>,
+    #[serde(default)]
+    pub default_slot: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -43,6 +47,8 @@ mod tests {
             version  = "0.1.0"
             author   = "Undone"
             requires = []
+            opening_scene = "base::rain_shelter"
+            default_slot  = "free_time"
 
             [content]
             traits     = "data/traits.toml"
@@ -53,5 +59,10 @@ mod tests {
         let manifest: PackManifest = toml::from_str(src).unwrap();
         assert_eq!(manifest.pack.id, "base");
         assert_eq!(manifest.content.scenes_dir, "scenes/");
+        assert_eq!(
+            manifest.pack.opening_scene.as_deref(),
+            Some("base::rain_shelter")
+        );
+        assert_eq!(manifest.pack.default_slot.as_deref(), Some("free_time"));
     }
 }

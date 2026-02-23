@@ -228,13 +228,16 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                 ref mut engine,
                                 ref mut world,
                                 ref registry,
+                                ref opening_scene,
                                 ..
                             } = *gs;
-                            engine.send(
-                                EngineCommand::StartScene("base::rain_shelter".into()),
-                                world,
-                                registry,
-                            );
+                            if let Some(scene_id) = opening_scene {
+                                engine.send(
+                                    EngineCommand::StartScene(scene_id.clone()),
+                                    world,
+                                    registry,
+                                );
+                            }
                             let events = engine.drain();
                             (events, fem_id)
                         }; // RefMut dropped here
@@ -253,15 +256,13 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 // --- Delete button ---
                 let delete_btn = label(|| "Delete".to_string())
                     .keyboard_navigable()
-                    .on_click_stop(move |_| {
-                        match std::fs::remove_file(&entry_path_delete) {
-                            Ok(()) => {
-                                save_list.set(list_saves());
-                                status_msg.set(String::new());
-                            }
-                            Err(e) => {
-                                status_msg.set(format!("Delete failed: {e}"));
-                            }
+                    .on_click_stop(move |_| match std::fs::remove_file(&entry_path_delete) {
+                        Ok(()) => {
+                            save_list.set(list_saves());
+                            status_msg.set(String::new());
+                        }
+                        Err(e) => {
+                            status_msg.set(format!("Delete failed: {e}"));
                         }
                     })
                     .style(move |s| small_action_btn_style(s, signals));
@@ -327,8 +328,9 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     });
 
     // --- Scrollable list area ---
-    let list_area = scroll(v_stack((entries_list, empty_label)).style(|s| s.padding(16.0).width_full()))
-        .style(|s| s.flex_grow(1.0).width_full());
+    let list_area =
+        scroll(v_stack((entries_list, empty_label)).style(|s| s.padding(16.0).width_full()))
+            .style(|s| s.flex_grow(1.0).width_full());
 
     v_stack((top_bar, list_area)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);

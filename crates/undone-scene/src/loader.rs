@@ -34,6 +34,12 @@ pub enum SceneLoadError {
     UnknownSkill { scene_id: String, id: String },
     #[error("scenes directory not found: {0}")]
     DirNotFound(PathBuf),
+    #[error("unknown goto target '{target}' in scene {scene_id}, action {action_id}")]
+    UnknownGotoTarget {
+        scene_id: String,
+        action_id: String,
+        target: String,
+    },
 }
 
 /// Load all `.toml` scene files from `scenes_dir`.
@@ -79,6 +85,29 @@ pub fn load_scenes(
     }
 
     Ok(map)
+}
+
+/// Validate that all `goto` targets in all scenes reference existing scene IDs.
+/// Call this after all packs' scenes have been loaded into the combined map.
+pub fn validate_cross_references(
+    scenes: &HashMap<String, Arc<SceneDefinition>>,
+) -> Result<(), SceneLoadError> {
+    for (scene_id, def) in scenes {
+        for action in &def.actions {
+            for branch in &action.next {
+                if let Some(ref target) = branch.goto {
+                    if !scenes.contains_key(target) {
+                        return Err(SceneLoadError::UnknownGotoTarget {
+                            scene_id: scene_id.clone(),
+                            action_id: action.id.clone(),
+                            target: target.clone(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn resolve_scene(
@@ -264,5 +293,80 @@ mod tests {
         let registry = undone_packs::PackRegistry::new();
         let result = load_scenes(std::path::Path::new("/no/such/dir"), &registry);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn validates_goto_cross_references() {
+        use crate::types::{Action, NextBranch, SceneDefinition};
+        use std::sync::Arc;
+
+        let scene_a = Arc::new(SceneDefinition {
+            id: "test::a".into(),
+            pack: "test".into(),
+            intro_prose: "A".into(),
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: Some("test::nonexistent".into()),
+                    finish: false,
+                }],
+            }],
+            npc_actions: vec![],
+        });
+
+        let mut scenes = HashMap::new();
+        scenes.insert("test::a".into(), scene_a);
+
+        let result = validate_cross_references(&scenes);
+        assert!(result.is_err(), "should reject unknown goto target");
+    }
+
+    #[test]
+    fn valid_goto_passes_cross_reference_check() {
+        use crate::types::{Action, NextBranch, SceneDefinition};
+        use std::sync::Arc;
+
+        let scene_a = Arc::new(SceneDefinition {
+            id: "test::a".into(),
+            pack: "test".into(),
+            intro_prose: "A".into(),
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: Some("test::b".into()),
+                    finish: false,
+                }],
+            }],
+            npc_actions: vec![],
+        });
+
+        let scene_b = Arc::new(SceneDefinition {
+            id: "test::b".into(),
+            pack: "test".into(),
+            intro_prose: "B".into(),
+            actions: vec![],
+            npc_actions: vec![],
+        });
+
+        let mut scenes = HashMap::new();
+        scenes.insert("test::a".into(), scene_a);
+        scenes.insert("test::b".into(), scene_b);
+
+        let result = validate_cross_references(&scenes);
+        assert!(result.is_ok(), "valid goto should pass");
     }
 }

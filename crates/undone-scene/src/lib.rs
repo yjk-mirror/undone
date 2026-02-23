@@ -7,7 +7,7 @@ pub mod types;
 
 pub use effects::{apply_effect, EffectError};
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
-pub use loader::{load_scenes, SceneLoadError};
+pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
 pub use scheduler::{load_schedule, Scheduler, SchedulerError};
 pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
 

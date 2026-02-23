@@ -32,6 +32,8 @@ pub struct GameState {
     pub rng: SmallRng,
     /// Set when pack loading fails; checked by app_view to surface the error.
     pub init_error: Option<String>,
+    pub opening_scene: Option<String>,
+    pub default_slot: Option<String>,
 }
 
 /// Resolve the packs directory. Tries:
@@ -79,6 +81,19 @@ pub fn init_game() -> PreGameState {
         }
     }
 
+    // Validate cross-references between scenes
+    if let Err(e) = undone_scene::loader::validate_cross_references(&scenes) {
+        let msg = format!("Scene validation error: {e}");
+        eprintln!("[init] {msg}");
+        return PreGameState {
+            registry,
+            scenes,
+            scheduler: Scheduler::empty(),
+            rng: SmallRng::from_entropy(),
+            init_error: Some(msg),
+        };
+    }
+
     // Build scheduler from all pack metas
     let scheduler = match load_schedule(&metas) {
         Ok(s) => s,
@@ -108,6 +123,8 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         mut rng,
         init_error,
     } = pre;
+    let opening_scene = registry.opening_scene().map(|s| s.to_owned());
+    let default_slot = registry.default_slot().map(|s| s.to_owned());
     let world = new_game(config, &mut registry, &mut rng);
     let engine = SceneEngine::new(scenes);
     GameState {
@@ -117,6 +134,8 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         scheduler,
         rng,
         init_error,
+        opening_scene,
+        default_slot,
     }
 }
 
@@ -172,6 +191,8 @@ pub fn error_game_state(msg: String) -> GameState {
         scheduler: Scheduler::empty(),
         rng: SmallRng::from_entropy(),
         init_error: Some(msg),
+        opening_scene: None,
+        default_slot: None,
     }
 }
 

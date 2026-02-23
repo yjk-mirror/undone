@@ -42,8 +42,8 @@ fn markdown_to_text_layout(
 
     // Flush the in-progress span up to `pos`, pushing it to `spans`.
     let flush = |pos: usize,
-                     span_start: &mut Option<(usize, bool, bool, Option<f32>)>,
-                     spans: &mut Vec<(usize, usize, bool, bool, Option<f32>)>| {
+                 span_start: &mut Option<(usize, bool, bool, Option<f32>)>,
+                 spans: &mut Vec<(usize, usize, bool, bool, Option<f32>)>| {
         if let Some((start, b, i, sz)) = span_start.take() {
             if pos > start {
                 spans.push((start, pos, b, i, sz));
@@ -190,6 +190,7 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref registry,
         ref scheduler,
         ref mut rng,
+        ref default_slot,
         ..
     } = *gs;
     engine.send(EngineCommand::ChooseAction(action_id), world, registry);
@@ -199,7 +200,8 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
     if let Ok(femininity_id) = registry.resolve_skill("FEMININITY") {
         let finished = crate::process_events(events, signals, world, femininity_id);
         if finished {
-            if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
+            let slot = default_slot.as_deref().unwrap_or("free_time");
+            if let Some(scene_id) = scheduler.pick(slot, world, registry, rng) {
                 engine.send(EngineCommand::StartScene(scene_id), world, registry);
                 let events = engine.drain();
                 crate::process_events(events, signals, world, femininity_id);
@@ -234,6 +236,8 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         false
     };
 
+    let scroll_gen = signals.scroll_gen;
+
     let prose_label = rich_text(move || {
         let prefs = signals.prefs.get();
         let colors = ThemeColors::from_mode(prefs.mode);
@@ -251,6 +255,10 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
     let scroll_area = scroll(centered_prose)
+        .scroll_to_percent(move || {
+            scroll_gen.get();
+            100.0
+        })
         .scroll_style(|s| s.shrink_to_fit())
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);

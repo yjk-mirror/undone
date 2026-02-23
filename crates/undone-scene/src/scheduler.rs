@@ -113,7 +113,16 @@ impl Scheduler {
             .filter(|e| {
                 e.weight > 0
                     && match &e.condition {
-                        Some(expr) => eval(expr, world, &ctx, registry).unwrap_or(false),
+                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                            Ok(val) => val,
+                            Err(err) => {
+                                eprintln!(
+                                    "[scheduler] condition error in slot '{}', scene '{}': {}",
+                                    slot_name, e.scene, err
+                                );
+                                false
+                            }
+                        },
                         None => true,
                     }
             })

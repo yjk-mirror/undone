@@ -71,6 +71,13 @@ fn load_one_pack(
         message: e.to_string(),
     })?;
 
+    if let Some(ref scene) = manifest.pack.opening_scene {
+        registry.set_opening_scene(scene.clone());
+    }
+    if let Some(ref slot) = manifest.pack.default_slot {
+        registry.set_default_slot(slot.clone());
+    }
+
     let traits_path = pack_dir.join(&manifest.content.traits);
     let src = read_file(&traits_path)?;
     let trait_file: TraitFile = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
@@ -193,5 +200,17 @@ mod tests {
             registry.male_names().contains(&"James".to_string()),
             "should include James"
         );
+    }
+
+    #[test]
+    fn base_pack_has_opening_scene() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert_eq!(registry.opening_scene(), Some("base::rain_shelter"));
+    }
+
+    #[test]
+    fn base_pack_has_default_slot() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert_eq!(registry.default_slot(), Some("free_time"));
     }
 }

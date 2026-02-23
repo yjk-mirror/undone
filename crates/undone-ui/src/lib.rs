@@ -48,6 +48,7 @@ pub struct AppSignals {
     pub prefs: RwSignal<UserPrefs>,
     pub tab: RwSignal<AppTab>,
     pub phase: RwSignal<AppPhase>,
+    pub scroll_gen: RwSignal<u64>,
 }
 
 impl Default for AppSignals {
@@ -66,6 +67,7 @@ impl AppSignals {
             prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
             phase: RwSignal::new(AppPhase::CharCreation),
+            scroll_gen: RwSignal::new(0),
         }
     }
 }
@@ -147,12 +149,10 @@ pub fn app_view() -> impl View {
     let content = dyn_container(
         move || phase.get(),
         move |current_phase| match current_phase {
-            AppPhase::CharCreation => char_creation_view(
-                signals,
-                Rc::clone(&pre_state_cc),
-                Rc::clone(&game_state_cc),
-            )
-            .into_any(),
+            AppPhase::CharCreation => {
+                char_creation_view(signals, Rc::clone(&pre_state_cc), Rc::clone(&game_state_cc))
+                    .into_any()
+            }
             AppPhase::InGame => {
                 // On first transition to InGame, start the opening scene.
                 let gs_ref = Rc::clone(&game_state_ig);
@@ -167,19 +167,23 @@ pub fn app_view() -> impl View {
                                     ref registry,
                                     ref scheduler,
                                     ref mut rng,
+                                    ref opening_scene,
+                                    ref default_slot,
                                     ..
                                 } = *gs;
-                                engine.send(
-                                    EngineCommand::StartScene("base::rain_shelter".into()),
-                                    world,
-                                    registry,
-                                );
+                                if let Some(scene_id) = opening_scene {
+                                    engine.send(
+                                        EngineCommand::StartScene(scene_id.clone()),
+                                        world,
+                                        registry,
+                                    );
+                                }
                                 let events = engine.drain();
-                                let finished =
-                                    process_events(events, signals, world, fem_id);
+                                let finished = process_events(events, signals, world, fem_id);
                                 if finished {
+                                    let slot = default_slot.as_deref().unwrap_or("free_time");
                                     if let Some(scene_id) =
-                                        scheduler.pick("free_time", world, registry, rng)
+                                        scheduler.pick(slot, world, registry, rng)
                                     {
                                         engine.send(
                                             EngineCommand::StartScene(scene_id),
@@ -205,27 +209,21 @@ pub fn app_view() -> impl View {
                 };
                 let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
 
-                dyn_container(
-                    move || signals.tab.get(),
-                    {
-                        let gs_cell = Rc::clone(&gs_cell);
-                        move |tab| match tab {
-                            AppTab::Game => h_stack((
-                                sidebar_panel(signals),
-                                story_panel(signals, Rc::clone(&gs_cell)),
-                            ))
-                            .style(|s| s.size_full())
-                            .into_any(),
-                            AppTab::Saves => {
-                                saves_panel(signals, Rc::clone(&gs_cell)).into_any()
-                            }
-                            AppTab::Settings => {
-                                placeholder_panel("Settings \u{2014} coming soon", signals)
-                                    .into_any()
-                            }
+                dyn_container(move || signals.tab.get(), {
+                    let gs_cell = Rc::clone(&gs_cell);
+                    move |tab| match tab {
+                        AppTab::Game => h_stack((
+                            sidebar_panel(signals),
+                            story_panel(signals, Rc::clone(&gs_cell)),
+                        ))
+                        .style(|s| s.size_full())
+                        .into_any(),
+                        AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
+                        AppTab::Settings => {
+                            placeholder_panel("Settings \u{2014} coming soon", signals).into_any()
                         }
-                    },
-                )
+                    }
+                })
                 .style(|s| s.flex_grow(1.0))
                 .into_any()
             }
@@ -234,11 +232,10 @@ pub fn app_view() -> impl View {
     .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 
     // Title bar is always visible (both CharCreation and InGame phases).
-    let body = v_stack((title_bar(signals), content))
-        .style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.size_full().background(colors.ground)
-        });
+    let body = v_stack((title_bar(signals), content)).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.size_full().background(colors.ground)
+    });
 
     let main_column = body.style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -338,6 +335,7 @@ pub fn process_events(
                     }
                     s.push_str(&text);
                 });
+                signals.scroll_gen.update(|n| *n += 1);
             }
             EngineEvent::ActionsAvailable(actions) => {
                 signals.actions.set(actions);
@@ -346,7 +344,7 @@ pub fn process_events(
                 signals.active_npc.set(data.as_ref().map(|d| NpcSnapshot {
                     name: d.name.clone(),
                     age: format!("{}", d.age),
-                    personality: format!("{:?}", d.personality),
+                    personality: d.personality.clone(),
                     relationship: format!("{}", d.relationship),
                     pc_liking: format!("{}", d.pc_liking),
                     pc_attraction: format!("{}", d.pc_attraction),
