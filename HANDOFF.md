@@ -2,16 +2,15 @@
 
 ## Current State
 
-**Branch:** `ui-floem-migration` — ready to merge to master.
+**Branch:** `master`
 **Tests:** 87 passing, 0 clippy warnings.
-**App:** Boots and runs. Stats panel left, story/choices right. Three theme modes selectable.
+**App:** Boots and runs. Sidebar (stats) left, story/choices right. Three theme modes. screenshot-mcp working.
 
 ---
 
-## ⚡ Next Action: Merge and begin Writing Guide session
+## ⚡ Next Action: Writing Guide session
 
-1. Merge `ui-floem-migration` → master
-2. Begin writing guide session (continuity-of-self principles, NE US voice)
+Begin writing guide session: continuity-of-self principles, transformation writing, NE US voice, delta-awareness.
 
 ---
 
@@ -95,4 +94,4 @@
 | 2026-02-23 | UI Quality Pass: Added Dark/Sepia theme modes, keyboard navigation, fixed clippy warnings. |
 | 2026-02-23 | UI Review + Fixes: £→$, window size (1200×800), panels swapped (stats left), mode toggle added. Built screenshot-mcp (WGC, no focus steal, Content::image). Registered in .mcp.json. |
 | 2026-02-23 | screenshot-mcp debug: fixed stop()→wait() race condition in capture_window(). New binary at .exe.new. .mcp.json updated. Restart Claude Code to activate. UI audit complete — 6 violations documented in HANDOFF ready to implement. |
-| 2026-02-23 | UI polish: screenshot-mcp verified working. Applied 5/6 audit fixes (focus_visible, single seam, chrome font, hover signal, border-radius 4px). Fix 3 letter_spacing not available in floem 0.2. Window config + panel swap committed. Ready to merge. |
+| 2026-02-23 | UI polish: screenshot-mcp verified working. Applied 5/6 audit fixes (focus_visible, single seam, chrome font, hover signal, border-radius 4px). Fix 3 letter_spacing not available in floem 0.2. Window config + panel swap committed. Code reviewed — fixed missed NPC name font, double prefs.get(), renamed left_panel→story_panel / right_panel→sidebar_panel. Merged to master. |
