@@ -4,12 +4,33 @@ use floem::views::dropdown::Dropdown;
 use floem::views::Checkbox;
 use std::cell::RefCell;
 use std::rc::Rc;
-use undone_domain::{Age, BreastSize, PlayerFigure, Sexuality};
+use undone_domain::{Age, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure};
 use undone_packs::char_creation::CharCreationConfig;
 
 use crate::game_state::{error_game_state, start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
 use crate::{AppPhase, AppSignals};
+
+// ── PC origin helpers ─────────────────────────────────────────────────────────
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum BeforeKind {
+    CisMale,
+    TransWoman,
+    CisFemale,
+}
+
+fn resolve_origin(was_transformed: bool, before_kind: BeforeKind) -> PcOrigin {
+    if !was_transformed {
+        PcOrigin::AlwaysFemale
+    } else {
+        match before_kind {
+            BeforeKind::CisMale => PcOrigin::CisMaleTransformed,
+            BeforeKind::TransWoman => PcOrigin::TransWomanTransformed,
+            BeforeKind::CisFemale => PcOrigin::CisFemaleTransformed,
+        }
+    }
+}
 
 // ── form-level signals ────────────────────────────────────────────────────────
 
@@ -21,9 +42,10 @@ struct CharFormSignals {
     age: RwSignal<Age>,
     figure: RwSignal<PlayerFigure>,
     breasts: RwSignal<BreastSize>,
-    always_female: RwSignal<bool>,
+    was_transformed: RwSignal<bool>,
+    before_kind: RwSignal<BeforeKind>,
     before_age_str: RwSignal<String>,
-    sexuality: RwSignal<Sexuality>,
+    sexuality: RwSignal<BeforeSexuality>,
     // personality
     trait_shy: RwSignal<bool>,
     trait_cute: RwSignal<bool>,
@@ -51,9 +73,10 @@ impl CharFormSignals {
             age: RwSignal::new(Age::EarlyTwenties),
             figure: RwSignal::new(PlayerFigure::Slim),
             breasts: RwSignal::new(BreastSize::MediumLarge),
-            always_female: RwSignal::new(false),
+            was_transformed: RwSignal::new(true),
+            before_kind: RwSignal::new(BeforeKind::CisMale),
             before_age_str: RwSignal::new("28".to_string()),
-            sexuality: RwSignal::new(Sexuality::StraightMale),
+            sexuality: RwSignal::new(BeforeSexuality::AttractedToWomen),
             trait_shy: RwSignal::new(false),
             trait_cute: RwSignal::new(false),
             trait_posh: RwSignal::new(false),
@@ -199,15 +222,58 @@ fn section_who_you_are(signals: AppSignals, form: CharFormSignals) -> impl View 
 // ── section: Your Past ────────────────────────────────────────────────────────
 
 fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
-    let always_female = form.always_female;
+    let was_transformed = form.was_transformed;
+    let before_kind = form.before_kind;
 
-    let past_fields = dyn_container(
-        move || always_female.get(),
-        move |is_always| {
-            if is_always {
-                empty().into_any()
-            } else {
-                v_stack((
+    // Step 1: was the PC transformed?
+    let step1 = v_stack((
+        radio_opt(
+            "Something happened to me",
+            move || was_transformed.get(),
+            move || was_transformed.set(true),
+            signals,
+        ),
+        radio_opt(
+            "I was always a woman",
+            move || !was_transformed.get(),
+            move || was_transformed.set(false),
+            signals,
+        ),
+    ))
+    .style(|s| s.margin_bottom(16.0));
+
+    // Step 2 + conditional fields
+    let step2_and_fields = dyn_container(
+        move || (was_transformed.get(), before_kind.get()),
+        move |(is_transformed, kind)| {
+            if !is_transformed {
+                return empty().into_any();
+            }
+            let kind_btns = v_stack((
+                radio_opt(
+                    "I was a man",
+                    move || before_kind.get() == BeforeKind::CisMale,
+                    move || before_kind.set(BeforeKind::CisMale),
+                    signals,
+                ),
+                radio_opt(
+                    "I was a trans woman",
+                    move || before_kind.get() == BeforeKind::TransWoman,
+                    move || before_kind.set(BeforeKind::TransWoman),
+                    signals,
+                ),
+                radio_opt(
+                    "I was a woman",
+                    move || before_kind.get() == BeforeKind::CisFemale,
+                    move || before_kind.set(BeforeKind::CisFemale),
+                    signals,
+                ),
+            ))
+            .style(|s| s.margin_bottom(16.0));
+
+            let origin = resolve_origin(is_transformed, kind);
+            let extra: Box<dyn View> = if origin.was_male_bodied() {
+                Box::new(v_stack((
                     form_row(
                         "Age before transition",
                         signals,
@@ -221,36 +287,30 @@ fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
                         Dropdown::new_rw(
                             form.sexuality,
                             vec![
-                                Sexuality::StraightMale,
-                                Sexuality::GayMale,
-                                Sexuality::BiMale,
+                                BeforeSexuality::AttractedToWomen,
+                                BeforeSexuality::AttractedToMen,
+                                BeforeSexuality::AttractedToBoth,
                             ],
                         )
                         .style(dropdown_style(signals)),
                     ),
+                )))
+            } else {
+                Box::new(form_row(
+                    "Age before transition",
+                    signals,
+                    text_input(form.before_age_str)
+                        .placeholder("28")
+                        .style(input_style(signals)),
                 ))
-                .into_any()
-            }
+            };
+
+            v_stack((kind_btns, extra)).into_any()
         },
     );
 
-    v_stack((
-        section_title("Your Past", signals),
-        h_stack((
-            Checkbox::labeled_rw(always_female, || "I was always female")
-                .style(move |s| {
-                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    s.items_center()
-                        .gap(8.0)
-                        .font_size(14.0)
-                        .color(colors.ink)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
-                }),
-        ))
-        .style(|s| s.margin_bottom(12.0)),
-        past_fields,
-    ))
-    .style(section_style())
+    v_stack((section_title("Your Past", signals), step1, step2_and_fields))
+        .style(section_style())
 }
 
 // ── section: Personality ──────────────────────────────────────────────────────
@@ -398,7 +458,10 @@ fn build_begin_button(
                 return;
             }
 
-            let is_always_female = form.always_female.get_untracked();
+            let origin = resolve_origin(
+                form.was_transformed.get_untracked(),
+                form.before_kind.get_untracked(),
+            );
 
             // Resolve before_age
             let before_age: u32 = form
@@ -407,11 +470,11 @@ fn build_begin_button(
                 .parse()
                 .unwrap_or(28);
 
-            // Collect sexuality
-            let before_sexuality = if is_always_female {
-                Sexuality::AlwaysFemale
+            // before_sexuality only set for male-bodied origins
+            let before_sexuality = if origin.was_male_bodied() {
+                Some(form.sexuality.get_untracked())
             } else {
-                form.sexuality.get_untracked()
+                None
             };
 
             // Collect starting traits (string names)
@@ -446,10 +509,6 @@ fn build_begin_button(
             if form.trait_ambitious.get_untracked() {
                 trait_names.push("AMBITIOUS");
             }
-            if is_always_female {
-                trait_names.push("ALWAYS_FEMALE");
-                trait_names.push("NOT_TRANSFORMED");
-            }
             if !form.include_rough.get_untracked() {
                 trait_names.push("BLOCK_ROUGH");
             }
@@ -477,7 +536,7 @@ fn build_begin_button(
                 race: "white".to_string(),
                 figure: form.figure.get_untracked(),
                 breasts: form.breasts.get_untracked(),
-                always_female: is_always_female,
+                origin,
                 before_age,
                 before_race: "white".to_string(),
                 before_sexuality,
@@ -555,6 +614,41 @@ fn trait_checkbox(name: &'static str, sig: RwSignal<bool>, signals: AppSignals) 
             .color(colors.ink)
             .font_family("system-ui, -apple-system, sans-serif".to_string())
     })
+}
+
+fn radio_opt(
+    opt_label: &'static str,
+    is_active: impl Fn() -> bool + Copy + 'static,
+    on_select: impl Fn() + Copy + 'static,
+    signals: AppSignals,
+) -> impl View {
+    let indicator = empty().style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        let bg = if is_active() { colors.lamp } else { colors.page_raised };
+        let border_col = if is_active() { colors.lamp } else { colors.seam };
+        s.width(13.0)
+            .height(13.0)
+            .border_radius(7.0)
+            .border(1.5)
+            .border_color(border_col)
+            .background(bg)
+            .margin_right(8.0)
+    });
+    h_stack((
+        indicator,
+        label(move || opt_label.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.font_size(14.0)
+                .color(colors.ink)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
+    ))
+    .style(|s| {
+        s.items_center()
+            .cursor(floem::style::CursorStyle::Pointer)
+            .margin_bottom(8.0)
+    })
+    .on_click_stop(move |_| on_select())
 }
 
 fn section_style() -> impl Fn(floem::style::Style) -> floem::style::Style {

@@ -130,7 +130,7 @@ fn placeholder_player() -> Player {
         name_masc: "Placeholder".into(),
         before_age: 18,
         before_race: "white".into(),
-        before_sexuality: Sexuality::StraightMale,
+        before_sexuality: Some(BeforeSexuality::AttractedToWomen),
         age: Age::LateTeen,
         race: "white".into(),
         figure: PlayerFigure::Slim,
@@ -154,7 +154,7 @@ fn placeholder_player() -> Player {
         stuff: HashSet::new(),
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
-        always_female: false,
+        origin: PcOrigin::CisMaleTransformed,
     }
 }
 
