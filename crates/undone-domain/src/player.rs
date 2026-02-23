@@ -1,5 +1,6 @@
 use crate::{
-    Age, AlcoholLevel, ArousalLevel, BreastSize, PlayerFigure, Sexuality, SkillId, StuffId, TraitId,
+    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure, SkillId,
+    StuffId, TraitId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -79,12 +80,12 @@ pub struct Player {
     pub custom_ints: HashMap<String, i32>,
 
     // Transformation axis
-    pub always_female: bool, // false = male-start PC
+    pub origin: PcOrigin,
 
-    // Before-transformation data
+    // Before-transformation data (meaningful when origin.has_before_life())
     pub before_age: u32,
     pub before_race: String,
-    pub before_sexuality: Sexuality,
+    pub before_sexuality: Option<BeforeSexuality>,
 }
 
 impl Player {
@@ -135,7 +136,7 @@ mod tests {
             name_masc: "Evan".into(),
             before_age: 30,
             before_race: "white".into(),
-            before_sexuality: crate::Sexuality::StraightMale,
+            before_sexuality: Some(crate::BeforeSexuality::AttractedToWomen),
             age: Age::LateTeen,
             race: "east_asian".into(),
             figure: PlayerFigure::Slim,
@@ -159,7 +160,7 @@ mod tests {
             stuff: HashSet::new(),
             custom_flags: HashMap::new(),
             custom_ints: HashMap::new(),
-            always_female: false,
+            origin: crate::PcOrigin::CisMaleTransformed,
         }
     }
 
