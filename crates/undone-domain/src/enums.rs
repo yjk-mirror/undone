@@ -100,12 +100,63 @@ pub enum Age {
     Old,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Sexuality {
-    StraightMale, // was attracted to women; now attracted to men = new territory
-    GayMale,      // was attracted to men; now attracted to men = familiar desire, new position
-    BiMale,       // was attracted to both
-    AlwaysFemale, // always_female=true; before_sexuality is not applicable
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum BeforeSexuality {
+    AttractedToWomen,
+    AttractedToMen,
+    AttractedToBoth,
+}
+
+impl std::fmt::Display for BeforeSexuality {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BeforeSexuality::AttractedToWomen => write!(f, "Attracted to Women"),
+            BeforeSexuality::AttractedToMen => write!(f, "Attracted to Men"),
+            BeforeSexuality::AttractedToBoth => write!(f, "Attracted to Both"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum PcOrigin {
+    CisMaleTransformed,
+    TransWomanTransformed,
+    CisFemaleTransformed,
+    AlwaysFemale,
+}
+
+impl PcOrigin {
+    /// Was this PC magically transformed?
+    pub fn was_transformed(self) -> bool {
+        !matches!(self, PcOrigin::AlwaysFemale)
+    }
+
+    /// Did this PC have a male body before transformation?
+    pub fn was_male_bodied(self) -> bool {
+        matches!(self, PcOrigin::CisMaleTransformed | PcOrigin::TransWomanTransformed)
+    }
+
+    /// Should the "before" section show in character creation?
+    pub fn has_before_life(self) -> bool {
+        self.was_transformed()
+    }
+
+    /// For backward compat: equivalent to the old `always_female` bool.
+    /// True for CisFemaleTransformed and AlwaysFemale.
+    pub fn is_always_female(self) -> bool {
+        matches!(self, PcOrigin::CisFemaleTransformed | PcOrigin::AlwaysFemale)
+    }
+}
+
+impl std::fmt::Display for PcOrigin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PcOrigin::CisMaleTransformed => write!(f, "Transformed (was cis man)"),
+            PcOrigin::TransWomanTransformed => write!(f, "Transformed (was trans woman)"),
+            PcOrigin::CisFemaleTransformed => write!(f, "Transformed (was cis woman)"),
+            PcOrigin::AlwaysFemale => write!(f, "Always Female"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -213,16 +264,6 @@ impl std::fmt::Display for Age {
     }
 }
 
-impl std::fmt::Display for Sexuality {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Sexuality::StraightMale => write!(f, "Straight Male"),
-            Sexuality::GayMale => write!(f, "Gay Male"),
-            Sexuality::BiMale => write!(f, "Bi Male"),
-            Sexuality::AlwaysFemale => write!(f, "Always Female"),
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -251,11 +292,21 @@ mod tests {
     }
 
     #[test]
-    fn sexuality_serde_roundtrip() {
-        let s = Sexuality::StraightMale;
+    fn before_sexuality_serde_roundtrip() {
+        let s = BeforeSexuality::AttractedToWomen;
         let json = serde_json::to_string(&s).unwrap();
-        let back: Sexuality = serde_json::from_str(&json).unwrap();
+        let back: BeforeSexuality = serde_json::from_str(&json).unwrap();
         assert_eq!(s, back);
+    }
+
+    #[test]
+    fn pc_origin_helpers() {
+        assert!(PcOrigin::CisMaleTransformed.was_transformed());
+        assert!(PcOrigin::TransWomanTransformed.was_male_bodied());
+        assert!(!PcOrigin::AlwaysFemale.was_transformed());
+        assert!(PcOrigin::AlwaysFemale.is_always_female());
+        assert!(PcOrigin::CisFemaleTransformed.is_always_female());
+        assert!(!PcOrigin::CisMaleTransformed.is_always_female());
     }
 
     #[test]
