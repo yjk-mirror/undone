@@ -90,7 +90,7 @@ pub fn spawn_npcs<R: Rng>(
     // and share the same rodeo, so the Spur from intern_personality is valid for both.
     let char_type_id = CharTypeId(registry.intern_personality("FRIEND").0);
 
-    for i in 0..config.male_count {
+    for (i, &personality) in personality_ids.iter().enumerate().take(config.male_count) {
         let name = male_names
             .choose(rng)
             .cloned()
@@ -99,7 +99,6 @@ pub fn spawn_npcs<R: Rng>(
         let race = RACES.choose(rng).unwrap().to_string();
         let eye_colour = EYE_COLOURS.choose(rng).unwrap().to_string();
         let hair_colour = HAIR_COLOURS.choose(rng).unwrap().to_string();
-        let personality = personality_ids[i];
         let traits = pick_traits(&npc_trait_ids, 2, rng);
         let figure = *MALE_FIGURES.choose(rng).unwrap();
 
