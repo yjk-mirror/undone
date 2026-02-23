@@ -124,6 +124,21 @@ session. The stubs are marked `// TODO: wire to registry` in `undone-expr/src/ev
 One deviation from the original plan: `gd.week` was changed to `gd.week()` — the
 parser requires method-call syntax everywhere, and the original plan had an inconsistency.
 
+## Runtime Testing Notes
+
+- **`cargo run` background task ≠ game process.** When launching the game via
+  `cargo run &` or `run_in_background`, the shell task completes when the build
+  finishes and the process is spawned. The GUI window keeps running independently.
+  A background task notification saying "completed" does NOT mean the game exited
+  or crashed. Always check `Get-Process undone` to verify actual process state.
+- **floem scroll requires `shrink_to_fit()`.** A `scroll()` widget inside a flex
+  container (v_stack/h_stack) must use `.scroll_style(|s| s.shrink_to_fit())` and
+  `.style(|s| s.flex_grow(1.0).flex_basis(0.0))` — otherwise taffy sizes the
+  scroll viewport to content height and scrolling never activates.
+- **game-input MCP cannot send scroll wheel events.** PostMessage-based input
+  only supports key presses and clicks, not WM_MOUSEWHEEL. Manual interaction
+  required for scroll testing until this is added.
+
 ## Agentic Workflow
 
 ### Skills — required invocations

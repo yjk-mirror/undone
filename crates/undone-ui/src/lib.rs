@@ -144,7 +144,7 @@ pub fn app_view() -> impl View {
 
     let phase = signals.phase;
 
-    let body = dyn_container(
+    let content = dyn_container(
         move || phase.get(),
         move |current_phase| match current_phase {
             AppPhase::CharCreation => char_creation_view(
@@ -195,28 +195,17 @@ pub fn app_view() -> impl View {
                     }
                 }
 
-                // Now render the game layout using the Rc<RefCell<Option<GameState>>>.
-                // We need a Rc<RefCell<GameState>> for story_panel, so we wrap
-                // the unwrapped GameState. We take the GameState out of Option and
-                // re-box it in a plain RefCell for the panels.
-                //
-                // This approach replaces Option with a fully-initialised cell for the
-                // game panels so they see a non-optional GameState.
-                let gs_opt = gs_ref.borrow();
-                if gs_opt.is_none() {
-                    // Fallback: shouldn't happen, but show error pane
-                    return placeholder_panel("Game state missing", signals).into_any();
-                }
-                drop(gs_opt);
-
-                // Convert Rc<RefCell<Option<GameState>>> into a Rc<RefCell<GameState>>
-                // by extracting the value and placing it in a new cell.
-                // We do this once at the moment of transition so the sub-views hold a
-                // clean reference.
-                let inner_gs: GameState = gs_ref.borrow_mut().take().unwrap();
+                // Convert Rc<RefCell<Option<GameState>>> into Rc<RefCell<GameState>>
+                // by extracting the value once at transition time.
+                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                    Some(gs) => gs,
+                    None => {
+                        return placeholder_panel("Game state missing", signals).into_any();
+                    }
+                };
                 let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
 
-                let content = dyn_container(
+                dyn_container(
                     move || signals.tab.get(),
                     {
                         let gs_cell = Rc::clone(&gs_cell);
@@ -237,22 +226,19 @@ pub fn app_view() -> impl View {
                         }
                     },
                 )
-                .style(|s| s.flex_grow(1.0));
-
-                v_stack((title_bar(signals), content))
-                    .style(move |s| {
-                        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                        s.size_full().background(colors.ground)
-                    })
-                    .into_any()
+                .style(|s| s.flex_grow(1.0))
+                .into_any()
             }
         },
     )
-    .style(|s| s.size_full());
+    .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 
-    // For CharCreation phase, we show without title bar.
-    // For InGame phase the title bar is built inside the dyn_container above.
-    // We still need the outer frame and resize grips.
+    // Title bar is always visible (both CharCreation and InGame phases).
+    let body = v_stack((title_bar(signals), content))
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.size_full().background(colors.ground)
+        });
 
     let main_column = body.style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);

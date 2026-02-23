@@ -104,10 +104,12 @@ pub fn char_creation_view(
 
     let centered = container(content).style(|s| s.width_full().flex_row().justify_center());
 
-    scroll(centered).style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.size_full().background(colors.page)
-    })
+    scroll(centered)
+        .scroll_style(|s| s.shrink_to_fit())
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.size_full().background(colors.page)
+        })
 }
 
 // ── heading ───────────────────────────────────────────────────────────────────

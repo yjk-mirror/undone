@@ -250,10 +250,12 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let centered_prose = container(prose_label)
         .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
-    let scroll_area = scroll(centered_prose).style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.flex_grow(1.0).background(colors.page)
-    });
+    let scroll_area = scroll(centered_prose)
+        .scroll_style(|s| s.shrink_to_fit())
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.flex_grow(1.0).flex_basis(0.0).background(colors.page)
+        });
 
     let detail_strip = label(move || hovered_detail.get()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -267,6 +269,8 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             .background(colors.page)
             .border_top(1.0)
             .border_color(colors.seam)
+            .hover(move |s| s.background(colors.page))
+            .focus(move |s| s.background(colors.page))
     });
 
     v_stack((

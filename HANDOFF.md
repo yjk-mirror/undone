@@ -2,32 +2,31 @@
 
 ## Current State
 
-**Branch:** `engineering-overnight` (worktree off master)
-**Tests:** 104 passing, 0 clippy warnings.
-**App:** Character creation screen on launch (names, age, figure, traits, content prefs). Settings persist across restarts. Saves tab functional (save/load/delete). Names updated to NE US. Three theme modes. Prose centered with markdown rendering. Literata font embedded. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired. NPC activation events wired to sidebar.
+**Branch:** `master`
+**Tests:** 104 passing, 0 failures.
+**App:** Character creation → gameplay loop working. Title bar always visible (both phases). Scroll working in both char creation and story panel. Choices visible at bottom of story panel. Three theme modes. Markdown italic rendering working. Literata font (regular + italic) embedded.
 
 ---
 
 ## ⚡ Next Action
 
-Merge `engineering-overnight` branch into master. Then pick from Open Items:
-1. **Settings tab UI** — expose font size, line height, and future prefs as UI controls
-2. **More scenes** — expand base pack content (apartment, work, social events)
-3. **Visual polish** — test char creation UI, refine layout, screenshot audit
+Plan an agent team session for parallel high-throughput work. Priority tasks:
+1. **Character creation redesign** — male-first flow (create male → transformation → tweak female), like Newlife
+2. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
+3. **More scenes** — expand base pack content
+4. **Settings tab UI** — expose font size, line height as interactive controls
 
 ---
 
-## game-input-mcp — Done
+## game-input-mcp — Updated
 
-**Built:** `undone-tools/game-input-mcp` — MCP server for background game interaction.
-Uses `PostMessage(WM_KEYDOWN/WM_KEYUP)` and `PostMessage(WM_LBUTTONDOWN/WM_LBUTTONUP)`
-— no focus steal, no cursor movement.
-
-**Tools:** `press_key(title, key)` and `click(title, x, y)`.
+**Tools:** `press_key(title, key)`, `click(title, x, y)`, `scroll(title, x, y, delta)`, `hover(title, x, y)`.
 Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
+Scroll: positive delta = up, negative = down (one tick = one wheel notch).
+Hover: sends WM_MOUSEMOVE to trigger hover effects.
 
-**Binary:** `undone-tools/target/release/game-input-mcp.exe` (2.9 MB).
-**.mcp.json** updated with `game-input` server entry. Restart Claude Code to activate.
+**New binary:** `undone-tools/target/release/game-input-mcp.exe.new` (built with scroll+hover).
+**Deploy:** Restart Claude Code. On next session, rename `.exe.new` → `.exe` (old one is locked while running).
 
 ---
 
@@ -42,9 +41,16 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 ## UI — Current State
 
 **Layout:**
+- Title bar always visible: UNDONE branding, Game/Saves/Settings tabs, window controls
 - Stats sidebar on the **left** (280px fixed): player name, stats, NPC panel, mode toggle
 - Story + choices on the **right** (flex-grow): scrollable prose + choices bar
 - Window opens at 1200×800, titled "Undone"
+
+**Scroll (floem):**
+- All scroll containers use `.scroll_style(|s| s.shrink_to_fit())` — required for floem scroll in flex layouts
+- Story panel scroll: `flex_grow(1.0).flex_basis(0.0)` (flex sibling of detail strip + choices bar)
+- Char creation scroll: `size_full()` (sole child of dyn_container)
+- Outer dyn_container: `flex_grow(1.0).flex_basis(0.0).min_height(0.0)` — required so taffy constrains children
 
 **Theme system:**
 - Three modes: Warm Paper (default), Sepia, Night
@@ -83,27 +89,34 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 11. ~~Writing import~~ ✅ (3 scenes with original prose)
 12. ~~Names update~~ ✅
 13. ~~Saves tab~~ ✅
-14. **Settings tab UI** — expose UserPrefs as interactive controls
-15. **More scenes** — expand base pack content
+14. **Character creation redesign** — male-first flow, Newlife-style two-phase creation
+15. **Keyboard controls redesign** — arrow key highlight, configurable instant vs confirm
+16. **Settings tab UI** — expose UserPrefs as interactive controls
+17. **More scenes** — expand base pack content
 
 ---
 
-## Recently Completed (overnight autonomous session)
-
-- ✅ Names update — British → NE US (30 male, 30 female, multicultural)
-- ✅ Settings persistence — UserPrefs saved to `%APPDATA%/undone/prefs.json`, survives restart
-- ✅ Character creation UI — full-screen form with text inputs, dropdowns, checkboxes, trait selection, content prefs; `AppPhase` system splits init into `PreGameState` → `start_game()`
-- ✅ Saves tab UI — save/load/delete with `undone-save`; saves to `%APPDATA%/undone/saves/`
-- ✅ rain_shelter rewrite — proper prose, 5 trait branches, transformation dimension, 4 player actions, game flag persistence
-- ✅ morning_routine scene — domestic intro, mirror moment, wardrobe trait branches, coffee decision, NE US details
-- ✅ coffee_shop scene — NPC interaction, trait-dependent dialogue, sit-with-him path, transformation texture, game flags
-
 ## Open Items — Future Sessions
 
-- **Settings tab UI** — expose font size, line height as interactive controls (Medium)
-- **More base pack scenes** — apartment, work, social events, evening activities (Large)
-- **Window drag on char creation** — no title bar during char creation means no drag area (Small)
-- **Save metadata display** — show player name / week in save list without full deserialization (Small)
+### Character Creation Redesign (Large)
+- **Male-first flow**: Create male character first → transformation event → then customize female form based on male traits (like Newlife)
+- **Trait checkbox UX**: Label text is currently drag-selectable; clicking label should toggle checkbox instead
+- **Age before transition**: Should be a dropdown (matching "Age" field), not a text input
+- **Form density**: Form too tall for 800px window; consider tighter spacing or two-column layout
+
+### Keyboard Controls (Medium)
+- **Arrow key navigation**: Highlight choices with arrow keys, show detail strip for highlighted choice
+- **Number key behavior**: Configurable — instant action vs highlight-then-confirm (press number → highlight, press again or Enter → confirm)
+- **Current limitation**: Number keys (1-9) currently fire instantly; no highlight-first mode
+
+### UI Polish (Small-Medium)
+- **Detail strip hover highlight**: Brief unwanted background highlight in Warm theme on first hover (floem default style leak — partially fixed with explicit hover/focus overrides)
+- **Choice button positioning**: Consider better visual balance between prose area and choices
+- **Save metadata display**: Show player name / week in save list without full deserialization
+
+### Tooling
+- **game-input scroll/hover**: Built but not deployed (exe locked). Rename `.exe.new` → `.exe` on next restart.
+- **game-input limitation**: PostMessage-based input may not establish focus like real user input — keyboard shortcuts may not fire after PostMessage click
 
 ---
 
@@ -135,3 +148,4 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 | 2026-02-23 | Engineering batch: 4 parallel agents in worktrees. packs_dir fix, female NPC effects, NpcActivated event, Literata font embed, markdown prose rendering. 95 tests, 0 warnings. |
 | 2026-02-23 | Engineering hardening 2: FEMININITY unified (removed Player.femininity field, reads from skills map), w.hasStuff() wired to player inventory via StuffId registry, stats registration added to pack system (stats.toml), panics eliminated in error-recovery paths, spawner unwraps hardened. 100 tests, 0 warnings. |
 | 2026-02-23 | Overnight autonomous session: 7 tasks via subagent-driven-development. Names → NE US, settings persistence (dirs + serde_json), character creation UI (AppPhase, PreGameState/GameState split, full form with floem widgets), saves tab (save/load/delete), rain_shelter rewrite (proper prose, 5 trait branches, transformation), morning_routine scene (domestic, mirror, wardrobe, Dunkin'), coffee_shop scene (NPC interaction, sit-with-him path, game flags). 104 tests, 0 warnings. |
+| 2026-02-23 | Playtest + bugfix session: Fixed 3 bugs — char creation skipped (title bar now always visible), scroll broken (floem shrink_to_fit + flex_basis(0)), take().unwrap() crash (replaced with match). Added Runtime Testing Notes to CLAUDE.md. Built game-input-mcp scroll + hover tools. Documented char creation redesign ideas (male-first flow, keyboard controls). 104 tests, 0 failures. |
