@@ -61,7 +61,7 @@ emotional register for trans woman PCs.
 
 ```
 undone/
-├── Cargo.toml               # workspace root
+├── Cargo.toml               # game workspace root (game code only — do not add tools here)
 ├── src/main.rs              # entry point
 ├── crates/
 │   ├── undone-domain/       # pure types — no IO, no game logic
@@ -71,9 +71,29 @@ undone/
 │   ├── undone-scene/        # scene execution engine
 │   ├── undone-save/         # serde save / load
 │   └── undone-ui/           # floem views and widgets
-└── packs/
-    └── base/                # base game content (is itself a pack)
+├── packs/
+│   └── base/                # base game content (is itself a pack)
+└── tools/                   # ⚠ AGENT DEVTOOLS — separate Cargo workspace, not game code
+    ├── Cargo.toml           # tools workspace root (independent of game workspace)
+    ├── rhai-mcp-server/     # MCP server: Rhai script validation
+    ├── minijinja-mcp-server/# MCP server: Minijinja template validation + preview
+    ├── screenshot-mcp/      # MCP server: screen capture for agent visual feedback
+    └── game-input-mcp/      # MCP server: keyboard/mouse/scroll injection into the game window
 ```
+
+### Two separate Cargo workspaces
+
+`Cargo.toml` at the root is the **game workspace** — `cargo build`, `cargo check`, and
+`cargo test` run here for game development. Never add `tools/` members to this workspace.
+
+`tools/Cargo.toml` is a separate **devtools workspace**. To build the MCP servers:
+
+```sh
+cd tools && cargo build --release
+```
+
+Binaries land in `tools/target/release/`. The `.mcp.json` at the repo root points here.
+The game workspace and the devtools workspace share nothing at the Cargo level.
 
 ## Design Philosophy
 

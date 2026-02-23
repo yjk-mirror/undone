@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "rhai-mcp-server",
+    "minijinja-mcp-server",
+    "screenshot-mcp",
+    "game-input-mcp",
+]
+resolver = "2"

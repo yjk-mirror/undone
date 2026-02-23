@@ -10,25 +10,25 @@
     },
     "rhai": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/rhai-mcp-server.exe",
+      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/rhai-mcp-server.exe",
       "args": [],
       "env": {}
     },
     "minijinja": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/minijinja-mcp-server.exe",
+      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/minijinja-mcp-server.exe",
       "args": [],
       "env": {}
     },
     "screenshot": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/screenshot-mcp.exe",
+      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/screenshot-mcp.exe",
       "args": [],
       "env": {}
     },
     "game-input": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/game-input-mcp.exe",
+      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/game-input-mcp.exe",
       "args": [],
       "env": {}
     }
