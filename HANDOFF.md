@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 95 passing, 0 clippy warnings.
+**Tests:** 100 passing, 0 clippy warnings.
 **App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered with markdown rendering (bold/italic/headings). Literata font embedded. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired (scenes chain). NPC activation events wired to sidebar. screenshot-mcp + game-input-mcp working.
 
 ---
@@ -127,3 +127,4 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 | 2026-02-23 | Built game-input-mcp: press_key + click tools via PostMessage, no focus steal. Release binary built, .mcp.json updated. Restart to activate. |
 | 2026-02-23 | Engineering hardening session: 3-agent team. Window resize grips, prose centering, single-instance (fs4), Display impls for all domain enums, lexer overflow fix, engine expects, scheduler wired to SceneFinished, multi-pack scene loading, pack error visibility. 88 tests, 0 warnings. |
 | 2026-02-23 | Engineering batch: 4 parallel agents in worktrees. packs_dir fix, female NPC effects, NpcActivated event, Literata font embed, markdown prose rendering. 95 tests, 0 warnings. |
+| 2026-02-23 | Engineering hardening 2: FEMININITY unified (removed Player.femininity field, reads from skills map), w.hasStuff() wired to player inventory via StuffId registry, stats registration added to pack system (stats.toml), panics eliminated in error-recovery paths, spawner unwraps hardened. 100 tests, 0 warnings. |
