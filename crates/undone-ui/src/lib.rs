@@ -2,6 +2,7 @@ pub mod char_creation;
 pub mod game_state;
 pub mod left_panel;
 pub mod right_panel;
+pub mod saves_panel;
 pub mod theme;
 pub mod title_bar;
 
@@ -20,6 +21,7 @@ use crate::char_creation::char_creation_view;
 use crate::game_state::{init_game, GameState, PreGameState};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
+use crate::saves_panel::saves_panel;
 use crate::theme::{ThemeColors, UserPrefs};
 use crate::title_bar::title_bar;
 
@@ -226,7 +228,7 @@ pub fn app_view() -> impl View {
                             .style(|s| s.size_full())
                             .into_any(),
                             AppTab::Saves => {
-                                placeholder_panel("Saves \u{2014} coming soon", signals).into_any()
+                                saves_panel(signals, Rc::clone(&gs_cell)).into_any()
                             }
                             AppTab::Settings => {
                                 placeholder_panel("Settings \u{2014} coming soon", signals)

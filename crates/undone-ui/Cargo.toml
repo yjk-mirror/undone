@@ -8,6 +8,7 @@ undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
 undone-scene  = { path = "../undone-scene" }
 undone-packs  = { path = "../undone-packs" }
+undone-save   = { path = "../undone-save" }
 floem            = { workspace = true }
 lasso            = { workspace = true }
 pulldown-cmark   = { workspace = true }
