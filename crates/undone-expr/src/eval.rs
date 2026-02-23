@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use thiserror::Error;
-use undone_domain::{FemaleNpcKey, MaleNpcKey};
+use undone_domain::{FemaleNpcKey, MaleNpcKey, PcOrigin};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
@@ -123,9 +123,12 @@ fn eval_to_value(
             Value::Bool(b) => EvalValue::Bool(*b),
         }),
         Expr::Call(call) => {
-            // Try to eval as int, then bool
+            // Try to eval as int, then string, then bool
             if let Ok(n) = eval_call_int(call, world, ctx, registry) {
                 return Ok(EvalValue::Int(n));
+            }
+            if let Ok(s) = eval_call_string(call, world, ctx, registry) {
+                return Ok(EvalValue::Str(s));
             }
             let b = eval_call_bool(call, world, ctx, registry)?;
             Ok(EvalValue::Bool(b))
@@ -188,7 +191,7 @@ pub fn eval_call_bool(
             "isSingle" => Ok(world.player.partner.is_none()),
             "isOnPill" => Ok(world.player.on_pill),
             "isPregnant" => Ok(world.player.pregnancy.is_some()),
-            "alwaysFemale" => Ok(world.player.always_female),
+            "alwaysFemale" => Ok(world.player.origin.is_always_female()),
             "hasStuff" => {
                 let id = str_arg(0)?;
                 match registry.resolve_stuff(id) {
@@ -327,6 +330,36 @@ pub fn eval_call_int(
     }
 }
 
+/// Evaluate a method call that returns a string (e.g. pcOrigin).
+pub fn eval_call_string(
+    call: &Call,
+    world: &World,
+    _ctx: &SceneCtx,
+    _registry: &PackRegistry,
+) -> Result<String, EvalError> {
+    match call.receiver {
+        Receiver::Player => match call.method.as_str() {
+            "pcOrigin" => {
+                let s = match world.player.origin {
+                    PcOrigin::CisMaleTransformed => "CisMaleTransformed",
+                    PcOrigin::TransWomanTransformed => "TransWomanTransformed",
+                    PcOrigin::CisFemaleTransformed => "CisFemaleTransformed",
+                    PcOrigin::AlwaysFemale => "AlwaysFemale",
+                };
+                Ok(s.to_string())
+            }
+            _ => Err(EvalError::UnknownMethod {
+                receiver: "w".into(),
+                method: call.method.clone(),
+            }),
+        },
+        _ => Err(EvalError::UnknownMethod {
+            receiver: format!("{:?}", call.receiver),
+            method: call.method.clone(),
+        }),
+    }
+}
+
 #[cfg(test)]
 #[allow(non_snake_case)]
 mod tests {
@@ -347,7 +380,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before_age: 30,
                 before_race: "white".into(),
-                before_sexuality: Sexuality::StraightMale,
+                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -371,7 +404,7 @@ mod tests {
                 stuff: HashSet::new(),
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
-                always_female: false,
+                origin: PcOrigin::CisMaleTransformed,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
@@ -495,6 +528,44 @@ mod tests {
         let ctx = SceneCtx::new();
         let expr = parse("w.hasStuff('UMBRELLA')").unwrap();
         assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn pcOrigin_returns_correct_string_for_cis_male() {
+        let world = make_world(); // origin = CisMaleTransformed
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.pcOrigin() == 'CisMaleTransformed'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn pcOrigin_returns_correct_string_for_always_female() {
+        let mut world = make_world();
+        world.player.origin = PcOrigin::AlwaysFemale;
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.pcOrigin() == 'AlwaysFemale'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn alwaysFemale_false_for_cis_male_transformed() {
+        let world = make_world(); // origin = CisMaleTransformed
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.alwaysFemale()").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn alwaysFemale_true_for_always_female() {
+        let mut world = make_world();
+        world.player.origin = PcOrigin::AlwaysFemale;
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.alwaysFemale()").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
     }
 
     #[test]
