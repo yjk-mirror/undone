@@ -1,34 +1,65 @@
 [scene]
 id          = "base::rain_shelter"
 pack        = "base"
-description = "Caught in the rain at a bus shelter."
+description = "Caught in rain, a stranger in a bus shelter. The city's first small test."
 
 [intro]
 prose = """
-The rain started ten minutes from home, a proper downpour that has soaked through your jacket.
+The sky opened up three blocks from your apartment. Not a drizzle — the kind of rain that turns gutters into rivers and sends people running for awnings with their bags over their heads. A delivery driver on a moped blasts through a puddle that soaks your left side from the hip down.
+
+The bus shelter on Clement Ave is the nearest cover. Glass walls, metal bench, an ad for a personal injury lawyer peeling off the back panel. There's a man already in there — mid-twenties, decent jacket, one of those compact umbrellas people in this city carry because they've learned.
+
+He looks up when you step in.
+
 {% if w.hasTrait("SHY") %}
-You find a spot at the far end of the shelter and stare at the pavement, shoulders hunched.
+You take the far end of the bench without looking at him. Water drips from your jacket onto the concrete in a rhythm you didn't ask for. You can feel his gaze shift in your direction and then, mercifully, away.
+{% elif w.hasTrait("POSH") %}
+You step under the shelter and position yourself with the kind of precision that says *I chose this spot*. Your jacket is ruined — or at least the dry cleaning bill just doubled. The man gives you a quick once-over. You return it, and whatever he was about to say stays behind his teeth.
+{% elif w.hasTrait("CUTE") %}
+You duck in with a breathless laugh, shaking water from your hair. "Oh my God," you say to no one, and then realize you said it to him. He grins.
+{% elif w.hasTrait("BITCHY") %}
+You step under the overhang and shake the water off your sleeves. The man shifts slightly, as if making room is a favor. You don't acknowledge it.
 {% else %}
-You step into the shelter with a quick nod at the man already there. He nods back.
+You slip in and lean against the glass. The rain hammers the roof above you. The man gives you a nod — the universal stranger-in-shared-misery nod — and you nod back.
 {% endif %}
+
+{% if not w.alwaysFemale() %}
+There's a specific quality to being looked at by a strange man in a small space. You know it now. Not danger, exactly — more like being *placed*. He's already decided three things about you, and none of them are the things you'd choose.
+
+*You used to do this too*, you think. Size someone up in two seconds. You just never knew what it felt like from this side.
+{% endif %}
+
+The rain isn't stopping. A bus goes by without pulling over — wrong route, or just indifferent. Across the street, a woman wrestles an inside-out umbrella and loses. The city goes on.
 """
+
+# ── Player Actions ────────────────────────────────────────────────────
 
 [[actions]]
 id                = "main"
 label             = "Wait it out"
-detail            = "Stand here until it eases off."
+detail            = "Stay put. Let the rain handle itself."
 allow_npc_actions = true
 
 [[actions]]
 id        = "leave"
 label     = "Make a run for it"
-detail    = "Get soaked. At least you'll be moving."
+detail    = "Three blocks. You'll survive."
 condition = "!scene.hasFlag('umbrella_offered')"
-prose     = "You pull your jacket over your head and step back out into it."
+prose     = """
+{% if w.hasTrait("SHY") %}
+You stand up before you've committed to the idea, and then you're already moving. Better soaked than stuck in silence with a stranger. The rain hits your face and you walk fast, shoulders up, not running but close.
+{% elif w.hasTrait("AMBITIOUS") %}
+Waiting is for people with nowhere to be. You step out and walk with purpose, rain be damned. Three blocks is three blocks.
+{% else %}
+You hunch your shoulders and step back into it. The rain is cold and immediate and doesn't care about your jacket. At least you're moving.
+{% endif %}
+
+By the time you reach your building, you're soaked through. Your shoes make sounds on the lobby floor that you'd rather not think about.
+"""
 
   [[actions.effects]]
   type   = "change_stress"
-  amount = 2
+  amount = 3
 
   [[actions.next]]
   finish = true
@@ -36,14 +67,26 @@ prose     = "You pull your jacket over your head and step back out into it."
 [[actions]]
 id        = "accept_umbrella"
 label     = "Share his umbrella"
-detail    = "Step closer. It's dry under there."
+detail    = "Step closer. He offered."
 condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-"Thanks," you manage, stepping under with as little eye contact as possible.
+"Thanks," you manage, and step under. The umbrella is small enough that your shoulders almost touch. You can smell whatever detergent he uses. You look at the rain. He looks at the rain. Neither of you has anything to say, and somehow that's worse than talking.
+{% elif w.hasTrait("FLIRTY") %}
+"My hero." You step under the umbrella and stand close enough that he has to adjust his grip. He smells like coffee and some kind of soap that probably costs more than it should. You don't move away.
+{% elif w.hasTrait("POSH") %}
+"That's kind of you." You step under, careful not to brush against him. The umbrella is barely adequate for two. He holds it slightly more toward your side, which you notice and don't acknowledge.
 {% else %}
-"Cheers," you say, stepping in. He smells of coffee and damp wool.
+"Sure, thanks." You step under. It's not quite big enough for two — the rain still catches your far shoulder — but it's better than nothing. He tilts it toward you without being asked. Small courtesy. The kind of thing you notice in this city because it doesn't happen enough.
 {% endif %}
+
+{% if not w.alwaysFemale() %}
+He's close enough that you can feel warmth coming off his arm. There's something about standing this close to a man who chose to move toward you. Not a threat. Just presence. Weight. The geometry of two bodies under insufficient shelter, and the fact that he's the bigger one.
+
+*This is what women do*, you think. *They stand next to men and calculate.*
+{% endif %}
+
+"I'm David," he says. Not a question, not a pickup line. Just information.
 """
 
   [[actions.effects]]
@@ -51,17 +94,71 @@ prose     = """
   npc   = "m"
   delta = 1
 
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "RAIN_SHELTER_MET"
+
   [[actions.next]]
   finish = true
 
-[[npc_actions]]
-id        = "offers_umbrella"
-condition = "!scene.hasFlag('umbrella_offered')"
+[[actions]]
+id        = "decline_umbrella"
+label     = "Decline politely"
+detail    = "Generous, but no."
+condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
-The man clears his throat. "Want to share?" He tilts his umbrella slightly in your direction.
+{% if w.hasTrait("SHY") %}
+"I'm okay, thanks." You weren't expecting your voice to come out that quiet. He nods once, puts the umbrella back at his side, and the moment closes like a door.
+{% elif w.hasTrait("BITCHY") %}
+"I'm fine." Something in the way you say it makes him take a half-step back. Good. Boundaries aren't a personality flaw.
+{% else %}
+"I'm good, but thanks." He shrugs — not offended, not invested. Just a guy who tried something small and moved on. The rain fills the silence instead.
+{% endif %}
 """
-weight = 10
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "RAIN_SHELTER_MET"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────────
+
+[[npc_actions]]
+id        = "umbrella_offer"
+condition = "!scene.hasFlag('umbrella_offered')"
+weight    = 12
+prose     = """
+The man pulls his umbrella from where it's leaning against the bench. He opens it — not over himself, just holds it out at an angle that makes the offer obvious without making it a statement.
+
+"Rain's not letting up. I've got this, if you want."
+
+{% if w.hasTrait("BEAUTIFUL") %}
+He's looking at you the way men do when they've decided to be helpful. You know this one. The umbrella isn't about the rain.
+{% elif w.hasTrait("PLAIN") %}
+It takes him a beat to offer — the kind of beat you might not notice if you weren't paying attention. But you were. You always are.
+{% endif %}
+"""
 
   [[npc_actions.effects]]
   type = "set_scene_flag"
   flag = "umbrella_offered"
+
+[[npc_actions]]
+id        = "small_talk"
+condition = "scene.hasFlag('umbrella_offered')"
+weight    = 5
+prose     = """
+"You live around here?" He says it the way people in this city ask — not interested, just filling air.
+
+{% if w.hasTrait("POSH") %}
+"Nearby." You leave it at that. He doesn't push.
+{% elif w.hasTrait("CUTE") %}
+"Just a few blocks that way." You point, and he nods like that means something.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+"Yeah, Clement and Fifth. You?" He says he's on Union, which is close enough to be relevant and far enough to not matter.
+{% else %}
+"Close by," you say. He nods. That's the end of that.
+{% endif %}
+"""

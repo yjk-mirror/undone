@@ -1,15 +1,14 @@
 male_names = [
-    "James", "Thomas", "William", "Oliver", "Harry", "Charlie", "George",
-    "Jack", "Henry", "Edward", "Arthur", "Frederick", "Albert", "Robert",
-    "John", "Michael", "David", "Richard", "Peter", "Samuel", "Daniel",
-    "Matthew", "Andrew", "Patrick", "Christopher", "Adam", "Benjamin",
-    "Joseph", "Luke", "Nathan"
+    "Matt", "Ryan", "David", "Mike", "Chris", "Jake", "Tyler", "Brandon",
+    "Nick", "Dan", "Kyle", "Josh", "Kevin", "Brian", "Sean", "Derek",
+    "Marcus", "Andre", "James", "Ben", "Sam", "Alex", "Eric", "Will",
+    "Tom", "Adam", "Nate", "Carlos", "Rob", "Ian"
 ]
 
 female_names = [
-    "Emma", "Sophie", "Charlotte", "Grace", "Lily", "Olivia", "Emily",
-    "Amelia", "Chloe", "Hannah", "Mia", "Holly", "Jessica", "Isabelle",
-    "Lucy", "Ava", "Ellie", "Kate", "Daisy", "Poppy", "Abigail",
-    "Victoria", "Natalie", "Claire", "Rachel", "Laura", "Amy",
-    "Eleanor", "Zoe", "Jasmine"
+    "Jess", "Sarah", "Ashley", "Megan", "Lauren", "Brittany", "Alexis",
+    "Morgan", "Taylor", "Kayla", "Courtney", "Brooke", "Amanda", "Nicole",
+    "Rachel", "Tiffany", "Stephanie", "Chelsea", "Amber", "Samantha",
+    "Andrea", "Vanessa", "Natasha", "Diana", "Carmen", "Jade", "Maya",
+    "Zoe", "Hailey", "Aria"
 ]

@@ -107,6 +107,8 @@ fn mode_toggle(signals: AppSignals) -> impl View {
             .keyboard_navigable()
             .on_click_stop(move |_| {
                 signals.prefs.update(|p| p.mode = mode);
+                let prefs = signals.prefs.get_untracked();
+                crate::theme::save_prefs(&prefs);
             })
             .style(move |s| {
                 let prefs = signals.prefs.get();

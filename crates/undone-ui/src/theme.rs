@@ -1,18 +1,42 @@
 use floem::peniko::Color;
+use std::path::PathBuf;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ThemeMode {
     Light,
     Sepia,
     Dark,
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct UserPrefs {
     pub mode: ThemeMode,
     pub font_family: String,
     pub font_size: u8,
     pub line_height: f32,
+}
+
+fn prefs_path() -> Option<PathBuf> {
+    dirs::config_dir().map(|d| d.join("undone").join("prefs.json"))
+}
+
+pub fn load_prefs() -> UserPrefs {
+    prefs_path()
+        .and_then(|p| std::fs::read_to_string(&p).ok())
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_default()
+}
+
+pub fn save_prefs(prefs: &UserPrefs) {
+    if let Some(path) = prefs_path() {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(
+            &path,
+            serde_json::to_string_pretty(prefs).unwrap_or_default(),
+        );
+    }
 }
 
 impl Default for UserPrefs {
@@ -79,5 +103,22 @@ impl ThemeColors {
                 lamp_glow: Color::rgba8(192, 128, 64, 30), // 12%
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn user_prefs_roundtrip_serde() {
+        let prefs = UserPrefs {
+            mode: ThemeMode::Dark,
+            ..UserPrefs::default()
+        };
+        let json = serde_json::to_string(&prefs).unwrap();
+        let back: UserPrefs = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.mode, ThemeMode::Dark);
+        assert_eq!(back.font_size, prefs.font_size);
     }
 }

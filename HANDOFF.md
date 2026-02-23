@@ -2,18 +2,18 @@
 
 ## Current State
 
-**Branch:** `master`
-**Tests:** 100 passing, 0 clippy warnings.
-**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered with markdown rendering (bold/italic/headings). Literata font embedded. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired (scenes chain). NPC activation events wired to sidebar. screenshot-mcp + game-input-mcp working.
+**Branch:** `engineering-overnight` (worktree off master)
+**Tests:** 104 passing, 0 clippy warnings.
+**App:** Character creation screen on launch (names, age, figure, traits, content prefs). Settings persist across restarts. Saves tab functional (save/load/delete). Names updated to NE US. Three theme modes. Prose centered with markdown rendering. Literata font embedded. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired. NPC activation events wired to sidebar.
 
 ---
 
 ## ⚡ Next Action
 
-Pick from Open Items — Future Sessions list below. Suggested priorities:
-1. **Character creation UI** — replace hardcoded Eva/Ev/Evan with a player config screen
-2. **Writing import** — original prose for base pack scenes
-3. **Names update** — British names.toml → NE US
+Merge `engineering-overnight` branch into master. Then pick from Open Items:
+1. **Settings tab UI** — expose font size, line height, and future prefs as UI controls
+2. **More scenes** — expand base pack content (apartment, work, social events)
+3. **Visual polish** — test char creation UI, refine layout, screenshot audit
 
 ---
 
@@ -56,12 +56,14 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 - Tab/Enter activate focused button
 
 **Key source files:**
-- `crates/undone-ui/src/lib.rs` — AppSignals, AppTab, app_view, placeholder panels
+- `crates/undone-ui/src/lib.rs` — AppSignals, AppTab, AppPhase, app_view
+- `crates/undone-ui/src/char_creation.rs` — character creation form (pre-game phase)
+- `crates/undone-ui/src/saves_panel.rs` — save/load/delete UI
 - `crates/undone-ui/src/title_bar.rs` — custom title bar, tab nav, window controls
 - `crates/undone-ui/src/left_panel.rs` — story panel, centered prose, detail strip, choices bar
 - `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
-- `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs
-- `crates/undone-ui/src/game_state.rs` — GameState, init_game()
+- `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs, save/load prefs
+- `crates/undone-ui/src/game_state.rs` — PreGameState, GameState, init_game(), start_game()
 - `.interface-design/system.md` — full design system spec
 
 ---
@@ -77,27 +79,31 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 7. ~~UI polish~~ ✅
 8. ~~Writing guide~~ ✅
 9. ~~Engineering hardening~~ ✅
-10. **Character creation UI** — player config screen before game starts
-11. **Writing import** — original prose for base pack
-12. **Names update** — names.toml British → NE US
-13. **Saves tab** — wire undone-save to UI
+10. ~~Character creation UI~~ ✅
+11. ~~Writing import~~ ✅ (3 scenes with original prose)
+12. ~~Names update~~ ✅
+13. ~~Saves tab~~ ✅
+14. **Settings tab UI** — expose UserPrefs as interactive controls
+15. **More scenes** — expand base pack content
 
 ---
 
-## Recently Completed (this session)
+## Recently Completed (overnight autonomous session)
 
-- ✅ `resolve_packs_dir()` — exe-relative path for distribution layout
-- ✅ Female NPC effects — apply_effect dispatches on "m"/"f" ref
-- ✅ `NpcActivated` engine event — sidebar receives NPC data on SetActiveMale/Female
-- ✅ Literata variable fonts embedded (include_bytes!, OFL-licensed)
-- ✅ Markdown prose rendering — pulldown-cmark → floem rich_text with bold/italic/headings
+- ✅ Names update — British → NE US (30 male, 30 female, multicultural)
+- ✅ Settings persistence — UserPrefs saved to `%APPDATA%/undone/prefs.json`, survives restart
+- ✅ Character creation UI — full-screen form with text inputs, dropdowns, checkboxes, trait selection, content prefs; `AppPhase` system splits init into `PreGameState` → `start_game()`
+- ✅ Saves tab UI — save/load/delete with `undone-save`; saves to `%APPDATA%/undone/saves/`
+- ✅ rain_shelter rewrite — proper prose, 5 trait branches, transformation dimension, 4 player actions, game flag persistence
+- ✅ morning_routine scene — domestic intro, mirror moment, wardrobe trait branches, coffee decision, NE US details
+- ✅ coffee_shop scene — NPC interaction, trait-dependent dialogue, sit-with-him path, transformation texture, game flags
 
 ## Open Items — Future Sessions
 
-- **Character creation UI** — hardcoded "Eva/Ev/Evan", no player config screen (Large)
-- **Saves tab UI** — undone-save works, needs UI surface (Large)
-- **Settings tab UI** — expose UserPrefs as controls + persistence (Medium-Large)
-- **`packs/base/data/names.toml`** — British names → NE US (Small, writing session)
+- **Settings tab UI** — expose font size, line height as interactive controls (Medium)
+- **More base pack scenes** — apartment, work, social events, evening activities (Large)
+- **Window drag on char creation** — no title bar during char creation means no drag area (Small)
+- **Save metadata display** — show player name / week in save list without full deserialization (Small)
 
 ---
 
@@ -128,3 +134,4 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 | 2026-02-23 | Engineering hardening session: 3-agent team. Window resize grips, prose centering, single-instance (fs4), Display impls for all domain enums, lexer overflow fix, engine expects, scheduler wired to SceneFinished, multi-pack scene loading, pack error visibility. 88 tests, 0 warnings. |
 | 2026-02-23 | Engineering batch: 4 parallel agents in worktrees. packs_dir fix, female NPC effects, NpcActivated event, Literata font embed, markdown prose rendering. 95 tests, 0 warnings. |
 | 2026-02-23 | Engineering hardening 2: FEMININITY unified (removed Player.femininity field, reads from skills map), w.hasStuff() wired to player inventory via StuffId registry, stats registration added to pack system (stats.toml), panics eliminated in error-recovery paths, spawner unwraps hardened. 100 tests, 0 warnings. |
+| 2026-02-23 | Overnight autonomous session: 7 tasks via subagent-driven-development. Names → NE US, settings persistence (dirs + serde_json), character creation UI (AppPhase, PreGameState/GameState split, full form with floem widgets), saves tab (save/load/delete), rain_shelter rewrite (proper prose, 5 trait branches, transformation), morning_routine scene (domestic, mirror, wardrobe, Dunkin'), coffee_shop scene (NPC interaction, sit-with-him path, game flags). 104 tests, 0 warnings. |

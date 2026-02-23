@@ -1,0 +1,120 @@
+[scene]
+id          = "base::morning_routine"
+pack        = "base"
+description = "First morning of a new week. Mirror, wardrobe, coffee decision."
+
+[intro]
+prose = """
+The alarm didn't go off. Your phone says 7:48, which means you set it to PM again, which means the first ten seconds of this week are already a minor catastrophe. Light pushes through the curtains — gray, noncommittal, the kind of sky that won't decide if it's raining until you've committed to shoes.
+
+The apartment is the same apartment. One bedroom off Clement Ave, third floor, the kitchen that's really a corner. Your landlord fixed the radiator in November and broke the hot water in doing so, and now you have both, which counts as a win in this city.
+
+{% if not w.alwaysFemale() %}
+The bathroom mirror is the first checkpoint of the day. It catches you before you're ready — hair still pressed flat on one side, face still soft with sleep. You look at yourself the way you look at someone you're not sure you recognize.
+
+*This is you now.* Not news. Just something that needs restating every morning, like a fact you keep checking because it still doesn't quite sit right.
+{% else %}
+The bathroom mirror catches you before you're ready — hair pressed flat on one side, pillow lines on your cheek. Monday.
+{% endif %}
+
+You get yourself together. Teeth, face, the usual negotiation with your hair.
+
+{% if w.hasTrait("POSH") %}
+You spend actual minutes deciding what to wear. Not because you don't know — you always know — but because the wrong top with the wrong jacket sends a message you didn't write, and you've learned that people in this city read the message before they hear the sentence.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+Jeans. That black top that works with everything. Done. Some women spend an hour getting dressed. You can't figure out what they're doing in there.
+{% elif w.hasTrait("CUTE") %}
+You grab the yellow sweater — the one that makes you look like someone who has her life together, even when the evidence is against it. You catch yourself smiling at your reflection and decide not to interrogate that.
+{% elif w.hasTrait("SULTRY") %}
+The dress or the skirt. You hold both up. The dress says *try me*. The skirt says *I already know*. The skirt wins.
+{% else %}
+You get dressed without ceremony. Whatever's clean, whatever fits the weather. It'll do.
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+Getting dressed is still a small negotiation. Not the mechanics — you've got those. But the decisions. Every piece of clothing is a declaration you didn't have to make before, and some mornings the weight of all those tiny choices adds up before you've even had coffee.
+{% endif %}
+
+Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
+
+Monday.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id        = "coffee_home"
+label     = "Coffee at home"
+detail    = "The kitchen. The mug with the chip. It'll be fine."
+prose     = """
+You make coffee in the kitchen. The machine takes its time. The mug with the chip in the rim — you keep meaning to replace it, but it's the one that holds enough, and you've made peace with the chip.
+
+{% if w.hasTrait("REFINED") %}
+It's terrible coffee. You know exactly how terrible it is. You drink it anyway, standing at the counter, looking out at the fire escape and the brick wall six feet away. Someday you'll buy a French press. Someday you'll have a window that looks at something.
+{% else %}
+It's fine. Not good, not bad, just caffeine in a mug. You drink it standing at the counter because sitting down feels like a commitment to staying.
+{% endif %}
+
+The day is waiting. Best not to keep it.
+"""
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "coffee_dunkin"
+label     = "Grab Dunkin' on the way"
+detail    = "Medium iced, cream, two sugars. The usual."
+prose     = """
+You grab your jacket and your bag and you're out the door before the apartment can talk you into staying.
+
+The Dunkin' on Fifth has a line, because the Dunkin' on Fifth always has a line. You stand behind a guy in a Celtics hoodie who's ordering something with fourteen words in it. The girl behind the counter has the expression of someone who stopped caring at 6 AM and is now operating on pure protocol.
+
+{% if w.hasTrait("SHY") %}
+"Medium iced, cream and sugar." You say it to the register, not to her. She doesn't notice the difference.
+{% elif w.hasTrait("CUTE") %}
+"Medium iced, please? Cream, two sugars?" She gives you the kind of half-smile that says *you're the first person today who used the word please*, and you feel unreasonably good about that for the rest of the block.
+{% else %}
+"Medium iced, cream, two sugars." She's already reaching for the cup before you finish. Some mornings the city just works.
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+The guy behind you in line is standing close. Not inappropriately — just the way men stand, the way they fill space without negotiating for it. You used to stand like that. Now you hold your elbows in and your bag against your hip and you notice the three inches of air between your shoulder and his, and you know those three inches are yours to manage.
+{% endif %}
+
+Coffee in hand. The day starts now.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "skip_coffee"
+label     = "Skip it"
+detail    = "You're already late. Coffee can wait."
+prose     = """
+No coffee. No time. You grab your keys and your bag and you're in the stairwell before you've finished deciding if this was the right call.
+
+The lobby smells like the super's cigarettes and the cleaning product that's supposed to cover for the super's cigarettes. You push through the door into the street and the city takes you.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Coffee is a crutch. You've read the articles. The body wakes up on its own if you let it. By the time you hit the next block you're walking fast and you almost believe this.
+{% else %}
+By the second block, you regret it. By the third, you've stopped noticing. The city has a way of replacing one problem with the next before you've finished the first one.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
