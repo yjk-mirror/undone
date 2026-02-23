@@ -263,6 +263,16 @@ pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &Wor
             EngineEvent::ActionsAvailable(actions) => {
                 signals.actions.set(actions);
             }
+            EngineEvent::NpcActivated(data) => {
+                signals.active_npc.set(data.as_ref().map(|d| NpcSnapshot {
+                    name: d.name.clone(),
+                    age: format!("{}", d.age),
+                    personality: format!("{:?}", d.personality),
+                    relationship: format!("{}", d.relationship),
+                    pc_liking: format!("{}", d.pc_liking),
+                    pc_attraction: format!("{}", d.pc_attraction),
+                }));
+            }
             EngineEvent::SceneFinished => {
                 signals.actions.set(vec![]);
                 scene_finished = true;

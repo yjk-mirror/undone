@@ -25,6 +25,9 @@ indexmap    = "2"
 # Template rendering
 minijinja   = "2"
 
+# Markdown parsing
+pulldown-cmark = "0.13"
+
 # GUI — replace existing eframe/egui lines with:
 floem = { version = "0.2" }
 

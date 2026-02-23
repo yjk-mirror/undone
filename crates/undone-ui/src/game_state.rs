@@ -1,6 +1,6 @@
 use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::PathBuf;
 
 use undone_domain::{Age, BreastSize, Player, PlayerFigure, Sexuality};
 use undone_packs::{
@@ -22,11 +22,26 @@ pub struct GameState {
     pub init_error: Option<String>,
 }
 
+/// Resolve the packs directory. Tries:
+/// 1. `<exe_dir>/packs` (distribution layout)
+/// 2. `./packs` (cargo run from workspace root)
+fn resolve_packs_dir() -> PathBuf {
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            let candidate = dir.join("packs");
+            if candidate.is_dir() {
+                return candidate;
+            }
+        }
+    }
+    PathBuf::from("packs")
+}
+
 pub fn init_game() -> GameState {
-    let packs_dir = Path::new("packs");
+    let packs_dir = resolve_packs_dir();
 
     // Load all packs from packs/ directory
-    let (mut registry, metas) = match load_packs(packs_dir) {
+    let (mut registry, metas) = match load_packs(&packs_dir) {
         Ok(r) => r,
         Err(e) => {
             let msg = format!("Failed to load packs: {e}");
@@ -97,6 +112,17 @@ pub fn init_game() -> GameState {
         scheduler,
         rng,
         init_error: None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resolve_packs_dir_returns_path_ending_in_packs() {
+        let dir = resolve_packs_dir();
+        assert_eq!(dir.file_name().unwrap(), "packs");
     }
 }
 

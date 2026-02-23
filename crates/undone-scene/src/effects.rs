@@ -1,5 +1,5 @@
 use thiserror::Error;
-use undone_domain::{ArousalLevel, LikingLevel, LoveLevel, MaleNpcKey, SkillValue};
+use undone_domain::{ArousalLevel, FemaleNpcKey, LikingLevel, LoveLevel, MaleNpcKey, SkillValue};
 use undone_expr::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
@@ -130,33 +130,60 @@ pub fn apply_effect(
             });
             entry.value += amount;
         }
-        EffectDef::AddNpcLiking { npc, delta } => {
-            let key = resolve_male_npc_ref(npc, ctx)?;
-            let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
-            npc_data.core.pc_liking = step_liking(npc_data.core.pc_liking, *delta);
-        }
-        EffectDef::AddNpcLove { npc, delta } => {
-            let key = resolve_male_npc_ref(npc, ctx)?;
-            let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
-            npc_data.core.npc_love = step_love(npc_data.core.npc_love, *delta);
-        }
-        EffectDef::AddWLiking { npc, delta } => {
-            let key = resolve_male_npc_ref(npc, ctx)?;
-            let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
-            npc_data.core.npc_liking = step_liking(npc_data.core.npc_liking, *delta);
-        }
-        EffectDef::SetNpcFlag { npc, flag } => {
-            let key = resolve_male_npc_ref(npc, ctx)?;
-            let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
-            npc_data.core.relationship_flags.insert(flag.clone());
-        }
+        EffectDef::AddNpcLiking { npc, delta } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.pc_liking = step_liking(npc_data.core.pc_liking, *delta);
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.pc_liking = step_liking(npc_data.core.pc_liking, *delta);
+            }
+        },
+        EffectDef::AddNpcLove { npc, delta } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_love = step_love(npc_data.core.npc_love, *delta);
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_love = step_love(npc_data.core.npc_love, *delta);
+            }
+        },
+        EffectDef::AddWLiking { npc, delta } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_liking = step_liking(npc_data.core.npc_liking, *delta);
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_liking = step_liking(npc_data.core.npc_liking, *delta);
+            }
+        },
+        EffectDef::SetNpcFlag { npc, flag } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.relationship_flags.insert(flag.clone());
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.relationship_flags.insert(flag.clone());
+            }
+        },
         EffectDef::AddNpcTrait { npc, trait_id } => {
-            let key = resolve_male_npc_ref(npc, ctx)?;
             let tid = registry
                 .resolve_npc_trait(trait_id)
                 .map_err(|_| EffectError::UnknownNpcTrait(trait_id.clone()))?;
-            let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
-            npc_data.core.traits.insert(tid);
+            match resolve_npc_ref(npc, ctx)? {
+                NpcRef::Male(key) => {
+                    let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.traits.insert(tid);
+                }
+                NpcRef::Female(key) => {
+                    let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.traits.insert(tid);
+                }
+            }
         }
         EffectDef::Transition { .. } => {
             // Dead code path. EffectDef::Transition exists so that `type =
@@ -170,9 +197,21 @@ pub fn apply_effect(
     Ok(())
 }
 
-fn resolve_male_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<MaleNpcKey, EffectError> {
+enum NpcRef {
+    Male(MaleNpcKey),
+    Female(FemaleNpcKey),
+}
+
+fn resolve_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<NpcRef, EffectError> {
     match npc {
-        "m" => ctx.active_male.ok_or(EffectError::NoActiveMale),
+        "m" => ctx
+            .active_male
+            .map(NpcRef::Male)
+            .ok_or(EffectError::NoActiveMale),
+        "f" => ctx
+            .active_female
+            .map(NpcRef::Female)
+            .ok_or(EffectError::NoActiveFemale),
         _ => Err(EffectError::BadNpcRef(npc.to_string())),
     }
 }
@@ -190,6 +229,42 @@ mod tests {
     use slotmap::SlotMap;
     use undone_domain::*;
     use undone_world::{GameData, World};
+
+    fn make_female_npc() -> FemaleNpc {
+        FemaleNpc {
+            core: NpcCore {
+                name: "Fiona".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                eye_colour: "green".into(),
+                hair_colour: "red".into(),
+                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Stranger,
+                pc_liking: LikingLevel::Neutral,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: ArousalLevel::Comfort,
+                alcohol: AlcoholLevel::Sober,
+            },
+            char_type: CharTypeId(lasso::Spur::try_from_usize(0).unwrap()),
+            figure: PlayerFigure::Slim,
+            breasts: BreastSize::MediumSmall,
+            clothing: FemaleClothing::default(),
+            pregnancy: None,
+            virgin: true,
+        }
+    }
 
     fn make_world() -> World {
         World {
@@ -368,5 +443,88 @@ mod tests {
         )
         .unwrap();
         assert_eq!(world.male_npcs[key].core.pc_liking, LikingLevel::Close);
+    }
+
+    #[test]
+    fn add_npc_liking_works_for_female() {
+        let mut world = make_world();
+        let key = world.female_npcs.insert(make_female_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_female = Some(key);
+        let reg = PackRegistry::new();
+        apply_effect(
+            &EffectDef::AddNpcLiking {
+                npc: "f".into(),
+                delta: 1,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.female_npcs[key].core.pc_liking, LikingLevel::Ok);
+    }
+
+    #[test]
+    fn add_npc_love_works_for_female() {
+        let mut world = make_world();
+        let key = world.female_npcs.insert(make_female_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_female = Some(key);
+        let reg = PackRegistry::new();
+        apply_effect(
+            &EffectDef::AddNpcLove {
+                npc: "f".into(),
+                delta: 2,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.female_npcs[key].core.npc_love, LoveLevel::Confused);
+    }
+
+    #[test]
+    fn set_npc_flag_works_for_female() {
+        let mut world = make_world();
+        let key = world.female_npcs.insert(make_female_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_female = Some(key);
+        let reg = PackRegistry::new();
+        apply_effect(
+            &EffectDef::SetNpcFlag {
+                npc: "f".into(),
+                flag: "kissed".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(world.female_npcs[key]
+            .core
+            .relationship_flags
+            .contains("kissed"));
+    }
+
+    #[test]
+    fn add_w_liking_works_for_female() {
+        let mut world = make_world();
+        let key = world.female_npcs.insert(make_female_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_female = Some(key);
+        let reg = PackRegistry::new();
+        apply_effect(
+            &EffectDef::AddWLiking {
+                npc: "f".into(),
+                delta: 1,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.female_npcs[key].core.npc_liking, LikingLevel::Ok);
     }
 }

@@ -39,11 +39,35 @@ pub enum EngineCommand {
     SetActiveFemale(FemaleNpcKey),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EngineEvent {
     ProseAdded(String),
     ActionsAvailable(Vec<ActionView>),
+    NpcActivated(Option<NpcActivatedData>),
     SceneFinished,
+}
+
+#[derive(Debug, Clone)]
+pub struct NpcActivatedData {
+    pub name: String,
+    pub age: undone_domain::Age,
+    pub personality: undone_domain::PersonalityId,
+    pub relationship: undone_domain::RelationshipStatus,
+    pub pc_liking: undone_domain::LikingLevel,
+    pub pc_attraction: undone_domain::AttractionLevel,
+}
+
+impl From<&undone_domain::NpcCore> for NpcActivatedData {
+    fn from(npc: &undone_domain::NpcCore) -> Self {
+        Self {
+            name: npc.name.clone(),
+            age: npc.age,
+            personality: npc.personality,
+            relationship: npc.relationship.clone(),
+            pc_liking: npc.pc_liking,
+            pc_attraction: npc.pc_attraction,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -80,10 +104,22 @@ impl SceneEngine {
                 if let Some(frame) = self.stack.last_mut() {
                     frame.ctx.active_male = Some(key);
                 }
+                if let Some(npc) = world.male_npc(key) {
+                    self.events
+                        .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from(
+                            &npc.core,
+                        ))));
+                }
             }
             EngineCommand::SetActiveFemale(key) => {
                 if let Some(frame) = self.stack.last_mut() {
                     frame.ctx.active_female = Some(key);
+                }
+                if let Some(npc) = world.female_npc(key) {
+                    self.events
+                        .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from(
+                            &npc.core,
+                        ))));
                 }
             }
         }
@@ -149,7 +185,10 @@ impl SceneEngine {
 
         // Apply effects
         {
-            let frame = self.stack.last_mut().expect("engine stack must not be empty");
+            let frame = self
+                .stack
+                .last_mut()
+                .expect("engine stack must not be empty");
             for effect in &action.effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     eprintln!("[scene-engine] effect error: {e}");
@@ -258,7 +297,10 @@ impl SceneEngine {
 
         // Apply NPC action effects
         {
-            let frame = self.stack.last_mut().expect("engine stack must not be empty");
+            let frame = self
+                .stack
+                .last_mut()
+                .expect("engine stack must not be empty");
             for effect in &effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     eprintln!("[scene-engine] npc effect error: {e}");
@@ -289,6 +331,7 @@ impl SceneEngine {
 
             if branch.finish {
                 self.stack.pop();
+                self.events.push_back(EngineEvent::NpcActivated(None));
                 self.events.push_back(EngineEvent::SceneFinished);
                 return;
             }
@@ -316,6 +359,7 @@ mod tests {
     use super::*;
     use std::collections::{HashMap, HashSet};
 
+    use lasso::Key;
     use slotmap::SlotMap;
     use undone_domain::*;
     use undone_world::{GameData, World};
@@ -575,5 +619,90 @@ mod tests {
         // Without the flag, only "always" should be visible
         assert_eq!(actions_event.len(), 1, "expected 1 visible action");
         assert_eq!(actions_event[0].id, "always");
+    }
+
+    #[test]
+    fn set_active_male_emits_npc_activated() {
+        let scene = make_simple_scene();
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = undone_packs::PackRegistry::new();
+
+        let npc = MaleNpc {
+            core: NpcCore {
+                name: "Jake".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Stranger,
+                pc_liking: LikingLevel::Neutral,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: ArousalLevel::Comfort,
+                alcohol: AlcoholLevel::Sober,
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        let key = world.male_npcs.insert(npc);
+
+        // Need a scene on the stack for SetActiveMale to work
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(EngineCommand::SetActiveMale(key), &mut world, &registry);
+        let events = engine.drain();
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::NpcActivated(Some(_)))),
+            "expected NpcActivated event with data"
+        );
+    }
+
+    #[test]
+    fn scene_finished_clears_npc_activated() {
+        let mut engine = make_engine_with(make_simple_scene());
+        let mut world = make_world();
+        let registry = undone_packs::PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("leave".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::NpcActivated(None))),
+            "expected NpcActivated(None) on scene finish"
+        );
     }
 }

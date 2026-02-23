@@ -1,4 +1,4 @@
-use floem::{kurbo::Size, window::WindowConfig, Application};
+use floem::{kurbo::Size, text::FONT_SYSTEM, window::WindowConfig, Application};
 use std::fs;
 use std::io::Write;
 
@@ -28,6 +28,16 @@ fn main() {
         }
     }
     let _lock = lock_file; // hold until process exits
+
+    // Register bundled Literata font (OFL-licensed, variable fonts).
+    // This must happen before the Application is created so the font system
+    // is ready when the first TextLayout is built.
+    {
+        let mut fs = FONT_SYSTEM.lock();
+        let db = fs.db_mut();
+        db.load_font_data(include_bytes!("../assets/fonts/Literata-Variable.ttf").to_vec());
+        db.load_font_data(include_bytes!("../assets/fonts/Literata-Variable-Italic.ttf").to_vec());
+    }
 
     Application::new()
         .window(
