@@ -224,9 +224,7 @@ pub fn eval_call_bool(
                 "isWAttractionOk" => {
                     Ok(npc.core.pc_attraction >= undone_domain::AttractionLevel::Ok)
                 }
-                "isNpcLoveCrush" => {
-                    Ok(npc.core.npc_love >= undone_domain::LoveLevel::Crush)
-                }
+                "isNpcLoveCrush" => Ok(npc.core.npc_love >= undone_domain::LoveLevel::Crush),
                 "isNpcLoveSome" => Ok(npc.core.npc_love >= undone_domain::LoveLevel::Some),
                 "isWLoveCrush" => Ok(npc.core.pc_love >= undone_domain::LoveLevel::Crush),
                 _ => Err(EvalError::UnknownMethod {

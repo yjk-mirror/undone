@@ -159,7 +159,12 @@ pub fn apply_effect(
             npc_data.core.traits.insert(tid);
         }
         EffectDef::Transition { .. } => {
-            // Handled by the engine's routing logic, not here.
+            // Dead code path. EffectDef::Transition exists so that `type =
+            // "transition"` in TOML deserialises without error.  Scene
+            // transitions are actually driven by NextBranch.goto in the engine
+            // (evaluate_next), not by apply_effect.  If a pack author
+            // mistakenly places a transition inside [[actions.effects]] it is
+            // silently ignored here rather than crashing.
         }
     }
     Ok(())

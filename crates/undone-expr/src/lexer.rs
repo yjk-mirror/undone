@@ -36,6 +36,8 @@ pub enum LexError {
     UnexpectedChar(char, usize),
     #[error("unterminated string at position {0}")]
     UnterminatedString(usize),
+    #[error("integer literal overflows i64")]
+    IntegerOverflow,
 }
 
 pub fn tokenize(src: &str) -> Result<Vec<Token>, LexError> {
@@ -123,7 +125,8 @@ pub fn tokenize(src: &str) -> Result<Vec<Token>, LexError> {
                     i += 1;
                 }
                 let n: String = chars[start..i].iter().collect();
-                tokens.push(Token::IntLit(n.parse().unwrap()));
+                let value = n.parse::<i64>().map_err(|_| LexError::IntegerOverflow)?;
+                tokens.push(Token::IntLit(value));
             }
             c if c.is_alphabetic() || c == '_' => {
                 let start = i;
@@ -187,5 +190,14 @@ mod tests {
         let toks = tokenize("true && false").unwrap();
         assert_eq!(toks[0], Token::BoolLit(true));
         assert_eq!(toks[2], Token::BoolLit(false));
+    }
+
+    #[test]
+    fn integer_overflow_returns_error() {
+        let result = tokenize("99999999999999999999");
+        assert!(
+            matches!(result, Err(LexError::IntegerOverflow)),
+            "expected IntegerOverflow error, got: {result:?}"
+        );
     }
 }

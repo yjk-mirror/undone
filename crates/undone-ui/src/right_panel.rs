@@ -120,7 +120,11 @@ fn mode_toggle(signals: AppSignals) -> impl View {
                     .margin_right(6.0)
                     .font_family("system-ui, -apple-system, sans-serif".to_string())
                     .border_color(if is_active { colors.lamp } else { colors.seam })
-                    .color(if is_active { colors.lamp } else { colors.ink_ghost })
+                    .color(if is_active {
+                        colors.lamp
+                    } else {
+                        colors.ink_ghost
+                    })
                     .background(if is_active {
                         colors.lamp_glow
                     } else {

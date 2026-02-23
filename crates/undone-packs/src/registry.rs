@@ -242,10 +242,7 @@ mod tests {
     #[test]
     fn register_names_accumulates() {
         let mut reg = PackRegistry::new();
-        reg.register_names(
-            vec!["James".into(), "Thomas".into()],
-            vec!["Emma".into()],
-        );
+        reg.register_names(vec!["James".into(), "Thomas".into()], vec!["Emma".into()]);
         assert_eq!(reg.male_names(), &["James", "Thomas"]);
         assert_eq!(reg.female_names(), &["Emma"]);
     }

@@ -138,7 +138,7 @@ impl SceneEngine {
 
         // Render action prose (if non-empty)
         if !action.prose.is_empty() {
-            let frame = self.stack.last().unwrap();
+            let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&action.prose, world, &frame.ctx, registry) {
                 Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
                 Err(e) => self
@@ -149,7 +149,7 @@ impl SceneEngine {
 
         // Apply effects
         {
-            let frame = self.stack.last_mut().unwrap();
+            let frame = self.stack.last_mut().expect("engine stack must not be empty");
             for effect in &action.effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     eprintln!("[scene-engine] effect error: {e}");
@@ -194,7 +194,7 @@ impl SceneEngine {
     fn run_npc_actions(&mut self, world: &mut World, registry: &PackRegistry) {
         // Collect eligible NPC actions (condition passes) with their weights
         let npc_actions: Vec<(usize, u32)> = {
-            let frame = self.stack.last().unwrap();
+            let frame = self.stack.last().expect("engine stack must not be empty");
             frame
                 .def
                 .npc_actions
@@ -240,14 +240,14 @@ impl SceneEngine {
 
         // Clone data we need before borrowing mutably
         let (prose, effects): (String, Vec<_>) = {
-            let frame = self.stack.last().unwrap();
+            let frame = self.stack.last().expect("engine stack must not be empty");
             let na = &frame.def.npc_actions[idx];
             (na.prose.clone(), na.effects.clone())
         };
 
         // Render NPC prose
         if !prose.is_empty() {
-            let frame = self.stack.last().unwrap();
+            let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&prose, world, &frame.ctx, registry) {
                 Ok(rendered) => self.events.push_back(EngineEvent::ProseAdded(rendered)),
                 Err(e) => self
@@ -258,7 +258,7 @@ impl SceneEngine {
 
         // Apply NPC action effects
         {
-            let frame = self.stack.last_mut().unwrap();
+            let frame = self.stack.last_mut().expect("engine stack must not be empty");
             for effect in &effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     eprintln!("[scene-engine] npc effect error: {e}");
@@ -277,7 +277,7 @@ impl SceneEngine {
         for branch in &branches {
             let condition_passes = match &branch.condition {
                 Some(expr) => {
-                    let frame = self.stack.last().unwrap();
+                    let frame = self.stack.last().expect("engine stack must not be empty");
                     eval(expr, world, &frame.ctx, registry).unwrap_or(false)
                 }
                 None => true,

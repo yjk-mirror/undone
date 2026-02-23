@@ -9,12 +9,17 @@ use undone_packs::{
 };
 use undone_scene::engine::SceneEngine;
 use undone_scene::loader::load_scenes;
+use undone_scene::scheduler::{load_schedule, Scheduler};
 use undone_world::{GameData, World};
 
 pub struct GameState {
     pub world: World,
     pub registry: PackRegistry,
     pub engine: SceneEngine,
+    pub scheduler: Scheduler,
+    pub rng: SmallRng,
+    /// Set when pack loading fails; checked by app_view to surface the error.
+    pub init_error: Option<String>,
 }
 
 pub fn init_game() -> GameState {
@@ -24,7 +29,8 @@ pub fn init_game() -> GameState {
     let (mut registry, metas) = match load_packs(packs_dir) {
         Ok(r) => r,
         Err(e) => {
-            eprintln!("[init] pack load error: {e}");
+            let msg = format!("Failed to load packs: {e}");
+            eprintln!("[init] {msg}");
             return GameState {
                 world: World {
                     player: placeholder_player(),
@@ -34,6 +40,12 @@ pub fn init_game() -> GameState {
                 },
                 registry: PackRegistry::new(),
                 engine: SceneEngine::new(HashMap::new()),
+                scheduler: load_schedule(&[]).unwrap_or_else(|_| {
+                    // load_schedule on empty slice cannot fail; this branch is unreachable
+                    panic!("load_schedule on empty slice failed")
+                }),
+                rng: SmallRng::from_entropy(),
+                init_error: Some(msg),
             };
         }
     };
@@ -59,21 +71,32 @@ pub fn init_game() -> GameState {
     let mut rng = SmallRng::from_entropy();
     let world = new_game(config, &mut registry, &mut rng);
 
-    // Load scenes from the base pack
-    let scenes = metas
-        .iter()
-        .find(|m| m.manifest.pack.id == "base")
-        .and_then(|m| {
-            let scene_dir = m.pack_dir.join(&m.manifest.content.scenes_dir);
-            load_scenes(&scene_dir, &registry).ok()
-        })
-        .unwrap_or_default();
+    // Load scenes from ALL packs (merge into one map)
+    let mut scenes: HashMap<String, _> = HashMap::new();
+    for meta in &metas {
+        let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
+        if let Ok(pack_scenes) = load_scenes(&scene_dir, &registry) {
+            scenes.extend(pack_scenes);
+        }
+    }
+
+    // Build scheduler from all pack metas
+    let scheduler = match load_schedule(&metas) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("[init] scheduler load error: {e}");
+            load_schedule(&[]).expect("empty schedule should never fail")
+        }
+    };
 
     let engine = SceneEngine::new(scenes);
     GameState {
         world,
         registry,
         engine,
+        scheduler,
+        rng,
+        init_error: None,
     }
 }
 

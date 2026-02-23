@@ -3,54 +3,28 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 87 passing, 0 clippy warnings.
+**Tests:** 88 passing, 0 clippy warnings.
 **App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered. Choice detail strip. screenshot-mcp working.
 
 ---
 
-## ⚡ Next Action: game-input-mcp
+## ⚡ Next Action
 
-Build `undone-tools/game-input-mcp` — a new MCP server for background game interaction.
-See **game-input-mcp plan** section below.
+Continue engineering work: PersonalityId Display, hasStuff() wiring, or other items from Open Items.
 
 ---
 
-## game-input-mcp — Plan
+## game-input-mcp — Done
 
-**Goal:** Allow Claude to interact with the running game without stealing focus or interrupting the user.
+**Built:** `undone-tools/game-input-mcp` — MCP server for background game interaction.
+Uses `PostMessage(WM_KEYDOWN/WM_KEYUP)` and `PostMessage(WM_LBUTTONDOWN/WM_LBUTTONUP)`
+— no focus steal, no cursor movement.
 
-**Approach:** `PostMessage(HWND, WM_KEYDOWN/WM_KEYUP, vkey, lparam)` and
-`PostMessage(HWND, WM_LBUTTONDOWN/UP, 0, MAKELPARAM(x,y))` — posts directly into the
-target window's message queue. No `SetForegroundWindow`, no `SendInput`, no focus steal,
-no cursor movement. Floem/winit processes these like real input.
+**Tools:** `press_key(title, key)` and `click(title, x, y)`.
+Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 
-**New crate:** `undone-tools/game-input-mcp` — same pattern as screenshot-mcp
-(`rmcp` 0.8 + stdio transport, `windows-rs` for Win32).
-
-**Tools to expose:**
-
-| Tool | Signature | Notes |
-|------|-----------|-------|
-| `press_key` | `(title: string, key: string)` | Find HWND by partial title, post WM_KEYDOWN + WM_KEYUP. Key strings: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"` |
-| `click` | `(title: string, x: i32, y: i32)` | Post WM_LBUTTONDOWN + WM_LBUTTONUP at window-client-relative coords |
-
-**Windows features needed:**
-```toml
-windows = { version = "0.58", features = [
-    "Win32_Foundation",
-    "Win32_UI_WindowsAndMessaging",
-    "Win32_UI_Input_KeyboardAndMouse",
-] }
-```
-
-**Key mapping:** `"1"`–`"9"` → `VK_1`–`VK_9` (0x31–0x39). `"enter"` → `VK_RETURN`.
-`"tab"` → `VK_TAB`. `"escape"` → `VK_ESCAPE`.
-
-**lparam for WM_KEYDOWN:** bits 0–15 = repeat count (1), bits 16–23 = scan code
-(`MapVirtualKeyW(vk, MAPVK_VK_TO_VSC)`), bit 24 = extended key flag.
-
-**Wiring:** Add to `undone-tools/Cargo.toml` workspace members. Build release binary.
-Add entry to `.mcp.json` alongside screenshot-mcp. Restart Claude Code to activate.
+**Binary:** `undone-tools/target/release/game-input-mcp.exe` (2.9 MB).
+**.mcp.json** updated with `game-input` server entry. Restart Claude Code to activate.
 
 ---
 
@@ -104,14 +78,31 @@ Add entry to `.mcp.json` alongside screenshot-mcp. Restart Claude Code to activa
 
 ---
 
-## Open Items
+## Recently Completed (this session)
 
-- Focus-stays-after-click in floem — being fixed this session (Fix 1 above)
-- `w.hasStuff()` returns false (StuffId registry stub) — needed when inventory matters
-- `PersonalityId` Display impl missing — using Debug format in NPC panel for now
-- Literata font loading from disk — deferred; using Georgia fallback
-- Markdown in prose (pulldown-cmark → floem RichText) — planned, not yet designed
-- `packs/base/data/names.toml` has British names — writing session
+- ✅ Display impls for all domain enums (Arousal, Alcohol, Age, Relationship, etc.)
+- ✅ Lexer integer overflow → returns LexError::IntegerOverflow
+- ✅ Engine stack unwrap → expect (better crash diagnostics)
+- ✅ Scheduler wired — SceneFinished → scheduler.pick() → next scene
+- ✅ Multi-pack scene loading (iterate all metas, merge scenes)
+- ✅ Pack load failure surfaced in UI (init_error field)
+- ✅ Window resize grips (drag_resize_window_area on all edges/corners)
+- ✅ Prose centering (flex_row + justify_center)
+- ✅ Single-instance guard (fs4 file lock)
+- ✅ game-input-mcp built and verified
+- ✅ cargo fmt --all
+
+## Open Items — Future Sessions
+
+- **Character creation UI** — hardcoded "Eva/Ev/Evan", no player config screen (Large)
+- **Saves tab UI** — undone-save works, needs UI surface (Large)
+- **Markdown in prose** — pulldown-cmark → floem RichText (Large)
+- **Settings tab UI** — expose UserPrefs as controls + persistence (Medium-Large)
+- **Literata font** — loading from disk, currently Georgia fallback (Small-Medium)
+- **`packs/base/data/names.toml`** — British names → NE US (Small, writing session)
+- **Female NPC effects** — apply_effect only handles male NPCs (Medium)
+- **`active_npc` signal** — NPC panel always empty, needs EngineEvent (Medium)
+- **`packs_dir` relative path** — fragile for distribution (Small-Medium)
 
 ---
 
@@ -138,3 +129,4 @@ Add entry to `.mcp.json` alongside screenshot-mcp. Restart Claude Code to activa
 | 2026-02-23 | UI polish: screenshot-mcp verified working. Applied 5/6 audit fixes (focus_visible, single seam, chrome font, hover signal, border-radius 4px). Fix 3 letter_spacing not available in floem 0.2. Window config + panel swap committed. Code reviewed — fixed missed NPC name font, double prefs.get(), renamed left_panel→story_panel / right_panel→sidebar_panel. Merged to master. |
 | 2026-02-23 | Writing guide session: docs/writing-guide.md written. NE US locale, Minijinja syntax, FEMININITY dial, four transformation textures, content gating (BLOCK_ROUGH/LIKES_ROUGH), markdown in prose, scene design principles, full checklist. Adapted from newlife-plus writing-style.md + scene-design.md. Added to CLAUDE.md key documents. |
 | 2026-02-23 | UI session: 3-agent team. Custom title bar (no OS chrome, Game/Saves/Settings nav, window controls). Prose centered in story panel. Choice detail strip (hover shows action.detail). Sepia theme darkened (warm amber-cream, not muddy). 87 tests pass. Documented game-input-mcp plan (PostMessage, no focus steal). |
+| 2026-02-23 | Built game-input-mcp: press_key + click tools via PostMessage, no focus steal. Release binary built, .mcp.json updated. Restart to activate. |

@@ -25,6 +25,12 @@
       "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/screenshot-mcp.exe",
       "args": [],
       "env": {}
+    },
+    "game-input": {
+      "type": "stdio",
+      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/game-input-mcp.exe",
+      "args": [],
+      "env": {}
     }
   }
 }

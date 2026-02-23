@@ -1,4 +1,6 @@
-use crate::{Age, AlcoholLevel, ArousalLevel, BreastSize, PlayerFigure, Sexuality, SkillId, StuffId, TraitId};
+use crate::{
+    Age, AlcoholLevel, ArousalLevel, BreastSize, PlayerFigure, Sexuality, SkillId, StuffId, TraitId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 

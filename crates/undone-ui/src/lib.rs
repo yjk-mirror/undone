@@ -6,6 +6,9 @@ pub mod title_bar;
 
 use floem::prelude::*;
 use floem::reactive::RwSignal;
+use floem::style::Position;
+use floem::views::drag_resize_window_area;
+use floem::window::ResizeDirection;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
@@ -74,8 +77,8 @@ impl From<&undone_domain::Player> for PlayerSnapshot {
             money: p.money,
             stress: p.stress,
             anxiety: p.anxiety,
-            arousal: format!("{:?}", p.arousal),
-            alcohol: format!("{:?}", p.alcohol),
+            arousal: format!("{}", p.arousal),
+            alcohol: format!("{}", p.alcohol),
         }
     }
 }
@@ -95,11 +98,11 @@ impl From<&undone_domain::NpcCore> for NpcSnapshot {
     fn from(npc: &undone_domain::NpcCore) -> Self {
         Self {
             name: npc.name.clone(),
-            age: format!("{:?}", npc.age),
+            age: format!("{}", npc.age),
             personality: format!("{:?}", npc.personality),
-            relationship: format!("{:?}", npc.relationship),
-            pc_liking: format!("{:?}", npc.pc_liking),
-            pc_attraction: format!("{:?}", npc.pc_attraction),
+            relationship: format!("{}", npc.relationship),
+            pc_liking: format!("{}", npc.pc_liking),
+            pc_attraction: format!("{}", npc.pc_attraction),
         }
     }
 }
@@ -109,21 +112,41 @@ pub fn app_view() -> impl View {
 
     let state = Rc::new(RefCell::new(init_game()));
 
-    // Start opening scene on app launch
+    // Surface pack-load errors in the story panel.
+    {
+        let gs = state.borrow();
+        if let Some(ref err) = gs.init_error {
+            signals.story.set(err.clone());
+        }
+    }
+
+    // Start opening scene on app launch (only when packs loaded successfully).
     {
         let mut gs = state.borrow_mut();
-        let GameState {
-            ref mut engine,
-            ref mut world,
-            ref registry,
-        } = *gs;
-        engine.send(
-            EngineCommand::StartScene("base::rain_shelter".into()),
-            world,
-            registry,
-        );
-        let events = engine.drain();
-        process_events(events, signals, world);
+        if gs.init_error.is_none() {
+            let GameState {
+                ref mut engine,
+                ref mut world,
+                ref registry,
+                ref scheduler,
+                ref mut rng,
+                ..
+            } = *gs;
+            engine.send(
+                EngineCommand::StartScene("base::rain_shelter".into()),
+                world,
+                registry,
+            );
+            let events = engine.drain();
+            let finished = process_events(events, signals, world);
+            if finished {
+                if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
+                    engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                    let events = engine.drain();
+                    process_events(events, signals, world);
+                }
+            }
+        }
     }
 
     let content = dyn_container(
@@ -143,13 +166,90 @@ pub fn app_view() -> impl View {
     )
     .style(|s| s.flex_grow(1.0));
 
-    v_stack((title_bar(signals), content)).style(move |s| {
+    let main_column = v_stack((title_bar(signals), content)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
-    })
+    });
+
+    // Resize grips — thin invisible strips on all edges/corners.
+    // Required because show_titlebar(false) removes the OS resize borders.
+    let grip = 5.0; // px, invisible hit area
+
+    let top = drag_resize_window_area(ResizeDirection::North, empty())
+        .style(move |s| s.width_full().height(grip).position(Position::Absolute));
+
+    let bottom = drag_resize_window_area(ResizeDirection::South, empty()).style(move |s| {
+        s.width_full()
+            .height(grip)
+            .position(Position::Absolute)
+            .inset_bottom(0.0)
+    });
+
+    let left = drag_resize_window_area(ResizeDirection::West, empty()).style(move |s| {
+        s.width(grip)
+            .height_full()
+            .position(Position::Absolute)
+            .inset_left(0.0)
+    });
+
+    let right = drag_resize_window_area(ResizeDirection::East, empty()).style(move |s| {
+        s.width(grip)
+            .height_full()
+            .position(Position::Absolute)
+            .inset_right(0.0)
+    });
+
+    let top_left = drag_resize_window_area(ResizeDirection::NorthWest, empty()).style(move |s| {
+        s.width(grip)
+            .height(grip)
+            .position(Position::Absolute)
+            .inset_top(0.0)
+            .inset_left(0.0)
+    });
+
+    let top_right = drag_resize_window_area(ResizeDirection::NorthEast, empty()).style(move |s| {
+        s.width(grip)
+            .height(grip)
+            .position(Position::Absolute)
+            .inset_top(0.0)
+            .inset_right(0.0)
+    });
+
+    let bottom_left =
+        drag_resize_window_area(ResizeDirection::SouthWest, empty()).style(move |s| {
+            s.width(grip)
+                .height(grip)
+                .position(Position::Absolute)
+                .inset_bottom(0.0)
+                .inset_left(0.0)
+        });
+
+    let bottom_right =
+        drag_resize_window_area(ResizeDirection::SouthEast, empty()).style(move |s| {
+            s.width(grip)
+                .height(grip)
+                .position(Position::Absolute)
+                .inset_bottom(0.0)
+                .inset_right(0.0)
+        });
+
+    (
+        main_column,
+        top,
+        bottom,
+        left,
+        right,
+        top_left,
+        top_right,
+        bottom_left,
+        bottom_right,
+    )
+        .style(|s| s.size_full())
 }
 
-pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &World) {
+/// Process engine events, updating signals. Returns `true` if `SceneFinished` was among them.
+pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &World) -> bool {
+    let mut scene_finished = false;
     for event in events {
         match event {
             EngineEvent::ProseAdded(text) => {
@@ -165,20 +265,19 @@ pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &Wor
             }
             EngineEvent::SceneFinished => {
                 signals.actions.set(vec![]);
-                // Scheduler integration: future session will pick next scene
+                scene_finished = true;
             }
         }
     }
     signals.player.set(PlayerSnapshot::from(&world.player));
+    scene_finished
 }
 
 fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
-    container(
-        label(move || msg.to_string()).style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.color(colors.ink_dim).font_size(16.0)
-        }),
-    )
+    container(label(move || msg.to_string()).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.color(colors.ink_dim).font_size(16.0)
+    }))
     .style(|s| s.size_full().items_center().justify_center())
 }
 

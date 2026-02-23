@@ -10,7 +10,35 @@ use floem::style::FlexWrap;
 use floem::views::dyn_stack;
 use std::cell::RefCell;
 use std::rc::Rc;
-use undone_scene::engine::ActionView;
+use undone_scene::engine::{ActionView, EngineCommand};
+
+/// Send a `ChooseAction` command, drain events, and if the scene finished,
+/// ask the scheduler to pick the next scene and start it.
+fn dispatch_action(
+    action_id: String,
+    state: &Rc<RefCell<GameState>>,
+    signals: AppSignals,
+) {
+    let mut gs = state.borrow_mut();
+    let GameState {
+        ref mut engine,
+        ref mut world,
+        ref registry,
+        ref scheduler,
+        ref mut rng,
+        ..
+    } = *gs;
+    engine.send(EngineCommand::ChooseAction(action_id), world, registry);
+    let events = engine.drain();
+    let finished = crate::process_events(events, signals, world);
+    if finished {
+        if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
+            engine.send(EngineCommand::StartScene(scene_id), world, registry);
+            let events = engine.drain();
+            crate::process_events(events, signals, world);
+        }
+    }
+}
 
 pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
     let story = signals.story;
@@ -28,19 +56,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                         let current_actions = actions.get();
                         if idx < current_actions.len() {
                             let action_id = current_actions[idx].id.clone();
-                            let mut gs = state_clone.borrow_mut();
-                            let GameState {
-                                ref mut engine,
-                                ref mut world,
-                                ref registry,
-                            } = *gs;
-                            engine.send(
-                                undone_scene::engine::EngineCommand::ChooseAction(action_id),
-                                world,
-                                registry,
-                            );
-                            let events = engine.drain();
-                            crate::process_events(events, signals, world);
+                            dispatch_action(action_id, &state_clone, signals);
                             return true; // handled
                         }
                     }
@@ -61,8 +77,8 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             .color(colors.ink)
     });
 
-    let centered_prose =
-        container(prose_label).style(|s| s.width_full().justify_center());
+    let centered_prose = container(prose_label)
+        .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
     let scroll_area = scroll(centered_prose).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -83,12 +99,16 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             .border_color(colors.seam)
     });
 
-    v_stack((scroll_area, detail_strip, choices_bar(signals, state, hovered_detail)))
-        .keyboard_navigable()
-        .on_event_stop(EventListener::KeyDown, move |e| {
-            keyboard_handler(e);
-        })
-        .style(|s| s.flex_grow(1.0))
+    v_stack((
+        scroll_area,
+        detail_strip,
+        choices_bar(signals, state, hovered_detail),
+    ))
+    .keyboard_navigable()
+    .on_event_stop(EventListener::KeyDown, move |e| {
+        keyboard_handler(e);
+    })
+    .style(|s| s.flex_grow(1.0))
 }
 
 fn choices_bar(
@@ -115,19 +135,7 @@ fn choices_bar(
             let signals_clone = signals;
 
             let exec_action = move || {
-                let mut gs = state_clone.borrow_mut();
-                let GameState {
-                    ref mut engine,
-                    ref mut world,
-                    ref registry,
-                } = *gs;
-                engine.send(
-                    undone_scene::engine::EngineCommand::ChooseAction(action_id.clone()),
-                    world,
-                    registry,
-                );
-                let events = engine.drain();
-                crate::process_events(events, signals_clone, world);
+                dispatch_action(action_id.clone(), &state_clone, signals_clone);
             };
 
             let exec_action_click = exec_action.clone();
@@ -137,7 +145,11 @@ fn choices_bar(
             h_stack((
                 label(move || format!("{}·", index + 1)).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    let ink = if hovered.get() { colors.ink_dim } else { colors.ink_ghost };
+                    let ink = if hovered.get() {
+                        colors.ink_dim
+                    } else {
+                        colors.ink_ghost
+                    };
                     s.padding_right(8.0)
                         .color(ink)
                         .font_size(15.0)
