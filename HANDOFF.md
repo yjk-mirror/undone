@@ -3,8 +3,8 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 88 passing, 0 clippy warnings.
-**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired (scenes chain). screenshot-mcp + game-input-mcp working.
+**Tests:** 95 passing, 0 clippy warnings.
+**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered with markdown rendering (bold/italic/headings). Literata font embedded. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired (scenes chain). NPC activation events wired to sidebar. screenshot-mcp + game-input-mcp working.
 
 ---
 
@@ -86,29 +86,18 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 
 ## Recently Completed (this session)
 
-- ✅ Display impls for all domain enums (Arousal, Alcohol, Age, Relationship, etc.)
-- ✅ Lexer integer overflow → returns LexError::IntegerOverflow
-- ✅ Engine stack unwrap → expect (better crash diagnostics)
-- ✅ Scheduler wired — SceneFinished → scheduler.pick() → next scene
-- ✅ Multi-pack scene loading (iterate all metas, merge scenes)
-- ✅ Pack load failure surfaced in UI (init_error field)
-- ✅ Window resize grips (drag_resize_window_area on all edges/corners)
-- ✅ Prose centering (flex_row + justify_center)
-- ✅ Single-instance guard (fs4 file lock)
-- ✅ game-input-mcp built and verified
-- ✅ cargo fmt --all
+- ✅ `resolve_packs_dir()` — exe-relative path for distribution layout
+- ✅ Female NPC effects — apply_effect dispatches on "m"/"f" ref
+- ✅ `NpcActivated` engine event — sidebar receives NPC data on SetActiveMale/Female
+- ✅ Literata variable fonts embedded (include_bytes!, OFL-licensed)
+- ✅ Markdown prose rendering — pulldown-cmark → floem rich_text with bold/italic/headings
 
 ## Open Items — Future Sessions
 
 - **Character creation UI** — hardcoded "Eva/Ev/Evan", no player config screen (Large)
 - **Saves tab UI** — undone-save works, needs UI surface (Large)
-- **Markdown in prose** — pulldown-cmark → floem RichText (Large)
 - **Settings tab UI** — expose UserPrefs as controls + persistence (Medium-Large)
-- **Literata font** — loading from disk, currently Georgia fallback (Small-Medium)
 - **`packs/base/data/names.toml`** — British names → NE US (Small, writing session)
-- **Female NPC effects** — apply_effect only handles male NPCs (Medium)
-- **`active_npc` signal** — NPC panel always empty, needs EngineEvent (Medium)
-- **`packs_dir` relative path** — fragile for distribution (Small-Medium)
 
 ---
 
@@ -137,3 +126,4 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 | 2026-02-23 | UI session: 3-agent team. Custom title bar (no OS chrome, Game/Saves/Settings nav, window controls). Prose centered in story panel. Choice detail strip (hover shows action.detail). Sepia theme darkened (warm amber-cream, not muddy). 87 tests pass. Documented game-input-mcp plan (PostMessage, no focus steal). |
 | 2026-02-23 | Built game-input-mcp: press_key + click tools via PostMessage, no focus steal. Release binary built, .mcp.json updated. Restart to activate. |
 | 2026-02-23 | Engineering hardening session: 3-agent team. Window resize grips, prose centering, single-instance (fs4), Display impls for all domain enums, lexer overflow fix, engine expects, scheduler wired to SceneFinished, multi-pack scene loading, pack error visibility. 88 tests, 0 warnings. |
+| 2026-02-23 | Engineering batch: 4 parallel agents in worktrees. packs_dir fix, female NPC effects, NpcActivated event, Literata font embed, markdown prose rendering. 95 tests, 0 warnings. |
