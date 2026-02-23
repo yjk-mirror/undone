@@ -4,13 +4,16 @@
 
 **Branch:** `master`
 **Tests:** 88 passing, 0 clippy warnings.
-**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered. Choice detail strip. screenshot-mcp working.
+**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered. Choice detail strip. Window resizable. Single-instance enforced. Scheduler wired (scenes chain). screenshot-mcp + game-input-mcp working.
 
 ---
 
 ## ⚡ Next Action
 
-Continue engineering work: PersonalityId Display, hasStuff() wiring, or other items from Open Items.
+Pick from Open Items — Future Sessions list below. Suggested priorities:
+1. **Character creation UI** — replace hardcoded Eva/Ev/Evan with a player config screen
+2. **Writing import** — original prose for base pack scenes
+3. **Names update** — British names.toml → NE US
 
 ---
 
@@ -71,10 +74,13 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 4. ~~Design research~~ ✅
 5. ~~UI quality pass~~ ✅
 6. ~~NPC spawning + character creation~~ ✅
-7. **UI polish** ← current. Fix 6 violations, screenshot-verify, merge.
-8. **Writing guide** — Continuity-of-self principles, transformation writing, delta-awareness, NE US voice.
-9. **Writing import** — Original prose for base pack
-10. **Names update** — names.toml British → NE US
+7. ~~UI polish~~ ✅
+8. ~~Writing guide~~ ✅
+9. ~~Engineering hardening~~ ✅
+10. **Character creation UI** — player config screen before game starts
+11. **Writing import** — original prose for base pack
+12. **Names update** — names.toml British → NE US
+13. **Saves tab** — wire undone-save to UI
 
 ---
 
@@ -130,3 +136,4 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 | 2026-02-23 | Writing guide session: docs/writing-guide.md written. NE US locale, Minijinja syntax, FEMININITY dial, four transformation textures, content gating (BLOCK_ROUGH/LIKES_ROUGH), markdown in prose, scene design principles, full checklist. Adapted from newlife-plus writing-style.md + scene-design.md. Added to CLAUDE.md key documents. |
 | 2026-02-23 | UI session: 3-agent team. Custom title bar (no OS chrome, Game/Saves/Settings nav, window controls). Prose centered in story panel. Choice detail strip (hover shows action.detail). Sepia theme darkened (warm amber-cream, not muddy). 87 tests pass. Documented game-input-mcp plan (PostMessage, no focus steal). |
 | 2026-02-23 | Built game-input-mcp: press_key + click tools via PostMessage, no focus steal. Release binary built, .mcp.json updated. Restart to activate. |
+| 2026-02-23 | Engineering hardening session: 3-agent team. Window resize grips, prose centering, single-instance (fs4), Display impls for all domain enums, lexer overflow fix, engine expects, scheduler wired to SceneFinished, multi-pack scene loading, pack error visibility. 88 tests, 0 warnings. |
