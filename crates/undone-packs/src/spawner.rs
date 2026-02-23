@@ -70,7 +70,6 @@ pub fn spawn_npcs<R: Rng>(
     // Required slots first (ROMANTIC, JERK, FRIEND), then random fills.
     let mut personality_ids: Vec<PersonalityId> = REQUIRED_PERSONALITIES
         .iter()
-        .take(config.male_count)
         .map(|s| registry.intern_personality(s))
         .collect();
     while personality_ids.len() < config.male_count {
@@ -86,11 +85,11 @@ pub fn spawn_npcs<R: Rng>(
     let male_names = registry.male_names().to_vec();
     let female_names = registry.female_names().to_vec();
 
-    // Intern female char_type once; CharTypeId and PersonalityId both wrap Spur
-    // and share the same rodeo, so the Spur from intern_personality is valid for both.
+    // All female NPCs get char_type FRIEND for now. CharTypeId wraps the same
+    // Spur type as PersonalityId — intern via personality gives us the right key.
     let char_type_id = CharTypeId(registry.intern_personality("FRIEND").0);
 
-    for (i, &personality) in personality_ids.iter().enumerate().take(config.male_count) {
+    for (i, &personality) in personality_ids.iter().enumerate() {
         let name = male_names
             .choose(rng)
             .cloned()
@@ -158,16 +157,9 @@ pub fn spawn_npcs<R: Rng>(
 }
 
 fn pick_traits<R: Rng>(pool: &[NpcTraitId], count: usize, rng: &mut R) -> HashSet<NpcTraitId> {
-    let mut result = HashSet::new();
-    if pool.is_empty() {
-        return result;
-    }
-    let mut indices: Vec<usize> = (0..pool.len()).collect();
-    indices.shuffle(rng);
-    for &i in indices.iter().take(count.min(pool.len())) {
-        result.insert(pool[i]);
-    }
-    result
+    pool.choose_multiple(rng, count.min(pool.len()))
+        .copied()
+        .collect()
 }
 
 fn make_core(
