@@ -212,6 +212,21 @@ When using parallel background subagents (Task tool with `run_in_background: tru
 - Scope safety comes from the prompt, not the permission gate — be precise about
   which files/crates each agent owns
 
+### Session end — audit and clean up
+
+When all perceived tasks for a session are complete, always:
+
+1. **Audit the working tree** — `git status`, check for uncommitted files, stale
+   artifacts, leftover `.exe.old`/`.exe.new` binaries, temp files
+2. **Commit or discard** — documentation updates, config changes, and completed
+   plan files should be committed. Junk should be removed
+3. **Update HANDOFF.md** — ensure Current State, Next Action, and Session Log
+   reflect what was done and what's next
+4. **Verify clean state** — working tree should be clean when you hand off. The
+   next session should start with zero surprises
+
+Do this by default, not only when asked.
+
 ## Dependency Direction (enforced, no cycles)
 
 ```
