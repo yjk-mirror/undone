@@ -24,9 +24,13 @@ You slip in and lean against the glass. The rain hammers the roof above you. The
 {% endif %}
 
 {% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+There's a specific quality to being looked at by a strange man in a small space. She knows what he's doing — the quick assessment, the two-second read. She used to do it herself, without thinking twice. What surprises her isn't the look. It's how much she doesn't mind it landing on her. He's already decided something about her. She lets it go. She gets to be the one who decides whether it matters.
+{% else %}
 There's a specific quality to being looked at by a strange man in a small space. You know it now. Not danger, exactly — more like being *placed*. He's already decided three things about you, and none of them are the things you'd choose.
 
 *You used to do this too*, you think. Size someone up in two seconds. You just never knew what it felt like from this side.
+{% endif %}
 {% endif %}
 
 The rain isn't stopping. A bus goes by without pulling over — wrong route, or just indifferent. Across the street, a woman wrestles an inside-out umbrella and loses. The city goes on.
@@ -81,9 +85,15 @@ prose     = """
 {% endif %}
 
 {% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+He's close enough that she can feel warmth coming off his arm. There's something about standing this close to a man who chose to move toward her — deliberately, without being asked. Not a threat. Weight, presence, the fact of being the smaller person under someone else's umbrella. She spent years wanting this. The wanting was always the truest part of her.
+
+She lets herself stand exactly where she is.
+{% else %}
 He's close enough that you can feel warmth coming off his arm. There's something about standing this close to a man who chose to move toward you. Not a threat. Just presence. Weight. The geometry of two bodies under insufficient shelter, and the fact that he's the bigger one.
 
 *This is what women do*, you think. *They stand next to men and calculate.*
+{% endif %}
 {% endif %}
 
 "I'm David," he says. Not a question, not a pickup line. Just information.

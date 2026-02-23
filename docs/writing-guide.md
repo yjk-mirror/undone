@@ -112,9 +112,14 @@ You nod at the man already there. He nods back.
 
 | Object | Methods |
 |--------|---------|
-| `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `isSingle()`, `isOnPill()`, `isPregnant()` |
+| `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()` |
 | `gd` | `hasGameFlag("FLAG")`, `week()` |
 | `scene` | `hasFlag("FLAG")` |
+
+**PC origin helpers:**
+- `w.alwaysFemale()` — `true` if `CisFemaleTransformed` or `AlwaysFemale`; `false` if transformed from male
+- `w.hasTrait("TRANS_WOMAN")` — `true` only for `TransWomanTransformed`; use this to distinguish the relief register from the disorientation register inside `{% if not w.alwaysFemale() %}` blocks
+- `w.pcOrigin()` — returns the origin string (`"CisMaleTransformed"`, `"TransWomanTransformed"`, `"CisFemaleTransformed"`, `"AlwaysFemale"`) for cases requiring all four variants explicitly
 
 > **Note:** `w.getSkill("FEMININITY")` is not yet available in prose templates.
 > FEMININITY-level prose branching currently requires the template context to be extended
@@ -328,16 +333,57 @@ to find out what that means from the other side.
 
 ---
 
-### The Three PC Types
+### The Four PC Origins
 
-Always ensure every player type gets a complete path. Never leave any type with a gap or
-an implicit assumption.
+The PC origin is determined by the `PcOrigin` enum, accessible via `w.pcOrigin()` (returns
+a string). The four variants are:
+
+| Origin | `w.pcOrigin()` | `w.alwaysFemale()` | `w.hasTrait("TRANS_WOMAN")` | Description |
+|--------|---------------|---------------------|------------------------------|-------------|
+| `CisMaleTransformed` | `"CisMaleTransformed"` | `false` | `false` | Cis man transformed. The disorientation register. Primary experience. |
+| `TransWomanTransformed` | `"TransWomanTransformed"` | `false` | `true` | Trans woman transformed. The relief/recognition register. |
+| `CisFemaleTransformed` | `"CisFemaleTransformed"` | `true` | `false` | Female-start with transformation element. |
+| `AlwaysFemale` | `"AlwaysFemale"` | `true` | `false` + `NOT_TRANSFORMED` trait | No transformation frame at all. |
+
+**The key rule:** Both `CisMaleTransformed` and `TransWomanTransformed` return `false` for
+`w.alwaysFemale()` — they both entered the transformation branches. But their emotional
+register is completely different. Always distinguish them inside the transformation branch.
+
+**Standard three-level pattern for transformation-aware scenes:**
+
+```jinja
+{% if w.alwaysFemale() %}
+    {# No transformation frame — write her as a woman who has always been one #}
+{% elif w.hasTrait("TRANS_WOMAN") %}
+    {# Trans woman — relief and recognition register. She knows this face. Finally. #}
+{% else %}
+    {# Cis-male-start — disorientation and alienation register. This is still new. #}
+{% endif %}
+```
+
+**Two-level pattern (for most scenes where only presence/absence of transformation matters):**
 
 ```jinja
 {% if not w.alwaysFemale() %}
-    {# Transformed from male — transformation content applies here #}
+    {# Transformation content — use inner branch to differentiate trans woman vs cis-male-start #}
 {% else %}
-    {# Always female (any variant) — write her as a woman who has always been one #}
+    {# Always female — no transformation frame #}
+{% endif %}
+```
+
+When using the two-level pattern and the scene has meaningful emotional texture for a trans
+woman (body recognition, choosing a female life, male presence she sought), **add the inner
+branch**:
+
+```jinja
+{% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+    {# Trans woman — relief register #}
+{% else %}
+    {# Cis-male-start — disorientation register #}
+{% endif %}
+{% else %}
+    {# Always female #}
 {% endif %}
 ```
 
@@ -346,15 +392,33 @@ For scenes where the distinction between "female-start with a transformation ele
 
 ```jinja
 {% if not w.alwaysFemale() %}
-    {# Transformed from male #}
+    {# Transformed — CisMaleTransformed or TransWomanTransformed #}
 {% elif not w.hasTrait("NOT_TRANSFORMED") %}
-    {# Female-start variant — some transformation element applies #}
+    {# CisFemaleTransformed — some transformation element applies #}
 {% else %}
-    {# Fully always female — no transformation frame at all #}
+    {# AlwaysFemale — no transformation frame at all #}
 {% endif %}
 ```
 
-For most scenes, the two-branch form is sufficient.
+For most scenes, the three-level form with `TRANS_WOMAN` inner branch is sufficient.
+
+#### The Two Transformation Emotional Registers
+
+**Cis-male-start (disorientation):** She is adjusting to a body and a social position she
+did not choose. Male attention lands strangely. The mirror is a fact that needs restating.
+Every gendered social interaction is a lesson she didn't ask for. The transformation is
+something that happened *to* her. Writing cue: alienation, recalibration, wry observation
+of what she used to be on the other side of.
+
+**Trans-woman-start (recognition):** She chose this. The body is the one she always knew
+was there. The transformation didn't change who she was — it revealed it. Male attention
+lands as confirmation, not disruption. The mirror is a checkpoint she's glad to reach. The
+social negotiations of female life are part of the life she wanted. Writing cue: relief,
+rightness, gratitude that is quiet rather than performed, the difference between *new* and
+*finally*.
+
+**Never conflate the two.** A trans woman looking in a mirror does not feel disoriented.
+A cis-male-start PC looking in a mirror does not feel relief. The registers are opposite.
 
 ---
 
@@ -650,6 +714,8 @@ Before submitting any scene, verify:
 **Transformation:**
 - [ ] Does this scene earn a transformation branch? If yes, is it written?
 - [ ] Do always-female players get a complete, valid path?
+- [ ] If there is a `{% if not w.alwaysFemale() %}` block with emotional texture, does it distinguish trans-woman (relief register) from cis-male-start (disorientation register)?
+- [ ] Trans woman prose uses the recognition/relief register — NOT disorientation or alienation
 - [ ] Transformation content calibrated to appropriate FEMININITY range (not one-size)?
 
 **Content gating:**

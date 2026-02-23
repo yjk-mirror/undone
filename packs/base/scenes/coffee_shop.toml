@@ -24,9 +24,15 @@ He nods. You nod back. The universal coffee-shop acknowledgment — *we are both
 {% endif %}
 
 {% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+There's a geometry to being a woman in a line. She knows it now — the small adjustments, the bag against her hip, the deliberate economy of posture. She learned these things consciously, one at a time, in the way you can only learn them if you weren't born into them. Most women don't know they know this. She knows she knows it. That's the difference.
+
+He didn't notice any of that. He never would. She used to be that oblivious. She isn't sure whether to miss it.
+{% else %}
 There's a geometry to being a woman in a line. You're aware of the man in front of you and the empty space behind you, and the way your body occupies a different amount of room than it used to. You stand with your bag against your hip. Shoulders in. Taking up exactly the space you need and no more.
 
 He didn't notice any of that. Men never do. That's the thing you know now that you didn't before: the negotiation is invisible to the people who don't have to do it.
+{% endif %}
 {% endif %}
 """
 
@@ -137,9 +143,15 @@ You sit down. He slides a sugar packet toward you without asking, which is eithe
 "I'm Jake," he says. He holds out his hand, which feels weirdly formal for a coffee shop but somehow works.
 
 {% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+His hand is warm and bigger than hers, and the handshake lasts exactly the right amount of time. She reaches back without thinking, which is how she knows something has shifted — there was a time when that gesture required conscious recalibration, when the whole social choreography felt like a translation. Now it's just a handshake. Just a man, and her hand in his, and the coffee-shop morning going on around them.
+
+She notices she's not noting it as a milestone. That might be the milestone.
+{% else %}
 His hand is warm and bigger than yours, and the handshake lasts exactly the right amount of time, and for a second you're struck by the simple mechanical fact of a man reaching for you and you reaching back. It's not desire. It's not discomfort. It's just *new*.
 
 *You used to be the one who extended the hand*, you think. *You used to be the one who set the grip.*
+{% endif %}
 {% endif %}
 """
 
