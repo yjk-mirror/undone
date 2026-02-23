@@ -2,8 +2,8 @@
 
 ## Current State
 
-**Branch:** `feat/pc-origin-system` (ready to merge to master)
-**Tests:** 112+ passing, 0 failures.
+**Branch:** `master`
+**Tests:** 111 passing, 0 failures.
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model and emotional register guidance.
 
 ---
@@ -24,8 +24,7 @@ Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 Scroll: positive delta = up, negative = down (one tick = one wheel notch).
 Hover: sends WM_MOUSEMOVE to trigger hover effects.
 
-**New binary:** `undone-tools/target/release/game-input-mcp.exe.new` (built with scroll+hover).
-**Deploy:** Restart Claude Code. On next session, rename `.exe.new` → `.exe` (old one is locked while running).
+**Deployed (2026-02-23):** scroll+hover binary renamed to `.exe`. Takes effect on next Claude Code restart.
 
 ---
 
@@ -113,7 +112,7 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 - **Save metadata display**: Show player name / week in save list without full deserialization
 
 ### Tooling
-- **game-input scroll/hover**: Built but not deployed (exe locked). Rename `.exe.new` → `.exe` on next restart.
+- **game-input scroll/hover**: ✅ Deployed. Restart Claude Code to activate scroll/hover MCP tools.
 - **game-input limitation**: PostMessage-based input may not establish focus like real user input — keyboard shortcuts may not fire after PostMessage click
 
 ---
@@ -147,4 +146,4 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 | 2026-02-23 | Engineering hardening 2: FEMININITY unified (removed Player.femininity field, reads from skills map), w.hasStuff() wired to player inventory via StuffId registry, stats registration added to pack system (stats.toml), panics eliminated in error-recovery paths, spawner unwraps hardened. 100 tests, 0 warnings. |
 | 2026-02-23 | Overnight autonomous session: 7 tasks via subagent-driven-development. Names → NE US, settings persistence (dirs + serde_json), character creation UI (AppPhase, PreGameState/GameState split, full form with floem widgets), saves tab (save/load/delete), rain_shelter rewrite (proper prose, 5 trait branches, transformation), morning_routine scene (domestic, mirror, wardrobe, Dunkin'), coffee_shop scene (NPC interaction, sit-with-him path, game flags). 104 tests, 0 warnings. |
 | 2026-02-23 | Playtest + bugfix session: Fixed 3 bugs — char creation skipped (title bar now always visible), scroll broken (floem shrink_to_fit + flex_basis(0)), take().unwrap() crash (replaced with match). Added Runtime Testing Notes to CLAUDE.md. Built game-input-mcp scroll + hover tools. Documented char creation redesign ideas (male-first flow, keyboard controls). 104 tests, 0 failures. |
-| 2026-02-23 | PC Origin System: Replace always_female:bool with PcOrigin enum (CisMaleTransformed/TransWomanTransformed/CisFemaleTransformed/AlwaysFemale). Two-step char creation flow. Trans woman PC type (FEMININITY=70). Auto-inject hidden traits in new_game(). w.pcOrigin() evaluator accessor. Save v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model + emotional register guidance. 112+ tests, 0 failures. |
+| 2026-02-23 | PC Origin System: Replace always_female:bool with PcOrigin enum (CisMaleTransformed/TransWomanTransformed/CisFemaleTransformed/AlwaysFemale). Two-step char creation flow. Trans woman PC type (FEMININITY=70). Auto-inject hidden traits in new_game(). w.pcOrigin() evaluator accessor. Save v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model + emotional register guidance. 111 tests, 0 failures. Deployed game-input scroll+hover binary. |
