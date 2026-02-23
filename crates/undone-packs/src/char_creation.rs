@@ -1,7 +1,8 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, ArousalLevel, BreastSize, Player, PlayerFigure, Sexuality, TraitId,
+    Age, AlcoholLevel, ArousalLevel, BreastSize, Player, PlayerFigure, Sexuality, SkillValue,
+    TraitId,
 };
 use undone_world::{GameData, World};
 
@@ -43,7 +44,7 @@ pub fn new_game<R: Rng>(
     let starting_femininity = if config.always_female { 75 } else { 10 };
     let traits: HashSet<TraitId> = config.starting_traits.into_iter().collect();
 
-    let player = Player {
+    let mut player = Player {
         name_fem: config.name_fem,
         name_androg: config.name_androg,
         name_masc: config.name_masc,
@@ -72,11 +73,22 @@ pub fn new_game<R: Rng>(
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
         always_female: config.always_female,
-        femininity: starting_femininity,
         before_age: config.before_age,
         before_race: config.before_race,
         before_sexuality: config.before_sexuality,
     };
+
+    // Seed FEMININITY skill in the skills map.
+    let femininity_skill = registry
+        .resolve_skill("FEMININITY")
+        .expect("FEMININITY skill must be registered by base pack");
+    player.skills.insert(
+        femininity_skill,
+        SkillValue {
+            value: starting_femininity,
+            modifier: 0,
+        },
+    );
 
     let spawn_config = NpcSpawnConfig {
         male_count: config.male_count,
@@ -173,8 +185,11 @@ mod tests {
         let mut rng = rand::rngs::SmallRng::seed_from_u64(4);
         let world = new_game(config, &mut registry, &mut rng);
 
+        let fem_id = registry
+            .resolve_skill("FEMININITY")
+            .expect("FEMININITY must be registered");
         assert!(
-            world.player.femininity >= 70,
+            world.player.skill(fem_id) >= 70,
             "always-female PC should start with high femininity"
         );
     }

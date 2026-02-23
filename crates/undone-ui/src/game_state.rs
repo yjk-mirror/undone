@@ -161,6 +161,5 @@ fn placeholder_player() -> Player {
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
         always_female: false,
-        femininity: 0,
     }
 }

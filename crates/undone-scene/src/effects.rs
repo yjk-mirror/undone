@@ -299,7 +299,6 @@ mod tests {
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
                 always_female: false,
-                femininity: 10,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),

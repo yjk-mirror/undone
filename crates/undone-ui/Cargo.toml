@@ -9,6 +9,7 @@ undone-world  = { path = "../undone-world" }
 undone-scene  = { path = "../undone-scene" }
 undone-packs  = { path = "../undone-packs" }
 floem            = { workspace = true }
+lasso            = { workspace = true }
 pulldown-cmark   = { workspace = true }
 rand             = { workspace = true }
 slotmap          = { workspace = true }

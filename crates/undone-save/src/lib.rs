@@ -210,7 +210,6 @@ mod tests {
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
                 always_female: false,
-                femininity: 15,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
@@ -233,7 +232,7 @@ mod tests {
         assert_eq!(loaded.player.name_fem, world.player.name_fem);
         assert_eq!(loaded.player.stress, world.player.stress);
         assert_eq!(loaded.player.money, world.player.money);
-        assert_eq!(loaded.player.femininity, world.player.femininity);
+        assert_eq!(loaded.player.skills, world.player.skills);
         assert_eq!(loaded.player.traits, world.player.traits);
         assert_eq!(loaded.game_data.week, world.game_data.week);
     }

@@ -60,26 +60,42 @@ fn markdown_to_text_layout(
             MdEvent::Start(Tag::Strong) => {
                 flush(text.len(), &mut span_start, &mut spans);
                 bold_depth += 1;
-                span_start =
-                    Some((text.len(), bold_depth > 0, italic_depth > 0, heading_sz(heading_level)));
+                span_start = Some((
+                    text.len(),
+                    bold_depth > 0,
+                    italic_depth > 0,
+                    heading_sz(heading_level),
+                ));
             }
             MdEvent::End(TagEnd::Strong) => {
                 flush(text.len(), &mut span_start, &mut spans);
                 bold_depth = bold_depth.saturating_sub(1);
-                span_start =
-                    Some((text.len(), bold_depth > 0, italic_depth > 0, heading_sz(heading_level)));
+                span_start = Some((
+                    text.len(),
+                    bold_depth > 0,
+                    italic_depth > 0,
+                    heading_sz(heading_level),
+                ));
             }
             MdEvent::Start(Tag::Emphasis) => {
                 flush(text.len(), &mut span_start, &mut spans);
                 italic_depth += 1;
-                span_start =
-                    Some((text.len(), bold_depth > 0, italic_depth > 0, heading_sz(heading_level)));
+                span_start = Some((
+                    text.len(),
+                    bold_depth > 0,
+                    italic_depth > 0,
+                    heading_sz(heading_level),
+                ));
             }
             MdEvent::End(TagEnd::Emphasis) => {
                 flush(text.len(), &mut span_start, &mut spans);
                 italic_depth = italic_depth.saturating_sub(1);
-                span_start =
-                    Some((text.len(), bold_depth > 0, italic_depth > 0, heading_sz(heading_level)));
+                span_start = Some((
+                    text.len(),
+                    bold_depth > 0,
+                    italic_depth > 0,
+                    heading_sz(heading_level),
+                ));
             }
             MdEvent::Start(Tag::Heading { level, .. }) => {
                 flush(text.len(), &mut span_start, &mut spans);
@@ -178,12 +194,16 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
     } = *gs;
     engine.send(EngineCommand::ChooseAction(action_id), world, registry);
     let events = engine.drain();
-    let finished = crate::process_events(events, signals, world);
-    if finished {
-        if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
-            engine.send(EngineCommand::StartScene(scene_id), world, registry);
-            let events = engine.drain();
-            crate::process_events(events, signals, world);
+    // Resolve FEMININITY id for building PlayerSnapshot after events are processed.
+    // If the skill is missing (pack load error), skip player snapshot update.
+    if let Ok(femininity_id) = registry.resolve_skill("FEMININITY") {
+        let finished = crate::process_events(events, signals, world, femininity_id);
+        if finished {
+            if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
+                engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                let events = engine.drain();
+                crate::process_events(events, signals, world, femininity_id);
+            }
         }
     }
 }
