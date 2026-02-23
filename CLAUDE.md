@@ -18,16 +18,22 @@ have started life as a man. The transformation is not backstory; it is a lens th
 changes how every socially-gendered experience lands. She knows how men think because
 she was one. Different story packs will use this premise in different settings.
 
-### The Three PC Types
+### The Four PC Origins
 
-| Type | `always_female` | Description |
-|---|---|---|
-| Male-start (transformed) | `false` | Definitively transformed from male. The primary experience. |
-| Female-start (variant) | `true`, no `NOT_TRANSFORMED` | Female from birth with a transformation element |
-| Always female | `true` + `NOT_TRANSFORMED` | No transformation frame at all |
+| `PcOrigin` variant | `w.alwaysFemale()` | FEMININITY start | Description |
+|---|---|---|---|
+| `CisMaleTransformed` | `false` | 10 | Transformed from a cis man. The primary experience. |
+| `TransWomanTransformed` | `false` | 70 | Transformed from a trans woman. Relief/recognition register. |
+| `CisFemaleTransformed` | `true` | 75 | Transformed from a cis woman. Auto-injects `ALWAYS_FEMALE` trait. |
+| `AlwaysFemale` | `true` | 75 | No transformation frame. Auto-injects `ALWAYS_FEMALE` + `NOT_TRANSFORMED`. |
 
-The `FEMININITY` skill (0–100+) tracks adaptation. Male-start begins low; always-female
-begins at 75. The richest transformation writing lives in the 0–50 range.
+The `FEMININITY` skill (0–100+) tracks adaptation. `CisMaleTransformed` begins low (10);
+`TransWomanTransformed` begins at 70 (she knew herself already); `CisFemale`/`AlwaysFemale`
+begin at 75. The richest transformation writing lives in the 0–50 range.
+
+Hidden traits auto-injected at game start by `new_game()` based on origin — do not inject them
+manually in UI code. Use `w.hasTrait("TRANS_WOMAN")` in scene templates to branch the
+emotional register for trans woman PCs.
 
 ## Key Documents (Read Before Working)
 

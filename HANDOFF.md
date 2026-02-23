@@ -2,19 +2,18 @@
 
 ## Current State
 
-**Branch:** `master`
-**Tests:** 104 passing, 0 failures.
-**App:** Character creation → gameplay loop working. Title bar always visible (both phases). Scroll working in both char creation and story panel. Choices visible at bottom of story panel. Three theme modes. Markdown italic rendering working. Literata font (regular + italic) embedded.
+**Branch:** `feat/pc-origin-system` (ready to merge to master)
+**Tests:** 112+ passing, 0 failures.
+**App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model and emotional register guidance.
 
 ---
 
 ## ⚡ Next Action
 
-Plan an agent team session for parallel high-throughput work. Priority tasks:
-1. **Character creation redesign** — male-first flow (create male → transformation → tweak female), like Newlife
-2. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
-3. **More scenes** — expand base pack content
-4. **Settings tab UI** — expose font size, line height as interactive controls
+Priority tasks:
+1. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
+2. **More scenes** — expand base pack content
+3. **Settings tab UI** — expose font size, line height as interactive controls
 
 ---
 
@@ -89,7 +88,7 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 11. ~~Writing import~~ ✅ (3 scenes with original prose)
 12. ~~Names update~~ ✅
 13. ~~Saves tab~~ ✅
-14. **Character creation redesign** — male-first flow, Newlife-style two-phase creation
+14. ~~**Character creation redesign**~~ ✅ (PcOrigin system: two-step flow, 4 origin types, trans woman PC type)
 15. **Keyboard controls redesign** — arrow key highlight, configurable instant vs confirm
 16. **Settings tab UI** — expose UserPrefs as interactive controls
 17. **More scenes** — expand base pack content
@@ -98,8 +97,7 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 
 ## Open Items — Future Sessions
 
-### Character Creation Redesign (Large)
-- **Male-first flow**: Create male character first → transformation event → then customize female form based on male traits (like Newlife)
+### Character Creation (Remaining Small Items)
 - **Trait checkbox UX**: Label text is currently drag-selectable; clicking label should toggle checkbox instead
 - **Age before transition**: Should be a dropdown (matching "Age" field), not a text input
 - **Form density**: Form too tall for 800px window; consider tighter spacing or two-column layout
@@ -149,3 +147,4 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 | 2026-02-23 | Engineering hardening 2: FEMININITY unified (removed Player.femininity field, reads from skills map), w.hasStuff() wired to player inventory via StuffId registry, stats registration added to pack system (stats.toml), panics eliminated in error-recovery paths, spawner unwraps hardened. 100 tests, 0 warnings. |
 | 2026-02-23 | Overnight autonomous session: 7 tasks via subagent-driven-development. Names → NE US, settings persistence (dirs + serde_json), character creation UI (AppPhase, PreGameState/GameState split, full form with floem widgets), saves tab (save/load/delete), rain_shelter rewrite (proper prose, 5 trait branches, transformation), morning_routine scene (domestic, mirror, wardrobe, Dunkin'), coffee_shop scene (NPC interaction, sit-with-him path, game flags). 104 tests, 0 warnings. |
 | 2026-02-23 | Playtest + bugfix session: Fixed 3 bugs — char creation skipped (title bar now always visible), scroll broken (floem shrink_to_fit + flex_basis(0)), take().unwrap() crash (replaced with match). Added Runtime Testing Notes to CLAUDE.md. Built game-input-mcp scroll + hover tools. Documented char creation redesign ideas (male-first flow, keyboard controls). 104 tests, 0 failures. |
+| 2026-02-23 | PC Origin System: Replace always_female:bool with PcOrigin enum (CisMaleTransformed/TransWomanTransformed/CisFemaleTransformed/AlwaysFemale). Two-step char creation flow. Trans woman PC type (FEMININITY=70). Auto-inject hidden traits in new_game(). w.pcOrigin() evaluator accessor. Save v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model + emotional register guidance. 112+ tests, 0 failures. |
