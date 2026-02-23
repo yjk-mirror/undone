@@ -4,18 +4,19 @@
 
 **Branch:** `master`
 **Tests:** 119 passing, 0 failures.
-**Remote:** `github-mirror:yjk-mirror/undone.git` (SSH key needs agent — see below).
+**Remote:** pushed (mirrored repo, pulled into Linux dev env).
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Engine correctness pass complete: cross-reference validation, transition guard, NPC personality rendering, condition eval logging, data-driven opening scene/slot, scroll-to-bottom fix, unknown scene surfacing. Engineering Principles documented in CLAUDE.md.
+**Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). rhai-mcp-server + minijinja-mcp-server build cross-platform. screenshot-mcp + game-input-mcp compile on Linux (cfg-gated, Windows-only at runtime). All 4 tools build cleanly on Linux.
 
 ---
 
 ## ⚡ Next Action
 
 Priority tasks:
-1. **Push to remote** — SSH key `id_ed25519_yjk_mirror` needs ssh-agent running. Start agent, add key, then `git push -u origin master`.
-2. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
-3. **More scenes** — expand base pack content
-4. **Settings tab UI** — expose font size, line height as interactive controls
+1. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
+2. **Settings tab UI** — expose font size, line height, theme mode, number key mode as interactive controls
+3. **Audit fixes** — silent stat effects, unbounded story string, free_time fallback, hardcoded race defaults
+4. **More scenes** — expand base pack content
 
 ### Remaining audit findings (MEDIUM/LOW, non-blocking)
 - Hardcoded `"free_time"` fallback in `left_panel.rs` — should use `default_slot` (partially fixed, still has fallback)
@@ -169,3 +170,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | Playtest + bugfix session: Fixed 3 bugs — char creation skipped (title bar now always visible), scroll broken (floem shrink_to_fit + flex_basis(0)), take().unwrap() crash (replaced with match). Added Runtime Testing Notes to CLAUDE.md. Built game-input-mcp scroll + hover tools. Documented char creation redesign ideas (male-first flow, keyboard controls). 104 tests, 0 failures. |
 | 2026-02-23 | PC Origin System: Replace always_female:bool with PcOrigin enum (CisMaleTransformed/TransWomanTransformed/CisFemaleTransformed/AlwaysFemale). Two-step char creation flow. Trans woman PC type (FEMININITY=70). Auto-inject hidden traits in new_game(). w.pcOrigin() evaluator accessor. Save v2 with v1 migration. Trans woman branches in all 3 scenes. Writing guide updated with four-origin model + emotional register guidance. 111 tests, 0 failures. Deployed game-input scroll+hover binary. |
 | 2026-02-23 | Engine correctness & safety pass: 7 tasks + 2 audit fixes. Scroll-to-bottom (scroll_gen signal), cross-reference validation (UnknownGotoTarget), transition counter guard (replaces stack depth), NPC personality rendering (String instead of PersonalityId), condition eval logging (eval_condition helper), unknown scene surfacing (ProseAdded error), data-driven opening scene/slot (manifest fields → registry → UI). Audit found 8 issues — fixed both HIGH (hardcoded scene ID in saves_panel, silent unwrap_or in scheduler). Engineering Principles added to CLAUDE.md. Remote configured (github-mirror SSH alias). 119 tests, 0 failures. |
+| 2026-02-23 | Devtools imported into repo as tools/ (separate workspace). Fixed Windows-only tools (screenshot-mcp, game-input-mcp) to compile on Linux via #[cfg(target_os = "windows")] module gates and target-specific Cargo deps. All 4 tools build cleanly. Global permissions set to bypassPermissions for subagents. |
