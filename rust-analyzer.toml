@@ -1,0 +1,23 @@
+# rust-analyzer configuration — tuned for headless/agentic use.
+#
+# This file is picked up by any rust-analyzer instance that discovers
+# this workspace (MCP servers, editors, CLI). VS Code settings take
+# precedence when both exist.
+#
+# Rationale: the 7-crate workspace + floem + serde derives pulls in
+# 443 dependencies. With RA defaults (cache priming, 128 LRU, full
+# flycheck), a single instance consumes 8+ GB. These settings cut
+# baseline memory roughly in half without losing navigation accuracy.
+
+[cachePriming]
+enable = false          # don't eagerly analyze everything on startup
+
+[lru]
+capacity = 32           # syntax trees kept hot (default 128)
+
+[check]
+workspace = false       # check only the active crate, not all members
+allTargets = false      # skip test/bench targets
+
+[cargo]
+allTargets = false      # mirror the check setting for cargo metadata

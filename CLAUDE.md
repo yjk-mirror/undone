@@ -141,9 +141,9 @@ parser requires method-call syntax everywhere, and the original plan had an inco
   container (v_stack/h_stack) must use `.scroll_style(|s| s.shrink_to_fit())` and
   `.style(|s| s.flex_grow(1.0).flex_basis(0.0))` — otherwise taffy sizes the
   scroll viewport to content height and scrolling never activates.
-- **game-input MCP cannot send scroll wheel events.** PostMessage-based input
-  only supports key presses and clicks, not WM_MOUSEWHEEL. Manual interaction
-  required for scroll testing until this is added.
+- **game-input MCP supports keys, clicks, scroll, and hover.** All four use
+  PostMessage (no focus steal). `scroll(title, x, y, delta)` sends WM_MOUSEWHEEL;
+  `hover(title, x, y)` sends WM_MOUSEMOVE for triggering hover effects.
 
 ## Agentic Workflow
 
@@ -159,17 +159,24 @@ parser requires method-call syntax everywhere, and the original plan had an inco
 
 ### MCP Tools — use these instead of raw Bash
 
-**Rust** (prefer over `cargo` in Bash for per-file work):
+**Rust:**
 
-| Task | Tool |
-|---|---|
-| Check compilation errors | `mcp__rust__run_cargo_check` |
-| Diagnostics on a specific file after writing it | `mcp__rust__get_diagnostics` |
-| Format a file after writing it | `mcp__rust__format_code` |
-| Find references / definitions | `mcp__rust__find_references`, `mcp__rust__find_definition` |
+The rust MCP server provides a long-lived rust-analyzer instance for
+**navigation only**. Use Bash for compilation checks and formatting.
 
-Still use `cargo test` / `cargo build --release` via Bash for workspace-wide commands
-and release builds — those don't have MCP equivalents.
+| Task | How | Notes |
+|---|---|---|
+| Check compilation errors | `cargo check` via Bash | Workspace-wide or per-crate with `-p` |
+| Format a file after writing it | `cargo fmt` via Bash | Or `rustfmt <file>` for a single file |
+| Find references / definitions | `mcp__rust__find_references`, `mcp__rust__find_definition` | Real LSP — these work |
+| Search workspace symbols | `mcp__rust__workspace_symbols` | Real LSP |
+| Rename a symbol | `mcp__rust__rename_symbol` | Real LSP |
+| Build / test / release | `cargo test` / `cargo build --release` via Bash | No MCP equivalent |
+
+> **Do NOT use** `mcp__rust__get_diagnostics` or `mcp__rust__run_cargo_check` —
+> they are stubs that return placeholder strings. Use `cargo check` via Bash instead.
+> `mcp__rust__format_code` sends an LSP request but does not apply edits to disk —
+> use `cargo fmt` via Bash instead.
 
 **Minijinja** (use after writing any `.j2` template):
 
@@ -191,7 +198,7 @@ and release builds — those don't have MCP equivalents.
 1. Invoke `superpowers:executing-plans`
 2. Invoke `superpowers:using-git-worktrees` — create a worktree for the plan
 3. Execute tasks in batches of ~3, reporting between batches
-4. After writing each `.rs` file: call `mcp__rust__get_diagnostics` + `mcp__rust__format_code`
+4. After writing each `.rs` file: run `cargo fmt` and `cargo check -p <crate>` via Bash
 5. After writing each `.j2` file: call `mcp__minijinja__jinja_validate_template`
 6. When all tasks done: invoke `superpowers:finishing-a-development-branch`
 
