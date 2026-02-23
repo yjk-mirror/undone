@@ -11,8 +11,8 @@ use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
 use crate::game_state::{init_game, GameState};
-use crate::left_panel::left_panel;
-use crate::right_panel::right_panel;
+use crate::left_panel::story_panel;
+use crate::right_panel::sidebar_panel;
 use crate::theme::{ThemeColors, UserPrefs};
 
 /// All reactive signals used by the view tree.
@@ -115,7 +115,7 @@ pub fn app_view() -> impl View {
         process_events(events, signals, world);
     }
 
-    h_stack((right_panel(signals), left_panel(signals, Rc::clone(&state)))).style(move |s| {
+    h_stack((sidebar_panel(signals), story_panel(signals, Rc::clone(&state)))).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     })

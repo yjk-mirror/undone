@@ -4,7 +4,7 @@ use floem::peniko::Color;
 use floem::prelude::*;
 use floem::reactive::RwSignal;
 
-pub fn right_panel(signals: AppSignals) -> impl View {
+pub fn sidebar_panel(signals: AppSignals) -> impl View {
     v_stack((
         stats_panel(signals.player, signals),
         npc_panel(signals.active_npc, signals),
@@ -82,6 +82,7 @@ fn npc_panel(active_npc: RwSignal<Option<NpcSnapshot>>, signals: AppSignals) -> 
                         .padding_bottom(8.0)
                         .items_center()
                         .width_full()
+                        .font_family("system-ui, -apple-system, sans-serif".to_string())
                 }),
                 stat_row("Age", move || npc.age.clone(), signals),
                 stat_row("Personality", move || npc.personality.clone(), signals),
@@ -108,8 +109,9 @@ fn mode_toggle(signals: AppSignals) -> impl View {
                 signals.prefs.update(|p| p.mode = mode);
             })
             .style(move |s| {
-                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                let is_active = signals.prefs.get().mode == mode;
+                let prefs = signals.prefs.get();
+                let colors = ThemeColors::from_mode(prefs.mode);
+                let is_active = prefs.mode == mode;
                 s.font_size(11.0)
                     .padding_horiz(10.0)
                     .padding_vert(5.0)

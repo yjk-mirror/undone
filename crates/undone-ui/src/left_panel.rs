@@ -12,7 +12,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use undone_scene::engine::ActionView;
 
-pub fn left_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
+pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
     let story = signals.story;
     let actions = signals.actions;
     let state_clone = Rc::clone(&state);
