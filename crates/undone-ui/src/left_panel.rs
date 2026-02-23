@@ -41,7 +41,7 @@ fn markdown_to_text_layout(
     let mut span_start: Option<(usize, bool, bool, Option<f32>)> = None;
 
     // Flush the in-progress span up to `pos`, pushing it to `spans`.
-    let mut flush = |pos: usize,
+    let flush = |pos: usize,
                      span_start: &mut Option<(usize, bool, bool, Option<f32>)>,
                      spans: &mut Vec<(usize, usize, bool, bool, Option<f32>)>| {
         if let Some((start, b, i, sz)) = span_start.take() {
