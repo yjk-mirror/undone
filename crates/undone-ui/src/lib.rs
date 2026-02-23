@@ -1,3 +1,4 @@
+pub mod char_creation;
 pub mod game_state;
 pub mod left_panel;
 pub mod right_panel;
@@ -15,7 +16,8 @@ use undone_domain::SkillId;
 use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
-use crate::game_state::{init_game, GameState};
+use crate::char_creation::char_creation_view;
+use crate::game_state::{init_game, GameState, PreGameState};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
 use crate::theme::{ThemeColors, UserPrefs};
@@ -28,6 +30,12 @@ pub enum AppTab {
     Settings,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum AppPhase {
+    CharCreation,
+    InGame,
+}
+
 /// All reactive signals used by the view tree.
 #[derive(Clone, Copy)]
 pub struct AppSignals {
@@ -37,6 +45,7 @@ pub struct AppSignals {
     pub active_npc: RwSignal<Option<NpcSnapshot>>,
     pub prefs: RwSignal<UserPrefs>,
     pub tab: RwSignal<AppTab>,
+    pub phase: RwSignal<AppPhase>,
 }
 
 impl Default for AppSignals {
@@ -54,6 +63,7 @@ impl AppSignals {
             active_npc: RwSignal::new(None),
             prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
+            phase: RwSignal::new(AppPhase::CharCreation),
         }
     }
 }
@@ -112,70 +122,137 @@ impl From<&undone_domain::NpcCore> for NpcSnapshot {
 pub fn app_view() -> impl View {
     let signals = AppSignals::new();
 
-    let state = Rc::new(RefCell::new(init_game()));
+    // Load packs (no world yet — waits for char creation)
+    let pre_state: Rc<RefCell<Option<PreGameState>>> = Rc::new(RefCell::new(Some(init_game())));
+    let game_state: Rc<RefCell<Option<GameState>>> = Rc::new(RefCell::new(None));
 
-    // Surface pack-load errors in the story panel.
+    // Surface pack-load errors in the story panel immediately (shown when we transition to InGame).
     {
-        let gs = state.borrow();
-        if let Some(ref err) = gs.init_error {
-            signals.story.set(err.clone());
-        }
-    }
-
-    // Resolve FEMININITY skill id once — used to build PlayerSnapshot.
-    // Only used in the non-error path (process_events is never called when init_error is set).
-    let femininity_id: Option<SkillId> = {
-        let gs = state.borrow();
-        gs.registry.resolve_skill("FEMININITY").ok()
-    };
-
-    // Start opening scene on app launch (only when packs loaded successfully).
-    if let Some(fem_id) = femininity_id {
-        let mut gs = state.borrow_mut();
-        if gs.init_error.is_none() {
-            let GameState {
-                ref mut engine,
-                ref mut world,
-                ref registry,
-                ref scheduler,
-                ref mut rng,
-                ..
-            } = *gs;
-            engine.send(
-                EngineCommand::StartScene("base::rain_shelter".into()),
-                world,
-                registry,
-            );
-            let events = engine.drain();
-            let finished = process_events(events, signals, world, fem_id);
-            if finished {
-                if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
-                    engine.send(EngineCommand::StartScene(scene_id), world, registry);
-                    let events = engine.drain();
-                    process_events(events, signals, world, fem_id);
-                }
+        let ps = pre_state.borrow();
+        if let Some(ref pre) = *ps {
+            if let Some(ref err) = pre.init_error {
+                signals.story.set(err.clone());
             }
         }
     }
 
-    let content = dyn_container(
-        move || signals.tab.get(),
-        move |tab| match tab {
-            AppTab::Game => h_stack((
-                sidebar_panel(signals),
-                story_panel(signals, Rc::clone(&state)),
-            ))
-            .style(|s| s.size_full())
+    let pre_state_cc = Rc::clone(&pre_state);
+    let game_state_cc = Rc::clone(&game_state);
+    let game_state_ig = Rc::clone(&game_state);
+
+    let phase = signals.phase;
+
+    let body = dyn_container(
+        move || phase.get(),
+        move |current_phase| match current_phase {
+            AppPhase::CharCreation => char_creation_view(
+                signals,
+                Rc::clone(&pre_state_cc),
+                Rc::clone(&game_state_cc),
+            )
             .into_any(),
-            AppTab::Saves => placeholder_panel("Saves \u{2014} coming soon", signals).into_any(),
-            AppTab::Settings => {
-                placeholder_panel("Settings \u{2014} coming soon", signals).into_any()
+            AppPhase::InGame => {
+                // On first transition to InGame, start the opening scene.
+                let gs_ref = Rc::clone(&game_state_ig);
+                {
+                    let mut gs_opt = gs_ref.borrow_mut();
+                    if let Some(ref mut gs) = *gs_opt {
+                        if gs.init_error.is_none() {
+                            if let Ok(fem_id) = gs.registry.resolve_skill("FEMININITY") {
+                                let GameState {
+                                    ref mut engine,
+                                    ref mut world,
+                                    ref registry,
+                                    ref scheduler,
+                                    ref mut rng,
+                                    ..
+                                } = *gs;
+                                engine.send(
+                                    EngineCommand::StartScene("base::rain_shelter".into()),
+                                    world,
+                                    registry,
+                                );
+                                let events = engine.drain();
+                                let finished =
+                                    process_events(events, signals, world, fem_id);
+                                if finished {
+                                    if let Some(scene_id) =
+                                        scheduler.pick("free_time", world, registry, rng)
+                                    {
+                                        engine.send(
+                                            EngineCommand::StartScene(scene_id),
+                                            world,
+                                            registry,
+                                        );
+                                        let events = engine.drain();
+                                        process_events(events, signals, world, fem_id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Now render the game layout using the Rc<RefCell<Option<GameState>>>.
+                // We need a Rc<RefCell<GameState>> for story_panel, so we wrap
+                // the unwrapped GameState. We take the GameState out of Option and
+                // re-box it in a plain RefCell for the panels.
+                //
+                // This approach replaces Option with a fully-initialised cell for the
+                // game panels so they see a non-optional GameState.
+                let gs_opt = gs_ref.borrow();
+                if gs_opt.is_none() {
+                    // Fallback: shouldn't happen, but show error pane
+                    return placeholder_panel("Game state missing", signals).into_any();
+                }
+                drop(gs_opt);
+
+                // Convert Rc<RefCell<Option<GameState>>> into a Rc<RefCell<GameState>>
+                // by extracting the value and placing it in a new cell.
+                // We do this once at the moment of transition so the sub-views hold a
+                // clean reference.
+                let inner_gs: GameState = gs_ref.borrow_mut().take().unwrap();
+                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                let content = dyn_container(
+                    move || signals.tab.get(),
+                    {
+                        let gs_cell = Rc::clone(&gs_cell);
+                        move |tab| match tab {
+                            AppTab::Game => h_stack((
+                                sidebar_panel(signals),
+                                story_panel(signals, Rc::clone(&gs_cell)),
+                            ))
+                            .style(|s| s.size_full())
+                            .into_any(),
+                            AppTab::Saves => {
+                                placeholder_panel("Saves \u{2014} coming soon", signals).into_any()
+                            }
+                            AppTab::Settings => {
+                                placeholder_panel("Settings \u{2014} coming soon", signals)
+                                    .into_any()
+                            }
+                        }
+                    },
+                )
+                .style(|s| s.flex_grow(1.0));
+
+                v_stack((title_bar(signals), content))
+                    .style(move |s| {
+                        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                        s.size_full().background(colors.ground)
+                    })
+                    .into_any()
             }
         },
     )
-    .style(|s| s.flex_grow(1.0));
+    .style(|s| s.size_full());
 
-    let main_column = v_stack((title_bar(signals), content)).style(move |s| {
+    // For CharCreation phase, we show without title bar.
+    // For InGame phase the title bar is built inside the dyn_container above.
+    // We still need the outer frame and resize grips.
+
+    let main_column = body.style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     });
