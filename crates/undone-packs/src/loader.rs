@@ -106,6 +106,17 @@ fn load_one_pack(
         registry.register_names(names_file.male_names, names_file.female_names);
     }
 
+    if let Some(ref stats_rel) = manifest.content.stats_file {
+        let stats_path = pack_dir.join(stats_rel);
+        let src = read_file(&stats_path)?;
+        let stats_file: crate::data::StatFile =
+            toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+                path: stats_path.clone(),
+                message: e.to_string(),
+            })?;
+        registry.register_stats(stats_file.stat);
+    }
+
     Ok(LoadedPackMeta {
         manifest,
         pack_dir: pack_dir.to_path_buf(),
@@ -156,6 +167,15 @@ mod tests {
     fn error_on_nonexistent_dir() {
         let result = load_packs(std::path::Path::new("/nonexistent/packs"));
         assert!(result.is_err(), "should error on missing directory");
+    }
+
+    #[test]
+    fn loads_base_pack_stats() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert!(
+            registry.get_stat("TIMES_KISSED").is_some(),
+            "TIMES_KISSED stat should be interned"
+        );
     }
 
     #[test]

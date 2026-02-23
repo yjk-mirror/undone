@@ -49,3 +49,16 @@ pub struct NamesFile {
     pub male_names: Vec<String>,
     pub female_names: Vec<String>,
 }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct StatDef {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct StatFile {
+    #[serde(default)]
+    pub stat: Vec<StatDef>,
+}
