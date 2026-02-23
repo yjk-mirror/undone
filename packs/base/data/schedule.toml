@@ -9,3 +9,13 @@ name = "free_time"
   scene     = "base::rain_shelter"
   condition = "gd.week() > 0"
   weight    = 10
+
+  [[slot.events]]
+  scene     = "base::morning_routine"
+  condition = "gd.week() >= 1"
+  weight    = 15
+
+  [[slot.events]]
+  scene     = "base::coffee_shop"
+  condition = "gd.week() >= 1"
+  weight    = 10
