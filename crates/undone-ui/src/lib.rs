@@ -1,34 +1,44 @@
+pub mod game_state;
 pub mod left_panel;
 pub mod right_panel;
-pub mod game_state;
+pub mod theme;
 
-use std::rc::Rc;
-use std::cell::RefCell;
 use floem::prelude::*;
 use floem::reactive::RwSignal;
+use std::cell::RefCell;
+use std::rc::Rc;
 use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
+use crate::game_state::{init_game, GameState};
 use crate::left_panel::left_panel;
 use crate::right_panel::right_panel;
-use crate::game_state::{GameState, init_game};
+use crate::theme::{ThemeColors, UserPrefs};
 
 /// All reactive signals used by the view tree.
 #[derive(Clone, Copy)]
 pub struct AppSignals {
-    pub story:      RwSignal<String>,
-    pub actions:    RwSignal<Vec<ActionView>>,
-    pub player:     RwSignal<PlayerSnapshot>,
+    pub story: RwSignal<String>,
+    pub actions: RwSignal<Vec<ActionView>>,
+    pub player: RwSignal<PlayerSnapshot>,
     pub active_npc: RwSignal<Option<NpcSnapshot>>,
+    pub prefs: RwSignal<UserPrefs>,
+}
+
+impl Default for AppSignals {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AppSignals {
     pub fn new() -> Self {
         Self {
-            story:      RwSignal::new(String::new()),
-            actions:    RwSignal::new(Vec::new()),
-            player:     RwSignal::new(PlayerSnapshot::default()),
+            story: RwSignal::new(String::new()),
+            actions: RwSignal::new(Vec::new()),
+            player: RwSignal::new(PlayerSnapshot::default()),
             active_npc: RwSignal::new(None),
+            prefs: RwSignal::new(UserPrefs::default()),
         }
     }
 }
@@ -41,8 +51,8 @@ pub struct PlayerSnapshot {
     pub money: i32,
     pub stress: i32,
     pub anxiety: i32,
-    pub arousal: String,   // e.g. "Comfort", "Enjoy"
-    pub alcohol: String,   // e.g. "Sober", "Tipsy"
+    pub arousal: String, // e.g. "Comfort", "Enjoy"
+    pub alcohol: String, // e.g. "Sober", "Tipsy"
 }
 
 impl From<&undone_domain::Player> for PlayerSnapshot {
@@ -91,7 +101,11 @@ pub fn app_view() -> impl View {
     // Start opening scene on app launch
     {
         let mut gs = state.borrow_mut();
-        let GameState { ref mut engine, ref mut world, ref registry } = *gs;
+        let GameState {
+            ref mut engine,
+            ref mut world,
+            ref registry,
+        } = *gs;
         engine.send(
             EngineCommand::StartScene("base::rain_shelter".into()),
             world,
@@ -101,14 +115,10 @@ pub fn app_view() -> impl View {
         process_events(events, signals, world);
     }
 
-    h_stack((
-        left_panel(signals, Rc::clone(&state)),
-        right_panel(signals),
-    ))
-    .style(|s| s
-        .size_full()
-        .background(Color::rgb8(247, 242, 232)) // #F7F2E8 Warm Paper Ground
-    )
+    h_stack((left_panel(signals, Rc::clone(&state)), right_panel(signals))).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.size_full().background(colors.ground)
+    })
 }
 
 pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &World) {

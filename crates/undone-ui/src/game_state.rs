@@ -1,12 +1,15 @@
+use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
 use std::path::Path;
-use rand::{rngs::SmallRng, SeedableRng};
 
-use undone_domain::{Age, BreastSize, PlayerFigure, Sexuality, Player};
-use undone_world::{World, GameData};
-use undone_packs::{PackRegistry, load_packs, char_creation::{new_game, CharCreationConfig}};
+use undone_domain::{Age, BreastSize, Player, PlayerFigure, Sexuality};
+use undone_packs::{
+    char_creation::{new_game, CharCreationConfig},
+    load_packs, PackRegistry,
+};
 use undone_scene::engine::SceneEngine;
 use undone_scene::loader::load_scenes;
+use undone_world::{GameData, World};
 
 pub struct GameState {
     pub world: World,
@@ -57,7 +60,8 @@ pub fn init_game() -> GameState {
     let world = new_game(config, &mut registry, &mut rng);
 
     // Load scenes from the base pack
-    let scenes = metas.iter()
+    let scenes = metas
+        .iter()
         .find(|m| m.manifest.pack.id == "base")
         .and_then(|m| {
             let scene_dir = m.pack_dir.join(&m.manifest.content.scenes_dir);
@@ -66,13 +70,17 @@ pub fn init_game() -> GameState {
         .unwrap_or_default();
 
     let engine = SceneEngine::new(scenes);
-    GameState { world, registry, engine }
+    GameState {
+        world,
+        registry,
+        engine,
+    }
 }
 
 fn placeholder_player() -> Player {
     use std::collections::{HashMap, HashSet};
     use undone_domain::*;
-    
+
     Player {
         name_fem: "Placeholder".into(),
         name_androg: "Placeholder".into(),
