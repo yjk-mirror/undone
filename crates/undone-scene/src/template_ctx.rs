@@ -223,7 +223,12 @@ mod tests {
     fn make_world() -> World {
         World {
             player: Player {
-                name: "Eva".into(),
+                name_fem: "Eva".into(),
+                name_androg: "Ev".into(),
+                name_masc: "Evan".into(),
+                before_age: 30,
+                before_race: "white".into(),
+                before_sexuality: Sexuality::StraightMale,
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
