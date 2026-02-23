@@ -25,7 +25,7 @@ content format, full ownership.
 | Concern | Choice | Rationale |
 |---|---|---|
 | Language | Rust | Type system pays dividends on complex game state |
-| GUI | egui / eframe | Immediate mode, pure Rust, single binary, cross-platform |
+| GUI | floem | Reactive, Lapce-team, pure Rust, single binary, cross-platform |
 | Template rendering | minijinja | Jinja2 syntax, embeds cleanly, well-maintained |
 | Scene conditions | Custom recursive descent parser | Zero dependencies, exact error messages, load-time validation |
 | Serialisation | serde + serde_json + toml | Standard, excellent |
@@ -513,7 +513,7 @@ by contributing to slot definitions.
 
 ## UI (`undone-ui`)
 
-egui / eframe. Three-panel layout:
+floem (Lapce reactive UI). Three-panel layout:
 
 ```
 ┌─────────────────────┬──────────────────────────────┐
@@ -527,21 +527,42 @@ egui / eframe. Three-panel layout:
 └────────────────────────────────────────────────────┘
 ```
 
-- Story text: custom egui widget, rich text, variable font size
+- Story text: floem text view, rich text, variable font size
 - Action buttons: tooltip shows `detail` field
 - Right panel: contextual — collapses when no NPC present
 - Theme and fonts loaded from `packs/base/ui/` — packs can reskin
 
 ---
 
-## Open Questions (for next session to resolve)
+## Open Questions — RESOLVED (2026-02-22)
 
-- Exact Cargo.toml dependency versions to pin
-- Whether `PersonalityId` stays data-driven or becomes an engine enum
-  (personalities may need engine-level scheduling logic)
-- Save file versioning / migration strategy
-- Character creation flow (separate from the scene engine or built on it?)
-- How NPC spawning / the NPC pool is seeded at game start
+See `docs/plans/2026-02-22-design-decisions.md` for full rationale.
+
+| Question | Decision |
+|---|---|
+| Cargo.toml dep versions | Pin at first stable release (not blocking) |
+| `PersonalityId` — data-driven or engine enum? | Engine enum for 5 core archetypes; pack extensions remain interned strings |
+| Save file versioning / migration | Current approach sufficient; migration framework at v0.1 |
+| Character creation flow | Two-phase hybrid: narrative "Before" scene + configured form. Three-name system. |
+| NPC spawning / pool seeding | Newlife model: 6–8 men + 2–3 women at game start, diversity guarantees |
+
+### New fields required on `Player`
+
+```rust
+pub before_age: u32,
+pub before_race: String,
+pub before_sexuality: Sexuality,   // engine enum
+pub name_masc: String,
+pub name_androg: String,
+pub name_fem: String,
+```
+
+### New engine enum required
+
+```rust
+pub enum Sexuality { StraightMale, GayMale, BiMale, AlwaysFemale }
+pub enum Personality { Romantic, Jerk, Friend, Intellectual, Lad }
+```
 
 ---
 

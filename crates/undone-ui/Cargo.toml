@@ -8,5 +8,6 @@ undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
 undone-scene  = { path = "../undone-scene" }
 undone-packs  = { path = "../undone-packs" }
-egui          = { workspace = true }
-eframe        = { workspace = true }
+floem         = { workspace = true }
+rand          = { workspace = true }
+slotmap       = { workspace = true }

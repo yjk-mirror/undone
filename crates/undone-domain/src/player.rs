@@ -127,7 +127,7 @@ mod tests {
     fn make_player() -> Player {
         Player {
             name_fem: "Eva".into(),
-            name_androg: "Evan".into(),
+            name_androg: "Ev".into(),
             name_masc: "Evan".into(),
             before_age: 30,
             before_race: "white".into(),
@@ -200,8 +200,7 @@ mod tests {
 
     #[test]
     fn skill_effective_adds_modifier() {
-        let _p = make_player();
-        // Test SkillValue directly — can't make SkillId without a Rodeo here
+        // SkillValue is tested directly — SkillId requires a Rodeo to construct
         let sv = SkillValue {
             value: 50,
             modifier: -10,

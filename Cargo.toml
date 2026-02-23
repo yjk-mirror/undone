@@ -25,9 +25,8 @@ indexmap    = "2"
 # Template rendering
 minijinja   = "2"
 
-# GUI
-eframe      = "0.31"
-egui        = "0.31"
+# GUI — replace existing eframe/egui lines with:
+floem = { version = "0.2" }
 
 # Error handling
 thiserror   = "2"
@@ -51,6 +50,5 @@ undone-world  = { path = "crates/undone-world" }
 undone-packs  = { path = "crates/undone-packs" }
 undone-scene  = { path = "crates/undone-scene" }
 undone-ui     = { path = "crates/undone-ui" }
-eframe        = { workspace = true }
-anyhow        = { workspace = true }
+floem         = { workspace = true }
 tracing-subscriber = { workspace = true }

@@ -109,12 +109,12 @@ impl PackRegistry {
     }
 
     /// Look up an already-interned stat name without mutating. Returns None if never interned.
-    pub fn get_stat(&self, id: &str) -> Option<undone_domain::StatId> {
-        self.rodeo.get(id).map(undone_domain::StatId)
+    pub fn get_stat(&self, id: &str) -> Option<StatId> {
+        self.rodeo.get(id).map(StatId)
     }
 
     /// Resolve a TraitId back to its string ID (spur → str). Used for template rendering.
-    pub fn trait_id_to_str(&self, id: undone_domain::TraitId) -> &str {
+    pub fn trait_id_to_str(&self, id: TraitId) -> &str {
         self.rodeo.resolve(&id.0)
     }
 

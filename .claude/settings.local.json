@@ -15,7 +15,21 @@
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy -p undone-packs -- -D warnings 2>&1)",
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test -p undone-expr 2>&1)",
       "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo clippy -p undone-expr -p undone-packs -- -D warnings 2>&1)",
-      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test --workspace 2>&1)"
+      "Bash(cd /c/Users/YJK/dev/mirror/undone && cargo test --workspace 2>&1)",
+      "Bash(cd:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "mcp__rust__run_cargo_check",
+      "Bash(cd \"C:\\\\Users\\\\YJK\\\\dev\\\\mirror\\\\undone\\\\.worktrees\\\\scene-engine\" && cargo test -p undone-expr 2>&1)",
+      "Bash(grep test result:*)",
+      "Bash(findstr test result:*)",
+      "Bash(cd \"C:\\\\Users\\\\YJK\\\\dev\\\\mirror\\\\undone\\\\.worktrees\\\\scene-engine\" && cargo test 2>&1)",
+      "Bash(head:*)",
+      "Bash(cd \"C:\\\\Users\\\\YJK\\\\dev\\\\mirror\\\\undone\\\\.worktrees\\\\scene-engine\" && cargo clippy --workspace 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone/.worktrees/scene-engine && cargo clippy --crate-name undone_expr -- -W clippy::all 2>&1)",
+      "Bash(cd /c/Users/YJK/dev/mirror/undone/.worktrees/scene-engine && cargo clippy --all 2>&1)",
+      "Bash(cd \"C:/Users/YJK/dev/mirror/undone/.worktrees/scene-engine\" && cargo fmt -p undone-packs && cargo test -p undone-packs 2>&1)",
+      "Bash(cd \"C:/Users/YJK/dev/mirror/undone/.worktrees/scene-engine\" && cargo test -p undone-packs 2>&1)"
     ]
   },
   "enableAllProjectMcpServers": true,

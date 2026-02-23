@@ -6,9 +6,10 @@
 premise. Built from scratch in Rust. Inspired by Newlife (Splendid Ostrich Games) but
 fully redesigned: new engine, new content format, complete ownership.
 
-The engine is a **platform**. The first release is set in contemporary Britain. Other
-settings, stories, and cultural contexts are first-class citizens — not afterthoughts.
-Extensibility is a core design constraint, not a future enhancement.
+The engine is a **platform**. The first release is set in a fictional Northeast US city
+(near-future, date unspecified). Other settings, stories, and cultural contexts are
+first-class citizens — not afterthoughts. Extensibility is a core design constraint,
+not a future enhancement.
 
 ### The Premise (shared across all stories)
 
@@ -41,7 +42,7 @@ begins at 75. The richest transformation writing lives in the 0–50 range.
 | Concern | Choice |
 |---|---|
 | Language | Rust (workspace, 7 crates) |
-| GUI | egui / eframe (immediate mode, single binary) |
+| GUI | floem (reactive, Lapce team, single binary) |
 | Template rendering | minijinja (Jinja2 syntax) |
 | Scene conditions | Custom recursive descent parser (validated at load time) |
 | Serialisation | serde + serde_json + toml |
@@ -61,7 +62,7 @@ undone/
 │   ├── undone-expr/         # custom expression parser & evaluator
 │   ├── undone-scene/        # scene execution engine
 │   ├── undone-save/         # serde save / load
-│   └── undone-ui/           # egui/eframe views and widgets
+│   └── undone-ui/           # floem views and widgets
 └── packs/
     └── base/                # base game content (is itself a pack)
 ```
@@ -70,7 +71,8 @@ undone/
 
 - **Platform, not product.** The engine is setting-agnostic. All content — traits,
   skills, stats, scenes, NPC personalities, cultural references — lives in packs.
-  The base game is the British pack. Nothing British is hardcoded into the engine.
+  The base game is set in a fictional Northeast US city. Nothing setting-specific is
+  hardcoded into the engine.
 
 - **Redesign, not port.** The Java source is obfuscated. We reverse-engineered the
   API surface for reference only. The Rust engine is designed from scratch.
@@ -105,9 +107,10 @@ Do not iterate on the UI until the scene engine can run scenes end-to-end.
 
 ## Writing and Content
 
-Original prose from the companion `newlife-plus` project will be ported and improved,
-but not until the engine can run scenes end-to-end. Do not work on prose content
-during the scaffold or engine sessions.
+The base pack is set in a fictional Northeast US city (near-future). All prose is
+original — the setting deliberately diverges from Newlife's British context to
+differentiate. Do not work on prose content until the engine can run scenes end-to-end
+and the writing guide session has established continuity-of-self principles.
 
 ## Expression Parser Notes
 

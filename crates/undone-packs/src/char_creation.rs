@@ -41,7 +41,6 @@ pub fn new_game<R: Rng>(
     rng: &mut R,
 ) -> World {
     let starting_femininity = if config.always_female { 75 } else { 10 };
-
     let traits: HashSet<TraitId> = config.starting_traits.into_iter().collect();
 
     let player = Player {
@@ -52,6 +51,7 @@ pub fn new_game<R: Rng>(
         race: config.race,
         figure: config.figure,
         breasts: config.breasts,
+        // Placeholder defaults — char creation UI will expose these fields later
         eye_colour: "brown".into(),
         hair_colour: "dark".into(),
         traits,

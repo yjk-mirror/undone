@@ -2,53 +2,116 @@
 
 ## Current State
 
-**Phase:** Scheduler + Save/Load merged to master. Backend complete.
+**Phase:** UI floem migration done (Gemini, unreviewed). Needs Claude audit + quality pass
+before merging to master. 87 tests pass, cargo check clean, on `master` branch.
 
-70 tests pass, zero clippy warnings. All work on `master`.
+**UI — floem migration** (this session, Gemini-authored — treat as draft):
+- egui/eframe removed. floem 0.2.0 wired across workspace and `undone-ui`
+- Module split: `lib.rs` (entry, AppSignals), `left_panel.rs`, `right_panel.rs`, `game_state.rs`
+- `PlayerSnapshot` / `NpcSnapshot` structs — UI never borrows World directly
+- `AppSignals` (RwSignal bundle) drives all reactive updates
+- Scene event loop wired: choice buttons → `EngineCommand` → drain events → update signals
+- App boots into `base::rain_shelter` scene
+- Warm Paper color tokens applied from `.interface-design/system.md`
+- Floem 0.2.0 adaptations noted by Gemini (see Technical Notes below)
 
-**Scheduler** (`undone-scene/src/scheduler.rs`):
-- `load_schedule(pack_metas)` → `Scheduler` — loads `schedule.toml` from each pack
-- `Scheduler::pick(slot, world, registry, rng)` → `Option<String>` — weighted random selection
-- Conditions use the existing expr evaluator with an empty SceneCtx
-- Base pack defines `free_time` slot with `rain_shelter` event (condition: `gd.week() > 0`)
-- 6 scheduler tests
+**Setting pivot** (this session):
+- Base pack setting changed from British to **fictional Northeast US city, near-future**
+- `CLAUDE.md`, `docs/plans/2026-02-22-design-decisions.md` updated accordingly
+- `docs/plans/2026-02-22-setting-principles.md` written — setting canon doc
+- `packs/base/data/names.toml` still has British names — **needs updating**
 
-**Save/Load** (`undone-save/src/lib.rs`):
-- `save_game(world, registry, path)` — writes `SaveFile { version, id_strings, world }` as JSON
-- `load_game(path, registry)` — validates ID stability before returning `World`
-- ID validation: saved `id_strings` (Spur-index order) must match current registry
-- Errors: `IdMismatch` (pack content changed), `TooManyIds` (pack removed), `VersionMismatch`
-- 6 save tests including full round-trip
+**Design system** (this session):
+- `.interface-design/system.md` written — full token set, three modes, typography, layout rules
+- Design direction: "Evening Reader" — research-backed (Choice of Games, Instapaper, iA Writer,
+  Degrees of Lewdity redesign, NN/G dark mode study)
 
-**Supporting changes**:
-- `PackContent.schedule_file: Option<String>` in pack manifests
-- `PackRegistry::all_interned_strings()` for save ID validation
-- `World: Clone`
+**Previous sessions** (still in place):
+- Scene engine, scheduler, save/load, NPC spawner, char creation — all working
 
-## Next Action
+---
 
-**UI design session** — dedicated session. Typography, layout, choice presentation.
-The backend is complete. See UI Direction in engine-design.md.
+## Next Action: UI Quality Pass
 
-Note on open questions (from engine-design.md):
-- NPC spawning / pool seeding at game start — not yet designed
-- Character creation flow — not yet designed
-- `w.hasStuff()` returns false (StuffId registry stub) — needed when inventory matters
+**The Gemini UI code is structurally complete but needs a thorough review.** Gemini rushes
+toward least-friction code; assume the implementation is functional but not clean or complete.
+
+### Known gaps and concerns (audit these specifically):
+
+**Not implemented at all — Gemini didn't attempt:**
+- [ ] Dark mode and Sepia mode (only Warm Paper was mentioned)
+- [ ] `UserPrefs` struct — no configurable font/size/mode
+- [ ] Keyboard navigation: number keys 1–9 select choices by position, Tab/Enter activate
+- [ ] Markdown rendering in prose (pulldown-cmark → floem RichText — intentionally deferred)
+
+**Quality concerns — verify these:**
+- [ ] All five choice button states present: default, hover, focus (2px ring), active, disabled
+- [ ] `letter_spacing` omitted from stat labels (floem doesn't support it) — acceptable for now
+- [ ] Font is Georgia fallback, not Literata (Literata loading is a future task) — acceptable
+- [ ] `ref mut` destructuring in game init — may be awkward, refactor if needed
+- [ ] `PersonalityId` uses Debug formatting — acceptable for now, note it
+- [ ] `rand` and `slotmap` added to `undone-ui/Cargo.toml` — verify these are actually needed
+  at the UI level vs. being pulled through `undone-packs`/`undone-world` transitively
+- [ ] No clippy pass run — run `cargo clippy -- -D warnings`, fix all warnings
+- [ ] Code style, naming, redundant code, missing error handling — general Gemini cleanup
+
+**UI plan tasks intentionally NOT done by Gemini — do these in the quality pass:**
+- [ ] Task 11 (cleanup): cargo clippy, format, test suite run
+- [ ] `superpowers:finishing-a-development-branch` — merge decision
+
+### Floem 0.2.0 adaptations Gemini made (verify each is correct):
+- `default-font` feature removed from Cargo.toml (was removed in 0.2.0)
+- `font_family` requires `String` in some Style contexts
+- `letter_spacing` not in Style API — stat label letter-spacing silently omitted
+
+---
+
+## For the Quality Pass Session
+
+1. Invoke `superpowers:requesting-code-review` — audit Gemini's work against the plan and system.md
+2. Fix issues found
+3. Add the three missing features: Dark/Sepia modes, UserPrefs, keyboard navigation
+4. `cargo clippy -- -D warnings` — zero warnings
+5. `cargo test` — all 87 tests pass
+6. Invoke `superpowers:finishing-a-development-branch`
+
+The plan file for reference: `docs/plans/2026-02-22-ui-floem.md`
+The design system: `.interface-design/system.md`
+
+---
 
 ## Planned Future Sessions
 
 1. ~~Scene engine~~ ✅
 2. ~~Scheduler~~ ✅
 3. ~~Save / load~~ ✅
-4. **UI design** — Dedicated session; typography, layout, choice presentation (NOT egui — see engine-design.md)
-5. **NPC spawning + character creation** — needs design session first
-6. **Writing import** — Port and improve original prose from `newlife-plus`
+4. ~~Design research~~ ✅
+5. **UI quality pass** — audit + fix Gemini's work, add dark/sepia modes, UserPrefs, keyboard nav
+6. ~~NPC spawning + character creation~~ ✅
+7. **Writing guide** — Continuity-of-self principles, transformation writing, delta-awareness,
+   Northeast US setting voice. Write before any prose work.
+8. **Writing import** — Original prose for the base pack (not a port — new setting, new content)
+9. **Names update** — `packs/base/data/names.toml` British → American Northeast names
+
+---
+
+## Open Items (not session-specific)
+
+- `w.hasStuff()` still returns false (StuffId registry stub) — needed when inventory matters
+- `PersonalityId` Display impl missing — using Debug format in UI for now
+- Literata font loading from disk — deferred; using Georgia fallback currently
+- Markdown in prose (pulldown-cmark → floem RichText) — planned, not yet designed
+
+---
 
 ## Agentic Workflow Reminder
 
 - Background implementation agents need `mode: "bypassPermissions"` — now in global CLAUDE.md
 - Use `mcp__rust__get_diagnostics` + `mcp__rust__format_code` after writing each `.rs` file
 - Use worktrees for post-scaffold sessions (master is the scaffold baseline)
+- Agent teams: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings env
+
+---
 
 ## Session Log
 
@@ -62,3 +125,8 @@ Note on open questions (from engine-design.md):
 | 2026-02-22 | Scene engine: 10-task implementation. Pack loader, eval wiring, effect system, minijinja templates, SceneEngine, rain shelter scene. 58 tests, 0 warnings. |
 | 2026-02-22 | Scene engine: code audit + cleanup. Merged to master, worktree removed. |
 | 2026-02-22 | Autonomous session: Scheduler + Save/Load. 70 tests, 0 warnings. Merged to master. |
+| 2026-02-22 | Design research session: character creation, NPC spawning, UI patterns, personality arch. All open questions resolved. |
+| 2026-02-22 | NPC spawning + char creation: 7-task plan via agent team. Sexuality/Personality enums, Player three-name system, NPC spawner with diversity guarantees, new_game() factory. 85 tests, 0 warnings. Merged to master. |
+| 2026-02-22 | Code audit: reviewer + simplifier. Fixed diversity guarantee bug (.take() truncated required personalities for male_count < 3). Simplified pick_traits to use choose_multiple. |
+| 2026-02-22 | Planning session: UI plan written (docs/plans/2026-02-22-ui-floem.md). Setting pivot to fictional NE US city. Design system init (Evening Reader / three modes). system.md written. |
+| 2026-02-22 | UI implementation: floem migration + layout (Gemini-authored, unreviewed). 87 tests pass. Warm Paper theme. Scene boots. Module split. Missing: dark/sepia modes, UserPrefs, keyboard nav. |
