@@ -96,10 +96,21 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 
 ## Open Items — Future Sessions
 
-### Character Creation (Remaining Small Items)
-- **Trait checkbox UX**: Label text is currently drag-selectable; clicking label should toggle checkbox instead
-- **Age before transition**: Should be a dropdown (matching "Age" field), not a text input
-- **Form density**: Form too tall for 800px window; consider tighter spacing or two-column layout
+### Character Creation — Needs Redesign (Medium)
+
+The current form is still a stat-picker upfront. The correct flow is:
+
+1. **Create the male character** — name, age, personality traits
+2. **Play an intro scene** as that character (pre-transformation)
+3. **Transformation event fires** mid-scene
+4. **Female customization appears in-game** — name, figure, etc. as part of the narrative moment
+
+The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and all the female character stats (feminine name, figure, breasts) should move out of the upfront form and into the transformation flow. Char creation should only capture the *before* state.
+
+**Remaining small items:**
+- Trait checkbox UX: clicking label text should toggle checkbox (currently drag-selects)
+- Age before transition: should be a dropdown, not a text input
+- Form density: too tall for 800px window; tighter spacing or two-column layout
 
 ### Keyboard Controls (Medium)
 - **Arrow key navigation**: Highlight choices with arrow keys, show detail strip for highlighted choice
