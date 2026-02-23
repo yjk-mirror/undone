@@ -13,3 +13,6 @@ lasso            = { workspace = true }
 pulldown-cmark   = { workspace = true }
 rand             = { workspace = true }
 slotmap          = { workspace = true }
+dirs             = { workspace = true }
+serde            = { workspace = true }
+serde_json       = { workspace = true }

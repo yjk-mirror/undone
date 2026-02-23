@@ -52,7 +52,7 @@ impl AppSignals {
             actions: RwSignal::new(Vec::new()),
             player: RwSignal::new(PlayerSnapshot::default()),
             active_npc: RwSignal::new(None),
-            prefs: RwSignal::new(UserPrefs::default()),
+            prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
         }
     }
