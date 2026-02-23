@@ -103,6 +103,36 @@ undone/
   a man? If yes, write the branch. This is not optional flavour — it is the
   game's distinctive register.
 
+## Engineering Principles
+
+These are constraints, not aspirations. Violating them is a bug.
+
+1. **Fail fast, fail loud.** Invalid data is caught at load time, not runtime.
+   Runtime errors are visible — never silently swallowed. A broken condition
+   that defaults to `false` still logs the error.
+
+2. **No hardcoded content IDs in engine code.** Scene IDs, slot names, skill
+   names, trait names belong in pack data files. The engine reads from the
+   registry. Structural IDs (like FEMININITY) must be declared as required
+   skills in the pack manifest — not magic strings scattered across crates.
+
+3. **Data-driven over code-driven.** If a value could come from a pack file,
+   it should. The engine is a platform — it should not know what game it runs.
+
+4. **No silent defaults for content errors.** A typo in a condition, an unknown
+   trait name, a broken goto target — these are content bugs, not edge cases.
+   Visible errors at the earliest possible moment: load time > runtime > silent.
+
+5. **Bounded resources.** Stacks, buffers, and accumulating strings have
+   depth/size limits. Unbounded growth is a latent crash.
+
+6. **Separation of concerns across crate boundaries.** Engine logic stays out
+   of the UI crate. UI concerns stay out of the domain crate. The dependency
+   DAG is enforced and maintained.
+
+7. **Tests before content.** New engine capabilities get tests before scenes
+   use them. Content authors should never discover a broken engine feature first.
+
 ## UI Direction
 
 The UI is a significant open design question. We are not replicating the original
