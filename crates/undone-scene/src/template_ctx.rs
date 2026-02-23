@@ -4,6 +4,7 @@ use minijinja::{
     value::{Object, ObjectRepr, Value},
     Error, ErrorKind, State,
 };
+use undone_domain::PcOrigin;
 use undone_expr::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
@@ -16,7 +17,7 @@ use undone_world::World;
 pub struct PlayerCtx {
     pub trait_strings: HashSet<String>,
     pub virgin: bool,
-    pub always_female: bool,
+    pub origin: PcOrigin,
     pub partner: bool, // true = has partner (i.e. NOT single)
     pub on_pill: bool,
     pub pregnant: bool,
@@ -45,7 +46,16 @@ impl Object for PlayerCtx {
                 Ok(Value::from(self.trait_strings.contains(id.as_str())))
             }
             "isVirgin" => Ok(Value::from(self.virgin)),
-            "alwaysFemale" => Ok(Value::from(self.always_female)),
+            "alwaysFemale" => Ok(Value::from(self.origin.is_always_female())),
+            "pcOrigin" => {
+                let s = match self.origin {
+                    PcOrigin::CisMaleTransformed => "CisMaleTransformed",
+                    PcOrigin::TransWomanTransformed => "TransWomanTransformed",
+                    PcOrigin::CisFemaleTransformed => "CisFemaleTransformed",
+                    PcOrigin::AlwaysFemale => "AlwaysFemale",
+                };
+                Ok(Value::from(s))
+            }
             "isSingle" => Ok(Value::from(!self.partner)),
             "isOnPill" => Ok(Value::from(self.on_pill)),
             "isPregnant" => Ok(Value::from(self.pregnant)),
@@ -178,7 +188,7 @@ pub fn render_prose(
     let player_ctx = PlayerCtx {
         trait_strings,
         virgin: world.player.virgin,
-        always_female: world.player.always_female,
+        origin: world.player.origin,
         partner: world.player.partner.is_some(),
         on_pill: world.player.on_pill,
         pregnant: world.player.pregnancy.is_some(),
@@ -228,7 +238,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before_age: 30,
                 before_race: "white".into(),
-                before_sexuality: Sexuality::StraightMale,
+                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -252,7 +262,7 @@ mod tests {
                 stuff: HashSet::new(),
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
-                always_female: false,
+                origin: PcOrigin::CisMaleTransformed,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
