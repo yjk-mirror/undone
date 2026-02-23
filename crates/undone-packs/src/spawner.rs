@@ -73,7 +73,9 @@ pub fn spawn_npcs<R: Rng>(
         .map(|s| registry.intern_personality(s))
         .collect();
     while personality_ids.len() < config.male_count {
-        let p = CORE_PERSONALITIES.choose(rng).unwrap();
+        let p = CORE_PERSONALITIES
+            .choose(rng)
+            .expect("CORE_PERSONALITIES is non-empty");
         personality_ids.push(registry.intern_personality(p));
     }
     personality_ids.shuffle(rng);
@@ -94,12 +96,18 @@ pub fn spawn_npcs<R: Rng>(
             .choose(rng)
             .cloned()
             .unwrap_or_else(|| format!("NPC{}", i));
-        let age = *AGES.choose(rng).unwrap();
-        let race = RACES.choose(rng).unwrap().to_string();
-        let eye_colour = EYE_COLOURS.choose(rng).unwrap().to_string();
-        let hair_colour = HAIR_COLOURS.choose(rng).unwrap().to_string();
+        let age = *AGES.choose(rng).expect("AGES is non-empty");
+        let race = RACES.choose(rng).expect("RACES is non-empty").to_string();
+        let eye_colour = EYE_COLOURS
+            .choose(rng)
+            .expect("EYE_COLOURS is non-empty")
+            .to_string();
+        let hair_colour = HAIR_COLOURS
+            .choose(rng)
+            .expect("HAIR_COLOURS is non-empty")
+            .to_string();
         let traits = pick_traits(&npc_trait_ids, 2, rng);
-        let figure = *MALE_FIGURES.choose(rng).unwrap();
+        let figure = *MALE_FIGURES.choose(rng).expect("MALE_FIGURES is non-empty");
 
         let core = make_core(
             name,
@@ -124,14 +132,22 @@ pub fn spawn_npcs<R: Rng>(
             .choose(rng)
             .cloned()
             .unwrap_or_else(|| format!("FNPC{}", i));
-        let age = *AGES.choose(rng).unwrap();
-        let race = RACES.choose(rng).unwrap().to_string();
-        let eye_colour = EYE_COLOURS.choose(rng).unwrap().to_string();
-        let hair_colour = HAIR_COLOURS.choose(rng).unwrap().to_string();
+        let age = *AGES.choose(rng).expect("AGES is non-empty");
+        let race = RACES.choose(rng).expect("RACES is non-empty").to_string();
+        let eye_colour = EYE_COLOURS
+            .choose(rng)
+            .expect("EYE_COLOURS is non-empty")
+            .to_string();
+        let hair_colour = HAIR_COLOURS
+            .choose(rng)
+            .expect("HAIR_COLOURS is non-empty")
+            .to_string();
         let personality = registry.intern_personality("FRIEND");
         let traits = pick_traits(&npc_trait_ids, 1, rng);
-        let figure = *FEMALE_FIGURES.choose(rng).unwrap();
-        let breasts = *BREAST_SIZES.choose(rng).unwrap();
+        let figure = *FEMALE_FIGURES
+            .choose(rng)
+            .expect("FEMALE_FIGURES is non-empty");
+        let breasts = *BREAST_SIZES.choose(rng).expect("BREAST_SIZES is non-empty");
 
         let core = make_core(
             name,

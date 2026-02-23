@@ -18,7 +18,7 @@ slotmap::new_key_type! {
     pub struct FemaleNpcKey;
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SkillValue {
     pub value: i32,
     pub modifier: i32,
@@ -80,7 +80,6 @@ pub struct Player {
 
     // Transformation axis
     pub always_female: bool, // false = male-start PC
-    pub femininity: i32,     // 0–100, starts low for male-start
 
     // Before-transformation data
     pub before_age: u32,
@@ -91,10 +90,12 @@ pub struct Player {
 impl Player {
     /// Returns the currently active display name based on femininity score.
     /// 0–30 → masculine name, 31–69 → androgynous name, 70+ → feminine name.
-    pub fn active_name(&self) -> &str {
-        if self.femininity >= 70 {
+    /// Pass the resolved FEMININITY skill id so the value is read from the skills map.
+    pub fn active_name(&self, femininity_skill: SkillId) -> &str {
+        let femininity = self.skill(femininity_skill);
+        if femininity >= 70 {
             &self.name_fem
-        } else if self.femininity >= 31 {
+        } else if femininity >= 31 {
             &self.name_androg
         } else {
             &self.name_masc
@@ -125,6 +126,7 @@ impl Player {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use lasso::Key;
 
     fn make_player() -> Player {
         Player {
@@ -158,34 +160,69 @@ mod tests {
             custom_flags: HashMap::new(),
             custom_ints: HashMap::new(),
             always_female: false,
-            femininity: 10,
         }
     }
 
     #[test]
     fn active_name_picks_correct_variant() {
+        // Use a fake SkillId (spur 0) — the test sets the skill value directly in the map.
+        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+
         let mut p = make_player();
         p.name_masc = "Evan".into();
         p.name_androg = "Ev".into();
         p.name_fem = "Eva".into();
 
-        p.femininity = 0;
-        assert_eq!(p.active_name(), "Evan");
+        let set_fem = |p: &mut Player, v: i32| {
+            p.skills.insert(
+                fem_id,
+                SkillValue {
+                    value: v,
+                    modifier: 0,
+                },
+            );
+        };
 
-        p.femininity = 30;
-        assert_eq!(p.active_name(), "Evan");
+        set_fem(&mut p, 0);
+        assert_eq!(p.active_name(fem_id), "Evan");
 
-        p.femininity = 31;
-        assert_eq!(p.active_name(), "Ev");
+        set_fem(&mut p, 30);
+        assert_eq!(p.active_name(fem_id), "Evan");
 
-        p.femininity = 69;
-        assert_eq!(p.active_name(), "Ev");
+        set_fem(&mut p, 31);
+        assert_eq!(p.active_name(fem_id), "Ev");
 
-        p.femininity = 70;
-        assert_eq!(p.active_name(), "Eva");
+        set_fem(&mut p, 69);
+        assert_eq!(p.active_name(fem_id), "Ev");
 
-        p.femininity = 100;
-        assert_eq!(p.active_name(), "Eva");
+        set_fem(&mut p, 70);
+        assert_eq!(p.active_name(fem_id), "Eva");
+
+        set_fem(&mut p, 100);
+        assert_eq!(p.active_name(fem_id), "Eva");
+    }
+
+    #[test]
+    fn active_name_reads_from_skills_map() {
+        // Verify that active_name reads from the skills map, not a standalone field.
+        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let mut p = make_player();
+        p.name_masc = "Evan".into();
+        p.name_androg = "Ev".into();
+        p.name_fem = "Eva".into();
+
+        // No entry in map → skill() returns 0 → masculine name
+        assert_eq!(p.active_name(fem_id), "Evan");
+
+        // Insert value via skills map → name changes accordingly
+        p.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 75,
+                modifier: 0,
+            },
+        );
+        assert_eq!(p.active_name(fem_id), "Eva");
     }
 
     #[test]

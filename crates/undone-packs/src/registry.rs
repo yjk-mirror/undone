@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
-use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, TraitId};
+use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, StuffId, TraitId};
 
-use crate::data::{NpcTraitDef, SkillDef, TraitDef};
+use crate::data::{NpcTraitDef, SkillDef, StatDef, TraitDef};
 
 #[derive(Debug, Error)]
 pub enum RegistryError {
@@ -69,6 +69,13 @@ impl PackRegistry {
         }
     }
 
+    /// Register stats from a pack data file, interning each stat id at load time.
+    pub fn register_stats(&mut self, defs: Vec<StatDef>) {
+        for def in defs {
+            self.intern_stat(&def.id);
+        }
+    }
+
     /// Resolve a string to a TraitId. Errors if the id is unknown.
     /// Call this at scene load time to validate condition expressions.
     pub fn resolve_trait(&self, id: &str) -> Result<TraitId, RegistryError> {
@@ -122,6 +129,16 @@ impl PackRegistry {
     /// validation table.
     pub fn resolve_spur(&self, spur: Spur) -> &str {
         self.rodeo.resolve(&spur)
+    }
+
+    /// Intern a stuff/item name, returning a StuffId.
+    pub fn intern_stuff(&mut self, id: &str) -> StuffId {
+        StuffId(self.intern(id))
+    }
+
+    /// Look up an already-interned stuff name. Returns None if never interned.
+    pub fn resolve_stuff(&self, id: &str) -> Option<StuffId> {
+        self.rodeo.get(id).map(StuffId)
     }
 
     /// Intern a personality name, returning a PersonalityId.

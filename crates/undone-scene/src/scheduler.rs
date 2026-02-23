@@ -80,6 +80,14 @@ pub struct Scheduler {
 }
 
 impl Scheduler {
+    /// Create an empty scheduler with no slots. Used as a fallback when
+    /// pack loading fails.
+    pub fn empty() -> Self {
+        Self {
+            slots: HashMap::new(),
+        }
+    }
+
     /// Return the names of all defined slots.
     pub fn slot_names(&self) -> impl Iterator<Item = &str> {
         self.slots.keys().map(|s| s.as_str())
@@ -245,7 +253,6 @@ mod tests {
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
                 always_female: false,
-                femininity: 10,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
@@ -355,5 +362,16 @@ mod tests {
         let r2 = scheduler.pick("test_slot", &world, &registry, &mut rng2);
         assert_eq!(r1, r2, "same seed should yield same selection");
         assert!(r1.is_some(), "should pick a scene");
+    }
+
+    #[test]
+    fn empty_scheduler_returns_none_for_any_slot() {
+        let scheduler = Scheduler::empty();
+        let registry = PackRegistry::new();
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+        assert!(scheduler
+            .pick("anything", &world, &registry, &mut rng)
+            .is_none());
     }
 }

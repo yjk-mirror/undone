@@ -55,10 +55,7 @@ pub fn init_game() -> GameState {
                 },
                 registry: PackRegistry::new(),
                 engine: SceneEngine::new(HashMap::new()),
-                scheduler: load_schedule(&[]).unwrap_or_else(|_| {
-                    // load_schedule on empty slice cannot fail; this branch is unreachable
-                    panic!("load_schedule on empty slice failed")
-                }),
+                scheduler: Scheduler::empty(),
                 rng: SmallRng::from_entropy(),
                 init_error: Some(msg),
             };
@@ -100,7 +97,7 @@ pub fn init_game() -> GameState {
         Ok(s) => s,
         Err(e) => {
             eprintln!("[init] scheduler load error: {e}");
-            load_schedule(&[]).expect("empty schedule should never fail")
+            Scheduler::empty()
         }
     };
 
@@ -112,17 +109,6 @@ pub fn init_game() -> GameState {
         scheduler,
         rng,
         init_error: None,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn resolve_packs_dir_returns_path_ending_in_packs() {
-        let dir = resolve_packs_dir();
-        assert_eq!(dir.file_name().unwrap(), "packs");
     }
 }
 
@@ -161,6 +147,16 @@ fn placeholder_player() -> Player {
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
         always_female: false,
-        femininity: 0,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resolve_packs_dir_returns_path_ending_in_packs() {
+        let dir = resolve_packs_dir();
+        assert_eq!(dir.file_name().unwrap(), "packs");
     }
 }

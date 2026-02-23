@@ -1,0 +1,14 @@
+[[stat]]
+id          = "TIMES_KISSED"
+name        = "Times Kissed"
+description = "Number of times the player has been kissed."
+
+[[stat]]
+id          = "DATES_ATTENDED"
+name        = "Dates Attended"
+description = "Number of dates the player has gone on."
+
+[[stat]]
+id          = "WEEKS_WORKED"
+name        = "Weeks Worked"
+description = "Number of weeks the player has worked."

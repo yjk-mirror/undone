@@ -190,8 +190,11 @@ pub fn eval_call_bool(
             "isPregnant" => Ok(world.player.pregnancy.is_some()),
             "alwaysFemale" => Ok(world.player.always_female),
             "hasStuff" => {
-                let _ = str_arg(0)?; // validate arg
-                Ok(false) // TODO: wire to StuffId when stuff registry exists
+                let id = str_arg(0)?;
+                match registry.resolve_stuff(id) {
+                    Some(stuff_id) => Ok(world.player.stuff.contains(&stuff_id)),
+                    None => Ok(false), // never interned = player can't have it
+                }
             }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "w".into(),
@@ -369,7 +372,6 @@ mod tests {
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
                 always_female: false,
-                femininity: 10,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
@@ -471,6 +473,27 @@ mod tests {
         let world = make_world();
         let ctx = SceneCtx::new();
         let expr = parse("w.hasTrait('SHY')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn hasStuff_true_when_player_has_item() {
+        let mut reg = undone_packs::PackRegistry::new();
+        let stuff_id = reg.intern_stuff("UMBRELLA");
+        let mut world = make_world();
+        world.player.stuff.insert(stuff_id);
+        let ctx = SceneCtx::new();
+        let expr = parse("w.hasStuff('UMBRELLA')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn hasStuff_false_when_player_lacks_item() {
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.intern_stuff("UMBRELLA");
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let expr = parse("w.hasStuff('UMBRELLA')").unwrap();
         assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
     }
 

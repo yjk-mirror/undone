@@ -11,6 +11,7 @@ use floem::views::drag_resize_window_area;
 use floem::window::ResizeDirection;
 use std::cell::RefCell;
 use std::rc::Rc;
+use undone_domain::SkillId;
 use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
@@ -69,11 +70,12 @@ pub struct PlayerSnapshot {
     pub alcohol: String, // e.g. "Sober", "Tipsy"
 }
 
-impl From<&undone_domain::Player> for PlayerSnapshot {
-    fn from(p: &undone_domain::Player) -> Self {
+impl PlayerSnapshot {
+    /// Build a display snapshot from the player, reading FEMININITY from the skills map.
+    pub fn from_player(p: &undone_domain::Player, femininity_id: SkillId) -> Self {
         Self {
-            name: p.active_name().to_owned(),
-            femininity: p.femininity,
+            name: p.active_name(femininity_id).to_owned(),
+            femininity: p.skill(femininity_id),
             money: p.money,
             stress: p.stress,
             anxiety: p.anxiety,
@@ -120,8 +122,15 @@ pub fn app_view() -> impl View {
         }
     }
 
+    // Resolve FEMININITY skill id once — used to build PlayerSnapshot.
+    // Only used in the non-error path (process_events is never called when init_error is set).
+    let femininity_id: Option<SkillId> = {
+        let gs = state.borrow();
+        gs.registry.resolve_skill("FEMININITY").ok()
+    };
+
     // Start opening scene on app launch (only when packs loaded successfully).
-    {
+    if let Some(fem_id) = femininity_id {
         let mut gs = state.borrow_mut();
         if gs.init_error.is_none() {
             let GameState {
@@ -138,12 +147,12 @@ pub fn app_view() -> impl View {
                 registry,
             );
             let events = engine.drain();
-            let finished = process_events(events, signals, world);
+            let finished = process_events(events, signals, world, fem_id);
             if finished {
                 if let Some(scene_id) = scheduler.pick("free_time", world, registry, rng) {
                     engine.send(EngineCommand::StartScene(scene_id), world, registry);
                     let events = engine.drain();
-                    process_events(events, signals, world);
+                    process_events(events, signals, world, fem_id);
                 }
             }
         }
@@ -248,7 +257,12 @@ pub fn app_view() -> impl View {
 }
 
 /// Process engine events, updating signals. Returns `true` if `SceneFinished` was among them.
-pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &World) -> bool {
+pub fn process_events(
+    events: Vec<EngineEvent>,
+    signals: AppSignals,
+    world: &World,
+    femininity_id: SkillId,
+) -> bool {
     let mut scene_finished = false;
     for event in events {
         match event {
@@ -279,7 +293,9 @@ pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &Wor
             }
         }
     }
-    signals.player.set(PlayerSnapshot::from(&world.player));
+    signals
+        .player
+        .set(PlayerSnapshot::from_player(&world.player, femininity_id));
     scene_finished
 }
 
@@ -294,6 +310,7 @@ fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use lasso::Key;
     use std::collections::{HashMap, HashSet};
     use undone_domain::*;
 
@@ -329,21 +346,30 @@ mod tests {
             custom_flags: HashMap::new(),
             custom_ints: HashMap::new(),
             always_female: false,
-            femininity: 25,
         }
     }
 
     #[test]
     fn player_snapshot_name_uses_active_name() {
-        let p = test_player();
-        let snap = PlayerSnapshot::from(&p);
+        // femininity=25 → masculine name; set via skills map
+        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let mut p = test_player();
+        p.skills.insert(
+            fem_id,
+            undone_domain::SkillValue {
+                value: 25,
+                modifier: 0,
+            },
+        );
+        let snap = PlayerSnapshot::from_player(&p, fem_id);
         assert_eq!(snap.name, "Evan"); // femininity=25 → masc
     }
 
     #[test]
     fn player_snapshot_captures_money() {
+        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
         let p = test_player();
-        let snap = PlayerSnapshot::from(&p);
+        let snap = PlayerSnapshot::from_player(&p, fem_id);
         assert_eq!(snap.money, 200);
     }
 }

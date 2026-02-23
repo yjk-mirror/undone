@@ -26,6 +26,8 @@ pub struct PackContent {
     pub schedule_file: Option<String>,
     #[serde(default)]
     pub names_file: Option<String>,
+    #[serde(default)]
+    pub stats_file: Option<String>,
 }
 
 #[cfg(test)]
