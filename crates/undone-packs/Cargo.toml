@@ -11,3 +11,5 @@ toml          = { workspace = true }
 lasso         = { workspace = true }
 thiserror     = { workspace = true }
 anyhow        = { workspace = true }
+rand          = { workspace = true }
+slotmap       = { workspace = true }
