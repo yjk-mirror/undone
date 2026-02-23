@@ -16,6 +16,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let story = signals.story;
     let actions = signals.actions;
     let state_clone = Rc::clone(&state);
+    let hovered_detail = create_rw_signal(String::new());
 
     // Global keyboard shortcut listener for left panel (1-9 to select choices)
     let keyboard_handler = move |e: &Event| {
@@ -49,31 +50,52 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         false
     };
 
-    v_stack((
-        scroll(label(move || story.get()).style(move |s| {
-            let prefs = signals.prefs.get();
-            let colors = ThemeColors::from_mode(prefs.mode);
-            s.font_family(prefs.font_family)
-                .font_size(prefs.font_size as f32)
-                .line_height(prefs.line_height)
-                .padding(24.0)
-                .max_width(680.0) // ~65 chars
-                .color(colors.ink)
-        }))
-        .style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.flex_grow(1.0).background(colors.page)
-        }),
-        choices_bar(signals, state),
-    ))
-    .keyboard_navigable()
-    .on_event_stop(EventListener::KeyDown, move |e| {
-        keyboard_handler(e);
-    })
-    .style(|s| s.flex_grow(1.0))
+    let prose_label = label(move || story.get()).style(move |s| {
+        let prefs = signals.prefs.get();
+        let colors = ThemeColors::from_mode(prefs.mode);
+        s.font_family(prefs.font_family)
+            .font_size(prefs.font_size as f32)
+            .line_height(prefs.line_height)
+            .padding(24.0)
+            .max_width(680.0) // ~65 chars
+            .color(colors.ink)
+    });
+
+    let centered_prose =
+        container(prose_label).style(|s| s.width_full().justify_center());
+
+    let scroll_area = scroll(centered_prose).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.flex_grow(1.0).background(colors.page)
+    });
+
+    let detail_strip = label(move || hovered_detail.get()).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.width_full()
+            .min_height(28.0)
+            .padding_horiz(24.0)
+            .padding_vert(6.0)
+            .font_size(13.0)
+            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .color(colors.ink_ghost)
+            .background(colors.page)
+            .border_top(1.0)
+            .border_color(colors.seam)
+    });
+
+    v_stack((scroll_area, detail_strip, choices_bar(signals, state, hovered_detail)))
+        .keyboard_navigable()
+        .on_event_stop(EventListener::KeyDown, move |e| {
+            keyboard_handler(e);
+        })
+        .style(|s| s.flex_grow(1.0))
 }
 
-fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
+fn choices_bar(
+    signals: AppSignals,
+    state: Rc<RefCell<GameState>>,
+    hovered_detail: floem::reactive::RwSignal<String>,
+) -> impl View {
     let actions = signals.actions;
 
     let buttons = dyn_stack(
@@ -87,6 +109,8 @@ fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View 
                 .unwrap_or(0);
             let action_id = action.id.clone();
             let label_text = action.label.clone();
+            let detail_text = action.detail.clone();
+            let detail_text_enter = detail_text.clone();
             let state_clone = Rc::clone(&state);
             let signals_clone = signals;
 
@@ -132,9 +156,11 @@ fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View 
             })
             .on_event_cont(EventListener::PointerEnter, move |_| {
                 hovered.set(true);
+                hovered_detail.set(detail_text_enter.clone());
             })
             .on_event_cont(EventListener::PointerLeave, move |_| {
                 hovered.set(false);
+                hovered_detail.set(String::new());
             })
             .on_event_stop(EventListener::KeyDown, move |e| {
                 if let Event::KeyDown(key_event) = e {

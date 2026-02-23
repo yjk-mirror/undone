@@ -7,7 +7,8 @@ fn main() {
             Some(
                 WindowConfig::default()
                     .size(Size::new(1200.0, 800.0))
-                    .title("Undone"),
+                    .title("Undone")
+                    .show_titlebar(false),
             ),
         )
         .run();

@@ -2,6 +2,7 @@ pub mod game_state;
 pub mod left_panel;
 pub mod right_panel;
 pub mod theme;
+pub mod title_bar;
 
 use floem::prelude::*;
 use floem::reactive::RwSignal;
@@ -14,6 +15,14 @@ use crate::game_state::{init_game, GameState};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
 use crate::theme::{ThemeColors, UserPrefs};
+use crate::title_bar::title_bar;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum AppTab {
+    Game,
+    Saves,
+    Settings,
+}
 
 /// All reactive signals used by the view tree.
 #[derive(Clone, Copy)]
@@ -23,6 +32,7 @@ pub struct AppSignals {
     pub player: RwSignal<PlayerSnapshot>,
     pub active_npc: RwSignal<Option<NpcSnapshot>>,
     pub prefs: RwSignal<UserPrefs>,
+    pub tab: RwSignal<AppTab>,
 }
 
 impl Default for AppSignals {
@@ -39,6 +49,7 @@ impl AppSignals {
             player: RwSignal::new(PlayerSnapshot::default()),
             active_npc: RwSignal::new(None),
             prefs: RwSignal::new(UserPrefs::default()),
+            tab: RwSignal::new(AppTab::Game),
         }
     }
 }
@@ -115,7 +126,24 @@ pub fn app_view() -> impl View {
         process_events(events, signals, world);
     }
 
-    h_stack((sidebar_panel(signals), story_panel(signals, Rc::clone(&state)))).style(move |s| {
+    let content = dyn_container(
+        move || signals.tab.get(),
+        move |tab| match tab {
+            AppTab::Game => h_stack((
+                sidebar_panel(signals),
+                story_panel(signals, Rc::clone(&state)),
+            ))
+            .style(|s| s.size_full())
+            .into_any(),
+            AppTab::Saves => placeholder_panel("Saves \u{2014} coming soon", signals).into_any(),
+            AppTab::Settings => {
+                placeholder_panel("Settings \u{2014} coming soon", signals).into_any()
+            }
+        },
+    )
+    .style(|s| s.flex_grow(1.0));
+
+    v_stack((title_bar(signals), content)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     })
@@ -142,6 +170,16 @@ pub fn process_events(events: Vec<EngineEvent>, signals: AppSignals, world: &Wor
         }
     }
     signals.player.set(PlayerSnapshot::from(&world.player));
+}
+
+fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
+    container(
+        label(move || msg.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.color(colors.ink_dim).font_size(16.0)
+        }),
+    )
+    .style(|s| s.size_full().items_center().justify_center())
 }
 
 #[cfg(test)]

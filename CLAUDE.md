@@ -34,6 +34,8 @@ begins at 75. The richest transformation writing lives in the 0–50 range.
 - `docs/plans/2026-02-21-engine-design.md` — Living architecture document. The
   authoritative design reference. **Update it when implementation reveals surprises.**
 - `docs/plans/2026-02-21-scaffold.md` — 13-task scaffold plan. ✅ Complete.
+- `docs/writing-guide.md` — Prose standard for all scene content. **Read before
+  writing any scene prose or designing a prose-writing agent.**
 - `HANDOFF.md` — Current state and session log. **Always read this first.**
 - `docs/status.md` — Scaffold progress history (all 13 tasks done).
 

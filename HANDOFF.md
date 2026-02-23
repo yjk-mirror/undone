@@ -4,13 +4,53 @@
 
 **Branch:** `master`
 **Tests:** 87 passing, 0 clippy warnings.
-**App:** Boots and runs. Sidebar (stats) left, story/choices right. Three theme modes. screenshot-mcp working.
+**App:** Boots and runs. Custom title bar (no OS chrome). Sidebar left, story/choices right. Three theme modes. Prose centered. Choice detail strip. screenshot-mcp working.
 
 ---
 
-## ⚡ Next Action: Writing Guide session
+## ⚡ Next Action: game-input-mcp
 
-Begin writing guide session: continuity-of-self principles, transformation writing, NE US voice, delta-awareness.
+Build `undone-tools/game-input-mcp` — a new MCP server for background game interaction.
+See **game-input-mcp plan** section below.
+
+---
+
+## game-input-mcp — Plan
+
+**Goal:** Allow Claude to interact with the running game without stealing focus or interrupting the user.
+
+**Approach:** `PostMessage(HWND, WM_KEYDOWN/WM_KEYUP, vkey, lparam)` and
+`PostMessage(HWND, WM_LBUTTONDOWN/UP, 0, MAKELPARAM(x,y))` — posts directly into the
+target window's message queue. No `SetForegroundWindow`, no `SendInput`, no focus steal,
+no cursor movement. Floem/winit processes these like real input.
+
+**New crate:** `undone-tools/game-input-mcp` — same pattern as screenshot-mcp
+(`rmcp` 0.8 + stdio transport, `windows-rs` for Win32).
+
+**Tools to expose:**
+
+| Tool | Signature | Notes |
+|------|-----------|-------|
+| `press_key` | `(title: string, key: string)` | Find HWND by partial title, post WM_KEYDOWN + WM_KEYUP. Key strings: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"` |
+| `click` | `(title: string, x: i32, y: i32)` | Post WM_LBUTTONDOWN + WM_LBUTTONUP at window-client-relative coords |
+
+**Windows features needed:**
+```toml
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+] }
+```
+
+**Key mapping:** `"1"`–`"9"` → `VK_1`–`VK_9` (0x31–0x39). `"enter"` → `VK_RETURN`.
+`"tab"` → `VK_TAB`. `"escape"` → `VK_ESCAPE`.
+
+**lparam for WM_KEYDOWN:** bits 0–15 = repeat count (1), bits 16–23 = scan code
+(`MapVirtualKeyW(vk, MAPVK_VK_TO_VSC)`), bit 24 = extended key flag.
+
+**Wiring:** Add to `undone-tools/Cargo.toml` workspace members. Build release binary.
+Add entry to `.mcp.json` alongside screenshot-mcp. Restart Claude Code to activate.
 
 ---
 
@@ -39,8 +79,9 @@ Begin writing guide session: continuity-of-self principles, transformation writi
 - Tab/Enter activate focused button
 
 **Key source files:**
-- `crates/undone-ui/src/lib.rs` — AppSignals, snapshots, app_view, process_events
-- `crates/undone-ui/src/left_panel.rs` — story panel + choices bar
+- `crates/undone-ui/src/lib.rs` — AppSignals, AppTab, app_view, placeholder panels
+- `crates/undone-ui/src/title_bar.rs` — custom title bar, tab nav, window controls
+- `crates/undone-ui/src/left_panel.rs` — story panel, centered prose, detail strip, choices bar
 - `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
 - `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs
 - `crates/undone-ui/src/game_state.rs` — GameState, init_game()
@@ -95,3 +136,5 @@ Begin writing guide session: continuity-of-self principles, transformation writi
 | 2026-02-23 | UI Review + Fixes: £→$, window size (1200×800), panels swapped (stats left), mode toggle added. Built screenshot-mcp (WGC, no focus steal, Content::image). Registered in .mcp.json. |
 | 2026-02-23 | screenshot-mcp debug: fixed stop()→wait() race condition in capture_window(). New binary at .exe.new. .mcp.json updated. Restart Claude Code to activate. UI audit complete — 6 violations documented in HANDOFF ready to implement. |
 | 2026-02-23 | UI polish: screenshot-mcp verified working. Applied 5/6 audit fixes (focus_visible, single seam, chrome font, hover signal, border-radius 4px). Fix 3 letter_spacing not available in floem 0.2. Window config + panel swap committed. Code reviewed — fixed missed NPC name font, double prefs.get(), renamed left_panel→story_panel / right_panel→sidebar_panel. Merged to master. |
+| 2026-02-23 | Writing guide session: docs/writing-guide.md written. NE US locale, Minijinja syntax, FEMININITY dial, four transformation textures, content gating (BLOCK_ROUGH/LIKES_ROUGH), markdown in prose, scene design principles, full checklist. Adapted from newlife-plus writing-style.md + scene-design.md. Added to CLAUDE.md key documents. |
+| 2026-02-23 | UI session: 3-agent team. Custom title bar (no OS chrome, Game/Saves/Settings nav, window controls). Prose centered in story panel. Choice detail strip (hover shows action.detail). Sepia theme darkened (warm amber-cream, not muddy). 87 tests pass. Documented game-input-mcp plan (PostMessage, no focus steal). |

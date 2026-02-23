@@ -55,16 +55,16 @@ impl ThemeColors {
                 lamp_glow: Color::rgba8(176, 112, 48, 30), // 12%
             },
             ThemeMode::Sepia => Self {
-                ground: Color::rgb8(0xF0, 0xE8, 0xD0),
-                page: Color::rgb8(0xF5, 0xED, 0xD8),
-                page_raised: Color::rgb8(0xEB, 0xE3, 0xCC),
-                sidebar_ground: Color::rgb8(0xE6, 0xDC, 0xCA),
+                ground: Color::rgb8(0xE6, 0xD8, 0xB8),
+                page: Color::rgb8(0xF0, 0xE6, 0xCC),
+                page_raised: Color::rgb8(0xE2, 0xD4, 0xB4),
+                sidebar_ground: Color::rgb8(0xDA, 0xCA, 0xA8),
                 ink: Color::rgb8(0x2C, 0x20, 0x0E),
-                ink_dim: Color::rgb8(0x6B, 0x58, 0x40),
-                ink_ghost: Color::rgb8(0x9A, 0x88, 0x70),
-                seam: Color::rgba8(44, 32, 14, 25), // 10%
-                lamp: Color::rgb8(0xA0, 0x68, 0x20),
-                lamp_glow: Color::rgba8(160, 104, 32, 30), // 12%
+                ink_dim: Color::rgb8(0x5A, 0x48, 0x30),
+                ink_ghost: Color::rgb8(0x90, 0x7C, 0x60),
+                seam: Color::rgba8(44, 32, 14, 30), // 12%
+                lamp: Color::rgb8(0xA8, 0x68, 0x18),
+                lamp_glow: Color::rgba8(168, 104, 24, 30), // 12%
             },
             ThemeMode::Dark => Self {
                 ground: Color::rgb8(0x14, 0x12, 0x10),
