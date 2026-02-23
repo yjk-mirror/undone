@@ -5,6 +5,7 @@ use floem::event::{Event, EventListener};
 use floem::keyboard::{Key, NamedKey};
 use floem::peniko::Color;
 use floem::prelude::*;
+use floem::reactive::create_rw_signal;
 use floem::style::FlexWrap;
 use floem::views::dyn_stack;
 use std::cell::RefCell;
@@ -69,10 +70,7 @@ pub fn left_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl Vi
     .on_event_stop(EventListener::KeyDown, move |e| {
         keyboard_handler(e);
     })
-    .style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.flex_grow(1.0).border_right(1.0).border_color(colors.seam)
-    })
+    .style(|s| s.flex_grow(1.0))
 }
 
 fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
@@ -110,20 +108,33 @@ fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View 
 
             let exec_action_click = exec_action.clone();
             let exec_action_key = exec_action;
+            let hovered = create_rw_signal(false);
 
             h_stack((
                 label(move || format!("{}·", index + 1)).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    s.padding_right(8.0).color(colors.ink_ghost).font_size(15.0)
+                    let ink = if hovered.get() { colors.ink_dim } else { colors.ink_ghost };
+                    s.padding_right(8.0)
+                        .color(ink)
+                        .font_size(15.0)
+                        .font_family("system-ui, -apple-system, sans-serif".to_string())
                 }),
                 label(move || label_text.clone()).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    s.color(colors.ink).font_size(15.0)
+                    s.color(colors.ink)
+                        .font_size(15.0)
+                        .font_family("system-ui, -apple-system, sans-serif".to_string())
                 }),
             ))
             .keyboard_navigable()
             .on_click_stop(move |_| {
                 exec_action_click();
+            })
+            .on_event_cont(EventListener::PointerEnter, move |_| {
+                hovered.set(true);
+            })
+            .on_event_cont(EventListener::PointerLeave, move |_| {
+                hovered.set(false);
             })
             .on_event_stop(EventListener::KeyDown, move |e| {
                 if let Event::KeyDown(key_event) = e {
@@ -145,11 +156,9 @@ fn choices_bar(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View 
                     .background(Color::TRANSPARENT)
                     .items_center()
                     .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
-                    .focus(|s| {
+                    .focus_visible(|s| {
                         s.background(colors.lamp_glow)
                             .border_color(colors.lamp)
-                            // In floem we can just emulate the outline via a border offset, or just use the outline property if available.
-                            // Using a 2px offset border color
                             .outline_color(colors.lamp)
                             .outline(2.0)
                     })

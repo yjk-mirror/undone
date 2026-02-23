@@ -2,59 +2,50 @@
 
 ## Current State
 
-**Phase:** UI floem migration done (Gemini, unreviewed). Needs Claude audit + quality pass
-before merging to master. 87 tests pass, cargo check clean, on `master` branch.
-**Update:** Claude audit and quality pass completed. All missing UI features implemented. 87 tests pass, clippy is clean. On `ui-floem-migration` branch.
-
-**UI — floem migration** (this session, Gemini-authored — treat as draft):
-- egui/eframe removed. floem 0.2.0 wired across workspace and `undone-ui`
-- Module split: `lib.rs` (entry, AppSignals), `left_panel.rs`, `right_panel.rs`, `game_state.rs`, `theme.rs`
-- `PlayerSnapshot` / `NpcSnapshot` structs — UI never borrows World directly
-- `AppSignals` (RwSignal bundle) drives all reactive updates
-- Scene event loop wired: choice buttons → `EngineCommand` → drain events → update signals
-- App boots into `base::rain_shelter` scene
-- Dark mode, Sepia mode, and Warm Paper color tokens applied from `.interface-design/system.md`
-- Keyboard navigation (1-9, Tab/Enter) implemented for choice buttons.
-- Floem 0.2.0 pseudo-class styling applied: hover, focus, active, disabled.
-
-**Setting pivot** (this session):
-- Base pack setting changed from British to **fictional Northeast US city, near-future**
-- `CLAUDE.md`, `docs/plans/2026-02-22-design-decisions.md` updated accordingly
-- `docs/plans/2026-02-22-setting-principles.md` written — setting canon doc
-- `packs/base/data/names.toml` still has British names — **needs updating**
-
-**Design system** (this session):
-- `.interface-design/system.md` written — full token set, three modes, typography, layout rules
-- Design direction: "Evening Reader" — research-backed (Choice of Games, Instapaper, iA Writer,
-  Degrees of Lewdity redesign, NN/G dark mode study)
-
-**Previous sessions** (still in place):
-- Scene engine, scheduler, save/load, NPC spawner, char creation — all working
+**Branch:** `ui-floem-migration` — ready to merge to master.
+**Tests:** 87 passing, 0 clippy warnings.
+**App:** Boots and runs. Stats panel left, story/choices right. Three theme modes selectable.
 
 ---
 
-## Next Action: Writing Guide and Prose
+## ⚡ Next Action: Merge and begin Writing Guide session
 
-**The UI code is structurally complete and verified.**
+1. Merge `ui-floem-migration` → master
+2. Begin writing guide session (continuity-of-self principles, NE US voice)
 
-### Resolved gaps and concerns:
+---
 
-**Implemented in Quality Pass:**
-- [x] Dark mode and Sepia mode
-- [x] `UserPrefs` struct — configurable font/size/mode
-- [x] Keyboard navigation: number keys 1–9 select choices by position, Tab/Enter activate
-- [x] All five choice button states present: default, hover, focus (2px ring), active, disabled
-- [x] `rand` and `slotmap` in `undone-ui/Cargo.toml` — verified needed for game init
+## screenshot-mcp — Working
 
-**Deferred / Noted:**
-- [ ] Markdown rendering in prose (pulldown-cmark → floem RichText — intentionally deferred)
-- [ ] `PersonalityId` uses Debug formatting — acceptable for now, noted as an open item.
+**Bug fixed (2026-02-23):** `capture_window()` was calling `control.stop()` instead of
+`control.wait()`. Fixed binary deployed to `undone-tools/target/release/screenshot-mcp.exe`.
+**.mcp.json** points to `screenshot-mcp.exe`. Verified working.
 
-### Writing guide and content
+---
 
-1. Establish Continuity-of-self principles, transformation writing, delta-awareness, Northeast US setting voice.
-2. Write before any prose work.
-3. Replace placeholder `base::rain_shelter` text with real base pack prose.
+## UI — Current State
+
+**Layout:**
+- Stats sidebar on the **left** (280px fixed): player name, stats, NPC panel, mode toggle
+- Story + choices on the **right** (flex-grow): scrollable prose + choices bar
+- Window opens at 1200×800, titled "Undone"
+
+**Theme system:**
+- Three modes: Warm Paper (default), Sepia, Night
+- Mode toggle at bottom of stats sidebar
+- All colors driven by `ThemeColors::from_mode()` reactively
+
+**Keyboard navigation:**
+- Number keys 1–9 select choices by position
+- Tab/Enter activate focused button
+
+**Key source files:**
+- `crates/undone-ui/src/lib.rs` — AppSignals, snapshots, app_view, process_events
+- `crates/undone-ui/src/left_panel.rs` — story panel + choices bar
+- `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
+- `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs
+- `crates/undone-ui/src/game_state.rs` — GameState, init_game()
+- `.interface-design/system.md` — full design system spec
 
 ---
 
@@ -64,21 +55,23 @@ before merging to master. 87 tests pass, cargo check clean, on `master` branch.
 2. ~~Scheduler~~ ✅
 3. ~~Save / load~~ ✅
 4. ~~Design research~~ ✅
-5. ~~UI quality pass~~ ✅ (Audit + fix Gemini's work, add dark/sepia modes, UserPrefs, keyboard nav)
+5. ~~UI quality pass~~ ✅
 6. ~~NPC spawning + character creation~~ ✅
-7. **Writing guide** — Continuity-of-self principles, transformation writing, delta-awareness,
-   Northeast US setting voice. Write before any prose work.
-8. **Writing import** — Original prose for the base pack (not a port — new setting, new content)
-9. **Names update** — `packs/base/data/names.toml` British → American Northeast names
+7. **UI polish** ← current. Fix 6 violations, screenshot-verify, merge.
+8. **Writing guide** — Continuity-of-self principles, transformation writing, delta-awareness, NE US voice.
+9. **Writing import** — Original prose for base pack
+10. **Names update** — names.toml British → NE US
 
 ---
 
-## Open Items (not session-specific)
+## Open Items
 
-- `w.hasStuff()` still returns false (StuffId registry stub) — needed when inventory matters
-- `PersonalityId` Display impl missing — using Debug format in UI for now
-- Literata font loading from disk — deferred; using Georgia fallback currently
+- Focus-stays-after-click in floem — being fixed this session (Fix 1 above)
+- `w.hasStuff()` returns false (StuffId registry stub) — needed when inventory matters
+- `PersonalityId` Display impl missing — using Debug format in NPC panel for now
+- Literata font loading from disk — deferred; using Georgia fallback
 - Markdown in prose (pulldown-cmark → floem RichText) — planned, not yet designed
+- `packs/base/data/names.toml` has British names — writing session
 
 ---
 
@@ -97,6 +90,9 @@ before merging to master. 87 tests pass, cargo check clean, on `master` branch.
 | 2026-02-22 | Design research session: character creation, NPC spawning, UI patterns, personality arch. All open questions resolved. |
 | 2026-02-22 | NPC spawning + char creation: 7-task plan via agent team. Sexuality/Personality enums, Player three-name system, NPC spawner with diversity guarantees, new_game() factory. 85 tests, 0 warnings. Merged to master. |
 | 2026-02-22 | Code audit: reviewer + simplifier. Fixed diversity guarantee bug (.take() truncated required personalities for male_count < 3). Simplified pick_traits to use choose_multiple. |
-| 2026-02-22 | Planning session: UI plan written (docs/plans/2026-02-22-ui-floem.md). Setting pivot to fictional NE US city. Design system init (Evening Reader / three modes). system.md written. |
-| 2026-02-22 | UI implementation: floem migration + layout (Gemini-authored, unreviewed). 87 tests pass. Warm Paper theme. Scene boots. Module split. Missing: dark/sepia modes, UserPrefs, keyboard nav. |
-| 2026-02-23 | UI Quality Pass: Added Dark/Sepia theme modes, keyboard navigation, fixed clippy warnings. UI is complete. |
+| 2026-02-22 | Planning session: UI plan written. Setting pivot to fictional NE US city. Design system init (Evening Reader / three modes). system.md written. |
+| 2026-02-22 | UI implementation: floem migration + layout (Gemini-authored, unreviewed). 87 tests pass. Warm Paper theme. Scene boots. Module split. |
+| 2026-02-23 | UI Quality Pass: Added Dark/Sepia theme modes, keyboard navigation, fixed clippy warnings. |
+| 2026-02-23 | UI Review + Fixes: £→$, window size (1200×800), panels swapped (stats left), mode toggle added. Built screenshot-mcp (WGC, no focus steal, Content::image). Registered in .mcp.json. |
+| 2026-02-23 | screenshot-mcp debug: fixed stop()→wait() race condition in capture_window(). New binary at .exe.new. .mcp.json updated. Restart Claude Code to activate. UI audit complete — 6 violations documented in HANDOFF ready to implement. |
+| 2026-02-23 | UI polish: screenshot-mcp verified working. Applied 5/6 audit fixes (focus_visible, single seam, chrome font, hover signal, border-radius 4px). Fix 3 letter_spacing not available in floem 0.2. Window config + panel swap committed. Ready to merge. |

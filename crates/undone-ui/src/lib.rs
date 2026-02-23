@@ -115,7 +115,7 @@ pub fn app_view() -> impl View {
         process_events(events, signals, world);
     }
 
-    h_stack((left_panel(signals, Rc::clone(&state)), right_panel(signals))).style(move |s| {
+    h_stack((right_panel(signals), left_panel(signals, Rc::clone(&state)))).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     })

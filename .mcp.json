@@ -19,6 +19,12 @@
       "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/minijinja-mcp-server.exe",
       "args": [],
       "env": {}
+    },
+    "screenshot": {
+      "type": "stdio",
+      "command": "C:/Users/YJK/dev/mirror/undone-tools/target/release/screenshot-mcp.exe",
+      "args": [],
+      "env": {}
     }
   }
 }
