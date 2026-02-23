@@ -1,7 +1,10 @@
+#[cfg(target_os = "windows")]
 mod capture;
+#[cfg(target_os = "windows")]
 mod server;
 
 use anyhow::Result;
+#[cfg(target_os = "windows")]
 use rmcp::{ServiceExt, transport::stdio};
 use tracing_subscriber::EnvFilter;
 
@@ -15,11 +18,21 @@ async fn main() -> Result<()> {
 
     tracing::info!("screenshot-mcp starting");
 
-    let service = server::ScreenshotServer::new()
-        .serve(stdio())
-        .await
-        .inspect_err(|e| tracing::error!("server error: {:?}", e))?;
+    #[cfg(target_os = "windows")]
+    {
+        let service = server::ScreenshotServer::new()
+            .serve(stdio())
+            .await
+            .inspect_err(|e| tracing::error!("server error: {:?}", e))?;
 
-    service.waiting().await?;
+        service.waiting().await?;
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        eprintln!("screenshot-mcp is Windows-only (uses Windows Graphics Capture API).");
+        std::process::exit(1);
+    }
+
     Ok(())
 }

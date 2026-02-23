@@ -16,6 +16,9 @@ schemars        = "1"
 anyhow          = "1"
 tracing         = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-windows-capture = "1.5"
+# windows-capture is Windows-only; see [target.'cfg(windows)'.dependencies] below
 image           = { version = "0.25", default-features = false, features = ["png"] }
 base64          = "0.22"
+
+[target.'cfg(windows)'.dependencies]
+windows-capture = "1.5"
