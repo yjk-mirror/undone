@@ -6,7 +6,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 /// Increment this whenever the save format changes in a breaking way.
-pub const SAVE_VERSION: u32 = 1;
+pub const SAVE_VERSION: u32 = 2;
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -97,29 +97,108 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 
 /// Deserialize a save file from `path`, validating it against the current registry.
 ///
+/// Automatically migrates v1 saves (using `always_female`/`Sexuality`) to the
+/// current v2 format (`origin: PcOrigin`, `before_sexuality: Option<BeforeSexuality>`).
+///
 /// # Errors
 ///
-/// Returns `SaveError::VersionMismatch` if the save was written with a different
-/// format version. Returns `SaveError::IdMismatch` or `SaveError::TooManyIds` if
-/// the pack content or load order has changed since the file was written.
+/// Returns `SaveError::VersionMismatch` if the save version is unknown (neither v1
+/// nor the current version). Returns `SaveError::IdMismatch` or `SaveError::TooManyIds`
+/// if the pack content or load order has changed since the file was written.
 pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveError> {
     let json = std::fs::read_to_string(path).map_err(|e| SaveError::Io {
         path: path.to_path_buf(),
         source: e,
     })?;
 
-    let file: SaveFile = serde_json::from_str(&json)?;
+    // Parse to a raw Value first so we can inspect the version and migrate if needed.
+    let mut raw: serde_json::Value = serde_json::from_str(&json)?;
 
-    if file.version != SAVE_VERSION {
+    let version = raw
+        .get("version")
+        .and_then(|v| v.as_u64())
+        .map(|v| v as u32)
+        .unwrap_or(0);
+
+    // Migrate v1 → v2 in-place on the raw JSON before deserializing.
+    if version == 1 {
+        raw = migrate_v1_to_v2(raw);
+        // After migration the version field is still 1; update it so deserialization
+        // of the SaveFile wrapper doesn't trip on the version field.  (SaveFile does
+        // not validate the version field itself — that is done below.)
+        raw["version"] = serde_json::Value::Number(2u32.into());
+    } else if version != SAVE_VERSION {
         return Err(SaveError::VersionMismatch {
-            saved: file.version,
+            saved: version,
             expected: SAVE_VERSION,
         });
     }
 
+    let file: SaveFile = serde_json::from_value(raw)?;
+
     validate_ids(&file.id_strings, registry)?;
 
     Ok(file.world)
+}
+
+// ---------------------------------------------------------------------------
+// Migration helpers
+// ---------------------------------------------------------------------------
+
+/// Transform a v1 save JSON into a v2-compatible JSON structure.
+///
+/// v1 differences in `world.player`:
+///   - `always_female: bool` (replaced by `origin: PcOrigin` string)
+///   - `before_sexuality: string` (variants: StraightMale, GayMale, BiMale, AlwaysFemale)
+///     (replaced by `before_sexuality: Option<BeforeSexuality>` string | null)
+///
+/// Because traits are stored as interned integer IDs in v1 saves, we cannot
+/// distinguish `AlwaysFemale` from `CisFemaleTransformed` via the NOT_TRANSFORMED
+/// trait at migration time. We therefore map `always_female: true` to `"AlwaysFemale"`
+/// as the safe default — callers who need the distinction can update via the UI.
+fn migrate_v1_to_v2(mut save_json: serde_json::Value) -> serde_json::Value {
+    if let Some(player) = save_json.get_mut("world").and_then(|w| w.get_mut("player")) {
+        let always_female = player
+            .get("always_female")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+
+        let old_sexuality = player
+            .get("before_sexuality")
+            .and_then(|v| v.as_str())
+            .unwrap_or("StraightMale")
+            .to_string();
+
+        // Map always_female bool → PcOrigin string.
+        // We cannot distinguish AlwaysFemale from CisFemaleTransformed without the
+        // NOT_TRANSFORMED trait (which is stored as an interned integer in the save),
+        // so we use AlwaysFemale as the safe default for always_female=true saves.
+        let origin = if always_female {
+            "AlwaysFemale"
+        } else {
+            "CisMaleTransformed"
+        };
+
+        // Map old Sexuality variants → new BeforeSexuality JSON representation.
+        // Some(BeforeSexuality::X) serialises as the string "X"; None serialises as null.
+        let new_sexuality = match old_sexuality.as_str() {
+            "StraightMale" => serde_json::Value::String("AttractedToWomen".to_string()),
+            "GayMale" => serde_json::Value::String("AttractedToMen".to_string()),
+            "BiMale" => serde_json::Value::String("AttractedToBoth".to_string()),
+            // "AlwaysFemale" variant meant no meaningful pre-transformation sexuality
+            _ => serde_json::Value::Null,
+        };
+
+        if let Some(obj) = player.as_object_mut() {
+            obj.remove("always_female");
+            obj.insert(
+                "origin".to_string(),
+                serde_json::Value::String(origin.to_string()),
+            );
+            obj.insert("before_sexuality".to_string(), new_sexuality);
+        }
+    }
+    save_json
 }
 
 /// Verify that all IDs recorded in the save file still map to the same strings
@@ -159,7 +238,7 @@ mod tests {
     use std::path::PathBuf;
 
     use slotmap::SlotMap;
-    use undone_domain::*;
+    use undone_domain::{BeforeSexuality, PcOrigin, *};
     use undone_world::{GameData, World};
 
     use super::*;
@@ -185,7 +264,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before_age: 30,
                 before_race: "white".into(),
-                before_sexuality: Sexuality::StraightMale,
+                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -209,7 +288,7 @@ mod tests {
                 stuff: HashSet::new(),
                 custom_flags: HashMap::new(),
                 custom_ints: HashMap::new(),
-                always_female: false,
+                origin: PcOrigin::CisMaleTransformed,
             },
             male_npcs: SlotMap::with_key(),
             female_npcs: SlotMap::with_key(),
@@ -262,7 +341,7 @@ mod tests {
         let path = dir.join("version_mismatch.json");
         save_game(&world, &registry, &path).unwrap();
 
-        // Patch the version field
+        // Patch the version field to something unknown (> current)
         let content = std::fs::read_to_string(&path).unwrap();
         let mut parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
         parsed["version"] = serde_json::Value::Number((SAVE_VERSION + 1).into());
@@ -327,6 +406,64 @@ mod tests {
         let saved = vec!["SHY".to_string()];
         let result = validate_ids(&saved, &registry);
         assert!(result.is_ok(), "registry having more IDs than save is OK");
+    }
+
+    /// Test that a v1-format save is correctly migrated to v2 on load.
+    ///
+    /// v1 used `always_female: bool` and `before_sexuality: "StraightMale"` (etc.).
+    /// After migration the player should have `origin: CisMaleTransformed` and
+    /// `before_sexuality: Some(BeforeSexuality::AttractedToWomen)`.
+    #[test]
+    fn migrate_v1_save_to_v2() {
+        let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+
+        // Build a v1-format JSON manually.  We need real interned IDs in id_strings
+        // and a real SHY trait in the world so the validator passes.
+        let id_strings = registry.all_interned_strings();
+
+        // Build a minimal v1 world JSON by constructing from the current world
+        // and then patching it to look like v1.
+        let world = make_world(&registry);
+        let mut save_json = serde_json::to_value(&SaveFile {
+            version: 1, // lie about the version
+            id_strings,
+            world,
+        })
+        .unwrap();
+
+        // Patch the version field to 1.
+        save_json["version"] = serde_json::Value::Number(1u32.into());
+
+        // Patch the player to v1 shape: remove `origin`, add `always_female`.
+        {
+            let player = save_json["world"]["player"].as_object_mut().unwrap();
+            player.remove("origin");
+            player.insert("always_female".to_string(), serde_json::Value::Bool(false));
+            // before_sexuality in v1 was a bare string like "StraightMale"
+            player.insert(
+                "before_sexuality".to_string(),
+                serde_json::Value::String("StraightMale".to_string()),
+            );
+        }
+
+        // Write the patched JSON to a temp file.
+        let dir = tempfile_dir();
+        let path = dir.join("v1_migration_test.json");
+        std::fs::write(&path, serde_json::to_string_pretty(&save_json).unwrap()).unwrap();
+
+        // Load it — should migrate transparently.
+        let loaded = load_game(&path, &registry).expect("v1 load should succeed");
+
+        assert_eq!(
+            loaded.player.origin,
+            PcOrigin::CisMaleTransformed,
+            "always_female=false should migrate to CisMaleTransformed"
+        );
+        assert_eq!(
+            loaded.player.before_sexuality,
+            Some(BeforeSexuality::AttractedToWomen),
+            "StraightMale should migrate to Some(AttractedToWomen)"
+        );
     }
 
     /// Create a temp dir under the OS temp location for test files.
