@@ -1,8 +1,8 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, ArousalLevel, BreastSize, Player, PlayerFigure, Sexuality, SkillValue,
-    TraitId,
+    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, PcOrigin, Player, PlayerFigure,
+    SkillValue, TraitId,
 };
 use undone_world::{GameData, World};
 
@@ -22,11 +22,10 @@ pub struct CharCreationConfig {
     pub race: String,
     pub figure: PlayerFigure,
     pub breasts: BreastSize,
-    /// true = PC was never transformed (always female)
-    pub always_female: bool,
+    pub origin: PcOrigin,
     pub before_age: u32,
     pub before_race: String,
-    pub before_sexuality: Sexuality,
+    pub before_sexuality: Option<BeforeSexuality>,
     /// Trait IDs (already resolved by the caller from registry)
     pub starting_traits: Vec<TraitId>,
     pub male_count: usize,
@@ -41,7 +40,11 @@ pub fn new_game<R: Rng>(
     registry: &mut PackRegistry,
     rng: &mut R,
 ) -> World {
-    let starting_femininity = if config.always_female { 75 } else { 10 };
+    let starting_femininity = match config.origin {
+        PcOrigin::CisMaleTransformed => 10,
+        PcOrigin::TransWomanTransformed => 70,
+        PcOrigin::CisFemaleTransformed | PcOrigin::AlwaysFemale => 75,
+    };
     let traits: HashSet<TraitId> = config.starting_traits.into_iter().collect();
 
     let mut player = Player {
@@ -72,7 +75,7 @@ pub fn new_game<R: Rng>(
         stuff: HashSet::new(),
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
-        always_female: config.always_female,
+        origin: config.origin,
         before_age: config.before_age,
         before_race: config.before_race,
         before_sexuality: config.before_sexuality,
@@ -89,6 +92,29 @@ pub fn new_game<R: Rng>(
             modifier: 0,
         },
     );
+
+    // Auto-inject origin-based hidden traits
+    match config.origin {
+        PcOrigin::TransWomanTransformed => {
+            if let Ok(id) = registry.resolve_trait("TRANS_WOMAN") {
+                player.traits.insert(id);
+            }
+        }
+        PcOrigin::CisFemaleTransformed => {
+            if let Ok(id) = registry.resolve_trait("ALWAYS_FEMALE") {
+                player.traits.insert(id);
+            }
+        }
+        PcOrigin::AlwaysFemale => {
+            if let Ok(id) = registry.resolve_trait("ALWAYS_FEMALE") {
+                player.traits.insert(id);
+            }
+            if let Ok(id) = registry.resolve_trait("NOT_TRANSFORMED") {
+                player.traits.insert(id);
+            }
+        }
+        PcOrigin::CisMaleTransformed => {} // no auto-injected traits
+    }
 
     let spawn_config = NpcSpawnConfig {
         male_count: config.male_count,
@@ -110,7 +136,7 @@ mod tests {
     use crate::load_packs;
     use rand::SeedableRng;
     use std::path::PathBuf;
-    use undone_domain::{Age, BreastSize, PlayerFigure, Sexuality};
+    use undone_domain::{Age, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -130,10 +156,10 @@ mod tests {
             race: "white".into(),
             figure: PlayerFigure::Slim,
             breasts: BreastSize::MediumLarge,
-            always_female: false,
+            origin: PcOrigin::CisMaleTransformed,
             before_age: 28,
             before_race: "white".into(),
-            before_sexuality: Sexuality::StraightMale,
+            before_sexuality: Some(BeforeSexuality::AttractedToWomen),
             starting_traits: vec![],
             male_count: 7,
             female_count: 2,
@@ -149,7 +175,7 @@ mod tests {
 
         assert_eq!(world.player.name_fem, "Eva");
         assert_eq!(world.player.before_age, 28);
-        assert!(!world.player.always_female);
+        assert_eq!(world.player.origin, PcOrigin::CisMaleTransformed);
         assert_eq!(world.game_data.week, 0);
     }
 
@@ -180,17 +206,44 @@ mod tests {
     fn new_game_always_female_sets_high_femininity() {
         let (mut registry, _) = load_packs(&packs_dir()).unwrap();
         let mut config = base_config();
-        config.always_female = true;
-        config.before_sexuality = Sexuality::AlwaysFemale;
+        config.origin = PcOrigin::AlwaysFemale;
+        config.before_sexuality = None;
         let mut rng = rand::rngs::SmallRng::seed_from_u64(4);
         let world = new_game(config, &mut registry, &mut rng);
 
         let fem_id = registry
             .resolve_skill("FEMININITY")
             .expect("FEMININITY must be registered");
+        assert_eq!(world.player.origin, PcOrigin::AlwaysFemale);
         assert!(
             world.player.skill(fem_id) >= 70,
             "always-female PC should start with high femininity"
         );
+    }
+
+    #[test]
+    fn new_game_trans_woman_sets_femininity_70() {
+        let (mut registry, _) = load_packs(&packs_dir()).unwrap();
+        let config = CharCreationConfig {
+            name_fem: "Eva".into(),
+            name_androg: "Ev".into(),
+            name_masc: "Evan".into(),
+            age: Age::EarlyTwenties,
+            race: "white".into(),
+            figure: PlayerFigure::Slim,
+            breasts: BreastSize::MediumLarge,
+            origin: PcOrigin::TransWomanTransformed,
+            before_age: 28,
+            before_race: "white".into(),
+            before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+            starting_traits: vec![],
+            male_count: 7,
+            female_count: 2,
+        };
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(5);
+        let world = new_game(config, &mut registry, &mut rng);
+
+        let fem_id = registry.resolve_skill("FEMININITY").unwrap();
+        assert_eq!(world.player.skill(fem_id), 70);
     }
 }

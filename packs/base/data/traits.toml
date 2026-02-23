@@ -99,3 +99,9 @@ id          = "NOT_TRANSFORMED"
 name        = "Not Transformed"
 description = "PC started as a woman (quickstart)."
 hidden      = true
+
+[[trait]]
+id          = "TRANS_WOMAN"
+name        = "Trans Woman"
+description = "PC was a trans woman before the magical transformation."
+hidden      = true
