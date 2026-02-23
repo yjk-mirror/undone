@@ -1,0 +1,210 @@
+[scene]
+id          = "base::coffee_shop"
+pack        = "base"
+description = "A local coffee shop, a man in line, the city doing what it does."
+
+[intro]
+prose = """
+The coffee shop on Union and Third is not a Starbucks, which is the first thing people say about it. It's the kind of place that has mismatched chairs and a chalkboard menu and an owner who remembers what you ordered last time even if you've only been once. The line moves at its own speed. Nobody complains. This is the social contract.
+
+You're third in line. A woman ahead of you is getting her order corrected for the second time with the patience of someone who has been through worse this morning. Behind the counter, a barista with sleeve tattoos and a septum ring makes drinks with the quiet competence of someone who could do this in her sleep and probably has.
+
+The man ahead of you turns around. Not fully — just the half-turn that says *I know you're there and I'm acknowledging it*. He's about your age, maybe a year or two older. Good shoulders. The kind of jaw that gets noticed. He's holding a phone but not looking at it, which is either a flex or a habit.
+
+{% if w.hasTrait("SHY") %}
+You look at the menu board. You've already decided what you want, but looking at the menu board is what you do when someone turns around and you're not ready to be looked at.
+{% elif w.hasTrait("BEAUTIFUL") %}
+He does the thing men do when they see you — the quick inventory, the slight pause, the recalibration. You've learned to read it in under a second. He's interested. The question is whether he'll do anything about it.
+{% elif w.hasTrait("BITCHY") %}
+He gives you a once-over that takes slightly too long. You return it with the flat expression of someone who has been looked at before and is not impressed by the repetition.
+{% elif w.hasTrait("FLIRTY") %}
+You catch his eye before he catches yours — or maybe it was simultaneous. Hard to tell. Doesn't matter. You smile. It's a reflex, like blinking, except you know exactly what it does.
+{% else %}
+He nods. You nod back. The universal coffee-shop acknowledgment — *we are both here, we are both waiting, this is fine.*
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+There's a geometry to being a woman in a line. You're aware of the man in front of you and the empty space behind you, and the way your body occupies a different amount of room than it used to. You stand with your bag against your hip. Shoulders in. Taking up exactly the space you need and no more.
+
+He didn't notice any of that. Men never do. That's the thing you know now that you didn't before: the negotiation is invisible to the people who don't have to do it.
+{% endif %}
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "wait_turn"
+label             = "Wait your turn"
+detail            = "The line moves. Let it."
+allow_npc_actions = true
+
+[[actions]]
+id        = "say_something"
+label     = "Say something"
+detail    = "He turned around. Might as well."
+condition = "!scene.hasFlag('talked')"
+prose     = """
+{% if w.hasTrait("SHY") %}
+"Busy today." You say it to the room as much as to him, and for a terrible second you think he didn't hear. Then he half-turns, and you wish he hadn't.
+
+"Always is," he says. "Monday thing." He gives you a smile that doesn't expect anything. You manage one back, and then the line moves, and you're both facing forward again.
+
+*That went fine*, you think, with the specific intensity of someone for whom *fine* is a victory.
+{% elif w.hasTrait("CUTE") %}
+"Is the oat milk latte actually good here, or is it one of those things people order to feel virtuous?" You said it before you decided to, which is how most of your conversations start.
+
+He laughs — the real kind, not the polite kind. "It's actually good. The chai is a trap though."
+
+"Noted." You're grinning. This is the part where a normal person would stop talking, but you've never been great at that part.
+{% elif w.hasTrait("BITCHY") %}
+"You're staring at your phone like it owes you money." You say it with exactly enough warmth to make it not an insult. Barely.
+
+He looks up, surprised. Then he grins. "It kind of does, actually." He puts it away. "Better?"
+
+"Marginally."
+{% else %}
+"Long line today." Not inspired, but honest.
+
+"Could be worse," he says. "At least the coffee's worth it." He says it like he's trying to believe it, which is more honest than the words.
+
+You nod. The line moves. That's enough.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "talked"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+[[actions]]
+id        = "order_and_leave"
+label     = "Order and go"
+detail    = "You came here for coffee, not conversation."
+condition = "scene.hasFlag('reached_counter')"
+prose     = """
+{% if w.hasTrait("POSH") %}
+"Cortado, please." The barista nods — no explanation needed. You pay with your card, leave a dollar in the jar because it's the right thing to do, and take your drink to the end of the counter. Clean exit.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+"Medium drip. Room for cream." Simple. The barista barely looks up, which is exactly the transaction you wanted.
+{% else %}
+You order, you pay, you wait at the pickup end. The cup is warm in your hands and the shop smells like espresso and someone's croissant, and for thirty seconds the morning is something you don't mind.
+{% endif %}
+
+{% if scene.hasFlag("talked") and not w.hasTrait("SHY") %}
+On the way out, you pass him at his table. He looks up.
+
+"Enjoy your Monday," he says, and there's something in the way he says it that makes it sound like he means it.
+
+"You too." You push through the door and the city takes you back.
+{% else %}
+You push through the door into the street. The coffee is already cooling. Monday doesn't wait.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -5
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "COFFEE_SHOP_VISITED"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "sit_with_him"
+label     = "Sit with him"
+detail    = "He gestured at the empty chair. Why not."
+condition = "scene.hasFlag('invited')"
+prose     = """
+You take the chair across from him. It's a small table — the kind where your knees almost touch and you both pretend they don't.
+
+{% if w.hasTrait("ROMANTIC") %}
+He wraps both hands around his mug the way people do in movies about autumn, and for a second you think *this is a moment*, and then you think *stop doing that*, and then you think *but what if it is*.
+{% elif w.hasTrait("SULTRY") %}
+You sit. Cross your legs. Take a sip. Let him look. He does. You let the silence go on exactly one beat longer than comfortable, because you know what that does, and then you say something ordinary and watch him recalibrate.
+{% elif w.hasTrait("AMBITIOUS") %}
+You take the chair. Efficient. He's interesting enough to justify five minutes. More than that depends on the next thing he says.
+{% else %}
+You sit down. He slides a sugar packet toward you without asking, which is either attentive or presumptuous. You take it, because you take sugar, and decide not to read into it.
+{% endif %}
+
+"I'm Jake," he says. He holds out his hand, which feels weirdly formal for a coffee shop but somehow works.
+
+{% if not w.alwaysFemale() %}
+His hand is warm and bigger than yours, and the handshake lasts exactly the right amount of time, and for a second you're struck by the simple mechanical fact of a man reaching for you and you reaching back. It's not desire. It's not discomfort. It's just *new*.
+
+*You used to be the one who extended the hand*, you think. *You used to be the one who set the grip.*
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -5
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_JAKE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "COFFEE_SHOP_VISITED"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────────
+
+[[npc_actions]]
+id        = "he_orders"
+condition = "!scene.hasFlag('reached_counter')"
+weight    = 8
+prose     = """
+The line moves. He steps up to the counter and orders without hesitation — medium black, no room, no sugar. The barista doesn't write anything on the cup, which means he's been here before.
+
+He steps aside to wait, and now it's your turn.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "reached_counter"
+
+[[npc_actions]]
+id        = "he_chats"
+condition = "scene.hasFlag('talked') && !scene.hasFlag('invited')"
+weight    = 10
+prose     = """
+He's sitting at a table by the window now, coffee in hand. He catches your eye and tips his cup slightly — the coffee equivalent of a wave.
+
+"You should sit," he says. Not a demand. Not a question, either. The empty chair across from him is already pulled out, like he planned this or like he's just optimistic.
+
+{% if w.hasTrait("PLAIN") %}
+He says it the way people say things to you — without the specific eagerness they reserve for other women. Just friendly. Just casual. You notice the absence of something you don't want to name.
+{% elif w.hasTrait("BEAUTIFUL") %}
+He says it with the careful casualness of a man who has decided to be brave. You recognize the calculation behind the ease. You've watched men do this math before.
+{% endif %}
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "invited"
+
+[[npc_actions]]
+id        = "background_noise"
+condition = "!scene.hasFlag('reached_counter')"
+weight    = 4
+prose     = """
+Someone's laptop makes the FaceTime ring at full volume. The entire shop turns. The guy with the laptop mouths *sorry* with the expression of a man who is not sorry, and a woman at the next table puts her headphones in with pointed finality.
+
+The barista makes eye contact with no one and keeps making drinks. Professionals.
+"""
