@@ -116,8 +116,8 @@ You nod at the man already there. He nods back.
 
 | Object | Methods |
 |--------|---------|
-| `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()` |
-| `gd` | `hasGameFlag("FLAG")`, `week()` |
+| `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()`, `getSkill("ID")`, `getMoney()`, `getStress()`, `wasMale()`, `wasTransformed()` |
+| `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")` |
 | `scene` | `hasFlag("FLAG")` |
 
 **PC origin helpers:**
@@ -125,10 +125,16 @@ You nod at the man already there. He nods back.
 - `w.hasTrait("TRANS_WOMAN")` — `true` only for `TransWomanTransformed`; use this to distinguish the relief register from the disorientation register inside `{% if not w.alwaysFemale() %}` blocks
 - `w.pcOrigin()` — returns the origin string (`"CisMaleTransformed"`, `"TransWomanTransformed"`, `"CisFemaleTransformed"`, `"AlwaysFemale"`) for cases requiring all four variants explicitly
 
-> **Note:** `w.getSkill("FEMININITY")` is not yet available in prose templates.
-> FEMININITY-level prose branching currently requires the template context to be extended
-> (small engine task). Condition fields in `.toml` can use `w.getSkill("FEMININITY") < 25`
-> to gate which action fires, as a workaround.
+**Arc state branching:**
+- `gd.arcState("arc_id")` — returns the current state string for the arc, or `""` if not yet started. Use `== ""` to check if an arc has not started yet.
+
+```jinja
+{% if gd.arcState("base::robin_opening") == "working" %}
+She's settling into the rhythm now.
+{% elif gd.arcState("base::robin_opening") == "" %}
+Everything is still new.
+{% endif %}
+```
 
 ### Condition expressions (in `.toml` `condition` fields)
 
@@ -459,10 +465,17 @@ Male-start PCs begin around 0–10. Always-female PCs begin at 75.
 | 50–74 | Adapted, not erased | Mostly inhabits female life. Occasional flicker of her former self. The past is real but not dominant. |
 | ≥ 75 | Fully adapted | Barely thinks about having been male. Don't impose transformation content here unless it's genuinely earned. |
 
-> **Current limitation:** `w.getSkill("FEMININITY")` is not yet available inside prose
-> templates. Use TOML `condition` fields to gate actions by FEMININITY level, or add
-> a hidden trait (e.g. `FEMININITY_ADJUSTING`) set during character creation as a proxy.
-> Extending the prose template context to expose `getSkill()` is a planned engine task.
+Use `w.getSkill("FEMININITY")` directly in prose templates to branch on adaptation level:
+
+```jinja
+{% if w.getSkill("FEMININITY") < 25 %}
+The mirror is still a fact that needs restating every morning.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You've stopped flinching. Mostly.
+{% else %}
+You're not thinking about it.
+{% endif %}
+```
 
 ---
 

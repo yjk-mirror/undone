@@ -101,6 +101,7 @@ pub struct GameDataCtx {
     pub day: u8,
     pub time_slot: String,
     pub flags: HashSet<String>,
+    pub arc_states: HashMap<String, String>,
 }
 
 impl fmt::Display for GameDataCtx {
@@ -129,6 +130,15 @@ impl Object for GameDataCtx {
             "hasGameFlag" => {
                 let flag = string_arg(method, args, 0)?;
                 Ok(Value::from(self.flags.contains(flag.as_str())))
+            }
+            "arcState" => {
+                let arc_id = string_arg(method, args, 0)?;
+                let state = self
+                    .arc_states
+                    .get(arc_id.as_str())
+                    .map(|s| s.as_str())
+                    .unwrap_or("");
+                Ok(Value::from(state))
             }
             _ => Err(Error::new(
                 ErrorKind::UnknownMethod,
@@ -246,6 +256,7 @@ pub fn render_prose(
         day: world.game_data.day,
         time_slot: format!("{:?}", world.game_data.time_slot),
         flags: world.game_data.flags.clone(),
+        arc_states: world.game_data.arc_states.clone(),
     };
 
     let scene_view = SceneCtxView {
@@ -401,5 +412,36 @@ mod tests {
         let template = r#"{% if scene.hasFlag("umbrella_offered") %}yes{% else %}no{% endif %}"#;
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert!(result.contains("yes"), "expected 'yes' in '{result}'");
+    }
+
+    #[test]
+    fn arcState_in_template_branches_on_state() {
+        let registry = undone_packs::PackRegistry::new();
+        let mut world = make_world();
+        world
+            .game_data
+            .arc_states
+            .insert("base::robin_opening".to_string(), "working".to_string());
+
+        let ctx = SceneCtx::new();
+        let template = r#"{% if gd.arcState("base::robin_opening") == "working" %}on-the-job{% else %}not-started{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(
+            result.contains("on-the-job"),
+            "expected 'on-the-job' in '{result}'"
+        );
+    }
+
+    #[test]
+    fn arcState_in_template_returns_empty_when_arc_not_started() {
+        let registry = undone_packs::PackRegistry::new();
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let template = r#"{% if gd.arcState("base::robin_opening") == "" %}not-started{% else %}started{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(
+            result.contains("not-started"),
+            "expected 'not-started' in '{result}'"
+        );
     }
 }

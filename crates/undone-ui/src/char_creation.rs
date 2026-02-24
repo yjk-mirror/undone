@@ -45,6 +45,8 @@ struct BeforeFormSignals {
     trait_romantic: RwSignal<bool>,
     trait_flirty: RwSignal<bool>,
     trait_ambitious: RwSignal<bool>,
+    trait_outgoing: RwSignal<bool>,
+    trait_overactive_imagination: RwSignal<bool>,
     trait_beautiful: RwSignal<bool>,
     trait_plain: RwSignal<bool>,
     // content prefs
@@ -70,6 +72,8 @@ impl BeforeFormSignals {
             trait_romantic: RwSignal::new(false),
             trait_flirty: RwSignal::new(false),
             trait_ambitious: RwSignal::new(false),
+            trait_outgoing: RwSignal::new(false),
+            trait_overactive_imagination: RwSignal::new(false),
             trait_beautiful: RwSignal::new(false),
             trait_plain: RwSignal::new(false),
             include_rough: RwSignal::new(false),
@@ -193,8 +197,14 @@ pub fn fem_creation_view(
             vec!["White".to_string()]
         }
     };
+    // Default to first race, then override with before_race if player set one.
     if let Some(first) = races_list.first() {
         form.race.set(first.clone());
+    }
+    if let Some(ref partial) = partial_char.get_untracked() {
+        if !partial.before_race.is_empty() {
+            form.race.set(partial.before_race.clone());
+        }
     }
 
     let begin_btn = build_begin_button(signals, form, pre_state, game_state, partial_char);
@@ -489,6 +499,19 @@ fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl Vie
             trait_checkbox("Flirty", form.trait_flirty, signals),
             trait_checkbox("Ambitious", form.trait_ambitious, signals),
         ))
+        .style(|s| {
+            s.gap(16.0)
+                .margin_bottom(8.0)
+                .flex_wrap(floem::style::FlexWrap::Wrap)
+        }),
+        h_stack((
+            trait_checkbox("Outgoing", form.trait_outgoing, signals),
+            trait_checkbox(
+                "Overactive Imagination",
+                form.trait_overactive_imagination,
+                signals,
+            ),
+        ))
         .style(|s| s.gap(16.0).flex_wrap(floem::style::FlexWrap::Wrap)),
     ));
 
@@ -556,7 +579,12 @@ fn build_next_button(
     label(|| "Next \u{2192}".to_string())
         .keyboard_navigable()
         .on_click_stop(move |_| {
-            let origin = origin_from_idx(form.origin_idx.get_untracked());
+            let origin_idx = form.origin_idx.get_untracked();
+            // Guard: non-AlwaysFemale origins require a name before proceeding.
+            if origin_idx != 3 && form.before_name.get_untracked().trim().is_empty() {
+                return;
+            }
+            let origin = origin_from_idx(origin_idx);
 
             // Collect starting traits
             let mut trait_names: Vec<&'static str> = Vec::new();
@@ -589,6 +617,12 @@ fn build_next_button(
             }
             if form.trait_ambitious.get_untracked() {
                 trait_names.push("AMBITIOUS");
+            }
+            if form.trait_outgoing.get_untracked() {
+                trait_names.push("OUTGOING");
+            }
+            if form.trait_overactive_imagination.get_untracked() {
+                trait_names.push("OVERACTIVE_IMAGINATION");
             }
             if form.trait_beautiful.get_untracked() {
                 trait_names.push("BEAUTIFUL");

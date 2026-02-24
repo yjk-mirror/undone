@@ -81,13 +81,12 @@ Second-person voice.
 *(Then trait branches — SHY, POSH, CUTE, BITCHY, default — each changing what the player does,
 not just how they feel about it. Then:)*
 
-> *[for non-alwaysFemale]*
-> There's a specific quality to being looked at by a strange man in a small space. You know it
-> now. Not danger, exactly — more like being *placed*. He's already decided three things about
-> you, and none of them are the things you'd choose.
+> *[for non-alwaysFemale, cis-male-start]*
+> The man glances at you — quick, automatic, the whole read done in under two seconds. You know
+> that look. You've made that look, in spaces like this, more times than you've ever thought to
+> count. You just never stood on the receiving end of it before.
 >
-> *You used to do this too*, you think. Size someone up in two seconds. You just never knew what
-> it felt like from this side.
+> *You used to do this*, you think, *without knowing you were doing anything.*
 
 ---
 
@@ -107,17 +106,18 @@ outside the NPC's head. Player choice implicit in the next step.
 
 ---
 
-> He does the thing where he looks at the rain and then at you and then at the umbrella
-> and then makes a decision about the kind of person he wants to be today.
+> He looks at the rain. Then at you. Then at the umbrella leaning against the bench. He makes
+> a decision about what kind of person he's going to be today.
 >
-> "I can walk you," he says. "If you're going a few blocks."
+> "Rain's not letting up. I've got this, if you want."
 >
-> *[if FLIRTY trait]:*
-> He says it like he's already thought about the answer to yes.
+> *[if BEAUTIFUL trait]:*
+> He says it like the offer was obvious, which for him it was. The umbrella is about the rain
+> and also not about the rain.
 >
-> *[default]:*
-> He says it like the offer is the natural conclusion of the situation and not a
-> personal risk he's just taken.
+> *[if PLAIN trait]:*
+> It takes him a beat to offer — the kind of beat you might not notice if you weren't paying
+> attention. But you were. You always are.
 
 ---
 

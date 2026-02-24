@@ -21,12 +21,14 @@ Something is different. Everything is different. She puts a hand to her face. He
 {% else %}
 He gets up. Makes coffee. Stands in the kitchen looking at nothing, which is how most mornings go.
 
-He is putting on a jacket he has owned since college when something happens that he has no frame for. It happens fast. It happens the way a mirror breaks — not slowly, all at once. The jacket no longer fits the way it should. Nothing fits the way it should. The body he is standing in is not the body he had three seconds ago.
-
-He grabs the counter.
+He is putting on a jacket he has owned since college when something happens that he has no frame for. The jacket no longer fits the way it should. Nothing fits. His hands are different. He looks at his hands and then at the rest of it, and his body is not the body he had three seconds ago — and he is not moving, and he is not making a sound, because there is no obvious next thing to do.
 
 He is not catastrophizing. He is not still asleep. Something real has happened and he has no language for it and the coffee is still warm and the world outside the window is exactly the same as it was and *he* is not.
 {% endif %}
+{% elif not w.hasTrait("NOT_TRANSFORMED") %}
+She gets up at seven. Makes coffee. In the mirror, the face looking back is hers — she recognizes it — but something has shifted. She catalogues the differences carefully, without hurrying toward a conclusion about what they mean.
+
+She drinks her coffee standing up. She's going to be late.
 {% endif %}
 """
 

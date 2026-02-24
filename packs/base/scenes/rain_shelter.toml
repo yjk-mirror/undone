@@ -20,20 +20,20 @@ You duck in with a breathless laugh, shaking water from your hair. "Oh my God," 
 {% elif w.hasTrait("BITCHY") %}
 You step under the overhang and shake the water off your sleeves. The man shifts slightly, as if making room is a favor. You don't acknowledge it.
 {% else %}
-You slip in and lean against the glass. The rain hammers the roof above you. The man gives you a nod — the universal stranger-in-shared-misery nod — and you nod back.
+You slip in and lean against the glass. The rain hammers the roof above you. The man looks up and nods. You nod back. That's all that needs to happen.
 {% endif %}
 
 {% if not w.alwaysFemale() %}
 {% if w.hasTrait("TRANS_WOMAN") %}
 There's a specific quality to being looked at by a strange man in a small space. She knows what he's doing — the quick assessment, the two-second read. She used to do it herself, without thinking twice. What surprises her isn't the look. It's how much she doesn't mind it landing on her. He's already decided something about her. She lets it go. She gets to be the one who decides whether it matters.
 {% else %}
-There's a specific quality to being looked at by a strange man in a small space. You know it now. Not danger, exactly — more like being *placed*. He's already decided three things about you, and none of them are the things you'd choose.
+The man glances at you — quick, automatic, the whole read done in under two seconds. You know that look. You've made that look, in spaces like this, more times than you've ever thought to count. You just never stood on the receiving end of it before.
 
-*You used to do this too*, you think. Size someone up in two seconds. You just never knew what it felt like from this side.
+*You used to do this*, you think, *without knowing you were doing anything.*
 {% endif %}
 {% endif %}
 
-The rain isn't stopping. A bus goes by without pulling over — wrong route, or just indifferent. Across the street, a woman wrestles an inside-out umbrella and loses. The city goes on.
+The rain isn't stopping. A bus goes by without pulling over — wrong route, or just indifferent. Across the street, a woman wrestles an inside-out umbrella and loses.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -140,12 +140,12 @@ id        = "umbrella_offer"
 condition = "!scene.hasFlag('umbrella_offered')"
 weight    = 12
 prose     = """
-The man pulls his umbrella from where it's leaning against the bench. He opens it — not over himself, just holds it out at an angle that makes the offer obvious without making it a statement.
+He looks at the rain. Then at you. Then at the umbrella leaning against the bench. He makes a decision about what kind of person he's going to be today.
 
 "Rain's not letting up. I've got this, if you want."
 
 {% if w.hasTrait("BEAUTIFUL") %}
-He's looking at you the way men do when they've decided to be helpful. You know this one. The umbrella isn't about the rain.
+He says it like the offer was obvious, which for him it was. You know this one. The umbrella is about the rain and also not about the rain.
 {% elif w.hasTrait("PLAIN") %}
 It takes him a beat to offer — the kind of beat you might not notice if you weren't paying attention. But you were. You always are.
 {% endif %}
