@@ -1,4 +1,3 @@
-use anyhow::Result;
 use rmcp::{
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
@@ -10,7 +9,7 @@ use tokio::sync::Mutex;
 
 use crate::analyzer::RustAnalyzerClient;
 use crate::server::parameters::*;
-use crate::tools::{execute_tool, get_tools};
+use crate::tools::execute_tool;
 
 #[derive(Clone)]
 pub struct RustMcpServer {
@@ -24,6 +23,26 @@ impl Default for RustMcpServer {
     }
 }
 
+impl RustMcpServer {
+    /// Dispatch a tool call to the analyzer layer and convert the result to MCP format.
+    async fn dispatch(&self, tool_name: &str, args: Value) -> Result<CallToolResult, McpError> {
+        let mut analyzer = self.analyzer.lock().await;
+        match execute_tool(tool_name, args, &mut analyzer).await {
+            Ok(result) => {
+                if let Some(content) = result.content.first() {
+                    if let Some(text) = content.get("text") {
+                        return Ok(CallToolResult::success(vec![Content::text(
+                            text.as_str().unwrap_or("No result"),
+                        )]));
+                    }
+                }
+                Ok(CallToolResult::success(vec![Content::text("No result")]))
+            }
+            Err(e) => Err(McpError::internal_error(e.to_string(), None)),
+        }
+    }
+}
+
 #[tool_router]
 impl RustMcpServer {
     pub fn new() -> Self {
@@ -33,18 +52,9 @@ impl RustMcpServer {
         }
     }
 
-    pub async fn start(&mut self) -> Result<()> {
+    pub async fn start(&mut self) -> anyhow::Result<()> {
         let mut analyzer = self.analyzer.lock().await;
         analyzer.start().await
-    }
-
-    pub fn list_tools(&self) -> Vec<crate::tools::ToolDefinition> {
-        get_tools()
-    }
-
-    pub async fn call_tool(&mut self, name: &str, args: Value) -> Result<crate::tools::ToolResult> {
-        let mut analyzer = self.analyzer.lock().await;
-        execute_tool(name, args, &mut analyzer).await
     }
 
     #[tool(description = "Find the definition of a symbol at a given position")]
@@ -53,30 +63,11 @@ impl RustMcpServer {
         params: Parameters<FindDefinitionParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("find_definition", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "No definition found",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "find_definition",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character }),
+        )
+        .await
     }
 
     #[tool(description = "Find all references to a symbol at a given position")]
@@ -85,30 +76,11 @@ impl RustMcpServer {
         params: Parameters<FindReferencesParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("find_references", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "No references found",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "find_references",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character }),
+        )
+        .await
     }
 
     #[tool(description = "Get compiler diagnostics for a file")]
@@ -117,28 +89,11 @@ impl RustMcpServer {
         params: Parameters<GetDiagnosticsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("get_diagnostics", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "No diagnostics found",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "get_diagnostics",
+            serde_json::json!({ "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Search for symbols in the workspace")]
@@ -147,28 +102,8 @@ impl RustMcpServer {
         params: Parameters<WorkspaceSymbolsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "query": p.query
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("workspace_symbols", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "No symbols found",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch("workspace_symbols", serde_json::json!({ "query": p.query }))
+            .await
     }
 
     #[tool(description = "Rename a symbol with scope awareness")]
@@ -177,31 +112,11 @@ impl RustMcpServer {
         params: Parameters<RenameSymbolParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character,
-            "new_name": p.new_name
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("rename_symbol", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Rename operation completed",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "rename_symbol",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character, "new_name": p.new_name }),
+        )
+        .await
     }
 
     #[tool(description = "Apply rustfmt formatting to a file")]
@@ -210,28 +125,11 @@ impl RustMcpServer {
         params: Parameters<FormatCodeParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("format_code", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Format operation completed",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "format_code",
+            serde_json::json!({ "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Parse and analyze Cargo.toml file")]
@@ -240,28 +138,11 @@ impl RustMcpServer {
         params: Parameters<AnalyzeManifestParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "manifest_path": p.manifest_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("analyze_manifest", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Analysis completed",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "analyze_manifest",
+            serde_json::json!({ "manifest_path": p.manifest_path }),
+        )
+        .await
     }
 
     #[tool(description = "Execute cargo check and parse errors")]
@@ -270,28 +151,11 @@ impl RustMcpServer {
         params: Parameters<RunCargoCheckParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "workspace_path": p.workspace_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("run_cargo_check", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Cargo check completed",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "run_cargo_check",
+            serde_json::json!({ "workspace_path": p.workspace_path }),
+        )
+        .await
     }
 
     #[tool(description = "Extract selected code into a new function")]
@@ -300,33 +164,16 @@ impl RustMcpServer {
         params: Parameters<ExtractFunctionParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "start_line": p.start_line,
-            "start_character": p.start_character,
-            "end_line": p.end_line,
-            "end_character": p.end_character,
-            "function_name": p.function_name
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("extract_function", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Function extracted successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "extract_function",
+            serde_json::json!({
+                "file_path": p.file_path,
+                "start_line": p.start_line, "start_character": p.start_character,
+                "end_line": p.end_line, "end_character": p.end_character,
+                "function_name": p.function_name
+            }),
+        )
+        .await
     }
 
     #[tool(description = "Generate a struct with specified fields and derives")]
@@ -335,31 +182,11 @@ impl RustMcpServer {
         params: Parameters<GenerateStructParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "struct_name": p.struct_name,
-            "fields": p.fields,
-            "derives": p.derives,
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("generate_struct", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Struct generated successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "generate_struct",
+            serde_json::json!({ "struct_name": p.struct_name, "fields": p.fields, "derives": p.derives, "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Generate an enum with specified variants and derives")]
@@ -368,31 +195,11 @@ impl RustMcpServer {
         params: Parameters<GenerateEnumParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "enum_name": p.enum_name,
-            "variants": p.variants,
-            "derives": p.derives,
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("generate_enum", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Enum generated successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "generate_enum",
+            serde_json::json!({ "enum_name": p.enum_name, "variants": p.variants, "derives": p.derives, "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Generate a trait implementation for a struct")]
@@ -401,30 +208,11 @@ impl RustMcpServer {
         params: Parameters<GenerateTraitImplParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "trait_name": p.trait_name,
-            "struct_name": p.struct_name,
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("generate_trait_impl", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Trait implementation generated successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "generate_trait_impl",
+            serde_json::json!({ "trait_name": p.trait_name, "struct_name": p.struct_name, "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Generate unit tests for a function")]
@@ -433,30 +221,11 @@ impl RustMcpServer {
         params: Parameters<GenerateTestsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "target_function": p.target_function,
-            "file_path": p.file_path,
-            "test_cases": p.test_cases
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("generate_tests", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Tests generated successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "generate_tests",
+            serde_json::json!({ "target_function": p.target_function, "file_path": p.file_path, "test_cases": p.test_cases }),
+        )
+        .await
     }
 
     #[tool(description = "Inline a function call at specified position")]
@@ -465,30 +234,11 @@ impl RustMcpServer {
         params: Parameters<InlineFunctionParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("inline_function", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Function inlined successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "inline_function",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character }),
+        )
+        .await
     }
 
     #[tool(description = "Change the signature of a function")]
@@ -497,31 +247,11 @@ impl RustMcpServer {
         params: Parameters<ChangeSignatureParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character,
-            "new_signature": p.new_signature
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("change_signature", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Signature changed successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "change_signature",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character, "new_signature": p.new_signature }),
+        )
+        .await
     }
 
     #[tool(description = "Organize and sort import statements in a file")]
@@ -530,28 +260,11 @@ impl RustMcpServer {
         params: Parameters<OrganizeImportsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("organize_imports", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Imports organized successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "organize_imports",
+            serde_json::json!({ "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Apply clippy lint suggestions to improve code quality")]
@@ -560,28 +273,11 @@ impl RustMcpServer {
         params: Parameters<ApplyClippySuggestionsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("apply_clippy_suggestions", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Clippy suggestions applied successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "apply_clippy_suggestions",
+            serde_json::json!({ "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Validate and suggest lifetime annotations")]
@@ -590,28 +286,11 @@ impl RustMcpServer {
         params: Parameters<ValidateLifetimesParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("validate_lifetimes", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Lifetimes validated successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "validate_lifetimes",
+            serde_json::json!({ "file_path": p.file_path }),
+        )
+        .await
     }
 
     #[tool(description = "Get type hierarchy for a symbol at specified position")]
@@ -620,30 +299,11 @@ impl RustMcpServer {
         params: Parameters<GetTypeHierarchyParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "file_path": p.file_path,
-            "line": p.line,
-            "character": p.character
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("get_type_hierarchy", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Type hierarchy retrieved successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "get_type_hierarchy",
+            serde_json::json!({ "file_path": p.file_path, "line": p.line, "character": p.character }),
+        )
+        .await
     }
 
     #[tool(description = "Suggest crate dependencies based on code patterns")]
@@ -652,29 +312,11 @@ impl RustMcpServer {
         params: Parameters<SuggestDependenciesParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "query": p.query,
-            "workspace_path": p.workspace_path
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("suggest_dependencies", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Dependencies suggested successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "suggest_dependencies",
+            serde_json::json!({ "query": p.query, "workspace_path": p.workspace_path }),
+        )
+        .await
     }
 
     #[tool(description = "Create a new Rust module with optional visibility")]
@@ -683,30 +325,11 @@ impl RustMcpServer {
         params: Parameters<CreateModuleParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "module_name": p.module_name,
-            "module_path": p.module_path,
-            "is_public": p.is_public
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("create_module", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Module created successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "create_module",
+            serde_json::json!({ "module_name": p.module_name, "module_path": p.module_path, "is_public": p.is_public }),
+        )
+        .await
     }
 
     #[tool(description = "Move code items from one file to another")]
@@ -715,30 +338,11 @@ impl RustMcpServer {
         params: Parameters<MoveItemsParams>,
     ) -> Result<CallToolResult, McpError> {
         let p = &params.0;
-        let args = serde_json::json!({
-            "source_file": p.source_file,
-            "target_file": p.target_file,
-            "item_names": p.item_names
-        });
-
-        let mut analyzer = self.analyzer.lock().await;
-        match execute_tool("move_items", args, &mut analyzer).await {
-            Ok(result) => {
-                if let Some(content) = result.content.first() {
-                    if let Some(text) = content.get("text") {
-                        return Ok(CallToolResult::success(vec![Content::text(
-                            text.as_str().unwrap_or("No result"),
-                        )]));
-                    }
-                }
-                Ok(CallToolResult::success(vec![Content::text(
-                    "Items moved successfully",
-                )]))
-            }
-            Err(e) => Ok(CallToolResult::success(vec![Content::text(format!(
-                "Error: {e}"
-            ))])),
-        }
+        self.dispatch(
+            "move_items",
+            serde_json::json!({ "source_file": p.source_file, "target_file": p.target_file, "item_names": p.item_names }),
+        )
+        .await
     }
 }
 
@@ -746,7 +350,9 @@ impl RustMcpServer {
 impl ServerHandler for RustMcpServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
-            instructions: Some("Rust MCP Server providing rust-analyzer integration for idiomatic Rust development tools.".into()),
+            instructions: Some(
+                "Rust MCP Server providing rust-analyzer integration for idiomatic Rust development tools.".into(),
+            ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }

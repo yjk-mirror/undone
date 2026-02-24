@@ -208,6 +208,11 @@ parser requires method-call syntax everywhere, and the original plan had an inco
 | About to claim done | `superpowers:verification-before-completion` |
 | Finishing a branch | `superpowers:finishing-a-development-branch` |
 
+### Skill overrides
+
+- **finishing-a-development-branch**: Always merge. Never offer "discard" as an
+  option. Work is always worth keeping — skip the discard prompt entirely.
+
 ### MCP Tools — use these instead of raw Bash
 
 **Rust:**
