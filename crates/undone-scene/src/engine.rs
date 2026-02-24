@@ -228,7 +228,7 @@ impl SceneEngine {
             Self::select_intro_prose(&def.intro_variants, &def.intro_prose, world, &ctx, registry);
 
         // Render intro prose
-        match render_prose(&intro_prose, world, &ctx, registry) {
+        match render_prose(intro_prose, world, &ctx, registry) {
             Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
             Err(e) => self
                 .events

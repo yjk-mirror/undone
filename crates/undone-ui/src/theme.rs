@@ -8,16 +8,11 @@ pub enum ThemeMode {
     Dark,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum NumberKeyMode {
+    #[default]
     Instant,
     Confirm,
-}
-
-impl Default for NumberKeyMode {
-    fn default() -> Self {
-        NumberKeyMode::Instant
-    }
 }
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]

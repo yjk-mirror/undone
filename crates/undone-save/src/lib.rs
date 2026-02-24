@@ -99,10 +99,10 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 ///
 /// Automatically migrates older saves to the current format:
 ///   - v1 → v2: `always_female: bool` + old `Sexuality` variants → `origin: PcOrigin`
-///              + `before_sexuality: Option<BeforeSexuality>`
+///     + `before_sexuality: Option<BeforeSexuality>`
 ///   - v2 → v3: flat `before_age`, `before_race`, `before_sexuality` fields on player
-///              → `before: Option<BeforeIdentity>`; adds `day` and `time_slot` to
-///              `game_data` if missing.
+///     → `before: Option<BeforeIdentity>`; adds `day` and `time_slot` to
+///     `game_data` if missing.
 ///
 /// # Errors
 ///

@@ -222,7 +222,7 @@ pub fn render_prose(
         .iter()
         .map(|(&sid, _sv)| {
             let name = registry.skill_id_to_str(sid).to_string();
-            (name, world.player.skill(sid) as i32)
+            (name, world.player.skill(sid))
         })
         .collect();
 

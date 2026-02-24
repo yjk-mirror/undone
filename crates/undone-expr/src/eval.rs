@@ -235,7 +235,7 @@ pub fn eval_call_bool(
                 let skill_id = registry
                     .resolve_skill(skill_id_str)
                     .map_err(|_| EvalError::UnknownSkill(skill_id_str.to_string()))?;
-                let skill_value = world.player.skill(skill_id) as i32;
+                let skill_value = world.player.skill(skill_id);
                 let roll = ctx.get_or_roll_skill(skill_id_str);
                 let target = (skill_value + (50 - dc)).clamp(5, 95);
                 Ok(roll <= target)
@@ -254,7 +254,7 @@ pub fn eval_call_bool(
                 let skill_id = registry
                     .resolve_skill(skill_id_str)
                     .map_err(|_| EvalError::UnknownSkill(skill_id_str.to_string()))?;
-                let skill_value = world.player.skill(skill_id) as i32;
+                let skill_value = world.player.skill(skill_id);
                 let roll = ctx.get_or_roll_skill(skill_id_str);
                 let target = (skill_value + (50 - dc)).clamp(5, 95);
                 Ok(roll <= target)

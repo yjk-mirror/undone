@@ -179,18 +179,13 @@ impl std::fmt::Display for PcOrigin {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum TimeSlot {
+    #[default]
     Morning,
     Afternoon,
     Evening,
     Night,
-}
-
-impl Default for TimeSlot {
-    fn default() -> Self {
-        TimeSlot::Morning
-    }
 }
 
 impl TimeSlot {
