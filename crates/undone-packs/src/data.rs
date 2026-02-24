@@ -6,7 +6,7 @@ pub struct TraitFile {
     pub traits: Vec<TraitDef>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct TraitDef {
     pub id: String,
     pub name: String,
@@ -25,7 +25,7 @@ pub struct NpcTraitFile {
     pub traits: Vec<NpcTraitDef>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct NpcTraitDef {
     pub id: String,
     pub name: String,
@@ -39,7 +39,7 @@ pub struct SkillFile {
     pub skill: Vec<SkillDef>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct SkillDef {
     pub id: String,
     pub name: String,

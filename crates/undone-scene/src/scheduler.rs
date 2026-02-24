@@ -66,6 +66,7 @@ fn default_weight() -> u32 {
 // Parsed runtime types
 // ---------------------------------------------------------------------------
 
+#[derive(Clone)]
 struct ScheduleEvent {
     scene: String,
     condition: Option<Expr>,
@@ -91,6 +92,7 @@ pub struct PickResult {
 
 /// Weighted scene selector. Holds all slot definitions loaded from packs.
 /// Use `load_schedule` to build from pack metadata, then call `pick` each week.
+#[derive(Clone)]
 pub struct Scheduler {
     /// slot_name → list of events
     slots: HashMap<String, Vec<ScheduleEvent>>,

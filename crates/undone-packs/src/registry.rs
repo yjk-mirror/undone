@@ -19,6 +19,7 @@ pub enum RegistryError {
 /// Central registry for all content-level IDs across all loaded packs.
 /// Owns the string interner — all TraitId/SkillId/etc. are valid only
 /// within the context of the registry that created them.
+#[derive(Clone)]
 pub struct PackRegistry {
     rodeo: Rodeo,
     pub trait_defs: HashMap<TraitId, TraitDef>,
