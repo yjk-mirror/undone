@@ -1,0 +1,128 @@
+[scene]
+id          = "base::camila_library"
+pack        = "base"
+description = "First week study session. A male classmate sits nearby. The attraction arrives before the thought."
+
+[intro]
+prose = """
+The main library reading room has the specific quality of places where nothing is supposed to happen. High ceilings, long tables, the ambient sound of keyboards and very quiet conversation. She's been here twice already this week. She likes it here.
+
+It's Thursday. She has a problem set due Monday and a reading due tomorrow. She's set up at the far end of one of the long tables — laptop, textbook, notebook, coffee in a spill-proof cup because she's learned — and she's been working for about forty minutes when someone sits down across from her.
+
+She doesn't look up immediately. She finishes the sentence she's writing. Then she looks up.
+
+He's about her age. Dark hair, serious face, the kind of jaw that you notice before you've decided to notice anything. He's opening a problem set that looks like hers — same course number at the top, she can see it from here.
+
+{% if not w.alwaysFemale() %}
+She registers all of this in about a second, and then she registers that she registered it, and then she looks back at her notes.
+
+*Oh*, she thinks. *Okay.*
+
+She is not ready for this. She was ready for the general concept, which she'd been processing for a week. She was not ready for it to arrive with a jaw and a problem set and sit across from her in the library at 3 PM on a Thursday.
+{% else %}
+She nods if he looks up. He doesn't. They work in silence, which is the correct library behavior.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+Thursday. The library. She's been here forty minutes and it's going fine.
+
+He sits down across from her. She finishes the sentence she's writing and then looks up. The sentence she finishes takes three extra beats.
+
+He's in the same course. Same problem set. He doesn't look up from his bag.
+
+*Okay*, she thinks. She looks back at her notes. Her handwriting for the next two lines is slightly different from the two lines before. She notices this later.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale()"
+style     = "inner_voice"
+prose = """
+She'd thought about this in the abstract. She'd been thinking about it for a week in the abstract. The abstract had the advantage of not having a face or a jaw or the specific way a person's hands move when they're opening a textbook.
+
+*This is just attraction*, she thinks. *This is what attraction is.* She knows what attraction is. She's had it before, pointed in different directions, and it always felt like this: the registering before the reasoning, the body ahead of the thought.
+
+The difference is just the direction. Theoretically.
+
+She looks back at her problem set. Line six. She was on line six.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "keep_working"
+label = "Keep working. Stay focused."
+detail = "You're here to study. The problem set doesn't care about your feelings."
+allow_npc_actions = true
+prose = """
+She works. He works. The reading room does what reading rooms do.
+
+Ninety minutes later she's through the problem set and into the reading, and the person across from her has packed up and left at some point in the last twenty minutes, and she didn't notice when. She notices his absence and then notes that she noticed it.
+
+{% if not w.alwaysFemale() %}
+*Okay*, she thinks. *Information. Filed.*
+
+She closes her laptop and gathers her things. She'll process it later. She's processed everything else later and that's worked approximately as well as anything.
+{% else %}
+She closes her laptop at six and goes to dinner. Fine day. Good work session.
+{% endif %}
+"""
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "say_something"
+label = "Say something. You have an excuse."
+detail = "Same problem set. It's a natural opening."
+condition = "!scene.hasFlag('talked')"
+prose = """
+She waits until there's a natural pause in whatever he's doing and says: "Are you in 201? I'm stuck on problem four."
+
+He looks up. He has brown eyes and the slightly surprised look of someone who wasn't expecting to be talked to.
+
+{% if not w.alwaysFemale() %}
+She watches herself watch him and thinks: *I am doing this. I am doing this on purpose. I don't know why I'm doing this.*
+
+She knows why she's doing this.
+{% endif %}
+
+"Problem four's the worst," he says. "I think you need the lemma from last week's reading." He says it without condescension, which is the good version of being told you need a lemma.
+
+They talk through it for ten minutes. He explains the lemma. She already knew the lemma, mostly, but the explanation is useful and she doesn't correct him because it turns out she was missing a step. His name is Theo. He's in her section.
+
+When she goes back to her problem set her face is doing something she doesn't have a name for yet.
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "talked"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────
+
+[[npc_actions]]
+id     = "theo_looks_up"
+label  = "He looks up from his work"
+weight = 6
+condition = "!scene.hasFlag('talked') && !scene.hasFlag('noticed')"
+prose = """
+He looks up — maybe she moved, maybe he just needed a break from the problem set — and they make eye contact for about a second.
+
+He looks back at his work. She looks back at hers.
+
+{% if not w.alwaysFemale() %}
+One second. She was fine before that second. She is also fine after it. But the second is — it's something. She adds it to the list of things she's processing.
+{% endif %}
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "noticed"
+
+  [[npc_actions.next]]
+  goto = "keep_working"

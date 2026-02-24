@@ -1,0 +1,150 @@
+[scene]
+id          = "base::robin_first_clothes"
+pack        = "base"
+description = "Robin goes shopping. The department store, the dressing room, the mirror. The gaze arrives before she's ready for it."
+
+[intro]
+prose = """
+She finds the department store by searching *bra fitting near me* and taking the result that has the highest rating and isn't a fifteen-minute subway ride. It's a fifteen-minute walk. Close enough.
+
+Sunday morning. The store is half-empty, the good light from the tall windows hitting the displays. She takes the escalator to the second floor and follows the signs.
+
+The lingerie department is in the back, which she's learned is always where it is, as if it's something the store would prefer to not have to acknowledge. A sales associate with reading glasses on a chain and an expression of total professional equilibrium looks up when Robin approaches.
+
+"Hi. I need help with sizing."
+
+"Sure." The associate looks at her — the practiced, clinical look, not the other kind — and names a section. "Starting there. Your measurements, or you haven't been fitted?"
+
+"Haven't been fitted."
+
+"Okay. I can do that. Two minutes."
+
+{% if w.hasTrait("SHY") %}
+Robin stands very still for the measurement. The associate is brisk and efficient and treats the whole thing with the detachment of someone who has done it several thousand times. Robin is still slightly mortified. She files this under *things that will be normal eventually.*
+{% elif w.hasTrait("POSH") %}
+Robin submits to the measurement with the awareness that she is in a department store rather than somewhere with a fitting room that has natural light. She doesn't say this. It's not relevant.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+The measurement takes ninety seconds. Robin watches the associate write a number down. H cup. Same as she expected from last night's research. Good. Information is useful.
+{% else %}
+Two minutes is approximately right. The associate writes something and says "okay" and leads Robin to a rack with the specific efficiency of someone who has been told a number and knows where the numbers live.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+She finds the department store. Nine AM. She is the first customer in the lingerie section.
+
+The associate who helps her has done this for approximately ever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads Robin to a rack of options with the specific efficiency of a professional who has been told a size and knows where sizes live.
+
+Robin follows. She keeps her face neutral. Inside, she is taking notes.
+
+*This is how this works.* She is learning how this works. It's information. She writes it down.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+style     = "inner_voice"
+prose = """
+She stands in the dressing room with the door closed and looks at the options the associate selected and thinks: *he would have bought the first one that fit and left.*
+
+She is going to buy — she looks at the options — several, actually, because she has to, and she's going to think about which ones work for different things, and she's going to learn what those things are, and this is all fine.
+
+This is all fine. She puts on the first one.
+
+It fits. This is, she realizes, information she has never had before. What *fits* means, practically, in this context. She makes a note.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale()"
+style     = "inner_voice"
+prose = """
+The dressing room mirror is unavoidable.
+
+She's been in this body for — she counts — two days. The shock from the first morning is different now. Less acute, more specific. She knows what she's looking at. She's been looking at it for two days. What she didn't have then was a well-lit mirror at this angle.
+
+She notes the things that are true. She doesn't editorialize. She has work on Monday.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "get_basics"
+label = "Get what you need, efficiently"
+detail = "Bras, underwear, basics. In and out. You have a list."
+allow_npc_actions = true
+prose = """
+She spends forty minutes and comes out with: three bras, a week of underwear, a pair of dress pants that needed minimal alteration, two work blouses, a sweater. She pays. The total is more than she expected — she'd been calibrating to men's clothing prices, apparently — and she files this as a new calibration point.
+
+Outside the store, she checks the list on her phone. The most urgent items are crossed off. She gets coffee from the Dunkin' across the street — she was going to get the independent café but it's Sunday and there's a line — and drinks it on the walk back.
+
+Boxes Monday. Work Monday. She's ahead of schedule, approximately.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -180
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -4
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "dwell_on_mirror"
+label = "Take a minute in the dressing room"
+detail = "The mirror. You've been avoiding this. You don't have to, particularly."
+prose = """
+She stays in the dressing room longer than she needs to.
+
+The mirror is what the mirror is. She spent thirty-two years walking past mirrors with one set of expectations and now the expectations are different and the mirror is different. This is a fact. She's looking at it.
+
+{% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
+She thinks about Monday. This person, in the office, in the dress pants and the work blouse. The manager's face when she says *I know, I wrote that spec.* She's practiced this face in her head so many times that she almost knows what it looks like. She thinks she looks competent. She hopes she looks competent. She decides to look competent regardless.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+She notes what's true. She doesn't spend time on it that she doesn't have. She gets dressed and takes the practical items to the register.
+{% else %}
+The person looking back from the mirror is a stranger who shares her memories. She finds this less upsetting than she expected to. Possibly because she's too tired to find it upsetting. Or possibly because she's been managing the logistics of this situation for forty-eight hours and logistics don't have room for upsetting.
+
+She gets dressed. She takes what she needs to the register.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -180
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────
+
+[[npc_actions]]
+id        = "shopper_notices"
+label     = "A man in the aisle notices her"
+weight    = 6
+condition = "!scene.hasFlag('noticed')"
+prose = """
+She's comparing two options — same brand, different cut — when she becomes aware of the man at the edge of her peripheral vision.
+
+He's shopping, technically. He has a bag. He's looking at her in the way that happens now, the two-second inventory, the held look that's slightly too long. She knows exactly what he's doing. She knew exactly what he was doing the first time she saw him, which was before she was ready for it.
+
+{% if not w.alwaysFemale() %}
+The thing she didn't expect: something in her body registered it before her brain did. Some calibration she doesn't control yet. She's working on not having an opinion about that until she understands what the opinion should be.
+{% endif %}
+
+She turns back to the options. He moves on. The store continues at its Sunday pace.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "noticed"
+
+  [[npc_actions.next]]
+  goto = "get_basics"

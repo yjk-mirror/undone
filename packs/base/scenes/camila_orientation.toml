@@ -1,0 +1,133 @@
+[scene]
+id          = "base::camila_orientation"
+pack        = "base"
+description = "Freshman orientation. The quad, the panels, the men who talk to her like she's someone new — which she is."
+
+[intro]
+prose = """
+Freshman orientation is a series of large rooms with name tags and people who have practiced their welcome. The Dean of Students speaks for thirty minutes. Two upperclassmen do a skit about campus resources that is slightly painful. Someone explains the honor code with genuine conviction, which Camila finds almost touching.
+
+She's at a round table with seven other freshmen. The table has been given an icebreaker card: *Share one thing you're excited about and one thing you're nervous about.*
+
+The people at her table go around. One person is nervous about the workload. One person is excited about the research opportunities. A guy two seats over — broad, easy smile, one of those people who are comfortable everywhere — says he's excited to "meet new people" and nervous about nothing, which gets a laugh, which he clocked and aimed for.
+
+When it gets to her she says she's excited about the coursework and nervous about time management.
+
+{% if not w.alwaysFemale() %}
+The broad guy across the table — his name tag says ADAM — gives her the smile that she now knows what to do with, which is to clock it and file it and decide later whether it has implications.
+
+It's the same smile she gave to women at parties. She knows exactly what it's for. She knows exactly how it reads from the other side now. She takes a sip of water.
+{% endif %}
+
+{% if w.hasTrait("SHY") %}
+Nobody asks follow-up questions. The card moves on. She's relieved.
+{% elif w.hasTrait("AMBITIOUS") %}
+Three people at the table ask follow-up questions. She fields them with the ease of someone who's been in rooms where she needs to be taken seriously and has learned how.
+{% else %}
+Adam asks what she's studying. She tells him. He nods like it's interesting, which it probably is, or probably isn't, and she can't quite tell which.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
+prose = """
+Freshman orientation. He sits at the assigned table. The icebreaker card says *Share something.*
+
+He says time management. The real answer is different but the real answer is not for this table.
+
+The guy two seats over — broad, easy smile — does the thing with the smile. Camila watches him do it. Watches it land in the room. She's been on the other side of that smile and she knows exactly what it's encoding.
+
+*You're watching this from the outside now*, she thinks, and then corrects herself: *No. You're watching it from the other side.* That's different. That's the whole thing.
+
+She takes a sip of water. Orientation continues.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale()"
+style     = "inner_voice"
+prose = """
+At break she gets coffee at the table in the back and a junior introduces himself and asks if she's enjoying orientation, and she says yes, and he recommends two clubs, and she nods, and he says *nice to meet you* and means it in the specific way that a junior means it to a freshman woman he thinks is attractive.
+
+She knows what that means. She's done it. The specific warmth of it, the manufactured interest, the slight lean-in that says *I'm not hitting on you, I'm just engaged with what you're saying.*
+
+She's standing on the other side of it. He hasn't done anything wrong — he's being perfectly nice. She's just seeing the blueprint now instead of the wall.
+
+She doesn't know what to do with this information. She adds it to the list.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "engage"
+label = "Engage with the orientation"
+detail = "You're here. You might as well get something out of it."
+allow_npc_actions = true
+prose = """
+She stays for the afternoon sessions — academic resources, financial aid, the campus wellness center — and actually takes notes on things she didn't know. The financial aid session in particular is useful. She talks to an advisor for ten minutes after and comes out with information that she wouldn't have if she'd cut early.
+
+By four she's back in the dorm with a folder of pamphlets and a slightly better sense of where everything is.
+
+Janette is in the room, already complaining cheerfully about the icebreaker cards. Camila drops her bag. She agrees that the icebreaker cards were bad. Janette laughs. This is a fine basis for a living situation.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "dorm_life"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "skip_afternoon"
+label = "Cut the afternoon session"
+detail = "You've got the map. You know where things are. Go explore."
+prose = """
+She walks the campus instead. Finds the library — main reading room, the kind with high ceilings and the specific hush of people performing focus. Finds the coffeehouse near the science building. Finds the river path that goes behind the dorms and curves toward the athletic center.
+
+The campus is smaller than it looks in photos. She can imagine living in it. She's going to live in it.
+
+A group of guys playing Frisbee on the far side of the quad. She watches for a second, the way you do, and then keeps walking.
+
+{% if not w.alwaysFemale() %}
+One of them looks over. She doesn't slow down.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "dorm_life"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────
+
+[[npc_actions]]
+id        = "adam_talks"
+label     = "Adam keeps the conversation going"
+weight    = 7
+condition = "!scene.hasFlag('adam_done')"
+prose = """
+After the morning session Adam materializes next to her at the coffee table with the ease of someone who is used to materializing next to people at coffee tables.
+
+"Your major's actually kind of interesting," he says. "I was thinking about doing something similar but then I took one look at the prerequisites."
+
+{% if w.hasTrait("AMBITIOUS") %}
+"The prerequisites are the easy part," she says, and he laughs, which was not the intended effect but she'll take it.
+{% elif w.hasTrait("FLIRTY") %}
+"The prerequisites are miserable," she agrees. "Worth it though." She says it like she knows, which she does, and he leans slightly more toward her than the conversation requires.
+{% else %}
+She says something noncommittal. He says something about how he's pre-law anyway, which is why he's here, and they have a conversation that goes nowhere and is completely fine.
+{% endif %}
+
+He wanders off toward someone else eventually. She watches him go and thinks: *six months ago I would have done exactly that.*
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "adam_done"
+
+  [[npc_actions.next]]
+  goto = "engage"

@@ -8,8 +8,8 @@ use thiserror::Error;
 use undone_packs::PackRegistry;
 
 use crate::types::{
-    Action, ActionDef, EffectDef, NextBranch, NextBranchDef, NpcAction, NpcActionDef,
-    SceneDefinition, SceneToml,
+    Action, ActionDef, EffectDef, NarratorVariant, NarratorVariantDef, NextBranch, NextBranchDef,
+    NpcAction, NpcActionDef, SceneDefinition, SceneToml, Thought, ThoughtDef,
 };
 
 #[derive(Debug, Error)]
@@ -115,6 +115,16 @@ fn resolve_scene(
     registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<SceneDefinition, SceneLoadError> {
+    let mut intro_variants = Vec::with_capacity(raw.intro_variants.len());
+    for v in raw.intro_variants {
+        intro_variants.push(resolve_narrator_variant(v, scene_id)?);
+    }
+
+    let mut intro_thoughts = Vec::with_capacity(raw.thoughts.len());
+    for t in raw.thoughts {
+        intro_thoughts.push(resolve_thought(t, scene_id)?);
+    }
+
     let mut actions = Vec::with_capacity(raw.actions.len());
     for a in raw.actions {
         actions.push(resolve_action(a, registry, scene_id)?);
@@ -129,8 +139,35 @@ fn resolve_scene(
         id: raw.scene.id,
         pack: raw.scene.pack,
         intro_prose: raw.intro.prose,
+        intro_variants,
+        intro_thoughts,
         actions,
         npc_actions,
+    })
+}
+
+fn resolve_thought(raw: ThoughtDef, scene_id: &str) -> Result<Thought, SceneLoadError> {
+    let condition = raw
+        .condition
+        .as_deref()
+        .map(|s| parse_condition(s, scene_id))
+        .transpose()?;
+
+    Ok(Thought {
+        condition,
+        prose: raw.prose,
+        style: raw.style,
+    })
+}
+
+fn resolve_narrator_variant(
+    raw: NarratorVariantDef,
+    scene_id: &str,
+) -> Result<NarratorVariant, SceneLoadError> {
+    let condition = parse_condition(&raw.condition, scene_id)?;
+    Ok(NarratorVariant {
+        condition,
+        prose: raw.prose,
     })
 }
 
@@ -164,6 +201,11 @@ fn resolve_action(
     // Validate effects at load time
     validate_effects(&raw.effects, registry, scene_id)?;
 
+    let mut thoughts = Vec::with_capacity(raw.thoughts.len());
+    for t in raw.thoughts {
+        thoughts.push(resolve_thought(t, scene_id)?);
+    }
+
     Ok(Action {
         id: raw.id,
         label: raw.label,
@@ -173,6 +215,7 @@ fn resolve_action(
         allow_npc_actions: raw.allow_npc_actions,
         effects: raw.effects,
         next,
+        thoughts,
     })
 }
 
@@ -305,6 +348,8 @@ mod tests {
             id: "test::a".into(),
             pack: "test".into(),
             intro_prose: "A".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![Action {
                 id: "go".into(),
                 label: "Go".into(),
@@ -319,6 +364,7 @@ mod tests {
                     slot: None,
                     finish: false,
                 }],
+                thoughts: vec![],
             }],
             npc_actions: vec![],
         });
@@ -339,6 +385,8 @@ mod tests {
             id: "test::a".into(),
             pack: "test".into(),
             intro_prose: "A".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![Action {
                 id: "go".into(),
                 label: "Go".into(),
@@ -353,6 +401,7 @@ mod tests {
                     slot: None,
                     finish: false,
                 }],
+                thoughts: vec![],
             }],
             npc_actions: vec![],
         });
@@ -361,6 +410,8 @@ mod tests {
             id: "test::b".into(),
             pack: "test".into(),
             intro_prose: "B".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![],
             npc_actions: vec![],
         });

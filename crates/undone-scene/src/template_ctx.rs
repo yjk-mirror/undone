@@ -1,4 +1,8 @@
-use std::{collections::HashSet, fmt, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt,
+    sync::Arc,
+};
 
 use minijinja::{
     value::{Object, ObjectRepr, Value},
@@ -21,6 +25,15 @@ pub struct PlayerCtx {
     pub partner: bool, // true = has partner (i.e. NOT single)
     pub on_pill: bool,
     pub pregnant: bool,
+    /// skill_id_string → effective value (base + modifier clamped to range)
+    pub skills: HashMap<String, i32>,
+    pub money: i32,
+    pub stress: i32,
+    pub anxiety: i32,
+    /// Display string for arousal level, e.g. "Comfort"
+    pub arousal: String,
+    /// Display string for alcohol level, e.g. "Sober"
+    pub alcohol: String,
 }
 
 impl fmt::Display for PlayerCtx {
@@ -59,6 +72,17 @@ impl Object for PlayerCtx {
             "isSingle" => Ok(Value::from(!self.partner)),
             "isOnPill" => Ok(Value::from(self.on_pill)),
             "isPregnant" => Ok(Value::from(self.pregnant)),
+            "getSkill" => {
+                let id = string_arg(method, args, 0)?;
+                Ok(Value::from(*self.skills.get(id.as_str()).unwrap_or(&0)))
+            }
+            "getMoney" => Ok(Value::from(self.money)),
+            "getStress" => Ok(Value::from(self.stress)),
+            "getAnxiety" => Ok(Value::from(self.anxiety)),
+            "getArousal" => Ok(Value::from(self.arousal.as_str())),
+            "getAlcohol" => Ok(Value::from(self.alcohol.as_str())),
+            "wasMale" => Ok(Value::from(self.origin.was_male_bodied())),
+            "wasTransformed" => Ok(Value::from(self.origin.was_transformed())),
             _ => Err(Error::new(
                 ErrorKind::UnknownMethod,
                 format!("w has no method '{method}'"),
@@ -74,6 +98,8 @@ impl Object for PlayerCtx {
 #[derive(Debug)]
 pub struct GameDataCtx {
     pub week: u32,
+    pub day: u8,
+    pub time_slot: String,
     pub flags: HashSet<String>,
 }
 
@@ -96,6 +122,10 @@ impl Object for GameDataCtx {
     ) -> Result<Value, Error> {
         match method {
             "week" => Ok(Value::from(self.week)),
+            "day" => Ok(Value::from(self.day as i32)),
+            "timeSlot" => Ok(Value::from(self.time_slot.as_str())),
+            "isWeekday" => Ok(Value::from(self.day <= 4)),
+            "isWeekend" => Ok(Value::from(self.day >= 5)),
             "hasGameFlag" => {
                 let flag = string_arg(method, args, 0)?;
                 Ok(Value::from(self.flags.contains(flag.as_str())))
@@ -185,6 +215,17 @@ pub fn render_prose(
         .map(|&tid| registry.trait_id_to_str(tid).to_string())
         .collect();
 
+    // Pre-resolve skill IDs to (string → effective value) map
+    let skills: HashMap<String, i32> = world
+        .player
+        .skills
+        .iter()
+        .map(|(&sid, _sv)| {
+            let name = registry.skill_id_to_str(sid).to_string();
+            (name, world.player.skill(sid) as i32)
+        })
+        .collect();
+
     let player_ctx = PlayerCtx {
         trait_strings,
         virgin: world.player.virgin,
@@ -192,10 +233,18 @@ pub fn render_prose(
         partner: world.player.partner.is_some(),
         on_pill: world.player.on_pill,
         pregnant: world.player.pregnancy.is_some(),
+        skills,
+        money: world.player.money,
+        stress: world.player.stress,
+        anxiety: world.player.anxiety,
+        arousal: format!("{:?}", world.player.arousal),
+        alcohol: format!("{:?}", world.player.alcohol),
     };
 
     let game_data_ctx = GameDataCtx {
         week: world.game_data.week,
+        day: world.game_data.day,
+        time_slot: format!("{:?}", world.game_data.time_slot),
         flags: world.game_data.flags.clone(),
     };
 
@@ -298,6 +347,47 @@ mod tests {
         assert!(
             !result.contains("bold"),
             "did not expect 'bold' in '{result}'"
+        );
+    }
+
+    #[test]
+    fn getSkill_in_template_returns_value() {
+        let mut registry = undone_packs::PackRegistry::new();
+        registry.register_skills(vec![undone_packs::SkillDef {
+            id: "CHARM".into(),
+            name: "Charm".into(),
+            description: "".into(),
+            min: 0,
+            max: 100,
+        }]);
+        let skill_id = registry.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 65,
+                modifier: 0,
+            },
+        );
+        let ctx = SceneCtx::new();
+        let template = r#"{% if w.getSkill("CHARM") > 50 %}skilled{% else %}unskilled{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(
+            result.contains("skilled"),
+            "expected 'skilled' in '{result}'"
+        );
+    }
+
+    #[test]
+    fn timeSlot_in_template() {
+        let registry = undone_packs::PackRegistry::new();
+        let world = make_world(); // time_slot = Morning
+        let ctx = SceneCtx::new();
+        let template = r#"{% if gd.timeSlot() == "Morning" %}morning{% else %}other{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(
+            result.contains("morning"),
+            "expected 'morning' in '{result}'"
         );
     }
 

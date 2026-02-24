@@ -95,3 +95,27 @@ pub struct CategoryDef {
     pub category_type: CategoryType,
     pub members: Vec<String>,
 }
+
+// ---------------------------------------------------------------------------
+// Arc data
+// ---------------------------------------------------------------------------
+
+/// A named story arc with an ordered list of valid state names.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ArcDef {
+    pub id: String,
+    /// Ordered list of valid state names (informational; engine doesn't validate transitions).
+    pub states: Vec<String>,
+    /// Optional NPC role tag for the arc's primary NPC.
+    #[serde(default)]
+    pub npc_role: Option<String>,
+    /// If set, new games auto-start the arc in this state.
+    #[serde(default)]
+    pub initial_state: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ArcsFile {
+    #[serde(default)]
+    pub arc: Vec<ArcDef>,
+}

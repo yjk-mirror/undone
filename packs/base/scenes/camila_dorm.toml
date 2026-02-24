@@ -1,0 +1,139 @@
+[scene]
+id          = "base::camila_dorm"
+pack        = "base"
+description = "Camila's first night in the dorm. The body, what happens in the dark, the phone call home."
+
+[intro]
+prose = """
+Janette arrived at two with her parents and a cheerful willingness to talk that Camila managed for about forty minutes before inventing a reason to take a walk.
+
+It's after midnight now. Janette is asleep on her side of the room, one arm over her face, breathing the steady rhythm of someone who went to bed at eleven without apparent difficulty. The dorm is not quiet — down the hall someone's doing something that involves a lot of muffled laughing — but Camila's curtains are drawn and the room has settled into its own dark.
+
+She's been lying here for an hour.
+
+The problem is the dream. Not the one she's having — she hasn't been asleep yet — but the one from the night before, and the night before that. She woke up last Tuesday knowing what she'd been dreaming and not being able to figure out what to do with the information. She'd been dreaming the way her body apparently dreams now, in the new grammar of this body, and she'd woken up with evidence of it and spent twenty minutes in the bathroom not thinking about it.
+
+She's thinking about it now.
+
+{% if not w.alwaysFemale() %}
+*He'd made those jokes*, she thinks, and then corrects herself, and then makes herself sit with the correction. *She* made those jokes. The person in this body made those jokes. And now this body is responding to the exact category of person that those jokes were about, with the specific enthusiasm that she didn't know bodies could have, and she can't explain that to herself in a way that makes it make sense.
+{% endif %}
+
+Outside, someone laughs loud enough that Camila hears it through the wall. College. It's college. She's at college.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+style     = "anxiety"
+prose = """
+She knows what she wants to do and she's not going to do it because she's in a room with another person and she doesn't know what this means and she's not ready to know what this means. She pulls the blanket up. She stares at the ceiling.
+
+The thing about shame is it doesn't argue. You can't reason with it. It just sits there saying *you know what this means* and you say *I don't know what it means* and it says *yes you do.*
+
+She doesn't. She's not going to. Not tonight.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "try_to_sleep"
+label = "Try to sleep"
+detail = "You're overthinking this. It's late. Sleep."
+prose = """
+She makes herself stop thinking about it with the force of will that she's applied to everything else in her life, which is considerable, and eventually, sometime after 1 AM, she is asleep.
+
+{% if not w.alwaysFemale() %}
+She dreams. She wakes up at 6:30 with the understanding that whatever she was trying not to think about, her body has a position on the question and is prepared to be clear about it.
+
+*Okay*, she thinks. *File it. Move on.*
+
+She gets up and showers and tells herself it will make more sense when she's less tired.
+{% else %}
+In the morning she feels fine. Janette is already up and getting coffee. College is, apparently, college.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "orientation"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "text_someone"
+label = "Text someone from home"
+detail = "You're not explaining anything. You just want to know someone's awake."
+prose = """
+She picks up her phone. It's 12:30, which is actually fine for the people she knows from home, who are like that.
+
+She texts Marcus — not *her* Marcus, she keeps having to remember the new geography of pronouns, the old friend Marcus, Raul's friend Marcus — and says: *you up?*
+
+He responds in four seconds. *yeah, can't sleep either. college?*
+
+*yeah*, she types.
+
+*how's the room?*
+
+She thinks about this. *fine. weird. the usual.*
+
+*lol fair.* A pause. Then: *you good?*
+
+{% if w.hasTrait("SHY") %}
+She types *yeah* and sends it and then lies there holding the phone and wishing she could explain it, and doesn't.
+{% else %}
+She types *getting there* and sends it. Which is true. She thinks it's true.
+
+*good*, he says. *get some sleep.*
+
+She puts the phone face-down. She's not going to explain it. She can't explain it. But she texted someone and someone texted back, and that's not nothing.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -2
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "orientation"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "explore_it"
+label = "Stay with it. See what you actually think."
+detail = "You're alone. The lights are off. No one's watching. Figure out what this is."
+condition = "!w.alwaysFemale()"
+prose = """
+She lies in the dark for a while longer and lets herself think it through instead of away from.
+
+*He made those jokes because*, she starts, and then stops, because the because doesn't go anywhere useful. The because is twenty years old and apparently doesn't have much to say about the present situation.
+
+The present situation is: she is attracted to men. The present situation is: this arrived without her permission and with considerable force. The present situation is: she is lying in a dorm room at a prestigious university thinking about a boy she saw on the quad for three seconds this afternoon and cannot remember his face but can remember the specific way he held a coffee cup.
+
+*This is insane*, she thinks.
+
+Then she thinks: *okay. but is it?*
+
+She doesn't fall asleep for another hour. When she does, she doesn't have the other dream. She has a regular dream, about something forgettable. In the morning she decides this is neither resolution nor progress, just information, and she has orientation at nine.
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = 4
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "orientation"
+
+  [[actions.next]]
+  finish = true

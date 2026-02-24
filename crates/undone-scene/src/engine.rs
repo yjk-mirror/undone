@@ -12,7 +12,7 @@ use undone_world::World;
 use crate::{
     effects::apply_effect,
     template_ctx::render_prose,
-    types::{Action, NextBranch, SceneDefinition},
+    types::{Action, NarratorVariant, NextBranch, SceneDefinition, Thought},
 };
 
 /// Maximum scene transitions per command. Prevents both deep sub-scene stacks
@@ -49,6 +49,12 @@ pub enum EngineCommand {
 #[derive(Debug, Clone)]
 pub enum EngineEvent {
     ProseAdded(String),
+    /// An inner thought or emotional aside. The UI renders this in a distinct style.
+    /// `style` is a hint: "inner_voice" = italic, "anxiety" = anxious register, etc.
+    ThoughtAdded {
+        text: String,
+        style: String,
+    },
     ActionsAvailable(Vec<ActionView>),
     NpcActivated(Option<NpcActivatedData>),
     SceneFinished,
@@ -214,15 +220,30 @@ impl SceneEngine {
             }
         };
 
-        let ctx = SceneCtx::new();
+        let mut ctx = SceneCtx::new();
+        ctx.scene_id = Some(def.id.clone());
+
+        // Select intro prose: use first passing variant, fall back to base intro
+        let intro_prose =
+            Self::select_intro_prose(&def.intro_variants, &def.intro_prose, world, &ctx, registry);
 
         // Render intro prose
-        match render_prose(&def.intro_prose, world, &ctx, registry) {
+        match render_prose(&intro_prose, world, &ctx, registry) {
             Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
             Err(e) => self
                 .events
                 .push_back(EngineEvent::ProseAdded(format!("[template error: {e}]"))),
         }
+
+        // Render intro thoughts
+        Self::render_thoughts(
+            &def.intro_thoughts,
+            world,
+            &ctx,
+            registry,
+            &mut self.events,
+            &def.id,
+        );
 
         self.stack.push(SceneFrame { def, ctx });
 
@@ -254,6 +275,21 @@ impl SceneEngine {
             }
         }
 
+        // Render action thoughts (after prose, before effects)
+        {
+            let frame = self.stack.last().expect("engine stack must not be empty");
+            let thoughts = action.thoughts.clone();
+            let scene_id = frame.def.id.clone();
+            Self::render_thoughts(
+                &thoughts,
+                world,
+                &frame.ctx,
+                registry,
+                &mut self.events,
+                &scene_id,
+            );
+        }
+
         // Apply effects
         {
             let frame = self
@@ -275,6 +311,64 @@ impl SceneEngine {
         // Evaluate next branches
         let next_branches = action.next.clone();
         self.evaluate_next(next_branches, world, registry);
+    }
+
+    // -----------------------------------------------------------------------
+    // Private: thought and narrator variant helpers
+    // -----------------------------------------------------------------------
+
+    /// Select the first narrator variant whose condition passes, or fall back to `base`.
+    fn select_intro_prose<'a>(
+        variants: &'a [NarratorVariant],
+        base: &'a str,
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+    ) -> &'a str {
+        for variant in variants {
+            if Self::eval_condition(
+                &variant.condition,
+                world,
+                ctx,
+                registry,
+                "variant",
+                "intro_variant",
+            ) {
+                return &variant.prose;
+            }
+        }
+        base
+    }
+
+    /// Evaluate and emit thought events for all thoughts whose conditions pass.
+    fn render_thoughts(
+        thoughts: &[Thought],
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+        events: &mut VecDeque<EngineEvent>,
+        scene_id: &str,
+    ) {
+        for thought in thoughts {
+            let passes = match &thought.condition {
+                None => true,
+                Some(expr) => Self::eval_condition(expr, world, ctx, registry, scene_id, "thought"),
+            };
+            if passes {
+                match render_prose(&thought.prose, world, ctx, registry) {
+                    Ok(text) if !text.trim().is_empty() => {
+                        events.push_back(EngineEvent::ThoughtAdded {
+                            text,
+                            style: thought.style.clone(),
+                        });
+                    }
+                    Ok(_) => {}
+                    Err(e) => events.push_back(EngineEvent::ErrorOccurred(format!(
+                        "thought prose error in scene '{scene_id}': {e}"
+                    ))),
+                }
+            }
+        }
     }
 
     fn emit_actions(&mut self, world: &World, registry: &PackRegistry) {
@@ -463,7 +557,7 @@ mod tests {
     use undone_domain::*;
     use undone_world::{GameData, World};
 
-    use crate::types::{EffectDef, SceneDefinition};
+    use crate::types::{EffectDef, SceneDefinition, Thought};
 
     fn make_world() -> World {
         World {
@@ -515,6 +609,8 @@ mod tests {
             id: "test::simple".into(),
             pack: "test".into(),
             intro_prose: "It begins.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![
                 Action {
                     id: "wait".into(),
@@ -525,6 +621,7 @@ mod tests {
                     allow_npc_actions: false,
                     effects: vec![],
                     next: vec![],
+                    thoughts: vec![],
                 },
                 Action {
                     id: "leave".into(),
@@ -540,6 +637,7 @@ mod tests {
                         slot: None,
                         finish: true,
                     }],
+                    thoughts: vec![],
                 },
             ],
             npc_actions: vec![],
@@ -673,6 +771,8 @@ mod tests {
             id: "test::conditional".into(),
             pack: "test".into(),
             intro_prose: "Conditional test.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![
                 Action {
                     id: "always".into(),
@@ -683,6 +783,7 @@ mod tests {
                     allow_npc_actions: false,
                     effects: vec![],
                     next: vec![],
+                    thoughts: vec![],
                 },
                 Action {
                     id: "special".into(),
@@ -693,6 +794,7 @@ mod tests {
                     allow_npc_actions: false,
                     effects: vec![],
                     next: vec![],
+                    thoughts: vec![],
                 },
             ],
             npc_actions: vec![],
@@ -758,6 +860,7 @@ mod tests {
                 contactable: true,
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
             },
             figure: MaleFigure::Average,
             clothing: MaleClothing::default(),
@@ -819,6 +922,8 @@ mod tests {
             id: "test::a".into(),
             pack: "test".into(),
             intro_prose: "A".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![Action {
                 id: "go".into(),
                 label: "Go".into(),
@@ -833,6 +938,7 @@ mod tests {
                     slot: None,
                     finish: false,
                 }],
+                thoughts: vec![],
             }],
             npc_actions: vec![],
         };
@@ -840,6 +946,8 @@ mod tests {
             id: "test::b".into(),
             pack: "test".into(),
             intro_prose: "B".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![Action {
                 id: "wait".into(),
                 label: "Wait".into(),
@@ -849,6 +957,7 @@ mod tests {
                 allow_npc_actions: false,
                 effects: vec![],
                 next: vec![],
+                thoughts: vec![],
             }],
             npc_actions: vec![],
         };
@@ -970,6 +1079,8 @@ mod tests {
             id: "test::hub".into(),
             pack: "test".into(),
             intro_prose: "Hub scene.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
             actions: vec![Action {
                 id: "go_free".into(),
                 label: "Free Time".into(),
@@ -984,6 +1095,7 @@ mod tests {
                     slot: Some("free_time".into()),
                     finish: false,
                 }],
+                thoughts: vec![],
             }],
             npc_actions: vec![],
         };
@@ -1017,6 +1129,104 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::NpcActivated(None))),
             "expected NpcActivated(None) when slot branch fires"
+        );
+    }
+
+    #[test]
+    fn intro_thought_emits_thought_added() {
+        let thought = Thought {
+            condition: None, // unconditional — always fires
+            prose: "You feel a pang of unease.".into(),
+            style: "inner_voice".into(),
+        };
+        let scene = SceneDefinition {
+            id: "test::thought".into(),
+            pack: "test".into(),
+            intro_prose: "The rain hammers the shelter roof.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![thought],
+            actions: vec![],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::thought".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events.iter().any(|e| matches!(
+                e,
+                EngineEvent::ThoughtAdded { text, style }
+                    if text.contains("unease") && style == "inner_voice"
+            )),
+            "expected ThoughtAdded with 'unease' prose"
+        );
+    }
+
+    #[test]
+    fn action_thought_emits_after_action_prose() {
+        let thought = Thought {
+            condition: None,
+            prose: "Was that really the right call?".into(),
+            style: "anxiety".into(),
+        };
+        let scene = SceneDefinition {
+            id: "test::action_thought".into(),
+            pack: "test".into(),
+            intro_prose: "Shelter.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "decide".into(),
+                label: "Decide".into(),
+                detail: String::new(),
+                condition: None,
+                prose: "You make a decision.".into(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: None,
+                    slot: None,
+                    finish: true,
+                }],
+                thoughts: vec![thought],
+            }],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::action_thought".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("decide".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events.iter().any(|e| matches!(
+                e,
+                EngineEvent::ThoughtAdded { text, style }
+                    if text.contains("right call") && style == "anxiety"
+            )),
+            "expected ThoughtAdded with 'right call' prose after action"
         );
     }
 }

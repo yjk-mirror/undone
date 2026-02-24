@@ -368,6 +368,23 @@ pub fn apply_effect(
                 world.game_data.advance_time_slot();
             }
         }
+        EffectDef::AdvanceArc { arc, to_state } => {
+            world.game_data.advance_arc(arc, to_state);
+        }
+        EffectDef::SetNpcRole { npc, role } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.roles.insert(role.clone());
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.roles.insert(role.clone());
+            }
+        },
+        EffectDef::FailRedCheck { skill } => {
+            let scene_id = ctx.scene_id.as_deref().unwrap_or("unknown");
+            world.game_data.fail_red_check(scene_id, skill);
+        }
         EffectDef::Transition { .. } => {
             // Dead code path. EffectDef::Transition exists so that `type =
             // "transition"` in TOML deserialises without error.  Scene
@@ -439,6 +456,7 @@ mod tests {
                 contactable: true,
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
             },
             char_type: CharTypeId(lasso::Spur::try_from_usize(0).unwrap()),
             figure: PlayerFigure::Slim,
@@ -520,6 +538,7 @@ mod tests {
                 contactable: true,
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
             },
             figure: MaleFigure::Average,
             clothing: MaleClothing::default(),
@@ -1022,5 +1041,58 @@ mod tests {
         )
         .unwrap();
         assert!(world.player.friends.contains(&NpcKey::Male(key)));
+    }
+
+    #[test]
+    fn advance_arc_effect_changes_state() {
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+        let mut ctx = SceneCtx::new();
+        ctx.scene_id = Some("test::scene".into());
+
+        let effect = EffectDef::AdvanceArc {
+            arc: "base::robin_opening".into(),
+            to_state: "week_one".into(),
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+        assert_eq!(
+            world.game_data.arc_state("base::robin_opening"),
+            Some("week_one")
+        );
+    }
+
+    #[test]
+    fn set_npc_role_adds_role_to_active_female() {
+        let mut world = make_world();
+        let npc = make_female_npc();
+        let key = world.female_npcs.insert(npc);
+        let mut ctx = SceneCtx::new();
+        ctx.active_female = Some(key);
+        ctx.scene_id = Some("test::scene".into());
+        let registry = PackRegistry::new();
+
+        let effect = EffectDef::SetNpcRole {
+            npc: "f".into(),
+            role: "ROLE_LANDLORD".into(),
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+        let npc_data = world.female_npcs.get(key).unwrap();
+        assert!(npc_data.core.roles.contains("ROLE_LANDLORD"));
+    }
+
+    #[test]
+    fn fail_red_check_effect_records_failure() {
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+        let mut ctx = SceneCtx::new();
+        ctx.scene_id = Some("base::rain_shelter".into());
+
+        let effect = EffectDef::FailRedCheck {
+            skill: "CHARM".into(),
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+        assert!(world
+            .game_data
+            .has_failed_red_check("base::rain_shelter", "CHARM"));
     }
 }
