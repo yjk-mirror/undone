@@ -19,3 +19,10 @@ name = "free_time"
   scene     = "base::coffee_shop"
   condition = "gd.week() >= 1"
   weight    = 10
+  once_only = false
+
+  [[slot.events]]
+  scene     = "base::plan_your_day"
+  weight    = 0
+  trigger   = "gd.week() >= 2"
+  once_only = true

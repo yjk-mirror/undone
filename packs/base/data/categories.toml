@@ -1,0 +1,23 @@
+[[category]]
+id = "RACE_PRIVILEGED"
+description = "Socially privileged races in the NE US setting"
+type = "race"
+members = ["White"]
+
+[[category]]
+id = "RACE_NON_PRIVILEGED"
+description = "Non-privileged races in the NE US setting"
+type = "race"
+members = ["Black", "Latina", "East Asian", "South Asian", "Mixed", "Other"]
+
+[[category]]
+id = "AGE_YOUNG"
+description = "Young age brackets"
+type = "age"
+members = ["LateTeen", "EarlyTwenties", "Twenties"]
+
+[[category]]
+id = "AGE_MATURE"
+description = "Mature age brackets"
+type = "age"
+members = ["Thirties", "Forties", "Fifties", "Old"]

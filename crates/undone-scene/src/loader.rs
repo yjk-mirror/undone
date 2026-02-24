@@ -208,6 +208,7 @@ fn resolve_next_branch(raw: NextBranchDef, scene_id: &str) -> Result<NextBranch,
     Ok(NextBranch {
         condition,
         goto: raw.goto,
+        slot: raw.slot,
         finish: raw.finish,
     })
 }
@@ -315,6 +316,7 @@ mod tests {
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::nonexistent".into()),
+                    slot: None,
                     finish: false,
                 }],
             }],
@@ -348,6 +350,7 @@ mod tests {
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::b".into()),
+                    slot: None,
                     finish: false,
                 }],
             }],

@@ -5,4 +5,6 @@ pub mod player;
 pub use enums::*;
 pub use ids::*;
 pub use npc::{FemaleClothing, FemaleNpc, MaleClothing, MaleNpc, NpcCore};
-pub use player::{FemaleNpcKey, MaleNpcKey, NpcKey, Player, PregnancyState, SkillValue};
+pub use player::{
+    BeforeIdentity, FemaleNpcKey, MaleNpcKey, NpcKey, Player, PregnancyState, SkillValue,
+};

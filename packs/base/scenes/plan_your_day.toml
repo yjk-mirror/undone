@@ -1,0 +1,43 @@
+[scene]
+id          = "base::plan_your_day"
+pack        = "base"
+description = "Choose what to do with your time."
+
+[intro]
+prose = """
+{% if gd.timeSlot() == "Morning" %}
+Morning light through the kitchen window. Coffee in hand, the day stretching out ahead.
+{% elif gd.timeSlot() == "Afternoon" %}
+The afternoon opens up. What now?
+{% elif gd.timeSlot() == "Evening" %}
+The evening is yours.
+{% else %}
+It's late. Not much left of the day.
+{% endif %}
+
+What do you want to do?
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "go_out"
+label = "Go out"
+detail = "See what the city has in store."
+prose = "You grab your jacket and head out."
+
+  [[actions.next]]
+  slot = "free_time"
+
+[[actions]]
+id    = "stay_home"
+label = "Stay home"
+detail = "A quiet day in."
+prose = "You settle in. Sometimes doing nothing is doing something."
+
+  [[actions.next]]
+  finish = true
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1

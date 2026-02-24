@@ -1,7 +1,7 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, PcOrigin, Player, PlayerFigure,
+    Age, AlcoholLevel, ArousalLevel, BeforeIdentity, BreastSize, PcOrigin, Player, PlayerFigure,
     SkillValue, TraitId,
 };
 use undone_world::{GameData, World};
@@ -23,9 +23,9 @@ pub struct CharCreationConfig {
     pub figure: PlayerFigure,
     pub breasts: BreastSize,
     pub origin: PcOrigin,
-    pub before_age: u32,
-    pub before_race: String,
-    pub before_sexuality: Option<BeforeSexuality>,
+    /// Pre-transformation identity snapshot. Only meaningful when
+    /// `origin.has_before_life()` is true; should be `None` for AlwaysFemale.
+    pub before: Option<BeforeIdentity>,
     /// Trait IDs (already resolved by the caller from registry)
     pub starting_traits: Vec<TraitId>,
     pub male_count: usize,
@@ -76,9 +76,7 @@ pub fn new_game<R: Rng>(
         custom_flags: HashMap::new(),
         custom_ints: HashMap::new(),
         origin: config.origin,
-        before_age: config.before_age,
-        before_race: config.before_race,
-        before_sexuality: config.before_sexuality,
+        before: config.before,
     };
 
     // Seed FEMININITY skill in the skills map.
@@ -136,7 +134,9 @@ mod tests {
     use crate::load_packs;
     use rand::SeedableRng;
     use std::path::PathBuf;
-    use undone_domain::{Age, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure};
+    use undone_domain::{
+        Age, BeforeIdentity, BeforeSexuality, BreastSize, MaleFigure, PcOrigin, PlayerFigure,
+    };
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -157,9 +157,14 @@ mod tests {
             figure: PlayerFigure::Slim,
             breasts: BreastSize::MediumLarge,
             origin: PcOrigin::CisMaleTransformed,
-            before_age: 28,
-            before_race: "white".into(),
-            before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+            before: Some(BeforeIdentity {
+                name: "Evan".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                sexuality: BeforeSexuality::AttractedToWomen,
+                figure: MaleFigure::Average,
+                traits: std::collections::HashSet::new(),
+            }),
             starting_traits: vec![],
             male_count: 7,
             female_count: 2,
@@ -174,7 +179,10 @@ mod tests {
         let world = new_game(config, &mut registry, &mut rng);
 
         assert_eq!(world.player.name_fem, "Eva");
-        assert_eq!(world.player.before_age, 28);
+        assert_eq!(
+            world.player.before.as_ref().map(|b| b.age),
+            Some(Age::Twenties)
+        );
         assert_eq!(world.player.origin, PcOrigin::CisMaleTransformed);
         assert_eq!(world.game_data.week, 0);
     }
@@ -207,7 +215,7 @@ mod tests {
         let (mut registry, _) = load_packs(&packs_dir()).unwrap();
         let mut config = base_config();
         config.origin = PcOrigin::AlwaysFemale;
-        config.before_sexuality = None;
+        config.before = None;
         let mut rng = rand::rngs::SmallRng::seed_from_u64(4);
         let world = new_game(config, &mut registry, &mut rng);
 
@@ -233,9 +241,14 @@ mod tests {
             figure: PlayerFigure::Slim,
             breasts: BreastSize::MediumLarge,
             origin: PcOrigin::TransWomanTransformed,
-            before_age: 28,
-            before_race: "white".into(),
-            before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+            before: Some(BeforeIdentity {
+                name: "Evan".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                sexuality: BeforeSexuality::AttractedToWomen,
+                figure: MaleFigure::Average,
+                traits: std::collections::HashSet::new(),
+            }),
             starting_traits: vec![],
             male_count: 7,
             female_count: 2,

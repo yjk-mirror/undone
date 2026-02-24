@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
 use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, StuffId, TraitId};
 
-use crate::data::{NpcTraitDef, SkillDef, StatDef, TraitDef};
+use crate::data::{CategoryDef, NpcTraitDef, SkillDef, StatDef, TraitDef};
 
 #[derive(Debug, Error)]
 pub enum RegistryError {
@@ -27,6 +27,7 @@ pub struct PackRegistry {
     male_names: Vec<String>,
     female_names: Vec<String>,
     races: Vec<String>,
+    categories: HashMap<String, CategoryDef>,
     opening_scene: Option<String>,
     default_slot: Option<String>,
 }
@@ -41,6 +42,7 @@ impl PackRegistry {
             male_names: Vec::new(),
             female_names: Vec::new(),
             races: Vec::new(),
+            categories: HashMap::new(),
             opening_scene: None,
             default_slot: None,
         }
@@ -194,6 +196,26 @@ impl PackRegistry {
         &self.races
     }
 
+    /// Register category definitions from a pack data file.
+    pub fn register_categories(&mut self, defs: Vec<CategoryDef>) {
+        for def in defs {
+            self.categories.insert(def.id.clone(), def);
+        }
+    }
+
+    /// Check if a value is a member of a category.
+    pub fn in_category(&self, category_id: &str, value: &str) -> bool {
+        self.categories
+            .get(category_id)
+            .map(|cat| cat.members.iter().any(|m| m == value))
+            .unwrap_or(false)
+    }
+
+    /// Get a category definition by ID.
+    pub fn get_category(&self, id: &str) -> Option<&CategoryDef> {
+        self.categories.get(id)
+    }
+
     /// Set the opening scene ID for the first pack that declares one.
     /// Subsequent packs cannot override it (first-writer wins).
     pub fn set_opening_scene(&mut self, id: String) {
@@ -231,6 +253,56 @@ impl PackRegistry {
             })
             .collect()
     }
+
+    /// Validate that all `conflicts` entries in every registered trait reference
+    /// known trait IDs. Returns a list of error messages for unknown references.
+    /// Call this after all packs have been loaded via `register_traits`.
+    pub fn validate_trait_conflicts(&self) -> Vec<String> {
+        let mut errors = Vec::new();
+        for (tid, def) in &self.trait_defs {
+            let owner = self.rodeo.resolve(&tid.0);
+            for conflict_id in &def.conflicts {
+                if self.resolve_trait(conflict_id).is_err() {
+                    errors.push(format!(
+                        "trait '{}': conflicts entry '{}' is not a known trait id",
+                        owner, conflict_id
+                    ));
+                }
+            }
+        }
+        errors
+    }
+
+    /// Return the slice of conflict trait ID strings declared by a given trait.
+    /// Returns an empty slice if the trait is unknown or has no conflicts.
+    pub fn trait_conflicts(&self, id: TraitId) -> &[String] {
+        self.trait_defs
+            .get(&id)
+            .map(|def| def.conflicts.as_slice())
+            .unwrap_or(&[])
+    }
+
+    /// Check whether adding `new_trait` to `existing` would violate any declared
+    /// conflict. Returns `Some(message)` if there is a conflict, `None` if safe.
+    pub fn check_trait_conflict(
+        &self,
+        existing: &HashSet<TraitId>,
+        new_trait: TraitId,
+    ) -> Option<String> {
+        let conflicts = self.trait_conflicts(new_trait);
+        let new_name = self.rodeo.resolve(&new_trait.0);
+        for conflict_id in conflicts {
+            if let Ok(conflict_tid) = self.resolve_trait(conflict_id) {
+                if existing.contains(&conflict_tid) {
+                    return Some(format!(
+                        "cannot add trait '{}': conflicts with already-present trait '{}'",
+                        new_name, conflict_id
+                    ));
+                }
+            }
+        }
+        None
+    }
 }
 
 impl Default for PackRegistry {
@@ -252,12 +324,16 @@ mod tests {
                 name: "Shy".into(),
                 description: "...".into(),
                 hidden: false,
+                group: None,
+                conflicts: vec![],
             },
             TraitDef {
                 id: "POSH".into(),
                 name: "Posh".into(),
                 description: "...".into(),
                 hidden: false,
+                group: None,
+                conflicts: vec![],
             },
         ]);
         reg
@@ -314,5 +390,127 @@ mod tests {
         reg.register_names(vec!["James".into(), "Thomas".into()], vec!["Emma".into()]);
         assert_eq!(reg.male_names(), &["James", "Thomas"]);
         assert_eq!(reg.female_names(), &["Emma"]);
+    }
+
+    #[test]
+    fn validate_trait_conflicts_no_errors_when_all_valid() {
+        let mut reg = PackRegistry::new();
+        reg.register_traits(vec![
+            TraitDef {
+                id: "SHY".into(),
+                name: "Shy".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["OUTGOING".into()],
+            },
+            TraitDef {
+                id: "OUTGOING".into(),
+                name: "Outgoing".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["SHY".into()],
+            },
+        ]);
+        let errors = reg.validate_trait_conflicts();
+        assert!(errors.is_empty(), "expected no errors, got: {:?}", errors);
+    }
+
+    #[test]
+    fn validate_trait_conflicts_reports_unknown_references() {
+        let mut reg = PackRegistry::new();
+        reg.register_traits(vec![TraitDef {
+            id: "SHY".into(),
+            name: "Shy".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec!["NONEXISTENT".into()],
+        }]);
+        let errors = reg.validate_trait_conflicts();
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("NONEXISTENT"));
+    }
+
+    #[test]
+    fn check_trait_conflict_detects_conflict() {
+        let mut reg = PackRegistry::new();
+        reg.register_traits(vec![
+            TraitDef {
+                id: "SHY".into(),
+                name: "Shy".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["OUTGOING".into()],
+            },
+            TraitDef {
+                id: "OUTGOING".into(),
+                name: "Outgoing".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["SHY".into()],
+            },
+        ]);
+        let shy_id = reg.resolve_trait("SHY").unwrap();
+        let outgoing_id = reg.resolve_trait("OUTGOING").unwrap();
+        let mut existing = HashSet::new();
+        existing.insert(shy_id);
+        let result = reg.check_trait_conflict(&existing, outgoing_id);
+        assert!(result.is_some(), "expected conflict message");
+        assert!(result.unwrap().contains("OUTGOING"));
+    }
+
+    #[test]
+    fn check_trait_conflict_none_when_no_conflict() {
+        let mut reg = PackRegistry::new();
+        reg.register_traits(vec![
+            TraitDef {
+                id: "SHY".into(),
+                name: "Shy".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["OUTGOING".into()],
+            },
+            TraitDef {
+                id: "POSH".into(),
+                name: "Posh".into(),
+                description: "...".into(),
+                hidden: false,
+                group: None,
+                conflicts: vec![],
+            },
+            TraitDef {
+                id: "OUTGOING".into(),
+                name: "Outgoing".into(),
+                description: "...".into(),
+                hidden: false,
+                group: Some("personality".into()),
+                conflicts: vec!["SHY".into()],
+            },
+        ]);
+        let shy_id = reg.resolve_trait("SHY").unwrap();
+        let posh_id = reg.resolve_trait("POSH").unwrap();
+        let mut existing = HashSet::new();
+        existing.insert(shy_id);
+        // POSH has no conflicts, so adding it alongside SHY should be fine
+        assert!(reg.check_trait_conflict(&existing, posh_id).is_none());
+    }
+
+    #[test]
+    fn in_category_returns_true_for_member() {
+        let mut reg = PackRegistry::new();
+        reg.register_categories(vec![CategoryDef {
+            id: "RACE_PRIVILEGED".into(),
+            description: "...".into(),
+            category_type: "race".into(),
+            members: vec!["White".into()],
+        }]);
+        assert!(reg.in_category("RACE_PRIVILEGED", "White"));
+        assert!(!reg.in_category("RACE_PRIVILEGED", "Black"));
+        assert!(!reg.in_category("NONEXISTENT", "White"));
     }
 }

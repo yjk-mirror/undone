@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use thiserror::Error;
 
 use crate::{
-    data::{NpcTraitFile, SkillFile, TraitFile},
+    data::{CategoriesFile, NpcTraitFile, SkillFile, TraitFile},
     manifest::PackManifest,
     registry::PackRegistry,
 };
@@ -133,6 +133,17 @@ fn load_one_pack(
                 message: e.to_string(),
             })?;
         registry.register_races(races_file.races);
+    }
+
+    if let Some(ref categories_rel) = manifest.content.categories_file {
+        let categories_path = pack_dir.join(categories_rel);
+        let src = read_file(&categories_path)?;
+        let categories_file: CategoriesFile =
+            toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+                path: categories_path.clone(),
+                message: e.to_string(),
+            })?;
+        registry.register_categories(categories_file.category);
     }
 
     Ok(LoadedPackMeta {

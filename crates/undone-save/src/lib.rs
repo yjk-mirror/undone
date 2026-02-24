@@ -6,7 +6,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 /// Increment this whenever the save format changes in a breaking way.
-pub const SAVE_VERSION: u32 = 2;
+pub const SAVE_VERSION: u32 = 3;
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -97,14 +97,18 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 
 /// Deserialize a save file from `path`, validating it against the current registry.
 ///
-/// Automatically migrates v1 saves (using `always_female`/`Sexuality`) to the
-/// current v2 format (`origin: PcOrigin`, `before_sexuality: Option<BeforeSexuality>`).
+/// Automatically migrates older saves to the current format:
+///   - v1 → v2: `always_female: bool` + old `Sexuality` variants → `origin: PcOrigin`
+///              + `before_sexuality: Option<BeforeSexuality>`
+///   - v2 → v3: flat `before_age`, `before_race`, `before_sexuality` fields on player
+///              → `before: Option<BeforeIdentity>`; adds `day` and `time_slot` to
+///              `game_data` if missing.
 ///
 /// # Errors
 ///
-/// Returns `SaveError::VersionMismatch` if the save version is unknown (neither v1
-/// nor the current version). Returns `SaveError::IdMismatch` or `SaveError::TooManyIds`
-/// if the pack content or load order has changed since the file was written.
+/// Returns `SaveError::VersionMismatch` if the save version is unknown. Returns
+/// `SaveError::IdMismatch` or `SaveError::TooManyIds` if the pack content or load
+/// order has changed since the file was written.
 pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveError> {
     let json = std::fs::read_to_string(path).map_err(|e| SaveError::Io {
         path: path.to_path_buf(),
@@ -120,13 +124,15 @@ pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveErro
         .map(|v| v as u32)
         .unwrap_or(0);
 
-    // Migrate v1 → v2 in-place on the raw JSON before deserializing.
     if version == 1 {
+        // v1 → v2 → v3
         raw = migrate_v1_to_v2(raw);
-        // After migration the version field is still 1; update it so deserialization
-        // of the SaveFile wrapper doesn't trip on the version field.  (SaveFile does
-        // not validate the version field itself — that is done below.)
-        raw["version"] = serde_json::Value::Number(2u32.into());
+        raw = migrate_v2_to_v3(raw);
+        raw["version"] = serde_json::Value::Number(3u32.into());
+    } else if version == 2 {
+        // v2 → v3
+        raw = migrate_v2_to_v3(raw);
+        raw["version"] = serde_json::Value::Number(3u32.into());
     } else if version != SAVE_VERSION {
         return Err(SaveError::VersionMismatch {
             saved: version,
@@ -201,6 +207,115 @@ fn migrate_v1_to_v2(mut save_json: serde_json::Value) -> serde_json::Value {
     save_json
 }
 
+/// Transform a v2 save JSON into a v3-compatible JSON structure.
+///
+/// v2 differences in `world.player`:
+///   - `before_age: u32` (a raw integer, not an Age enum string)
+///   - `before_race: String`
+///   - `before_sexuality: Option<BeforeSexuality>` (string or null)
+///
+/// v3 replaces those three flat fields with:
+///   - `before: Option<BeforeIdentity>` (an object or null)
+///
+/// Additionally, v2 `world.game_data` may be missing `day` and `time_slot`
+/// (they are new in v3). Those fields have serde defaults so they are handled
+/// automatically by deserialization, but we explicitly insert them here for
+/// clarity and to keep the raw JSON valid before any further processing.
+fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
+    if let Some(player) = save_json.get_mut("world").and_then(|w| w.get_mut("player")) {
+        // Extract old flat fields before mutating the object.
+        let before_race = player
+            .get("before_race")
+            .and_then(|v| v.as_str())
+            .unwrap_or("white")
+            .to_string();
+
+        let before_sexuality = player
+            .get("before_sexuality")
+            .cloned()
+            .unwrap_or(serde_json::Value::Null);
+
+        let before_age_num = player
+            .get("before_age")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(25);
+
+        // Map numeric age to Age enum string.
+        let before_age = match before_age_num {
+            0..=19 => "LateTeen",
+            20..=22 => "EarlyTwenties",
+            23..=26 => "Twenties",
+            27..=29 => "LateTwenties",
+            30..=39 => "Thirties",
+            40..=49 => "Forties",
+            50..=59 => "Fifties",
+            _ => "Old",
+        };
+
+        // Use name_masc for the before identity name, falling back to name_androg.
+        let before_name = player
+            .get("name_masc")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Unknown")
+            .to_string();
+
+        // AlwaysFemale PCs have no pre-transformation identity.
+        let origin = player
+            .get("origin")
+            .and_then(|v| v.as_str())
+            .unwrap_or("CisMaleTransformed");
+
+        let before = if origin == "AlwaysFemale" {
+            serde_json::Value::Null
+        } else {
+            let mut before_obj = serde_json::Map::new();
+            before_obj.insert("name".into(), serde_json::Value::String(before_name));
+            before_obj.insert(
+                "age".into(),
+                serde_json::Value::String(before_age.to_string()),
+            );
+            before_obj.insert("race".into(), serde_json::Value::String(before_race));
+            // Keep before_sexuality as-is if present; default to AttractedToWomen.
+            if before_sexuality.is_null() {
+                before_obj.insert(
+                    "sexuality".into(),
+                    serde_json::Value::String("AttractedToWomen".into()),
+                );
+            } else {
+                before_obj.insert("sexuality".into(), before_sexuality);
+            }
+            before_obj.insert("figure".into(), serde_json::Value::String("Average".into()));
+            before_obj.insert("traits".into(), serde_json::Value::Array(vec![]));
+            serde_json::Value::Object(before_obj)
+        };
+
+        if let Some(obj) = player.as_object_mut() {
+            // Remove the three flat v2 fields.
+            obj.remove("before_age");
+            obj.remove("before_race");
+            obj.remove("before_sexuality");
+            // Insert the new nested before field.
+            obj.insert("before".into(), before);
+        }
+    }
+
+    // GameData: insert day and time_slot if absent (they have serde defaults but
+    // explicit insertion keeps the migrated JSON self-consistent).
+    if let Some(game_data) = save_json
+        .get_mut("world")
+        .and_then(|w| w.get_mut("game_data"))
+    {
+        if let Some(gd) = game_data.as_object_mut() {
+            gd.entry("day")
+                .or_insert(serde_json::Value::Number(0.into()));
+            gd.entry("time_slot")
+                .or_insert(serde_json::Value::String("Morning".into()));
+        }
+    }
+
+    save_json
+}
+
 /// Verify that all IDs recorded in the save file still map to the same strings
 /// in the current registry.
 fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveError> {
@@ -238,7 +353,7 @@ mod tests {
     use std::path::PathBuf;
 
     use slotmap::SlotMap;
-    use undone_domain::{BeforeSexuality, PcOrigin, *};
+    use undone_domain::{BeforeIdentity, BeforeSexuality, MaleFigure, PcOrigin, *};
     use undone_world::{GameData, World};
 
     use super::*;
@@ -262,9 +377,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -362,6 +482,8 @@ mod tests {
             name: "Alpha".into(),
             description: "".into(),
             hidden: false,
+            group: None,
+            conflicts: vec![],
         }]);
 
         // "ALPHA" → index 0; save claims index 0 = "BETA"
@@ -393,12 +515,16 @@ mod tests {
                 name: "Shy".into(),
                 description: "".into(),
                 hidden: false,
+                group: None,
+                conflicts: vec![],
             },
             undone_packs::TraitDef {
                 id: "POSH".into(),
                 name: "Posh".into(),
                 description: "".into(),
                 hidden: false,
+                group: None,
+                conflicts: vec![],
             },
         ]);
 
@@ -408,11 +534,12 @@ mod tests {
         assert!(result.is_ok(), "registry having more IDs than save is OK");
     }
 
-    /// Test that a v1-format save is correctly migrated to v2 on load.
+    /// Test that a v1-format save is correctly migrated through v2 and v3 on load.
     ///
     /// v1 used `always_female: bool` and `before_sexuality: "StraightMale"` (etc.).
-    /// After migration the player should have `origin: CisMaleTransformed` and
-    /// `before_sexuality: Some(BeforeSexuality::AttractedToWomen)`.
+    /// After the full v1→v2→v3 migration chain the player should have:
+    ///   - `origin: CisMaleTransformed`
+    ///   - `before: Some(BeforeIdentity { sexuality: AttractedToWomen, ... })`
     #[test]
     fn migrate_v1_save_to_v2() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
@@ -434,10 +561,14 @@ mod tests {
         // Patch the version field to 1.
         save_json["version"] = serde_json::Value::Number(1u32.into());
 
-        // Patch the player to v1 shape: remove `origin`, add `always_female`.
+        // Patch the player to v1 shape: remove `origin`, remove `before`,
+        // add `always_female`. The v1→v2 migration will add back `origin` and
+        // `before_sexuality` as flat fields; v2→v3 will then collapse them into
+        // `before: Option<BeforeIdentity>`.
         {
             let player = save_json["world"]["player"].as_object_mut().unwrap();
             player.remove("origin");
+            player.remove("before");
             player.insert("always_female".to_string(), serde_json::Value::Bool(false));
             // before_sexuality in v1 was a bare string like "StraightMale"
             player.insert(
@@ -451,7 +582,7 @@ mod tests {
         let path = dir.join("v1_migration_test.json");
         std::fs::write(&path, serde_json::to_string_pretty(&save_json).unwrap()).unwrap();
 
-        // Load it — should migrate transparently.
+        // Load it — should migrate v1→v2→v3 transparently.
         let loaded = load_game(&path, &registry).expect("v1 load should succeed");
 
         assert_eq!(
@@ -459,10 +590,82 @@ mod tests {
             PcOrigin::CisMaleTransformed,
             "always_female=false should migrate to CisMaleTransformed"
         );
+        // After the full v1→v2→v3 chain, before_sexuality="AttractedToWomen" (mapped
+        // from "StraightMale") is assembled into a BeforeIdentity object.
+        assert!(
+            loaded.player.before.is_some(),
+            "before should be Some after v1→v2→v3 migration"
+        );
         assert_eq!(
-            loaded.player.before_sexuality,
-            Some(BeforeSexuality::AttractedToWomen),
-            "StraightMale should migrate to Some(AttractedToWomen)"
+            loaded.player.before.as_ref().unwrap().sexuality,
+            BeforeSexuality::AttractedToWomen,
+            "StraightMale v1 sexuality should map to AttractedToWomen"
+        );
+    }
+
+    /// Test that a v2-format save (flat before_age / before_race / before_sexuality)
+    /// is correctly migrated to v3 (nested before: Option<BeforeIdentity>) on load.
+    #[test]
+    fn migrate_v2_save_to_v3() {
+        let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+
+        let id_strings = registry.all_interned_strings();
+
+        // Build a v2-format world from the current world, then patch it.
+        let world = make_world(&registry);
+        let mut save_json = serde_json::to_value(&SaveFile {
+            version: 2,
+            id_strings,
+            world,
+        })
+        .unwrap();
+
+        // Patch to v2 player shape: remove `before`, add flat before_* fields.
+        {
+            let player = save_json["world"]["player"].as_object_mut().unwrap();
+            player.remove("before");
+            player.insert(
+                "before_age".to_string(),
+                serde_json::Value::Number(30u32.into()),
+            );
+            player.insert(
+                "before_race".to_string(),
+                serde_json::Value::String("white".to_string()),
+            );
+            player.insert(
+                "before_sexuality".to_string(),
+                serde_json::Value::String("AttractedToWomen".to_string()),
+            );
+        }
+
+        // Also remove day/time_slot from game_data to simulate a v2 save that
+        // predates those fields.
+        {
+            let gd = save_json["world"]["game_data"].as_object_mut().unwrap();
+            gd.remove("day");
+            gd.remove("time_slot");
+        }
+
+        let dir = tempfile_dir();
+        let path = dir.join("v2_migration_test.json");
+        std::fs::write(&path, serde_json::to_string_pretty(&save_json).unwrap()).unwrap();
+
+        // Load — should migrate v2→v3 transparently.
+        let loaded = load_game(&path, &registry).expect("v2→v3 load should succeed");
+
+        assert!(
+            loaded.player.before.is_some(),
+            "before should be Some after v2→v3 migration"
+        );
+        assert_eq!(
+            loaded.player.before.as_ref().unwrap().race,
+            "white",
+            "before.race should be migrated from before_race"
+        );
+        assert_eq!(
+            loaded.game_data.time_slot,
+            undone_domain::TimeSlot::Morning,
+            "time_slot should default to Morning when absent in v2 save"
         );
     }
 

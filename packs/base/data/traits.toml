@@ -3,78 +3,103 @@ id          = "SHY"
 name        = "Shy"
 description = "Avoids eye contact, defers, gets flustered."
 hidden      = false
+group       = "personality"
+conflicts   = ["OUTGOING", "FLIRTY"]
 
 [[trait]]
 id          = "POSH"
 name        = "Posh"
 description = "Notices class signals. Faintly superior."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "CUTE"
 name        = "Cute"
 description = "Genuine enthusiasm, easily delighted."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "SULTRY"
 name        = "Sultry"
 description = "Aware of her effect on people."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "BITCHY"
 name        = "Bitchy"
 description = "Low tolerance for nonsense."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "DOWN_TO_EARTH"
 name        = "Down to Earth"
 description = "Practical, unselfconscious."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "REFINED"
 name        = "Refined"
 description = "Sensitive to vulgarity."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "ROMANTIC"
 name        = "Romantic"
 description = "Takes things slightly more seriously than warranted."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "FLIRTY"
 name        = "Flirty"
 description = "Can't entirely help it."
 hidden      = false
+group       = "personality"
+conflicts   = ["SHY"]
 
 [[trait]]
 id          = "AMBITIOUS"
 name        = "Ambitious"
 description = "Goal-focused. Impatient with things that don't advance anything."
 hidden      = false
+group       = "personality"
 
 [[trait]]
 id          = "OVERACTIVE_IMAGINATION"
 name        = "Overactive Imagination"
 description = "Takes situations to their logical conclusion."
 hidden      = false
+group       = "personality"
+
+[[trait]]
+id          = "OUTGOING"
+name        = "Outgoing"
+description = "Comfortable in a crowd, draws energy from other people."
+hidden      = false
+group       = "personality"
+conflicts   = ["SHY"]
 
 [[trait]]
 id          = "PLAIN"
 name        = "Plain"
 description = "A modelling career is out of the question."
 hidden      = false
+group       = "appearance"
+conflicts   = ["BEAUTIFUL"]
 
 [[trait]]
 id          = "BEAUTIFUL"
 name        = "Beautiful"
 description = "Draws attention wherever she goes."
 hidden      = false
+group       = "appearance"
+conflicts   = ["PLAIN"]
 
 [[trait]]
 id          = "BLOCK_ROUGH"

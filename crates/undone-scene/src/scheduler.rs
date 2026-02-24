@@ -52,6 +52,10 @@ struct ScheduleEventToml {
     condition: Option<String>,
     #[serde(default = "default_weight")]
     weight: u32,
+    #[serde(default)]
+    once_only: bool,
+    #[serde(default)]
+    trigger: Option<String>,
 }
 
 fn default_weight() -> u32 {
@@ -66,6 +70,19 @@ struct ScheduleEvent {
     scene: String,
     condition: Option<Expr>,
     weight: u32,
+    once_only: bool,
+    trigger: Option<Expr>,
+}
+
+// ---------------------------------------------------------------------------
+// Public result types
+// ---------------------------------------------------------------------------
+
+/// The result of a successful `pick` or `check_triggers` call.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PickResult {
+    pub scene_id: String,
+    pub once_only: bool,
 }
 
 // ---------------------------------------------------------------------------
@@ -94,15 +111,16 @@ impl Scheduler {
     }
 
     /// Pick a scene for the given slot. Evaluates conditions against the current
-    /// world state, performs weighted random selection, and returns the scene ID.
+    /// world state, performs weighted random selection, and returns a `PickResult`.
     /// Returns `None` if the slot is unknown or no events pass their conditions.
+    /// Once-only events that have already fired (flag `ONCE_<scene_id>` set) are excluded.
     pub fn pick(
         &self,
         slot_name: &str,
         world: &World,
         registry: &PackRegistry,
         rng: &mut impl Rng,
-    ) -> Option<String> {
+    ) -> Option<PickResult> {
         let events = self.slots.get(slot_name)?;
 
         // Empty SceneCtx — scheduler conditions have no scene-local state.
@@ -112,6 +130,7 @@ impl Scheduler {
             .iter()
             .filter(|e| {
                 e.weight > 0
+                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.condition {
                         Some(expr) => match eval(expr, world, &ctx, registry) {
                             Ok(val) => val,
@@ -144,7 +163,47 @@ impl Scheduler {
                     false
                 }
             })
-            .map(|e| e.scene.clone())
+            .map(|e| PickResult {
+                scene_id: e.scene.clone(),
+                once_only: e.once_only,
+            })
+    }
+
+    /// Find the first triggered event in `slot_name` whose trigger condition evaluates to true.
+    /// Triggered events are not subject to weighted random selection — the first match wins.
+    /// Once-only events that have already fired (flag `ONCE_<scene_id>` set) are excluded.
+    pub fn check_triggers(
+        &self,
+        slot_name: &str,
+        world: &World,
+        registry: &PackRegistry,
+    ) -> Option<PickResult> {
+        let events = self.slots.get(slot_name)?;
+        let ctx = SceneCtx::new();
+
+        events
+            .iter()
+            .find(|e| {
+                e.trigger.is_some()
+                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
+                    && match &e.trigger {
+                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                            Ok(val) => val,
+                            Err(err) => {
+                                eprintln!(
+                                    "[scheduler] trigger error in slot '{}', scene '{}': {}",
+                                    slot_name, e.scene, err
+                                );
+                                false
+                            }
+                        },
+                        None => false,
+                    }
+            })
+            .map(|e| PickResult {
+                scene_id: e.scene.clone(),
+                once_only: e.once_only,
+            })
     }
 }
 
@@ -183,10 +242,19 @@ pub fn load_schedule(pack_metas: &[LoadedPackMeta]) -> Result<Scheduler, Schedul
                     })?),
                     None => None,
                 };
+                let trigger = match ev.trigger {
+                    Some(ref src) => Some(parse(src).map_err(|e| SchedulerError::ExprParse {
+                        condition: src.clone(),
+                        message: e.to_string(),
+                    })?),
+                    None => None,
+                };
                 entry.push(ScheduleEvent {
                     scene: ev.scene,
                     condition,
                     weight: ev.weight,
+                    once_only: ev.once_only,
+                    trigger,
                 });
             }
         }
@@ -235,9 +303,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -328,6 +401,8 @@ mod tests {
             scene: "test::scene".into(),
             condition: None,
             weight: 0,
+            once_only: false,
+            trigger: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -351,11 +426,15 @@ mod tests {
                 scene: "test::scene_a".into(),
                 condition: None,
                 weight: 5,
+                once_only: false,
+                trigger: None,
             },
             ScheduleEvent {
                 scene: "test::scene_b".into(),
                 condition: None,
                 weight: 5,
+                once_only: false,
+                trigger: None,
             },
         ];
         let mut slots = HashMap::new();
@@ -381,5 +460,66 @@ mod tests {
         assert!(scheduler
             .pick("anything", &world, &registry, &mut rng)
             .is_none());
+    }
+
+    #[test]
+    fn once_only_event_filtered_after_flag_set() {
+        let registry = PackRegistry::new();
+        let event = ScheduleEvent {
+            scene: "test::once_scene".into(),
+            condition: None,
+            weight: 10,
+            once_only: true,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("test_slot".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+
+        // Before flag is set — should pick the scene
+        let mut world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+        let result = scheduler.pick("test_slot", &world, &registry, &mut rng);
+        assert!(
+            result.is_some(),
+            "once_only event should be eligible before flag is set"
+        );
+
+        // Set the ONCE_ flag
+        world.game_data.set_flag("ONCE_test::once_scene");
+
+        // After flag is set — should be filtered out
+        let mut rng2 = SmallRng::seed_from_u64(42);
+        let result2 = scheduler.pick("test_slot", &world, &registry, &mut rng2);
+        assert!(
+            result2.is_none(),
+            "once_only event should be excluded after ONCE_ flag is set"
+        );
+    }
+
+    #[test]
+    fn pick_result_includes_once_only() {
+        let registry = PackRegistry::new();
+        let event = ScheduleEvent {
+            scene: "test::flagged_scene".into(),
+            condition: None,
+            weight: 10,
+            once_only: true,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("test_slot".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let result = scheduler
+            .pick("test_slot", &world, &registry, &mut rng)
+            .unwrap();
+        assert!(
+            result.once_only,
+            "PickResult.once_only should be true for a once_only event"
+        );
+        assert_eq!(result.scene_id, "test::flagged_scene");
     }
 }

@@ -1,5 +1,8 @@
 use thiserror::Error;
-use undone_domain::{ArousalLevel, FemaleNpcKey, LikingLevel, LoveLevel, MaleNpcKey, SkillValue};
+use undone_domain::{
+    AlcoholLevel, ArousalLevel, AttractionLevel, Behaviour, FemaleNpcKey, LikingLevel, LoveLevel,
+    MaleNpcKey, NpcKey, RelationshipStatus, SkillValue,
+};
 use undone_expr::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
@@ -24,6 +27,12 @@ pub enum EffectError {
     UnknownSkill(String),
     #[error("unknown stat '{0}'")]
     UnknownStat(String),
+    #[error("unknown stuff item '{0}'")]
+    UnknownStuff(String),
+    #[error("unknown relationship status '{0}'")]
+    UnknownRelationshipStatus(String),
+    #[error("unknown behaviour '{0}'")]
+    UnknownBehaviour(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -63,6 +72,53 @@ fn step_arousal(current: ArousalLevel, delta: i8) -> ArousalLevel {
     ];
     let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
+}
+
+fn step_attraction(current: AttractionLevel, delta: i8) -> AttractionLevel {
+    const LEVELS: [AttractionLevel; 4] = [
+        AttractionLevel::Unattracted,
+        AttractionLevel::Ok,
+        AttractionLevel::Attracted,
+        AttractionLevel::Lust,
+    ];
+    let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
+    LEVELS[(idx + delta as i32).clamp(0, 3) as usize]
+}
+
+fn step_alcohol(current: AlcoholLevel, delta: i8) -> AlcoholLevel {
+    const LEVELS: [AlcoholLevel; 5] = [
+        AlcoholLevel::Sober,
+        AlcoholLevel::Tipsy,
+        AlcoholLevel::Drunk,
+        AlcoholLevel::VeryDrunk,
+        AlcoholLevel::MaxDrunk,
+    ];
+    let idx = LEVELS.iter().position(|&l| l == current).unwrap_or(0) as i32;
+    LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
+}
+
+fn parse_relationship_status(s: &str) -> Option<RelationshipStatus> {
+    match s {
+        "Stranger" => Some(RelationshipStatus::Stranger),
+        "Acquaintance" => Some(RelationshipStatus::Acquaintance),
+        "Friend" => Some(RelationshipStatus::Friend),
+        "Partner" => Some(RelationshipStatus::Partner { cohabiting: false }),
+        "PartnerCohabiting" => Some(RelationshipStatus::Partner { cohabiting: true }),
+        "Married" => Some(RelationshipStatus::Married),
+        "Ex" => Some(RelationshipStatus::Ex),
+        _ => None,
+    }
+}
+
+fn parse_behaviour(s: &str) -> Option<Behaviour> {
+    match s {
+        "Neutral" => Some(Behaviour::Neutral),
+        "Romantic" => Some(Behaviour::Romantic),
+        "Mean" => Some(Behaviour::Mean),
+        "Cold" => Some(Behaviour::Cold),
+        "Faking" => Some(Behaviour::Faking),
+        _ => None,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -116,7 +172,12 @@ pub fn apply_effect(
             let tid = registry
                 .resolve_trait(trait_id)
                 .map_err(|_| EffectError::UnknownTrait(trait_id.clone()))?;
-            world.player.traits.insert(tid);
+            if let Some(conflict_msg) = registry.check_trait_conflict(&world.player.traits, tid) {
+                eprintln!("[effect] trait conflict: {}", conflict_msg);
+                // Skip the effect — don't add the conflicting trait
+            } else {
+                world.player.traits.insert(tid);
+            }
         }
         EffectDef::RemoveTrait { trait_id } => {
             let tid = registry
@@ -187,6 +248,119 @@ pub fn apply_effect(
                     let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
                     npc_data.core.traits.insert(tid);
                 }
+            }
+        }
+        EffectDef::AddStuff { item } => {
+            let stuff_id = registry
+                .resolve_stuff(item)
+                .ok_or_else(|| EffectError::UnknownStuff(item.clone()))?;
+            world.player.stuff.insert(stuff_id);
+        }
+        EffectDef::RemoveStuff { item } => {
+            let stuff_id = registry
+                .resolve_stuff(item)
+                .ok_or_else(|| EffectError::UnknownStuff(item.clone()))?;
+            world.player.stuff.remove(&stuff_id);
+        }
+        EffectDef::SetRelationship { npc, status } => {
+            let parsed = parse_relationship_status(status)
+                .ok_or_else(|| EffectError::UnknownRelationshipStatus(status.clone()))?;
+            match resolve_npc_ref(npc, ctx)? {
+                NpcRef::Male(key) => {
+                    let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.relationship = parsed;
+                }
+                NpcRef::Female(key) => {
+                    let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.relationship = parsed;
+                }
+            }
+        }
+        EffectDef::SetNpcAttraction { npc, delta } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_attraction =
+                    step_attraction(npc_data.core.npc_attraction, *delta);
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.npc_attraction =
+                    step_attraction(npc_data.core.npc_attraction, *delta);
+            }
+        },
+        EffectDef::SetNpcBehaviour { npc, behaviour } => {
+            let parsed = parse_behaviour(behaviour)
+                .ok_or_else(|| EffectError::UnknownBehaviour(behaviour.clone()))?;
+            match resolve_npc_ref(npc, ctx)? {
+                NpcRef::Male(key) => {
+                    let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.behaviour = parsed;
+                }
+                NpcRef::Female(key) => {
+                    let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                    npc_data.core.behaviour = parsed;
+                }
+            }
+        }
+        EffectDef::SetContactable { npc, value } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.contactable = *value;
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.contactable = *value;
+            }
+        },
+        EffectDef::AddSexualActivity { npc, activity } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.sexual_activities.insert(activity.clone());
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.sexual_activities.insert(activity.clone());
+            }
+        },
+        EffectDef::SetPlayerPartner { npc } => {
+            let npc_key = match resolve_npc_ref(npc, ctx)? {
+                NpcRef::Male(key) => NpcKey::Male(key),
+                NpcRef::Female(key) => NpcKey::Female(key),
+            };
+            world.player.partner = Some(npc_key);
+        }
+        EffectDef::AddPlayerFriend { npc } => {
+            let npc_key = match resolve_npc_ref(npc, ctx)? {
+                NpcRef::Male(key) => NpcKey::Male(key),
+                NpcRef::Female(key) => NpcKey::Female(key),
+            };
+            if !world.player.friends.contains(&npc_key) {
+                world.player.friends.push(npc_key);
+            }
+        }
+        EffectDef::SetJobTitle { title } => {
+            world.game_data.job_title = title.clone();
+        }
+        EffectDef::ChangeAlcohol { delta } => {
+            world.player.alcohol = step_alcohol(world.player.alcohol, *delta);
+        }
+        EffectDef::SetVirgin { value, virgin_type } => match virgin_type.as_deref() {
+            None | Some("vaginal") => {
+                world.player.virgin = *value;
+            }
+            Some("anal") => {
+                world.player.anal_virgin = *value;
+            }
+            Some("lesbian") => {
+                world.player.lesbian_virgin = *value;
+            }
+            Some(other) => {
+                eprintln!("[effect] set_virgin: unknown virgin_type '{}'", other);
+            }
+        },
+        EffectDef::AdvanceTime { slots } => {
+            for _ in 0..*slots {
+                world.game_data.advance_time_slot();
             }
         }
         EffectDef::Transition { .. } => {
@@ -276,9 +450,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -565,5 +744,170 @@ mod tests {
         )
         .unwrap();
         assert_eq!(world.female_npcs[key].core.npc_liking, LikingLevel::Ok);
+    }
+
+    #[test]
+    fn add_stuff_works() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let mut reg = PackRegistry::new();
+        // intern the item so resolve_stuff can find it
+        reg.intern_stuff("CONDOMS");
+        apply_effect(
+            &EffectDef::AddStuff {
+                item: "CONDOMS".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        let stuff_id = reg.resolve_stuff("CONDOMS").unwrap();
+        assert!(world.player.stuff.contains(&stuff_id));
+    }
+
+    #[test]
+    fn remove_stuff_works() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let mut reg = PackRegistry::new();
+        reg.intern_stuff("CONDOMS");
+        // add it first
+        apply_effect(
+            &EffectDef::AddStuff {
+                item: "CONDOMS".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        let stuff_id = reg.resolve_stuff("CONDOMS").unwrap();
+        assert!(world.player.stuff.contains(&stuff_id));
+        // now remove it
+        apply_effect(
+            &EffectDef::RemoveStuff {
+                item: "CONDOMS".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(!world.player.stuff.contains(&stuff_id));
+    }
+
+    #[test]
+    fn set_job_title_works() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new();
+        apply_effect(
+            &EffectDef::SetJobTitle {
+                title: "Barista".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.game_data.job_title, "Barista");
+    }
+
+    #[test]
+    fn change_alcohol_steps_up() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new();
+        // world starts Sober, delta 1 → Tipsy
+        apply_effect(
+            &EffectDef::ChangeAlcohol { delta: 1 },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.player.alcohol, AlcoholLevel::Tipsy);
+    }
+
+    #[test]
+    fn set_virgin_works() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new();
+        assert!(world.player.virgin);
+        apply_effect(
+            &EffectDef::SetVirgin {
+                value: false,
+                virgin_type: None,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(!world.player.virgin);
+    }
+
+    #[test]
+    fn advance_time_works() {
+        use undone_domain::TimeSlot;
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new();
+        assert_eq!(world.game_data.time_slot, TimeSlot::Morning);
+        apply_effect(
+            &EffectDef::AdvanceTime { slots: 1 },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.game_data.time_slot, TimeSlot::Afternoon);
+    }
+
+    #[test]
+    fn set_npc_attraction_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        // starts Unattracted, delta 1 → Ok
+        apply_effect(
+            &EffectDef::SetNpcAttraction {
+                npc: "m".into(),
+                delta: 1,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(
+            world.male_npcs[key].core.npc_attraction,
+            AttractionLevel::Ok
+        );
+    }
+
+    #[test]
+    fn set_contactable_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert!(world.male_npcs[key].core.contactable);
+        apply_effect(
+            &EffectDef::SetContactable {
+                npc: "m".into(),
+                value: false,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(!world.male_npcs[key].core.contactable);
     }
 }

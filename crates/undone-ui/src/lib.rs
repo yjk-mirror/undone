@@ -184,11 +184,11 @@ pub fn app_view() -> impl View {
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
                                     if let Some(slot) = default_slot.as_deref() {
-                                        if let Some(scene_id) =
+                                        if let Some(result) =
                                             scheduler.pick(slot, world, registry, rng)
                                         {
                                             engine.send(
-                                                EngineCommand::StartScene(scene_id),
+                                                EngineCommand::StartScene(result.scene_id),
                                                 world,
                                                 registry,
                                             );
@@ -388,6 +388,10 @@ pub fn process_events(
                 signals.actions.set(vec![]);
                 scene_finished = true;
             }
+            EngineEvent::SlotRequested(_slot) => {
+                // Slot routing is handled by the caller (left_panel dispatch);
+                // the UI event processor ignores it here.
+            }
             EngineEvent::ErrorOccurred(msg) => {
                 signals.story.update(|s| {
                     if !s.is_empty() {
@@ -428,9 +432,14 @@ mod tests {
             name_fem: "Eva".into(),
             name_androg: "Ev".into(),
             name_masc: "Evan".into(),
-            before_age: 30,
-            before_race: "white".into(),
-            before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+            before: Some(BeforeIdentity {
+                name: "Evan".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                sexuality: BeforeSexuality::AttractedToWomen,
+                figure: MaleFigure::Average,
+                traits: HashSet::new(),
+            }),
             age: Age::LateTeen,
             race: "white".into(),
             figure: PlayerFigure::Slim,
