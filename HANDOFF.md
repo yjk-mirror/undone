@@ -2,12 +2,11 @@
 
 ## Current State
 
-**Branch:** `engine-routes-foundation` (pending merge to master)
-**Tests:** 197 passing, 0 failures.
-**Remote:** not yet pushed on this branch.
-**App:** Character creation → gameplay loop working. Two-step "Your Past" flow. Four PC origin types. Engine routes foundation complete: check system (percentile-based, red/white, cached rolls), arc system (arc_states in GameData, AdvanceArc/FailRedCheck effects), thought system ([[thoughts]] blocks, ThoughtAdded event, inner_voice/anxiety styles), narrator variants ([[intro_variants]] conditional intro replacement), NPC roles (roles HashSet on NpcCore, hasRole() evaluator, SetNpcRole effect), validate-pack binary (content error checker), route flags (starting_flags/starting_arc_states in CharCreationConfig). Full prose template context (getSkill, getMoney, getStress, timeSlot, wasTransformed, etc.).
-**Content:** 14 scenes total (4 universal + 5 Robin opening arc + 5 Camila opening arc). Two character routes implemented: ROUTE_ROBIN (robin_arrival → robin_landlord → robin_first_night → robin_first_clothes → robin_first_day) and ROUTE_CAMILA (camila_arrival → camila_dorm → camila_orientation → camila_library → camila_call_raul).
-**Docs:** docs/world.md (canonical world reference), docs/characters/robin.md, docs/characters/camila.md, docs/arcs/robin-opening.md, docs/arcs/camila-opening.md, docs/writing-samples.md (quality calibration, 6 annotated samples).
+**Branch:** `master`
+**Tests:** 198 passing, 0 failures.
+**App:** 3-phase character creation working end-to-end: BeforeCreation form → TransformationIntro scene → FemCreation form → InGame. Four PC origins. AlwaysFemale skips TransformationIntro. Engine routes foundation complete: check system, arc system, thought system, narrator variants, NPC roles, validate-pack binary, route flags. Full prose template context.
+**Content:** 15 scenes total (4 universal + 5 Robin opening arc + 5 Camila opening arc + transformation_intro). Two character routes: ROUTE_ROBIN and ROUTE_CAMILA.
+**Docs:** docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Writing guide updated with AI-ism anti-patterns (staccato declaratives, over-naming) and BG3 narrator reference.
 **Tools:** Same as before — all 5 MCP servers in tools/ workspace.
 **MCPs:** All MCP config is cross-platform — no hardcoded absolute paths.
 
@@ -15,7 +14,7 @@
 
 ## ⚡ Next Action
 
-**Merge engine-routes-foundation to master**, then: second-week scenes for both routes, or a dedicated Robin NPC arc (the landlord as recurring character, the coworker Dan, etc.).
+**Prose revision pass** — both `rain_shelter` and `transformation_intro` have AI-ism issues (staccato, em-dash reveals, over-naming). Rewrite using BG3 narrator standard (dry, plain, trusts the scene). Or: second-week scenes for Robin/Camila routes.
 
 ---
 
@@ -100,22 +99,6 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 ## Open Items — Future Sessions
 
-### Character Creation — Needs Redesign (Medium)
-
-The current form is still a stat-picker upfront. The correct flow is:
-
-1. **Create the male character** — name, age, personality traits
-2. **Play an intro scene** as that character (pre-transformation)
-3. **Transformation event fires** mid-scene
-4. **Female customization appears in-game** — name, figure, etc. as part of the narrative moment
-
-The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and all the female character stats (feminine name, figure, breasts) should move out of the upfront form and into the transformation flow. Char creation should only capture the *before* state.
-
-**Remaining small items:**
-- Trait checkbox UX: clicking label text should toggle checkbox (currently drag-selects)
-- Age before transition: should be a dropdown, not a text input
-- Form density: too tall for 800px window; tighter spacing or two-column layout
-
 ### UI Polish (Small-Medium)
 - **Detail strip hover highlight**: Brief unwanted background highlight in Warm theme on first hover (floem default style leak — partially fixed with explicit hover/focus overrides)
 - **Choice button positioning**: Consider better visual balance between prose area and choices
@@ -165,3 +148,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | Engine foundation: 9 tasks from `docs/plans/2026-02-23-engine-foundation.md` (Sessions A/B/C, D deferred). Batch 1 (sequential): BeforeIdentity struct (domain), trait groups/conflicts (domain+packs), categories system (domain+packs+expr), TimeSlot enum (domain+world+scene). Batch 2 (4 parallel agents): 25+ evaluator methods (expr), 13 new effect types (scene/effects+types), slot routing + once_only/trigger scheduler (scene/engine+scheduler), save v3 with v2→v3 migration (save). Cross-agent integration: fixed PickResult type mismatch in UI (scheduler.pick() now returns PickResult), added SlotRequested event handler. Task 9: hub scene plan_your_day.toml, schedule.toml updates. 28 files changed, +1709/-118 lines. 153 tests (29 new), 0 failures. Merged to master (--no-ff). |
 | 2026-02-24 | Engine foundation audit: 4 parallel audit agents reviewed all crates against plan. 15 findings (4 HIGH, 2 MED, 6 LOW, 3 NOTE). 3 parallel fix agents resolved 10 issues: CategoryType String→enum (data.rs+eval.rs), SetVirgin unknown type → error (effects.rs), LateTwenties added to AGE_YOUNG (categories.toml), MaleFigure Display impl (enums.rs), test rename v2→v3 (save), redundant check_triggers guard removed (scheduler.rs), 16 new tests (inCategory, beforeInCategory, check_triggers, 5 NPC effects, before=None paths). 5 findings resolved without code changes (deferred or not bugs). CLAUDE.md updated: background agents must not run cargo build/check/test (file lock contention). 169 tests, 0 failures. |
 | 2026-02-24 | Engine routes foundation: 28-task plan (worktree: engine-routes-foundation). Engine: skill roll cache (RefCell<HashMap> in SceneCtx), checkSkill/checkSkillRed evaluator methods (percentile, clamped 5–95), arc_states + red_check_failures in GameData, arcState/arcStarted/arcAdvanced evaluator methods, full prose template context (getSkill/getMoney/getStress/timeSlot/wasTransformed etc.), thought system ([[thoughts]] → ThoughtAdded event, inner_voice/anxiety styles), narrator variants ([[intro_variants]] conditional intro replacement), arc effects (AdvanceArc/SetNpcRole/FailRedCheck), NPC roles (roles field on NpcCore, hasRole() evaluator), arc data format (arcs.toml, ArcDef, registry), route flags (starting_flags/starting_arc_states in CharCreationConfig), validate-pack binary. Docs: docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Content: Robin arc (5 scenes: robin_arrival, robin_landlord, robin_first_night, robin_first_clothes, robin_first_day), Camila arc (5 scenes: camila_arrival, camila_dorm, camila_orientation, camila_library, camila_call_raul). 14 total scenes. 197 tests, 0 failures. |
+| 2026-02-24 | Char creation redesign: 10-task plan (worktree: char-creation-redesign). AppPhase expanded to 4 variants (BeforeCreation/TransformationIntro/FemCreation/InGame). PartialCharState accumulates before-choices. PackRegistry+Scheduler derive Clone (throwaway world for intro scene). transformation_scene field in manifest/registry/loader. char_creation_view (BeforeCreation) + fem_creation_view (FemCreation). TransformationIntro phase runs transformation_intro scene against throwaway world. dispatch_action phase check transitions scene-finish → FemCreation. AlwaysFemale skips TransformationIntro. transformation_intro.toml scene with CisMale/TransWoman voice branches. Writing guide: AI-ism anti-patterns (staccato declaratives, over-naming), BG3 narrator reference. dev/CLAUDE.md skill overrides: finishing-a-development-branch auto-merges (no options prompt). 198 tests, 0 failures. |
