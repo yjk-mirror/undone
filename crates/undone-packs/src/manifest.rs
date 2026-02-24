@@ -18,6 +18,8 @@ pub struct PackMeta {
     pub opening_scene: Option<String>,
     #[serde(default)]
     pub default_slot: Option<String>,
+    #[serde(default)]
+    pub transformation_scene: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

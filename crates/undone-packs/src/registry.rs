@@ -31,6 +31,7 @@ pub struct PackRegistry {
     arcs: HashMap<String, ArcDef>,
     opening_scene: Option<String>,
     default_slot: Option<String>,
+    transformation_scene: Option<String>,
 }
 
 impl PackRegistry {
@@ -47,6 +48,7 @@ impl PackRegistry {
             arcs: HashMap::new(),
             opening_scene: None,
             default_slot: None,
+            transformation_scene: None,
         }
     }
 
@@ -259,6 +261,19 @@ impl PackRegistry {
     /// Return the default scheduler slot declared by the pack, if any.
     pub fn default_slot(&self) -> Option<&str> {
         self.default_slot.as_deref()
+    }
+
+    /// Set the transformation scene ID for the first pack that declares one.
+    /// Subsequent packs cannot override it (first-writer wins).
+    pub fn set_transformation_scene(&mut self, id: String) {
+        if self.transformation_scene.is_none() {
+            self.transformation_scene = Some(id);
+        }
+    }
+
+    /// Return the transformation scene ID declared by the pack, if any.
+    pub fn transformation_scene(&self) -> Option<&str> {
+        self.transformation_scene.as_deref()
     }
 
     /// Return all interned strings in Spur-index order (index 0 first).
