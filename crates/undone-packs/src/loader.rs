@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use thiserror::Error;
 
 use crate::{
-    data::{CategoriesFile, NpcTraitFile, SkillFile, TraitFile},
+    data::{ArcsFile, CategoriesFile, NpcTraitFile, SkillFile, TraitFile},
     manifest::PackManifest,
     registry::PackRegistry,
 };
@@ -146,6 +146,16 @@ fn load_one_pack(
         registry.register_categories(categories_file.category);
     }
 
+    if let Some(ref arcs_rel) = manifest.content.arcs_file {
+        let arcs_path = pack_dir.join(arcs_rel);
+        let src = read_file(&arcs_path)?;
+        let arcs_file: ArcsFile = toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+            path: arcs_path.clone(),
+            message: e.to_string(),
+        })?;
+        registry.register_arcs(arcs_file.arc);
+    }
+
     Ok(LoadedPackMeta {
         manifest,
         pack_dir: pack_dir.to_path_buf(),
@@ -247,5 +257,18 @@ mod tests {
     fn base_pack_has_default_slot() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         assert_eq!(registry.default_slot(), Some("free_time"));
+    }
+
+    #[test]
+    fn loads_base_pack_arcs() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        let arc = registry.get_arc("base::robin_opening");
+        assert!(
+            arc.is_some(),
+            "base::robin_opening arc should be registered"
+        );
+        let arc = arc.unwrap();
+        assert!(arc.states.contains(&"arrived".to_string()));
+        assert!(arc.states.contains(&"working".to_string()));
     }
 }

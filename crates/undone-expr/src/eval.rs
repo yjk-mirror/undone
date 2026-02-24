@@ -357,6 +357,10 @@ pub fn eval_call_bool(
                     let flag = str_arg(0)?;
                     Ok(npc.core.relationship_flags.contains(flag))
                 }
+                "hasRole" => {
+                    let role = str_arg(0)?;
+                    Ok(npc.core.roles.contains(role))
+                }
                 _ => Err(EvalError::UnknownMethod {
                     receiver: "m".into(),
                     method: call.method.clone(),
@@ -403,6 +407,10 @@ pub fn eval_call_bool(
                 "hasFlag" => {
                     let flag = str_arg(0)?;
                     Ok(npc.core.relationship_flags.contains(flag))
+                }
+                "hasRole" => {
+                    let role = str_arg(0)?;
+                    Ok(npc.core.roles.contains(role))
                 }
                 _ => Err(EvalError::UnknownMethod {
                     receiver: "f".into(),

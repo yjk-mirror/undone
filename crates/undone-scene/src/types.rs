@@ -210,6 +210,18 @@ pub enum EffectDef {
     AdvanceTime {
         slots: u32,
     },
+    AdvanceArc {
+        arc: String,
+        to_state: String,
+    },
+    SetNpcRole {
+        /// "m" or "f"
+        npc: String,
+        role: String,
+    },
+    FailRedCheck {
+        skill: String,
+    },
 }
 
 // ---------------------------------------------------------------------------

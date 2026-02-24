@@ -211,6 +211,7 @@ fn make_core(
         contactable: false,
         arousal: ArousalLevel::Comfort,
         alcohol: AlcoholLevel::Sober,
+        roles: HashSet::new(),
     }
 }
 

@@ -36,6 +36,9 @@ pub struct NpcCore {
     pub contactable: bool,
     pub arousal: ArousalLevel,
     pub alcohol: AlcoholLevel,
+
+    #[serde(default)]
+    pub roles: HashSet<String>, // route role assignments e.g. "ROLE_LANDLORD"
 }
 
 impl NpcCore {

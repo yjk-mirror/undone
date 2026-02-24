@@ -1,0 +1,9 @@
+[[arc]]
+id            = "base::robin_opening"
+states        = ["arrived", "week_one", "working", "settled"]
+initial_state = "arrived"
+
+[[arc]]
+id            = "base::camila_opening"
+states        = ["arrived", "orientation", "dorm_life", "first_week"]
+initial_state = "arrived"

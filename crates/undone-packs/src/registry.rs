@@ -4,7 +4,7 @@ use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
 use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, StuffId, TraitId};
 
-use crate::data::{CategoryDef, NpcTraitDef, SkillDef, StatDef, TraitDef};
+use crate::data::{ArcDef, CategoryDef, NpcTraitDef, SkillDef, StatDef, TraitDef};
 
 #[derive(Debug, Error)]
 pub enum RegistryError {
@@ -28,6 +28,7 @@ pub struct PackRegistry {
     female_names: Vec<String>,
     races: Vec<String>,
     categories: HashMap<String, CategoryDef>,
+    arcs: HashMap<String, ArcDef>,
     opening_scene: Option<String>,
     default_slot: Option<String>,
 }
@@ -43,6 +44,7 @@ impl PackRegistry {
             female_names: Vec::new(),
             races: Vec::new(),
             categories: HashMap::new(),
+            arcs: HashMap::new(),
             opening_scene: None,
             default_slot: None,
         }
@@ -219,6 +221,18 @@ impl PackRegistry {
     /// Get a category definition by ID.
     pub fn get_category(&self, id: &str) -> Option<&CategoryDef> {
         self.categories.get(id)
+    }
+
+    /// Register arc definitions from a pack data file.
+    pub fn register_arcs(&mut self, arcs: Vec<ArcDef>) {
+        for arc in arcs {
+            self.arcs.insert(arc.id.clone(), arc);
+        }
+    }
+
+    /// Look up an arc definition by ID.
+    pub fn get_arc(&self, id: &str) -> Option<&ArcDef> {
+        self.arcs.get(id)
     }
 
     /// Set the opening scene ID for the first pack that declares one.
