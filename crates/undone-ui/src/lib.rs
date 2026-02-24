@@ -18,7 +18,7 @@ use undone_domain::SkillId;
 use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
-use crate::char_creation::char_creation_view;
+use crate::char_creation::{char_creation_view, fem_creation_view};
 use crate::game_state::{init_game, GameState, PreGameState};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
@@ -36,8 +36,21 @@ pub enum AppTab {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum AppPhase {
-    CharCreation,
+    BeforeCreation,
+    TransformationIntro,
+    FemCreation,
     InGame,
+}
+
+/// Accumulated choices from BeforeCreation, passed forward to FemCreation.
+#[derive(Clone)]
+pub struct PartialCharState {
+    pub origin: undone_domain::PcOrigin,
+    pub before_name: String,
+    pub before_age: undone_domain::Age,
+    pub before_race: String,
+    pub before_sexuality: undone_domain::BeforeSexuality,
+    pub starting_traits: Vec<undone_domain::TraitId>,
 }
 
 /// All reactive signals used by the view tree.
@@ -68,7 +81,7 @@ impl AppSignals {
             active_npc: RwSignal::new(None),
             prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
-            phase: RwSignal::new(AppPhase::CharCreation),
+            phase: RwSignal::new(AppPhase::BeforeCreation),
             scroll_gen: RwSignal::new(0),
         }
     }
@@ -132,6 +145,9 @@ pub fn app_view() -> impl View {
     let pre_state: Rc<RefCell<Option<PreGameState>>> = Rc::new(RefCell::new(Some(init_game())));
     let game_state: Rc<RefCell<Option<GameState>>> = Rc::new(RefCell::new(None));
 
+    // Accumulates choices across the three-phase creation flow.
+    let partial_char: RwSignal<Option<PartialCharState>> = RwSignal::new(None);
+
     // Surface pack-load errors in the story panel immediately (shown when we transition to InGame).
     {
         let ps = pre_state.borrow();
@@ -151,10 +167,63 @@ pub fn app_view() -> impl View {
     let content = dyn_container(
         move || phase.get(),
         move |current_phase| match current_phase {
-            AppPhase::CharCreation => {
-                char_creation_view(signals, Rc::clone(&pre_state_cc), Rc::clone(&game_state_cc))
-                    .into_any()
+            AppPhase::BeforeCreation => char_creation_view(
+                signals,
+                Rc::clone(&pre_state_cc),
+                Rc::clone(&game_state_cc),
+                partial_char,
+            )
+            .into_any(),
+            AppPhase::TransformationIntro => {
+                // Start the transformation_intro scene against the throwaway world
+                // (created in the "Next" button handler in char_creation.rs).
+                let gs_ref = Rc::clone(&game_state_ig);
+                {
+                    let mut gs_opt = gs_ref.borrow_mut();
+                    if let Some(ref mut gs) = *gs_opt {
+                        if let Ok(fem_id) = gs.registry.resolve_skill("FEMININITY") {
+                            let GameState {
+                                ref mut engine,
+                                ref mut world,
+                                ref registry,
+                                ..
+                            } = *gs;
+                            if let Some(scene_id) = registry.transformation_scene() {
+                                let scene_id = scene_id.to_owned();
+                                engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                            }
+                            let events = engine.drain();
+                            process_events(events, signals, world, fem_id);
+                        }
+                    }
+                }
+
+                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                    Some(gs) => gs,
+                    None => {
+                        return placeholder_panel(
+                            "Transformation intro: game state missing",
+                            signals,
+                        )
+                        .into_any();
+                    }
+                };
+                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                h_stack((
+                    sidebar_panel(signals),
+                    story_panel(signals, Rc::clone(&gs_cell)),
+                ))
+                .style(|s| s.size_full())
+                .into_any()
             }
+            AppPhase::FemCreation => fem_creation_view(
+                signals,
+                Rc::clone(&pre_state_cc),
+                Rc::clone(&game_state_cc),
+                partial_char,
+            )
+            .into_any(),
             AppPhase::InGame => {
                 // On first transition to InGame, start the opening scene.
                 let gs_ref = Rc::clone(&game_state_ig);

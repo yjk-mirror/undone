@@ -26,6 +26,10 @@ It sits somewhere between a wry novel and someone telling you exactly what happe
 The narrator notices things. It has opinions but doesn't editorialize directly. Casual-to-
 conversational without being sloppy.
 
+**Reference voice: the BG3 narrator.** Dry. Present-tense. Second-person. Wry. Matter-of-fact.
+Trusts the scene. Doesn't signal significance before the moment earns it. Plain English. Nothing
+artistic. Nothing performative. Just what happened, with occasional dry observation.
+
 ---
 
 ## POV and Tense
@@ -297,6 +301,27 @@ can stay awkward. The world doesn't owe the player a tidy conclusion.
 | "She moaned softly" | Default; every encounter doesn't sound the same |
 | "He looked at her hungrily" | Stock phrase; what does hungry look like on *this* man |
 | "She was lost in the moment" | Abstraction where the moment itself should be |
+
+### 9. Staccato declaratives for dramatic effect
+
+The single biggest AI prose tell. Using sentence structure to signal importance.
+
+- ❌ Single-sentence pause drops: "He grabs the counter."
+- ❌ Anaphoric repetition: "It happens fast. It happens the way a mirror breaks."
+- ❌ Em-dash reveals: "Not danger, exactly — more like being *placed*."
+- ❌ Trailing staccato closers: "The city goes on."
+- ✅ Say the thing. The weight comes from the event, not from how the sentence sits on the page.
+
+**Test:** read it aloud. If it sounds like a movie trailer voiceover, rewrite it.
+
+### 10. Over-naming experiences
+
+The narrator names the emotional category instead of showing the thing.
+
+- ❌ "the universal stranger-in-shared-misery nod" — labelling it, not showing it
+- ❌ "There's a specific quality to being looked at by a strange man in a small space." — announcing significance before delivering it
+- ❌ "more like being *placed*" — italicised coinage in place of observation
+- ✅ Show the nod. Show the look. The reader names it themselves.
 
 ---
 

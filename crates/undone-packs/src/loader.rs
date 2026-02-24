@@ -77,6 +77,9 @@ fn load_one_pack(
     if let Some(ref slot) = manifest.pack.default_slot {
         registry.set_default_slot(slot.clone());
     }
+    if let Some(ref scene) = manifest.pack.transformation_scene {
+        registry.set_transformation_scene(scene.clone());
+    }
 
     let traits_path = pack_dir.join(&manifest.content.traits);
     let src = read_file(&traits_path)?;
@@ -257,6 +260,15 @@ mod tests {
     fn base_pack_has_default_slot() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         assert_eq!(registry.default_slot(), Some("free_time"));
+    }
+
+    #[test]
+    fn base_pack_has_transformation_scene() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert_eq!(
+            registry.transformation_scene(),
+            Some("base::transformation_intro")
+        );
     }
 
     #[test]
