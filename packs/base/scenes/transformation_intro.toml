@@ -1,0 +1,39 @@
+[scene]
+id          = "base::transformation_intro"
+pack        = "base"
+description = "The moment before everything changed."
+
+[intro]
+prose = """
+Tuesday morning. The alarm goes off at seven like it always does.
+
+{% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+She's been getting up at seven for three years. The body that gets up is wrong in the specific ways she has learned to catalog — the broad line of the shoulders, the flat chest, the way the jaw sits in the mirror. She knows the list by heart. She is very tired of knowing it.
+
+She is putting on a shirt she has worn a hundred times when something happens that she does not have words for yet. It happens fast. It happens the way a held breath finally releases.
+
+She sits down on the edge of the bed.
+
+Something is different. Everything is different. She puts a hand to her face. Her face is different. She is *shaking* but it isn't fear — or it isn't only fear.
+
+*Oh*, she thinks. *Oh. There you are.*
+{% else %}
+He gets up. Makes coffee. Stands in the kitchen looking at nothing, which is how most mornings go.
+
+He is putting on a jacket he has owned since college when something happens that he has no frame for. It happens fast. It happens the way a mirror breaks — not slowly, all at once. The jacket no longer fits the way it should. Nothing fits the way it should. The body he is standing in is not the body he had three seconds ago.
+
+He grabs the counter.
+
+He is not catastrophizing. He is not still asleep. Something real has happened and he has no language for it and the coffee is still warm and the world outside the window is exactly the same as it was and *he* is not.
+{% endif %}
+{% endif %}
+"""
+
+[[actions]]
+id     = "continue"
+label  = "Continue"
+detail = "The city outside is the same. You are not."
+
+  [[actions.next]]
+  finish = true
