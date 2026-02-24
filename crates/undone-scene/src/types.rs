@@ -5,10 +5,37 @@ use serde::Deserialize;
 pub struct SceneToml {
     pub scene: SceneMeta,
     pub intro: IntroDef,
+    /// Optional narrator variants. First passing condition replaces the base intro.
+    #[serde(default)]
+    pub intro_variants: Vec<NarratorVariantDef>,
+    /// Thoughts that fire automatically after the intro, based on conditions.
+    #[serde(default)]
+    pub thoughts: Vec<ThoughtDef>,
     #[serde(default)]
     pub actions: Vec<ActionDef>,
     #[serde(default)]
     pub npc_actions: Vec<NpcActionDef>,
+}
+
+/// A narrator variant: replaces the base intro when its condition passes.
+#[derive(Debug, Deserialize, Clone)]
+pub struct NarratorVariantDef {
+    pub condition: String,
+    pub prose: String,
+}
+
+/// A thought block: fires automatically (optionally conditioned) with a style tag.
+#[derive(Debug, Deserialize, Clone)]
+pub struct ThoughtDef {
+    pub condition: Option<String>,
+    pub prose: String,
+    /// Visual style tag for the UI. "inner_voice" = italicised inner monologue.
+    #[serde(default = "default_thought_style")]
+    pub style: String,
+}
+
+fn default_thought_style() -> String {
+    "inner_voice".to_string()
 }
 
 #[derive(Debug, Deserialize)]
@@ -38,6 +65,9 @@ pub struct ActionDef {
     pub effects: Vec<EffectDef>,
     #[serde(default)]
     pub next: Vec<NextBranchDef>,
+    /// Thoughts fired after the action prose is displayed.
+    #[serde(default)]
+    pub thoughts: Vec<ThoughtDef>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -188,6 +218,21 @@ pub enum EffectDef {
 
 use undone_expr::parser::Expr;
 
+/// Resolved thought — condition pre-parsed, ready for runtime evaluation.
+#[derive(Debug, Clone)]
+pub struct Thought {
+    pub condition: Option<Expr>,
+    pub prose: String,
+    pub style: String,
+}
+
+/// Resolved narrator variant — condition pre-parsed.
+#[derive(Debug, Clone)]
+pub struct NarratorVariant {
+    pub condition: Expr,
+    pub prose: String,
+}
+
 /// Resolved action — conditions parsed, ready for runtime evaluation.
 #[derive(Debug, Clone)]
 pub struct Action {
@@ -199,6 +244,8 @@ pub struct Action {
     pub allow_npc_actions: bool,
     pub effects: Vec<EffectDef>,
     pub next: Vec<NextBranch>,
+    /// Thoughts displayed after the action prose.
+    pub thoughts: Vec<Thought>,
 }
 
 #[derive(Debug, Clone)]
@@ -224,6 +271,10 @@ pub struct SceneDefinition {
     pub id: String,
     pub pack: String,
     pub intro_prose: String,
+    /// Narrator variants evaluated at scene start; first match replaces intro_prose.
+    pub intro_variants: Vec<NarratorVariant>,
+    /// Thoughts fired after intro prose (before actions are shown).
+    pub intro_thoughts: Vec<Thought>,
     pub actions: Vec<Action>,
     pub npc_actions: Vec<NpcAction>,
 }

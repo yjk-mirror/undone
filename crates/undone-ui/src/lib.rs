@@ -388,6 +388,20 @@ pub fn process_events(
                 signals.actions.set(vec![]);
                 scene_finished = true;
             }
+            EngineEvent::ThoughtAdded { text, .. } => {
+                // Thoughts append to the story text. Style differentiation (italic,
+                // anxiety register, etc.) is deferred to the UI design session.
+                signals.story.update(|s| {
+                    if !s.is_empty() {
+                        s.push_str("\n\n");
+                    }
+                    s.push_str(&text);
+                });
+                let sg = signals.scroll_gen;
+                floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+                    sg.update(|n| *n += 1);
+                });
+            }
             EngineEvent::SlotRequested(_slot) => {
                 // Slot routing is handled by the caller (left_panel dispatch);
                 // the UI event processor ignores it here.
