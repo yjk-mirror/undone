@@ -13,19 +13,18 @@
 
 ## ⚡ Next Action
 
-Priority tasks:
-1. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
-2. **Settings tab UI** — expose font size, line height, theme mode, number key mode as interactive controls
-3. **Audit fixes** — silent stat effects, unbounded story string, free_time fallback, hardcoded race defaults
-4. **More scenes** — expand base pack content
+**Execute `docs/plans/2026-02-23-engineering-tasks-plan.md`** — 7 tasks covering keyboard controls, settings tab UI, and 6 audit fixes. Design doc: `docs/plans/2026-02-23-engineering-tasks-design.md`. No creative/content work.
+
+After that:
+- **More scenes** — expand base pack content
 
 ### Remaining audit findings (MEDIUM/LOW, non-blocking)
-- Hardcoded `"free_time"` fallback in `left_panel.rs` — should use `default_slot` (partially fixed, still has fallback)
+- Hardcoded `"free_time"` fallback in `story_panel.rs` — should use `default_slot` (partially fixed, still has fallback)
 - Silent stat effects in `engine.rs` `apply_effects()` — `set_stat`/`add_stat` silently ignore unknown stats
 - Unbounded `story` string in `SceneEngine` — no size limit on accumulated prose
 - Scheduler failure without UI feedback — errors logged to stderr but not surfaced to player
 - Hardcoded eye/hair/race defaults in `char_creation.rs` — should come from pack data
-- Engine logic in UI crate (`left_panel.rs` action dispatch) — should move to scene crate
+- Engine logic in UI crate (`story_panel.rs` action dispatch) — should move to scene crate
 
 ---
 
@@ -76,7 +75,7 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 - `crates/undone-ui/src/char_creation.rs` — character creation form (pre-game phase)
 - `crates/undone-ui/src/saves_panel.rs` — save/load/delete UI
 - `crates/undone-ui/src/title_bar.rs` — custom title bar, tab nav, window controls
-- `crates/undone-ui/src/left_panel.rs` — story panel, centered prose, detail strip, choices bar
+- `crates/undone-ui/src/story_panel.rs` — story panel, centered prose, detail strip, choices bar
 - `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
 - `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs, save/load prefs
 - `crates/undone-ui/src/game_state.rs` — PreGameState, GameState, init_game(), start_game()
