@@ -26,3 +26,42 @@ name = "free_time"
   weight    = 0
   trigger   = "gd.week() >= 2"
   once_only = true
+
+# ── Robin opening arc ────────────────────────────────────────────────
+
+[[slot]]
+name = "robin_opening"
+
+  [[slot.events]]
+  scene     = "base::robin_arrival"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_landlord"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && !gd.hasGameFlag('MET_LANDLORD')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && !gd.hasGameFlag('MET_LANDLORD')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_first_night"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'arrived'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'arrived'"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_first_clothes"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  weight    = 10
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_first_day"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  once_only = true

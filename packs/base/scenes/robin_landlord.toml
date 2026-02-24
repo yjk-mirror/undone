@@ -1,0 +1,129 @@
+[scene]
+id          = "base::robin_landlord"
+pack        = "base"
+description = "Robin meets her landlord. The lease, the ID, the voice that doesn't match the photo. She waits him out."
+
+[intro]
+prose = """
+The building has a buzzer panel with half the names missing. Hers isn't on it yet. She called ahead — last week, when she was still organizing the move, when the logistics were still the problem — and the landlord said come by Saturday afternoon, he'd be around.
+
+She buzzes the manager unit.
+
+The man who opens the door is mid-fifties, flannel shirt, the kind of careful expression people wear when they've decided not to say the first thing they thought. He looks at her. He looks at the folder in her hand — lease printout, ID, first month's check, all the documentation she prepared because she knew this moment was coming.
+
+"Robin?" he says. He means it as a question.
+
+"Yes," she says. It isn't.
+
+She hands him the folder. He opens it. The check is correct. The lease is signed in the right places. The ID is a valid driver's license with a clear photo of a white man in his early thirties. He looks at the photo for a moment longer than he needs to.
+
+She gives him nothing. She's done this before — meetings where someone says something wrong and she's decided not to correct them. The silence does the work. You wait. They fill it.
+
+{% if w.hasTrait("SHY") %}
+The silence lasts three seconds, which is two too many. She says, "I know the photo's a little old." It isn't what she meant to say, and now he's more confused than before.
+{% elif w.hasTrait("AMBITIOUS") %}
+She's already thinking about Monday. The landlord is documentation to process. She watches his face with the patience of someone who has sat across from investors who didn't read the deck.
+{% elif w.hasTrait("CUTE") %}
+She smiles when he looks up. It's not calculated — it's a reflex. His expression softens slightly, and she makes a note that she doesn't entirely like.
+{% elif w.hasTrait("BITCHY") %}
+She meets his eyes when he looks up and holds them. He is the one who looks away first.
+{% else %}
+She waits. He processes. From somewhere upstairs, the muffled sound of a television.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+style     = "inner_voice"
+prose = """
+*Thirty-two years of existence*, she thinks, *and this man is trying to reconcile three things: the voice on the phone, the ID photo, and the person in front of him.* He doesn't have a fourth category. Most people don't.
+
+She knows exactly what he's thinking because she's had the same thought about other people and then filed it as *weird situation, doesn't concern me* and moved on. She's counting on him to do the same.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "wait_him_out"
+label             = "Let him work through it"
+detail            = "He'll get there. Give him time."
+allow_npc_actions = true
+prose = """
+He looks at the ID again. He looks at her. He looks back at the paperwork.
+
+From upstairs: "Frank, is that the new tenant?"
+
+"Yeah," he calls back.
+
+A pause. "Tell her the radiator in the bedroom takes a few minutes to warm up."
+
+"Right." He looks at Robin. "The radiator in the bedroom takes a few minutes."
+
+"Understood," she says.
+
+He hands back the folder — keeping the check, obviously — and takes a key from a hook by the door. Unit 4B. Third floor, no elevator. He says the garbage is Tuesday and Thursday and the building has a no-smoking policy. She says yes, got it, thank you. He says welcome to the building, and seems to mean it.
+
+She takes the stairs.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "explain_briefly"
+label = "Give him a sentence"
+detail = "One sentence. Enough to move things along."
+prose = """
+{% if w.hasTrait("SHY") %}
+"It's a long story," she says. She means this as a door closing. He hears it as an invitation. She watches him decide not to take it.
+
+"Okay," he says finally. "Okay." He looks at the paperwork one more time and then seems to decide it's not worth the conversation. He hands her the key.
+{% else %}
+"I just look younger than the photo." She says it the way she'd say *the build failed in staging* — factual, no drama, move on.
+
+He looks at her for a moment. Then he nods, the way people nod when they've decided that whatever is happening is not their problem today.
+
+He hands her the key.
+{% endif %}
+
+Unit 4B. Third floor. She thanks him and finds the stairs.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions (Frank, the landlord) ────────────────────────────────
+
+[[npc_actions]]
+id        = "frank_radiator"
+label     = "His wife calls down about the radiator"
+weight    = 8
+condition = "!scene.hasFlag('frank_called')"
+prose = """
+From upstairs: "Frank." A pause. "The radiator."
+
+He tilts his head up toward the ceiling with the expression of a man who has had this conversation many times. "Radiator in the bedroom takes a minute," he says. "Just letting you know."
+
+"Thank you," she says.
+
+He looks at her paperwork again, briefly, and then seems to give up on whatever he was going to ask.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "frank_called"
+
+  [[npc_actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[npc_actions.next]]
+  finish = true

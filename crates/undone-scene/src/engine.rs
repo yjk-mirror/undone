@@ -860,6 +860,7 @@ mod tests {
                 contactable: true,
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
             },
             figure: MaleFigure::Average,
             clothing: MaleClothing::default(),
