@@ -52,6 +52,7 @@ pub enum EngineEvent {
     ActionsAvailable(Vec<ActionView>),
     NpcActivated(Option<NpcActivatedData>),
     SceneFinished,
+    ErrorOccurred(String),
 }
 
 #[derive(Debug, Clone)]
@@ -135,6 +136,22 @@ impl SceneEngine {
     /// Drain all pending events, returning them in order.
     pub fn drain(&mut self) -> Vec<EngineEvent> {
         self.events.drain(..).collect()
+    }
+
+    /// Convenience: send a ChooseAction command and immediately drain events.
+    /// Use this from the UI instead of calling send() + drain() separately.
+    pub fn advance_with_action(
+        &mut self,
+        action_id: &str,
+        world: &mut World,
+        registry: &PackRegistry,
+    ) -> Vec<EngineEvent> {
+        self.send(
+            EngineCommand::ChooseAction(action_id.to_string()),
+            world,
+            registry,
+        );
+        self.drain()
     }
 
     // -----------------------------------------------------------------------
@@ -876,6 +893,29 @@ mod tests {
         assert!(
             MAX_TRANSITIONS_PER_COMMAND <= 128,
             "limit too high — would allow runaway before tripping"
+        );
+    }
+
+    #[test]
+    fn advance_with_action_returns_events() {
+        let mut engine = make_engine_with(make_simple_scene());
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        // advance_with_action("leave") should produce ProseAdded + NpcActivated + SceneFinished
+        let events = engine.advance_with_action("leave", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::SceneFinished)),
+            "expected SceneFinished from advance_with_action"
         );
     }
 
