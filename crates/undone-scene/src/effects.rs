@@ -22,6 +22,8 @@ pub enum EffectError {
     UnknownNpcTrait(String),
     #[error("unknown skill '{0}'")]
     UnknownSkill(String),
+    #[error("unknown stat '{0}'")]
+    UnknownStat(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -99,14 +101,16 @@ pub fn apply_effect(
             world.game_data.remove_flag(flag.as_str());
         }
         EffectDef::AddStat { stat, amount } => {
-            if let Some(sid) = registry.get_stat(stat) {
-                world.game_data.add_stat(sid, *amount);
-            }
+            let sid = registry
+                .get_stat(stat)
+                .ok_or_else(|| EffectError::UnknownStat(stat.clone()))?;
+            world.game_data.add_stat(sid, *amount);
         }
         EffectDef::SetStat { stat, value } => {
-            if let Some(sid) = registry.get_stat(stat) {
-                world.game_data.set_stat(sid, *value);
-            }
+            let sid = registry
+                .get_stat(stat)
+                .ok_or_else(|| EffectError::UnknownStat(stat.clone()))?;
+            world.game_data.set_stat(sid, *value);
         }
         EffectDef::AddTrait { trait_id } => {
             let tid = registry
@@ -505,6 +509,42 @@ mod tests {
             .core
             .relationship_flags
             .contains("kissed"));
+    }
+
+    #[test]
+    fn add_stat_unknown_returns_error() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new(); // empty registry — no stats registered
+        let result = apply_effect(
+            &EffectDef::AddStat {
+                stat: "NONEXISTENT_STAT".into(),
+                amount: 1,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        );
+        assert!(result.is_err(), "expected error for unknown stat");
+        assert!(matches!(result, Err(EffectError::UnknownStat(_))));
+    }
+
+    #[test]
+    fn set_stat_unknown_returns_error() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let reg = PackRegistry::new();
+        let result = apply_effect(
+            &EffectDef::SetStat {
+                stat: "NONEXISTENT_STAT".into(),
+                value: 5,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        );
+        assert!(result.is_err(), "expected error for unknown stat");
+        assert!(matches!(result, Err(EffectError::UnknownStat(_))));
     }
 
     #[test]
