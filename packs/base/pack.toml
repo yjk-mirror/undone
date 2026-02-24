@@ -4,8 +4,9 @@ name     = "Base Game"
 version  = "0.1.0"
 author   = "Undone"
 requires = []
-opening_scene = "base::rain_shelter"
-default_slot  = "free_time"
+opening_scene        = "base::rain_shelter"
+default_slot         = "free_time"
+transformation_scene = "base::transformation_intro"
 
 [content]
 traits     = "data/traits.toml"

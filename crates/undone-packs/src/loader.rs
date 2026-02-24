@@ -265,9 +265,10 @@ mod tests {
     #[test]
     fn base_pack_has_transformation_scene() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
-        // Returns None until pack.toml is updated in Task 9.
-        // This test documents the expectation — assertion updated in Task 9.
-        let _ = registry.transformation_scene(); // verify no panic
+        assert_eq!(
+            registry.transformation_scene(),
+            Some("base::transformation_intro")
+        );
     }
 
     #[test]
