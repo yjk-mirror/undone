@@ -14,7 +14,15 @@
 
 ## ⚡ Next Action
 
-**Content expansion** — Phases 4–8 of `docs/plans/2026-02-24-prolific-session.md` are deferred:
+**⚠ FIRST: Complete the merge.** Git hung at end of last session. The `prolific-session` branch has all work committed. Run:
+```bash
+git checkout master
+git merge --no-ff prolific-session
+git worktree remove .worktrees/prolific-session
+git branch -d prolific-session
+```
+
+**Then: Content expansion** — Phases 4–8 of `docs/plans/2026-02-24-prolific-session.md` are deferred:
 - Phase 4: World canonization (`docs/world.md` with facts from all 15 scenes)
 - Phase 5: Robin week 2 scenes (`working` arc state — `robin_work_meeting`, `robin_evening`)
 - Phase 6: Camila week 2 scenes (`first_week` arc state — `camila_study_session`, `camila_dining_hall`)
