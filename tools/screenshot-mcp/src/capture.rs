@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use windows_capture::{
-    capture::{Context, GraphicsCaptureApiHandler},
+    capture::{CaptureControl, Context, GraphicsCaptureApiHandler},
     frame::Frame,
     graphics_capture_api::InternalCaptureControl,
     settings::{
@@ -10,8 +12,7 @@ use windows_capture::{
     window::Window,
 };
 
-/// Captured frame data shared between the capture thread and the caller.
-type SharedFrame = Arc<Mutex<Option<CapturedFrame>>>;
+// ── Frame data ─────────────────────────────────────────────────────
 
 pub struct CapturedFrame {
     pub data: Vec<u8>, // BGRA8 pixels, no padding
@@ -19,13 +20,19 @@ pub struct CapturedFrame {
     pub height: u32,
 }
 
-struct OneShotCapture {
+type SharedFrame = Arc<Mutex<Option<CapturedFrame>>>;
+
+// ── Persistent capture handler ─────────────────────────────────────
+
+type CaptureError = Box<dyn std::error::Error + Send + Sync>;
+
+struct PersistentCapture {
     shared: SharedFrame,
 }
 
-impl GraphicsCaptureApiHandler for OneShotCapture {
+impl GraphicsCaptureApiHandler for PersistentCapture {
     type Flags = SharedFrame;
-    type Error = Box<dyn std::error::Error + Send + Sync>;
+    type Error = CaptureError;
 
     fn new(ctx: Context<Self::Flags>) -> Result<Self, Self::Error> {
         Ok(Self { shared: ctx.flags })
@@ -34,10 +41,9 @@ impl GraphicsCaptureApiHandler for OneShotCapture {
     fn on_frame_arrived(
         &mut self,
         frame: &mut Frame,
-        capture_control: InternalCaptureControl,
+        _capture_control: InternalCaptureControl,
     ) -> Result<(), Self::Error> {
-        // frame.buffer() can fail on the first frame for some DirectX windows.
-        // Skip bad frames rather than aborting — a good frame usually follows.
+        // Skip bad frames (can happen on first frame for some DirectX windows).
         let Ok(mut buf) = frame.buffer() else {
             return Ok(());
         };
@@ -52,8 +58,7 @@ impl GraphicsCaptureApiHandler for OneShotCapture {
 
         *self.shared.lock().unwrap() = Some(CapturedFrame { data, width, height });
 
-        // Take exactly one frame and stop — no continuous capture loop.
-        capture_control.stop();
+        // Do NOT call capture_control.stop() — session stays alive for future reads.
         Ok(())
     }
 
@@ -62,37 +67,108 @@ impl GraphicsCaptureApiHandler for OneShotCapture {
     }
 }
 
-/// Capture a single frame from the window whose title contains `title_fragment`.
-/// No focus stealing. No border on Windows 11. Cursor excluded.
-/// Returns raw BGRA8 pixel bytes plus dimensions.
-pub fn capture_window(title_fragment: &str) -> anyhow::Result<CapturedFrame> {
-    let window = Window::from_contains_name(title_fragment)
-        .map_err(|e| anyhow::anyhow!("window '{}' not found: {}", title_fragment, e))?;
+// ── Session — one per captured window ──────────────────────────────
 
-    let shared: SharedFrame = Arc::new(Mutex::new(None));
+struct Session {
+    shared: SharedFrame,
+    control: Option<CaptureControl<PersistentCapture, CaptureError>>,
+}
 
-    let settings = Settings::new(
-        window,
-        CursorCaptureSettings::WithoutCursor,
-        DrawBorderSettings::WithoutBorder,
-        SecondaryWindowSettings::Default,
-        MinimumUpdateIntervalSettings::Default,
-        DirtyRegionSettings::Default,
-        ColorFormat::Bgra8,
-        Arc::clone(&shared),
-    );
+impl Session {
+    fn start(title_fragment: &str) -> anyhow::Result<Self> {
+        let window = Window::from_contains_name(title_fragment)
+            .map_err(|e| anyhow::anyhow!("window '{}' not found: {}", title_fragment, e))?;
 
-    // Spawns a capture thread; does not activate or focus the window.
-    let control = OneShotCapture::start_free_threaded(settings)
-        .map_err(|e| anyhow::anyhow!("capture start failed: {}", e))?;
+        let shared: SharedFrame = Arc::new(Mutex::new(None));
 
-    // Wait for on_frame_arrived to call capture_control.stop() and finish naturally.
-    // Do NOT use control.stop() here — that sends WM_QUIT which kills the thread
-    // before the first frame arrives, leaving shared=None.
-    control
-        .wait()
-        .map_err(|e| anyhow::anyhow!("capture wait failed: {}", e))?;
+        let settings = Settings::new(
+            window,
+            CursorCaptureSettings::WithoutCursor,
+            DrawBorderSettings::WithoutBorder,
+            SecondaryWindowSettings::Default,
+            // 10 fps — plenty for agent screenshots, saves CPU in persistent mode.
+            MinimumUpdateIntervalSettings::Custom(Duration::from_millis(100)),
+            DirtyRegionSettings::Default,
+            ColorFormat::Bgra8,
+            Arc::clone(&shared),
+        );
 
-    let frame = shared.lock().unwrap().take();
-    frame.ok_or_else(|| anyhow::anyhow!("no frame received"))
+        let control = PersistentCapture::start_free_threaded(settings)
+            .map_err(|e| anyhow::anyhow!("capture start failed: {}", e))?;
+
+        Ok(Self {
+            shared,
+            control: Some(control),
+        })
+    }
+
+    /// Read the latest captured frame. Returns None if no frame has arrived yet.
+    fn latest_frame(&self) -> Option<CapturedFrame> {
+        self.shared.lock().unwrap().take()
+    }
+
+    /// Check if the capture thread has exited (window closed, error, etc).
+    fn is_finished(&self) -> bool {
+        self.control.as_ref().is_some_and(|c| c.is_finished())
+    }
+}
+
+impl Drop for Session {
+    fn drop(&mut self) {
+        if let Some(control) = self.control.take() {
+            let _ = control.stop();
+        }
+    }
+}
+
+// ── SessionManager — manages sessions across MCP requests ──────────
+
+pub struct SessionManager {
+    sessions: HashMap<String, Session>,
+}
+
+impl SessionManager {
+    pub fn new() -> Self {
+        Self {
+            sessions: HashMap::new(),
+        }
+    }
+
+    /// Get the latest frame for the given window title.
+    /// Creates or re-creates the capture session as needed.
+    /// Waits briefly on first call for the initial frame to arrive.
+    pub fn capture(&mut self, title: &str) -> anyhow::Result<CapturedFrame> {
+        // Evict dead sessions (window closed, errors).
+        if self
+            .sessions
+            .get(title)
+            .is_some_and(|s| s.is_finished())
+        {
+            self.sessions.remove(title);
+        }
+
+        // Start session if needed.
+        let is_new = !self.sessions.contains_key(title);
+        if is_new {
+            let session = Session::start(title)?;
+            self.sessions.insert(title.to_string(), session);
+        }
+
+        let session = self.sessions.get(title).unwrap();
+
+        // On first call, wait for the initial frame (WGC needs a GPU round-trip).
+        if is_new {
+            for _ in 0..50 {
+                // 50 × 20ms = 1 second max wait
+                if session.shared.lock().unwrap().is_some() {
+                    break;
+                }
+                std::thread::sleep(Duration::from_millis(20));
+            }
+        }
+
+        session
+            .latest_frame()
+            .ok_or_else(|| anyhow::anyhow!("no frame received from '{}'", title))
+    }
 }

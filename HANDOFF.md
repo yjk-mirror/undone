@@ -6,7 +6,7 @@
 **Tests:** 124 passing, 0 failures.
 **Remote:** pushed (mirrored repo, pulled into Linux dev env).
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Engine correctness pass complete: cross-reference validation, transition guard, NPC personality rendering, condition eval logging, data-driven opening scene/slot, scroll-to-bottom fix, unknown scene surfacing. Engineering Principles documented in CLAUDE.md.
-**Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform.
+**Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform. screenshot-mcp uses persistent WGC sessions (10fps, ~20ms reads after first). game-input-mcp has lifecycle tools (start_game, stop_game, is_game_running).
 **MCPs:** All MCP config is cross-platform — no hardcoded absolute paths. `tools/mcp-launcher.mjs` detects OS and appends `.exe` on Windows. All 5 servers registered in `.mcp.json`.
 
 ---
@@ -19,20 +19,17 @@
 
 ## game-input-mcp — Updated
 
-**Tools:** `press_key(title, key)`, `click(title, x, y)`, `scroll(title, x, y, delta)`, `hover(title, x, y)`.
+**Input tools:** `press_key(title, key)`, `click(title, x, y)`, `scroll(title, x, y, delta)`, `hover(title, x, y)`.
 Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
-Scroll: positive delta = up, negative = down (one tick = one wheel notch).
-Hover: sends WM_MOUSEMOVE to trigger hover effects.
-
-**Deployed (2026-02-23):** scroll+hover binary renamed to `.exe`. Takes effect on next Claude Code restart.
+Scroll: sends WM_MOUSEMOVE before WM_MOUSEWHEEL (floem routes wheel events via cached cursor_position). Positive delta = up, negative = down (one tick = one wheel notch).
+**Lifecycle tools:** `start_game(working_dir)`, `stop_game(exe_name)`, `is_game_running(exe_name)`.
+Process management uses Toolhelp32 snapshot API.
 
 ---
 
-## screenshot-mcp — Working
+## screenshot-mcp — Persistent Sessions
 
-**Bug fixed (2026-02-23):** `capture_window()` was calling `control.stop()` instead of
-`control.wait()`. Fixed binary deployed to `undone-tools/target/release/screenshot-mcp.exe`.
-**.mcp.json** points to `screenshot-mcp.exe`. Verified working.
+Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First request creates session + waits up to 1s for initial frame. Subsequent requests read cached frame (~20ms). Sessions are keyed by window title, evicted when window closes. Fast PNG encoding via `png` crate with `Compression::Fast`.
 
 ---
 
@@ -49,6 +46,7 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 - Story panel scroll: `flex_grow(1.0).flex_basis(0.0)` (flex sibling of detail strip + choices bar)
 - Char creation scroll: `size_full()` (sole child of dyn_container)
 - Outer dyn_container: `flex_grow(1.0).flex_basis(0.0).min_height(0.0)` — required so taffy constrains children
+- **Scroll-to-bottom timing:** floem's `scroll_to` uses `update_state_deferred` which processes after layout in the same frame. When content change and scroll signal fire simultaneously, `child_size` may be stale. Fix: defer `scroll_gen` bump via `exec_after(Duration::ZERO)` to next frame. Only scroll on append (not on first prose of a new scene).
 
 **Theme system:**
 - Three modes: Warm Paper (default), Sepia, Night
@@ -120,7 +118,6 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 - **Save metadata display**: Show player name / week in save list without full deserialization
 
 ### Tooling
-- **game-input scroll/hover**: ✅ Deployed. Restart Claude Code to activate scroll/hover MCP tools.
 - **game-input limitation**: PostMessage-based input may not establish focus like real user input — keyboard shortcuts may not fire after PostMessage click
 
 ---
@@ -160,3 +157,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | MCP cross-platform fix. All configs had hardcoded Windows paths. Added tools/mcp-launcher.mjs (OS-aware, self-locating via import.meta.url, appends .exe on Windows). .mcp.json now uses node + launcher for all 4 servers. post-edit-check.mjs and settings.json hook also de-hardcoded. rust MCP removed pending source migration into tools/ (source only exists on Windows machine). |
 | 2026-02-23 | rust-mcp migration: Ported from rmcp 0.2 to 0.8 (ErrorData, wrapper::Parameters, params.0 access pattern). 22 tool methods updated. Release binary builds cleanly. Added to .mcp.json. All 5 MCP servers now in-repo. Cleanup pass: extracted dispatch() helper (-728 lines), removed dead code (ToolDefinition, get_tools, lsp.rs, service.rs), fixed error handling (McpError::internal_error instead of swallowing). Added CLAUDE.md skill override: always merge, never offer discard. |
 | 2026-02-23 | Engineering tasks: 7-task plan executed in worktree. NumberKeyMode enum + UserPrefs (theme.rs), ErrorOccurred event + advance_with_action (engine.rs), silent stat effects fix (effects.rs), races from pack data (races.toml + registry + char creation), story cap (200 paras) + free_time fix + dispatch refactor (lib.rs), keyboard controls redesign (arrow nav, highlight, Confirm mode), settings panel (theme/font/line-height/number-key-mode). Code reviewed — fixed `drop` variable shadow. 124 tests, 0 failures. |
+| 2026-02-23 | Tooling + scroll fix session. screenshot-mcp rewritten to persistent WGC sessions (10fps, ~20ms reads). game-input-mcp: WM_MOUSEMOVE before WM_MOUSEWHEEL (floem cursor_position routing fix), added start_game/stop_game/is_game_running lifecycle tools (Toolhelp32). Scroll-to-bottom fixed: root cause was floem timing — scroll_to deferred message fires with stale child_size when content change and scroll signal are in same reactive batch. Fix: exec_after(Duration::ZERO) defers scroll to next frame; skip scroll on first prose of new scene (start at top). CLAUDE.md: Engineering Principle #8 (no tech debt/workarounds/hacks), background task ≠ game exit guardrail. 124 tests, 0 failures. |

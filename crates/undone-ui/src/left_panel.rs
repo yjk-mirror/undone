@@ -337,9 +337,13 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
     let scroll_area = scroll(centered_prose)
-        .scroll_to_percent(move || {
-            scroll_gen.get();
-            100.0
+        .scroll_to(move || {
+            let gen = scroll_gen.get();
+            if gen > 0 {
+                Some(floem::kurbo::Point::new(0.0, f64::MAX))
+            } else {
+                None
+            }
         })
         .scroll_style(|s| s.shrink_to_fit())
         .style(move |s| {
@@ -362,16 +366,26 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.width_full()
             .min_height(28.0)
+            .max_width(680.0)
             .padding_horiz(24.0)
             .padding_vert(6.0)
             .font_size(13.0)
             .font_family("system-ui, -apple-system, sans-serif".to_string())
             .color(colors.ink_ghost)
             .background(colors.page)
-            .border_top(1.0)
-            .border_color(colors.seam)
             .hover(move |s| s.background(colors.page))
             .focus(move |s| s.background(colors.page))
+    });
+
+    // Wrap detail strip in a centering container to align with prose column
+    let detail_strip = container(detail_strip).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.width_full()
+            .flex_row()
+            .justify_center()
+            .background(colors.page)
+            .border_top(1.0)
+            .border_color(colors.seam)
     });
 
     v_stack((
@@ -491,7 +505,7 @@ fn choices_bar(
             })
         },
     )
-    .style(|s| s.flex_row().flex_wrap(FlexWrap::Wrap));
+    .style(|s| s.flex_row().flex_wrap(FlexWrap::Wrap).max_width(680.0));
 
     container(buttons).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -500,6 +514,8 @@ fn choices_bar(
             .border_color(colors.seam)
             .min_height(64.0)
             .width_full()
+            .flex_row()
+            .justify_center()
             .background(colors.page)
     })
 }

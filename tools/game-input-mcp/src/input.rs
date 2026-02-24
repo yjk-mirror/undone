@@ -1,5 +1,12 @@
 use windows::Win32::{
-    Foundation::{BOOL, HWND, LPARAM, WPARAM},
+    Foundation::{BOOL, CloseHandle, HWND, LPARAM, WPARAM},
+    System::{
+        Diagnostics::ToolHelp::{
+            CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
+            TH32CS_SNAPPROCESS,
+        },
+        Threading::{OpenProcess, TerminateProcess, PROCESS_TERMINATE},
+    },
     UI::{
         Input::KeyboardAndMouse::{MapVirtualKeyW, MAPVK_VK_TO_VSC, VIRTUAL_KEY},
         WindowsAndMessaging::{
@@ -128,14 +135,24 @@ pub fn click(hwnd: HWND, x: i32, y: i32) -> anyhow::Result<()> {
 /// Post a mouse wheel scroll at client-relative (x, y).
 /// `delta` is in wheel ticks: positive = scroll up, negative = scroll down.
 /// One tick is typically WHEEL_DELTA (120 units).
+///
+/// Sends WM_MOUSEMOVE first to update the framework's internal cursor position,
+/// then WM_MOUSEWHEEL. floem (via winit) routes wheel events using its cached
+/// cursor_position for hit-testing — without a preceding WM_MOUSEMOVE, the wheel
+/// event targets whatever widget the real cursor was last over.
 pub fn scroll(hwnd: HWND, x: i32, y: i32, delta: i32) -> anyhow::Result<()> {
-    // WM_MOUSEWHEEL wparam: high word = wheel delta, low word = key state (0)
+    // Step 1: Update floem's cursor_position so the wheel event hits the right widget.
+    let move_lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
+    unsafe {
+        PostMessageW(hwnd, WM_MOUSEMOVE, WPARAM(0), move_lparam)
+            .map_err(|e| anyhow::anyhow!("PostMessage WM_MOUSEMOVE failed: {}", e))?;
+    }
+
+    // Step 2: Send the wheel event. PostMessage preserves FIFO order, so the
+    // WM_MOUSEMOVE above will be processed first.
     let wheel_delta = delta * 120; // WHEEL_DELTA = 120
     let wparam = WPARAM(((wheel_delta as u16 as usize) << 16) | 0);
-    // WM_MOUSEWHEEL lparam: screen coordinates (not client), but PostMessage
-    // delivers whatever we put here — the app may or may not use it.
     let lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
-
     unsafe {
         PostMessageW(hwnd, WM_MOUSEWHEEL, wparam, lparam)
             .map_err(|e| anyhow::anyhow!("PostMessage WM_MOUSEWHEEL failed: {}", e))?;
@@ -154,4 +171,59 @@ pub fn hover(hwnd: HWND, x: i32, y: i32) -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+// ── Process management ─────────────────────────────────────────────
+
+/// Find a running process by executable name (case-insensitive).
+/// Returns the PID if found.
+pub fn find_process(exe_name: &str) -> anyhow::Result<Option<u32>> {
+    unsafe {
+        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+            .map_err(|e| anyhow::anyhow!("CreateToolhelp32Snapshot failed: {}", e))?;
+
+        let mut entry = PROCESSENTRY32W {
+            dwSize: std::mem::size_of::<PROCESSENTRY32W>() as u32,
+            ..Default::default()
+        };
+
+        let target = exe_name.to_lowercase();
+
+        if Process32FirstW(snapshot, &mut entry).is_ok() {
+            loop {
+                let name_len = entry
+                    .szExeFile
+                    .iter()
+                    .position(|&c| c == 0)
+                    .unwrap_or(entry.szExeFile.len());
+                let name = String::from_utf16_lossy(&entry.szExeFile[..name_len]);
+
+                if name.to_lowercase() == target {
+                    let _ = CloseHandle(snapshot);
+                    return Ok(Some(entry.th32ProcessID));
+                }
+
+                if Process32NextW(snapshot, &mut entry).is_err() {
+                    break;
+                }
+            }
+        }
+
+        let _ = CloseHandle(snapshot);
+        Ok(None)
+    }
+}
+
+/// Terminate a process by PID.
+pub fn kill_process(pid: u32) -> anyhow::Result<()> {
+    unsafe {
+        let handle = OpenProcess(PROCESS_TERMINATE, false, pid)
+            .map_err(|e| anyhow::anyhow!("OpenProcess({}) failed: {}", pid, e))?;
+
+        let result = TerminateProcess(handle, 1);
+        let _ = CloseHandle(handle);
+
+        result.map_err(|e| anyhow::anyhow!("TerminateProcess({}) failed: {}", pid, e))?;
+        Ok(())
+    }
 }

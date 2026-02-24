@@ -17,6 +17,7 @@ anyhow          = "1"
 tracing         = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # windows-capture is Windows-only; see [target.'cfg(windows)'.dependencies] below
+png             = "0.17"
 image           = { version = "0.25", default-features = false, features = ["png"] }
 base64          = "0.22"
 

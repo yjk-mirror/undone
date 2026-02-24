@@ -154,6 +154,13 @@ These are constraints, not aspirations. Violating them is a bug.
 7. **Tests before content.** New engine capabilities get tests before scenes
    use them. Content authors should never discover a broken engine feature first.
 
+8. **No tech debt. No workarounds. No hacks.** Do it correctly the first time.
+   If a proper solution requires more work, do the work — don't ship a shortcut
+   and plan to fix it later. If you're unsure whether something is the right
+   approach, surface it explicitly. The user will always choose correctness over
+   speed. This applies to game code, tooling, infrastructure, and agent workflows
+   equally. Workarounds accumulate; correct solutions compose.
+
 ## UI Direction
 
 The UI is a significant open design question. We are not replicating the original
@@ -183,18 +190,24 @@ parser requires method-call syntax everywhere, and the original plan had an inco
 
 ## Runtime Testing Notes
 
-- **`cargo run` background task ≠ game process.** When launching the game via
-  `cargo run &` or `run_in_background`, the shell task completes when the build
-  finishes and the process is spawned. The GUI window keeps running independently.
-  A background task notification saying "completed" does NOT mean the game exited
-  or crashed. Always check `Get-Process undone` to verify actual process state.
 - **floem scroll requires `shrink_to_fit()`.** A `scroll()` widget inside a flex
   container (v_stack/h_stack) must use `.scroll_style(|s| s.shrink_to_fit())` and
   `.style(|s| s.flex_grow(1.0).flex_basis(0.0))` — otherwise taffy sizes the
   scroll viewport to content height and scrolling never activates.
 - **game-input MCP supports keys, clicks, scroll, and hover.** All four use
-  PostMessage (no focus steal). `scroll(title, x, y, delta)` sends WM_MOUSEWHEEL;
-  `hover(title, x, y)` sends WM_MOUSEMOVE for triggering hover effects.
+  PostMessage (no focus steal). `scroll(title, x, y, delta)` sends WM_MOUSEMOVE
+  then WM_MOUSEWHEEL (floem routes wheel events using cached cursor_position,
+  so the preceding WM_MOUSEMOVE is required for correct widget targeting).
+
+## Guardrails — Runtime
+
+### Background task completion ≠ game exit
+- **Trigger**: A `cargo run` background task notification says "completed"
+- **Rule**: This means the BUILD finished and the process was SPAWNED. The GUI
+  window keeps running independently. **Never say the game exited or closed based
+  on a background task completing.** Always verify with
+  `Get-Process undone -ErrorAction SilentlyContinue` before making any claim about
+  the game process state. If the process is running, the game is running.
 
 ## Agentic Workflow
 

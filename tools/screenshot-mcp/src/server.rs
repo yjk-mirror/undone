@@ -1,5 +1,6 @@
+use std::sync::{Arc, Mutex};
+
 use base64::{engine::general_purpose::STANDARD, Engine as _};
-use image::RgbaImage;
 use rmcp::{
     ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
@@ -10,7 +11,7 @@ use rmcp::{
 use schemars::JsonSchema;
 use serde::Deserialize;
 
-use crate::capture;
+use crate::capture::SessionManager;
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct ScreenshotInput {
@@ -22,6 +23,7 @@ pub struct ScreenshotInput {
 #[derive(Clone)]
 pub struct ScreenshotServer {
     tool_router: ToolRouter<Self>,
+    sessions: Arc<Mutex<SessionManager>>,
 }
 
 #[tool_router]
@@ -29,6 +31,7 @@ impl ScreenshotServer {
     pub fn new() -> Self {
         Self {
             tool_router: Self::tool_router(),
+            sessions: Arc::new(Mutex::new(SessionManager::new())),
         }
     }
 
@@ -38,29 +41,38 @@ impl ScreenshotServer {
         params: Parameters<ScreenshotInput>,
     ) -> Result<CallToolResult, McpError> {
         let title = params.0.title.clone();
+        let sessions = Arc::clone(&self.sessions);
 
-        // Run the blocking WGC capture on a dedicated thread so we don't block tokio.
-        let frame = tokio::task::spawn_blocking(move || capture::capture_window(&title))
-            .await
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
-
-        // BGRA8 → RGBA8 (swap B and R channels; alpha unchanged).
-        let rgba: Vec<u8> = frame
-            .data
-            .chunks_exact(4)
-            .flat_map(|p| [p[2], p[1], p[0], p[3]])
-            .collect();
-
-        let img = RgbaImage::from_raw(frame.width, frame.height, rgba)
-            .ok_or_else(|| McpError::internal_error("image dimensions mismatch", None))?;
-
-        let mut png_bytes: Vec<u8> = Vec::new();
-        img.write_to(
-            &mut std::io::Cursor::new(&mut png_bytes),
-            image::ImageFormat::Png,
-        )
+        // Run on a blocking thread — session creation involves WGC init,
+        // and frame reads touch a Mutex that the capture thread writes to.
+        let frame = tokio::task::spawn_blocking(move || {
+            let mut mgr = sessions.lock().unwrap();
+            mgr.capture(&title)
+        })
+        .await
+        .map_err(|e| McpError::internal_error(e.to_string(), None))?
         .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+
+        // BGRA8 → RGBA8 in-place (swap B and R channels; alpha unchanged).
+        let mut rgba = frame.data;
+        for pixel in rgba.chunks_exact_mut(4) {
+            pixel.swap(0, 2);
+        }
+
+        // Encode PNG with fast compression — agent use doesn't need small files.
+        let mut png_bytes: Vec<u8> = Vec::new();
+        {
+            let mut encoder = png::Encoder::new(&mut png_bytes, frame.width, frame.height);
+            encoder.set_color(png::ColorType::Rgba);
+            encoder.set_depth(png::BitDepth::Eight);
+            encoder.set_compression(png::Compression::Fast);
+            let mut writer = encoder
+                .write_header()
+                .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+            writer
+                .write_image_data(&rgba)
+                .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        }
 
         let b64 = STANDARD.encode(&png_bytes);
 

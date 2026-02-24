@@ -330,6 +330,10 @@ pub fn process_events(
     for event in events {
         match event {
             EngineEvent::ProseAdded(text) => {
+                // Only scroll to bottom when appending to existing prose (i.e.
+                // after the player picks an action). On the first prose of a new
+                // scene the story starts empty — we want the viewport at the top.
+                let should_scroll = !signals.story.get_untracked().is_empty();
                 signals.story.update(|s| {
                     if !s.is_empty() {
                         s.push_str("\n\n");
@@ -354,7 +358,18 @@ pub fn process_events(
                         }
                     }
                 });
-                signals.scroll_gen.update(|n| *n += 1);
+                if should_scroll {
+                    // Delay the scroll-to-bottom by one frame. The scroll_to
+                    // effect uses update_state_deferred which fires after layout
+                    // in the same frame — but the content rebuild (from the story
+                    // signal) may not have its new taffy size computed yet in that
+                    // same layout pass. Deferring to the next frame via exec_after
+                    // ensures layout has fully settled with the new content.
+                    let sg = signals.scroll_gen;
+                    floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+                        sg.update(|n| *n += 1);
+                    });
+                }
             }
             EngineEvent::ActionsAvailable(actions) => {
                 signals.actions.set(actions);
@@ -380,7 +395,10 @@ pub fn process_events(
                     }
                     s.push_str(&format!("[Scene error: {}]", msg));
                 });
-                signals.scroll_gen.update(|n| *n += 1);
+                let sg = signals.scroll_gen;
+                floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+                    sg.update(|n| *n += 1);
+                });
             }
         }
     }
