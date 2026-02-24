@@ -167,15 +167,13 @@ pub fn app_view() -> impl View {
     let content = dyn_container(
         move || phase.get(),
         move |current_phase| match current_phase {
-            AppPhase::BeforeCreation => {
-                char_creation_view(
-                    signals,
-                    Rc::clone(&pre_state_cc),
-                    Rc::clone(&game_state_cc),
-                    partial_char,
-                )
-                .into_any()
-            }
+            AppPhase::BeforeCreation => char_creation_view(
+                signals,
+                Rc::clone(&pre_state_cc),
+                Rc::clone(&game_state_cc),
+                partial_char,
+            )
+            .into_any(),
             AppPhase::TransformationIntro => {
                 // TODO Task 5: wire transformation intro scene
                 placeholder_panel("Transformation intro — coming soon", signals).into_any()

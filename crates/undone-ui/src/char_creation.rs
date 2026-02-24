@@ -2,6 +2,7 @@ use floem::prelude::*;
 use floem::reactive::RwSignal;
 use floem::views::dropdown::Dropdown;
 use floem::views::Checkbox;
+use rand::SeedableRng;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::{
@@ -9,62 +10,30 @@ use undone_domain::{
 };
 use undone_packs::char_creation::CharCreationConfig;
 
-use crate::game_state::{error_game_state, start_game, GameState, PreGameState};
+use crate::game_state::{start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
-use crate::{AppPhase, AppSignals};
-
-// ── Age bucketing ─────────────────────────────────────────────────────────────
-
-/// Convert a raw age number to the nearest Age enum bucket.
-fn age_from_u32(years: u32) -> Age {
-    match years {
-        0..=19 => Age::LateTeen,
-        20..=22 => Age::EarlyTwenties,
-        23..=26 => Age::Twenties,
-        27..=29 => Age::LateTwenties,
-        30..=39 => Age::Thirties,
-        40..=49 => Age::Forties,
-        50..=59 => Age::Fifties,
-        _ => Age::Old,
-    }
-}
+use crate::{AppPhase, AppSignals, PartialCharState};
 
 // ── PC origin helpers ─────────────────────────────────────────────────────────
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum BeforeKind {
-    CisMale,
-    TransWoman,
-    CisFemale,
-}
-
-fn resolve_origin(was_transformed: bool, before_kind: BeforeKind) -> PcOrigin {
-    if !was_transformed {
-        PcOrigin::AlwaysFemale
-    } else {
-        match before_kind {
-            BeforeKind::CisMale => PcOrigin::CisMaleTransformed,
-            BeforeKind::TransWoman => PcOrigin::TransWomanTransformed,
-            BeforeKind::CisFemale => PcOrigin::CisFemaleTransformed,
-        }
+fn origin_from_idx(idx: u8) -> PcOrigin {
+    match idx {
+        0 => PcOrigin::CisMaleTransformed,
+        1 => PcOrigin::TransWomanTransformed,
+        2 => PcOrigin::CisFemaleTransformed,
+        _ => PcOrigin::AlwaysFemale,
     }
 }
 
-// ── form-level signals ────────────────────────────────────────────────────────
+// ── BeforeCreation form signals ───────────────────────────────────────────────
 
 #[derive(Clone, Copy)]
-struct CharFormSignals {
-    name_fem: RwSignal<String>,
-    name_androg: RwSignal<String>,
-    name_masc: RwSignal<String>,
-    age: RwSignal<Age>,
-    figure: RwSignal<PlayerFigure>,
-    breasts: RwSignal<BreastSize>,
-    was_transformed: RwSignal<bool>,
-    before_kind: RwSignal<BeforeKind>,
-    before_age_str: RwSignal<String>,
-    before_figure: RwSignal<MaleFigure>,
-    sexuality: RwSignal<BeforeSexuality>,
+struct BeforeFormSignals {
+    origin_idx: RwSignal<u8>,
+    before_name: RwSignal<String>,
+    before_age: RwSignal<Age>,
+    before_sexuality: RwSignal<BeforeSexuality>,
+    before_race: RwSignal<String>,
     // personality
     trait_shy: RwSignal<bool>,
     trait_cute: RwSignal<bool>,
@@ -78,28 +47,19 @@ struct CharFormSignals {
     trait_ambitious: RwSignal<bool>,
     trait_beautiful: RwSignal<bool>,
     trait_plain: RwSignal<bool>,
-    // race
-    race: RwSignal<String>,
-    before_race: RwSignal<String>,
-    // content
+    // content prefs
     include_rough: RwSignal<bool>,
     likes_rough: RwSignal<bool>,
 }
 
-impl CharFormSignals {
+impl BeforeFormSignals {
     fn new() -> Self {
         Self {
-            name_fem: RwSignal::new("Eva".to_string()),
-            name_androg: RwSignal::new("Ev".to_string()),
-            name_masc: RwSignal::new("Evan".to_string()),
-            age: RwSignal::new(Age::EarlyTwenties),
-            figure: RwSignal::new(PlayerFigure::Slim),
-            breasts: RwSignal::new(BreastSize::MediumLarge),
-            was_transformed: RwSignal::new(true),
-            before_kind: RwSignal::new(BeforeKind::CisMale),
-            before_age_str: RwSignal::new("28".to_string()),
-            before_figure: RwSignal::new(MaleFigure::Average),
-            sexuality: RwSignal::new(BeforeSexuality::AttractedToWomen),
+            origin_idx: RwSignal::new(0),
+            before_name: RwSignal::new("Evan".to_string()),
+            before_age: RwSignal::new(Age::Twenties),
+            before_sexuality: RwSignal::new(BeforeSexuality::AttractedToWomen),
+            before_race: RwSignal::new(String::new()),
             trait_shy: RwSignal::new(false),
             trait_cute: RwSignal::new(false),
             trait_posh: RwSignal::new(false),
@@ -112,24 +72,116 @@ impl CharFormSignals {
             trait_ambitious: RwSignal::new(false),
             trait_beautiful: RwSignal::new(false),
             trait_plain: RwSignal::new(false),
-            race: RwSignal::new(String::new()),
-            before_race: RwSignal::new(String::new()),
             include_rough: RwSignal::new(false),
             likes_rough: RwSignal::new(false),
         }
     }
 }
 
-// ── public entry point ────────────────────────────────────────────────────────
+// ── FemCreation form signals ──────────────────────────────────────────────────
 
+#[derive(Clone, Copy)]
+struct FemFormSignals {
+    name_fem: RwSignal<String>,
+    name_androg: RwSignal<String>,
+    age: RwSignal<Age>,
+    figure: RwSignal<PlayerFigure>,
+    breasts: RwSignal<BreastSize>,
+    race: RwSignal<String>,
+}
+
+impl FemFormSignals {
+    fn new() -> Self {
+        Self {
+            name_fem: RwSignal::new("Eva".to_string()),
+            name_androg: RwSignal::new("Ev".to_string()),
+            age: RwSignal::new(Age::EarlyTwenties),
+            figure: RwSignal::new(PlayerFigure::Slim),
+            breasts: RwSignal::new(BreastSize::MediumLarge),
+            race: RwSignal::new(String::new()),
+        }
+    }
+}
+
+// ── public entry points ───────────────────────────────────────────────────────
+
+/// BeforeCreation phase: who you were before the transformation.
 pub fn char_creation_view(
     signals: AppSignals,
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
 ) -> impl View {
-    let form = CharFormSignals::new();
+    let form = BeforeFormSignals::new();
 
-    // Read available races from pack registry; set form defaults.
+    // Read available races from pack registry; set form default.
+    let races_list: Vec<String> = {
+        if let Some(ref pre) = *pre_state.borrow() {
+            if pre.registry.races().is_empty() {
+                vec!["White".to_string()]
+            } else {
+                pre.registry.races().to_vec()
+            }
+        } else {
+            vec!["White".to_string()]
+        }
+    };
+    if let Some(first) = races_list.first() {
+        form.before_race.set(first.clone());
+    }
+
+    let next_btn = build_next_button(
+        signals,
+        form,
+        races_list.clone(),
+        pre_state,
+        game_state,
+        partial_char,
+    );
+
+    let content = v_stack((
+        heading("Your Story Begins", signals),
+        section_your_past(signals, form, races_list),
+        section_personality(signals, form),
+        section_content_prefs(signals, form),
+        next_btn,
+        empty().style(|s| s.height(40.0)),
+    ))
+    .style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.width_full()
+            .max_width(640.0)
+            .padding_horiz(40.0)
+            .padding_vert(32.0)
+            .color(colors.ink)
+    });
+
+    let centered = container(content).style(|s| s.width_full().flex_row().justify_center());
+
+    scroll(centered)
+        .scroll_style(|s| s.shrink_to_fit())
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.size_full().background(colors.page)
+        })
+}
+
+/// FemCreation phase: who you are now.
+pub fn fem_creation_view(
+    signals: AppSignals,
+    pre_state: Rc<RefCell<Option<PreGameState>>>,
+    game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
+) -> impl View {
+    let form = FemFormSignals::new();
+
+    // Determine if AlwaysFemale (so we show the Age field).
+    let is_always_female = partial_char
+        .get_untracked()
+        .map(|p| p.origin == PcOrigin::AlwaysFemale)
+        .unwrap_or(false);
+
+    // Read available races from pack registry; set form default.
     let races_list: Vec<String> = {
         if let Some(ref pre) = *pre_state.borrow() {
             if pre.registry.races().is_empty() {
@@ -143,21 +195,94 @@ pub fn char_creation_view(
     };
     if let Some(first) = races_list.first() {
         form.race.set(first.clone());
-        form.before_race.set(first.clone());
     }
-    let races_for_now = races_list.clone();
-    let races_for_before = races_list.clone();
 
-    let begin_btn = build_begin_button(signals, form, pre_state, game_state);
+    let begin_btn = build_begin_button(signals, form, pre_state, game_state, partial_char);
+
+    let age_row: Box<dyn View> = if is_always_female {
+        Box::new(form_row(
+            "Age",
+            signals,
+            Dropdown::new_rw(
+                form.age,
+                vec![
+                    Age::LateTeen,
+                    Age::EarlyTwenties,
+                    Age::Twenties,
+                    Age::LateTwenties,
+                    Age::Thirties,
+                    Age::Forties,
+                    Age::Fifties,
+                    Age::Old,
+                ],
+            )
+            .style(dropdown_style(signals)),
+        ))
+    } else {
+        Box::new(empty())
+    };
 
     let content = v_stack((
-        heading(signals),
-        section_who_you_are(signals, form, races_for_now),
-        section_your_past(signals, form, races_for_before),
-        section_personality(signals, form),
-        section_content_prefs(signals, form),
+        heading("Who Are You Now?", signals),
+        // Names section
+        v_stack((
+            section_title("Your Name", signals),
+            form_row(
+                "Feminine name",
+                signals,
+                text_input(form.name_fem)
+                    .placeholder("e.g. Eva")
+                    .style(input_style(signals)),
+            ),
+            form_row(
+                "Androgynous name",
+                signals,
+                text_input(form.name_androg)
+                    .placeholder("e.g. Ev")
+                    .style(input_style(signals)),
+            ),
+        ))
+        .style(section_style()),
+        // Body section
+        v_stack((
+            section_title("Your Body", signals),
+            form_row(
+                "Figure",
+                signals,
+                Dropdown::new_rw(
+                    form.figure,
+                    vec![
+                        PlayerFigure::Slim,
+                        PlayerFigure::Toned,
+                        PlayerFigure::Womanly,
+                    ],
+                )
+                .style(dropdown_style(signals)),
+            ),
+            form_row(
+                "Breasts",
+                signals,
+                Dropdown::new_rw(
+                    form.breasts,
+                    vec![
+                        BreastSize::Small,
+                        BreastSize::MediumSmall,
+                        BreastSize::MediumLarge,
+                        BreastSize::Large,
+                    ],
+                )
+                .style(dropdown_style(signals)),
+            ),
+        ))
+        .style(section_style()),
+        // Background section
+        v_stack((
+            section_title("Background", signals),
+            form_row("Race", signals, race_picker(form.race, races_list, signals)),
+            age_row,
+        ))
+        .style(section_style()),
         begin_btn,
-        // bottom padding so the button isn't flush with bottom
         empty().style(|s| s.height(40.0)),
     ))
     .style(move |s| {
@@ -181,8 +306,8 @@ pub fn char_creation_view(
 
 // ── heading ───────────────────────────────────────────────────────────────────
 
-fn heading(signals: AppSignals) -> impl View {
-    label(|| "Create Your Character".to_string()).style(move |s| {
+fn heading(title: &'static str, signals: AppSignals) -> impl View {
+    label(move || title.to_string()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(28.0)
             .font_weight(floem::text::Weight::LIGHT)
@@ -192,204 +317,122 @@ fn heading(signals: AppSignals) -> impl View {
     })
 }
 
-// ── section: Who You Are Now ──────────────────────────────────────────────────
-
-fn section_who_you_are(
-    signals: AppSignals,
-    form: CharFormSignals,
-    races: Vec<String>,
-) -> impl View {
-    v_stack((
-        section_title("Who You Are Now", signals),
-        form_row(
-            "Feminine name",
-            signals,
-            text_input(form.name_fem)
-                .placeholder("e.g. Eva")
-                .style(input_style(signals)),
-        ),
-        form_row(
-            "Androgynous name",
-            signals,
-            text_input(form.name_androg)
-                .placeholder("e.g. Ev")
-                .style(input_style(signals)),
-        ),
-        form_row(
-            "Masculine name",
-            signals,
-            text_input(form.name_masc)
-                .placeholder("e.g. Evan")
-                .style(input_style(signals)),
-        ),
-        form_row(
-            "Age",
-            signals,
-            Dropdown::new_rw(
-                form.age,
-                vec![
-                    Age::LateTeen,
-                    Age::EarlyTwenties,
-                    Age::Twenties,
-                    Age::LateTwenties,
-                    Age::Thirties,
-                    Age::Forties,
-                    Age::Fifties,
-                    Age::Old,
-                ],
-            )
-            .style(dropdown_style(signals)),
-        ),
-        form_row(
-            "Figure",
-            signals,
-            Dropdown::new_rw(
-                form.figure,
-                vec![
-                    PlayerFigure::Slim,
-                    PlayerFigure::Toned,
-                    PlayerFigure::Womanly,
-                ],
-            )
-            .style(dropdown_style(signals)),
-        ),
-        form_row(
-            "Breasts",
-            signals,
-            Dropdown::new_rw(
-                form.breasts,
-                vec![
-                    BreastSize::Small,
-                    BreastSize::MediumSmall,
-                    BreastSize::MediumLarge,
-                    BreastSize::Large,
-                ],
-            )
-            .style(dropdown_style(signals)),
-        ),
-        form_row("Race", signals, race_picker(form.race, races, signals)),
-    ))
-    .style(section_style())
-}
-
 // ── section: Your Past ────────────────────────────────────────────────────────
 
 fn section_your_past(
     signals: AppSignals,
-    form: CharFormSignals,
-    before_races: Vec<String>,
+    form: BeforeFormSignals,
+    races: Vec<String>,
 ) -> impl View {
-    let was_transformed = form.was_transformed;
-    let before_kind = form.before_kind;
+    let origin_idx = form.origin_idx;
 
-    // Step 1: was the PC transformed?
-    let step1 = v_stack((
+    let origin_radios = v_stack((
         radio_opt(
-            "Something happened to me",
-            move || was_transformed.get(),
-            move || was_transformed.set(true),
+            "Something happened to me \u{2014} I was a man",
+            move || origin_idx.get() == 0,
+            move || origin_idx.set(0),
+            signals,
+        ),
+        radio_opt(
+            "Something happened to me \u{2014} I was a trans woman",
+            move || origin_idx.get() == 1,
+            move || origin_idx.set(1),
+            signals,
+        ),
+        radio_opt(
+            "Something happened to me \u{2014} I was a woman",
+            move || origin_idx.get() == 2,
+            move || origin_idx.set(2),
             signals,
         ),
         radio_opt(
             "I was always a woman",
-            move || !was_transformed.get(),
-            move || was_transformed.set(false),
+            move || origin_idx.get() == 3,
+            move || origin_idx.set(3),
             signals,
         ),
     ))
     .style(|s| s.margin_bottom(16.0));
 
-    // Step 2 + conditional fields
-    let step2_and_fields = dyn_container(
-        move || (was_transformed.get(), before_kind.get()),
-        move |(is_transformed, kind)| {
-            if !is_transformed {
+    let before_fields = dyn_container(
+        move || origin_idx.get(),
+        move |idx| {
+            if idx == 3 {
+                // AlwaysFemale — no before-fields
                 return empty().into_any();
             }
-            let kind_btns = v_stack((
-                radio_opt(
-                    "I was a man",
-                    move || before_kind.get() == BeforeKind::CisMale,
-                    move || before_kind.set(BeforeKind::CisMale),
-                    signals,
-                ),
-                radio_opt(
-                    "I was a trans woman",
-                    move || before_kind.get() == BeforeKind::TransWoman,
-                    move || before_kind.set(BeforeKind::TransWoman),
-                    signals,
-                ),
-                radio_opt(
-                    "I was a woman",
-                    move || before_kind.get() == BeforeKind::CisFemale,
-                    move || before_kind.set(BeforeKind::CisFemale),
-                    signals,
-                ),
-            ))
-            .style(|s| s.margin_bottom(16.0));
 
-            let origin = resolve_origin(is_transformed, kind);
-            let br = before_races.clone();
-            let extra: Box<dyn View> = if origin.was_male_bodied() {
-                Box::new(v_stack((
-                    form_row(
-                        "Age before transition",
-                        signals,
-                        text_input(form.before_age_str)
-                            .placeholder("28")
-                            .style(input_style(signals)),
-                    ),
-                    form_row(
-                        "Before sexuality",
-                        signals,
-                        Dropdown::new_rw(
-                            form.sexuality,
-                            vec![
-                                BeforeSexuality::AttractedToWomen,
-                                BeforeSexuality::AttractedToMen,
-                                BeforeSexuality::AttractedToBoth,
-                            ],
-                        )
-                        .style(dropdown_style(signals)),
-                    ),
-                    form_row(
-                        "Race before",
-                        signals,
-                        race_picker(form.before_race, br, signals),
-                    ),
-                )))
+            let origin = origin_from_idx(idx);
+            let br = races.clone();
+
+            let name_row = form_row(
+                "Name before",
+                signals,
+                text_input(form.before_name)
+                    .placeholder("e.g. Evan")
+                    .style(input_style(signals)),
+            );
+
+            let age_row = form_row(
+                "Age before",
+                signals,
+                Dropdown::new_rw(
+                    form.before_age,
+                    vec![
+                        Age::LateTeen,
+                        Age::EarlyTwenties,
+                        Age::Twenties,
+                        Age::LateTwenties,
+                        Age::Thirties,
+                        Age::Forties,
+                        Age::Fifties,
+                        Age::Old,
+                    ],
+                )
+                .style(dropdown_style(signals)),
+            );
+
+            let race_row = form_row(
+                "Race before",
+                signals,
+                race_picker(form.before_race, br, signals),
+            );
+
+            if origin.was_male_bodied() {
+                let sexuality_row = form_row(
+                    "Before sexuality",
+                    signals,
+                    Dropdown::new_rw(
+                        form.before_sexuality,
+                        vec![
+                            BeforeSexuality::AttractedToWomen,
+                            BeforeSexuality::AttractedToMen,
+                            BeforeSexuality::AttractedToBoth,
+                        ],
+                    )
+                    .style(dropdown_style(signals)),
+                );
+                v_stack((name_row, age_row, sexuality_row, race_row)).into_any()
             } else {
-                Box::new(v_stack((
-                    form_row(
-                        "Age before transition",
-                        signals,
-                        text_input(form.before_age_str)
-                            .placeholder("28")
-                            .style(input_style(signals)),
-                    ),
-                    form_row(
-                        "Race before",
-                        signals,
-                        race_picker(form.before_race, br, signals),
-                    ),
-                )))
-            };
-
-            v_stack((kind_btns, extra)).into_any()
+                v_stack((name_row, age_row, race_row)).into_any()
+            }
         },
     );
 
-    v_stack((section_title("Your Past", signals), step1, step2_and_fields)).style(section_style())
+    v_stack((
+        section_title("Your Past", signals),
+        origin_radios,
+        before_fields,
+    ))
+    .style(section_style())
 }
 
 // ── section: Personality ──────────────────────────────────────────────────────
 
-fn section_personality(signals: AppSignals, form: CharFormSignals) -> impl View {
+fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl View {
     let beautiful = form.trait_beautiful;
     let plain = form.trait_plain;
 
-    // Mutual exclusion: toggling beautiful clears plain and vice versa.
-    // We use on_click_stop inside custom checkbox wrappers.
     let beautiful_cb = h_stack((
         Checkbox::new_rw(beautiful).style(|s| s.margin_right(8.0)),
         label(|| "Beautiful").style(move |s| {
@@ -471,7 +514,7 @@ fn section_personality(signals: AppSignals, form: CharFormSignals) -> impl View 
 
 // ── section: Content Preferences ─────────────────────────────────────────────
 
-fn section_content_prefs(signals: AppSignals, form: CharFormSignals) -> impl View {
+fn section_content_prefs(signals: AppSignals, form: BeforeFormSignals) -> impl View {
     v_stack((
         section_title("Content Preferences", signals),
         Checkbox::labeled_rw(form.include_rough, || {
@@ -500,64 +543,22 @@ fn section_content_prefs(signals: AppSignals, form: CharFormSignals) -> impl Vie
     .style(section_style())
 }
 
-// ── Begin button ──────────────────────────────────────────────────────────────
+// ── Next button ───────────────────────────────────────────────────────────────
 
-fn build_begin_button(
+fn build_next_button(
     signals: AppSignals,
-    form: CharFormSignals,
+    form: BeforeFormSignals,
+    _races: Vec<String>,
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
 ) -> impl View {
-    label(|| "Begin Your Story".to_string())
+    label(|| "Next \u{2192}".to_string())
         .keyboard_navigable()
         .on_click_stop(move |_| {
-            // Take the PreGameState out of the cell
-            let pre = pre_state.borrow_mut().take();
-            let pre = match pre {
-                Some(p) => p,
-                None => return, // already started
-            };
+            let origin = origin_from_idx(form.origin_idx.get_untracked());
 
-            // If pack loading failed, build error state and go to in-game
-            if let Some(ref err) = pre.init_error {
-                let err_msg = err.clone();
-                signals
-                    .story
-                    .set(format!("Error loading packs: {}", err_msg));
-                let gs = error_game_state(err_msg);
-                *game_state.borrow_mut() = Some(gs);
-                signals.phase.set(AppPhase::InGame);
-                return;
-            }
-
-            let origin = resolve_origin(
-                form.was_transformed.get_untracked(),
-                form.before_kind.get_untracked(),
-            );
-
-            // Build BeforeIdentity if this PC has a before-life.
-            let before = if origin.has_before_life() {
-                let raw_age: u32 = form.before_age_str.get_untracked().parse().unwrap_or(28);
-                let sexuality = if origin.was_male_bodied() {
-                    form.sexuality.get_untracked()
-                } else {
-                    // Default for cis-female-transformed: attracted to women (least
-                    // narratively loaded default; content can branch on pcOrigin).
-                    BeforeSexuality::AttractedToWomen
-                };
-                Some(BeforeIdentity {
-                    name: form.name_masc.get_untracked(),
-                    age: age_from_u32(raw_age),
-                    race: form.before_race.get_untracked(),
-                    sexuality,
-                    figure: form.before_figure.get_untracked(),
-                    traits: std::collections::HashSet::new(),
-                })
-            } else {
-                None
-            };
-
-            // Collect starting traits (string names)
+            // Collect starting traits
             let mut trait_names: Vec<&'static str> = Vec::new();
             if form.trait_shy.get_untracked() {
                 trait_names.push("SHY");
@@ -589,36 +590,180 @@ fn build_begin_button(
             if form.trait_ambitious.get_untracked() {
                 trait_names.push("AMBITIOUS");
             }
-            if !form.include_rough.get_untracked() {
-                trait_names.push("BLOCK_ROUGH");
-            }
-            if form.likes_rough.get_untracked() {
-                trait_names.push("LIKES_ROUGH");
-            }
             if form.trait_beautiful.get_untracked() {
                 trait_names.push("BEAUTIFUL");
             }
             if form.trait_plain.get_untracked() {
                 trait_names.push("PLAIN");
             }
+            if !form.include_rough.get_untracked() {
+                trait_names.push("BLOCK_ROUGH");
+            }
+            if form.likes_rough.get_untracked() {
+                trait_names.push("LIKES_ROUGH");
+            }
 
             // Resolve trait IDs from registry
-            let starting_traits: Vec<_> = trait_names
-                .iter()
-                .filter_map(|name| pre.registry.resolve_trait(name).ok())
-                .collect();
+            let starting_traits: Vec<_> = {
+                let pre_borrow = pre_state.borrow();
+                if let Some(ref pre) = *pre_borrow {
+                    trait_names
+                        .iter()
+                        .filter_map(|name| pre.registry.resolve_trait(name).ok())
+                        .collect()
+                } else {
+                    vec![]
+                }
+            };
+
+            let partial = PartialCharState {
+                origin,
+                before_name: form.before_name.get_untracked(),
+                before_age: form.before_age.get_untracked(),
+                before_race: form.before_race.get_untracked(),
+                before_sexuality: form.before_sexuality.get_untracked(),
+                starting_traits: starting_traits.clone(),
+            };
+            partial_char.set(Some(partial.clone()));
+
+            if origin == PcOrigin::AlwaysFemale {
+                // Skip transformation intro — go straight to fem creation.
+                signals.phase.set(AppPhase::FemCreation);
+            } else {
+                // Create a throwaway world for the transformation intro scene.
+                // This world is discarded after the intro — the real world is
+                // created at FemCreation submit via new_game().
+                let before_identity = Some(BeforeIdentity {
+                    name: partial.before_name.clone(),
+                    age: partial.before_age,
+                    race: partial.before_race.clone(),
+                    sexuality: partial.before_sexuality,
+                    figure: MaleFigure::Average,
+                    traits: std::collections::HashSet::new(),
+                });
+                let throwaway_config = CharCreationConfig {
+                    name_fem: String::new(),
+                    name_androg: String::new(),
+                    name_masc: partial.before_name.clone(),
+                    age: partial.before_age,
+                    race: partial.before_race.clone(),
+                    figure: PlayerFigure::Slim,
+                    breasts: BreastSize::MediumLarge,
+                    origin,
+                    before: before_identity,
+                    starting_traits: partial.starting_traits.clone(),
+                    male_count: 0,
+                    female_count: 0,
+                    starting_flags: std::collections::HashSet::new(),
+                    starting_arc_states: std::collections::HashMap::new(),
+                };
+
+                {
+                    let mut pre_mut = pre_state.borrow_mut();
+                    if let Some(ref mut pre) = *pre_mut {
+                        let throwaway_world = undone_packs::char_creation::new_game(
+                            throwaway_config,
+                            &mut pre.registry,
+                            &mut pre.rng,
+                        );
+                        let engine = undone_scene::engine::SceneEngine::new(pre.scenes.clone());
+                        let throwaway_gs = GameState {
+                            world: throwaway_world,
+                            registry: pre.registry.clone(),
+                            engine,
+                            scheduler: pre.scheduler.clone(),
+                            rng: rand::rngs::SmallRng::from_entropy(),
+                            init_error: None,
+                            opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
+                            default_slot: pre.registry.default_slot().map(|s| s.to_owned()),
+                        };
+                        *game_state.borrow_mut() = Some(throwaway_gs);
+                    }
+                }
+
+                signals.phase.set(AppPhase::TransformationIntro);
+            }
+        })
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.margin_top(24.0)
+                .padding_horiz(40.0)
+                .padding_vert(16.0)
+                .font_size(16.0)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .border(1.5)
+                .border_color(colors.lamp)
+                .border_radius(6.0)
+                .color(colors.lamp)
+                .background(colors.lamp_glow)
+                .hover(|s| s.background(colors.lamp_glow))
+                .focus_visible(|s| s.outline(2.0).outline_color(colors.lamp))
+                .active(|s| s.background(colors.lamp_glow))
+        })
+}
+
+// ── Begin Your Story button (FemCreation) ─────────────────────────────────────
+
+fn build_begin_button(
+    signals: AppSignals,
+    form: FemFormSignals,
+    pre_state: Rc<RefCell<Option<PreGameState>>>,
+    game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
+) -> impl View {
+    label(|| "Begin Your Story".to_string())
+        .keyboard_navigable()
+        .on_click_stop(move |_| {
+            let pre = match pre_state.borrow_mut().take() {
+                Some(p) => p,
+                None => return, // already started
+            };
+
+            let partial = partial_char.get_untracked().unwrap_or_else(|| {
+                // AlwaysFemale path: partial may not carry before-data.
+                PartialCharState {
+                    origin: PcOrigin::AlwaysFemale,
+                    before_name: String::new(),
+                    before_age: form.age.get_untracked(),
+                    before_race: form.race.get_untracked(),
+                    before_sexuality: BeforeSexuality::AttractedToWomen,
+                    starting_traits: vec![],
+                }
+            });
+
+            let origin = partial.origin;
+            let fem_race = form.race.get_untracked();
+
+            let before = if origin.has_before_life() {
+                Some(BeforeIdentity {
+                    name: partial.before_name.clone(),
+                    age: partial.before_age,
+                    race: partial.before_race.clone(),
+                    sexuality: partial.before_sexuality,
+                    figure: MaleFigure::Average,
+                    traits: std::collections::HashSet::new(),
+                })
+            } else {
+                None
+            };
+
+            let pc_age = if origin == PcOrigin::AlwaysFemale {
+                form.age.get_untracked()
+            } else {
+                partial.before_age
+            };
 
             let config = CharCreationConfig {
                 name_fem: form.name_fem.get_untracked(),
                 name_androg: form.name_androg.get_untracked(),
-                name_masc: form.name_masc.get_untracked(),
-                age: form.age.get_untracked(),
-                race: form.race.get_untracked(),
+                name_masc: partial.before_name.clone(),
+                age: pc_age,
+                race: fem_race,
                 figure: form.figure.get_untracked(),
                 breasts: form.breasts.get_untracked(),
                 origin,
                 before,
-                starting_traits,
+                starting_traits: partial.starting_traits,
                 male_count: 6,
                 female_count: 2,
                 starting_flags: std::collections::HashSet::new(),
