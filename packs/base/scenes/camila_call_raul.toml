@@ -1,0 +1,191 @@
+[scene]
+id          = "base::camila_call_raul"
+pack        = "base"
+description = "A friend from home calls for Raul. She has to be someone who knows where Raul is."
+
+[intro]
+prose = """
+Her phone rings on Wednesday evening. She looks at the name: Diego.
+
+Diego is her best friend from home. Was. Diego is the person who would have called Raul on a Wednesday to check in, because that's what Diego does — he calls, which is unusual, because everyone texts, but Diego calls because he says texting lacks inflection and he is correct about this in a way that she's always found slightly insufferable.
+
+She stares at the name for three rings.
+
+She answers.
+
+"Yo, is Raul there?"
+
+Diego says this because he doesn't know. He doesn't know because she hasn't told him. She hasn't told him because she doesn't know how to tell him and the longer she doesn't the harder it gets and it's been two weeks now.
+
+{% if w.hasTrait("SHY") %}
+"He's — " she starts, and then stops, and then makes herself finish: "He stepped out. He'll call you back."
+
+She hangs up before Diego can ask questions. She sits in the dark of her dorm room. She has to call him back and she doesn't know how to call him back.
+{% elif w.hasTrait("AMBITIOUS") %}
+She does the math in about half a second. "He's not available right now," she says. "I'm — I'm his — I'm his roommate." Which is not true in any geography. "He'll call you back."
+
+"Oh." A pause. "Okay. Tell him Diego called. It's not urgent."
+
+"I will," she says. She hangs up.
+{% else %}
+She opens her mouth. She doesn't know what's going to come out. "He's not — he's not around right now," she says. "Can I take a message?"
+
+A beat. "Uh, yeah. Tell him Diego called." Another beat. "His roommate?"
+
+"Yeah," she says. "His roommate."
+
+"Cool. Tell him to call me when he gets a chance."
+
+"I will," she says, and hangs up.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
+prose = """
+Diego calls on Wednesday.
+
+She stares at the name. Three rings.
+
+She answers.
+
+"Yo, is Raul there?"
+
+*He's right here*, she thinks. *He's always right here. He's the only one who's right here.*
+
+"He's not available," she says. "I'm his — I can take a message."
+
+A pause. "Okay. Tell him Diego called."
+
+"I'll tell him."
+
+She hangs up. She puts the phone on her desk. She looks at it.
+
+*File it for later*, she thinks. *File everything for later. Later will come.*
+
+She doesn't know when later is.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale()"
+style     = "inner_voice"
+prose = """
+The lie is still easier than the truth, which means she still doesn't have the truth in a form she can say out loud.
+
+She knows what happened. She knows what she is now. She can write it in a note on her phone at 2 AM and delete it. But saying it to Diego — saying it to anyone who knew Raul — would make it a story, and she doesn't have the story yet.
+
+*He'll figure it out eventually*, she thinks, and then: *No, he won't. He'll just think Raul stopped calling.*
+
+She picks up her phone. She puts it down. She picks it up again.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "call_him_back"
+label = "Call him back. Figure it out on the call."
+detail = "You don't have a plan. You'll figure it out when he answers."
+prose = """
+He answers on the first ring, which is Diego. "Hey, uh — who's this?"
+
+"It's me," she says, and then has to decide what *me* means. She goes with: "It's Camila. I'm — I know Raul."
+
+"Oh hey." A pause. "Is Raul okay?"
+
+{% if w.hasTrait("SHY") %}
+She hasn't thought about what to say beyond *hi.* "He's fine," she says. "He's — going through some stuff. He asked me to reach out."
+
+She is going through some stuff. She is reaching out. Nothing she said was technically a lie.
+
+"Oh, okay." Diego sounds uncertain. "Like, should I be worried?"
+
+"No," she says. "He's okay. He just needs some time."
+
+The call ends on that. She hangs up and her hands are shaking slightly and she doesn't know if she made things better or worse.
+{% else %}
+"He's okay," she says. "He's going through something. I'm — I'm a friend of his from the city. He asked me to let people know he needs some space."
+
+A long pause. "Space from what?"
+
+"Just — things got complicated. He's safe. He'll reach out when he's ready."
+
+She doesn't know if this is true. She is Raul. She is not reaching out. She hasn't decided if she ever will.
+
+"Tell him to call me," Diego says, and his voice has the quality of someone who has too many questions to know which one to ask. "Tell him I don't care what it is."
+
+"I'll tell him," she says.
+
+She hangs up. She sits with the phone in her hands for a moment. Diego doesn't care what it is. She didn't know that. She still doesn't know what to do with it.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = 5
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "CALL_HOME_DONE"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "dont_call_back"
+label = "Don't call back. Not yet."
+detail = "You're not ready. Diego will be fine."
+prose = """
+She puts her phone face-down on the desk.
+
+Diego will be fine. He's always fine. He'll text a few more times, then less, then occasionally, the way friendships do when the geography changes. By the time she figures out what to say, it might not matter anymore.
+
+She doesn't know if that's a plan or a failure. She picks up her textbook. She has a problem set due Friday.
+
+{% if not w.alwaysFemale() %}
+*He'd have called back*, she thinks, and then corrects herself. *He was always bad at calling back.* Diego was always the one who called. She's been here the whole time.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "CALL_HOME_DONE"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "text_instead"
+label = "Text him instead. Control what you say."
+detail = "In text you have time to think before you send."
+prose = """
+She opens a text to Diego. She types: *hey, it's camila. raul's friend. he asked me to reach out — he's going through something and needs some space. he's okay.*
+
+She reads it four times. She sends it.
+
+He replies in a minute: *okay. thanks for letting me know. tell him to call me when he can?*
+
+She types: *I will.*
+
+She puts the phone in her bag. She will, eventually. She doesn't know when eventually is.
+
+{% if not w.alwaysFemale() %}
+She thinks: he said *thanks for letting me know*. Not *who are you* or *that's weird* — just *thanks.* Diego is, she thinks, probably fine. Better at this than Raul expected.
+
+Than she expected.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -2
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "CALL_HOME_DONE"
+
+  [[actions.next]]
+  finish = true

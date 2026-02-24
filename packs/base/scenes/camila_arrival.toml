@@ -1,0 +1,127 @@
+[scene]
+id          = "base::camila_arrival"
+pack        = "base"
+description = "Camila arrives on campus. Move-in day. Being greeted as a girl for the first time in public."
+
+[intro]
+prose = """
+Move-in day at the Ivy is a production. Parents with Volvos and Range Rovers double-parked along the quad, upperclassmen in university t-shirts holding clipboards, someone somewhere already playing music too loud for 10 AM. A banner over the gate: WELCOME CLASS OF 2032.
+
+She has a duffel bag and a laptop case and a driver's license that says Raul, and she is standing at the check-in table while a junior in a yellow t-shirt smiles at her with the practiced warmth of someone who has done this forty times this morning.
+
+"Name?" the junior says.
+
+She almost says Raul.
+
+"Camila," she says instead.
+
+The junior types it. Finds it. Because *Camila* is in the system — her parents' emergency contact, which she'd filled out months ago under her old name, had been quietly updated when the enrollment office got her email last week. She'd called it "a legal name update." The office person had been completely normal about it, which Camila had not expected and still doesn't know what to do with.
+
+"Here you go." The junior hands her a lanyard with her room key and a campus map. "Aldrich Hall, room 214. Elevator's on the left. Welcome!"
+
+{% if w.hasTrait("SHY") %}
+"Thanks," she says. She takes the lanyard and moves before the junior can ask anything else.
+{% elif w.hasTrait("AMBITIOUS") %}
+She takes the lanyard with the efficiency of someone who has already memorized the campus map from the PDF and doesn't need the paper one. "Thanks," she says, and locates Aldrich Hall before she's ten feet from the table.
+{% else %}
+She says thank you. The junior has already moved on to the next person. She stands for a moment with the lanyard in her hands, looking at the campus, before she starts walking.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
+prose = """
+Move-in day. He — Camila — she walks up to the check-in table and says her name when she's asked and the junior types it into a laptop and finds it and hands her a lanyard.
+
+*Welcome.*
+
+She walks toward Aldrich Hall. The campus is full of families doing the thing families do on move-in day: carrying boxes, pointing at buildings, taking photos. A woman — a mother — looks at her as she passes. Smiles the way you smile at a freshman on move-in day.
+
+Camila smiles back. The woman looks away. Camila keeps walking.
+
+*That happened*, she thinks. *That was that.* She adds it to the list of things that are happening and files it under *later*.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale()"
+style     = "inner_voice"
+prose = """
+The junior said *Welcome!* like she meant it, which she probably did, and meant it toward Camila specifically, which is the part that's strange.
+
+He'd been welcomed to things before. Orientation at his private school. The lacrosse team. College interviews where the alumni assessors leaned forward when he spoke. He knows what *welcome* feels like from the inside and this is different in a way he can't locate yet.
+
+Camila, the junior just assumed. Not *welcome, whichever gender you are* — just *welcome.* Like it was obvious.
+
+She walks toward her dorm. It was obvious, she supposes. She supposes that's the whole situation.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "find_the_room"
+label = "Find room 214"
+detail = "Aldrich Hall. Second floor. Get your bearings."
+allow_npc_actions = true
+prose = """
+The dorm is already half-chaos — doors propped open, the elevator slow and crowded, parents navigating hallways with boxes they can't see over. She takes the stairs.
+
+Room 214 is at the end of the hall. Her roommate isn't there yet — just furniture, a bare mattress on each side, and a window that looks onto a courtyard. She sets her duffel down. She looks at the room.
+
+{% if w.hasTrait("POSH") %}
+The furniture is institutional. She'd expected institutional. She's going to need a rug and better lighting and possibly a lamp from somewhere that isn't the campus store. She makes a note.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+The room is fine. She's slept in worse at lacrosse away games. She starts unpacking.
+{% else %}
+She sits on the mattress. The springs are mediocre. Outside, someone is asking their parent to please just let them handle the boxes. The parent is not letting them.
+
+She has a room at college. She has a name on the lanyard. She is at the Ivy, which was the plan, and the plan still more or less happened. She just didn't expect to be here like this.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "ROUTE_CAMILA"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "arrived"
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions (resident advisor) ────────────────────────────────────
+
+[[npc_actions]]
+id     = "ra_checks_in"
+label  = "The RA introduces herself"
+weight = 8
+prose = """
+A knock on the open door. A junior — tall, natural hair, clipboard — leans in.
+
+"Hey, I'm Priya, your RA. Just doing a quick check-in. You get the key okay?"
+
+"Yeah," Camila says. "Thank you."
+
+Priya glances at the room. "Your roommate's Janette — she's usually here by noon." She gives the spiel: quiet hours, common room, her door is always open, weekly study breaks on Wednesdays. She delivers it with the warmth of someone who's done it enough times to mean it.
+
+{% if w.hasTrait("SHY") %}
+Camila nods at the right moments. When Priya leaves she feels slightly better about the whole thing, which she didn't expect.
+{% else %}
+Camila asks one question — where's the nearest laundry — and Priya answers it and is gone in thirty seconds. Efficient. Camila approves.
+{% endif %}
+
+She goes back to her unpacking.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_game_flag"
+  flag = "ROUTE_CAMILA"
+
+  [[npc_actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "arrived"
+
+  [[npc_actions.next]]
+  finish = true

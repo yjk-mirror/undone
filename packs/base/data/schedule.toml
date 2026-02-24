@@ -65,3 +65,41 @@ name = "robin_opening"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
   once_only = true
+
+# ── Camila opening arc ────────────────────────────────────────────────
+
+[[slot]]
+name = "camila_opening"
+
+  [[slot.events]]
+  scene     = "base::camila_arrival"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMILA')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_dorm"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'arrived'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'arrived'"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_orientation"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'orientation'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'orientation'"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_library"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life'"
+  weight    = 10
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_call_raul"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && !gd.hasGameFlag('CALL_HOME_DONE')"
+  weight    = 8
+  once_only = true
