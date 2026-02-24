@@ -1,11 +1,12 @@
 use crate::game_state::GameState;
+use crate::theme::NumberKeyMode;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 use floem::event::{Event, EventListener};
 use floem::keyboard::{Key, NamedKey};
 use floem::peniko::Color;
 use floem::prelude::*;
-use floem::reactive::create_rw_signal;
+use floem::reactive::{create_effect, create_rw_signal, RwSignal};
 use floem::style::FlexWrap;
 use floem::text::{
     Attrs, AttrsList, FamilyOwned, LineHeightValue, Style as TextStyle, TextLayout, Weight,
@@ -193,18 +194,20 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref default_slot,
         ..
     } = *gs;
-    engine.send(EngineCommand::ChooseAction(action_id), world, registry);
-    let events = engine.drain();
-    // Resolve FEMININITY id for building PlayerSnapshot after events are processed.
-    // If the skill is missing (pack load error), skip player snapshot update.
     if let Ok(femininity_id) = registry.resolve_skill("FEMININITY") {
+        let events = engine.advance_with_action(&action_id, world, registry);
         let finished = crate::process_events(events, signals, world, femininity_id);
         if finished {
-            let slot = default_slot.as_deref().unwrap_or("free_time");
-            if let Some(scene_id) = scheduler.pick(slot, world, registry, rng) {
-                engine.send(EngineCommand::StartScene(scene_id), world, registry);
-                let events = engine.drain();
-                crate::process_events(events, signals, world, femininity_id);
+            if let Some(slot) = default_slot.as_deref() {
+                if let Some(scene_id) = scheduler.pick(slot, world, registry, rng) {
+                    engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                    let events = engine.drain();
+                    crate::process_events(events, signals, world, femininity_id);
+                }
+            } else {
+                eprintln!(
+                    "[scheduler] no default_slot configured — scene finished with no next scene"
+                );
             }
         }
     }
@@ -215,19 +218,98 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let actions = signals.actions;
     let state_clone = Rc::clone(&state);
     let hovered_detail = create_rw_signal(String::new());
+    let highlighted_idx: RwSignal<Option<usize>> = RwSignal::new(None);
 
-    // Global keyboard shortcut listener for left panel (1-9 to select choices)
-    let keyboard_handler = move |e: &Event| {
+    // Reset highlight whenever actions change (new scene step).
+    let hi_reset = highlighted_idx;
+    create_effect(move |_| {
+        let _ = actions.get(); // reactive dependency
+        hi_reset.set(None);
+    });
+
+    let keyboard_handler = move |e: &Event| -> bool {
         if let Event::KeyDown(key_event) = e {
-            if let Key::Character(char_str) = &key_event.key.logical_key {
+            let mode = signals.prefs.get().number_key_mode;
+            let key = &key_event.key.logical_key;
+
+            // Arrow navigation (always active regardless of mode).
+            if key == &Key::Named(NamedKey::ArrowDown) {
+                let len = actions.get().len();
+                if len > 0 {
+                    highlighted_idx.update(|h| {
+                        *h = Some(match *h {
+                            None => 0,
+                            Some(i) => (i + 1) % len,
+                        });
+                    });
+                }
+                return true;
+            }
+            if key == &Key::Named(NamedKey::ArrowUp) {
+                let len = actions.get().len();
+                if len > 0 {
+                    highlighted_idx.update(|h| {
+                        *h = Some(match *h {
+                            None => len.saturating_sub(1),
+                            Some(i) => {
+                                if i == 0 {
+                                    len - 1
+                                } else {
+                                    i - 1
+                                }
+                            }
+                        });
+                    });
+                }
+                return true;
+            }
+
+            // Enter: confirm highlighted choice.
+            if key == &Key::Named(NamedKey::Enter) {
+                if let Some(idx) = highlighted_idx.get() {
+                    let current_actions = actions.get();
+                    if idx < current_actions.len() {
+                        let action_id = current_actions[idx].id.clone();
+                        drop(current_actions);
+                        dispatch_action(action_id, &state_clone, signals);
+                        return true;
+                    }
+                }
+            }
+
+            // Escape: clear highlight.
+            if key == &Key::Named(NamedKey::Escape) {
+                highlighted_idx.set(None);
+                return true;
+            }
+
+            // Number keys 1–9.
+            if let Key::Character(char_str) = key {
                 if let Ok(num) = char_str.parse::<usize>() {
                     if num > 0 && num <= 9 {
                         let idx = num - 1;
                         let current_actions = actions.get();
                         if idx < current_actions.len() {
-                            let action_id = current_actions[idx].id.clone();
-                            dispatch_action(action_id, &state_clone, signals);
-                            return true; // handled
+                            match mode {
+                                NumberKeyMode::Instant => {
+                                    let action_id = current_actions[idx].id.clone();
+                                    drop(current_actions);
+                                    dispatch_action(action_id, &state_clone, signals);
+                                    return true;
+                                }
+                                NumberKeyMode::Confirm => {
+                                    if highlighted_idx.get() == Some(idx) {
+                                        // Already highlighted — confirm.
+                                        let action_id = current_actions[idx].id.clone();
+                                        drop(current_actions);
+                                        dispatch_action(action_id, &state_clone, signals);
+                                    } else {
+                                        // Not highlighted — highlight it.
+                                        highlighted_idx.set(Some(idx));
+                                    }
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
@@ -265,7 +347,18 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             s.flex_grow(1.0).flex_basis(0.0).background(colors.page)
         });
 
-    let detail_strip = label(move || hovered_detail.get()).style(move |s| {
+    let detail_strip = label(move || {
+        // Show highlighted detail when a choice is keyboard-highlighted,
+        // otherwise fall back to hovered detail.
+        if let Some(idx) = highlighted_idx.get() {
+            let acts = actions.get();
+            if idx < acts.len() {
+                return acts[idx].detail.clone();
+            }
+        }
+        hovered_detail.get()
+    })
+    .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.width_full()
             .min_height(28.0)
@@ -284,7 +377,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     v_stack((
         scroll_area,
         detail_strip,
-        choices_bar(signals, state, hovered_detail),
+        choices_bar(signals, state, hovered_detail, highlighted_idx),
     ))
     .keyboard_navigable()
     .on_event_stop(EventListener::KeyDown, move |e| {
@@ -297,6 +390,7 @@ fn choices_bar(
     signals: AppSignals,
     state: Rc<RefCell<GameState>>,
     hovered_detail: floem::reactive::RwSignal<String>,
+    highlighted_idx: RwSignal<Option<usize>>,
 ) -> impl View {
     let actions = signals.actions;
 
@@ -323,11 +417,12 @@ fn choices_bar(
             let exec_action_click = exec_action.clone();
             let exec_action_key = exec_action;
             let hovered = create_rw_signal(false);
+            let is_highlighted = move || highlighted_idx.get() == Some(index);
 
             h_stack((
                 label(move || format!("{}·", index + 1)).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    let ink = if hovered.get() {
+                    let ink = if hovered.get() || is_highlighted() {
                         colors.ink_dim
                     } else {
                         colors.ink_ghost
@@ -366,14 +461,23 @@ fn choices_bar(
             })
             .style(move |s| {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                let highlighted = is_highlighted();
                 s.margin(4.0)
                     .padding_horiz(20.0)
                     .padding_vert(12.0)
                     .min_height(48.0)
                     .border(1.0)
-                    .border_color(colors.seam)
+                    .border_color(if highlighted {
+                        colors.lamp
+                    } else {
+                        colors.seam
+                    })
                     .border_radius(4.0)
-                    .background(Color::TRANSPARENT)
+                    .background(if highlighted {
+                        colors.lamp_glow
+                    } else {
+                        Color::TRANSPARENT
+                    })
                     .items_center()
                     .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
                     .focus_visible(|s| {

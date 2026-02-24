@@ -3,6 +3,7 @@ pub mod game_state;
 pub mod left_panel;
 pub mod right_panel;
 pub mod saves_panel;
+pub mod settings_panel;
 pub mod theme;
 pub mod title_bar;
 
@@ -22,6 +23,7 @@ use crate::game_state::{init_game, GameState, PreGameState};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
 use crate::saves_panel::saves_panel;
+use crate::settings_panel::settings_view;
 use crate::theme::{ThemeColors, UserPrefs};
 use crate::title_bar::title_bar;
 
@@ -181,17 +183,18 @@ pub fn app_view() -> impl View {
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
-                                    let slot = default_slot.as_deref().unwrap_or("free_time");
-                                    if let Some(scene_id) =
-                                        scheduler.pick(slot, world, registry, rng)
-                                    {
-                                        engine.send(
-                                            EngineCommand::StartScene(scene_id),
-                                            world,
-                                            registry,
-                                        );
-                                        let events = engine.drain();
-                                        process_events(events, signals, world, fem_id);
+                                    if let Some(slot) = default_slot.as_deref() {
+                                        if let Some(scene_id) =
+                                            scheduler.pick(slot, world, registry, rng)
+                                        {
+                                            engine.send(
+                                                EngineCommand::StartScene(scene_id),
+                                                world,
+                                                registry,
+                                            );
+                                            let events = engine.drain();
+                                            process_events(events, signals, world, fem_id);
+                                        }
                                     }
                                 }
                             }
@@ -219,9 +222,7 @@ pub fn app_view() -> impl View {
                         .style(|s| s.size_full())
                         .into_any(),
                         AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
-                        AppTab::Settings => {
-                            placeholder_panel("Settings \u{2014} coming soon", signals).into_any()
-                        }
+                        AppTab::Settings => settings_view(signals).into_any(),
                     }
                 })
                 .style(|s| s.flex_grow(1.0))
@@ -334,6 +335,24 @@ pub fn process_events(
                         s.push_str("\n\n");
                     }
                     s.push_str(&text);
+                    // Cap at 200 paragraphs to prevent unbounded growth.
+                    const MAX_PARAGRAPHS: usize = 200;
+                    let para_count = s.split("\n\n").count();
+                    if para_count > MAX_PARAGRAPHS {
+                        let to_drop = para_count - MAX_PARAGRAPHS;
+                        let mut remaining = to_drop;
+                        let mut byte_offset = 0;
+                        for (i, _) in s.match_indices("\n\n") {
+                            remaining -= 1;
+                            if remaining == 0 {
+                                byte_offset = i + 2;
+                                break;
+                            }
+                        }
+                        if byte_offset > 0 {
+                            *s = s[byte_offset..].to_string();
+                        }
+                    }
                 });
                 signals.scroll_gen.update(|n| *n += 1);
             }
@@ -353,6 +372,15 @@ pub fn process_events(
             EngineEvent::SceneFinished => {
                 signals.actions.set(vec![]);
                 scene_finished = true;
+            }
+            EngineEvent::ErrorOccurred(msg) => {
+                signals.story.update(|s| {
+                    if !s.is_empty() {
+                        s.push_str("\n\n");
+                    }
+                    s.push_str(&format!("[Scene error: {}]", msg));
+                });
+                signals.scroll_gen.update(|n| *n += 1);
             }
         }
     }
