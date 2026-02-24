@@ -226,6 +226,40 @@ pub fn eval_call_bool(
             }
             "wasMale" => Ok(world.player.origin.was_male_bodied()),
             "wasTransformed" => Ok(world.player.origin.was_transformed()),
+            "checkSkill" => {
+                let skill_id_str = str_arg(0)?;
+                let dc = match call.args.get(1) {
+                    Some(Value::Int(n)) => *n as i32,
+                    _ => return Err(EvalError::BadArg("checkSkill".into())),
+                };
+                let skill_id = registry
+                    .resolve_skill(skill_id_str)
+                    .map_err(|_| EvalError::UnknownSkill(skill_id_str.to_string()))?;
+                let skill_value = world.player.skill(skill_id) as i32;
+                let roll = ctx.get_or_roll_skill(skill_id_str);
+                let target = (skill_value + (50 - dc)).clamp(5, 95);
+                Ok(roll <= target)
+            }
+            "checkSkillRed" => {
+                let skill_id_str = str_arg(0)?;
+                let dc = match call.args.get(1) {
+                    Some(Value::Int(n)) => *n as i32,
+                    _ => return Err(EvalError::BadArg("checkSkillRed".into())),
+                };
+                // If already permanently failed, block immediately.
+                let scene_id = ctx.scene_id.as_deref().unwrap_or("unknown");
+                if world.game_data.has_failed_red_check(scene_id, skill_id_str) {
+                    return Ok(false);
+                }
+                let skill_id = registry
+                    .resolve_skill(skill_id_str)
+                    .map_err(|_| EvalError::UnknownSkill(skill_id_str.to_string()))?;
+                let skill_value = world.player.skill(skill_id) as i32;
+                let roll = ctx.get_or_roll_skill(skill_id_str);
+                let target = (skill_value + (50 - dc)).clamp(5, 95);
+                Ok(roll <= target)
+                // NOTE: Marking failure is an Effect (FailRedCheck), not done here.
+            }
             "hadTraitBefore" => {
                 let id = str_arg(0)?;
                 match &world.player.before {
@@ -348,6 +382,10 @@ pub fn eval_call_bool(
             }
             "isWeekday" => Ok(world.game_data.is_weekday()),
             "isWeekend" => Ok(world.game_data.is_weekend()),
+            "arcStarted" => {
+                let arc_id = str_arg(0)?;
+                Ok(world.game_data.arc_state(arc_id).is_some())
+            }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "gd".into(),
                 method: call.method.clone(),
@@ -435,6 +473,12 @@ pub fn eval_call_string(
     ctx: &SceneCtx,
     _registry: &PackRegistry,
 ) -> Result<String, EvalError> {
+    let str_arg = |i: usize| -> Result<&str, EvalError> {
+        match call.args.get(i) {
+            Some(Value::Str(s)) => Ok(s.as_str()),
+            _ => Err(EvalError::BadArg(call.method.clone())),
+        }
+    };
     match call.receiver {
         Receiver::Player => match call.method.as_str() {
             "pcOrigin" => {
@@ -482,6 +526,10 @@ pub fn eval_call_string(
         Receiver::GameData => match call.method.as_str() {
             "timeSlot" => Ok(format!("{:?}", world.game_data.time_slot)),
             "getJobTitle" => Ok(world.game_data.job_title.clone()),
+            "arcState" => {
+                let arc_id = str_arg(0)?;
+                Ok(world.game_data.arc_state(arc_id).unwrap_or("").to_string())
+            }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "gd".into(),
                 method: call.method.clone(),
@@ -787,6 +835,158 @@ mod tests {
         ctx.set_skill_roll("FITNESS", 80);
         assert_eq!(ctx.get_or_roll_skill("CHARM"), 30);
         assert_eq!(ctx.get_or_roll_skill("FITNESS"), 80);
+    }
+
+    // ── checkSkill tests ───────────────────────────────────────────────────────
+
+    fn make_registry_with_charm() -> undone_packs::PackRegistry {
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_skills(vec![undone_packs::SkillDef {
+            id: "CHARM".into(),
+            name: "Charm".into(),
+            description: "".into(),
+            min: 0,
+            max: 100,
+        }]);
+        reg
+    }
+
+    #[test]
+    fn checkSkill_succeeds_when_roll_below_target() {
+        let reg = make_registry_with_charm();
+        let skill_id = reg.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 60,
+                modifier: 0,
+            },
+        );
+        // skill=60, dc=50 → target=60. roll=40 → success
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 40);
+        let expr = parse("w.checkSkill('CHARM', 50)").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn checkSkill_fails_when_roll_above_target() {
+        let reg = make_registry_with_charm();
+        let skill_id = reg.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 60,
+                modifier: 0,
+            },
+        );
+        // skill=60, dc=50 → target=60. roll=80 → fail
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 80);
+        let expr = parse("w.checkSkill('CHARM', 50)").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn checkSkill_tiered_uses_same_roll() {
+        // roll=65; hard dc=70 → target=40 (fail); easy dc=30 → target=80 (success)
+        let reg = make_registry_with_charm();
+        let skill_id = reg.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 60,
+                modifier: 0,
+            },
+        );
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 65);
+        let hard = parse("w.checkSkill('CHARM', 70)").unwrap();
+        assert!(!eval(&hard, &world, &ctx, &reg).unwrap()); // fail
+        let easy = parse("w.checkSkill('CHARM', 30)").unwrap();
+        assert!(eval(&easy, &world, &ctx, &reg).unwrap()); // success, same roll
+    }
+
+    #[test]
+    fn checkSkill_minimum_5_percent_chance() {
+        let reg = make_registry_with_charm();
+        let skill_id = reg.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 0,
+                modifier: 0,
+            },
+        );
+        // skill=0, dc=100 → raw=-50 → clamped to 5. roll=4 → success
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 4);
+        let expr = parse("w.checkSkill('CHARM', 100)").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn checkSkillRed_blocked_after_permanent_failure() {
+        let reg = make_registry_with_charm();
+        let skill_id = reg.resolve_skill("CHARM").unwrap();
+        let mut world = make_world();
+        world.player.skills.insert(
+            skill_id,
+            undone_domain::SkillValue {
+                value: 100,
+                modifier: 0,
+            },
+        );
+        // Record permanent failure
+        world.game_data.fail_red_check("my_scene", "CHARM");
+        let mut ctx = SceneCtx::new();
+        ctx.scene_id = Some("my_scene".to_string());
+        // roll=1 would succeed normally, but red check is blocked
+        ctx.set_skill_roll("CHARM", 1);
+        let expr = parse("w.checkSkillRed('CHARM', 50)").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn arcState_returns_empty_when_not_started() {
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.arcState('base::jake') == ''").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn arcState_returns_current_state() {
+        let mut world = make_world();
+        world.game_data.advance_arc("base::jake", "acquaintance");
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.arcState('base::jake') == 'acquaintance'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn arcStarted_false_initially() {
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.arcStarted('base::jake')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn arcStarted_true_after_advance() {
+        let mut world = make_world();
+        world.game_data.advance_arc("base::jake", "met");
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.arcStarted('base::jake')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
     }
 
     // ── New tests ─────────────────────────────────────────────────────────────
