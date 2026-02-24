@@ -50,6 +50,10 @@ name    = "undone"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "validate-pack"
+path = "src/bin/validate_pack.rs"
+
 [dependencies]
 undone-domain = { path = "crates/undone-domain" }
 undone-world  = { path = "crates/undone-world" }

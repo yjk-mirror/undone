@@ -30,6 +30,10 @@ pub struct CharCreationConfig {
     pub starting_traits: Vec<TraitId>,
     pub male_count: usize,
     pub female_count: usize,
+    /// Game flags set at game start (e.g. "ROUTE_ROBIN").
+    pub starting_flags: HashSet<String>,
+    /// Arc states to initialise at game start. Maps arc_id → initial state name.
+    pub starting_arc_states: HashMap<String, String>,
 }
 
 /// Create a brand-new World from character creation choices.
@@ -120,11 +124,19 @@ pub fn new_game<R: Rng>(
     };
     let (male_npcs, female_npcs) = spawn_npcs(&spawn_config, registry, rng);
 
+    let mut game_data = GameData::default();
+    for flag in config.starting_flags {
+        game_data.set_flag(flag);
+    }
+    for (arc_id, state) in config.starting_arc_states {
+        game_data.advance_arc(arc_id, state);
+    }
+
     World {
         player,
         male_npcs,
         female_npcs,
-        game_data: GameData::default(),
+        game_data,
     }
 }
 
@@ -168,6 +180,8 @@ mod tests {
             starting_traits: vec![],
             male_count: 7,
             female_count: 2,
+            starting_flags: HashSet::new(),
+            starting_arc_states: HashMap::new(),
         }
     }
 
@@ -252,11 +266,41 @@ mod tests {
             starting_traits: vec![],
             male_count: 7,
             female_count: 2,
+            starting_flags: HashSet::new(),
+            starting_arc_states: HashMap::new(),
         };
         let mut rng = rand::rngs::SmallRng::seed_from_u64(5);
         let world = new_game(config, &mut registry, &mut rng);
 
         let fem_id = registry.resolve_skill("FEMININITY").unwrap();
         assert_eq!(world.player.skill(fem_id), 70);
+    }
+
+    #[test]
+    fn new_game_sets_starting_flags() {
+        let (mut registry, _) = load_packs(&packs_dir()).unwrap();
+        let mut config = base_config();
+        config.starting_flags = ["ROUTE_ROBIN".to_string()].into();
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(42);
+        let world = new_game(config, &mut registry, &mut rng);
+        assert!(
+            world.game_data.has_flag("ROUTE_ROBIN"),
+            "ROUTE_ROBIN flag should be set"
+        );
+    }
+
+    #[test]
+    fn new_game_sets_starting_arc_states() {
+        let (mut registry, _) = load_packs(&packs_dir()).unwrap();
+        let mut config = base_config();
+        config
+            .starting_arc_states
+            .insert("base::robin_opening".to_string(), "arrived".to_string());
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(43);
+        let world = new_game(config, &mut registry, &mut rng);
+        assert_eq!(
+            world.game_data.arc_state("base::robin_opening"),
+            Some("arrived")
+        );
     }
 }

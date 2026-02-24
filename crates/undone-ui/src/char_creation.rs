@@ -621,6 +621,8 @@ fn build_begin_button(
                 starting_traits,
                 male_count: 6,
                 female_count: 2,
+                starting_flags: std::collections::HashSet::new(),
+                starting_arc_states: std::collections::HashMap::new(),
             };
 
             let gs = start_game(pre, config);
