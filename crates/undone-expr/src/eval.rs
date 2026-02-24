@@ -199,6 +199,51 @@ pub fn eval_call_bool(
                     None => Ok(false), // never interned = player can't have it
                 }
             }
+            "wasMale" => Ok(world.player.origin.was_male_bodied()),
+            "wasTransformed" => Ok(world.player.origin.was_transformed()),
+            "hadTraitBefore" => {
+                let id = str_arg(0)?;
+                match &world.player.before {
+                    None => Ok(false),
+                    Some(before) => {
+                        let trait_id = registry
+                            .resolve_trait(id)
+                            .map_err(|_| EvalError::UnknownTrait(id.to_string()))?;
+                        Ok(before.traits.contains(&trait_id))
+                    }
+                }
+            }
+            "inCategory" => {
+                let cat = str_arg(0)?;
+                match registry.get_category(cat) {
+                    None => Ok(false),
+                    Some(cat_def) => {
+                        let value = if cat_def.category_type == "age" {
+                            format!("{:?}", world.player.age)
+                        } else {
+                            world.player.race.clone()
+                        };
+                        Ok(cat_def.members.iter().any(|m| m == &value))
+                    }
+                }
+            }
+            "beforeInCategory" => {
+                let cat = str_arg(0)?;
+                match &world.player.before {
+                    None => Ok(false),
+                    Some(before) => match registry.get_category(cat) {
+                        None => Ok(false),
+                        Some(cat_def) => {
+                            let value = if cat_def.category_type == "age" {
+                                format!("{:?}", before.age)
+                            } else {
+                                before.race.clone()
+                            };
+                            Ok(cat_def.members.iter().any(|m| m == &value))
+                        }
+                    },
+                }
+            }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "w".into(),
                 method: call.method.clone(),
@@ -233,6 +278,10 @@ pub fn eval_call_bool(
                 "isNpcLoveCrush" => Ok(npc.core.npc_love >= undone_domain::LoveLevel::Crush),
                 "isNpcLoveSome" => Ok(npc.core.npc_love >= undone_domain::LoveLevel::Some),
                 "isWLoveCrush" => Ok(npc.core.pc_love >= undone_domain::LoveLevel::Crush),
+                "hasFlag" => {
+                    let flag = str_arg(0)?;
+                    Ok(npc.core.relationship_flags.contains(flag))
+                }
                 _ => Err(EvalError::UnknownMethod {
                     receiver: "m".into(),
                     method: call.method.clone(),
@@ -256,6 +305,8 @@ pub fn eval_call_bool(
                 let flag = str_arg(0)?;
                 Ok(world.game_data.has_flag(flag))
             }
+            "isWeekday" => Ok(world.game_data.is_weekday()),
+            "isWeekend" => Ok(world.game_data.is_weekend()),
             _ => Err(EvalError::UnknownMethod {
                 receiver: "gd".into(),
                 method: call.method.clone(),
@@ -270,6 +321,10 @@ pub fn eval_call_bool(
                 "isFriend" => Ok(npc.core.is_friend()),
                 "isPregnant" => Ok(npc.pregnancy.is_some()),
                 "isVirgin" => Ok(npc.virgin),
+                "hasFlag" => {
+                    let flag = str_arg(0)?;
+                    Ok(npc.core.relationship_flags.contains(flag))
+                }
                 _ => Err(EvalError::UnknownMethod {
                     receiver: "f".into(),
                     method: call.method.clone(),
@@ -297,6 +352,7 @@ pub fn eval_call_int(
         Receiver::Player => match call.method.as_str() {
             "getMoney" => Ok(world.player.money as i64),
             "getStress" => Ok(world.player.stress as i64),
+            "getAnxiety" => Ok(world.player.anxiety as i64),
             "getSkill" => {
                 let id = str_arg(0)?;
                 let skill_id = registry
@@ -311,6 +367,7 @@ pub fn eval_call_int(
         },
         Receiver::GameData => match call.method.as_str() {
             "week" => Ok(world.game_data.week as i64),
+            "day" => Ok(world.game_data.day as i64),
             "getStat" => {
                 let id = str_arg(0)?;
                 match registry.get_stat(id) {
@@ -334,7 +391,7 @@ pub fn eval_call_int(
 pub fn eval_call_string(
     call: &Call,
     world: &World,
-    _ctx: &SceneCtx,
+    ctx: &SceneCtx,
     _registry: &PackRegistry,
 ) -> Result<String, EvalError> {
     match call.receiver {
@@ -348,11 +405,75 @@ pub fn eval_call_string(
                 };
                 Ok(s.to_string())
             }
+            "beforeName" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| b.name.clone())
+                .unwrap_or_default()),
+            "beforeRace" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| b.race.clone())
+                .unwrap_or_default()),
+            "beforeAge" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.age))
+                .unwrap_or_default()),
+            "beforeSexuality" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.sexuality))
+                .unwrap_or_default()),
+            "getRace" => Ok(world.player.race.clone()),
+            "getAge" => Ok(format!("{:?}", world.player.age)),
+            "getArousal" => Ok(format!("{:?}", world.player.arousal)),
+            "getAlcohol" => Ok(format!("{:?}", world.player.alcohol)),
             _ => Err(EvalError::UnknownMethod {
                 receiver: "w".into(),
                 method: call.method.clone(),
             }),
         },
+        Receiver::GameData => match call.method.as_str() {
+            "timeSlot" => Ok(format!("{:?}", world.game_data.time_slot)),
+            "getJobTitle" => Ok(world.game_data.job_title.clone()),
+            _ => Err(EvalError::UnknownMethod {
+                receiver: "gd".into(),
+                method: call.method.clone(),
+            }),
+        },
+        Receiver::MaleNpc => {
+            let key = ctx.active_male.ok_or(EvalError::NoActiveMaleNpc)?;
+            let npc = world.male_npc(key).ok_or(EvalError::NpcNotFound)?;
+            match call.method.as_str() {
+                "getLiking" => Ok(npc.core.pc_liking.to_string()),
+                "getLove" => Ok(format!("{:?}", npc.core.pc_love)),
+                "getAttraction" => Ok(npc.core.pc_attraction.to_string()),
+                "getBehaviour" => Ok(format!("{:?}", npc.core.behaviour)),
+                _ => Err(EvalError::UnknownMethod {
+                    receiver: "m".into(),
+                    method: call.method.clone(),
+                }),
+            }
+        }
+        Receiver::FemaleNpc => {
+            let key = ctx.active_female.ok_or(EvalError::NoActiveFemaleNpc)?;
+            let npc = world.female_npc(key).ok_or(EvalError::NpcNotFound)?;
+            match call.method.as_str() {
+                "getLiking" => Ok(npc.core.pc_liking.to_string()),
+                "getLove" => Ok(format!("{:?}", npc.core.pc_love)),
+                "getAttraction" => Ok(npc.core.pc_attraction.to_string()),
+                "getBehaviour" => Ok(format!("{:?}", npc.core.behaviour)),
+                _ => Err(EvalError::UnknownMethod {
+                    receiver: "f".into(),
+                    method: call.method.clone(),
+                }),
+            }
+        }
         _ => Err(EvalError::UnknownMethod {
             receiver: format!("{:?}", call.receiver),
             method: call.method.clone(),
@@ -378,9 +499,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -485,6 +611,8 @@ mod tests {
             name: "Shy".into(),
             description: "...".into(),
             hidden: false,
+            group: None,
+            conflicts: vec![],
         }]);
         let shy_id = reg.resolve_trait("SHY").unwrap();
         let mut world = make_world();
@@ -502,6 +630,8 @@ mod tests {
             name: "Shy".into(),
             description: "...".into(),
             hidden: false,
+            group: None,
+            conflicts: vec![],
         }]);
         let world = make_world();
         let ctx = SceneCtx::new();
@@ -589,6 +719,81 @@ mod tests {
         );
         let ctx = SceneCtx::new();
         let expr = parse("w.getSkill('FITNESS') > 40").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    // ── New tests ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn beforeRace_returns_before_race() {
+        let world = make_world(); // before.race = "white"
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.beforeRace() == 'white'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn getRace_returns_current_race() {
+        let world = make_world(); // race = "east_asian"
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.getRace() == 'east_asian'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn wasMale_true_for_cis_male() {
+        let world = make_world(); // origin = CisMaleTransformed
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.wasMale()").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn wasTransformed_false_for_always_female() {
+        let mut world = make_world();
+        world.player.origin = PcOrigin::AlwaysFemale;
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.wasTransformed()").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn getAnxiety_returns_value() {
+        let world = make_world(); // anxiety = 0
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.getAnxiety() == 0").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_day_returns_day() {
+        let world = make_world(); // game_data.day defaults to 0
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.day() == 0").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_isWeekday_true_for_day_0() {
+        let world = make_world(); // game_data.day defaults to 0 (Monday)
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.isWeekday()").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_timeSlot_returns_morning() {
+        let world = make_world(); // game_data.time_slot defaults to Morning
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("gd.timeSlot() == 'Morning'").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
     }
 }

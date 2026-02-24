@@ -34,6 +34,8 @@ pub struct PackContent {
     pub stats_file: Option<String>,
     #[serde(default)]
     pub races_file: Option<String>,
+    #[serde(default)]
+    pub categories_file: Option<String>,
 }
 
 #[cfg(test)]

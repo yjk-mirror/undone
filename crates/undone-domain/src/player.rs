@@ -1,9 +1,22 @@
 use crate::{
-    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure, SkillId,
-    StuffId, TraitId,
+    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, MaleFigure, PcOrigin,
+    PlayerFigure, SkillId, StuffId, TraitId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
+
+/// Frozen snapshot of the player's pre-transformation identity.
+/// Populated during character creation, immutable after transformation.
+/// Only meaningful when `origin.has_before_life()` is true.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BeforeIdentity {
+    pub name: String,
+    pub age: Age,
+    pub race: String,
+    pub sexuality: BeforeSexuality,
+    pub figure: MaleFigure,
+    pub traits: HashSet<TraitId>,
+}
 
 /// A reference to any NPC (male or female) by their SlotMap key.
 /// The World figures out which map to look in via the MaleNpcKey/FemaleNpcKey
@@ -83,9 +96,7 @@ pub struct Player {
     pub origin: PcOrigin,
 
     // Before-transformation data (meaningful when origin.has_before_life())
-    pub before_age: u32,
-    pub before_race: String,
-    pub before_sexuality: Option<BeforeSexuality>,
+    pub before: Option<BeforeIdentity>,
 }
 
 impl Player {
@@ -134,9 +145,14 @@ mod tests {
             name_fem: "Eva".into(),
             name_androg: "Ev".into(),
             name_masc: "Evan".into(),
-            before_age: 30,
-            before_race: "white".into(),
-            before_sexuality: Some(crate::BeforeSexuality::AttractedToWomen),
+            before: Some(BeforeIdentity {
+                name: "Evan".into(),
+                age: Age::Twenties,
+                race: "white".into(),
+                sexuality: crate::BeforeSexuality::AttractedToWomen,
+                figure: crate::MaleFigure::Average,
+                traits: HashSet::new(),
+            }),
             age: Age::LateTeen,
             race: "east_asian".into(),
             figure: PlayerFigure::Slim,

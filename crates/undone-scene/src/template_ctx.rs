@@ -236,9 +236,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -279,6 +284,8 @@ mod tests {
             name: "Shy".into(),
             description: "...".into(),
             hidden: false,
+            group: None,
+            conflicts: vec![],
         }]);
         let shy_id = registry.resolve_trait("SHY").unwrap();
         let mut world = make_world();

@@ -61,6 +61,7 @@ pub struct NextBranchDef {
     #[serde(rename = "if")]
     pub condition: Option<String>,
     pub goto: Option<String>,
+    pub slot: Option<String>,
     #[serde(default)]
     pub finish: bool,
 }
@@ -69,25 +70,116 @@ pub struct NextBranchDef {
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum EffectDef {
-    ChangeStress { amount: i32 },
-    ChangeMoney { amount: i32 },
-    ChangeAnxiety { amount: i32 },
-    SetSceneFlag { flag: String },
-    RemoveSceneFlag { flag: String },
-    SetGameFlag { flag: String },
-    RemoveGameFlag { flag: String },
-    AddStat { stat: String, amount: i32 },
-    SetStat { stat: String, value: i32 },
-    SkillIncrease { skill: String, amount: i32 },
-    AddTrait { trait_id: String },
-    RemoveTrait { trait_id: String },
-    AddArousal { delta: i8 },
-    AddNpcLiking { npc: String, delta: i8 },
-    AddNpcLove { npc: String, delta: i8 },
-    AddWLiking { npc: String, delta: i8 },
-    SetNpcFlag { npc: String, flag: String },
-    AddNpcTrait { npc: String, trait_id: String },
-    Transition { target: String },
+    ChangeStress {
+        amount: i32,
+    },
+    ChangeMoney {
+        amount: i32,
+    },
+    ChangeAnxiety {
+        amount: i32,
+    },
+    SetSceneFlag {
+        flag: String,
+    },
+    RemoveSceneFlag {
+        flag: String,
+    },
+    SetGameFlag {
+        flag: String,
+    },
+    RemoveGameFlag {
+        flag: String,
+    },
+    AddStat {
+        stat: String,
+        amount: i32,
+    },
+    SetStat {
+        stat: String,
+        value: i32,
+    },
+    SkillIncrease {
+        skill: String,
+        amount: i32,
+    },
+    AddTrait {
+        trait_id: String,
+    },
+    RemoveTrait {
+        trait_id: String,
+    },
+    AddArousal {
+        delta: i8,
+    },
+    AddNpcLiking {
+        npc: String,
+        delta: i8,
+    },
+    AddNpcLove {
+        npc: String,
+        delta: i8,
+    },
+    AddWLiking {
+        npc: String,
+        delta: i8,
+    },
+    SetNpcFlag {
+        npc: String,
+        flag: String,
+    },
+    AddNpcTrait {
+        npc: String,
+        trait_id: String,
+    },
+    Transition {
+        target: String,
+    },
+    AddStuff {
+        item: String,
+    },
+    RemoveStuff {
+        item: String,
+    },
+    SetRelationship {
+        npc: String,
+        status: String,
+    },
+    SetNpcAttraction {
+        npc: String,
+        delta: i8,
+    },
+    SetNpcBehaviour {
+        npc: String,
+        behaviour: String,
+    },
+    SetContactable {
+        npc: String,
+        value: bool,
+    },
+    AddSexualActivity {
+        npc: String,
+        activity: String,
+    },
+    SetPlayerPartner {
+        npc: String,
+    },
+    AddPlayerFriend {
+        npc: String,
+    },
+    SetJobTitle {
+        title: String,
+    },
+    ChangeAlcohol {
+        delta: i8,
+    },
+    SetVirgin {
+        value: bool,
+        virgin_type: Option<String>,
+    },
+    AdvanceTime {
+        slots: u32,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -113,6 +205,7 @@ pub struct Action {
 pub struct NextBranch {
     pub condition: Option<Expr>,
     pub goto: Option<String>,
+    pub slot: Option<String>,
     pub finish: bool,
 }
 

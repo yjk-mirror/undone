@@ -4,12 +4,30 @@ use floem::views::dropdown::Dropdown;
 use floem::views::Checkbox;
 use std::cell::RefCell;
 use std::rc::Rc;
-use undone_domain::{Age, BeforeSexuality, BreastSize, PcOrigin, PlayerFigure};
+use undone_domain::{
+    Age, BeforeIdentity, BeforeSexuality, BreastSize, MaleFigure, PcOrigin, PlayerFigure,
+};
 use undone_packs::char_creation::CharCreationConfig;
 
 use crate::game_state::{error_game_state, start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
 use crate::{AppPhase, AppSignals};
+
+// ── Age bucketing ─────────────────────────────────────────────────────────────
+
+/// Convert a raw age number to the nearest Age enum bucket.
+fn age_from_u32(years: u32) -> Age {
+    match years {
+        0..=19 => Age::LateTeen,
+        20..=22 => Age::EarlyTwenties,
+        23..=26 => Age::Twenties,
+        27..=29 => Age::LateTwenties,
+        30..=39 => Age::Thirties,
+        40..=49 => Age::Forties,
+        50..=59 => Age::Fifties,
+        _ => Age::Old,
+    }
+}
 
 // ── PC origin helpers ─────────────────────────────────────────────────────────
 
@@ -45,6 +63,7 @@ struct CharFormSignals {
     was_transformed: RwSignal<bool>,
     before_kind: RwSignal<BeforeKind>,
     before_age_str: RwSignal<String>,
+    before_figure: RwSignal<MaleFigure>,
     sexuality: RwSignal<BeforeSexuality>,
     // personality
     trait_shy: RwSignal<bool>,
@@ -79,6 +98,7 @@ impl CharFormSignals {
             was_transformed: RwSignal::new(true),
             before_kind: RwSignal::new(BeforeKind::CisMale),
             before_age_str: RwSignal::new("28".to_string()),
+            before_figure: RwSignal::new(MaleFigure::Average),
             sexuality: RwSignal::new(BeforeSexuality::AttractedToWomen),
             trait_shy: RwSignal::new(false),
             trait_cute: RwSignal::new(false),
@@ -515,12 +535,24 @@ fn build_begin_button(
                 form.before_kind.get_untracked(),
             );
 
-            // Resolve before_age
-            let before_age: u32 = form.before_age_str.get_untracked().parse().unwrap_or(28);
-
-            // before_sexuality only set for male-bodied origins
-            let before_sexuality = if origin.was_male_bodied() {
-                Some(form.sexuality.get_untracked())
+            // Build BeforeIdentity if this PC has a before-life.
+            let before = if origin.has_before_life() {
+                let raw_age: u32 = form.before_age_str.get_untracked().parse().unwrap_or(28);
+                let sexuality = if origin.was_male_bodied() {
+                    form.sexuality.get_untracked()
+                } else {
+                    // Default for cis-female-transformed: attracted to women (least
+                    // narratively loaded default; content can branch on pcOrigin).
+                    BeforeSexuality::AttractedToWomen
+                };
+                Some(BeforeIdentity {
+                    name: form.name_masc.get_untracked(),
+                    age: age_from_u32(raw_age),
+                    race: form.before_race.get_untracked(),
+                    sexuality,
+                    figure: form.before_figure.get_untracked(),
+                    traits: std::collections::HashSet::new(),
+                })
             } else {
                 None
             };
@@ -585,9 +617,7 @@ fn build_begin_button(
                 figure: form.figure.get_untracked(),
                 breasts: form.breasts.get_untracked(),
                 origin,
-                before_age,
-                before_race: form.before_race.get_untracked(),
-                before_sexuality,
+                before,
                 starting_traits,
                 male_count: 6,
                 female_count: 2,

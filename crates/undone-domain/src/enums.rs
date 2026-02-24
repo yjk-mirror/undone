@@ -165,6 +165,42 @@ impl std::fmt::Display for PcOrigin {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum TimeSlot {
+    Morning,
+    Afternoon,
+    Evening,
+    Night,
+}
+
+impl Default for TimeSlot {
+    fn default() -> Self {
+        TimeSlot::Morning
+    }
+}
+
+impl TimeSlot {
+    pub fn next(self) -> Option<TimeSlot> {
+        match self {
+            TimeSlot::Morning => Some(TimeSlot::Afternoon),
+            TimeSlot::Afternoon => Some(TimeSlot::Evening),
+            TimeSlot::Evening => Some(TimeSlot::Night),
+            TimeSlot::Night => None, // day is over
+        }
+    }
+}
+
+impl std::fmt::Display for TimeSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TimeSlot::Morning => write!(f, "Morning"),
+            TimeSlot::Afternoon => write!(f, "Afternoon"),
+            TimeSlot::Evening => write!(f, "Evening"),
+            TimeSlot::Night => write!(f, "Night"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Personality {
     Romantic,

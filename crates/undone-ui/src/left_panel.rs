@@ -199,8 +199,8 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         let finished = crate::process_events(events, signals, world, femininity_id);
         if finished {
             if let Some(slot) = default_slot.as_deref() {
-                if let Some(scene_id) = scheduler.pick(slot, world, registry, rng) {
-                    engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                if let Some(result) = scheduler.pick(slot, world, registry, rng) {
+                    engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
                     let events = engine.drain();
                     crate::process_events(events, signals, world, femininity_id);
                 }

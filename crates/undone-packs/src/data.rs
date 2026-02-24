@@ -13,6 +13,10 @@ pub struct TraitDef {
     pub description: String,
     #[serde(default)]
     pub hidden: bool,
+    #[serde(default)]
+    pub group: Option<String>,
+    #[serde(default)]
+    pub conflicts: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -66,4 +70,19 @@ pub struct StatFile {
 #[derive(Debug, Deserialize)]
 pub struct RacesFile {
     pub races: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CategoriesFile {
+    #[serde(default)]
+    pub category: Vec<CategoryDef>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct CategoryDef {
+    pub id: String,
+    pub description: String,
+    #[serde(rename = "type")]
+    pub category_type: String,
+    pub members: Vec<String>,
 }

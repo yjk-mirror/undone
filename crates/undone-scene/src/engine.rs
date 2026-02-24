@@ -52,6 +52,8 @@ pub enum EngineEvent {
     ActionsAvailable(Vec<ActionView>),
     NpcActivated(Option<NpcActivatedData>),
     SceneFinished,
+    /// Hub scene chose a scheduler slot — UI should run the scheduler for this slot.
+    SlotRequested(String),
     ErrorOccurred(String),
 }
 
@@ -432,6 +434,14 @@ impl SceneEngine {
                 self.start_scene(target, world, registry);
                 return;
             }
+
+            if let Some(slot_name) = &branch.slot {
+                let slot = slot_name.clone();
+                self.stack.pop();
+                self.events.push_back(EngineEvent::NpcActivated(None));
+                self.events.push_back(EngineEvent::SlotRequested(slot));
+                return;
+            }
         }
 
         // No branch matched — re-emit actions
@@ -461,9 +471,14 @@ mod tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
@@ -522,6 +537,7 @@ mod tests {
                     next: vec![NextBranch {
                         condition: None,
                         goto: None,
+                        slot: None,
                         finish: true,
                     }],
                 },
@@ -814,6 +830,7 @@ mod tests {
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::b".into()),
+                    slot: None,
                     finish: false,
                 }],
             }],
@@ -943,6 +960,63 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::SceneFinished)),
             "expected SceneFinished for unknown scene"
+        );
+    }
+
+    #[test]
+    fn slot_branch_emits_slot_requested() {
+        // Build a scene with an action whose next branch has slot = Some("free_time")
+        let scene = SceneDefinition {
+            id: "test::hub".into(),
+            pack: "test".into(),
+            intro_prose: "Hub scene.".into(),
+            actions: vec![Action {
+                id: "go_free".into(),
+                label: "Free Time".into(),
+                detail: "Choose a free time activity.".into(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: None,
+                    slot: Some("free_time".into()),
+                    finish: false,
+                }],
+            }],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::hub".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("go_free".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::SlotRequested(s) if s == "free_time")),
+            "expected SlotRequested(\"free_time\") after choosing a slot branch"
+        );
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::NpcActivated(None))),
+            "expected NpcActivated(None) when slot branch fires"
         );
     }
 }

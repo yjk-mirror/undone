@@ -8,7 +8,7 @@ pub mod types;
 pub use effects::{apply_effect, EffectError};
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
 pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
-pub use scheduler::{load_schedule, Scheduler, SchedulerError};
+pub use scheduler::{load_schedule, PickResult, Scheduler, SchedulerError};
 pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
 
 #[cfg(test)]
@@ -40,9 +40,14 @@ mod integration_tests {
                 name_fem: "Eva".into(),
                 name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
-                before_age: 30,
-                before_race: "white".into(),
-                before_sexuality: Some(BeforeSexuality::AttractedToWomen),
+                before: Some(BeforeIdentity {
+                    name: "Evan".into(),
+                    age: Age::Twenties,
+                    race: "white".into(),
+                    sexuality: BeforeSexuality::AttractedToWomen,
+                    figure: MaleFigure::Average,
+                    traits: HashSet::new(),
+                }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
