@@ -1,5 +1,7 @@
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 
+use rand::Rng;
 use thiserror::Error;
 use undone_domain::{FemaleNpcKey, MaleNpcKey, PcOrigin};
 use undone_packs::{CategoryType, PackRegistry};
@@ -14,6 +16,12 @@ pub struct SceneCtx {
     pub active_female: Option<FemaleNpcKey>,
     pub scene_flags: HashSet<String>,
     pub weighted_map: HashMap<String, i32>,
+    /// Cached percentile rolls (1–100) keyed by skill_id string.
+    /// Interior mutability so eval() can cache without needing &mut SceneCtx.
+    pub skill_rolls: RefCell<HashMap<String, i32>>,
+    /// Scene ID set by the engine before evaluating conditions.
+    /// Required for red-check failure tracking.
+    pub scene_id: Option<String>,
 }
 
 impl SceneCtx {
@@ -23,6 +31,8 @@ impl SceneCtx {
             active_female: None,
             scene_flags: HashSet::new(),
             weighted_map: HashMap::new(),
+            skill_rolls: RefCell::new(HashMap::new()),
+            scene_id: None,
         }
     }
 
@@ -32,6 +42,21 @@ impl SceneCtx {
 
     pub fn set_flag(&mut self, flag: impl Into<String>) {
         self.scene_flags.insert(flag.into());
+    }
+
+    /// Force a specific roll value for testing. Call before evaluating checkSkill.
+    pub fn set_skill_roll(&self, skill_id: &str, roll: i32) {
+        self.skill_rolls
+            .borrow_mut()
+            .insert(skill_id.to_string(), roll);
+    }
+
+    /// Return a cached roll for this skill, or generate and cache a new one (1–100).
+    pub fn get_or_roll_skill(&self, skill_id: &str) -> i32 {
+        let mut rolls = self.skill_rolls.borrow_mut();
+        *rolls
+            .entry(skill_id.to_string())
+            .or_insert_with(|| rand::thread_rng().gen_range(1_i32..=100))
     }
 }
 
@@ -736,6 +761,32 @@ mod tests {
         let ctx = SceneCtx::new();
         let expr = parse("w.getSkill('FITNESS') > 40").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    // ── Skill roll cache tests ─────────────────────────────────────────────────
+
+    #[test]
+    fn set_and_get_skill_roll_returns_same_value() {
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 42);
+        assert_eq!(ctx.get_or_roll_skill("CHARM"), 42);
+    }
+
+    #[test]
+    fn get_or_roll_is_idempotent_without_set() {
+        let ctx = SceneCtx::new();
+        let first = ctx.get_or_roll_skill("FITNESS");
+        let second = ctx.get_or_roll_skill("FITNESS");
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn different_skills_get_independent_rolls() {
+        let ctx = SceneCtx::new();
+        ctx.set_skill_roll("CHARM", 30);
+        ctx.set_skill_roll("FITNESS", 80);
+        assert_eq!(ctx.get_or_roll_skill("CHARM"), 30);
+        assert_eq!(ctx.get_or_roll_skill("FITNESS"), 80);
     }
 
     // ── New tests ─────────────────────────────────────────────────────────────

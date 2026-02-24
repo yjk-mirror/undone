@@ -13,6 +13,14 @@ pub struct GameData {
     pub day: u8, // 0–6 (Mon–Sun)
     #[serde(default = "default_time_slot")]
     pub time_slot: TimeSlot,
+    /// Arc state machine: arc_id → current state name.
+    /// Added with serde(default) for backward-compat with v3 saves.
+    #[serde(default)]
+    pub arc_states: HashMap<String, String>,
+    /// Red-check permanent failure registry: "scene_id::skill_id".
+    /// Once a red check fails it is blocked for the rest of the game.
+    #[serde(default)]
+    pub red_check_failures: HashSet<String>,
 }
 
 fn default_time_slot() -> TimeSlot {
@@ -73,6 +81,28 @@ impl GameData {
     pub fn is_weekend(&self) -> bool {
         self.day >= 5 // 5=Sat, 6=Sun
     }
+
+    /// Record a permanent red-check failure for this scene+skill combination.
+    pub fn fail_red_check(&mut self, scene_id: &str, skill_id: &str) {
+        self.red_check_failures
+            .insert(format!("{scene_id}::{skill_id}"));
+    }
+
+    /// Returns true if a red check for this scene+skill has been permanently failed.
+    pub fn has_failed_red_check(&self, scene_id: &str, skill_id: &str) -> bool {
+        self.red_check_failures
+            .contains(&format!("{scene_id}::{skill_id}"))
+    }
+
+    /// Returns the current state name for an arc, if the arc has been started.
+    pub fn arc_state(&self, arc_id: &str) -> Option<&str> {
+        self.arc_states.get(arc_id).map(|s| s.as_str())
+    }
+
+    /// Advance an arc to a new state (or start it at the given state).
+    pub fn advance_arc(&mut self, arc_id: impl Into<String>, state: impl Into<String>) {
+        self.arc_states.insert(arc_id.into(), state.into());
+    }
 }
 
 #[cfg(test)]
@@ -107,6 +137,50 @@ mod tests {
         assert_eq!(gd.time_slot, TimeSlot::Morning);
         assert_eq!(gd.day, 0); // Monday
         assert_eq!(gd.week, 1);
+    }
+
+    #[test]
+    fn red_check_absent_initially() {
+        let gd = GameData::default();
+        assert!(!gd.has_failed_red_check("base::some_scene", "CHARM"));
+    }
+
+    #[test]
+    fn red_check_present_after_fail() {
+        let mut gd = GameData::default();
+        gd.fail_red_check("base::some_scene", "CHARM");
+        assert!(gd.has_failed_red_check("base::some_scene", "CHARM"));
+    }
+
+    #[test]
+    fn red_check_does_not_cross_contaminate() {
+        let mut gd = GameData::default();
+        gd.fail_red_check("base::some_scene", "CHARM");
+        // Different skill — not failed
+        assert!(!gd.has_failed_red_check("base::some_scene", "FITNESS"));
+        // Different scene — not failed
+        assert!(!gd.has_failed_red_check("base::other_scene", "CHARM"));
+    }
+
+    #[test]
+    fn arc_state_absent_initially() {
+        let gd = GameData::default();
+        assert_eq!(gd.arc_state("base::jake"), None);
+    }
+
+    #[test]
+    fn arc_advance_and_query() {
+        let mut gd = GameData::default();
+        gd.advance_arc("base::jake", "acquaintance");
+        assert_eq!(gd.arc_state("base::jake"), Some("acquaintance"));
+    }
+
+    #[test]
+    fn arc_advance_overwrites_previous_state() {
+        let mut gd = GameData::default();
+        gd.advance_arc("base::jake", "acquaintance");
+        gd.advance_arc("base::jake", "friend");
+        assert_eq!(gd.arc_state("base::jake"), Some("friend"));
     }
 
     #[test]
