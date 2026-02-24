@@ -59,6 +59,9 @@ struct CharFormSignals {
     trait_ambitious: RwSignal<bool>,
     trait_beautiful: RwSignal<bool>,
     trait_plain: RwSignal<bool>,
+    // race
+    race: RwSignal<String>,
+    before_race: RwSignal<String>,
     // content
     include_rough: RwSignal<bool>,
     likes_rough: RwSignal<bool>,
@@ -89,6 +92,8 @@ impl CharFormSignals {
             trait_ambitious: RwSignal::new(false),
             trait_beautiful: RwSignal::new(false),
             trait_plain: RwSignal::new(false),
+            race: RwSignal::new(String::new()),
+            before_race: RwSignal::new(String::new()),
             include_rough: RwSignal::new(false),
             likes_rough: RwSignal::new(false),
         }
@@ -104,12 +109,31 @@ pub fn char_creation_view(
 ) -> impl View {
     let form = CharFormSignals::new();
 
+    // Read available races from pack registry; set form defaults.
+    let races_list: Vec<String> = {
+        if let Some(ref pre) = *pre_state.borrow() {
+            if pre.registry.races().is_empty() {
+                vec!["White".to_string()]
+            } else {
+                pre.registry.races().to_vec()
+            }
+        } else {
+            vec!["White".to_string()]
+        }
+    };
+    if let Some(first) = races_list.first() {
+        form.race.set(first.clone());
+        form.before_race.set(first.clone());
+    }
+    let races_for_now = races_list.clone();
+    let races_for_before = races_list.clone();
+
     let begin_btn = build_begin_button(signals, form, pre_state, game_state);
 
     let content = v_stack((
         heading(signals),
-        section_who_you_are(signals, form),
-        section_your_past(signals, form),
+        section_who_you_are(signals, form, races_for_now),
+        section_your_past(signals, form, races_for_before),
         section_personality(signals, form),
         section_content_prefs(signals, form),
         begin_btn,
@@ -150,7 +174,11 @@ fn heading(signals: AppSignals) -> impl View {
 
 // ── section: Who You Are Now ──────────────────────────────────────────────────
 
-fn section_who_you_are(signals: AppSignals, form: CharFormSignals) -> impl View {
+fn section_who_you_are(
+    signals: AppSignals,
+    form: CharFormSignals,
+    races: Vec<String>,
+) -> impl View {
     v_stack((
         section_title("Who You Are Now", signals),
         form_row(
@@ -219,13 +247,18 @@ fn section_who_you_are(signals: AppSignals, form: CharFormSignals) -> impl View 
             )
             .style(dropdown_style(signals)),
         ),
+        form_row("Race", signals, race_picker(form.race, races, signals)),
     ))
     .style(section_style())
 }
 
 // ── section: Your Past ────────────────────────────────────────────────────────
 
-fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
+fn section_your_past(
+    signals: AppSignals,
+    form: CharFormSignals,
+    before_races: Vec<String>,
+) -> impl View {
     let was_transformed = form.was_transformed;
     let before_kind = form.before_kind;
 
@@ -276,6 +309,7 @@ fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
             .style(|s| s.margin_bottom(16.0));
 
             let origin = resolve_origin(is_transformed, kind);
+            let br = before_races.clone();
             let extra: Box<dyn View> = if origin.was_male_bodied() {
                 Box::new(v_stack((
                     form_row(
@@ -298,15 +332,27 @@ fn section_your_past(signals: AppSignals, form: CharFormSignals) -> impl View {
                         )
                         .style(dropdown_style(signals)),
                     ),
+                    form_row(
+                        "Race before",
+                        signals,
+                        race_picker(form.before_race, br, signals),
+                    ),
                 )))
             } else {
-                Box::new(form_row(
-                    "Age before transition",
-                    signals,
-                    text_input(form.before_age_str)
-                        .placeholder("28")
-                        .style(input_style(signals)),
-                ))
+                Box::new(v_stack((
+                    form_row(
+                        "Age before transition",
+                        signals,
+                        text_input(form.before_age_str)
+                            .placeholder("28")
+                            .style(input_style(signals)),
+                    ),
+                    form_row(
+                        "Race before",
+                        signals,
+                        race_picker(form.before_race, br, signals),
+                    ),
+                )))
             };
 
             v_stack((kind_btns, extra)).into_any()
@@ -535,12 +581,12 @@ fn build_begin_button(
                 name_androg: form.name_androg.get_untracked(),
                 name_masc: form.name_masc.get_untracked(),
                 age: form.age.get_untracked(),
-                race: "white".to_string(),
+                race: form.race.get_untracked(),
                 figure: form.figure.get_untracked(),
                 breasts: form.breasts.get_untracked(),
                 origin,
                 before_age,
-                before_race: "white".to_string(),
+                before_race: form.before_race.get_untracked(),
                 before_sexuality,
                 starting_traits,
                 male_count: 6,
@@ -659,6 +705,43 @@ fn radio_opt(
             .margin_bottom(8.0)
     })
     .on_click_stop(move |_| on_select())
+}
+
+fn race_picker(selection: RwSignal<String>, races: Vec<String>, signals: AppSignals) -> impl View {
+    let races_signal = RwSignal::new(races);
+    dyn_stack(
+        move || races_signal.get(),
+        |r| r.clone(),
+        move |race| {
+            let race_for_cmp = race.clone();
+            let race_for_set = race.clone();
+            let is_sel = move || selection.get() == race_for_cmp;
+            let set_race = move || selection.set(race_for_set.clone());
+            label(move || race.clone())
+                .on_click_stop(move |_| set_race())
+                .style(move |s| {
+                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                    let selected = is_sel();
+                    s.padding_horiz(12.0)
+                        .padding_vert(6.0)
+                        .margin_right(4.0)
+                        .margin_bottom(4.0)
+                        .border(1.0)
+                        .border_radius(4.0)
+                        .font_size(14.0)
+                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .cursor(floem::style::CursorStyle::Pointer)
+                        .border_color(if selected { colors.lamp } else { colors.seam })
+                        .color(if selected { colors.lamp } else { colors.ink })
+                        .background(if selected {
+                            colors.lamp_glow
+                        } else {
+                            floem::peniko::Color::TRANSPARENT
+                        })
+                })
+        },
+    )
+    .style(|s| s.flex_row().flex_wrap(floem::style::FlexWrap::Wrap))
 }
 
 fn section_style() -> impl Fn(floem::style::Style) -> floem::style::Style {

@@ -1,0 +1,9 @@
+races = [
+    "White",
+    "Black",
+    "Latina",
+    "East Asian",
+    "South Asian",
+    "Mixed",
+    "Other",
+]

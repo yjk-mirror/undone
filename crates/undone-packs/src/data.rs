@@ -62,3 +62,8 @@ pub struct StatFile {
     #[serde(default)]
     pub stat: Vec<StatDef>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct RacesFile {
+    pub races: Vec<String>,
+}

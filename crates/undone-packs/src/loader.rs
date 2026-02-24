@@ -124,6 +124,17 @@ fn load_one_pack(
         registry.register_stats(stats_file.stat);
     }
 
+    if let Some(ref races_rel) = manifest.content.races_file {
+        let races_path = pack_dir.join(races_rel);
+        let src = read_file(&races_path)?;
+        let races_file: crate::data::RacesFile =
+            toml::from_str(&src).map_err(|e| PackLoadError::Toml {
+                path: races_path.clone(),
+                message: e.to_string(),
+            })?;
+        registry.register_races(races_file.races);
+    }
+
     Ok(LoadedPackMeta {
         manifest,
         pack_dir: pack_dir.to_path_buf(),
@@ -199,6 +210,19 @@ mod tests {
         assert!(
             registry.male_names().contains(&"James".to_string()),
             "should include James"
+        );
+    }
+
+    #[test]
+    fn loads_base_pack_races() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        assert!(
+            !registry.races().is_empty(),
+            "should have loaded races from base pack"
+        );
+        assert!(
+            registry.races().contains(&"White".to_string()),
+            "should include White"
         );
     }
 

@@ -26,6 +26,7 @@ pub struct PackRegistry {
     pub skill_defs: HashMap<SkillId, SkillDef>,
     male_names: Vec<String>,
     female_names: Vec<String>,
+    races: Vec<String>,
     opening_scene: Option<String>,
     default_slot: Option<String>,
 }
@@ -39,6 +40,7 @@ impl PackRegistry {
             skill_defs: HashMap::new(),
             male_names: Vec::new(),
             female_names: Vec::new(),
+            races: Vec::new(),
             opening_scene: None,
             default_slot: None,
         }
@@ -182,6 +184,14 @@ impl PackRegistry {
 
     pub fn female_names(&self) -> &[String] {
         &self.female_names
+    }
+
+    pub fn register_races(&mut self, races: Vec<String>) {
+        self.races.extend(races);
+    }
+
+    pub fn races(&self) -> &[String] {
+        &self.races
     }
 
     /// Set the opening scene ID for the first pack that declares one.
