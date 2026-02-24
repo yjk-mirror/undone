@@ -133,6 +133,11 @@ impl PackRegistry {
         self.rodeo.resolve(&id.0)
     }
 
+    /// Resolve a SkillId back to its string ID (spur → str). Used for template rendering.
+    pub fn skill_id_to_str(&self, id: SkillId) -> &str {
+        self.rodeo.resolve(&id.0)
+    }
+
     /// Resolve any Spur back to its string. Used by the save system to build the id_strings
     /// validation table.
     pub fn resolve_spur(&self, spur: Spur) -> &str {
