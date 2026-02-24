@@ -3,9 +3,9 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 124 passing, 0 failures.
+**Tests:** 153 passing, 0 failures.
 **Remote:** pushed (mirrored repo, pulled into Linux dev env).
-**App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Engine correctness pass complete: cross-reference validation, transition guard, NPC personality rendering, condition eval logging, data-driven opening scene/slot, scroll-to-bottom fix, unknown scene surfacing. Engineering Principles documented in CLAUDE.md.
+**App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v3 with v1→v2→v3 migration chain. Trans woman branches in all 3 scenes. Engine correctness pass complete. Engine foundation complete: BeforeIdentity struct, trait groups/conflicts, categories, TimeSlot enum, 25+ evaluator methods, 13 new effect types, slot routing, once_only/trigger scheduler, hub scene (plan_your_day).
 **Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform. screenshot-mcp uses persistent WGC sessions (10fps, ~20ms reads after first). game-input-mcp has lifecycle tools (start_game, stop_game, is_game_running).
 **MCPs:** All MCP config is cross-platform — no hardcoded absolute paths. `tools/mcp-launcher.mjs` detects OS and appends `.exe` on Windows. All 5 servers registered in `.mcp.json`.
 
@@ -13,7 +13,7 @@
 
 ## ⚡ Next Action
 
-**More scenes** — expand base pack content
+**Validate and audit engine foundation code** — review all 28 files changed in engine foundation merge, verify correctness, check for drift from plan
 
 ---
 
@@ -90,7 +90,9 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 14. ~~**Character creation redesign**~~ ✅ (PcOrigin system: two-step flow, 4 origin types, trans woman PC type)
 15. ~~**Keyboard controls redesign**~~ ✅ (arrow nav, Confirm mode, Escape, highlight style)
 16. ~~**Settings tab UI**~~ ✅ (theme, font size, line height, number key mode controls)
-17. **More scenes** — expand base pack content
+17. ~~**Engine foundation**~~ ✅ (identity, time, activity loop, effects, evaluator — 9 tasks, 29 new tests)
+18. **Validate and audit engine foundation** — review code quality, check for drift
+19. **More scenes** — expand base pack content
 
 ---
 
@@ -158,3 +160,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | rust-mcp migration: Ported from rmcp 0.2 to 0.8 (ErrorData, wrapper::Parameters, params.0 access pattern). 22 tool methods updated. Release binary builds cleanly. Added to .mcp.json. All 5 MCP servers now in-repo. Cleanup pass: extracted dispatch() helper (-728 lines), removed dead code (ToolDefinition, get_tools, lsp.rs, service.rs), fixed error handling (McpError::internal_error instead of swallowing). Added CLAUDE.md skill override: always merge, never offer discard. |
 | 2026-02-23 | Engineering tasks: 7-task plan executed in worktree. NumberKeyMode enum + UserPrefs (theme.rs), ErrorOccurred event + advance_with_action (engine.rs), silent stat effects fix (effects.rs), races from pack data (races.toml + registry + char creation), story cap (200 paras) + free_time fix + dispatch refactor (lib.rs), keyboard controls redesign (arrow nav, highlight, Confirm mode), settings panel (theme/font/line-height/number-key-mode). Code reviewed — fixed `drop` variable shadow. 124 tests, 0 failures. |
 | 2026-02-23 | Tooling + scroll fix session. screenshot-mcp rewritten to persistent WGC sessions (10fps, ~20ms reads). game-input-mcp: WM_MOUSEMOVE before WM_MOUSEWHEEL (floem cursor_position routing fix), added start_game/stop_game/is_game_running lifecycle tools (Toolhelp32). Scroll-to-bottom fixed: root cause was floem timing — scroll_to deferred message fires with stale child_size when content change and scroll signal are in same reactive batch. Fix: exec_after(Duration::ZERO) defers scroll to next frame; skip scroll on first prose of new scene (start at top). CLAUDE.md: Engineering Principle #8 (no tech debt/workarounds/hacks), background task ≠ game exit guardrail. 124 tests, 0 failures. |
+| 2026-02-23 | Engine foundation: 9 tasks from `docs/plans/2026-02-23-engine-foundation.md` (Sessions A/B/C, D deferred). Batch 1 (sequential): BeforeIdentity struct (domain), trait groups/conflicts (domain+packs), categories system (domain+packs+expr), TimeSlot enum (domain+world+scene). Batch 2 (4 parallel agents): 25+ evaluator methods (expr), 13 new effect types (scene/effects+types), slot routing + once_only/trigger scheduler (scene/engine+scheduler), save v3 with v2→v3 migration (save). Cross-agent integration: fixed PickResult type mismatch in UI (scheduler.pick() now returns PickResult), added SlotRequested event handler. Task 9: hub scene plan_your_day.toml, schedule.toml updates. 28 files changed, +1709/-118 lines. 153 tests (29 new), 0 failures. Merged to master (--no-ff). |
