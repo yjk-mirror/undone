@@ -78,11 +78,20 @@ pub struct CategoriesFile {
     pub category: Vec<CategoryDef>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CategoryType {
+    Race,
+    Age,
+    Trait,
+    Personality,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct CategoryDef {
     pub id: String,
     pub description: String,
     #[serde(rename = "type")]
-    pub category_type: String,
+    pub category_type: CategoryType,
     pub members: Vec<String>,
 }

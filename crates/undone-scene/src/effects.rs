@@ -33,6 +33,8 @@ pub enum EffectError {
     UnknownRelationshipStatus(String),
     #[error("unknown behaviour '{0}'")]
     UnknownBehaviour(String),
+    #[error("unknown virgin_type '{0}'")]
+    UnknownVirginType(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -355,7 +357,10 @@ pub fn apply_effect(
                 world.player.lesbian_virgin = *value;
             }
             Some(other) => {
-                eprintln!("[effect] set_virgin: unknown virgin_type '{}'", other);
+                return Err(EffectError::UnknownVirginType(format!(
+                    "set_virgin: unknown virgin_type '{}'",
+                    other
+                )));
             }
         },
         EffectDef::AdvanceTime { slots } => {
@@ -909,5 +914,113 @@ mod tests {
         )
         .unwrap();
         assert!(!world.male_npcs[key].core.contactable);
+    }
+
+    #[test]
+    fn set_relationship_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert_eq!(
+            world.male_npcs[key].core.relationship,
+            RelationshipStatus::Stranger
+        );
+        apply_effect(
+            &EffectDef::SetRelationship {
+                npc: "m".into(),
+                status: "Friend".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(
+            world.male_npcs[key].core.relationship,
+            RelationshipStatus::Friend
+        );
+    }
+
+    #[test]
+    fn set_npc_behaviour_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert_eq!(world.male_npcs[key].core.behaviour, Behaviour::Neutral);
+        apply_effect(
+            &EffectDef::SetNpcBehaviour {
+                npc: "m".into(),
+                behaviour: "Romantic".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.male_npcs[key].core.behaviour, Behaviour::Romantic);
+    }
+
+    #[test]
+    fn add_sexual_activity_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert!(world.male_npcs[key].core.sexual_activities.is_empty());
+        apply_effect(
+            &EffectDef::AddSexualActivity {
+                npc: "m".into(),
+                activity: "kissed".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(world.male_npcs[key]
+            .core
+            .sexual_activities
+            .contains("kissed"));
+    }
+
+    #[test]
+    fn set_player_partner_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert!(world.player.partner.is_none());
+        apply_effect(
+            &EffectDef::SetPlayerPartner { npc: "m".into() },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert_eq!(world.player.partner, Some(NpcKey::Male(key)));
+    }
+
+    #[test]
+    fn add_player_friend_works() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        let reg = PackRegistry::new();
+        assert!(world.player.friends.is_empty());
+        apply_effect(
+            &EffectDef::AddPlayerFriend { npc: "m".into() },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+        assert!(world.player.friends.contains(&NpcKey::Male(key)));
     }
 }

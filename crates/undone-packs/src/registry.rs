@@ -314,7 +314,7 @@ impl Default for PackRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::data::TraitDef;
+    use crate::data::{CategoryType, TraitDef};
 
     fn make_registry() -> PackRegistry {
         let mut reg = PackRegistry::new();
@@ -506,7 +506,7 @@ mod tests {
         reg.register_categories(vec![CategoryDef {
             id: "RACE_PRIVILEGED".into(),
             description: "...".into(),
-            category_type: "race".into(),
+            category_type: CategoryType::Race,
             members: vec!["White".into()],
         }]);
         assert!(reg.in_category("RACE_PRIVILEGED", "White"));

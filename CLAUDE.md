@@ -278,6 +278,11 @@ When using parallel background subagents (Task tool with `run_in_background: tru
   permission prompts and will silently block on every Bash/Write/Edit call without it
 - **Never** have background agents commit to git — they may run concurrently and will
   corrupt the index. Have them implement + test only; the lead commits after review.
+- **Never** have background agents run `cargo check`, `cargo test`, `cargo fmt`, or
+  any build/compile commands — concurrent agents share the same build directory and
+  serialize on the cargo file lock, wasting time. The lead runs a single verification
+  pass after all agents complete. Agents should **edit files only** and report what
+  they changed.
 - Scope safety comes from the prompt, not the permission gate — be precise about
   which files/crates each agent owns
 

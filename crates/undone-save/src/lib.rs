@@ -541,7 +541,7 @@ mod tests {
     ///   - `origin: CisMaleTransformed`
     ///   - `before: Some(BeforeIdentity { sexuality: AttractedToWomen, ... })`
     #[test]
-    fn migrate_v1_save_to_v2() {
+    fn migrate_v1_save_to_v3() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
 
         // Build a v1-format JSON manually.  We need real interned IDs in id_strings

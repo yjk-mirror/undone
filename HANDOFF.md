@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 153 passing, 0 failures.
+**Tests:** 169 passing, 0 failures.
 **Remote:** pushed (mirrored repo, pulled into Linux dev env).
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v3 with v1→v2→v3 migration chain. Trans woman branches in all 3 scenes. Engine correctness pass complete. Engine foundation complete: BeforeIdentity struct, trait groups/conflicts, categories, TimeSlot enum, 25+ evaluator methods, 13 new effect types, slot routing, once_only/trigger scheduler, hub scene (plan_your_day).
 **Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform. screenshot-mcp uses persistent WGC sessions (10fps, ~20ms reads after first). game-input-mcp has lifecycle tools (start_game, stop_game, is_game_running).
@@ -13,7 +13,7 @@
 
 ## ⚡ Next Action
 
-**Validate and audit engine foundation code** — review all 28 files changed in engine foundation merge, verify correctness, check for drift from plan
+**Expand base pack content** — more scenes, deeper game loop
 
 ---
 
@@ -91,7 +91,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 15. ~~**Keyboard controls redesign**~~ ✅ (arrow nav, Confirm mode, Escape, highlight style)
 16. ~~**Settings tab UI**~~ ✅ (theme, font size, line height, number key mode controls)
 17. ~~**Engine foundation**~~ ✅ (identity, time, activity loop, effects, evaluator — 9 tasks, 29 new tests)
-18. **Validate and audit engine foundation** — review code quality, check for drift
+18. ~~**Validate and audit engine foundation**~~ ✅ (15 findings categorized, 10 fixed, 5 deferred/resolved, 16 new tests)
 19. **More scenes** — expand base pack content
 
 ---
@@ -161,3 +161,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | Engineering tasks: 7-task plan executed in worktree. NumberKeyMode enum + UserPrefs (theme.rs), ErrorOccurred event + advance_with_action (engine.rs), silent stat effects fix (effects.rs), races from pack data (races.toml + registry + char creation), story cap (200 paras) + free_time fix + dispatch refactor (lib.rs), keyboard controls redesign (arrow nav, highlight, Confirm mode), settings panel (theme/font/line-height/number-key-mode). Code reviewed — fixed `drop` variable shadow. 124 tests, 0 failures. |
 | 2026-02-23 | Tooling + scroll fix session. screenshot-mcp rewritten to persistent WGC sessions (10fps, ~20ms reads). game-input-mcp: WM_MOUSEMOVE before WM_MOUSEWHEEL (floem cursor_position routing fix), added start_game/stop_game/is_game_running lifecycle tools (Toolhelp32). Scroll-to-bottom fixed: root cause was floem timing — scroll_to deferred message fires with stale child_size when content change and scroll signal are in same reactive batch. Fix: exec_after(Duration::ZERO) defers scroll to next frame; skip scroll on first prose of new scene (start at top). CLAUDE.md: Engineering Principle #8 (no tech debt/workarounds/hacks), background task ≠ game exit guardrail. 124 tests, 0 failures. |
 | 2026-02-23 | Engine foundation: 9 tasks from `docs/plans/2026-02-23-engine-foundation.md` (Sessions A/B/C, D deferred). Batch 1 (sequential): BeforeIdentity struct (domain), trait groups/conflicts (domain+packs), categories system (domain+packs+expr), TimeSlot enum (domain+world+scene). Batch 2 (4 parallel agents): 25+ evaluator methods (expr), 13 new effect types (scene/effects+types), slot routing + once_only/trigger scheduler (scene/engine+scheduler), save v3 with v2→v3 migration (save). Cross-agent integration: fixed PickResult type mismatch in UI (scheduler.pick() now returns PickResult), added SlotRequested event handler. Task 9: hub scene plan_your_day.toml, schedule.toml updates. 28 files changed, +1709/-118 lines. 153 tests (29 new), 0 failures. Merged to master (--no-ff). |
+| 2026-02-24 | Engine foundation audit: 4 parallel audit agents reviewed all crates against plan. 15 findings (4 HIGH, 2 MED, 6 LOW, 3 NOTE). 3 parallel fix agents resolved 10 issues: CategoryType String→enum (data.rs+eval.rs), SetVirgin unknown type → error (effects.rs), LateTwenties added to AGE_YOUNG (categories.toml), MaleFigure Display impl (enums.rs), test rename v2→v3 (save), redundant check_triggers guard removed (scheduler.rs), 16 new tests (inCategory, beforeInCategory, check_triggers, 5 NPC effects, before=None paths). 5 findings resolved without code changes (deferred or not bugs). CLAUDE.md updated: background agents must not run cargo build/check/test (file lock contention). 169 tests, 0 failures. |

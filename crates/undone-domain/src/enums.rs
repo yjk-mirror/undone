@@ -80,6 +80,20 @@ pub enum MaleFigure {
     Fat,
 }
 
+impl std::fmt::Display for MaleFigure {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MaleFigure::Average => write!(f, "Average"),
+            MaleFigure::Skinny => write!(f, "Skinny"),
+            MaleFigure::Toned => write!(f, "Toned"),
+            MaleFigure::Muscular => write!(f, "Muscular"),
+            MaleFigure::Thickset => write!(f, "Thickset"),
+            MaleFigure::Paunchy => write!(f, "Paunchy"),
+            MaleFigure::Fat => write!(f, "Fat"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BreastSize {
     Small,

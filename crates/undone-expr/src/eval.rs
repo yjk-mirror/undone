@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use thiserror::Error;
 use undone_domain::{FemaleNpcKey, MaleNpcKey, PcOrigin};
-use undone_packs::PackRegistry;
+use undone_packs::{CategoryType, PackRegistry};
 use undone_world::World;
 
 use crate::parser::{Call, Expr, Receiver, Value};
@@ -217,14 +217,22 @@ pub fn eval_call_bool(
                 let cat = str_arg(0)?;
                 match registry.get_category(cat) {
                     None => Ok(false),
-                    Some(cat_def) => {
-                        let value = if cat_def.category_type == "age" {
-                            format!("{:?}", world.player.age)
-                        } else {
-                            world.player.race.clone()
-                        };
-                        Ok(cat_def.members.iter().any(|m| m == &value))
-                    }
+                    Some(cat_def) => match cat_def.category_type {
+                        CategoryType::Age => {
+                            let value = format!("{:?}", world.player.age);
+                            Ok(cat_def.members.iter().any(|m| m == &value))
+                        }
+                        CategoryType::Race => {
+                            Ok(cat_def.members.iter().any(|m| m == &world.player.race))
+                        }
+                        CategoryType::Trait => Ok(cat_def.members.iter().any(|m| {
+                            registry
+                                .resolve_trait(m)
+                                .map(|id| world.player.traits.contains(&id))
+                                .unwrap_or(false)
+                        })),
+                        CategoryType::Personality => Ok(false),
+                    },
                 }
             }
             "beforeInCategory" => {
@@ -233,14 +241,22 @@ pub fn eval_call_bool(
                     None => Ok(false),
                     Some(before) => match registry.get_category(cat) {
                         None => Ok(false),
-                        Some(cat_def) => {
-                            let value = if cat_def.category_type == "age" {
-                                format!("{:?}", before.age)
-                            } else {
-                                before.race.clone()
-                            };
-                            Ok(cat_def.members.iter().any(|m| m == &value))
-                        }
+                        Some(cat_def) => match cat_def.category_type {
+                            CategoryType::Age => {
+                                let value = format!("{:?}", before.age);
+                                Ok(cat_def.members.iter().any(|m| m == &value))
+                            }
+                            CategoryType::Race => {
+                                Ok(cat_def.members.iter().any(|m| m == &before.race))
+                            }
+                            CategoryType::Trait => Ok(cat_def.members.iter().any(|m| {
+                                registry
+                                    .resolve_trait(m)
+                                    .map(|id| before.traits.contains(&id))
+                                    .unwrap_or(false)
+                            })),
+                            CategoryType::Personality => Ok(false),
+                        },
                     },
                 }
             }
@@ -795,5 +811,125 @@ mod tests {
         let reg = undone_packs::PackRegistry::new();
         let expr = parse("gd.timeSlot() == 'Morning'").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    // ── inCategory tests ──────────────────────────────────────────────────────
+
+    #[test]
+    fn inCategory_returns_true_for_matching_age() {
+        let world = make_world(); // age = LateTeen
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_categories(vec![undone_packs::CategoryDef {
+            id: "AGE_YOUNG".into(),
+            description: "...".into(),
+            category_type: undone_packs::CategoryType::Age,
+            members: vec!["LateTeen".into(), "EarlyTwenties".into(), "Twenties".into()],
+        }]);
+        let expr = parse("w.inCategory('AGE_YOUNG')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn inCategory_returns_false_for_non_matching_age() {
+        let world = make_world(); // age = LateTeen
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_categories(vec![undone_packs::CategoryDef {
+            id: "AGE_MATURE".into(),
+            description: "...".into(),
+            category_type: undone_packs::CategoryType::Age,
+            members: vec!["Thirties".into(), "Forties".into()],
+        }]);
+        let expr = parse("w.inCategory('AGE_MATURE')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn inCategory_returns_false_for_unknown_category() {
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.inCategory('NONEXISTENT')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn inCategory_race_returns_true() {
+        let world = make_world(); // race = "east_asian"
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_categories(vec![undone_packs::CategoryDef {
+            id: "NON_PRIVILEGED".into(),
+            description: "...".into(),
+            category_type: undone_packs::CategoryType::Race,
+            members: vec!["east_asian".into(), "Black".into()],
+        }]);
+        let expr = parse("w.inCategory('NON_PRIVILEGED')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    // ── beforeInCategory tests ────────────────────────────────────────────────
+
+    #[test]
+    fn beforeInCategory_returns_true_for_before_age() {
+        let world = make_world(); // before.age = Twenties
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_categories(vec![undone_packs::CategoryDef {
+            id: "AGE_YOUNG".into(),
+            description: "...".into(),
+            category_type: undone_packs::CategoryType::Age,
+            members: vec!["LateTeen".into(), "EarlyTwenties".into(), "Twenties".into()],
+        }]);
+        let expr = parse("w.beforeInCategory('AGE_YOUNG')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn beforeInCategory_returns_false_when_no_before() {
+        let mut world = make_world();
+        world.player.before = None;
+        world.player.origin = PcOrigin::AlwaysFemale;
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_categories(vec![undone_packs::CategoryDef {
+            id: "AGE_YOUNG".into(),
+            description: "...".into(),
+            category_type: undone_packs::CategoryType::Age,
+            members: vec!["LateTeen".into()],
+        }]);
+        let expr = parse("w.beforeInCategory('AGE_YOUNG')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    // ── before-identity None path tests ──────────────────────────────────────
+
+    #[test]
+    fn beforeRace_returns_empty_when_no_before() {
+        let mut world = make_world();
+        world.player.before = None;
+        let ctx = SceneCtx::new();
+        let reg = undone_packs::PackRegistry::new();
+        let expr = parse("w.beforeRace() == ''").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn hadTraitBefore_returns_false_when_no_before() {
+        let mut world = make_world();
+        world.player.before = None;
+        let ctx = SceneCtx::new();
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_traits(vec![undone_packs::TraitDef {
+            id: "SHY".into(),
+            name: "Shy".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        let expr = parse("w.hadTraitBefore('SHY')").unwrap();
+        assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
     }
 }

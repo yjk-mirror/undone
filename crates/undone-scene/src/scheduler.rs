@@ -184,8 +184,7 @@ impl Scheduler {
         events
             .iter()
             .find(|e| {
-                e.trigger.is_some()
-                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
+                !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.trigger {
                         Some(expr) => match eval(expr, world, &ctx, registry) {
                             Ok(val) => val,
@@ -521,5 +520,81 @@ mod tests {
             "PickResult.once_only should be true for a once_only event"
         );
         assert_eq!(result.scene_id, "test::flagged_scene");
+    }
+
+    #[test]
+    fn check_triggers_returns_scene_when_condition_true() {
+        let registry = PackRegistry::new();
+        // trigger on "true" — always fires
+        let trigger_expr = undone_expr::parse("true").unwrap();
+        let event = ScheduleEvent {
+            scene: "test::triggered_scene".into(),
+            condition: None,
+            weight: 0,
+            once_only: false,
+            trigger: Some(trigger_expr),
+        };
+        let mut slots = HashMap::new();
+        slots.insert("test_slot".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+        let world = make_world();
+
+        let result = scheduler.check_triggers("test_slot", &world, &registry);
+        assert!(
+            result.is_some(),
+            "triggered event with true condition should be returned"
+        );
+        assert_eq!(result.unwrap().scene_id, "test::triggered_scene");
+    }
+
+    #[test]
+    fn check_triggers_returns_none_when_condition_false() {
+        let registry = PackRegistry::new();
+        // trigger on "false" — never fires
+        let trigger_expr = undone_expr::parse("false").unwrap();
+        let event = ScheduleEvent {
+            scene: "test::triggered_scene".into(),
+            condition: None,
+            weight: 0,
+            once_only: false,
+            trigger: Some(trigger_expr),
+        };
+        let mut slots = HashMap::new();
+        slots.insert("test_slot".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+        let world = make_world();
+
+        let result = scheduler.check_triggers("test_slot", &world, &registry);
+        assert!(
+            result.is_none(),
+            "triggered event with false condition should not fire"
+        );
+    }
+
+    #[test]
+    fn check_triggers_filtered_by_once_only_flag() {
+        let registry = PackRegistry::new();
+        // trigger on "true" — would fire, but once_only and flag already set
+        let trigger_expr = undone_expr::parse("true").unwrap();
+        let event = ScheduleEvent {
+            scene: "test::once_trigger_scene".into(),
+            condition: None,
+            weight: 0,
+            once_only: true,
+            trigger: Some(trigger_expr),
+        };
+        let mut slots = HashMap::new();
+        slots.insert("test_slot".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+
+        // Set the ONCE_ flag so the event is filtered out
+        let mut world = make_world();
+        world.game_data.set_flag("ONCE_test::once_trigger_scene");
+
+        let result = scheduler.check_triggers("test_slot", &world, &registry);
+        assert!(
+            result.is_none(),
+            "once_only triggered event should be excluded after ONCE_ flag is set"
+        );
     }
 }
