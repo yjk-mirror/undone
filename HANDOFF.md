@@ -6,21 +6,12 @@
 **Tests:** 119 passing, 0 failures.
 **Remote:** pushed (mirrored repo, pulled into Linux dev env).
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Engine correctness pass complete: cross-reference validation, transition guard, NPC personality rendering, condition eval logging, data-driven opening scene/slot, scroll-to-bottom fix, unknown scene surfacing. Engineering Principles documented in CLAUDE.md.
-**Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). rhai-mcp-server + minijinja-mcp-server build cross-platform. screenshot-mcp + game-input-mcp compile on Linux (cfg-gated, Windows-only at runtime). All 4 tools build cleanly on Linux.
-**MCPs:** All MCP config is now cross-platform — no hardcoded absolute paths. `tools/mcp-launcher.mjs` detects OS and appends `.exe` on Windows. The `rust` MCP (LSP navigation) was removed from `.mcp.json` pending source migration (see Next Action).
+**Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform.
+**MCPs:** All MCP config is cross-platform — no hardcoded absolute paths. `tools/mcp-launcher.mjs` detects OS and appends `.exe` on Windows. All 5 servers registered in `.mcp.json`.
 
 ---
 
 ## ⚡ Next Action
-
-**WINDOWS SESSION — do this first:**
-Move the `rust` MCP source into the repo so it builds on both platforms:
-1. Copy `C:/Users/YJK/.claude/mcp-servers/rust-mcp/` → `tools/rust-mcp/`
-2. Add `"rust-mcp"` to the `members` array in `tools/Cargo.toml`
-3. Add to `.mcp.json` under `mcpServers`: `"rust": { "type": "stdio", "command": "node", "args": ["tools/mcp-launcher.mjs", "rust-mcp"] }`
-   (adjust the binary name to match whatever `cargo build` produces)
-4. `cd tools && cargo build --release` — verify it builds
-5. Commit and push
 
 Priority tasks:
 1. **Keyboard controls redesign** — arrow keys for choice highlight, configurable number-key behavior (instant vs highlight+confirm)
@@ -182,3 +173,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | Engine correctness & safety pass: 7 tasks + 2 audit fixes. Scroll-to-bottom (scroll_gen signal), cross-reference validation (UnknownGotoTarget), transition counter guard (replaces stack depth), NPC personality rendering (String instead of PersonalityId), condition eval logging (eval_condition helper), unknown scene surfacing (ProseAdded error), data-driven opening scene/slot (manifest fields → registry → UI). Audit found 8 issues — fixed both HIGH (hardcoded scene ID in saves_panel, silent unwrap_or in scheduler). Engineering Principles added to CLAUDE.md. Remote configured (github-mirror SSH alias). 119 tests, 0 failures. |
 | 2026-02-23 | Devtools imported into repo as tools/ (separate workspace). Fixed Windows-only tools (screenshot-mcp, game-input-mcp) to compile on Linux via #[cfg(target_os = "windows")] module gates and target-specific Cargo deps. All 4 tools build cleanly. Global permissions set to bypassPermissions for subagents. |
 | 2026-02-23 | MCP cross-platform fix. All configs had hardcoded Windows paths. Added tools/mcp-launcher.mjs (OS-aware, self-locating via import.meta.url, appends .exe on Windows). .mcp.json now uses node + launcher for all 4 servers. post-edit-check.mjs and settings.json hook also de-hardcoded. rust MCP removed pending source migration into tools/ (source only exists on Windows machine). |
+| 2026-02-23 | rust-mcp migration: Ported from rmcp 0.2 to 0.8 (ErrorData, wrapper::Parameters, params.0 access pattern). 22 tool methods updated. Release binary builds cleanly. Added to .mcp.json. All 5 MCP servers now in-repo. |

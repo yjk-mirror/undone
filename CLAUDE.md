@@ -78,7 +78,8 @@ undone/
     ├── rhai-mcp-server/     # MCP server: Rhai script validation
     ├── minijinja-mcp-server/# MCP server: Minijinja template validation + preview
     ├── screenshot-mcp/      # MCP server: screen capture for agent visual feedback
-    └── game-input-mcp/      # MCP server: keyboard/mouse/scroll injection into the game window
+    ├── game-input-mcp/      # MCP server: keyboard/mouse/scroll injection into the game window
+    └── rust-mcp/            # MCP server: rust-analyzer LSP integration (navigation, rename)
 ```
 
 ### Two separate Cargo workspaces

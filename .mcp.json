@@ -23,6 +23,12 @@
       "command": "node",
       "args": ["tools/mcp-launcher.mjs", "game-input-mcp"],
       "env": {}
+    },
+    "rust": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["tools/mcp-launcher.mjs", "rust-mcp"],
+      "env": {}
     }
   }
 }

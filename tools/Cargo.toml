@@ -4,5 +4,6 @@ members = [
     "minijinja-mcp-server",
     "screenshot-mcp",
     "game-input-mcp",
+    "rust-mcp",
 ]
 resolver = "2"
