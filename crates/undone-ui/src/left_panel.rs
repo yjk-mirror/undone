@@ -198,7 +198,11 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         let events = engine.advance_with_action(&action_id, world, registry);
         let finished = crate::process_events(events, signals, world, femininity_id);
         if finished {
-            if let Some(slot) = default_slot.as_deref() {
+            if signals.phase.get_untracked() == crate::AppPhase::TransformationIntro {
+                // Transformation intro complete — move to female customisation.
+                // (The throwaway world is discarded; FemCreation builds the real one.)
+                signals.phase.set(crate::AppPhase::FemCreation);
+            } else if let Some(slot) = default_slot.as_deref() {
                 if let Some(result) = scheduler.pick(slot, world, registry, rng) {
                     engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
                     let events = engine.drain();
