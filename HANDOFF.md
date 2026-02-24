@@ -3,10 +3,10 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 198 passing, 0 failures.
-**App:** 3-phase character creation working end-to-end: BeforeCreation form → TransformationIntro scene → FemCreation form → InGame. Four PC origins. AlwaysFemale skips TransformationIntro. Engine routes foundation complete: check system, arc system, thought system, narrator variants, NPC roles, validate-pack binary, route flags. Full prose template context.
+**Tests:** 200 passing, 0 failures.
+**App:** 3-phase character creation working end-to-end: BeforeCreation form → TransformationIntro scene → FemCreation form → InGame. Four PC origins. AlwaysFemale skips TransformationIntro. Engine routes foundation complete: check system, arc system, thought system, narrator variants, NPC roles, validate-pack binary, route flags. Full prose template context (including `gd.arcState()` and `w.getSkill()`).
 **Content:** 15 scenes total (4 universal + 5 Robin opening arc + 5 Camila opening arc + transformation_intro). Two character routes: ROUTE_ROBIN and ROUTE_CAMILA.
-**Docs:** docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Writing guide updated with AI-ism anti-patterns (staccato declaratives, over-naming) and BG3 narrator reference.
+**Docs:** docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Writing guide fully updated — stale notes removed, gd.arcState() and w.getSkill() documented, BG3 narrator reference.
 **Tools:** Same as before — all 5 MCP servers in tools/ workspace.
 **MCPs:** All MCP config is cross-platform — no hardcoded absolute paths.
 
@@ -14,7 +14,12 @@
 
 ## ⚡ Next Action
 
-**Prose revision pass** — both `rain_shelter` and `transformation_intro` have AI-ism issues (staccato, em-dash reveals, over-naming). Rewrite using BG3 narrator standard (dry, plain, trusts the scene). Or: second-week scenes for Robin/Camila routes.
+**Content expansion** — Phases 4–8 of `docs/plans/2026-02-24-prolific-session.md` are deferred:
+- Phase 4: World canonization (`docs/world.md` with facts from all 15 scenes)
+- Phase 5: Robin week 2 scenes (`working` arc state — `robin_work_meeting`, `robin_evening`)
+- Phase 6: Camila week 2 scenes (`first_week` arc state — `camila_study_session`, `camila_dining_hall`)
+- Phase 7: `plan_your_day.toml` prose depth (trait branches, weight, texture)
+- Phase 8: Free-time recurrence variety (return-visit prose variants using game flags)
 
 ---
 
@@ -149,3 +154,4 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 | 2026-02-24 | Engine foundation audit: 4 parallel audit agents reviewed all crates against plan. 15 findings (4 HIGH, 2 MED, 6 LOW, 3 NOTE). 3 parallel fix agents resolved 10 issues: CategoryType String→enum (data.rs+eval.rs), SetVirgin unknown type → error (effects.rs), LateTwenties added to AGE_YOUNG (categories.toml), MaleFigure Display impl (enums.rs), test rename v2→v3 (save), redundant check_triggers guard removed (scheduler.rs), 16 new tests (inCategory, beforeInCategory, check_triggers, 5 NPC effects, before=None paths). 5 findings resolved without code changes (deferred or not bugs). CLAUDE.md updated: background agents must not run cargo build/check/test (file lock contention). 169 tests, 0 failures. |
 | 2026-02-24 | Engine routes foundation: 28-task plan (worktree: engine-routes-foundation). Engine: skill roll cache (RefCell<HashMap> in SceneCtx), checkSkill/checkSkillRed evaluator methods (percentile, clamped 5–95), arc_states + red_check_failures in GameData, arcState/arcStarted/arcAdvanced evaluator methods, full prose template context (getSkill/getMoney/getStress/timeSlot/wasTransformed etc.), thought system ([[thoughts]] → ThoughtAdded event, inner_voice/anxiety styles), narrator variants ([[intro_variants]] conditional intro replacement), arc effects (AdvanceArc/SetNpcRole/FailRedCheck), NPC roles (roles field on NpcCore, hasRole() evaluator), arc data format (arcs.toml, ArcDef, registry), route flags (starting_flags/starting_arc_states in CharCreationConfig), validate-pack binary. Docs: docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Content: Robin arc (5 scenes: robin_arrival, robin_landlord, robin_first_night, robin_first_clothes, robin_first_day), Camila arc (5 scenes: camila_arrival, camila_dorm, camila_orientation, camila_library, camila_call_raul). 14 total scenes. 197 tests, 0 failures. |
 | 2026-02-24 | Char creation redesign: 10-task plan (worktree: char-creation-redesign). AppPhase expanded to 4 variants (BeforeCreation/TransformationIntro/FemCreation/InGame). PartialCharState accumulates before-choices. PackRegistry+Scheduler derive Clone (throwaway world for intro scene). transformation_scene field in manifest/registry/loader. char_creation_view (BeforeCreation) + fem_creation_view (FemCreation). TransformationIntro phase runs transformation_intro scene against throwaway world. dispatch_action phase check transitions scene-finish → FemCreation. AlwaysFemale skips TransformationIntro. transformation_intro.toml scene with CisMale/TransWoman voice branches. Writing guide: AI-ism anti-patterns (staccato declaratives, over-naming), BG3 narrator reference. dev/CLAUDE.md skill overrides: finishing-a-development-branch auto-merges (no options prompt). 198 tests, 0 failures. |
+| 2026-02-24 | Prolific session (partial — phases 1–3 of 8). Engine: gd.arcState() added to prose template context (2 new tests, 200 total). Writing guide: removed stale notes for getSkill/arcState, expanded template objects table with all current methods, updated FEMININITY section with live usage, added arcState branching example. Prose revision: rain_shelter AI-isms fixed (default nod named→shown, CisMale interiority shows-the-look-not-names-category, trailing staccato cut, NPC action prose upgraded), transformation_intro CisMale branch rewritten (removed anaphoric repetition, removed isolated staccato), CisFemaleTransformed branch added. Char creation: OUTGOING + OVERACTIVE_IMAGINATION added to trait grid (14 traits total), Next button guards empty before_name, FemCreation race defaults to before_race carry-forward. Phases 4–8 deferred. 200 tests, 0 failures. |
