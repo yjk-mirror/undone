@@ -36,8 +36,21 @@ pub enum AppTab {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum AppPhase {
-    CharCreation,
+    BeforeCreation,
+    TransformationIntro,
+    FemCreation,
     InGame,
+}
+
+/// Accumulated choices from BeforeCreation, passed forward to FemCreation.
+#[derive(Clone)]
+pub struct PartialCharState {
+    pub origin: undone_domain::PcOrigin,
+    pub before_name: String,
+    pub before_age: undone_domain::Age,
+    pub before_race: String,
+    pub before_sexuality: undone_domain::BeforeSexuality,
+    pub starting_traits: Vec<undone_domain::TraitId>,
 }
 
 /// All reactive signals used by the view tree.
@@ -68,7 +81,7 @@ impl AppSignals {
             active_npc: RwSignal::new(None),
             prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
-            phase: RwSignal::new(AppPhase::CharCreation),
+            phase: RwSignal::new(AppPhase::BeforeCreation),
             scroll_gen: RwSignal::new(0),
         }
     }
@@ -132,6 +145,9 @@ pub fn app_view() -> impl View {
     let pre_state: Rc<RefCell<Option<PreGameState>>> = Rc::new(RefCell::new(Some(init_game())));
     let game_state: Rc<RefCell<Option<GameState>>> = Rc::new(RefCell::new(None));
 
+    // Accumulates choices across the three-phase creation flow.
+    let partial_char: RwSignal<Option<PartialCharState>> = RwSignal::new(None);
+
     // Surface pack-load errors in the story panel immediately (shown when we transition to InGame).
     {
         let ps = pre_state.borrow();
@@ -151,9 +167,22 @@ pub fn app_view() -> impl View {
     let content = dyn_container(
         move || phase.get(),
         move |current_phase| match current_phase {
-            AppPhase::CharCreation => {
-                char_creation_view(signals, Rc::clone(&pre_state_cc), Rc::clone(&game_state_cc))
-                    .into_any()
+            AppPhase::BeforeCreation => {
+                char_creation_view(
+                    signals,
+                    Rc::clone(&pre_state_cc),
+                    Rc::clone(&game_state_cc),
+                    partial_char,
+                )
+                .into_any()
+            }
+            AppPhase::TransformationIntro => {
+                // TODO Task 5: wire transformation intro scene
+                placeholder_panel("Transformation intro — coming soon", signals).into_any()
+            }
+            AppPhase::FemCreation => {
+                // TODO Task 7: wire fem creation form
+                placeholder_panel("Fem creation — coming soon", signals).into_any()
             }
             AppPhase::InGame => {
                 // On first transition to InGame, start the opening scene.
