@@ -29,13 +29,18 @@
       "Bash(cd /c/Users/YJK/dev/mirror/undone/.worktrees/scene-engine && cargo clippy --crate-name undone_expr -- -W clippy::all 2>&1)",
       "Bash(cd /c/Users/YJK/dev/mirror/undone/.worktrees/scene-engine && cargo clippy --all 2>&1)",
       "Bash(cd \"C:/Users/YJK/dev/mirror/undone/.worktrees/scene-engine\" && cargo fmt -p undone-packs && cargo test -p undone-packs 2>&1)",
-      "Bash(cd \"C:/Users/YJK/dev/mirror/undone/.worktrees/scene-engine\" && cargo test -p undone-packs 2>&1)"
+      "Bash(cd \"C:/Users/YJK/dev/mirror/undone/.worktrees/scene-engine\" && cargo test -p undone-packs 2>&1)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(cd /home/yjk/dev/mirror/undone/tools && cargo build --release 2>&1)",
+      "Bash(git add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "rust",
     "rhai",
-    "minijinja"
+    "minijinja",
+    "screenshot",
+    "game-input"
   ]
 }

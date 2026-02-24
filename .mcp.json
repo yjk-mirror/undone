@@ -1,35 +1,27 @@
 {
   "mcpServers": {
-    "rust": {
-      "type": "stdio",
-      "command": "C:/Users/YJK/.claude/mcp-servers/rust-mcp/target/release/rustmcp.exe",
-      "args": [],
-      "env": {
-        "RUST_ANALYZER_PATH": "C:/Users/YJK/.cargo/bin/rust-analyzer.exe"
-      }
-    },
     "rhai": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/rhai-mcp-server.exe",
-      "args": [],
+      "command": "node",
+      "args": ["tools/mcp-launcher.mjs", "rhai-mcp-server"],
       "env": {}
     },
     "minijinja": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/minijinja-mcp-server.exe",
-      "args": [],
+      "command": "node",
+      "args": ["tools/mcp-launcher.mjs", "minijinja-mcp-server"],
       "env": {}
     },
     "screenshot": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/screenshot-mcp.exe",
-      "args": [],
+      "command": "node",
+      "args": ["tools/mcp-launcher.mjs", "screenshot-mcp"],
       "env": {}
     },
     "game-input": {
       "type": "stdio",
-      "command": "C:/Users/YJK/dev/mirror/undone/tools/target/release/game-input-mcp.exe",
-      "args": [],
+      "command": "node",
+      "args": ["tools/mcp-launcher.mjs", "game-input-mcp"],
       "env": {}
     }
   }

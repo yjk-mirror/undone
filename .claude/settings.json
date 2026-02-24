@@ -9,10 +9,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node C:/Users/YJK/dev/mirror/undone/.claude/hooks/post-edit-check.mjs"
+            "command": "node .claude/hooks/post-edit-check.mjs"
           }
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {}
 }
