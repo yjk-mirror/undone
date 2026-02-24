@@ -8,12 +8,26 @@ pub enum ThemeMode {
     Dark,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum NumberKeyMode {
+    Instant,
+    Confirm,
+}
+
+impl Default for NumberKeyMode {
+    fn default() -> Self {
+        NumberKeyMode::Instant
+    }
+}
+
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct UserPrefs {
     pub mode: ThemeMode,
     pub font_family: String,
     pub font_size: u8,
     pub line_height: f32,
+    #[serde(default)]
+    pub number_key_mode: NumberKeyMode,
 }
 
 fn prefs_path() -> Option<PathBuf> {
@@ -46,6 +60,7 @@ impl Default for UserPrefs {
             font_family: "Literata, Palatino, Georgia, serif".to_string(),
             font_size: 17,
             line_height: 1.5,
+            number_key_mode: NumberKeyMode::Instant,
         }
     }
 }
@@ -109,6 +124,21 @@ impl ThemeColors {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn number_key_mode_roundtrip_serde() {
+        let prefs = UserPrefs {
+            number_key_mode: NumberKeyMode::Confirm,
+            ..UserPrefs::default()
+        };
+        let json = serde_json::to_string(&prefs).unwrap();
+        let back: UserPrefs = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.number_key_mode, NumberKeyMode::Confirm);
+        // Old prefs without the field should deserialize to Instant
+        let old_json = r#"{"mode":"Light","font_family":"x","font_size":17,"line_height":1.5}"#;
+        let old: UserPrefs = serde_json::from_str(old_json).unwrap();
+        assert_eq!(old.number_key_mode, NumberKeyMode::Instant);
+    }
 
     #[test]
     fn user_prefs_roundtrip_serde() {
