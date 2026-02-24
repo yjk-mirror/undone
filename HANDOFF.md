@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 119 passing, 0 failures.
+**Tests:** 124 passing, 0 failures.
 **Remote:** pushed (mirrored repo, pulled into Linux dev env).
 **App:** Character creation → gameplay loop working. Two-step "Your Past" flow: was/wasn't transformed → which kind. Four PC origin types: CisMaleTransformed (FEMININITY=10), TransWomanTransformed (FEMININITY=70), CisFemaleTransformed (FEMININITY=75), AlwaysFemale (FEMININITY=75). Hidden traits auto-injected by new_game(). Save format v2 with v1 migration. Trans woman branches in all 3 scenes. Engine correctness pass complete: cross-reference validation, transition guard, NPC personality rendering, condition eval logging, data-driven opening scene/slot, scroll-to-bottom fix, unknown scene surfacing. Engineering Principles documented in CLAUDE.md.
 **Tools:** Devtools moved into repo as `tools/` (separate Cargo workspace). All 5 MCP servers (rhai-mcp-server, minijinja-mcp-server, screenshot-mcp, game-input-mcp, rust-mcp) build from `tools/`. rhai + minijinja build cross-platform. screenshot + game-input compile on Linux (cfg-gated, Windows-only at runtime). rust-mcp is pure Rust, cross-platform.
@@ -13,18 +13,7 @@
 
 ## ⚡ Next Action
 
-**Execute `docs/plans/2026-02-23-engineering-tasks-plan.md`** — 7 tasks covering keyboard controls, settings tab UI, and 6 audit fixes. Design doc: `docs/plans/2026-02-23-engineering-tasks-design.md`. No creative/content work.
-
-After that:
-- **More scenes** — expand base pack content
-
-### Remaining audit findings (MEDIUM/LOW, non-blocking)
-- Hardcoded `"free_time"` fallback in `story_panel.rs` — should use `default_slot` (partially fixed, still has fallback)
-- Silent stat effects in `engine.rs` `apply_effects()` — `set_stat`/`add_stat` silently ignore unknown stats
-- Unbounded `story` string in `SceneEngine` — no size limit on accumulated prose
-- Scheduler failure without UI feedback — errors logged to stderr but not surfaced to player
-- Hardcoded eye/hair/race defaults in `char_creation.rs` — should come from pack data
-- Engine logic in UI crate (`story_panel.rs` action dispatch) — should move to scene crate
+**More scenes** — expand base pack content
 
 ---
 
@@ -67,8 +56,9 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 - All colors driven by `ThemeColors::from_mode()` reactively
 
 **Keyboard navigation:**
-- Number keys 1–9 select choices by position
-- Tab/Enter activate focused button
+- Arrow Up/Down highlight choices, Enter confirms highlighted choice, Escape clears highlight
+- Number keys 1–9: configurable via NumberKeyMode (Instant = fire immediately, Confirm = highlight then Enter)
+- Detail strip shows highlighted choice detail (falls back to hovered)
 
 **Key source files:**
 - `crates/undone-ui/src/lib.rs` — AppSignals, AppTab, AppPhase, app_view
@@ -77,7 +67,8 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 - `crates/undone-ui/src/title_bar.rs` — custom title bar, tab nav, window controls
 - `crates/undone-ui/src/story_panel.rs` — story panel, centered prose, detail strip, choices bar
 - `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
-- `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, UserPrefs, save/load prefs
+- `crates/undone-ui/src/settings_panel.rs` — settings tab (theme, font size, line height, number key mode)
+- `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, NumberKeyMode, UserPrefs, save/load prefs
 - `crates/undone-ui/src/game_state.rs` — PreGameState, GameState, init_game(), start_game()
 - `.interface-design/system.md` — full design system spec
 
@@ -99,8 +90,8 @@ Hover: sends WM_MOUSEMOVE to trigger hover effects.
 12. ~~Names update~~ ✅
 13. ~~Saves tab~~ ✅
 14. ~~**Character creation redesign**~~ ✅ (PcOrigin system: two-step flow, 4 origin types, trans woman PC type)
-15. **Keyboard controls redesign** — arrow key highlight, configurable instant vs confirm
-16. **Settings tab UI** — expose UserPrefs as interactive controls
+15. ~~**Keyboard controls redesign**~~ ✅ (arrow nav, Confirm mode, Escape, highlight style)
+16. ~~**Settings tab UI**~~ ✅ (theme, font size, line height, number key mode controls)
 17. **More scenes** — expand base pack content
 
 ---
@@ -122,11 +113,6 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 - Trait checkbox UX: clicking label text should toggle checkbox (currently drag-selects)
 - Age before transition: should be a dropdown, not a text input
 - Form density: too tall for 800px window; tighter spacing or two-column layout
-
-### Keyboard Controls (Medium)
-- **Arrow key navigation**: Highlight choices with arrow keys, show detail strip for highlighted choice
-- **Number key behavior**: Configurable — instant action vs highlight-then-confirm (press number → highlight, press again or Enter → confirm)
-- **Current limitation**: Number keys (1-9) currently fire instantly; no highlight-first mode
 
 ### UI Polish (Small-Medium)
 - **Detail strip hover highlight**: Brief unwanted background highlight in Warm theme on first hover (floem default style leak — partially fixed with explicit hover/focus overrides)
@@ -173,3 +159,4 @@ The `PcOrigin` selection (CisMale / TransWoman / CisFemale / AlwaysFemale) and a
 | 2026-02-23 | Devtools imported into repo as tools/ (separate workspace). Fixed Windows-only tools (screenshot-mcp, game-input-mcp) to compile on Linux via #[cfg(target_os = "windows")] module gates and target-specific Cargo deps. All 4 tools build cleanly. Global permissions set to bypassPermissions for subagents. |
 | 2026-02-23 | MCP cross-platform fix. All configs had hardcoded Windows paths. Added tools/mcp-launcher.mjs (OS-aware, self-locating via import.meta.url, appends .exe on Windows). .mcp.json now uses node + launcher for all 4 servers. post-edit-check.mjs and settings.json hook also de-hardcoded. rust MCP removed pending source migration into tools/ (source only exists on Windows machine). |
 | 2026-02-23 | rust-mcp migration: Ported from rmcp 0.2 to 0.8 (ErrorData, wrapper::Parameters, params.0 access pattern). 22 tool methods updated. Release binary builds cleanly. Added to .mcp.json. All 5 MCP servers now in-repo. Cleanup pass: extracted dispatch() helper (-728 lines), removed dead code (ToolDefinition, get_tools, lsp.rs, service.rs), fixed error handling (McpError::internal_error instead of swallowing). Added CLAUDE.md skill override: always merge, never offer discard. |
+| 2026-02-23 | Engineering tasks: 7-task plan executed in worktree. NumberKeyMode enum + UserPrefs (theme.rs), ErrorOccurred event + advance_with_action (engine.rs), silent stat effects fix (effects.rs), races from pack data (races.toml + registry + char creation), story cap (200 paras) + free_time fix + dispatch refactor (lib.rs), keyboard controls redesign (arrow nav, highlight, Confirm mode), settings panel (theme/font/line-height/number-key-mode). Code reviewed — fixed `drop` variable shadow. 124 tests, 0 failures. |
