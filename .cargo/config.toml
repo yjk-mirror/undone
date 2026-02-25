@@ -1,0 +1,12 @@
+# Shared build configuration for the undone game workspace.
+# This file is read by cargo regardless of which git worktree is active.
+
+[build]
+# All worktrees share one target directory so switching branches stays fast.
+# Absolute path — this is a single-developer machine, no portability concern.
+target-dir = "C:/Users/YJK/dev/mirror/undone/target"
+
+# Release profile: 16 codegen units instead of 1 roughly halves link time
+# at the cost of marginal optimization — acceptable for a single-player game.
+[profile.release]
+codegen-units = 16

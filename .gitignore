@@ -10,3 +10,5 @@ Thumbs.db
 !.mcp.json
 !.claude/
 !.claude/**
+!.cargo/
+!.cargo/**
