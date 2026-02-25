@@ -42,7 +42,7 @@ mod integration_tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,

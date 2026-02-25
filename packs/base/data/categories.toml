@@ -14,7 +14,7 @@ members = ["Black", "Latina", "East Asian", "South Asian", "Mixed", "Other"]
 id = "AGE_YOUNG"
 description = "Young age brackets"
 type = "age"
-members = ["LateTeen", "EarlyTwenties", "Twenties", "LateTwenties"]
+members = ["LateTeen", "EarlyTwenties", "MidLateTwenties", "LateTwenties"]
 
 [[category]]
 id = "AGE_MATURE"

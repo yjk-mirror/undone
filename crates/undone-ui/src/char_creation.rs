@@ -35,6 +35,16 @@ fn read_races(pre_state: &Rc<RefCell<Option<PreGameState>>>) -> Vec<String> {
     vec!["White".to_string()]
 }
 
+/// Read the male names list from the pack registry, falling back to a minimal set.
+fn read_male_names(pre_state: &Rc<RefCell<Option<PreGameState>>>) -> Vec<String> {
+    if let Some(ref pre) = *pre_state.borrow() {
+        if !pre.registry.male_names().is_empty() {
+            return pre.registry.male_names().to_vec();
+        }
+    }
+    vec!["Matt".to_string(), "Ryan".to_string(), "David".to_string()]
+}
+
 // ── BeforeCreation form signals ───────────────────────────────────────────────
 
 #[derive(Clone, Copy)]
@@ -68,8 +78,8 @@ impl BeforeFormSignals {
     fn new() -> Self {
         Self {
             origin_idx: RwSignal::new(0),
-            before_name: RwSignal::new("Evan".to_string()),
-            before_age: RwSignal::new(Age::Twenties),
+            before_name: RwSignal::new(String::new()),
+            before_age: RwSignal::new(Age::EarlyTwenties),
             before_sexuality: RwSignal::new(BeforeSexuality::AttractedToWomen),
             before_race: RwSignal::new(String::new()),
             trait_shy: RwSignal::new(false),
@@ -132,12 +142,13 @@ pub fn char_creation_view(
     if let Some(first) = races_list.first() {
         form.before_race.set(first.clone());
     }
+    let male_names = read_male_names(&pre_state);
 
     let next_btn = build_next_button(signals, form, pre_state, game_state, partial_char);
 
     let content = v_stack((
         heading("Your Story Begins", signals),
-        section_your_past(signals, form, races_list),
+        section_your_past(signals, form, races_list, male_names),
         section_personality(signals, form),
         section_content_prefs(signals, form),
         next_btn,
@@ -199,7 +210,7 @@ pub fn fem_creation_view(
                 vec![
                     Age::LateTeen,
                     Age::EarlyTwenties,
-                    Age::Twenties,
+                    Age::MidLateTwenties,
                     Age::LateTwenties,
                     Age::Thirties,
                     Age::Forties,
@@ -207,6 +218,7 @@ pub fn fem_creation_view(
                     Age::Old,
                 ],
             )
+            .list_item_view(themed_item::<Age>(signals))
             .style(field_style(signals)),
         ))
     } else {
@@ -248,6 +260,7 @@ pub fn fem_creation_view(
                         PlayerFigure::Womanly,
                     ],
                 )
+                .list_item_view(themed_item::<PlayerFigure>(signals))
                 .style(field_style(signals)),
             ),
             form_row(
@@ -262,6 +275,7 @@ pub fn fem_creation_view(
                         BreastSize::Large,
                     ],
                 )
+                .list_item_view(themed_item::<BreastSize>(signals))
                 .style(field_style(signals)),
             ),
         ))
@@ -314,30 +328,35 @@ fn section_your_past(
     signals: AppSignals,
     form: BeforeFormSignals,
     races: Vec<String>,
+    male_names: Vec<String>,
 ) -> impl View {
     let origin_idx = form.origin_idx;
 
     let origin_radios = v_stack((
         radio_opt(
             "Something happened to me \u{2014} I was a man",
+            "Transformed from male. The core experience.",
             move || origin_idx.get() == 0,
             move || origin_idx.set(0),
             signals,
         ),
         radio_opt(
             "Something happened to me \u{2014} I was a trans woman",
+            "Already knew yourself. The transformation was recognition.",
             move || origin_idx.get() == 1,
             move || origin_idx.set(1),
             signals,
         ),
         radio_opt(
             "Something happened to me \u{2014} I was a woman",
+            "You were female. Something still changed.",
             move || origin_idx.get() == 2,
             move || origin_idx.set(2),
             signals,
         ),
         radio_opt(
             "I was always a woman",
+            "No transformation. Play as yourself.",
             move || origin_idx.get() == 3,
             move || origin_idx.set(3),
             signals,
@@ -355,14 +374,61 @@ fn section_your_past(
 
             let origin = origin_from_idx(idx);
             let br = races.clone();
+            let mn = male_names.clone();
+            let hint = mn.first().cloned().unwrap_or_else(|| "Matt".to_string());
 
-            let name_row = form_row(
-                "Name before",
-                signals,
-                text_input(form.before_name)
-                    .placeholder("e.g. Evan")
-                    .style(field_style(signals)),
-            );
+            // Name field with Randomize button
+            let name_row = {
+                let mn_click = mn.clone();
+                h_stack((
+                    label(move || "Name before".to_string()).style(move |s| {
+                        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                        s.width(180.0)
+                            .font_size(14.0)
+                            .color(colors.ink_dim)
+                            .items_center()
+                            .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    }),
+                    text_input(form.before_name)
+                        .placeholder(hint)
+                        .style(move |s| {
+                            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                            s.width(178.0)
+                                .height(32.0)
+                                .padding_horiz(10.0)
+                                .font_size(14.0)
+                                .color(colors.ink)
+                                .background(colors.page_raised)
+                                .border(1.0)
+                                .border_color(colors.seam)
+                                .border_radius(4.0)
+                                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        }),
+                    label(|| "Rand".to_string())
+                        .keyboard_navigable()
+                        .on_click_stop(move |_| {
+                            if !mn_click.is_empty() {
+                                let idx = rand::random::<usize>() % mn_click.len();
+                                form.before_name.set(mn_click[idx].clone());
+                            }
+                        })
+                        .style(move |s| {
+                            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                            s.width(40.0)
+                                .height(32.0)
+                                .margin_left(4.0)
+                                .font_size(11.0)
+                                .color(colors.ink_dim)
+                                .border(1.0)
+                                .border_color(colors.seam)
+                                .border_radius(4.0)
+                                .items_center()
+                                .justify_center()
+                                .cursor(floem::style::CursorStyle::Pointer)
+                        }),
+                ))
+                .style(|s| s.items_center().margin_bottom(12.0))
+            };
 
             let age_row = form_row(
                 "Age before",
@@ -372,7 +438,7 @@ fn section_your_past(
                     vec![
                         Age::LateTeen,
                         Age::EarlyTwenties,
-                        Age::Twenties,
+                        Age::MidLateTwenties,
                         Age::LateTwenties,
                         Age::Thirties,
                         Age::Forties,
@@ -380,6 +446,7 @@ fn section_your_past(
                         Age::Old,
                     ],
                 )
+                .list_item_view(themed_item::<Age>(signals))
                 .style(field_style(signals)),
             );
 
@@ -401,6 +468,7 @@ fn section_your_past(
                             BeforeSexuality::AttractedToBoth,
                         ],
                     )
+                    .list_item_view(themed_item::<BeforeSexuality>(signals))
                     .style(field_style(signals)),
                 );
                 v_stack((name_row, age_row, sexuality_row, race_row)).into_any()
@@ -857,6 +925,7 @@ fn trait_checkbox(name: &'static str, sig: RwSignal<bool>, signals: AppSignals) 
 
 fn radio_opt(
     opt_label: &'static str,
+    subtitle: &'static str,
     is_active: impl Fn() -> bool + Copy + 'static,
     on_select: impl Fn() + Copy + 'static,
     signals: AppSignals,
@@ -880,22 +949,31 @@ fn radio_opt(
             .border_color(border_col)
             .background(bg)
             .margin_right(8.0)
+            .margin_top(3.0)
+            .flex_shrink(0.0)
     });
-    h_stack((
-        indicator,
+    let text_col = v_stack((
         label(move || opt_label.to_string()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
                 .color(colors.ink)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
-    ))
-    .style(|s| {
-        s.items_center()
-            .cursor(floem::style::CursorStyle::Pointer)
-            .margin_bottom(8.0)
-    })
-    .on_click_stop(move |_| on_select())
+        label(move || subtitle.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.font_size(12.0)
+                .color(colors.ink_dim)
+                .margin_top(2.0)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
+    ));
+    h_stack((indicator, text_col))
+        .style(|s| {
+            s.items_start()
+                .cursor(floem::style::CursorStyle::Pointer)
+                .margin_bottom(10.0)
+        })
+        .on_click_stop(move |_| on_select())
 }
 
 fn race_picker(selection: RwSignal<String>, races: Vec<String>, signals: AppSignals) -> impl View {
@@ -941,6 +1019,28 @@ fn section_style() -> impl Fn(floem::style::Style) -> floem::style::Style {
             .width_full()
             .margin_bottom(32.0)
             .padding_bottom(24.0)
+    }
+}
+
+/// Returns a closure suitable for `Dropdown::list_item_view` that renders each item
+/// with the current theme's ink color and page_raised background.
+fn themed_item<T: std::fmt::Display + 'static>(
+    signals: AppSignals,
+) -> impl Fn(T) -> floem::AnyView {
+    move |item| {
+        let s = item.to_string();
+        label(move || s.clone())
+            .style(move |style| {
+                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                style
+                    .color(colors.ink)
+                    .background(colors.page_raised)
+                    .padding_horiz(10.0)
+                    .padding_vert(6.0)
+                    .font_size(14.0)
+                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+            })
+            .into_any()
     }
 }
 

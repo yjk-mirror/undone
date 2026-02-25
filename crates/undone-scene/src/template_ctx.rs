@@ -133,7 +133,10 @@ impl Object for GameDataCtx {
             }
             "arcState" => {
                 let arc_id = string_arg(method, args, 0)?;
-                let state = self.arc_states.get(arc_id.as_str()).map_or("", |s| s.as_str());
+                let state = self
+                    .arc_states
+                    .get(arc_id.as_str())
+                    .map_or("", |s| s.as_str());
                 Ok(Value::from(state))
             }
             _ => Err(Error::new(
@@ -294,7 +297,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,

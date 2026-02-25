@@ -6,7 +6,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 /// Increment this whenever the save format changes in a breaking way.
-pub const SAVE_VERSION: u32 = 3;
+pub const SAVE_VERSION: u32 = 4;
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -103,6 +103,8 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 ///   - v2 → v3: flat `before_age`, `before_race`, `before_sexuality` fields on player
 ///     → `before: Option<BeforeIdentity>`; adds `day` and `time_slot` to
 ///     `game_data` if missing.
+///   - v3 → v4: renames `Age::Twenties` → `Age::MidLateTwenties` in player.age
+///     and player.before.age.
 ///
 /// # Errors
 ///
@@ -125,14 +127,20 @@ pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveErro
         .unwrap_or(0);
 
     if version == 1 {
-        // v1 → v2 → v3
+        // v1 → v2 → v3 → v4
         raw = migrate_v1_to_v2(raw);
         raw = migrate_v2_to_v3(raw);
-        raw["version"] = serde_json::Value::Number(3u32.into());
+        raw = migrate_v3_to_v4(raw);
+        raw["version"] = serde_json::Value::Number(4u32.into());
     } else if version == 2 {
-        // v2 → v3
+        // v2 → v3 → v4
         raw = migrate_v2_to_v3(raw);
-        raw["version"] = serde_json::Value::Number(3u32.into());
+        raw = migrate_v3_to_v4(raw);
+        raw["version"] = serde_json::Value::Number(4u32.into());
+    } else if version == 3 {
+        // v3 → v4: rename Age::Twenties → Age::MidLateTwenties
+        raw = migrate_v3_to_v4(raw);
+        raw["version"] = serde_json::Value::Number(4u32.into());
     } else if version != SAVE_VERSION {
         return Err(SaveError::VersionMismatch {
             saved: version,
@@ -316,6 +324,34 @@ fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
     save_json
 }
 
+/// Transform a v3 save JSON into a v4-compatible JSON structure.
+///
+/// v4 renames the `Age::Twenties` variant to `Age::MidLateTwenties`. Saves that
+/// contain the old string `"Twenties"` in `world.player.age` or
+/// `world.player.before.age` are updated to `"MidLateTwenties"`.
+fn migrate_v3_to_v4(mut save_json: serde_json::Value) -> serde_json::Value {
+    fn rename_age(val: &mut serde_json::Value) {
+        if val.as_str() == Some("Twenties") {
+            *val = serde_json::Value::String("MidLateTwenties".to_string());
+        }
+    }
+
+    if let Some(world) = save_json.get_mut("world") {
+        if let Some(player) = world.get_mut("player") {
+            if let Some(age) = player.get_mut("age") {
+                rename_age(age);
+            }
+            if let Some(before) = player.get_mut("before") {
+                if let Some(age) = before.get_mut("age") {
+                    rename_age(age);
+                }
+            }
+        }
+    }
+
+    save_json
+}
+
 /// Verify that all IDs recorded in the save file still map to the same strings
 /// in the current registry.
 fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveError> {
@@ -379,7 +415,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
