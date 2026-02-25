@@ -2,32 +2,32 @@
   "mcpServers": {
     "rhai": {
       "type": "stdio",
-      "command": "node",
-      "args": ["tools/mcp-launcher.mjs", "rhai-mcp-server"],
+      "command": "bash",
+      "args": ["tools/mcp-launcher.sh", "rhai-mcp-server"],
       "env": {}
     },
     "minijinja": {
       "type": "stdio",
-      "command": "node",
-      "args": ["tools/mcp-launcher.mjs", "minijinja-mcp-server"],
+      "command": "bash",
+      "args": ["tools/mcp-launcher.sh", "minijinja-mcp-server"],
       "env": {}
     },
     "screenshot": {
       "type": "stdio",
-      "command": "node",
-      "args": ["tools/mcp-launcher.mjs", "screenshot-mcp"],
+      "command": "bash",
+      "args": ["tools/mcp-launcher.sh", "screenshot-mcp"],
       "env": {}
     },
     "game-input": {
       "type": "stdio",
-      "command": "node",
-      "args": ["tools/mcp-launcher.mjs", "game-input-mcp"],
+      "command": "bash",
+      "args": ["tools/mcp-launcher.sh", "game-input-mcp"],
       "env": {}
     },
     "rust": {
       "type": "stdio",
-      "command": "node",
-      "args": ["tools/mcp-launcher.mjs", "rust-mcp"],
+      "command": "bash",
+      "args": ["tools/mcp-launcher.sh", "rust-mcp"],
       "env": {}
     }
   }

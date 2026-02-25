@@ -141,7 +141,9 @@ undone/
 cd tools && cargo build --release
 ```
 
-Binaries land in `tools/target/release/`. The `.mcp.json` at the repo root points here.
+Binaries land in `tools/target/release/`. The `.mcp.json` at the repo root launches
+them via `bash tools/mcp-launcher.sh <name>` which uses `exec` to replace the shell
+process with the Rust binary (zero wrapper overhead). No node.js dependency for MCP.
 The game workspace and the devtools workspace share nothing at the Cargo level.
 
 ## Design Philosophy
@@ -361,6 +363,32 @@ When using parallel background subagents (Task tool with `run_in_background: tru
   they changed.
 - Scope safety comes from the prompt, not the permission gate — be precise about
   which files/crates each agent owns
+
+### Resource management — MCP servers and agent teams
+
+Each Claude Code session starts 5 MCP server processes (rhai, minijinja, screenshot,
+game-input, rust). The `.mcp.json` launcher uses `bash` + `exec` so the shell is
+replaced by the Rust binary — no lingering wrapper processes.
+
+**Agent Teams are expensive.** Each teammate is a full Claude Code session that
+re-spawns all enabled MCP servers. 3 teammates = 4× the MCP server processes =
+~400 MB in server overhead alone. Prefer **subagents** (Task tool) over agent teams
+unless cross-layer coordination is genuinely needed.
+
+**Custom agents restrict MCP servers via `mcpServers` frontmatter.** The `scene-writer`
+and `writing-reviewer` agents only connect to `minijinja` — not all 5 servers.
+
+**Practical limits:** On a 16 GB machine with normal background load (browser, Discord,
+etc.), keep concurrent agent team teammates to 2-3 max. Subagents are cheap (they share
+the parent's MCP connections).
+
+### Launching the game
+
+The workspace has two binaries (`undone` and `validate-pack`). Always specify `--bin`:
+```sh
+cargo run --release --bin undone
+```
+The `game-input` MCP server's `start_game` does this automatically.
 
 ### Session end — audit and clean up
 

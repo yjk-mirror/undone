@@ -2,6 +2,8 @@
 name: scene-writer
 description: Writes Undone scene TOML files following the writing guide. Use for writing new scenes, expanding existing scenes, adding trait branches, or authoring action prose. Always validates minijinja templates after writing.
 tools: Read, Glob, Grep, Write, Edit, Bash, mcp__minijinja__jinja_validate_template, mcp__minijinja__jinja_render_preview
+mcpServers:
+  minijinja:
 model: sonnet
 ---
 

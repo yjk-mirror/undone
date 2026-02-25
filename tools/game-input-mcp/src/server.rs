@@ -219,7 +219,7 @@ impl GameInputServer {
         let working_dir = params.0.working_dir.clone();
 
         let child = std::process::Command::new("cargo")
-            .args(["run", "--release"])
+            .args(["run", "--release", "--bin", "undone"])
             .current_dir(&working_dir)
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())

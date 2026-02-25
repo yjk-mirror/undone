@@ -2,6 +2,8 @@
 name: writing-reviewer
 description: Reviews Undone scene prose for AI-isms, style guide violations, and quality issues. Use after writing scenes, before committing content, or when prose feels off. Read-only — reports issues, does not edit.
 tools: Read, Glob, Grep, mcp__minijinja__jinja_validate_template
+mcpServers:
+  minijinja:
 model: sonnet
 ---
 
