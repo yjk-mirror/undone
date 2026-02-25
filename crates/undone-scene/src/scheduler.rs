@@ -206,6 +206,105 @@ impl Scheduler {
                 once_only: e.once_only,
             })
     }
+
+    /// Pick the next scene considering ALL slots.
+    ///
+    /// Priority:
+    /// 1. Triggered events — scans each slot in alphabetical order, returns
+    ///    the first event whose `trigger` expression evaluates to true.
+    ///    Arc slots use triggers for sequential narrative scenes; only one
+    ///    trigger should be active at any given moment because each event's
+    ///    conditions are mutually exclusive by arc state and game flags.
+    /// 2. Weighted random pick across all eligible events from all slots.
+    ///    Each event's `condition` already gates it behind the appropriate
+    ///    route flags (e.g. `gd.hasGameFlag('ROUTE_ROBIN')`), so events from
+    ///    inactive arcs are naturally excluded without any special-casing here.
+    ///
+    /// Returns `None` if no eligible events exist in any slot.
+    pub fn pick_next(
+        &self,
+        world: &World,
+        registry: &PackRegistry,
+        rng: &mut impl Rng,
+    ) -> Option<PickResult> {
+        let ctx = SceneCtx::new();
+
+        // Sort slot names for deterministic trigger evaluation order.
+        let mut slot_names: Vec<&str> = self.slots.keys().map(|s| s.as_str()).collect();
+        slot_names.sort_unstable();
+
+        // 1. Triggers — first active trigger across all slots wins.
+        for slot_name in &slot_names {
+            if let Some(events) = self.slots.get(*slot_name) {
+                if let Some(e) = events.iter().find(|e| {
+                    !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
+                        && match &e.trigger {
+                            Some(expr) => match eval(expr, world, &ctx, registry) {
+                                Ok(val) => val,
+                                Err(err) => {
+                                    eprintln!(
+                                        "[scheduler] trigger error in slot '{}', scene '{}': {}",
+                                        slot_name, e.scene, err
+                                    );
+                                    false
+                                }
+                            },
+                            None => false,
+                        }
+                }) {
+                    return Some(PickResult {
+                        scene_id: e.scene.clone(),
+                        once_only: e.once_only,
+                    });
+                }
+            }
+        }
+
+        // 2. Weighted pick across all eligible events from all slots.
+        let eligible: Vec<&ScheduleEvent> = slot_names
+            .iter()
+            .filter_map(|name| self.slots.get(*name))
+            .flat_map(|events| events.iter())
+            .filter(|e| {
+                e.weight > 0
+                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
+                    && match &e.condition {
+                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                            Ok(val) => val,
+                            Err(err) => {
+                                eprintln!(
+                                    "[scheduler] condition error in scene '{}': {}",
+                                    e.scene, err
+                                );
+                                false
+                            }
+                        },
+                        None => true,
+                    }
+            })
+            .collect();
+
+        if eligible.is_empty() {
+            return None;
+        }
+
+        let total: u32 = eligible.iter().map(|e| e.weight).sum();
+        let mut roll = rng.gen_range(0..total);
+        eligible
+            .iter()
+            .find(|e| {
+                if roll < e.weight {
+                    true
+                } else {
+                    roll -= e.weight;
+                    false
+                }
+            })
+            .map(|e| PickResult {
+                scene_id: e.scene.clone(),
+                once_only: e.once_only,
+            })
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -597,6 +696,123 @@ mod tests {
         assert!(
             result.is_none(),
             "once_only triggered event should be excluded after ONCE_ flag is set"
+        );
+    }
+
+    // ── pick_next tests ──────────────────────────────────────────────────────
+
+    #[test]
+    fn pick_next_returns_none_when_empty() {
+        let scheduler = Scheduler::empty();
+        let registry = PackRegistry::new();
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+        assert!(
+            scheduler.pick_next(&world, &registry, &mut rng).is_none(),
+            "empty scheduler should return None from pick_next"
+        );
+    }
+
+    #[test]
+    fn pick_next_returns_scene_from_eligible_events() {
+        let registry = PackRegistry::new();
+        let event = ScheduleEvent {
+            scene: "test::free_scene".into(),
+            condition: None,
+            weight: 10,
+            once_only: false,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("free_time".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let result = scheduler.pick_next(&world, &registry, &mut rng);
+        assert!(result.is_some(), "pick_next should find the eligible event");
+        assert_eq!(result.unwrap().scene_id, "test::free_scene");
+    }
+
+    #[test]
+    fn pick_next_trigger_fires_before_weighted_pick() {
+        let registry = PackRegistry::new();
+        let trigger_expr = undone_expr::parse("true").unwrap();
+        let triggered_event = ScheduleEvent {
+            scene: "test::triggered".into(),
+            condition: None,
+            weight: 0, // zero weight — only eligible via trigger
+            once_only: false,
+            trigger: Some(trigger_expr),
+        };
+        let weighted_event = ScheduleEvent {
+            scene: "test::weighted".into(),
+            condition: None,
+            weight: 100,
+            once_only: false,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        // Put triggered in "a_slot" (sorts first alphabetically) and weighted in "b_slot"
+        slots.insert("a_slot".into(), vec![triggered_event]);
+        slots.insert("b_slot".into(), vec![weighted_event]);
+        let scheduler = Scheduler { slots };
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let result = scheduler
+            .pick_next(&world, &registry, &mut rng)
+            .expect("pick_next should return a result");
+        assert_eq!(
+            result.scene_id, "test::triggered",
+            "trigger should win over weighted pick"
+        );
+    }
+
+    #[test]
+    fn pick_next_arc_event_only_eligible_when_flag_set() {
+        let registry = PackRegistry::new();
+        let free_event = ScheduleEvent {
+            scene: "test::free_scene".into(),
+            condition: None,
+            weight: 10,
+            once_only: false,
+            trigger: None,
+        };
+        let route_condition = undone_expr::parse("gd.hasGameFlag('ROUTE_ROBIN')").unwrap();
+        let arc_event = ScheduleEvent {
+            scene: "test::robin_scene".into(),
+            condition: Some(route_condition),
+            weight: 100, // much higher weight — should dominate when eligible
+            once_only: false,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("free_time".into(), vec![free_event]);
+        slots.insert("robin_opening".into(), vec![arc_event]);
+        let scheduler = Scheduler { slots };
+
+        // Without flag — only free_time eligible
+        let world_no_flag = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+        let r1 = scheduler
+            .pick_next(&world_no_flag, &registry, &mut rng)
+            .expect("should pick something without flag");
+        assert_eq!(
+            r1.scene_id, "test::free_scene",
+            "arc event should be excluded when flag is absent"
+        );
+
+        // With flag — arc slot also eligible; higher weight means it should win
+        let mut world_with_flag = make_world();
+        world_with_flag.game_data.set_flag("ROUTE_ROBIN");
+        let mut rng2 = SmallRng::seed_from_u64(42);
+        let r2 = scheduler
+            .pick_next(&world_with_flag, &registry, &mut rng2)
+            .expect("should pick something with flag");
+        assert_eq!(
+            r2.scene_id, "test::robin_scene",
+            "arc event should win due to higher weight when flag is present"
         );
     }
 }

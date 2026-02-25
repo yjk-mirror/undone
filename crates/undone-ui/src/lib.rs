@@ -51,6 +51,9 @@ pub struct PartialCharState {
     pub before_race: String,
     pub before_sexuality: undone_domain::BeforeSexuality,
     pub starting_traits: Vec<undone_domain::TraitId>,
+    /// Route flag to set at game start (e.g. "ROUTE_ROBIN", "ROUTE_CAMILA").
+    /// `None` means freeform — no arc selected.
+    pub arc_flag: Option<String>,
 }
 
 /// All reactive signals used by the view tree.
@@ -239,7 +242,6 @@ pub fn app_view() -> impl View {
                                     ref scheduler,
                                     ref mut rng,
                                     ref opening_scene,
-                                    ref default_slot,
                                     ..
                                 } = *gs;
                                 if let Some(scene_id) = opening_scene {
@@ -252,18 +254,15 @@ pub fn app_view() -> impl View {
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
-                                    if let Some(slot) = default_slot.as_deref() {
-                                        if let Some(result) =
-                                            scheduler.pick(slot, world, registry, rng)
-                                        {
-                                            engine.send(
-                                                EngineCommand::StartScene(result.scene_id),
-                                                world,
-                                                registry,
-                                            );
-                                            let events = engine.drain();
-                                            process_events(events, signals, world, fem_id);
-                                        }
+                                    if let Some(result) = scheduler.pick_next(world, registry, rng)
+                                    {
+                                        engine.send(
+                                            EngineCommand::StartScene(result.scene_id),
+                                            world,
+                                            registry,
+                                        );
+                                        let events = engine.drain();
+                                        process_events(events, signals, world, fem_id);
                                     }
                                 }
                             }

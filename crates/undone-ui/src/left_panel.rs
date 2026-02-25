@@ -191,7 +191,6 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref registry,
         ref scheduler,
         ref mut rng,
-        ref default_slot,
         ..
     } = *gs;
     if let Ok(femininity_id) = registry.resolve_skill("FEMININITY") {
@@ -202,16 +201,10 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
                 // Transformation intro complete — move to female customisation.
                 // (The throwaway world is discarded; FemCreation builds the real one.)
                 signals.phase.set(crate::AppPhase::FemCreation);
-            } else if let Some(slot) = default_slot.as_deref() {
-                if let Some(result) = scheduler.pick(slot, world, registry, rng) {
-                    engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
-                    let events = engine.drain();
-                    crate::process_events(events, signals, world, femininity_id);
-                }
-            } else {
-                eprintln!(
-                    "[scheduler] no default_slot configured — scene finished with no next scene"
-                );
+            } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
+                let events = engine.drain();
+                crate::process_events(events, signals, world, femininity_id);
             }
         }
     }

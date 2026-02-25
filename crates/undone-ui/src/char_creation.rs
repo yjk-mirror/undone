@@ -24,6 +24,10 @@ struct PresetData {
     before_race: &'static str,
     trait_ids: &'static [&'static str],
     blurb: &'static str,
+    /// Starting circumstance flag set at game start (e.g. `"ROUTE_ROBIN"`).
+    /// Defined by the pack — the engine stores whatever string the preset declares.
+    /// `None` for freeform / no fixed starting scenario.
+    arc_flag: Option<&'static str>,
 }
 
 const PRESET_ROBIN: PresetData = PresetData {
@@ -37,6 +41,7 @@ const PRESET_ROBIN: PresetData = PresetData {
             You took a job offer in a city you didn't know — new company, new start, \
             boxes shipped to an apartment you've never seen. When things go sideways, \
             you inventory and solve. You're very good at that.",
+    arc_flag: Some("ROUTE_ROBIN"),
 };
 
 const PRESET_RAUL: PresetData = PresetData {
@@ -50,6 +55,7 @@ const PRESET_RAUL: PresetData = PresetData {
             You arrived with your expectations calibrated: you knew who you were, where you \
             were headed, and what the next four years were supposed to look like. \
             Things have always worked out. You've never had a real reason to think they wouldn't.",
+    arc_flag: Some("ROUTE_CAMILA"),
 };
 
 // ── PC origin helpers ─────────────────────────────────────────────────────────
@@ -799,6 +805,7 @@ fn build_next_button(
             let before_sexuality: BeforeSexuality;
             let trait_names: Vec<&'static str>;
 
+            let preset_ref: Option<&'static PresetData>;
             if char_mode < 2 {
                 // Preset mode — Robin (0) or Raul (1)
                 let preset: &'static PresetData = if char_mode == 0 {
@@ -806,6 +813,7 @@ fn build_next_button(
                 } else {
                     &PRESET_RAUL
                 };
+                preset_ref = Some(preset);
                 origin = preset.origin;
                 before_name = preset.before_name.to_string();
                 before_age = preset.before_age;
@@ -814,6 +822,7 @@ fn build_next_button(
                 trait_names = preset.trait_ids.to_vec();
             } else {
                 // Custom mode
+                preset_ref = None;
                 let origin_idx = form.origin_idx.get_untracked();
                 if origin_idx != 3 && form.before_name.get_untracked().trim().is_empty() {
                     return;
@@ -904,6 +913,11 @@ fn build_next_button(
                 }
             };
 
+            // Derive route arc flag from the preset definition.
+            // Presets declare their own starting circumstance flag; custom players start freeform.
+            let arc_flag: Option<String> =
+                preset_ref.and_then(|p| p.arc_flag).map(|s| s.to_string());
+
             let partial = PartialCharState {
                 origin,
                 before_name: before_name.clone(),
@@ -911,6 +925,7 @@ fn build_next_button(
                 before_race: before_race.clone(),
                 before_sexuality,
                 starting_traits,
+                arc_flag,
             };
             partial_char.set(Some(partial.clone()));
 
@@ -963,7 +978,6 @@ fn build_next_button(
                             rng: rand::rngs::SmallRng::from_entropy(),
                             init_error: None,
                             opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
-                            default_slot: pre.registry.default_slot().map(|s| s.to_owned()),
                         };
                         *game_state.borrow_mut() = Some(throwaway_gs);
                     }
@@ -1016,6 +1030,7 @@ fn build_begin_button(
                     before_race: form.race.get_untracked(),
                     before_sexuality: BeforeSexuality::AttractedToWomen,
                     starting_traits: vec![],
+                    arc_flag: None,
                 }
             });
 
@@ -1054,7 +1069,7 @@ fn build_begin_button(
                 starting_traits: partial.starting_traits,
                 male_count: 6,
                 female_count: 2,
-                starting_flags: std::collections::HashSet::new(),
+                starting_flags: partial.arc_flag.into_iter().collect(),
                 starting_arc_states: std::collections::HashMap::new(),
             };
 

@@ -32,7 +32,6 @@ pub struct GameState {
     /// Set when pack loading fails; checked by app_view to surface the error.
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
-    pub default_slot: Option<String>,
 }
 
 /// Resolve the packs directory. Tries:
@@ -140,7 +139,6 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         init_error,
     } = pre;
     let opening_scene = registry.opening_scene().map(|s| s.to_owned());
-    let default_slot = registry.default_slot().map(|s| s.to_owned());
     let world = new_game(config, &mut registry, &mut rng);
     let engine = SceneEngine::new(scenes);
     GameState {
@@ -151,7 +149,6 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         rng,
         init_error,
         opening_scene,
-        default_slot,
     }
 }
 
