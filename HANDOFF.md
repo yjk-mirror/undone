@@ -14,16 +14,9 @@
 
 ## ⚡ Next Action
 
-**⚠ FIRST: Complete the merge.** Git hung at end of last session. The `prolific-session` branch has all work committed. Run:
-```bash
-git checkout master
-git merge --no-ff prolific-session
-git worktree remove .worktrees/prolific-session
-git branch -d prolific-session
-```
+**More scenes** — second-week scenes for Robin/Camila routes, or additional standalone scenes. Use `scene-writer` agent for drafting, `writing-reviewer` for quality pass.
 
-**Then: Content expansion** — Phases 4–8 of `docs/plans/2026-02-24-prolific-session.md` are deferred:
-- Phase 4: World canonization (`docs/world.md` with facts from all 15 scenes)
+**Deferred content phases** (from `docs/plans/2026-02-24-prolific-session.md`):
 - Phase 5: Robin week 2 scenes (`working` arc state — `robin_work_meeting`, `robin_evening`)
 - Phase 6: Camila week 2 scenes (`first_week` arc state — `camila_study_session`, `camila_dining_hall`)
 - Phase 7: `plan_your_day.toml` prose depth (trait branches, weight, texture)
@@ -126,6 +119,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Reorientation + cleanup: merged prolific-session branch (6 commits), code review (15 findings, fixed C1+C2+I3+M5), code simplifier pass (4 cleanups), created scene-writer + writing-reviewer custom agents in .claude/agents/. 200 tests, 0 failures. Pushed to origin. |
 | 2026-02-21 | Design session: decompiled Newlife, designed Undone engine, wrote scaffold plan |
 | 2026-02-21 | Tooling session: built rhai-mcp-server + minijinja-mcp-server, wired MCP + hooks |
 | 2026-02-22 | Scaffold session: Tasks 1–3 complete. MCP confirmed working. Added agentic workflow rules. |
