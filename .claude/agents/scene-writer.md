@@ -63,28 +63,24 @@ Pick 2–4 traits where the trait genuinely changes whether this situation is en
 
 ## PC Origin and Transformation
 
-**Three-level pattern (default for most scenes):**
+**CisMale-only pattern (the only origin being written right now):**
 ```jinja
-{% if w.alwaysFemale() %}
-    {# No transformation frame — she's always been a woman #}
-{% elif w.hasTrait("TRANS_WOMAN") %}
-    {# Trans woman — RELIEF and RECOGNITION register. Finally. She knew this face. #}
-{% else %}
+{% if not w.alwaysFemale() %}
     {# Cis-male-start — DISORIENTATION register. Still adjusting. New. #}
 {% endif %}
 ```
 
-**These registers are OPPOSITE. Never conflate them:**
-- **Cis-male-start**: The mirror is still a fact that needs restating. Male attention lands strangely. Social reversal is a lesson she didn't ask for. Writing cue: alienation, wry observation of what she used to be.
-- **Trans woman**: The body is the one she always knew was there. Male attention lands as confirmation. The mirror is a checkpoint she's glad to reach. Writing cue: relief, rightness, quiet gratitude.
+**Do NOT add `{% else %}` AlwaysFemale branches.** AlwaysFemale is deprioritized along with TransWoman — both require their own dedicated content passes. Write transformation content inside `{% if not w.alwaysFemale() %}` blocks only. The default (non-branched) prose should read naturally for any player.
+
+**Cis-male-start register**: The mirror is still a fact that needs restating. Male attention lands strangely. Social reversal is a lesson she didn't ask for. Writing cue: alienation, wry observation of what she used to be.
 
 **Only add transformation content when it changes something.** Ask: would this moment feel different to a woman who used to be a man? If yes, write the branch. If no, don't force it.
 
 **Calibrate to FEMININITY:**
-- `< 25`: The body still surprises her. Female experiences feel like thresholds. Sex with a man is conceptually enormous.
+- `< 25`: The body still surprises her. Female experiences feel like thresholds.
 - `25–49`: Recognises female feelings, doesn't fully own them yet.
 - `50–74`: Mostly inhabits female life. Occasional flicker.
-- `≥ 75`: Barely thinks about having been male. Don't impose transformation content here unless genuinely earned.
+- `≥ 75`: Barely thinks about having been male. Don't impose transformation content here.
 
 ## Template Syntax
 
@@ -185,11 +181,13 @@ prose = """..."""
 - At least one path sets a lasting game flag or NPC/PC stat
 - Trait branches are structurally different (not adjective swaps)
 - American English throughout
-- Second-person present tense
+- **Second-person present tense throughout — no exceptions, no "she" narration**
 - Varied sentence starters (not all "You...")
 - No emotion announcements, heart/pulse clichés, generic NPC dialogue
+- No staccato closers ("The city goes on."), no over-naming ("There's a specific quality to...")
+- No trailing atmospheric one-liners as scene endings
 - NPC dialogue reflects personality and goal, not a generic type
 - Transformation branches calibrated to FEMININITY level
-- Trans woman and cis-male-start registers are distinct and opposite
-- Always-female players get a complete, valid path
+- CisMale-only: transformation content inside `{% if not w.alwaysFemale() %}` blocks, no `{% else %}` AlwaysFemale branches
+- No `TRANS_WOMAN` inner branches (deprioritized)
 - Content gating correct for ROUGH/DUBCON/NONCON paths

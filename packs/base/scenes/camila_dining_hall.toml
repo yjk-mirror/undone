@@ -61,11 +61,6 @@ She finishes the grain bowl. Gets coffee. Sits.
 The dining hall noise is steady around her — trays, conversations, the scrape of chairs, someone across the room who laughs loud and specific, the kind of laugh that other people's tables hear. The world has its own life in here. She's just eating in it.
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-One week. She's been doing the inventory the whole time — what's different, what's easier, what she'd expected and what she didn't. The kindness in the lunch line was one she knew was coming eventually. She had language for it already. That's the part that people on the outside don't understand about this: she knew the theory. She's spent years knowing the theory. What's been different this week is the practice of it, the way the theory fits the actual world less cleanly than it looked on paper.
-
-She's not surprised. She's just learning where the seams are.
-{% else %}
 {% if w.getSkill("FEMININITY") < 25 %}
 She tries to think through what she actually knows versus what she assumed. In high school she understood the hierarchy because she was running the same operating system as everyone else in it — the rules were written in a language she spoke natively. This place is running a different OS. She keeps submitting commands that don't work and getting outputs she didn't expect.
 

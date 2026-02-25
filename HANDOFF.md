@@ -2,42 +2,41 @@
 
 ## Current State
 
-**Branch:** `master` (clean)
+**Branch:** `master`
 **Tests:** 204 passing, 0 failures.
-**App:** 3-phase character creation working end-to-end. Preset character selection (Robin / Raul / Custom) on BeforeCreation screen. Presets declare their own arc flag (ROUTE_ROBIN / ROUTE_CAMILA); custom players start freeform.
-**Arc system:** `pick_next()` on Scheduler evaluates ALL slots (triggers first, then weighted pick across all eligible events). Arc slot conditions in schedule.toml gate on `gd.hasGameFlag('ROUTE_*')`. The system is fully functional — arc scenes are now reachable.
-**Content:** transformation_intro.toml fully rewritten. Four week-2 scenes: robin_work_meeting, robin_evening, camila_study_session, camila_dining_hall. All writing-reviewer Criticals and Importants addressed.
-**Traits:** ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING. All in traits.toml, exposed in char creation.
-**Build:** `.cargo/config.toml` at repo root — shared target directory (no cold builds when switching worktrees), `codegen-units=16` for faster release builds.
+**Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
+**Audits complete:** Engineering (`docs/audits/2026-02-25-engineering-audit.md`), Writing & Design (`docs/audits/2026-02-25-writing-design-audit.md`), Arc Flow (`docs/audits/2026-02-25-arc-flow-audit.md`).
+**TRANS_WOMAN branches removed** from all 7 scene files that had them. Two-level pattern simplified to CisMale-only (`{% if not w.alwaysFemale() %}` with no `{% else %}`).
+**Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer, writing-samples all reflect CisMale-only focus, POV enforcement elevated to Critical, TRANS_WOMAN/AlwaysFemale branches flagged for removal.
+**Schema documented:** `docs/content-schema.md` — complete Pack→Schedule→Scene→Action→Effect reference.
 
 ---
 
 ## ⚡ Next Action
 
-**Two audits complete. Fix the findings, then expand content.** Both `docs/audits/2026-02-25-engineering-audit.md` (8C/19I/18M) and `docs/audits/2026-02-25-writing-design-audit.md` (16C/34I/21M) are committed.
+**Three audits complete. Engine bugs and arc flow issues identified. Content focus narrowed to CisMale→Woman.**
 
-### Immediate — blocks correctness
-1. **POV policy decision** — both arcs use third-person ("she"); writing guide says second-person ("you"). Decide, then apply arc-wide. Also fix TRANS_WOMAN branches in universal scenes (third-person → second-person).
-2. **TRANS_WOMAN inner branches** — 13 of 19 scenes give trans women the cis-male disorientation register. Systematic pass required.
-3. **Fix `robin_first_clothes` scheduling** — currently unreachable (trigger ordering means `robin_first_day` always fires first and advances the arc past `week_one`).
-4. **Fix `robin_evening` copy-paste duplication** — verbatim repeated clause in `settle` action.
-5. **Engineering C1: `once_only` flag never set** — `pick_next()` returns `once_only: bool` but the caller drops it. Once-only scenes repeat indefinitely.
-6. **Engineering C2: `choose_action` skips condition check** — hidden actions can be executed by ID.
+### Engine bugs — blocks correctness
+1. **NPC action `next` field missing from engine** — 6 scene files have `[[npc_actions.next]]` blocks that are silently dropped. Either add `next` to `NpcActionDef` or remove dead TOML. See arc flow audit B1.
+2. **`once_only` mechanism inert** — `ONCE_<scene_id>` flags never set. `camila_library` can fire repeatedly. Fix: set `ONCE_` flag when `pick_next()` returns a once_only scene. See arc flow audit B2.
+3. **`choose_action` skips condition check** — hidden actions can be executed by ID. See engineering audit C2.
+4. **`add_npc_liking npc = "m"` silently fails** — no active NPC set before `coffee_shop`/`rain_shelter`. See arc flow audit B3.
 
-### Before next content pass
-7. **alwaysFemale gating audit** — `camila_call_raul`, `camila_dorm`, `camila_dining_hall` deliver transformed-PC-only content to alwaysFemale players.
-8. **FEMININITY increment mechanism** — no scene sets `change_skill FEMININITY +N`. The three-tier branching in `robin_evening` and `camila_dining_hall` is unreachable.
-9. **`plan_your_day` full rewrite** — currently a placeholder stub below quality floor.
-10. **Staccato/over-naming cleanup** — scattered AI prose artifacts across both arcs.
+### Schedule/reachability
+5. **`robin_first_clothes` unreachable** — `robin_first_day` trigger always fires first. Restructure `week_one` state. See arc flow audit R1.
+6. **`robin_landlord` trigger doesn't check arc state** — uses only game flags, inconsistent with other arc scenes.
 
-### Content expansion
-11. **Post-arc content** — `settled` (Robin) and `first_week` (Camila) states have zero scenes. Game becomes a 3-scene loop after arcs exhaust.
-12. **Free_time expansion** — more universal scenes to sustain play.
-13. **Trait/skill coverage** — SULTRY, ROMANTIC, REFINED, OVERACTIVE_IMAGINATION nearly absent from scenes. 8 skills have zero scene usage.
+### Content (CisMale-only)
+7. **`plan_your_day` full rewrite** — placeholder stub.
+8. **FEMININITY never increments** — no scene has `skill_increase FEMININITY`. FEMININITY branching is unreachable.
+9. **Post-arc content void** — `settled` (Robin) and `first_week` (Camila) have zero scenes. 3-scene free_time loop.
+10. **Staccato/over-naming cleanup** — scattered AI prose artifacts.
+11. **Free_time expansion** — more universal scenes needed.
+12. **Character docs missing** — 13 named NPCs have no character docs (Marcus name collision, David, Jake, Frank, etc.).
 
 ### Design debt
-14. **Presets as pack data** — `PRESET_ROBIN` / `PRESET_RAUL` are currently static Rust structs in `char_creation.rs`. Should eventually load from TOML.
-15. **Custom character starting scenario** — currently freeform (no arc scenes). Deferred until preset arcs are well-developed.
+13. **Presets as pack data** — `PRESET_ROBIN` / `PRESET_RAUL` are static Rust structs. Should load from TOML.
+14. **Custom character starting scenario** — freeform, no arc scenes. Deferred.
 
 ### Writing sessions — no compilation needed
 For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
@@ -206,6 +205,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Content focus narrowed + arc flow audit. User directed: CisMale→Woman only (AlwaysFemale/TransWoman/CisFemale all deprioritized). Removed TRANS_WOMAN branches from all 7 scene files. Rewrote `docs/writing-samples.md` (removed 3rd-person robin_arrival sample — root cause of POV violations). Updated writing-guide, scene-writer, writing-reviewer to CisMale-only focus. Created `docs/content-schema.md` (complete schema reference). Arc flow audit found 3 engine bugs: NPC `next` field missing (6 scenes affected), `once_only` inert, `add_npc_liking` fails silently. `robin_first_clothes` confirmed unreachable. 13 named NPCs have no character docs. Full report: `docs/audits/2026-02-25-arc-flow-audit.md`. |
 | 2026-02-25 | Writing & game design audit: 4 parallel agents (Robin prose, Camila prose, universal prose, game design). Found 16 Critical, 34 Important, 21 Minor. Systemic: both arcs in third-person (guide says second-person), TRANS_WOMAN register missing from 13/19 scenes, post-arc content void (3-scene loop after arcs exhaust), 8 skills with zero scene usage. Key writing criticals: over-naming ("specific quality", "geometry of being a woman"), staccato closers ("the city goes on"), adjective-swap branches, alwaysFemale gating gaps, `plan_your_day` is a placeholder stub. Full report: `docs/audits/2026-02-25-writing-design-audit.md`. |
 | 2026-02-25 | Engineering audit: 6 parallel review agents across all 7 crates + pack data. 204 tests passing, 0 clippy warnings. Found 8 Critical, 19 Important, 18 Minor. Key criticals: once_only flag never set, choose_action skips condition check, scheduler load failure silent, ArcDef.initial_state dead, spawner count bug, hardcoded content IDs in char_creation. Full report: `docs/audits/2026-02-25-engineering-audit.md`. |
 | 2026-02-25 | Linux/Mac dev readiness: removed hardcoded Windows `target-dir` from `.cargo/config.toml` (use `CARGO_TARGET_DIR` env var instead), added `enabledMcpjsonServers` for cross-platform servers to committed `settings.json`, added Linux setup section to CLAUDE.md. Also cleaned stale test binary from deleted arc-system worktree (had embedded old CARGO_MANIFEST_DIR). 204 tests, 0 failures. |

@@ -27,13 +27,16 @@ she was one. Different story packs will use this premise in different settings.
 | `CisFemaleTransformed` | `true` | 75 | Transformed from a cis woman. Auto-injects `ALWAYS_FEMALE` trait. |
 | `AlwaysFemale` | `true` | 75 | No transformation frame. Auto-injects `ALWAYS_FEMALE` + `NOT_TRANSFORMED`. |
 
-The `FEMININITY` skill (0–100+) tracks adaptation. `CisMaleTransformed` begins low (10);
-`TransWomanTransformed` begins at 70 (she knew herself already); `CisFemale`/`AlwaysFemale`
-begin at 75. The richest transformation writing lives in the 0–50 range.
+The `FEMININITY` skill (0–100+) tracks adaptation. `CisMaleTransformed` begins low (10).
+The richest transformation writing lives in the 0–50 range.
+
+**Content focus: CisMale→Woman only.** All other origins (AlwaysFemale, TransWomanTransformed,
+CisFemaleTransformed) are deprioritized. Do not write origin-specific branches for them.
+Transformation content goes inside `{% if not w.alwaysFemale() %}` blocks only — no
+`{% else %}` AlwaysFemale branches, no `TRANS_WOMAN` branches.
 
 Hidden traits auto-injected at game start by `new_game()` based on origin — do not inject them
-manually in UI code. Use `w.hasTrait("TRANS_WOMAN")` in scene templates to branch the
-emotional register for trans woman PCs.
+manually in UI code.
 
 ## Key Documents (Read Before Working)
 
@@ -218,9 +221,23 @@ For UI changes see `.interface-design/system.md` (design system spec) and
 ## Writing and Content — Current State
 
 Engine is fully end-to-end. Writing guide is established (`docs/writing-guide.md`).
-15 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
+19 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
 and `writing-reviewer` for quality passes. See `docs/arcs/` for arc structure and
-`docs/characters/` for NPC profiles.
+`docs/characters/` for NPC profiles. See `docs/content-schema.md` for the complete
+content schema reference (pack → schedule → scenes → actions → effects).
+
+### Key content rules
+- **Always second-person present tense.** No "she" narration. Ever.
+- **CisMale→Woman is the only origin being written.** All other origins (AlwaysFemale,
+  TransWoman, CisFemale) are deprioritized. Transformation content goes in
+  `{% if not w.alwaysFemale() %}` blocks only — no `{% else %}` branches.
+
+### After writing audits
+When a writing audit completes, always feed findings back into the writing tools:
+1. Update `docs/writing-guide.md` with any new anti-patterns discovered
+2. Update `.claude/agents/scene-writer.md` checklist with new rules
+3. Update `.claude/agents/writing-reviewer.md` detection criteria with new patterns
+4. Update `docs/writing-samples.md` if samples contributed to confusion
 
 ## Runtime Testing Notes
 

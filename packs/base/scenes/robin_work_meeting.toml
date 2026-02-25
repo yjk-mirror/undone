@@ -79,11 +79,7 @@ The rest of the deck goes cleanly. The platform engineer asks two sharp question
 They finish at 11:47.
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-She packs up her laptop. Carter says "great work" on his way out and she takes it for what it is. The part with Kevin she's already filed — she knows the shape of it, has known the shape of it for a long time, and she knows where it goes. It goes there. She picks up her bag and heads for the door.
-{% else %}
 She closes the laptop. Carter says "great work" on the way out and she says thanks. She's held two things at once before — the technical outcome and the other thing, the layer underneath it — but not in this specific configuration. Not where the other thing is this legible and this familiar and also, apparently, this unavoidable. She knows how to run this experiment. She'll keep running it.
-{% endif %}
 {% else %}
 She closes the laptop. Carter says "great work" on the way out. The work was good. What she's turning over is Kevin — the room, the way it absorbed it and moved on, whether "moved on" is accurate or just what the room needed to do to function.
 {% endif %}
@@ -129,13 +125,9 @@ The meeting was good. The technical content held. Kevin did what Kevin did and t
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-She goes back to her desk. The afternoon has a shape now and she knows how to work inside it. The Kevin thing is already filed — not as a new lesson, just as another entry in a file she's been keeping longer than this job. The room was mostly fine. She's worked in worse.
-{% else %}
 She goes back to her desk. She knows the work was good because she knows what good work looks like; she's been producing it for over a decade. The thing she's less certain about is whether the room knows the work was good in the way she needs it to know, or whether that's a longer project than a single forty-five minute meeting. She thinks it's probably a longer project.
 
 She opens Slack. Carter has already messaged her. She wasn't wrong about that part.
-{% endif %}
 {% else %}
 She goes back to her desk. The afternoon has its tasks and she knows what they are. The work was good. The next thing is to make sure the work is remembered as good, which is a different task and one she's had to run before. She opens her laptop and starts on the follow-ups.
 {% endif %}

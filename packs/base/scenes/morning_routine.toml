@@ -10,15 +10,9 @@ The alarm didn't go off. Your phone says 7:48, which means you set it to PM agai
 The apartment is the same apartment. One bedroom off Clement Ave, third floor, the kitchen that's really a corner. Your landlord fixed the radiator in November and broke the hot water in doing so, and now you have both, which counts as a win in this city.
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-The bathroom mirror is the first checkpoint of the day. It catches you before you're ready — hair pressed flat on one side, face still soft with sleep. You stand there a moment longer than necessary.
-
-The face looking back is the one you always knew was underneath. Not a stranger. Not a revision. Just you, finally visible. You touch your cheek. Real skin. Real bone structure. No gap between who you are and what you see. Some mornings this still stops you — not from disorientation, but from something closer to gratitude.
-{% else %}
 The bathroom mirror is the first checkpoint of the day. It catches you before you're ready — hair still pressed flat on one side, face still soft with sleep. You look at yourself the way you look at someone you're not sure you recognize.
 
 *This is you now.* Not news. Just something that needs restating every morning, like a fact you keep checking because it still doesn't quite sit right.
-{% endif %}
 {% else %}
 The bathroom mirror catches you before you're ready — hair pressed flat on one side, pillow lines on your cheek. Monday.
 {% endif %}
@@ -38,11 +32,7 @@ You get dressed without ceremony. Whatever's clean, whatever fits the weather. I
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-Getting dressed has weight to it still — not burden, exactly, but significance. Every piece of clothing is a choice she gets to make now, and the choosing matters in a way that has nothing to do with inconvenience. She notices this. She lets herself notice it.
-{% else %}
 Getting dressed is still a small negotiation. Not the mechanics — you've got those. But the decisions. Every piece of clothing is a declaration you didn't have to make before, and some mornings the weight of all those tiny choices adds up before you've even had coffee.
-{% endif %}
 {% endif %}
 
 Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
@@ -89,11 +79,7 @@ The Dunkin' on Fifth has a line, because the Dunkin' on Fifth always has a line.
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-The guy behind you in line is standing close. Not inappropriately — just the way men stand, the way they fill space without negotiating for it. She knows this stance. She used to have it. Now she holds her bag against her hip and tracks the three inches between them, and this — the tracking, the small geometry of existing in the world as a woman — is part of the life she chose. It is not a tax. It is just true.
-{% else %}
 The guy behind you in line is standing close. Not inappropriately — just the way men stand, the way they fill space without negotiating for it. You used to stand like that. Now you hold your elbows in and your bag against your hip and you notice the three inches of air between your shoulder and his, and you know those three inches are yours to manage.
-{% endif %}
 {% endif %}
 
 Coffee in hand. The day starts now.

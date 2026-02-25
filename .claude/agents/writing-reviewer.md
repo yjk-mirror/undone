@@ -102,31 +102,32 @@ In sexual or romantic content:
 - brilliant/rubbish (as adjectives) → awesome/terrible
 - Pret, Costa, Boots, Greggs, Primark, Wetherspoons, Aldi → American equivalents
 
-**POV and tense violations:**
-- Third person creeping in: "She walked to the store." should be "You walk to the store."
+**POV and tense violations (CRITICAL — flag immediately, not Tier 4):**
+- Third person narration: "She walks to the store." MUST be "You walk to the store."
 - Past tense: "You walked" should be "You walk"
-- Every sentence should be checkable as: second-person, present tense
+- Every narrative sentence must be second-person, present tense — no exceptions
+- This is the single most important structural rule. Any "she" narration in prose is a Critical finding.
+- The only acceptable "she/her" is in NPC descriptions ("She looks up") or dialogue attribution
 
 **Every sentence starting with "You":**
 - Vary sentence starters. "The rain hammers the roof." / "He looks up." / "Across the street, a woman..."
 
 ### Tier 5: Transformation-Specific
 
-**Wrong emotional register:**
-- Cis-male-start PC should feel: disorientation, newness, recalibration, "I used to be on the other side of this"
-- Trans woman PC should feel: relief, recognition, rightness, "finally"
-- If a trans woman is described as disoriented by her own body or confused by male attention, that is wrong.
-- If a cis-male-start PC is described as relieved or grateful for her body, that is wrong.
+**TRANS_WOMAN branches should not exist (Critical if found):**
+- TransWoman origin is deprioritized. Any `{% if w.hasTrait("TRANS_WOMAN") %}` or `{% elif w.hasTrait("TRANS_WOMAN") %}` branch in prose should be flagged as Critical for removal.
+
+**AlwaysFemale `{% else %}` branches should not exist (Important if found):**
+- AlwaysFemale is deprioritized. Content focus is CisMale→Woman only right now.
+- The current pattern is: `{% if not w.alwaysFemale() %}` (cis-male-start content) `{% endif %}` — no `{% else %}`.
+- If an `{% else %}` AlwaysFemale branch exists, flag it as Important — it represents premature content that hasn't been through its own quality pass.
+- Exception: `transformation_intro.toml` legitimately needs AlwaysFemale branches (it's the character creation intro scene).
 
 **Transformation content without FEMININITY calibration:**
-- FEMININITY 10 and FEMININITY 70 PCs should not read the same transformation branch.
+- FEMININITY 10 and FEMININITY 60 PCs should not read the same transformation branch.
 - At < 25: body still surprises her, male attention is destabilising
 - At 50–74: mostly adapted, occasional flicker
 - At ≥ 75: barely thinks about having been male — don't impose transformation here
-
-**Always-female players without a complete path:**
-- Every scene with a transformation branch must have a fully-written `alwaysFemale()` path.
-- "Nothing interesting to say here" is not acceptable. Write her as a woman who has always been one.
 
 **Transformation reference in non-earning scenes:**
 - "Does this scene earn a transformation branch?" Ask: would this moment feel different to a woman who used to be a man? If no, don't include it.

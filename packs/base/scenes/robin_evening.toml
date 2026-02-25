@@ -36,11 +36,6 @@ She goes to the bathroom to wash her face.
 The light switch is on the right side of the door. She reaches left on instinct — muscle memory from wherever, the old apartment, the old body, some room she hasn't been in for weeks — and her hand finds nothing for a quarter-second before she corrects. She flips the switch.
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-The mirror catches her off-guard the way it still does sometimes. Not the face — she knows the face. Something about the light, or the angle, or the hour. She watches herself reach for the faucet. She's been waiting a long time to have this specific problem.
-
-She runs the water cold and splashes it twice and doesn't linger.
-{% else %}
 {% if w.getSkill("FEMININITY") < 25 %}
 The face in the mirror takes him a second. Not because he doesn't know it — he knows it; he's been looking at it for a week and a half — but because the light in the bathroom is different in the evening and for one split second his brain ran the wrong comparison and came up empty.
 
@@ -99,9 +94,6 @@ She drinks the tea. The apartment is quiet in a way that's becoming, if not comf
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-Later she'll look back on this week as the week she stopped bracing for the apartment to feel wrong and started noticing when it felt, briefly, like something else. Not comfortable — not yet. But less like somewhere she was put and more like somewhere she came back to.
-{% else %}
 {% if w.getSkill("FEMININITY") < 25 %}
 *He* would have ordered food and worked until midnight and not thought twice. He would have been fine.
 
@@ -112,7 +104,6 @@ She gets up and starts figuring out dinner. The city is outside. She is in here.
 The switch thing was nothing. She knows it was nothing. In a month she'll stop reaching left entirely, and at some point after that she won't remember that she ever did.
 
 She gets up and figures out dinner.
-{% endif %}
 {% endif %}
 {% else %}
 The switch will retrain itself eventually. The body catches up to where it lives. She's done it before — new apartment, new city, new set of instincts to build. This one has a few more variables but the process is the same.
