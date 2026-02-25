@@ -2,19 +2,25 @@
 
 ## Current State
 
-**Branch:** `master`
+**Branch:** `playtest-fixes` (open, 4 commits ahead of master — ready to merge after Batch 4)
 **Tests:** 200 passing, 0 failures.
-**App:** 3-phase character creation working end-to-end: BeforeCreation form → TransformationIntro scene → FemCreation form → InGame. Four PC origins. AlwaysFemale skips TransformationIntro. Engine routes foundation complete: check system, arc system, thought system, narrator variants, NPC roles, validate-pack binary, route flags. Full prose template context (including `gd.arcState()` and `w.getSkill()`).
-**Content:** 15 scenes total (4 universal + 5 Robin opening arc + 5 Camila opening arc + transformation_intro). Two character routes: ROUTE_ROBIN and ROUTE_CAMILA.
-**Docs:** docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Writing guide fully updated — stale notes removed, gd.arcState() and w.getSkill() documented, BG3 narrator reference.
-**Tools:** Same as before — all 5 MCP servers in tools/ workspace.
-**MCPs:** All MCP config is cross-platform — no hardcoded absolute paths.
+**App:** 3-phase character creation working end-to-end. Preset character selection (Robin / Raul / Custom) on BeforeCreation screen. Three-way mode selector with dyn_container. Preset detail view shows blurb + read-only attributes. All traits exposed in custom mode including new attitude traits. Dropdown popup theming fixed (Night mode). Age enum simplified (MidLateTwenties). Origin subtitles. v4 save migration.
+**Content:** transformation_intro.toml fully rewritten — second person, 4 beats, 3-way origin branch, trait branches for SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION.
+**Traits:** 5 new traits added to traits.toml: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING. All non-hidden, group personality/attitude. All exposed in character creation custom mode under "Former attitudes."
 
 ---
 
 ## ⚡ Next Action
 
-**Playtest feedback pass + new scenes.** See "Playtest Feedback" section below for all issues. Priority order: Batch 1 (quick fixes) → Batch 2 (transformation_intro rewrite) → Batch 3 (origin presets) → Batch 4 (week-2 scenes).
+**Batch 4 — Week-2 scenes.** Batches 1–3 complete and committed. Dispatch 4 parallel scene-writer agents for the four week-2 scenes, audit with writing-reviewer, apply fixes, add schedule.toml entries, then merge the playtest-fixes branch to master.
+
+Scene targets:
+- `robin_work_meeting.toml` (arc state: `"working"`, Robin week 2)
+- `robin_evening.toml` (arc state: `"working"`, Robin week 2)
+- `camila_study_session.toml` (arc state: `"first_week"`, Camila week 2)
+- `camila_dining_hall.toml` (arc state: `"first_week"`, Camila week 2)
+
+Scenes should use the new attitude traits (SEXIST, HOMOPHOBIC, OBJECTIFYING) where they enrich the experience. Read character docs and arc docs before writing.
 
 ---
 
@@ -215,3 +221,4 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 | 2026-02-24 | Engine routes foundation: 28-task plan (worktree: engine-routes-foundation). Engine: skill roll cache (RefCell<HashMap> in SceneCtx), checkSkill/checkSkillRed evaluator methods (percentile, clamped 5–95), arc_states + red_check_failures in GameData, arcState/arcStarted/arcAdvanced evaluator methods, full prose template context (getSkill/getMoney/getStress/timeSlot/wasTransformed etc.), thought system ([[thoughts]] → ThoughtAdded event, inner_voice/anxiety styles), narrator variants ([[intro_variants]] conditional intro replacement), arc effects (AdvanceArc/SetNpcRole/FailRedCheck), NPC roles (roles field on NpcCore, hasRole() evaluator), arc data format (arcs.toml, ArcDef, registry), route flags (starting_flags/starting_arc_states in CharCreationConfig), validate-pack binary. Docs: docs/world.md, docs/characters/robin.md + camila.md, docs/arcs/robin-opening.md + camila-opening.md, docs/writing-samples.md. Content: Robin arc (5 scenes: robin_arrival, robin_landlord, robin_first_night, robin_first_clothes, robin_first_day), Camila arc (5 scenes: camila_arrival, camila_dorm, camila_orientation, camila_library, camila_call_raul). 14 total scenes. 197 tests, 0 failures. |
 | 2026-02-24 | Char creation redesign: 10-task plan (worktree: char-creation-redesign). AppPhase expanded to 4 variants (BeforeCreation/TransformationIntro/FemCreation/InGame). PartialCharState accumulates before-choices. PackRegistry+Scheduler derive Clone (throwaway world for intro scene). transformation_scene field in manifest/registry/loader. char_creation_view (BeforeCreation) + fem_creation_view (FemCreation). TransformationIntro phase runs transformation_intro scene against throwaway world. dispatch_action phase check transitions scene-finish → FemCreation. AlwaysFemale skips TransformationIntro. transformation_intro.toml scene with CisMale/TransWoman voice branches. Writing guide: AI-ism anti-patterns (staccato declaratives, over-naming), BG3 narrator reference. dev/CLAUDE.md skill overrides: finishing-a-development-branch auto-merges (no options prompt). 198 tests, 0 failures. |
 | 2026-02-24 | Prolific session (partial — phases 1–3 of 8). Engine: gd.arcState() added to prose template context (2 new tests, 200 total). Writing guide: removed stale notes for getSkill/arcState, expanded template objects table with all current methods, updated FEMININITY section with live usage, added arcState branching example. Prose revision: rain_shelter AI-isms fixed (default nod named→shown, CisMale interiority shows-the-look-not-names-category, trailing staccato cut, NPC action prose upgraded), transformation_intro CisMale branch rewritten (removed anaphoric repetition, removed isolated staccato), CisFemaleTransformed branch added. Char creation: OUTGOING + OVERACTIVE_IMAGINATION added to trait grid (14 traits total), Next button guards empty before_name, FemCreation race defaults to before_race carry-forward. Phases 4–8 deferred. 200 tests, 0 failures. |
+| 2026-02-24 | Playtest feedback pass (Batches 1–3). Batch 1: Dropdown Night-mode theming fixed (list_item_view + themed_item helper), "Evan" default removed + Randomize button added, Age::Twenties → MidLateTwenties + v4 save migration, origin radio subtitles. Batch 2: transformation_intro.toml full rewrite — second person, 4 beats, alwaysFemale/TRANS_WOMAN/default 3-way branches, SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION trait branches, TRANSFORMATION_WITNESSED flag. Writing-reviewer audit: 4 Critical + Important fixes applied. Batch 3: Robin/Raul preset character selection (3-way mode: Robin/Raul/Custom), dyn_container for preset-vs-custom UI, section_preset_detail with blurb+read-only rows, build_next_button unified for preset+custom paths. New traits: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING (traits.toml + custom mode UI + preset trait lists). Design doc updated with trait philosophy, race-change mechanics, "coming soon" greyout notes. 200 tests, 0 failures. Branch: playtest-fixes. |
