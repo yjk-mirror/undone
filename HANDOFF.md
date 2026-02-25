@@ -3,24 +3,33 @@
 ## Current State
 
 **Branch:** `master` (clean)
-**Tests:** 200 passing, 0 failures.
-**App:** 3-phase character creation working end-to-end. Preset character selection (Robin / Raul / Custom) on BeforeCreation screen. Three-way mode selector with dyn_container. Preset detail view shows blurb + read-only attributes. All traits exposed in custom mode including new attitude traits. Dropdown popup theming fixed (Night mode). Age enum simplified (MidLateTwenties). Origin subtitles. v4 save migration.
-**Content:** transformation_intro.toml fully rewritten — second person, 4 beats, 3-way origin branch, trait branches for SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION. Four week-2 scenes: robin_work_meeting, robin_evening, camila_study_session, camila_dining_hall. All writing-reviewer Criticals and Importants addressed.
-**Traits:** 5 new traits added to traits.toml: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING. All non-hidden, group personality/attitude. All exposed in character creation custom mode under "Former attitudes."
+**Tests:** 204 passing, 0 failures.
+**App:** 3-phase character creation working end-to-end. Preset character selection (Robin / Raul / Custom) on BeforeCreation screen. Presets declare their own arc flag (ROUTE_ROBIN / ROUTE_CAMILA); custom players start freeform.
+**Arc system:** `pick_next()` on Scheduler evaluates ALL slots (triggers first, then weighted pick across all eligible events). Arc slot conditions in schedule.toml gate on `gd.hasGameFlag('ROUTE_*')`. The system is fully functional — arc scenes are now reachable.
+**Content:** transformation_intro.toml fully rewritten. Four week-2 scenes: robin_work_meeting, robin_evening, camila_study_session, camila_dining_hall. All writing-reviewer Criticals and Importants addressed.
+**Traits:** ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING. All in traits.toml, exposed in char creation.
+**Build:** `.cargo/config.toml` at repo root — shared target directory (no cold builds when switching worktrees), `codegen-units=16` for faster release builds.
 
 ---
 
 ## ⚡ Next Action
 
-**More content or deferred items.** All playtest feedback batches complete and merged. Options:
+**Engine is a platform — content is the pack.** Arc system is now functional. Next priorities:
 
-1. **Deferred content** (from docs/plans/2026-02-24-prolific-session.md):
-   - Phase 7: `plan_your_day.toml` prose depth (currently has minimal placeholder prose)
-   - Phase 8: Free-time recurrence variety (rain_shelter/morning_routine/coffee_shop repeating — need more slots)
+### Immediate (high impact)
+1. **Second playtest** — run Robin arc end to end with the fixed scheduler. Verify arc scenes fire (robin_arrival → robin_work_meeting chain). Report any blocking issues.
+2. **Scene content audit** — the 4 week-2 scenes were written before the archetype/preset distinction was clear. Verify all conditions use traits/flags (not preset identity). No scene should depend on "which preset did you choose."
+3. **Week-3 scenes** — arc docs describe `settled` (Robin) and `first_week` (Camila) arc states. These are the next tier.
 
-2. **Second playtest** — run the full Robin + Camila arcs end to end, find new issues.
+### Design debt
+4. **Presets as pack data** — `PRESET_ROBIN` / `PRESET_RAUL` are currently static Rust structs in `char_creation.rs`. They should eventually load from TOML (pack manifest or a `presets.toml`). Not urgent but tracked.
+5. **Custom character starting scenario** — currently freeform (no arc scenes). Future: add a job/enrollment question to custom character creation that sets the appropriate circumstance flags. Deferred until the preset arcs are well-developed.
 
-3. **Week-3 scenes** — the arc docs describe `settled` and `first_week` arc states; those would be the next scene tier for both routes.
+### Writing sessions — no compilation needed
+For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
+1. Write `.toml` files in `packs/base/scenes/`
+2. Run `cargo run` (or use the game-input MCP) — if no Rust code changed, only linking (~5s)
+3. Validate templates with `mcp__minijinja__jinja_validate_template` before running
 
 ---
 
@@ -183,6 +192,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Arc system implementation (worktree: arc-system). Scheduler: added pick_next() — evaluates triggers across ALL slots first (alphabetical), then weighted pick from all eligible events. Arc scenes now reachable via ROUTE_* flags. GameState: removed default_slot (vestigial). UI: PartialCharState.arc_flag flows from char creation → starting_flags. PresetData gets arc_flag field (each preset declares its own flag). Custom players start freeform (no arc picker). Build: .cargo/config.toml with shared target dir (no more cold worktree builds) + codegen-units=16. 204 tests, 0 failures. |
 | 2026-02-25 | Reorientation + cleanup: merged prolific-session branch (6 commits), code review (15 findings, fixed C1+C2+I3+M5), code simplifier pass (4 cleanups), created scene-writer + writing-reviewer custom agents in .claude/agents/. 200 tests, 0 failures. Pushed to origin. |
 | 2026-02-21 | Design session: decompiled Newlife, designed Undone engine, wrote scaffold plan |
 | 2026-02-21 | Tooling session: built rhai-mcp-server + minijinja-mcp-server, wired MCP + hooks |

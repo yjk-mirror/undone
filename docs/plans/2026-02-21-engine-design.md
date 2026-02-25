@@ -509,6 +509,36 @@ Weekly timeslots. Each slot holds a weighted event pool. Conditions evaluated
 against `&World`. Eligible scenes weighted and selected. Packs inject scenes
 by contributing to slot definitions.
 
+### `pick_next()` — unified cross-slot selection (implemented 2026-02-25)
+
+The main entry point for advancing the game loop. Replaces slot-specific
+`pick(slot_name, ...)` calls. Algorithm:
+
+1. **Triggers first** — iterate all slots alphabetically. Return the first
+   event whose `trigger` condition evaluates true (and hasn't been consumed
+   if `once_only`). Order is deterministic.
+
+2. **Weighted pick** — collect all eligible events from all slots (condition
+   passes, weight > 0, not filtered by once_only). Random weighted selection.
+   Arc slot events are gated by `gd.hasGameFlag('ROUTE_*')` conditions in the
+   pack data — no engine hardcoding.
+
+The `default_slot` field on `GameState` is removed. The engine no longer
+needs to know which slot is "primary" — all slots compete equally.
+
+### Arc circumstance flags
+
+Arc content is driven by starting circumstance flags set by presets:
+- `ROUTE_ROBIN` → workplace scenario (tech job)
+- `ROUTE_CAMILA` → college scenario (enrolled student)
+
+These are **pack content** (in `schedule.toml` conditions), not engine
+concepts. Custom players start without these flags; their scenario can be
+set by future gameplay or a starting-situation question in char creation.
+
+Flags are fluid — future implementation can clear/set them as circumstances
+change (quit job → clear ROUTE_ROBIN, take new job → set new flag).
+
 ---
 
 ## UI (`undone-ui`)
