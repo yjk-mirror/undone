@@ -34,6 +34,34 @@ Universal scenes fire normally. Camila-specific flavor via `[[intro_variants]]`.
 | `base::camila_orientation` | orientation | Quad + orientation events | VANILLA | arc→dorm_life |
 | `base::camila_library` | dorm_life | The Ivy library | VANILLA | — |
 | `base::camila_call_raul` | dorm_life | Dorm room (phone) | VANILLA | `CALL_HOME_DONE` |
+| `base::camila_study_session` | dorm_life | Study room / dorm | VANILLA | `STUDY_SESSION_DONE` |
+| `base::camila_dining_hall` | dorm_life | The Ivy dining hall | VANILLA | arc→first_week |
+
+## Week-2 Scenes — Design Notes
+
+**`camila_study_session`**
+Camila trying to study. Something is harder to concentrate on than it should be.
+The material isn't the problem — she's always been good at school. Her body is
+the problem. She keeps noticing things she didn't used to notice. Maybe it's a
+classmate. Maybe it's just the fact of existing in this new body in a room full
+of people and not knowing how to sit.
+
+SEXIST and HOMOPHOBIC fire here as specific interiority: she had assumptions about
+who does well at certain subjects, what certain types of students are like. She
+catches one of those assumptions against the reality she's now inside.
+
+Branch on: `w.hasTrait("SEXIST")`, `w.hasTrait("HOMOPHOBIC")`, `w.hasTrait("AMBITIOUS")`
+
+**`camila_dining_hall`**
+The dining hall. Camila had a clear read on social hierarchies in high school.
+This place has different ones and she's not in the position she expected to be in.
+Someone is kind to her in a way that would have confused Raul. Someone is dismissive
+in a way that would have been impossible for Raul.
+
+This scene advances arc → first_week. She has been here a week. She does not yet
+know what she doesn't know, but the shape of what she doesn't know has become visible.
+
+Branch on: `w.hasTrait("SEXIST")`, `w.hasTrait("CONFIDENT")`, `w.hasTrait("OUTGOING")`
 
 ## Tone Notes
 
@@ -97,5 +125,18 @@ name = "camila_opening"
   scene     = "base::camila_call_raul"
   condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && !gd.hasGameFlag('CALL_HOME_DONE')"
   weight    = 8
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_study_session"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && !gd.hasGameFlag('STUDY_SESSION_DONE')"
+  weight    = 10
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::camila_dining_hall"
+  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
   once_only = true
 ```

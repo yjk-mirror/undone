@@ -566,4 +566,64 @@ pub enum Personality { Romantic, Jerk, Friend, Intellectual, Lad }
 
 ---
 
+## Trait Design Philosophy (added 2026-02-24)
+
+### All non-hidden traits are selectable in custom mode
+
+Every trait defined with `hidden = false` appears in the character creation
+personality picker. There is no category of traits that is "only for presets" or
+"only for NPCs." Traits are shared vocabulary across the entire game system.
+
+### Attitude traits are first-class
+
+The trait groups include `"attitude"` in addition to `"personality"` and
+`"appearance"`. Attitude traits — things like `SEXIST`, `HOMOPHOBIC`,
+`OBJECTIFYING` — represent unexamined positions that the transformation will
+confront. The game does not endorse them; it puts the player inside them and
+shows what they encounter. Write them unflinchingly.
+
+**Rules for attitude traits in scenes:**
+- They are not required for a scene to be playable — scenes work with or without them
+- When present they enrich: add specific interiority, add a specific register of
+  discomfort or recognition, unlock paths that require that specific history
+- Some scenes may be gated behind attitude traits — this is fine and intended
+- NPCs can carry attitude traits too; NPC conditions check for them identically
+
+### Preset characters guarantee content paths
+
+Origin presets (Robin, Raul/Camila, future additions) are not alternative UIs —
+they are **content guarantees**. Each preset is designed alongside a specific arc.
+When a player picks Robin, they are picking into a set of scenes and branches that
+are fully written for Robin's exact trait/origin combination.
+
+As new arcs are written, new presets are added. Custom mode gives full access but
+without content guarantees — custom characters may encounter scenes that have no
+specific branch for their combination. That is acceptable.
+
+### Race change is structurally present
+
+The engine tracks `before_race` and current `race` independently. Scene templates
+can branch on both. The most notable example: Robin was White and becomes East
+Asian, and also carries `OBJECTIFYING`. Scenes involving the male gaze on East
+Asian women can fire with specific interiority for Robin: she knows that gaze
+because it was hers.
+
+Scene conditions for race-change combinations follow this pattern:
+- `w.player().race` — current race (string)
+- `w.player().before.race` — before-transformation race (string, may be empty for AlwaysFemale)
+- Both can appear in conditions alongside trait checks
+
+### "Coming soon" greyout for initial release (not implemented in dev)
+
+For the production initial release, the TransWomanTransformed and AlwaysFemale
+origins on the character creation screen should be greyed out with a
+"Coming soon" label. Content for these routes is not written yet. CisFemaleTransformed
+may also need this treatment.
+
+This is a **release-time UI concern only**. In the current dev build all origins
+remain selectable — content gaps show as missing branches in existing scenes.
+
+---
+
 *Design session: 2026-02-21. Authors: YJK + Claude.*
+*Trait philosophy section added: 2026-02-24.*
