@@ -1,0 +1,132 @@
+[scene]
+id          = "base::robin_evening"
+pack        = "base"
+description = "After work. The apartment. She has been competent all day. Something small undoes her."
+
+[intro]
+prose = """
+The apartment is the same as she left it this morning.
+
+She knew it would be. Apartments don't rearrange themselves. She's aware this is not a thought that needed thinking, which means she's more tired than she estimated. The bag goes on the chair. Her shoes go by the door. She's getting better at the shoes-by-the-door thing — she forgets maybe one morning in three now, instead of every morning.
+
+The city is doing its early-evening thing outside: delivery cyclists, someone on the third floor of the building across the street pacing with a phone, a bus pulling away from the stop. None of it requires anything from her.
+
+{% if w.hasTrait("ANALYTICAL") %}
+She does a brief audit. Day was a net positive: the PR got merged, the design review ran long but concluded, no one said anything that needed immediate correction. She gave feedback on two pull requests before lunch. She has three items carried over to tomorrow. She knows where each of them lives in the backlog.
+
+The apartment is quiet. She doesn't have a read on the quiet yet.
+{% elif w.hasTrait("AMBITIOUS") %}
+She pulls out her laptop before her coat is off. There's still two hours before she'd call it a reasonable stopping point and she has a follow-up she meant to send before the end of day. She gets as far as opening her email, reads the first line of the thread, and then just sits there with her coat half-off and the laptop open.
+
+The radiator ticks. She doesn't type anything.
+{% else %}
+She stands in the kitchen for a moment without particular purpose. Not hungry yet. Not ready to sit down. She puts the kettle on, which buys her something to wait for.
+{% endif %}
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "moment"
+label  = "Continue"
+detail = "Something small. Not the meeting. Something smaller."
+prose = """
+She goes to the bathroom to wash her face.
+
+The light switch is on the right side of the door. She reaches left on instinct — muscle memory from wherever, the old apartment, the old body, some room she hasn't been in for weeks — and her hand finds nothing for a quarter-second before she corrects. She flips the switch.
+
+{% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+The mirror catches her off-guard the way it still does sometimes. Not the face — she knows the face. Something about the light, or the angle, or the hour. She watches herself reach for the faucet. She's been waiting a long time to have this specific problem.
+
+She runs the water cold and splashes it twice and doesn't linger.
+{% else %}
+{% if w.getSkill("FEMININITY") < 25 %}
+The face in the mirror takes him a second. Not because he doesn't know it — he knows it; he's been looking at it for a week and a half — but because the light in the bathroom is different in the evening and for one split second his brain ran the wrong comparison and came up empty.
+
+*That's her*, he thinks. *That's you.* The correction takes no time at all. It's just the gap before the correction that he notices.
+
+He runs the water cold. He washes his face. He avoids looking directly at the mirror again in the way he's developed for managing the mirrors in this apartment.
+{% elif w.getSkill("FEMININITY") < 50 %}
+She catches herself in the mirror mid-reach and holds there for a second. Not startled, exactly — she knows the face. But the light switch thing and then the mirror thing in the same moment layers in a way that's harder to file away cleanly.
+
+She runs the water and washes her face and goes back out to the kitchen.
+{% else %}
+She washes her face. The mirror is just the mirror. What catches her is the light switch again — the phantom reach that her hand still makes sometimes, corrected before it completes. She's going to be doing that for a while.
+{% endif %}
+{% endif %}
+{% else %}
+The mirror is just the mirror. What catches her is the light switch, the hand that went left instead of right, the small stupid lag of muscle memory that the body takes its time unlearning. She washes her face and goes back out to the kitchen, slightly annoyed at herself for nothing specific.
+{% endif %}
+
+{% if w.hasTrait("ANALYTICAL") %}
+She runs through the incident the way she'd run through a bug report: the switch is on the right, the instinct goes left, the instinct is a cached value from an input that no longer applies. The cache will clear eventually. There's no intervention required.
+
+She dries her face on the towel and finds this mildly insufficient as a resolution.
+{% elif w.hasTrait("AMBITIOUS") %}
+Two hours of work left and she's standing in her bathroom thinking about a light switch. The day had been productive. She'd been useful. She'd made things move. None of that is present in this room right now.
+
+She grips the edge of the sink for a moment, then turns off the light and goes back to the kitchen.
+{% else %}
+The kettle starts to rumble in the other room. She goes back out to deal with it.
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "settle"
+
+[[actions]]
+id     = "settle"
+label  = "Continue"
+detail = "She is not okay. She is operational. There is a difference."
+prose = """
+{% if w.hasTrait("ANALYTICAL") %}
+She makes tea — the box of green tea she bought on Sunday because it was the familiar brand and she wasn't prepared to make any additional decisions — and sits at the kitchen table with her laptop. Not working. She opens a notes file and writes: *light switch L→R. bathroom mirror. adaptation lag normal, cached motor patterns. no action required.*
+
+She reads it back. Closes the note. Opens the PR she'd been meaning to review.
+
+She is not okay. But she is categorically operational, and the categories matter, and she has always found it easier to move through the world when she can name which category she's in.
+{% elif w.hasTrait("AMBITIOUS") %}
+She goes back to the laptop. She sends the follow-up she'd meant to send. It takes four minutes. The three carried-over items go into tomorrow's list in priority order.
+
+When she's done she sits for a minute without doing anything. The city does its thing outside. She thinks about how the day went — specifically, accurately, without editorializing. It went fine. It went better than fine. She knows what she's doing at this job, which is the one thing she was certain would survive the month intact, and it did.
+
+She closes the laptop and orders from the Thai place down the block.
+{% else %}
+She makes tea and sits with it by the window. The bus stop below has two people waiting. One is reading something on her phone; the other is just standing. The bus comes. They both get on. The stop is empty.
+
+She drinks the tea. The apartment is quiet in a way that's becoming, if not comfortable, at least familiar — a quiet that's becoming, if not comfortable, at least familiar.
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+Later she'll look back on this week as the week she stopped bracing for the apartment to feel wrong and started noticing when it felt, briefly, like something else. Not comfortable — not yet. But less like somewhere she was put and more like somewhere she came back to.
+{% else %}
+{% if w.getSkill("FEMININITY") < 25 %}
+*He* would have ordered food and worked until midnight and not thought twice. He would have been fine.
+
+She's fine. She is categorically fine. She has a job and an apartment and a list and the list is getting shorter. The thing in the bathroom was thirty seconds of nothing and it's over.
+
+She gets up and starts figuring out dinner. The city is outside. She is in here. Both of these are facts, and facts are manageable.
+{% else %}
+The switch thing was nothing. She knows it was nothing. In a month she'll stop reaching left entirely, and at some point after that she won't remember that she ever did.
+
+She gets up and figures out dinner.
+{% endif %}
+{% endif %}
+{% else %}
+The switch will retrain itself eventually. The body catches up to where it lives. She's done it before — new apartment, new city, new set of instincts to build. This one has a few more variables but the process is the same.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::robin_opening"
+  to_state = "settled"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true

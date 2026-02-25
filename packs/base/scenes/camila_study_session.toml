@@ -1,0 +1,159 @@
+[scene]
+id          = "base::camila_study_session"
+pack        = "base"
+description = "Trying to study. The body is the problem. An assumption surfaces."
+
+[intro]
+prose = """
+The study room in the science building is open until midnight and mostly empty on Tuesday afternoons. She got here at two. She's been here for an hour. Her notebook has twelve lines in it, three of which are useful.
+
+The material is not the problem. She knows this because she read the chapter twice the night before and it clicked — all of it, the kind of clicking that used to make her feel better about herself than it had any right to. Raul was the student who could just sit down and go. She has been sitting down for an hour and she has twelve lines.
+
+The room has a whiteboard along one wall with someone's problem set still on it from the morning, half-erased. There are three other people — two over by the windows working on something she can't see, and one guy at the table two spots down from her, reading a textbook, occasionally writing something in the margin. She knows this because she's been clocking all of it instead of doing the reading. She can't seem to stop.
+
+It's the body. Specifically: she doesn't know how to sit in it. She's tried three positions. In two of them she's aware of her hair against her neck. In the third she's aware of her posture in a way that makes her think about her posture, which is the opposite of working. She keeps wanting to run a hand through her hair the way she used to, and when she does it, it lands wrong — too long, too much of it.
+
+She puts her pen down and looks at the ceiling for a moment. The ceiling has fluorescent lights and a water stain shaped like nothing in particular.
+
+Fine. She'll take five minutes and then she'll work. She looks back at the study room.
+"""
+
+[[actions]]
+id     = "distraction"
+label  = "Continue"
+detail = "Something pulls her attention before the five minutes are up."
+prose = """
+{% if w.hasTrait("SEXIST") %}
+The two students by the windows are sharing notes on something. One of them is showing the other a diagram — she can see them pointing at it, back and forth. The one doing the explaining is a girl, maybe a year older than Camila, talking through something with patient precision.
+
+Camila watches this for a second and catches herself having a thought.
+
+It's not a loud thought. It's the kind of thought that arrives fully formed, pre-verbal, the way old opinions do before you've examined them: *yeah, but does she actually understand it, or is she just explaining what someone else told her?*
+
+The thought is already gone before she recognizes what it was.
+
+She looks down at her notebook. Twelve lines. Most of them copied from the chapter she read last night, which she understood because she read it carefully and it clicked, because she's always been good at this, because — because —
+
+She puts the pen down again. The girl by the window is still explaining, and her lab partner is nodding and writing things down, and it looks like the exact, unremarkable way smart people talk through problems together. It looks exactly like that.
+
+*Oh*, she thinks, and doesn't finish the thought.
+
+The guy at the table two spots down turns a page in his textbook. Outside, someone is walking by with a coffee. The fluorescent light over the whiteboard flickers once and goes still, and she picks up her pen.
+{% elif w.hasTrait("HOMOPHOBIC") %}
+The guy at the table two spots down has been reading for an hour. He looks up at some point — to think, or to rest his eyes, she doesn't know — and for a second he's looking in her direction.
+
+He's not looking at her. His eyes are somewhere in the middle distance between her and the whiteboard, the way people's eyes go when they're solving something. He has good cheekbones and the specific kind of tiredness that looks like concentration. He doesn't register her at all.
+
+She looks back at her notebook.
+
+Three lines down, she realizes she's thought about his cheekbones twice more. She doesn't do anything about this. She just notices the direction of it, the specific person it keeps returning to, the fact that it happens without her deciding anything. She holds that for a moment before anything else.
+
+Then the rest of it arrives. She knows what those jokes meant. She's known for a while. The registering came first — before she knew what she was registering, before any decision — and then the recognition, and then the accounting of what the jokes were, which is a different kind of knowing and worse.
+
+He turns a page. She reads the same sentence for the third time and this time she actually reads it.
+{% elif w.hasTrait("AMBITIOUS") %}
+Ninety minutes in, she counts what she's actually done.
+
+Two-thirds of the reading. The first three problems out of eight. A page of notes that are mostly repetition from the chapter rather than her own working through it. The kind of session that looks productive if you squint and don't count the time.
+
+She's always been able to work. Not in the sense of working hard — she's never loved the effort — but in the sense of just sitting down and doing it, of being able to close off everything external and point herself at the problem until it resolved. It was one of the things she was quietly sure of. She wasn't the most organized. She wasn't always the most prepared. But she could always, when it mattered, just *go*.
+
+She is not going. She's been here ninety minutes and she has two-thirds of a reading and three problems, and the study room is quiet and there are no external distractions and the work is not even particularly hard. She understands the material. She checked. When she actually reads a sentence she knows what it means.
+
+The problem is she keeps not reading the sentences.
+
+She flips back through the notebook to the first useful line. She wrote it forty minutes ago. The handwriting after it deteriorates for two lines and then stops. She was going to finish the thought and then she lost the thread and started writing about something else for a line and a half and then stopped entirely.
+
+She was going to be the person in this building who had things under control. She had a very clear plan for who she was going to be, arriving here.
+
+She draws a line under the last useful line and starts from there.
+{% else %}
+The two students by the windows pack up and leave sometime after three, and the study room is quieter without them, and she still hasn't produced anything useful.
+
+She's not distracted by anything specific. That's the part she keeps turning over. There's no reason. The room is quiet. The material is fine. She had a plan for this afternoon — two hours of reading, problem set started, at least forty minutes of real productive time — and she's been sitting here for ninety minutes doing an impression of a person who is about to start.
+
+Her body keeps interrupting her. Not dramatically. Just the awareness of it: the hair, the chair, the way she's holding her pen, the specific way the light is hitting her hand. She catches herself noticing these things and then spends a second being annoyed that she noticed them and then she's lost another half a minute.
+
+{% if w.alwaysFemale() %}
+She's always been able to just start. That's the part she can't account for. There's nothing external to blame. The room is quiet. The material is fine. She has always been the kind of person who sits down and does the work.
+{% else %}
+Raul could sit down anywhere and just start. She knew this about herself as a certainty. She'd never had to think about being inside her own body; it had just been where she was, background, present and unremarkable.
+{% endif %}
+
+She reads the next sentence in the chapter. She understands it. She writes it down.
+
+Okay. Okay.
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "back"
+
+[[actions]]
+id     = "back"
+label  = "Continue"
+detail = "She forces herself back to the work."
+prose = """
+{% if w.hasTrait("SEXIST") %}
+She works through the rest of the problem set in order. It takes her an hour. The work is fine; the problems go the way problems go when you understand the material, which she does, and she finishes before she expected to.
+
+She doesn't look at the students by the window again. She doesn't not-look at them either, which would be its own kind of thing. She just works.
+
+Somewhere in the last hour, the girl who was explaining the diagram finishes whatever she was explaining and both of them close their notebooks and leave together, talking. Camila hears a fragment of what they're saying — something about a lab section, something about Thursday — and it sounds exactly the way any two students sound when they're leaving a study session that went well.
+
+She finishes problem eight, closes the notebook, and sits for a second.
+
+She had that thought before she'd finished forming it. She caught it, but she caught it late, which is different from not having it. She doesn't know what to do with the difference yet. She puts her notebook in her bag and heads for the door.
+
+The girl was clearly explaining the diagram to someone who didn't understand it yet.
+{% elif w.hasTrait("HOMOPHOBIC") %}
+She finishes the reading. She does all eight problems. She doesn't look up again — not deliberately, just out of a kind of focused attention that is ninety percent real and ten percent protective, and she takes the productivity where she finds it.
+
+The guy two spots down leaves around four-thirty. She hears the chair. She doesn't look.
+
+She stays another twenty minutes, working through the last two problems, and then she packs up and goes. In the hall outside she passes a group heading to dinner, laughing at something, and the sound of it is just people, just a Tuesday.
+
+The shame came after. She catches herself being careful about the order, making sure she has it right, because the order matters. The registering came first — before she knew what she was registering, before she'd made any decision — and then came the recognition of what it was, and then the jokes she used to make.
+
+She can't unknow what the jokes meant. She's known for a while. But knowing something and having it land in your body in a study room on a Tuesday afternoon are different kinds of knowing, and she's had both of them now, and she doesn't know what to do with the gap.
+
+She goes to dinner. The food is fine.
+{% elif w.hasTrait("AMBITIOUS") %}
+She gets through it. That's the honest version: she gets through it, with effort, over the next ninety minutes, in a way that feels like work in the bad sense.
+
+Problems four through eight go slowly. She has to read some of the chapter sections twice. Not because she doesn't understand them — she does, she checks, she quizzes herself — but because she has to read them twice to actually hold them, and the second read takes twice as long as it should because she's spending part of her attention managing the fact that she's not working as fast as she should be.
+
+She finishes at five-fifteen. The problem set is done. The reading is done. She has notes she can actually use.
+
+It took her three and a half hours to do something that should have taken two. She knows this. She is doing the math while she packs up her bag.
+
+She's not bad at this. She knows she's not bad at this; she was at the top of her class for four years and she reads fast and she understood everything in that chapter. She was not bad at this today. She was just slower than she's supposed to be, slower than she used to be, and the gap between supposed to be and actually was is going to bother her for the rest of the night and she knows it.
+
+She zips up the bag. Stands up. The study room is still quiet, the whiteboard still half-erased.
+
+She'll be faster next time. She'll have to be.
+{% else %}
+She works. Slowly, then not-slowly. The reading comes together across the next hour and a half in the way that work sometimes does when you stop waiting for it to feel right and just do it — not inspired, not flowing, just sentence by sentence until there's enough of them and they add up.
+
+The problems go okay. Three of them are straightforward. The other two take longer than she'd like.
+
+At five o'clock she has everything done and she sits for a minute, her hands flat on the notebook, letting the end of the session settle. The study room is nearly empty. Someone outside the door is on a phone call, voice low and fast.
+
+Her body is still there — it's always there, always slightly too present — but she's not thinking about it right now, which is maybe as much as she can ask for on a Tuesday.
+
+She'll figure out how to sit in it. Probably. She's figured out other things.
+
+She packs up and goes.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STUDY_SESSION_DONE"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
