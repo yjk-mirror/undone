@@ -2,27 +2,25 @@
 
 ## Current State
 
-**Branch:** `playtest-fixes` (open, 4 commits ahead of master — ready to merge after Batch 4)
+**Branch:** `master` (clean)
 **Tests:** 200 passing, 0 failures.
 **App:** 3-phase character creation working end-to-end. Preset character selection (Robin / Raul / Custom) on BeforeCreation screen. Three-way mode selector with dyn_container. Preset detail view shows blurb + read-only attributes. All traits exposed in custom mode including new attitude traits. Dropdown popup theming fixed (Night mode). Age enum simplified (MidLateTwenties). Origin subtitles. v4 save migration.
-**Content:** transformation_intro.toml fully rewritten — second person, 4 beats, 3-way origin branch, trait branches for SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION.
+**Content:** transformation_intro.toml fully rewritten — second person, 4 beats, 3-way origin branch, trait branches for SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION. Four week-2 scenes: robin_work_meeting, robin_evening, camila_study_session, camila_dining_hall. All writing-reviewer Criticals and Importants addressed.
 **Traits:** 5 new traits added to traits.toml: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING. All non-hidden, group personality/attitude. All exposed in character creation custom mode under "Former attitudes."
 
 ---
 
 ## ⚡ Next Action
 
-**Batch 4 — Week-2 scenes.** Batches 1–3 complete and committed. Dispatch 4 parallel scene-writer agents for the four week-2 scenes, audit with writing-reviewer, apply fixes, add schedule.toml entries, then merge the playtest-fixes branch to master.
+**More content or deferred items.** All playtest feedback batches complete and merged. Options:
 
-Scene targets (arc docs have full specs including schedule.toml entries):
-- `robin_work_meeting.toml` — gates on `working`, sets `FIRST_MEETING_DONE`
-- `robin_evening.toml` — gates on `working` + `FIRST_MEETING_DONE`, advances arc→settled
-- `camila_study_session.toml` — gates on `dorm_life`, sets `STUDY_SESSION_DONE`
-- `camila_dining_hall.toml` — gates on `dorm_life` + `STUDY_SESSION_DONE`, advances arc→first_week
+1. **Deferred content** (from docs/plans/2026-02-24-prolific-session.md):
+   - Phase 7: `plan_your_day.toml` prose depth (currently has minimal placeholder prose)
+   - Phase 8: Free-time recurrence variety (rain_shelter/morning_routine/coffee_shop repeating — need more slots)
 
-All four scenes should use the new attitude traits (SEXIST, HOMOPHOBIC, OBJECTIFYING, ANALYTICAL, CONFIDENT) where they enrich the experience. See `docs/arcs/robin-opening.md` and `docs/arcs/camila-opening.md` for per-scene branch guidance.
+2. **Second playtest** — run the full Robin + Camila arcs end to end, find new issues.
 
-After scenes are written and reviewed: add schedule entries (arc docs have the TOML to add), run full test suite, then merge `playtest-fixes` to `master` via `superpowers:finishing-a-development-branch`.
+3. **Week-3 scenes** — the arc docs describe `settled` and `first_week` arc states; those would be the next scene tier for both routes.
 
 ---
 
@@ -224,3 +222,4 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 | 2026-02-24 | Char creation redesign: 10-task plan (worktree: char-creation-redesign). AppPhase expanded to 4 variants (BeforeCreation/TransformationIntro/FemCreation/InGame). PartialCharState accumulates before-choices. PackRegistry+Scheduler derive Clone (throwaway world for intro scene). transformation_scene field in manifest/registry/loader. char_creation_view (BeforeCreation) + fem_creation_view (FemCreation). TransformationIntro phase runs transformation_intro scene against throwaway world. dispatch_action phase check transitions scene-finish → FemCreation. AlwaysFemale skips TransformationIntro. transformation_intro.toml scene with CisMale/TransWoman voice branches. Writing guide: AI-ism anti-patterns (staccato declaratives, over-naming), BG3 narrator reference. dev/CLAUDE.md skill overrides: finishing-a-development-branch auto-merges (no options prompt). 198 tests, 0 failures. |
 | 2026-02-24 | Prolific session (partial — phases 1–3 of 8). Engine: gd.arcState() added to prose template context (2 new tests, 200 total). Writing guide: removed stale notes for getSkill/arcState, expanded template objects table with all current methods, updated FEMININITY section with live usage, added arcState branching example. Prose revision: rain_shelter AI-isms fixed (default nod named→shown, CisMale interiority shows-the-look-not-names-category, trailing staccato cut, NPC action prose upgraded), transformation_intro CisMale branch rewritten (removed anaphoric repetition, removed isolated staccato), CisFemaleTransformed branch added. Char creation: OUTGOING + OVERACTIVE_IMAGINATION added to trait grid (14 traits total), Next button guards empty before_name, FemCreation race defaults to before_race carry-forward. Phases 4–8 deferred. 200 tests, 0 failures. |
 | 2026-02-24 | Playtest feedback pass (Batches 1–3). Batch 1: Dropdown Night-mode theming fixed (list_item_view + themed_item helper), "Evan" default removed + Randomize button added, Age::Twenties → MidLateTwenties + v4 save migration, origin radio subtitles. Batch 2: transformation_intro.toml full rewrite — second person, 4 beats, alwaysFemale/TRANS_WOMAN/default 3-way branches, SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION trait branches, TRANSFORMATION_WITNESSED flag. Writing-reviewer audit: 4 Critical + Important fixes applied. Batch 3: Robin/Raul preset character selection (3-way mode: Robin/Raul/Custom), dyn_container for preset-vs-custom UI, section_preset_detail with blurb+read-only rows, build_next_button unified for preset+custom paths. New traits: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING (traits.toml + custom mode UI + preset trait lists). Design doc updated with trait philosophy, race-change mechanics, "coming soon" greyout notes. 200 tests, 0 failures. Branch: playtest-fixes. |
+| 2026-02-25 | Playtest feedback Batch 4 (week-2 scenes) + Batch 1 dropdown fix. Dark-mode dropdown trigger text fixed via themed_trigger helper applied to all 5 Dropdown instances in char_creation.rs. Four week-2 scenes written (parallel scene-writer agents), writing-reviewer audits run on all four, all Criticals and Importants addressed: staccato closers, em-dash reveals, over-naming, POV leaks (you/your in third-person), desire/shame ordering (HOMOPHOBIC branch), missing alwaysFemale() guards (Raul references), SEXIST hierarchy insight unlocked as default !alwaysFemale() path. schedule.toml updated with all 4 scene entries. All 200 tests pass. Merged playtest-fixes to master, worktree removed. |
