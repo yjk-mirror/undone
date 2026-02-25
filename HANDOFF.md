@@ -14,13 +14,15 @@
 
 **Batch 4 — Week-2 scenes.** Batches 1–3 complete and committed. Dispatch 4 parallel scene-writer agents for the four week-2 scenes, audit with writing-reviewer, apply fixes, add schedule.toml entries, then merge the playtest-fixes branch to master.
 
-Scene targets:
-- `robin_work_meeting.toml` (arc state: `"working"`, Robin week 2)
-- `robin_evening.toml` (arc state: `"working"`, Robin week 2)
-- `camila_study_session.toml` (arc state: `"first_week"`, Camila week 2)
-- `camila_dining_hall.toml` (arc state: `"first_week"`, Camila week 2)
+Scene targets (arc docs have full specs including schedule.toml entries):
+- `robin_work_meeting.toml` — gates on `working`, sets `FIRST_MEETING_DONE`
+- `robin_evening.toml` — gates on `working` + `FIRST_MEETING_DONE`, advances arc→settled
+- `camila_study_session.toml` — gates on `dorm_life`, sets `STUDY_SESSION_DONE`
+- `camila_dining_hall.toml` — gates on `dorm_life` + `STUDY_SESSION_DONE`, advances arc→first_week
 
-Scenes should use the new attitude traits (SEXIST, HOMOPHOBIC, OBJECTIFYING) where they enrich the experience. Read character docs and arc docs before writing.
+All four scenes should use the new attitude traits (SEXIST, HOMOPHOBIC, OBJECTIFYING, ANALYTICAL, CONFIDENT) where they enrich the experience. See `docs/arcs/robin-opening.md` and `docs/arcs/camila-opening.md` for per-scene branch guidance.
+
+After scenes are written and reviewed: add schedule entries (arc docs have the TOML to add), run full test suite, then merge `playtest-fixes` to `master` via `superpowers:finishing-a-development-branch`.
 
 ---
 
