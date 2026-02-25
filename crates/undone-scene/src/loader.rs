@@ -40,6 +40,14 @@ pub enum SceneLoadError {
         action_id: String,
         target: String,
     },
+    #[error("unknown arc '{id}' in scene {scene_id}")]
+    UnknownArc { scene_id: String, id: String },
+    #[error("unknown arc state '{state}' for arc '{arc}' in scene {scene_id}")]
+    UnknownArcState {
+        scene_id: String,
+        arc: String,
+        state: String,
+    },
 }
 
 /// Load all `.toml` scene files from `scenes_dir`.
@@ -287,6 +295,22 @@ fn validate_effects(
                         scene_id: scene_id.to_string(),
                         id: skill.clone(),
                     })?;
+            }
+            EffectDef::AdvanceArc { arc, to_state } => {
+                let arc_def =
+                    registry
+                        .get_arc(arc)
+                        .ok_or_else(|| SceneLoadError::UnknownArc {
+                            scene_id: scene_id.to_string(),
+                            id: arc.clone(),
+                        })?;
+                if !arc_def.states.contains(to_state) {
+                    return Err(SceneLoadError::UnknownArcState {
+                        scene_id: scene_id.to_string(),
+                        arc: arc.clone(),
+                        state: to_state.clone(),
+                    });
+                }
             }
             _ => {}
         }

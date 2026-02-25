@@ -104,7 +104,7 @@ pub struct CategoryDef {
 #[derive(Debug, Clone, Deserialize)]
 pub struct ArcDef {
     pub id: String,
-    /// Ordered list of valid state names (informational; engine doesn't validate transitions).
+    /// Ordered list of valid state names. AdvanceArc effects are validated against this list at load time.
     pub states: Vec<String>,
     /// Optional NPC role tag for the arc's primary NPC.
     #[serde(default)]

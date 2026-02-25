@@ -25,6 +25,16 @@ fn origin_from_idx(idx: u8) -> PcOrigin {
     }
 }
 
+/// Read the race list from the pack registry, falling back to `["White"]` if empty.
+fn read_races(pre_state: &Rc<RefCell<Option<PreGameState>>>) -> Vec<String> {
+    if let Some(ref pre) = *pre_state.borrow() {
+        if !pre.registry.races().is_empty() {
+            return pre.registry.races().to_vec();
+        }
+    }
+    vec!["White".to_string()]
+}
+
 // ── BeforeCreation form signals ───────────────────────────────────────────────
 
 #[derive(Clone, Copy)]
@@ -118,30 +128,12 @@ pub fn char_creation_view(
 ) -> impl View {
     let form = BeforeFormSignals::new();
 
-    // Read available races from pack registry; set form default.
-    let races_list: Vec<String> = {
-        if let Some(ref pre) = *pre_state.borrow() {
-            if pre.registry.races().is_empty() {
-                vec!["White".to_string()]
-            } else {
-                pre.registry.races().to_vec()
-            }
-        } else {
-            vec!["White".to_string()]
-        }
-    };
+    let races_list = read_races(&pre_state);
     if let Some(first) = races_list.first() {
         form.before_race.set(first.clone());
     }
 
-    let next_btn = build_next_button(
-        signals,
-        form,
-        races_list.clone(),
-        pre_state,
-        game_state,
-        partial_char,
-    );
+    let next_btn = build_next_button(signals, form, pre_state, game_state, partial_char);
 
     let content = v_stack((
         heading("Your Story Begins", signals),
@@ -185,19 +177,8 @@ pub fn fem_creation_view(
         .map(|p| p.origin == PcOrigin::AlwaysFemale)
         .unwrap_or(false);
 
-    // Read available races from pack registry; set form default.
-    let races_list: Vec<String> = {
-        if let Some(ref pre) = *pre_state.borrow() {
-            if pre.registry.races().is_empty() {
-                vec!["White".to_string()]
-            } else {
-                pre.registry.races().to_vec()
-            }
-        } else {
-            vec!["White".to_string()]
-        }
-    };
-    // Default to first race, then override with before_race if player set one.
+    // Default race to first available; override with before_race if the player set one.
+    let races_list = read_races(&pre_state);
     if let Some(first) = races_list.first() {
         form.race.set(first.clone());
     }
@@ -226,7 +207,7 @@ pub fn fem_creation_view(
                     Age::Old,
                 ],
             )
-            .style(dropdown_style(signals)),
+            .style(field_style(signals)),
         ))
     } else {
         Box::new(empty())
@@ -242,14 +223,14 @@ pub fn fem_creation_view(
                 signals,
                 text_input(form.name_fem)
                     .placeholder("e.g. Eva")
-                    .style(input_style(signals)),
+                    .style(field_style(signals)),
             ),
             form_row(
                 "Androgynous name",
                 signals,
                 text_input(form.name_androg)
                     .placeholder("e.g. Ev")
-                    .style(input_style(signals)),
+                    .style(field_style(signals)),
             ),
         ))
         .style(section_style()),
@@ -267,7 +248,7 @@ pub fn fem_creation_view(
                         PlayerFigure::Womanly,
                     ],
                 )
-                .style(dropdown_style(signals)),
+                .style(field_style(signals)),
             ),
             form_row(
                 "Breasts",
@@ -281,7 +262,7 @@ pub fn fem_creation_view(
                         BreastSize::Large,
                     ],
                 )
-                .style(dropdown_style(signals)),
+                .style(field_style(signals)),
             ),
         ))
         .style(section_style()),
@@ -380,7 +361,7 @@ fn section_your_past(
                 signals,
                 text_input(form.before_name)
                     .placeholder("e.g. Evan")
-                    .style(input_style(signals)),
+                    .style(field_style(signals)),
             );
 
             let age_row = form_row(
@@ -399,7 +380,7 @@ fn section_your_past(
                         Age::Old,
                     ],
                 )
-                .style(dropdown_style(signals)),
+                .style(field_style(signals)),
             );
 
             let race_row = form_row(
@@ -420,7 +401,7 @@ fn section_your_past(
                             BeforeSexuality::AttractedToBoth,
                         ],
                     )
-                    .style(dropdown_style(signals)),
+                    .style(field_style(signals)),
                 );
                 v_stack((name_row, age_row, sexuality_row, race_row)).into_any()
             } else {
@@ -571,7 +552,6 @@ fn section_content_prefs(signals: AppSignals, form: BeforeFormSignals) -> impl V
 fn build_next_button(
     signals: AppSignals,
     form: BeforeFormSignals,
-    _races: Vec<String>,
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
     partial_char: RwSignal<Option<PartialCharState>>,
@@ -656,7 +636,7 @@ fn build_next_button(
                 before_age: form.before_age.get_untracked(),
                 before_race: form.before_race.get_untracked(),
                 before_sexuality: form.before_sexuality.get_untracked(),
-                starting_traits: starting_traits.clone(),
+                starting_traits,
             };
             partial_char.set(Some(partial.clone()));
 
@@ -964,23 +944,8 @@ fn section_style() -> impl Fn(floem::style::Style) -> floem::style::Style {
     }
 }
 
-fn input_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::style::Style {
-    move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.width(220.0)
-            .height(32.0)
-            .padding_horiz(10.0)
-            .font_size(14.0)
-            .color(colors.ink)
-            .background(colors.page_raised)
-            .border(1.0)
-            .border_color(colors.seam)
-            .border_radius(4.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
-    }
-}
-
-fn dropdown_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::style::Style {
+/// Shared style for text inputs and dropdowns — same dimensions, border, and font.
+fn field_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::style::Style {
     move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.width(220.0)

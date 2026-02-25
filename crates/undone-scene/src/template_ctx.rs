@@ -133,11 +133,7 @@ impl Object for GameDataCtx {
             }
             "arcState" => {
                 let arc_id = string_arg(method, args, 0)?;
-                let state = self
-                    .arc_states
-                    .get(arc_id.as_str())
-                    .map(|s| s.as_str())
-                    .unwrap_or("");
+                let state = self.arc_states.get(arc_id.as_str()).map_or("", |s| s.as_str());
                 Ok(Value::from(state))
             }
             _ => Err(Error::new(
