@@ -293,6 +293,7 @@ pub fn fem_creation_view(
                     Age::Old,
                 ],
             )
+            .main_view(themed_trigger::<Age>(signals))
             .list_item_view(themed_item::<Age>(signals))
             .style(field_style(signals)),
         ))
@@ -335,6 +336,7 @@ pub fn fem_creation_view(
                         PlayerFigure::Womanly,
                     ],
                 )
+                .main_view(themed_trigger::<PlayerFigure>(signals))
                 .list_item_view(themed_item::<PlayerFigure>(signals))
                 .style(field_style(signals)),
             ),
@@ -350,6 +352,7 @@ pub fn fem_creation_view(
                         BreastSize::Large,
                     ],
                 )
+                .main_view(themed_trigger::<BreastSize>(signals))
                 .list_item_view(themed_item::<BreastSize>(signals))
                 .style(field_style(signals)),
             ),
@@ -521,6 +524,7 @@ fn section_your_past(
                         Age::Old,
                     ],
                 )
+                .main_view(themed_trigger::<Age>(signals))
                 .list_item_view(themed_item::<Age>(signals))
                 .style(field_style(signals)),
             );
@@ -543,6 +547,7 @@ fn section_your_past(
                             BeforeSexuality::AttractedToBoth,
                         ],
                     )
+                    .main_view(themed_trigger::<BeforeSexuality>(signals))
                     .list_item_view(themed_item::<BeforeSexuality>(signals))
                     .style(field_style(signals)),
                 );
@@ -1258,6 +1263,26 @@ fn themed_item<T: std::fmt::Display + 'static>(
                     .background(colors.page_raised)
                     .padding_horiz(10.0)
                     .padding_vert(6.0)
+                    .font_size(14.0)
+                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+            })
+            .into_any()
+    }
+}
+
+/// Returns a closure suitable for `Dropdown::main_view` that renders the selected item
+/// with the current theme's ink color — used to fix text-invisible bug in Night theme
+/// (floem's default_main_view uses unstyled `text()` which doesn't inherit ink color).
+fn themed_trigger<T: std::fmt::Display + 'static>(
+    signals: AppSignals,
+) -> impl Fn(T) -> floem::AnyView {
+    move |item| {
+        let s = item.to_string();
+        label(move || s.clone())
+            .style(move |style| {
+                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                style
+                    .color(colors.ink)
                     .font_size(14.0)
                     .font_family("system-ui, -apple-system, sans-serif".to_string())
             })
