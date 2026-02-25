@@ -32,7 +32,7 @@ const PRESET_ROBIN: PresetData = PresetData {
     origin: PcOrigin::CisMaleTransformed,
     before_sexuality: BeforeSexuality::AttractedToWomen,
     before_race: "White",
-    trait_ids: &["AMBITIOUS", "ANALYTICAL", "DOWN_TO_EARTH"],
+    trait_ids: &["AMBITIOUS", "ANALYTICAL", "DOWN_TO_EARTH", "OBJECTIFYING"],
     blurb: "You're thirty-two, a software engineer with ten years of experience. \
             You took a job offer in a city you didn't know — new company, new start, \
             boxes shipped to an apartment you've never seen. When things go sideways, \
@@ -45,7 +45,7 @@ const PRESET_RAUL: PresetData = PresetData {
     origin: PcOrigin::CisMaleTransformed,
     before_sexuality: BeforeSexuality::AttractedToWomen,
     before_race: "Latina",
-    trait_ids: &["AMBITIOUS", "CONFIDENT", "OUTGOING"],
+    trait_ids: &["AMBITIOUS", "CONFIDENT", "OUTGOING", "SEXIST", "HOMOPHOBIC"],
     blurb: "You're eighteen, starting at a university your family has talked about for years. \
             You arrived with your expectations calibrated: you knew who you were, where you \
             were headed, and what the next four years were supposed to look like. \
@@ -107,6 +107,10 @@ struct BeforeFormSignals {
     trait_overactive_imagination: RwSignal<bool>,
     trait_analytical: RwSignal<bool>,
     trait_confident: RwSignal<bool>,
+    // attitude traits
+    trait_sexist: RwSignal<bool>,
+    trait_homophobic: RwSignal<bool>,
+    trait_objectifying: RwSignal<bool>,
     trait_beautiful: RwSignal<bool>,
     trait_plain: RwSignal<bool>,
     // content prefs
@@ -138,6 +142,9 @@ impl BeforeFormSignals {
             trait_overactive_imagination: RwSignal::new(false),
             trait_analytical: RwSignal::new(false),
             trait_confident: RwSignal::new(false),
+            trait_sexist: RwSignal::new(false),
+            trait_homophobic: RwSignal::new(false),
+            trait_objectifying: RwSignal::new(false),
             trait_beautiful: RwSignal::new(false),
             trait_plain: RwSignal::new(false),
             include_rough: RwSignal::new(false),
@@ -642,7 +649,22 @@ fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl Vie
             .margin_vert(12.0)
     });
 
+    let divider2 = empty().style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.height(1.0)
+            .width_full()
+            .background(colors.seam)
+            .margin_vert(12.0)
+    });
+
     let appearance_row = h_stack((beautiful_cb, plain_cb)).style(|s| s.gap(24.0).items_center());
+
+    let attitude_grid = h_stack((
+        trait_checkbox("Sexist", form.trait_sexist, signals),
+        trait_checkbox("Homophobic", form.trait_homophobic, signals),
+        trait_checkbox("Objectifying", form.trait_objectifying, signals),
+    ))
+    .style(|s| s.gap(16.0).flex_wrap(floem::style::FlexWrap::Wrap));
 
     v_stack((
         section_title("Personality", signals),
@@ -650,6 +672,9 @@ fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl Vie
         trait_grid,
         divider,
         appearance_row,
+        divider2,
+        hint_label("Former attitudes (optional):", signals),
+        attitude_grid,
     ))
     .style(section_style())
 }
@@ -836,6 +861,15 @@ fn build_next_button(
                 }
                 if form.trait_confident.get_untracked() {
                     tn.push("CONFIDENT");
+                }
+                if form.trait_sexist.get_untracked() {
+                    tn.push("SEXIST");
+                }
+                if form.trait_homophobic.get_untracked() {
+                    tn.push("HOMOPHOBIC");
+                }
+                if form.trait_objectifying.get_untracked() {
+                    tn.push("OBJECTIFYING");
                 }
                 if form.trait_beautiful.get_untracked() {
                     tn.push("BEAUTIFUL");
