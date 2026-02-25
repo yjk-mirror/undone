@@ -161,32 +161,21 @@ These are constraints, not aspirations. Violating them is a bug.
    speed. This applies to game code, tooling, infrastructure, and agent workflows
    equally. Workarounds accumulate; correct solutions compose.
 
-## UI Direction
+## UI — Current State
 
-The UI is a significant open design question. We are not replicating the original
-Newlife layout. A dedicated design session will determine what makes this the most
-engaging experience — typography, layout, how choices are presented, how the world
-and character state are surfaced.
+Layout: title bar (UNDONE branding, Game/Saves/Settings tabs, window controls) always
+visible. Stats sidebar left (280px). Story panel right (scrollable prose + choices bar +
+detail strip). 1200×800. Three themes: Warm Paper (default), Sepia, Night.
 
-The scaffold produced a minimal eframe window (900×600, placeholder text, no logic).
-Do not iterate on the UI until the scene engine can run scenes end-to-end.
+For UI changes see `.interface-design/system.md` (design system spec) and
+`crates/undone-ui/src/` source files.
 
-## Writing and Content
+## Writing and Content — Current State
 
-The base pack is set in a fictional Northeast US city (near-future). All prose is
-original — the setting deliberately diverges from Newlife's British context to
-differentiate. Do not work on prose content until the engine can run scenes end-to-end
-and the writing guide session has established continuity-of-self principles.
-
-## Expression Parser Notes
-
-The expression system (lexer + recursive descent parser + evaluator) is complete.
-The evaluator returns stub values (`false`/`0`) for `hasTrait()`, `getSkill()`,
-`hasStuff()`, `getStat()` — these are wired to `PackRegistry` in the scene engine
-session. The stubs are marked `// TODO: wire to registry` in `undone-expr/src/eval.rs`.
-
-One deviation from the original plan: `gd.week` was changed to `gd.week()` — the
-parser requires method-call syntax everywhere, and the original plan had an inconsistency.
+Engine is fully end-to-end. Writing guide is established (`docs/writing-guide.md`).
+15 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
+and `writing-reviewer` for quality passes. See `docs/arcs/` for arc structure and
+`docs/characters/` for NPC profiles.
 
 ## Runtime Testing Notes
 
@@ -215,9 +204,16 @@ parser requires method-call syntax everywhere, and the original plan had an inco
 
 | Situation | Required skill |
 |---|---|
-| Starting a plan | `superpowers:executing-plans` |
+| Any creative/feature work (new scenes, new features) | `superpowers:brainstorming` |
+| Multi-step plan with spec | `superpowers:writing-plans` |
+| Executing a written plan | `superpowers:executing-plans` |
 | Before touching code on a plan | `superpowers:using-git-worktrees` (worktree per plan) |
+| Parallel independent tasks (2+) | `superpowers:dispatching-parallel-agents` |
+| Parallel tasks with coordination | `superpowers:subagent-driven-development` |
+| Implementing any feature or fix | `superpowers:test-driven-development` |
 | Debugging any failure | `superpowers:systematic-debugging` |
+| After completing major feature | `superpowers:requesting-code-review` |
+| Receiving code review feedback | `superpowers:receiving-code-review` |
 | About to claim done | `superpowers:verification-before-completion` |
 | Finishing a branch | `superpowers:finishing-a-development-branch` |
 
@@ -270,6 +266,24 @@ The rust MCP server provides a long-lived rust-analyzer instance for
 4. After writing each `.rs` file: run `cargo fmt` and `cargo check -p <crate>` via Bash
 5. After writing each `.j2` file: call `mcp__minijinja__jinja_validate_template`
 6. When all tasks done: invoke `superpowers:finishing-a-development-branch`
+
+### Custom Agents (`.claude/agents/`)
+
+Project-specific agents invoked via `subagent_type` in the Task tool.
+
+| Agent | `subagent_type` | When to use |
+|---|---|---|
+| scene-writer | `scene-writer` | Writing new scenes or expanding existing ones. Has Write/Edit, minijinja validation. |
+| writing-reviewer | `writing-reviewer` | Quality review of scene prose. Read-only. Returns Critical/Important/Minor findings. |
+
+**Prolific writing sessions:** Dispatch multiple `scene-writer` agents in parallel (one per
+scene), then run `writing-reviewer` on each result. Use `superpowers:dispatching-parallel-agents`
+to coordinate.
+
+**Writing workflow per scene:**
+1. `scene-writer` reads character docs + arc docs + writing guide → writes TOML
+2. `writing-reviewer` audits the output → reports issues
+3. Lead agent applies Critical fixes, commits
 
 ### Dispatching background agents
 
