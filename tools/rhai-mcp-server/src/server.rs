@@ -1,11 +1,9 @@
+use rhai::Engine;
 use rmcp::{
-    ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
-    tool, tool_handler, tool_router,
-    Error as McpError,
+    tool, tool_handler, tool_router, ErrorData as McpError, ServerHandler,
 };
-use rhai::Engine;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use std::sync::Arc;
@@ -42,7 +40,9 @@ impl RhaiServer {
         }
     }
 
-    #[tool(description = "Fast syntax-only check of a Rhai source string. Returns a JSON array of diagnostics with line/column. Empty array means valid. Does not evaluate the script.")]
+    #[tool(
+        description = "Fast syntax-only check of a Rhai source string. Returns a JSON array of diagnostics with line/column. Empty array means valid. Does not evaluate the script."
+    )]
     async fn rhai_check_syntax(
         &self,
         params: Parameters<SourceInput>,
@@ -53,7 +53,9 @@ impl RhaiServer {
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
-    #[tool(description = "Validate a Rhai script file at the given absolute path. Returns a JSON array of diagnostics with line/column. Empty array means valid. Use this after writing or editing a .rhai file.")]
+    #[tool(
+        description = "Validate a Rhai script file at the given absolute path. Returns a JSON array of diagnostics with line/column. Empty array means valid. Use this after writing or editing a .rhai file."
+    )]
     async fn rhai_validate_script(
         &self,
         params: Parameters<FilePathInput>,
@@ -65,7 +67,9 @@ impl RhaiServer {
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
-    #[tool(description = "Run a Rhai source string through the engine to catch runtime errors that syntax-checking misses (e.g. undefined variable references, type mismatches). Returns a JSON array of diagnostics.")]
+    #[tool(
+        description = "Run a Rhai source string through the engine to catch runtime errors that syntax-checking misses (e.g. undefined variable references, type mismatches). Returns a JSON array of diagnostics."
+    )]
     async fn rhai_get_diagnostics(
         &self,
         params: Parameters<SourceInput>,
@@ -76,10 +80,10 @@ impl RhaiServer {
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
-    #[tool(description = "List all functions registered in the Rhai engine, including built-ins. Returns a JSON array of function signatures. Use this to check what functions are available before calling them in a script.")]
-    async fn rhai_list_registered_api(
-        &self,
-    ) -> Result<CallToolResult, McpError> {
+    #[tool(
+        description = "List all functions registered in the Rhai engine, including built-ins. Returns a JSON array of function signatures. Use this to check what functions are available before calling them in a script."
+    )]
+    async fn rhai_list_registered_api(&self) -> Result<CallToolResult, McpError> {
         let fns = validator::list_registered_functions(&self.engine);
         let json = serde_json::to_string_pretty(&fns)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;

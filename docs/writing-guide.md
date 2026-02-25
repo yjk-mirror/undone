@@ -220,6 +220,12 @@ Use these to build branches that structurally change what happens.
 | `OVERACTIVE_IMAGINATION` | Takes situations to their logical conclusion. | Gets ahead of herself. Anticipates outcomes before they exist. |
 | `PLAIN` | Not conventionally attractive. | Some male attention routes don't fire or land differently. |
 | `BEAUTIFUL` | Draws attention. | More male attention, more often, and she knows it. |
+| `OUTGOING` | Approaches people, fills silences. | Initiates conversations. Comfortable in crowds. Opposite of SHY. |
+| `ANALYTICAL` | Observes patterns, thinks before acting. | Notices inconsistencies. Internal monologue runs heavy. |
+| `CONFIDENT` | Self-assured, doesn't second-guess. | Takes up space. Makes decisions fast. Doesn't apologize for existing. |
+| `SEXIST` | Internalized misogyny from the before-life. | Judges women by male standards. Catches herself doing it. Self-awareness optional. |
+| `HOMOPHOBIC` | Discomfort with same-sex attraction. | Male attention registers as desire before shame kicks in. The conflict is the content. |
+| `OBJECTIFYING` | Evaluates bodies automatically. | Notices proportions, attractiveness. The male gaze she used to own, now turned inward. |
 
 ---
 

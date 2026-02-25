@@ -56,7 +56,11 @@ impl GraphicsCaptureApiHandler for PersistentCapture {
             buf.as_raw_buffer().to_vec()
         };
 
-        *self.shared.lock().unwrap() = Some(CapturedFrame { data, width, height });
+        *self.shared.lock().unwrap() = Some(CapturedFrame {
+            data,
+            width,
+            height,
+        });
 
         // Do NOT call capture_control.stop() — session stays alive for future reads.
         Ok(())
@@ -139,11 +143,7 @@ impl SessionManager {
     /// Waits briefly on first call for the initial frame to arrive.
     pub fn capture(&mut self, title: &str) -> anyhow::Result<CapturedFrame> {
         // Evict dead sessions (window closed, errors).
-        if self
-            .sessions
-            .get(title)
-            .is_some_and(|s| s.is_finished())
-        {
+        if self.sessions.get(title).is_some_and(|s| s.is_finished()) {
             self.sessions.remove(title);
         }
 

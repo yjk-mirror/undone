@@ -70,7 +70,7 @@ fn parse_error_to_diagnostic(e: &ParseError) -> Diagnostic {
     }
 }
 
-fn eval_error_to_diagnostic(e: &Box<EvalAltResult>) -> Diagnostic {
+fn eval_error_to_diagnostic(e: &EvalAltResult) -> Diagnostic {
     let pos = e.position();
     Diagnostic {
         line: pos.line().map(|l| l as u16),
@@ -88,7 +88,11 @@ mod tests {
     #[test]
     fn valid_script_returns_no_diagnostics() {
         let diags = check_syntax("let x = 1 + 2; x");
-        assert!(diags.is_empty(), "expected no diagnostics, got: {:?}", diags);
+        assert!(
+            diags.is_empty(),
+            "expected no diagnostics, got: {:?}",
+            diags
+        );
     }
 
     #[test]
@@ -96,7 +100,10 @@ mod tests {
         let diags = check_syntax("let x = "); // incomplete expression
         assert!(!diags.is_empty(), "expected at least one diagnostic");
         assert!(matches!(diags[0].severity, DiagnosticSeverity::Error));
-        assert!(diags[0].line.is_some(), "expected a line number in the diagnostic");
+        assert!(
+            diags[0].line.is_some(),
+            "expected a line number in the diagnostic"
+        );
     }
 
     #[test]
@@ -104,7 +111,10 @@ mod tests {
         let engine = Engine::new();
         // Type mismatch: syntax is valid but runtime evaluation fails
         let diags = validate_with_engine("let x: i64 = \"not a number\";", &engine);
-        assert!(!diags.is_empty(), "expected runtime diagnostic for type mismatch");
+        assert!(
+            !diags.is_empty(),
+            "expected runtime diagnostic for type mismatch"
+        );
         assert!(matches!(diags[0].severity, DiagnosticSeverity::Error));
     }
 

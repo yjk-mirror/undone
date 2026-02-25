@@ -2,11 +2,9 @@ use std::sync::{Arc, Mutex};
 
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use rmcp::{
-    ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
-    tool, tool_handler, tool_router,
-    ErrorData as McpError,
+    tool, tool_handler, tool_router, ErrorData as McpError, ServerHandler,
 };
 use schemars::JsonSchema;
 use serde::Deserialize;
@@ -35,7 +33,9 @@ impl ScreenshotServer {
         }
     }
 
-    #[tool(description = "Capture a screenshot of a running native window by partial title match. Uses Windows Graphics Capture API — no focus stealing, no border on Windows 11, cursor excluded. Returns the screenshot as an image/png content block.")]
+    #[tool(
+        description = "Capture a screenshot of a running native window by partial title match. Uses Windows Graphics Capture API — no focus stealing, no border on Windows 11, cursor excluded. Returns the screenshot as an image/png content block."
+    )]
     async fn screenshot_window(
         &self,
         params: Parameters<ScreenshotInput>,

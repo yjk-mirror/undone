@@ -23,8 +23,11 @@ pub fn render_template(source: &str, context_json: &str) -> Result<String, Templ
         message: format!("Invalid JSON context: {}", e),
     })?;
     let mut env = Environment::new();
-    env.add_template("__render__", source).map_err(|e| to_template_error(&e))?;
-    let tmpl = env.get_template("__render__").map_err(|e| to_template_error(&e))?;
+    env.add_template("__render__", source)
+        .map_err(|e| to_template_error(&e))?;
+    let tmpl = env
+        .get_template("__render__")
+        .map_err(|e| to_template_error(&e))?;
     tmpl.render(ctx).map_err(|e| to_template_error(&e))
 }
 
@@ -35,15 +38,54 @@ pub fn render_template(source: &str, context_json: &str) -> Result<String, Templ
 pub fn list_builtin_filters() -> Vec<&'static str> {
     vec![
         // Always available
-        "safe", "escape", "e",
+        "safe",
+        "escape",
+        "e",
         // builtins feature (enabled by default)
-        "abs", "attr", "batch", "bool", "capitalize", "chain", "count",
-        "d", "default", "dictsort", "first", "float", "format", "groupby",
-        "indent", "int", "items", "join", "last", "length", "lines", "list",
-        "lower", "map", "max", "min", "pprint", "reject", "rejectattr",
-        "replace", "reverse", "round", "select", "selectattr", "slice",
-        "sort", "split", "string", "sum", "title", "trim", "unique",
-        "upper", "zip",
+        "abs",
+        "attr",
+        "batch",
+        "bool",
+        "capitalize",
+        "chain",
+        "count",
+        "d",
+        "default",
+        "dictsort",
+        "first",
+        "float",
+        "format",
+        "groupby",
+        "indent",
+        "int",
+        "items",
+        "join",
+        "last",
+        "length",
+        "lines",
+        "list",
+        "lower",
+        "map",
+        "max",
+        "min",
+        "pprint",
+        "reject",
+        "rejectattr",
+        "replace",
+        "reverse",
+        "round",
+        "select",
+        "selectattr",
+        "slice",
+        "sort",
+        "split",
+        "string",
+        "sum",
+        "title",
+        "trim",
+        "unique",
+        "upper",
+        "zip",
     ]
 }
 
@@ -83,9 +125,18 @@ mod tests {
         assert!(filters.contains(&"lower"));
         assert!(filters.contains(&"join"));
         // Filters present in Jinja2 (Python) but NOT in minijinja 2.x defaults
-        assert!(!filters.contains(&"filesizeformat"), "filesizeformat is not in minijinja 2");
-        assert!(!filters.contains(&"striptags"), "striptags is not in minijinja 2");
-        assert!(!filters.contains(&"wordwrap"), "wordwrap is not in minijinja 2");
+        assert!(
+            !filters.contains(&"filesizeformat"),
+            "filesizeformat is not in minijinja 2"
+        );
+        assert!(
+            !filters.contains(&"striptags"),
+            "striptags is not in minijinja 2"
+        );
+        assert!(
+            !filters.contains(&"wordwrap"),
+            "wordwrap is not in minijinja 2"
+        );
     }
 
     #[test]

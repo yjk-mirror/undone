@@ -10,10 +10,10 @@
 
 ## Project Overview
 
-**Undone** is a British life-simulation text game with adult themes. The player
+**Undone** is a life-simulation text game with adult themes. The player
 character is a young woman navigating relationships, work, and social life in a
-contemporary UK city. The game is a runtime for content — mechanics are minimal,
-writing is everything.
+fictional Northeast US city. The game is a runtime for content — mechanics are
+minimal, writing is everything.
 
 Inspired by Newlife (Splendid Ostrich Games). Full redesign: new engine, new
 content format, full ownership.
@@ -40,7 +40,7 @@ content format, full ownership.
 undone/
 ├── Cargo.toml               # workspace root
 ├── src/
-│   └── main.rs              # entry point, launches eframe
+│   └── main.rs              # entry point, launches floem
 │
 ├── crates/
 │   ├── undone-domain/       # pure types — no IO, no game logic
@@ -49,7 +49,7 @@ undone/
 │   ├── undone-expr/         # custom expression parser & evaluator
 │   ├── undone-scene/        # scene execution engine
 │   ├── undone-save/         # serde save / load
-│   └── undone-ui/           # egui/eframe views and widgets
+│   └── undone-ui/           # floem views and widgets
 │
 ├── packs/
 │   └── base/                # base game content (is itself a pack)

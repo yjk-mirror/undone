@@ -56,7 +56,7 @@ manually in UI code.
 # Rust toolchain
 curl https://sh.rustup.rs -sSf | sh
 
-# Node (for MCP launchers and hooks) — use your distro's package manager or nvm
+# Node (for post-edit hooks only) — use your distro's package manager or nvm
 # Debian/Ubuntu:
 sudo apt install nodejs
 

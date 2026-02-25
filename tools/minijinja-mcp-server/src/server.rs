@@ -1,9 +1,7 @@
 use rmcp::{
-    ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
-    tool, tool_handler, tool_router,
-    Error as McpError,
+    tool, tool_handler, tool_router, ErrorData as McpError, ServerHandler,
 };
 use schemars::JsonSchema;
 use serde::Deserialize;
@@ -37,7 +35,9 @@ impl MiniJinjaServer {
         }
     }
 
-    #[tool(description = "Parse a Minijinja/Jinja2 template and return syntax errors. Returns an empty array if valid. Use this after writing or editing a .j2 or .jinja file.")]
+    #[tool(
+        description = "Parse a Minijinja/Jinja2 template and return syntax errors. Returns an empty array if valid. Use this after writing or editing a .j2 or .jinja file."
+    )]
     async fn jinja_validate_template(
         &self,
         params: Parameters<ValidateTemplateInput>,
@@ -48,7 +48,9 @@ impl MiniJinjaServer {
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
-    #[tool(description = "Render a Minijinja template with a JSON context object. Returns the rendered string, or an error with line number if rendering fails. Useful for testing templates against example data.")]
+    #[tool(
+        description = "Render a Minijinja template with a JSON context object. Returns the rendered string, or an error with line number if rendering fails. Useful for testing templates against example data."
+    )]
     async fn jinja_render_preview(
         &self,
         params: Parameters<RenderTemplateInput>,
@@ -63,10 +65,10 @@ impl MiniJinjaServer {
         }
     }
 
-    #[tool(description = "List all built-in Minijinja filters available in templates. Returns a JSON array of filter names.")]
-    async fn jinja_list_filters(
-        &self,
-    ) -> Result<CallToolResult, McpError> {
+    #[tool(
+        description = "List all built-in Minijinja filters available in templates. Returns a JSON array of filter names."
+    )]
+    async fn jinja_list_filters(&self) -> Result<CallToolResult, McpError> {
         let filters = validator::list_builtin_filters();
         let json = serde_json::to_string_pretty(&filters)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;

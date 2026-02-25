@@ -1,5 +1,5 @@
 use windows::Win32::{
-    Foundation::{BOOL, CloseHandle, HWND, LPARAM, WPARAM},
+    Foundation::{CloseHandle, BOOL, HWND, LPARAM, WPARAM},
     System::{
         Diagnostics::ToolHelp::{
             CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
@@ -10,8 +10,8 @@ use windows::Win32::{
     UI::{
         Input::KeyboardAndMouse::{MapVirtualKeyW, MAPVK_VK_TO_VSC, VIRTUAL_KEY},
         WindowsAndMessaging::{
-            EnumWindows, GetWindowTextLengthW, GetWindowTextW, PostMessageW, WM_KEYDOWN,
-            WM_KEYUP, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL,
+            EnumWindows, GetWindowTextLengthW, GetWindowTextW, PostMessageW, WM_KEYDOWN, WM_KEYUP,
+            WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL,
         },
     },
 };
@@ -51,7 +51,10 @@ pub fn find_window(title_fragment: &str) -> anyhow::Result<HWND> {
     };
 
     unsafe {
-        let _ = EnumWindows(Some(enum_callback), LPARAM(&mut ctx as *mut FindCtx as isize));
+        let _ = EnumWindows(
+            Some(enum_callback),
+            LPARAM(&mut ctx as *mut FindCtx as isize),
+        );
     }
 
     ctx.result
@@ -72,11 +75,14 @@ pub fn key_to_vk(key: &str) -> anyhow::Result<VIRTUAL_KEY> {
         "7" => Ok(VIRTUAL_KEY(0x37)),
         "8" => Ok(VIRTUAL_KEY(0x38)),
         "9" => Ok(VIRTUAL_KEY(0x39)),
-        "enter" | "return" => Ok(VIRTUAL_KEY(0x0D)),  // VK_RETURN
-        "tab" => Ok(VIRTUAL_KEY(0x09)),                // VK_TAB
-        "escape" | "esc" => Ok(VIRTUAL_KEY(0x1B)),     // VK_ESCAPE
-        "space" => Ok(VIRTUAL_KEY(0x20)),              // VK_SPACE
-        _ => Err(anyhow::anyhow!("unsupported key: '{}'. Supported: 1-9, enter, tab, escape, space", key)),
+        "enter" | "return" => Ok(VIRTUAL_KEY(0x0D)), // VK_RETURN
+        "tab" => Ok(VIRTUAL_KEY(0x09)),              // VK_TAB
+        "escape" | "esc" => Ok(VIRTUAL_KEY(0x1B)),   // VK_ESCAPE
+        "space" => Ok(VIRTUAL_KEY(0x20)),            // VK_SPACE
+        _ => Err(anyhow::anyhow!(
+            "unsupported key: '{}'. Supported: 1-9, enter, tab, escape, space",
+            key
+        )),
     }
 }
 
@@ -151,7 +157,7 @@ pub fn scroll(hwnd: HWND, x: i32, y: i32, delta: i32) -> anyhow::Result<()> {
     // Step 2: Send the wheel event. PostMessage preserves FIFO order, so the
     // WM_MOUSEMOVE above will be processed first.
     let wheel_delta = delta * 120; // WHEEL_DELTA = 120
-    let wparam = WPARAM(((wheel_delta as u16 as usize) << 16) | 0);
+    let wparam = WPARAM((wheel_delta as u16 as usize) << 16);
     let lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
     unsafe {
         PostMessageW(hwnd, WM_MOUSEWHEEL, wparam, lparam)

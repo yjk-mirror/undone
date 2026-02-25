@@ -5,7 +5,7 @@ mod server;
 
 use anyhow::Result;
 #[cfg(target_os = "windows")]
-use rmcp::{ServiceExt, transport::stdio};
+use rmcp::{transport::stdio, ServiceExt};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]

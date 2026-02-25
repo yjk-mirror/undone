@@ -1,9 +1,7 @@
 use rmcp::{
-    ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
-    tool, tool_handler, tool_router,
-    ErrorData as McpError,
+    tool, tool_handler, tool_router, ErrorData as McpError, ServerHandler,
 };
 use schemars::JsonSchema;
 use serde::Deserialize;
@@ -93,11 +91,10 @@ impl GameInputServer {
         let title = &params.0.title;
         let key = &params.0.key;
 
-        let hwnd = input::find_window(title)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        let hwnd =
+            input::find_window(title).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
-        input::press_key(hwnd, key)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        input::press_key(hwnd, key).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
         Ok(CallToolResult::success(vec![Content::text(format!(
             "Pressed '{}' in window matching '{}'",
@@ -108,19 +105,15 @@ impl GameInputServer {
     #[tool(
         description = "Click at a position in a running native window without stealing focus or moving the cursor. Posts WM_LBUTTONDOWN + WM_LBUTTONUP via PostMessage at window-client-relative coordinates."
     )]
-    async fn click(
-        &self,
-        params: Parameters<ClickInput>,
-    ) -> Result<CallToolResult, McpError> {
+    async fn click(&self, params: Parameters<ClickInput>) -> Result<CallToolResult, McpError> {
         let title = &params.0.title;
         let x = params.0.x;
         let y = params.0.y;
 
-        let hwnd = input::find_window(title)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        let hwnd =
+            input::find_window(title).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
-        input::click(hwnd, x, y)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        input::click(hwnd, x, y).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
         Ok(CallToolResult::success(vec![Content::text(format!(
             "Clicked at ({}, {}) in window matching '{}'",
@@ -131,17 +124,14 @@ impl GameInputServer {
     #[tool(
         description = "Scroll the mouse wheel in a running native window without stealing focus. Posts WM_MOUSEWHEEL via PostMessage. Use negative delta to scroll down, positive to scroll up."
     )]
-    async fn scroll(
-        &self,
-        params: Parameters<ScrollInput>,
-    ) -> Result<CallToolResult, McpError> {
+    async fn scroll(&self, params: Parameters<ScrollInput>) -> Result<CallToolResult, McpError> {
         let title = &params.0.title;
         let x = params.0.x;
         let y = params.0.y;
         let delta = params.0.delta;
 
-        let hwnd = input::find_window(title)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        let hwnd =
+            input::find_window(title).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
         input::scroll(hwnd, x, y, delta)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
@@ -160,19 +150,15 @@ impl GameInputServer {
     #[tool(
         description = "Move the mouse cursor to a position in a running native window without stealing focus. Posts WM_MOUSEMOVE via PostMessage. Use this to trigger hover effects on UI elements."
     )]
-    async fn hover(
-        &self,
-        params: Parameters<HoverInput>,
-    ) -> Result<CallToolResult, McpError> {
+    async fn hover(&self, params: Parameters<HoverInput>) -> Result<CallToolResult, McpError> {
         let title = &params.0.title;
         let x = params.0.x;
         let y = params.0.y;
 
-        let hwnd = input::find_window(title)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        let hwnd =
+            input::find_window(title).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
-        input::hover(hwnd, x, y)
-            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        input::hover(hwnd, x, y).map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
         Ok(CallToolResult::success(vec![Content::text(format!(
             "Hovered at ({}, {}) in window matching '{}'",
