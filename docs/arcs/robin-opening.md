@@ -33,6 +33,33 @@ Universal scenes fire normally. Robin-specific flavor via `[[intro_variants]]`.
 | `base::robin_first_night` | arrived | Her apartment | VANILLA | arc→week_one |
 | `base::robin_first_clothes` | week_one | Clothing store | VANILLA | — |
 | `base::robin_first_day` | week_one | Tech office | VANILLA | arc→working, `STARTED_JOB` |
+| `base::robin_work_meeting` | working | Tech office — meeting room | VANILLA | `FIRST_MEETING_DONE` |
+| `base::robin_evening` | working | Her apartment (evening) | VANILLA | arc→settled |
+
+## Week-2 Scenes — Design Notes
+
+**`robin_work_meeting`**
+Robin's first real meeting. She's been in standups — this is a design review where she
+has to speak. She knows the technical content cold. The room will not read her the way
+she was read before: she is visibly young, visibly a woman, visibly East Asian.
+Someone will explain something she invented. She will notice.
+
+The OBJECTIFYING trait should fire here — she can read the male gaze on her in this room
+with precision because she used to be on the other side of it. Use it for specific
+interiority, not a lecture. She recognizes a look. She knows what it means. She continues
+presenting her slides.
+
+Branch on: `w.hasTrait("OBJECTIFYING")`, `w.hasTrait("ANALYTICAL")`
+
+**`robin_evening`**
+After work. The apartment. She has been competent all day. She is now alone.
+Something small undoes her — not the meeting, not the gaze, something smaller and more
+specific. A moment of physical disorientation. Or just the silence.
+
+This scene advances arc → settled because it marks the end of the initial shock period.
+She's not okay, but she's operational. There is a difference.
+
+Branch on: `w.hasTrait("ANALYTICAL")`, `w.hasTrait("AMBITIOUS")`
 
 ## Tone Notes
 
@@ -85,5 +112,19 @@ name = "robin_opening"
   condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_work_meeting"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::robin_evening"
+  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && gd.hasGameFlag('FIRST_MEETING_DONE')"
   once_only = true
 ```
