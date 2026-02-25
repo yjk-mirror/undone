@@ -86,6 +86,41 @@ group       = "personality"
 conflicts   = ["SHY"]
 
 [[trait]]
+id          = "ANALYTICAL"
+name        = "Analytical"
+description = "Reaches for frameworks before feelings. Thinks in systems."
+hidden      = false
+group       = "personality"
+
+[[trait]]
+id          = "CONFIDENT"
+name        = "Confident"
+description = "Settled in herself. Doesn't need the room's approval."
+hidden      = false
+group       = "personality"
+
+[[trait]]
+id          = "SEXIST"
+name        = "Sexist"
+description = "Mild, unexamined contempt for women as less capable. Not malicious — just never questioned."
+hidden      = false
+group       = "attitude"
+
+[[trait]]
+id          = "HOMOPHOBIC"
+name        = "Homophobic"
+description = "Ambient homophobia. Not violent — the kind that comes out as jokes nobody objected to."
+hidden      = false
+group       = "attitude"
+
+[[trait]]
+id          = "OBJECTIFYING"
+name        = "Objectifying"
+description = "Had the casual objectifying gaze. Didn't think of it as a gaze. Just thought of it as noticing."
+hidden      = false
+group       = "attitude"
+
+[[trait]]
 id          = "PLAIN"
 name        = "Plain"
 description = "A modelling career is out of the question."

@@ -434,7 +434,7 @@ mod tests {
         FemaleNpc {
             core: NpcCore {
                 name: "Fiona".into(),
-                age: Age::Twenties,
+                age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),
                 hair_colour: "red".into(),
@@ -475,7 +475,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
@@ -516,7 +516,7 @@ mod tests {
         MaleNpc {
             core: NpcCore {
                 name: "Test".into(),
-                age: Age::Twenties,
+                age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
                 hair_colour: "brown".into(),

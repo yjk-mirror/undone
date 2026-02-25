@@ -297,13 +297,12 @@ fn validate_effects(
                     })?;
             }
             EffectDef::AdvanceArc { arc, to_state } => {
-                let arc_def =
-                    registry
-                        .get_arc(arc)
-                        .ok_or_else(|| SceneLoadError::UnknownArc {
-                            scene_id: scene_id.to_string(),
-                            id: arc.clone(),
-                        })?;
+                let arc_def = registry
+                    .get_arc(arc)
+                    .ok_or_else(|| SceneLoadError::UnknownArc {
+                        scene_id: scene_id.to_string(),
+                        id: arc.clone(),
+                    })?;
                 if !arc_def.states.contains(to_state) {
                     return Err(SceneLoadError::UnknownArcState {
                         scene_id: scene_id.to_string(),

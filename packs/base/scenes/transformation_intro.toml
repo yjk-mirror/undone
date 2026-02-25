@@ -1,41 +1,275 @@
 [scene]
 id          = "base::transformation_intro"
 pack        = "base"
-description = "The moment before everything changed."
+description = "The morning after. Waking up wrong. Discovery, mirror, first reckoning."
+
+# Content level: VANILLA — no sexual content.
 
 [intro]
 prose = """
-Tuesday morning. The alarm goes off at seven like it always does.
+Tuesday. The alarm goes off at seven like it always does.
 
-{% if not w.alwaysFemale() %}
-{% if w.hasTrait("TRANS_WOMAN") %}
-She's been getting up at seven for three years. The body that gets up is wrong in the specific ways she has learned to catalog — the broad line of the shoulders, the flat chest, the way the jaw sits in the mirror. She knows the list by heart. She is very tired of knowing it.
+{% if w.alwaysFemale() %}
+You reach over and kill the alarm. The room is the same room it was last night. You lie still for a moment, running inventory: ceiling, the gray light through the curtains, the specific weight of the duvet, the sound of the building.
 
-She is putting on a shirt she has worn a hundred times when something happens that she does not have words for yet. It happens fast. It happens the way a held breath finally releases.
+Everything checks out. But there's something underneath the inventory — a quality to the morning you can't immediately locate, like the room had weather while you slept and is waiting to see if you'll notice.
 
-She sits down on the edge of the bed.
+You notice.
+{% elif w.hasTrait("TRANS_WOMAN") %}
+Seven AM, same as always. You reach over and kill the alarm with the reflex of someone who has done it ten thousand times. The room is the same room it was last night — same walls, same gray light through the curtains, same distant sound of a truck somewhere two blocks over.
 
-Something is different. Everything is different. She puts a hand to her face. Her face is different. She is *shaking* but it isn't fear — or it isn't only fear.
+You lie still for a moment.
 
-*Oh*, she thinks. *Oh. There you are.*
+Something in the weight of you is wrong. Your arm, reaching back to your side, is wrong in a way that takes a second to parse — slimmer, the skin smoother, the proportions not the ones you've spent every morning waking up to.
+
+You lie very still and let your hands tell you what they're finding.
 {% else %}
-He gets up. Makes coffee. Stands in the kitchen looking at nothing, which is how most mornings go.
+Seven AM. You reach over and kill the alarm with the reflex of someone who has done it a thousand times. You close your eyes again for thirty seconds, which is how most mornings start. The room is the same room it was last night.
 
-He is putting on a jacket he has owned since college when something happens that he has no frame for. The jacket no longer fits the way it should. Nothing fits. His hands are different. He looks at his hands and then at the rest of it, and his body is not the body he had three seconds ago — and he is not moving, and he is not making a sound, because there is no obvious next thing to do.
+But the weight of you inside the sheets is wrong — lighter somewhere, redistributed in ways you can't immediately account for, your hand resting against the blanket in a shape that isn't the shape you went to sleep with.
 
-He is not catastrophizing. He is not still asleep. Something real has happened and he has no language for it and the coffee is still warm and the world outside the window is exactly the same as it was and *he* is not.
-{% endif %}
-{% elif not w.hasTrait("NOT_TRANSFORMED") %}
-She gets up at seven. Makes coffee. In the mirror, the face looking back is hers — she recognizes it — but something has shifted. She catalogues the differences carefully, without hurrying toward a conclusion about what they mean.
+You lie very still, the way you lie still when you're trying to decide whether the strange noise downstairs is something or nothing.
 
-She drinks her coffee standing up. She's going to be late.
+It is.
 {% endif %}
 """
 
+# ── Beat 1: sitting up, hands, voice ──────────────────────────────────────
+
 [[actions]]
-id     = "continue"
-label  = "Continue"
-detail = "The city outside is the same. You are not."
+id    = "waking"
+label = "Continue"
+detail = "Something is different. Work out what."
+prose = """
+{% if w.alwaysFemale() %}
+You sit up and look at your hands.
+
+They're your hands. The hands you've had for your entire life, the nails the way they were when you went to sleep, the small scar at the base of your left thumb. Nothing has changed.
+
+You take stock anyway. Voice, when you clear your throat — your voice. Body — yours, the one you've always had, the one you grew up in. You run through the inventory methodically and everything comes back correct.
+
+And yet something happened last night. You're certain of it the way you're certain of things you can't prove — a quality to the morning, a sense of having been handled and replaced. You feel entirely yourself. You also feel like you passed through something and came out the other side, and the something isn't visible from here.
+{% elif w.hasTrait("TRANS_WOMAN") %}
+You sit up.
+
+The first thing you see are your hands. Not small, exactly — but different, the fingers longer relative to the palm, the knuckles softer, nails that somehow grew overnight into neat ovals. You turn them over and look at the backs, then the palms. Real. Skin, lines, texture. You press them together and feel them press back.
+
+You've been imagining hands like this for years. The imagining and the reality are not the same thing, but they're not as far apart as you expected.
+
+Your weight, sitting up, is redistributed. Lower center. Different hips. You're aware of your chest — aware of it the way you're aware of something that belongs, that has always been supposed to be there. Not alarming. Like something finally settled into its correct position.
+
+You breathe in. You breathe out. The apartment is quiet.
+{% else %}
+You sit up.
+
+The first thing you see are your hands and they are not your hands. Or they are your hands but they have been — revised, somehow, reduced, the knuckles softer, the fingers longer in proportion, the skin looking like it belongs to someone younger or just someone else. You stare at them for a solid five seconds doing nothing else.
+
+You try to say something. The sound that comes out is not your voice. Higher than it should be, and lighter, and you close your mouth immediately as if that will help. It does not help.
+
+{% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
+The worst part is that you're not even that surprised. You've read enough, dreamed enough, half-expected enough that the scenario arriving is almost a relief from the anticipation. Almost. The difference between imagining something and standing inside it turns out to be significant.
+{% elif w.hasTrait("AMBITIOUS") %}
+Your first coherent thought is about work. You have a meeting at nine. You have a presentation Thursday. You have a year-end review in six weeks that you have been preparing for since August. All of this surfaces immediately and absurdly, because your brain would apparently rather inventory the professional calendar than process what your hands look like.
+{% elif w.hasTrait("SHY") %}
+You fold your hands in your lap. As if keeping them small and close to your body will contain the situation. You are aware that this is not a rational response. You're doing it anyway.
+{% else %}
+You look at your hands for a while longer. At some point you realize you're waiting for them to correct themselves, and they're not going to do that.
+{% endif %}
+
+The sound of traffic outside is perfectly normal. Somewhere a door closes.
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "discovery"
+
+# ── Beat 2: standing, moving through the room ─────────────────────────────
+
+[[actions]]
+id    = "discovery"
+label = "Continue"
+detail = "Get up. See what you're working with."
+prose = """
+{% if w.alwaysFemale() %}
+You get up and move through the apartment. The apartment is the same apartment.
+
+You look at yourself in the darkened screen of your phone on the nightstand — small, reversed, incomplete — and your reflection looks back. Still you. Still the face you're used to.
+
+The mirror will be clearer. You go to the bathroom.
+{% elif w.hasTrait("TRANS_WOMAN") %}
+You get up slowly — not from shock, but from care, the way you move when you're not yet sure what the new rules are. Your balance is different. Your center of gravity is lower. Your legs are different legs, and when you take the first step the floor receives you differently, and you stand there for a moment getting used to that.
+
+The apartment is exactly the same apartment. You're the only thing that changed.
+
+You catch your reflection in the dark screen of your phone on the nightstand and stop. It's not enough to see properly. You need the mirror.
+
+{% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
+On your way to the bathroom you notice you're moving carefully, placing your feet, as if you're handling something that might break. You've always moved through the world like it was mostly theoretical. Now the theory has become extremely specific.
+{% elif w.hasTrait("OUTGOING") %}
+Your first impulse is to call someone. This is your first impulse in most situations and it is an entirely useless impulse here, and you push it aside. There is no one to call. You don't have language for this yet, let alone a script.
+{% else %}
+You notice you're holding your breath. You let it out.
+{% endif %}
+{% else %}
+You get up.
+
+The mechanics of getting up are wrong in ways that take a second to isolate. Your balance is off — different, not worse, just wrong relative to thirty years of calibration. You stand at the side of the bed and your legs are your legs but they're not the legs you went to sleep with. Smoother. The muscle distribution is different. You are smaller in some specific sense that you can't fully quantify from the inside.
+
+You look down.
+
+The shirt you slept in doesn't fit right. It fits the way a shirt fits someone with a different body, which is correct, because you have a different body. There is something underneath the shirt that shouldn't be there. You look at it for a moment.
+
+{% if w.hasTrait("SHY") %}
+You pull the shirt down as far as it will go and hold it there. This helps nothing. You let go.
+{% elif w.hasTrait("AMBITIOUS") %}
+The part of your brain that manages logistics is already running. It's running because that's what it does — it ran through your commute, it ran through your performance reviews, it ran through every uncertain situation as a list of problems and their order. Right now it's running a list you haven't finished making yet, because you don't have all the variables.
+{% elif w.hasTrait("OUTGOING") %}
+You need to tell someone. The impulse is immediate and absolutely useless. You do not have a script for this phone call. "Hey, so something happened overnight" — no. You put the phone down without picking it up.
+{% else %}
+You stand there for a moment doing nothing in particular.
+{% endif %}
+
+Whatever happened last night happened, and now it's morning, and the bathroom is six feet away, and there's a mirror in the bathroom.
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "mirror"
+
+# ── Beat 3: the mirror ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "mirror"
+label = "Continue"
+detail = "The mirror. The thing you need to see."
+prose = """
+{% if w.alwaysFemale() %}
+Your face in the mirror is your face.
+
+You look at it for a long time anyway. The jaw, the eyes, the line of your nose — everything where it should be, everything as it's always been. The left eye fractionally larger than the right. The specific shade of your hair in this particular light. The small crease on your forehead you made your peace with years ago.
+
+All of it is there.
+
+Something is still different. You can't place it in the mirror. It's not in the reflection — it's behind the reflection, in whatever is doing the looking. You are yourself. Something also happened to you. You don't know yet how both of these things can be true at once.
+{% elif w.hasTrait("TRANS_WOMAN") %}
+The bathroom mirror catches you before you're ready, which is always how mirrors work.
+
+The face looking back is not the face you've been waking up to. The jaw is different — softer, the angles resolved into something less angular, something that looks like it was arrived at from a different direction. Your eyes are larger. The proportions of your face have shifted in ways you couldn't have drawn from memory but that you recognize, the way you recognize a song you've only heard in your head.
+
+*There you are.*
+
+{% if w.hasTrait("SHY") %}
+You look away almost immediately. Not from revulsion — from the opposite. You're not ready to look directly at it yet. You look at your hands instead, then at the wall, then slowly back. Small doses. Your brain needs time to stop bracing for the wrong thing.
+{% elif w.hasTrait("OVERACTIVE_IMAGINATION") %}
+You've imagined this moment in various forms for longer than you've been willing to admit. The imagined version was either better or worse, depending on the version. The actual version is quieter than any of them. You stand here, and you exist, and the face in the mirror exists, and there is less drama to it than the years of anticipating would suggest. You're not sure if this is disappointing or exactly right.
+{% else %}
+You look at yourself for a long time. Not cataloguing, not evaluating. Just looking. You've never been able to just look before. There was always something in the way.
+{% endif %}
+
+Your hands go to your face without instruction. Your cheekbones. The line of your jaw. You press your fingers to your cheek and the cheek presses back, real, present, here.
+{% else %}
+{% if w.hasTrait("SHY") %}
+You stand in front of the bathroom mirror for three seconds and then you turn away and sit on the edge of the tub.
+
+Not because you can't look. Because you need a moment first. You look at the tile instead, the grout lines, the corner of the soap dish. You give yourself thirty seconds to breathe.
+
+Then you look.
+{% else %}
+You stand in front of the bathroom mirror and look.
+{% endif %}
+
+The face looking back is not your face. Or: it is your face now, and it isn't the face you've had for however many years you've been alive. The jaw is softer. The nose is different. The eyes look back with the full, specific attention of someone watching to see how you're going to react. Different bone structure. Different everything.
+
+You are — smaller. Not just the face. The shoulders behind you in the mirror are narrower. You can see the line of a collarbone that wasn't there yesterday. Below that there are things your shirt is trying and failing to conceal, and you look at those too, because there is no advantage in not looking.
+
+{% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
+The strangest thing is how concrete it is. The scenarios you've run in your head — disaster scenarios, mostly, because that's where your brain goes — none of them included this specific detail, this exact quality of light, the way the mirror has a slight lean to the left that makes the reflection slightly trapezoidal. You've been imagining catastrophes in abstract. The actual thing is extremely literal.
+{% elif w.hasTrait("AMBITIOUS") %}
+You find yourself thinking about logistics again. At some point this week you're going to need — your brain itemizes, and you let it, because it is genuinely easier than finishing the sentence *you are looking at a body that is not the body you had yesterday.*
+{% elif w.hasTrait("OUTGOING") %}
+The thought arrives before you can stop it: *someone else has to know about this.* Not because you need help, exactly. Because this is the kind of thing that doesn't feel real until you say it out loud to another person. But you look at yourself in the mirror and realize you don't know where you'd start.
+{% else %}
+You look at yourself in the mirror for a long time. The face looks back. Neither of you looks away.
+{% endif %}
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "aftermath"
+
+# ── Beat 4: first interior reckoning ──────────────────────────────────────
+
+[[actions]]
+id    = "aftermath"
+label = "Continue"
+detail = "The world is still out there. That's the next problem."
+prose = """
+{% if w.alwaysFemale() %}
+You go back to the bedroom and sit on the edge of the bed.
+
+You were something last night and you are something this morning and the something is the same thing, mostly. You are yourself. You are intact. Whatever happened in the night didn't change your body, your voice, your face — nothing you can point to and say: that's it, that's what's different.
+
+But something is different. You are going to find out what.
+
+Outside, the city is starting its day. A bus goes by. The radiator ticks once and goes quiet. Whatever moved through this apartment last night is gone now, and you're the only one who knows it was here.
+{% elif w.hasTrait("TRANS_WOMAN") %}
+You go back to the bedroom and sit on the edge of the bed.
+
+There is a lot to process and you are not going to process all of it right now. Some of it you've been processing for years — in the abstract, in theory, in the private arithmetic of imagining something that always seemed just outside of reach. Now it's here, and it's not abstract, and your brain is attempting to update every assumption it's ever made about your life simultaneously, which is not a process that completes before breakfast.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The question that rises first, embarrassingly practical, is what this means for your plans. Your schedule. The specific shape of the life you've been building. Some of it doesn't change. Some of it changes enormously and you don't yet know which is which. You make a note to figure this out — not now, but soon, systematically, once you have slightly more information.
+{% elif w.hasTrait("SHY") %}
+You pull the covers back over yourself and sit there for a while, not hiding exactly, just contained. Small. You need to think before you do anything and thinking requires not being observed, even by a room, even by your own reflection three feet away through the open bathroom door.
+
+Eventually you'll have to get up. You know this. Right now, a few minutes.
+{% elif w.hasTrait("OUTGOING") %}
+You want to call your sister. Or your friend from work. Or the first person in your phone who would pick up at seven in the morning without needing a reason. You want to tell this to another person because you have always processed things by saying them out loud, and right now you have a lot to say and no one to say it to and the silence feels specific and large.
+{% else %}
+You sit with it for a while. No plan forming yet. Just the fact of it, and the morning, and the light coming through the curtains, and the person on the other side of that bathroom mirror who is waiting to find out what you're going to do next.
+{% endif %}
+
+Outside, the city is starting its day. A bus goes by. Someone's car alarm fires twice and stops. You don't know yet what this body means, what this life is going to look like from the inside, what it means to finally be here. But you're here, and the morning is here, and some things can wait until after coffee.
+{% else %}
+You go back to the bedroom and sit on the edge of the bed.
+
+Your body is different. You have tested this thoroughly. The evidence is not going to change.
+
+You have no framework for this. That's the part that keeps surfacing — not the fact of what happened, but the absence of any procedure for it. Every hard thing you have ever handled, you've handled by finding the right framework and applying it. This thing doesn't have a framework. There are no instructions. You have a body you don't recognize, a face that belongs to someone else, a voice that isn't yours, and it is seven in the morning on a Tuesday and you are sitting on the edge of your bed.
+
+{% if w.hasTrait("SHY") %}
+You pull the blanket around your shoulders and hold it there. This is the second time you've done something physically containing in the last ten minutes. You're aware of the pattern. You don't stop.
+
+Eventually you're going to have to engage with this. Stand up, make some kind of decision, do something. You know this. But not yet. A few more minutes of not yet.
+{% elif w.hasTrait("AMBITIOUS") %}
+The part of your brain that handles logistics will not stop running the list. Okay. Fine. Let it run the list. If you're going to deal with this — and you are going to deal with this, because you deal with things, that is what you do — then you need information. You need to understand what changed and what didn't and what the variables are, and you need to do it in the right order.
+
+You take a breath. You get a piece of paper. You start writing.
+{% elif w.hasTrait("OUTGOING") %}
+What you need, desperately and uselessly, is to talk to someone. This is always your first move. You process things out loud. You have a whole support network built around the principle that no problem is too weird to say out loud to the right person.
+
+The problem with this problem is that you genuinely do not know how to say it out loud. You try it quietly to yourself, in the empty bedroom. It sounds wrong. You try it a different way. Still wrong. The language you have doesn't fit what happened.
+
+You're going to figure out the language. You're going to have to.
+{% elif w.hasTrait("OVERACTIVE_IMAGINATION") %}
+You've thought about scenarios like this before — because your brain produces scenarios constantly, including the unlikely ones, including the impossible ones. You have run the tape on disasters of many kinds, and in all of them you handled it with more grace than you're currently managing.
+
+The thing about finally being inside the scenario is that all the mental preparation turns out to have been preparation for the wrong thing. You weren't preparing for this. You were preparing for a version of this that your brain could render from the outside. The inside is different.
+{% else %}
+You sit there for a while. No plan. Just the room, and the morning, and the weight of a body you've never met before sitting on the edge of your bed.
+
+Eventually you'll have to do something. Everyone always has to do something eventually. Right now you're doing nothing, which feels approximately correct.
+{% endif %}
+
+Outside, the city is starting. A bus goes by. Someone's car somewhere gives up honking on its own.
+
+You're going to have to figure out what to do next.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "TRANSFORMATION_WITNESSED"
 
   [[actions.next]]
   finish = true

@@ -598,7 +598,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
@@ -1083,7 +1083,11 @@ mod tests {
             id: "AGE_YOUNG".into(),
             description: "...".into(),
             category_type: undone_packs::CategoryType::Age,
-            members: vec!["LateTeen".into(), "EarlyTwenties".into(), "Twenties".into()],
+            members: vec![
+                "LateTeen".into(),
+                "EarlyTwenties".into(),
+                "MidLateTwenties".into(),
+            ],
         }]);
         let expr = parse("w.inCategory('AGE_YOUNG')").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
@@ -1132,14 +1136,18 @@ mod tests {
 
     #[test]
     fn beforeInCategory_returns_true_for_before_age() {
-        let world = make_world(); // before.age = Twenties
+        let world = make_world(); // before.age = MidLateTwenties
         let ctx = SceneCtx::new();
         let mut reg = undone_packs::PackRegistry::new();
         reg.register_categories(vec![undone_packs::CategoryDef {
             id: "AGE_YOUNG".into(),
             description: "...".into(),
             category_type: undone_packs::CategoryType::Age,
-            members: vec!["LateTeen".into(), "EarlyTwenties".into(), "Twenties".into()],
+            members: vec![
+                "LateTeen".into(),
+                "EarlyTwenties".into(),
+                "MidLateTwenties".into(),
+            ],
         }]);
         let expr = parse("w.beforeInCategory('AGE_YOUNG')").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());

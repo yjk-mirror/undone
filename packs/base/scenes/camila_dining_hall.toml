@@ -1,0 +1,98 @@
+[scene]
+id          = "base::camila_dining_hall"
+pack        = "base"
+description = "The dining hall. Social hierarchies, inverted. The shape of what she doesn't know."
+
+[intro]
+prose = """
+The Ivy dining hall is large enough that it has factions. She can see them from the entrance — the clustered tables, the particular density of certain groups, the territories that formed around the second week without any apparent announcement. In high school she knew exactly where she stood in this kind of map. She was good at rooms. She read the room and then put herself correctly in it.
+
+She picks up a tray and joins the line. The woman behind her — a sophomore, maybe a junior, one of those people who carry themselves with the specific confidence of having survived a year of this — steps closer to point at the grain bowl and says, "Get the harissa, not the tahini, the tahini's been sitting out all morning." She says it like they know each other. Like helping is just a thing she does.
+
+{% if not w.alwaysFemale() %}
+Raul would not have received that. Not because she's especially generous — Camila doesn't know her — but because the calculus of a woman offering that kind of casual friendliness to a stranger skews by who the stranger is.
+{% endif %}
+
+She gets the harissa. It's good. She's standing with her tray, looking at the factions map, and doing the math.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "hierarchy"
+label  = "Find somewhere to sit"
+detail = "The room has rules. You're learning them from the wrong side."
+prose = """
+She identifies a table with space at the end — three people already there, talking, not an established territory. She walks over. One of the guys at the table — broad shoulders, easy sprawl, the kind of person who takes up space without thinking about it — glances up and then back down. His backpack is on the seat next to him.
+
+He doesn't move it.
+
+{% if not w.alwaysFemale() %}
+She stands there for a second. In high school she was the one with the backpack on the seat — not to exclude anyone, but because spaces filled with the people she expected them to fill with, and everyone else was background. She knew she was doing it. She just didn't know what it looked like from out here.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Is that seat taken?" she asks, meaning the backpack.
+
+He looks up. There's a half-second where he reads her — the same way she reads rooms, she's watching him do it — and then he moves the backpack with a shrug and gestures at the seat.
+
+She sits. He doesn't start a conversation. She doesn't need him to. But she noticed the half-second. She's going to be thinking about what he was calculating for the rest of the meal.
+{% elif w.hasTrait("OUTGOING") %}
+She's halfway into "is that seat free" when she reads his face and stops. He's not hostile. He's just not interested in rearranging for her. She knows that face — she's made that face. She changes the sentence mid-word into "never mind, I see another spot," which comes out almost natural, and walks away toward a table by the window.
+
+The table by the window has two women who move their bags without being asked and say hello. The conversation that follows is fine and ordinary and she's paying a different kind of attention the entire time, turning over what happened with the backpack like an object she can't quite identify.
+{% else %}
+She doesn't say anything. She finds another table. This is probably the clearest thing anyone has shown her all week and nobody said a word.
+{% endif %}
+{% else %}
+She scans for a different table. There are other options. She takes one, a two-person table against the wall, and eats alone, which is fine. She's not bothered by eating alone. She catches herself watching the big table in the center — who gets waved over, who gets the backpack moved, who gets the half-second look and who doesn't get it — and she's taking notes she didn't mean to take.
+{% endif %}
+"""
+
+  [[actions.next]]
+  goto = "week"
+
+[[actions]]
+id     = "week"
+label  = "Sit with the week"
+detail = "One week. The shape of what she doesn't know."
+prose = """
+She finishes the grain bowl. Gets coffee. Sits.
+
+The dining hall noise is steady around her — trays, conversations, the scrape of chairs, someone across the room who laughs loud and specific, the kind of laugh that other people's tables hear. The world has its own life in here. She's just eating in it.
+
+{% if not w.alwaysFemale() %}
+{% if w.hasTrait("TRANS_WOMAN") %}
+One week. She's been doing the inventory the whole time — what's different, what's easier, what she'd expected and what she didn't. The kindness in the lunch line was one she knew was coming eventually. She had language for it already. That's the part that people on the outside don't understand about this: she knew the theory. She's spent years knowing the theory. What's been different this week is the practice of it, the way the theory fits the actual world less cleanly than it looked on paper.
+
+She's not surprised. She's just learning where the seams are.
+{% else %}
+{% if w.getSkill("FEMININITY") < 25 %}
+She tries to think through what she actually knows versus what she assumed. In high school she understood the hierarchy because she was running the same operating system as everyone else in it — the rules were written in a language she spoke natively. This place is running a different OS. She keeps submitting commands that don't work and getting outputs she didn't expect.
+
+She called her mom on Tuesday. Everything's great, she said. Classes are interesting. I'm making friends. Her mom said she sounded tired. She said she was fine, just adjusting. She is fine. She is adjusting. She just can't explain what she's adjusting *to*, because the explanation starts three weeks ago and she doesn't have the words and even if she did, this is not a conversation that happens over the phone on a Tuesday.
+{% elif w.getSkill("FEMININITY") < 50 %}
+She's been cataloguing. Not deliberately — it's just happening. The woman in the lunch line. The backpack. The junior who held a door yesterday and then did a visible recalibration when she said thank you without the particular warmth he'd been expecting. All these small data points accumulating into a picture she doesn't have a frame for yet.
+
+She called home this week. Her dad asked about her classes. Her mom asked if she was eating. She said yes to both. There was a thing she wanted to say, hovering right at the surface, and she said nothing. She doesn't know who she'd even explain it to.
+{% else %}
+She's been at this for a week and she's made a list, not on paper but in the back of her head, of things she was wrong about. The list is longer than she thought it would be. Not catastrophically longer. Just longer.
+
+She called her dad yesterday. He wanted to hear about her classes. She told him about her classes. He sounded proud in the way he always sounds proud, which is the thing she misses — being known well enough to be predicted. Here, nobody knows what to expect from her, and she doesn't know what to expect from herself.
+{% endif %}
+{% endif %}
+{% else %}
+The first week of anything is mostly information gathering. She's gotten some. The dining hall, the library, the specific texture of lectures where nobody asks questions versus ones where half the room has opinions. The kindness in the lunch line. The backpack.
+
+She's not going to understand this place in a week. She knows that. A week is enough to know the shape of what she doesn't know yet.
+{% endif %}
+
+She finishes the coffee, drops the tray, and walks back to the dorm.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::camila_opening"
+  to_state = "first_week"
+
+  [[actions.next]]
+  finish = true

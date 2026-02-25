@@ -31,7 +31,7 @@ const BREAST_SIZES: &[BreastSize] = &[
 ];
 const AGES: &[Age] = &[
     Age::EarlyTwenties,
-    Age::Twenties,
+    Age::MidLateTwenties,
     Age::LateTwenties,
     Age::Thirties,
 ];

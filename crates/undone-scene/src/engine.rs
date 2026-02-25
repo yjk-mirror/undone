@@ -567,7 +567,7 @@ mod tests {
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),
-                    age: Age::Twenties,
+                    age: Age::MidLateTwenties,
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
@@ -838,7 +838,7 @@ mod tests {
         let npc = MaleNpc {
             core: NpcCore {
                 name: "Jake".into(),
-                age: Age::Twenties,
+                age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
                 hair_colour: "brown".into(),

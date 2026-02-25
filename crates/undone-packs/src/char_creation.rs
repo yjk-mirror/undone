@@ -171,7 +171,7 @@ mod tests {
             origin: PcOrigin::CisMaleTransformed,
             before: Some(BeforeIdentity {
                 name: "Evan".into(),
-                age: Age::Twenties,
+                age: Age::MidLateTwenties,
                 race: "white".into(),
                 sexuality: BeforeSexuality::AttractedToWomen,
                 figure: MaleFigure::Average,
@@ -195,7 +195,7 @@ mod tests {
         assert_eq!(world.player.name_fem, "Eva");
         assert_eq!(
             world.player.before.as_ref().map(|b| b.age),
-            Some(Age::Twenties)
+            Some(Age::MidLateTwenties)
         );
         assert_eq!(world.player.origin, PcOrigin::CisMaleTransformed);
         assert_eq!(world.game_data.week, 0);
@@ -257,7 +257,7 @@ mod tests {
             origin: PcOrigin::TransWomanTransformed,
             before: Some(BeforeIdentity {
                 name: "Evan".into(),
-                age: Age::Twenties,
+                age: Age::MidLateTwenties,
                 race: "white".into(),
                 sexuality: BeforeSexuality::AttractedToWomen,
                 figure: MaleFigure::Average,

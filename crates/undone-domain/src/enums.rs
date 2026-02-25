@@ -106,7 +106,7 @@ pub enum BreastSize {
 pub enum Age {
     LateTeen,
     EarlyTwenties,
-    Twenties,
+    MidLateTwenties,
     LateTwenties,
     Thirties,
     Forties,
@@ -305,7 +305,7 @@ impl std::fmt::Display for Age {
         match self {
             Age::LateTeen => write!(f, "Late Teen"),
             Age::EarlyTwenties => write!(f, "Early Twenties"),
-            Age::Twenties => write!(f, "Twenties"),
+            Age::MidLateTwenties => write!(f, "Mid to Late 20s"),
             Age::LateTwenties => write!(f, "Late Twenties"),
             Age::Thirties => write!(f, "Thirties"),
             Age::Forties => write!(f, "Forties"),
