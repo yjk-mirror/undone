@@ -14,6 +14,44 @@ use crate::game_state::{start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
 use crate::{AppPhase, AppSignals, PartialCharState};
 
+// ── Preset character data ─────────────────────────────────────────────────────
+
+struct PresetData {
+    before_name: &'static str,
+    before_age: Age,
+    origin: PcOrigin,
+    before_sexuality: BeforeSexuality,
+    before_race: &'static str,
+    trait_ids: &'static [&'static str],
+    blurb: &'static str,
+}
+
+const PRESET_ROBIN: PresetData = PresetData {
+    before_name: "Robin",
+    before_age: Age::Thirties,
+    origin: PcOrigin::CisMaleTransformed,
+    before_sexuality: BeforeSexuality::AttractedToWomen,
+    before_race: "White",
+    trait_ids: &["AMBITIOUS", "ANALYTICAL", "DOWN_TO_EARTH"],
+    blurb: "You're thirty-two, a software engineer with ten years of experience. \
+            You took a job offer in a city you didn't know — new company, new start, \
+            boxes shipped to an apartment you've never seen. When things go sideways, \
+            you inventory and solve. You're very good at that.",
+};
+
+const PRESET_RAUL: PresetData = PresetData {
+    before_name: "Raul",
+    before_age: Age::LateTeen,
+    origin: PcOrigin::CisMaleTransformed,
+    before_sexuality: BeforeSexuality::AttractedToWomen,
+    before_race: "Latina",
+    trait_ids: &["AMBITIOUS", "CONFIDENT", "OUTGOING"],
+    blurb: "You're eighteen, starting at a university your family has talked about for years. \
+            You arrived with your expectations calibrated: you knew who you were, where you \
+            were headed, and what the next four years were supposed to look like. \
+            Things have always worked out. You've never had a real reason to think they wouldn't.",
+};
+
 // ── PC origin helpers ─────────────────────────────────────────────────────────
 
 fn origin_from_idx(idx: u8) -> PcOrigin {
@@ -67,11 +105,15 @@ struct BeforeFormSignals {
     trait_ambitious: RwSignal<bool>,
     trait_outgoing: RwSignal<bool>,
     trait_overactive_imagination: RwSignal<bool>,
+    trait_analytical: RwSignal<bool>,
+    trait_confident: RwSignal<bool>,
     trait_beautiful: RwSignal<bool>,
     trait_plain: RwSignal<bool>,
     // content prefs
     include_rough: RwSignal<bool>,
     likes_rough: RwSignal<bool>,
+    // mode: 0=Robin preset, 1=Raul preset, 2=Custom
+    char_mode: RwSignal<u8>,
 }
 
 impl BeforeFormSignals {
@@ -94,10 +136,13 @@ impl BeforeFormSignals {
             trait_ambitious: RwSignal::new(false),
             trait_outgoing: RwSignal::new(false),
             trait_overactive_imagination: RwSignal::new(false),
+            trait_analytical: RwSignal::new(false),
+            trait_confident: RwSignal::new(false),
             trait_beautiful: RwSignal::new(false),
             trait_plain: RwSignal::new(false),
             include_rough: RwSignal::new(false),
             likes_rough: RwSignal::new(false),
+            char_mode: RwSignal::new(0u8),
         }
     }
 }
@@ -137,6 +182,7 @@ pub fn char_creation_view(
     partial_char: RwSignal<Option<PartialCharState>>,
 ) -> impl View {
     let form = BeforeFormSignals::new();
+    let char_mode = form.char_mode;
 
     let races_list = read_races(&pre_state);
     if let Some(first) = races_list.first() {
@@ -146,11 +192,33 @@ pub fn char_creation_view(
 
     let next_btn = build_next_button(signals, form, pre_state, game_state, partial_char);
 
+    let races_for_dyn = races_list;
+    let names_for_dyn = male_names;
+    let main_section = dyn_container(
+        move || char_mode.get(),
+        move |mode| {
+            if mode == 2 {
+                v_stack((
+                    section_your_past(signals, form, races_for_dyn.clone(), names_for_dyn.clone()),
+                    section_personality(signals, form),
+                    section_content_prefs(signals, form),
+                ))
+                .into_any()
+            } else {
+                let preset: &'static PresetData = if mode == 0 {
+                    &PRESET_ROBIN
+                } else {
+                    &PRESET_RAUL
+                };
+                section_preset_detail(signals, preset).into_any()
+            }
+        },
+    );
+
     let content = v_stack((
         heading("Your Story Begins", signals),
-        section_your_past(signals, form, races_list, male_names),
-        section_personality(signals, form),
-        section_content_prefs(signals, form),
+        section_preset_select(signals, char_mode),
+        main_section,
         next_btn,
         empty().style(|s| s.height(40.0)),
     ))
@@ -560,6 +628,8 @@ fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl Vie
                 form.trait_overactive_imagination,
                 signals,
             ),
+            trait_checkbox("Analytical", form.trait_analytical, signals),
+            trait_checkbox("Confident", form.trait_confident, signals),
         ))
         .style(|s| s.gap(16.0).flex_wrap(floem::style::FlexWrap::Wrap)),
     ));
@@ -615,6 +685,69 @@ fn section_content_prefs(signals: AppSignals, form: BeforeFormSignals) -> impl V
     .style(section_style())
 }
 
+// ── section: Preset select ────────────────────────────────────────────────────
+
+fn section_preset_select(signals: AppSignals, char_mode: RwSignal<u8>) -> impl View {
+    v_stack((
+        section_title("Who Were You?", signals),
+        radio_opt(
+            "Robin",
+            "Thirty-two. Software engineer, a decade in. Moved to a city you didn't know.",
+            move || char_mode.get() == 0,
+            move || char_mode.set(0),
+            signals,
+        ),
+        radio_opt(
+            "Raul",
+            "Eighteen. Starting university. Expectations carefully calibrated.",
+            move || char_mode.get() == 1,
+            move || char_mode.set(1),
+            signals,
+        ),
+        radio_opt(
+            "Create your own",
+            "Customize your origin, name, traits, and background.",
+            move || char_mode.get() == 2,
+            move || char_mode.set(2),
+            signals,
+        ),
+    ))
+    .style(section_style())
+}
+
+// ── section: Preset detail ────────────────────────────────────────────────────
+
+fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> impl View {
+    let traits_display = preset
+        .trait_ids
+        .iter()
+        .map(|id| {
+            let s = id.to_lowercase().replace('_', " ");
+            let mut c = s.chars();
+            match c.next() {
+                None => String::new(),
+                Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(", ");
+
+    v_stack((
+        label(move || preset.blurb.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.font_size(14.0)
+                .color(colors.ink)
+                .margin_bottom(20.0)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
+        read_only_row("Name before", preset.before_name.to_string(), signals),
+        read_only_row("Age before", preset.before_age.to_string(), signals),
+        read_only_row("Race", preset.before_race.to_string(), signals),
+        read_only_row("Starting traits", traits_display, signals),
+    ))
+    .style(|s| s.flex_col().width_full().margin_bottom(24.0))
+}
+
 // ── Next button ───────────────────────────────────────────────────────────────
 
 fn build_next_button(
@@ -627,62 +760,96 @@ fn build_next_button(
     label(|| "Next \u{2192}".to_string())
         .keyboard_navigable()
         .on_click_stop(move |_| {
-            let origin_idx = form.origin_idx.get_untracked();
-            // Guard: non-AlwaysFemale origins require a name before proceeding.
-            if origin_idx != 3 && form.before_name.get_untracked().trim().is_empty() {
-                return;
-            }
-            let origin = origin_from_idx(origin_idx);
+            let char_mode = form.char_mode.get_untracked();
 
-            // Collect starting traits
-            let mut trait_names: Vec<&'static str> = Vec::new();
-            if form.trait_shy.get_untracked() {
-                trait_names.push("SHY");
-            }
-            if form.trait_cute.get_untracked() {
-                trait_names.push("CUTE");
-            }
-            if form.trait_posh.get_untracked() {
-                trait_names.push("POSH");
-            }
-            if form.trait_sultry.get_untracked() {
-                trait_names.push("SULTRY");
-            }
-            if form.trait_down_to_earth.get_untracked() {
-                trait_names.push("DOWN_TO_EARTH");
-            }
-            if form.trait_bitchy.get_untracked() {
-                trait_names.push("BITCHY");
-            }
-            if form.trait_refined.get_untracked() {
-                trait_names.push("REFINED");
-            }
-            if form.trait_romantic.get_untracked() {
-                trait_names.push("ROMANTIC");
-            }
-            if form.trait_flirty.get_untracked() {
-                trait_names.push("FLIRTY");
-            }
-            if form.trait_ambitious.get_untracked() {
-                trait_names.push("AMBITIOUS");
-            }
-            if form.trait_outgoing.get_untracked() {
-                trait_names.push("OUTGOING");
-            }
-            if form.trait_overactive_imagination.get_untracked() {
-                trait_names.push("OVERACTIVE_IMAGINATION");
-            }
-            if form.trait_beautiful.get_untracked() {
-                trait_names.push("BEAUTIFUL");
-            }
-            if form.trait_plain.get_untracked() {
-                trait_names.push("PLAIN");
-            }
-            if !form.include_rough.get_untracked() {
-                trait_names.push("BLOCK_ROUGH");
-            }
-            if form.likes_rough.get_untracked() {
-                trait_names.push("LIKES_ROUGH");
+            let origin: PcOrigin;
+            let before_name: String;
+            let before_age: Age;
+            let before_race: String;
+            let before_sexuality: BeforeSexuality;
+            let trait_names: Vec<&'static str>;
+
+            if char_mode < 2 {
+                // Preset mode — Robin (0) or Raul (1)
+                let preset: &'static PresetData = if char_mode == 0 {
+                    &PRESET_ROBIN
+                } else {
+                    &PRESET_RAUL
+                };
+                origin = preset.origin;
+                before_name = preset.before_name.to_string();
+                before_age = preset.before_age;
+                before_race = preset.before_race.to_string();
+                before_sexuality = preset.before_sexuality;
+                trait_names = preset.trait_ids.to_vec();
+            } else {
+                // Custom mode
+                let origin_idx = form.origin_idx.get_untracked();
+                if origin_idx != 3 && form.before_name.get_untracked().trim().is_empty() {
+                    return;
+                }
+                origin = origin_from_idx(origin_idx);
+                before_name = form.before_name.get_untracked();
+                before_age = form.before_age.get_untracked();
+                before_race = form.before_race.get_untracked();
+                before_sexuality = form.before_sexuality.get_untracked();
+
+                let mut tn: Vec<&'static str> = Vec::new();
+                if form.trait_shy.get_untracked() {
+                    tn.push("SHY");
+                }
+                if form.trait_cute.get_untracked() {
+                    tn.push("CUTE");
+                }
+                if form.trait_posh.get_untracked() {
+                    tn.push("POSH");
+                }
+                if form.trait_sultry.get_untracked() {
+                    tn.push("SULTRY");
+                }
+                if form.trait_down_to_earth.get_untracked() {
+                    tn.push("DOWN_TO_EARTH");
+                }
+                if form.trait_bitchy.get_untracked() {
+                    tn.push("BITCHY");
+                }
+                if form.trait_refined.get_untracked() {
+                    tn.push("REFINED");
+                }
+                if form.trait_romantic.get_untracked() {
+                    tn.push("ROMANTIC");
+                }
+                if form.trait_flirty.get_untracked() {
+                    tn.push("FLIRTY");
+                }
+                if form.trait_ambitious.get_untracked() {
+                    tn.push("AMBITIOUS");
+                }
+                if form.trait_outgoing.get_untracked() {
+                    tn.push("OUTGOING");
+                }
+                if form.trait_overactive_imagination.get_untracked() {
+                    tn.push("OVERACTIVE_IMAGINATION");
+                }
+                if form.trait_analytical.get_untracked() {
+                    tn.push("ANALYTICAL");
+                }
+                if form.trait_confident.get_untracked() {
+                    tn.push("CONFIDENT");
+                }
+                if form.trait_beautiful.get_untracked() {
+                    tn.push("BEAUTIFUL");
+                }
+                if form.trait_plain.get_untracked() {
+                    tn.push("PLAIN");
+                }
+                if !form.include_rough.get_untracked() {
+                    tn.push("BLOCK_ROUGH");
+                }
+                if form.likes_rough.get_untracked() {
+                    tn.push("LIKES_ROUGH");
+                }
+                trait_names = tn;
             }
 
             // Resolve trait IDs from registry
@@ -700,10 +867,10 @@ fn build_next_button(
 
             let partial = PartialCharState {
                 origin,
-                before_name: form.before_name.get_untracked(),
-                before_age: form.before_age.get_untracked(),
-                before_race: form.before_race.get_untracked(),
-                before_sexuality: form.before_sexuality.get_untracked(),
+                before_name: before_name.clone(),
+                before_age,
+                before_race: before_race.clone(),
+                before_sexuality,
                 starting_traits,
             };
             partial_char.set(Some(partial.clone()));
@@ -908,6 +1075,26 @@ fn form_row(label_text: &'static str, signals: AppSignals, input: impl IntoView)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
         input.into_view(),
+    ))
+    .style(|s| s.items_center().margin_bottom(12.0))
+}
+
+fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -> impl View {
+    h_stack((
+        label(move || label_text.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.width(180.0)
+                .font_size(14.0)
+                .color(colors.ink_dim)
+                .items_center()
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
+        label(move || value.clone()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.font_size(14.0)
+                .color(colors.ink)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
     ))
     .style(|s| s.items_center().margin_bottom(12.0))
 }

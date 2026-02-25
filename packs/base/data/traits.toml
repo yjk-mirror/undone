@@ -86,6 +86,20 @@ group       = "personality"
 conflicts   = ["SHY"]
 
 [[trait]]
+id          = "ANALYTICAL"
+name        = "Analytical"
+description = "Reaches for frameworks before feelings. Thinks in systems."
+hidden      = false
+group       = "personality"
+
+[[trait]]
+id          = "CONFIDENT"
+name        = "Confident"
+description = "Settled in herself. Doesn't need the room's approval."
+hidden      = false
+group       = "personality"
+
+[[trait]]
 id          = "PLAIN"
 name        = "Plain"
 description = "A modelling career is out of the question."
