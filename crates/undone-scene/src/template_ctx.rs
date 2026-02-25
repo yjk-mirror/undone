@@ -34,6 +34,36 @@ pub struct PlayerCtx {
     pub arousal: String,
     /// Display string for alcohol level, e.g. "Sober"
     pub alcohol: String,
+
+    // Physical attributes (Debug variant names as strings)
+    pub height: String,
+    pub figure: String,
+    pub breasts: String,
+    pub butt: String,
+    pub waist: String,
+    pub lips: String,
+    pub hair_colour: String,
+    pub hair_length: String,
+    pub eye_colour: String,
+    pub skin_tone: String,
+    pub complexion: String,
+    pub race: String,
+    pub age: String,
+
+    // Sexual/intimate attributes
+    pub nipple_sensitivity: String,
+    pub clit_sensitivity: String,
+    pub pubic_hair: String,
+    pub inner_labia: String,
+    pub wetness: String,
+
+    // Before-life attributes (empty string if no before identity)
+    pub before_height: String,
+    pub before_hair_colour: String,
+    pub before_eye_colour: String,
+    pub before_skin_tone: String,
+    pub before_penis_size: String,
+    pub before_figure: String,
 }
 
 impl fmt::Display for PlayerCtx {
@@ -83,6 +113,37 @@ impl Object for PlayerCtx {
             "getAlcohol" => Ok(Value::from(self.alcohol.as_str())),
             "wasMale" => Ok(Value::from(self.origin.was_male_bodied())),
             "wasTransformed" => Ok(Value::from(self.origin.was_transformed())),
+
+            // Physical attributes
+            "getHeight" => Ok(Value::from(self.height.as_str())),
+            "getFigure" => Ok(Value::from(self.figure.as_str())),
+            "getBreasts" => Ok(Value::from(self.breasts.as_str())),
+            "getButt" => Ok(Value::from(self.butt.as_str())),
+            "getWaist" => Ok(Value::from(self.waist.as_str())),
+            "getLips" => Ok(Value::from(self.lips.as_str())),
+            "getHairColour" => Ok(Value::from(self.hair_colour.as_str())),
+            "getHairLength" => Ok(Value::from(self.hair_length.as_str())),
+            "getEyeColour" => Ok(Value::from(self.eye_colour.as_str())),
+            "getSkinTone" => Ok(Value::from(self.skin_tone.as_str())),
+            "getComplexion" => Ok(Value::from(self.complexion.as_str())),
+            "getRace" => Ok(Value::from(self.race.as_str())),
+            "getAge" => Ok(Value::from(self.age.as_str())),
+
+            // Sexual/intimate attributes
+            "getNippleSensitivity" => Ok(Value::from(self.nipple_sensitivity.as_str())),
+            "getClitSensitivity" => Ok(Value::from(self.clit_sensitivity.as_str())),
+            "getPubicHair" => Ok(Value::from(self.pubic_hair.as_str())),
+            "getInnerLabia" => Ok(Value::from(self.inner_labia.as_str())),
+            "getWetness" => Ok(Value::from(self.wetness.as_str())),
+
+            // Before-life attributes
+            "beforeHeight" => Ok(Value::from(self.before_height.as_str())),
+            "beforeHairColour" => Ok(Value::from(self.before_hair_colour.as_str())),
+            "beforeEyeColour" => Ok(Value::from(self.before_eye_colour.as_str())),
+            "beforeSkinTone" => Ok(Value::from(self.before_skin_tone.as_str())),
+            "beforePenisSize" => Ok(Value::from(self.before_penis_size.as_str())),
+            "beforeFigure" => Ok(Value::from(self.before_figure.as_str())),
+
             _ => Err(Error::new(
                 ErrorKind::UnknownMethod,
                 format!("w has no method '{method}'"),
@@ -235,19 +296,71 @@ pub fn render_prose(
         })
         .collect();
 
+    let p = &world.player;
+
+    // Extract before-life attribute strings
+    let (bh, bhc, bec, bst, bps, bf) = match &p.before {
+        Some(b) => (
+            format!("{:?}", b.height),
+            format!("{:?}", b.hair_colour),
+            format!("{:?}", b.eye_colour),
+            format!("{:?}", b.skin_tone),
+            format!("{:?}", b.penis_size),
+            format!("{:?}", b.figure),
+        ),
+        None => (
+            String::new(),
+            String::new(),
+            String::new(),
+            String::new(),
+            String::new(),
+            String::new(),
+        ),
+    };
+
     let player_ctx = PlayerCtx {
         trait_strings,
-        virgin: world.player.virgin,
-        origin: world.player.origin,
-        partner: world.player.partner.is_some(),
-        on_pill: world.player.on_pill,
-        pregnant: world.player.pregnancy.is_some(),
+        virgin: p.virgin,
+        origin: p.origin,
+        partner: p.partner.is_some(),
+        on_pill: p.on_pill,
+        pregnant: p.pregnancy.is_some(),
         skills,
-        money: world.player.money,
-        stress: world.player.stress,
-        anxiety: world.player.anxiety,
-        arousal: format!("{:?}", world.player.arousal),
-        alcohol: format!("{:?}", world.player.alcohol),
+        money: p.money,
+        stress: p.stress,
+        anxiety: p.anxiety,
+        arousal: format!("{:?}", p.arousal),
+        alcohol: format!("{:?}", p.alcohol),
+
+        // Physical attributes
+        height: format!("{:?}", p.height),
+        figure: format!("{:?}", p.figure),
+        breasts: format!("{:?}", p.breasts),
+        butt: format!("{:?}", p.butt),
+        waist: format!("{:?}", p.waist),
+        lips: format!("{:?}", p.lips),
+        hair_colour: format!("{:?}", p.hair_colour),
+        hair_length: format!("{:?}", p.hair_length),
+        eye_colour: format!("{:?}", p.eye_colour),
+        skin_tone: format!("{:?}", p.skin_tone),
+        complexion: format!("{:?}", p.complexion),
+        race: p.race.clone(),
+        age: format!("{:?}", p.age),
+
+        // Sexual/intimate attributes
+        nipple_sensitivity: format!("{:?}", p.nipple_sensitivity),
+        clit_sensitivity: format!("{:?}", p.clit_sensitivity),
+        pubic_hair: format!("{:?}", p.pubic_hair),
+        inner_labia: format!("{:?}", p.inner_labia),
+        wetness: format!("{:?}", p.wetness_baseline),
+
+        // Before-life attributes
+        before_height: bh,
+        before_hair_colour: bhc,
+        before_eye_colour: bec,
+        before_skin_tone: bst,
+        before_penis_size: bps,
+        before_figure: bf,
     };
 
     let game_data_ctx = GameDataCtx {
@@ -301,14 +414,31 @@ mod tests {
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
+                    height: Height::Average,
+                    hair_colour: HairColour::DarkBrown,
+                    eye_colour: EyeColour::Brown,
+                    skin_tone: SkinTone::Medium,
+                    penis_size: PenisSize::Average,
                     traits: HashSet::new(),
                 }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
-                breasts: BreastSize::Large,
-                eye_colour: "brown".into(),
-                hair_colour: "dark".into(),
+                breasts: BreastSize::Full,
+                eye_colour: EyeColour::Brown,
+                hair_colour: HairColour::DarkBrown,
+                height: Height::Average,
+                hair_length: HairLength::Shoulder,
+                skin_tone: SkinTone::Medium,
+                complexion: Complexion::Normal,
+                butt: ButtSize::Round,
+                waist: WaistSize::Average,
+                lips: LipShape::Average,
+                nipple_sensitivity: NippleSensitivity::Normal,
+                clit_sensitivity: ClitSensitivity::Normal,
+                pubic_hair: PubicHairStyle::Trimmed,
+                inner_labia: InnerLabiaSize::Average,
+                wetness_baseline: WetnessBaseline::Normal,
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 100,

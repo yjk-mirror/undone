@@ -526,6 +526,65 @@ pub fn eval_call_string(
             "getAge" => Ok(format!("{:?}", world.player.age)),
             "getArousal" => Ok(format!("{:?}", world.player.arousal)),
             "getAlcohol" => Ok(format!("{:?}", world.player.alcohol)),
+
+            // Physical attributes
+            "getHeight" => Ok(format!("{:?}", world.player.height)),
+            "getFigure" => Ok(format!("{:?}", world.player.figure)),
+            "getBreasts" => Ok(format!("{:?}", world.player.breasts)),
+            "getButt" => Ok(format!("{:?}", world.player.butt)),
+            "getWaist" => Ok(format!("{:?}", world.player.waist)),
+            "getLips" => Ok(format!("{:?}", world.player.lips)),
+            "getHairColour" => Ok(format!("{:?}", world.player.hair_colour)),
+            "getHairLength" => Ok(format!("{:?}", world.player.hair_length)),
+            "getEyeColour" => Ok(format!("{:?}", world.player.eye_colour)),
+            "getSkinTone" => Ok(format!("{:?}", world.player.skin_tone)),
+            "getComplexion" => Ok(format!("{:?}", world.player.complexion)),
+
+            // Sexual/intimate attributes
+            "getNippleSensitivity" => Ok(format!("{:?}", world.player.nipple_sensitivity)),
+            "getClitSensitivity" => Ok(format!("{:?}", world.player.clit_sensitivity)),
+            "getPubicHair" => Ok(format!("{:?}", world.player.pubic_hair)),
+            "getInnerLabia" => Ok(format!("{:?}", world.player.inner_labia)),
+            "getWetness" => Ok(format!("{:?}", world.player.wetness_baseline)),
+
+            // Before-life attributes
+            "beforeHeight" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.height))
+                .unwrap_or_default()),
+            "beforeHairColour" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.hair_colour))
+                .unwrap_or_default()),
+            "beforeEyeColour" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.eye_colour))
+                .unwrap_or_default()),
+            "beforeSkinTone" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.skin_tone))
+                .unwrap_or_default()),
+            "beforePenisSize" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.penis_size))
+                .unwrap_or_default()),
+            "beforeFigure" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.figure))
+                .unwrap_or_default()),
+
             _ => Err(EvalError::UnknownMethod {
                 receiver: "w".into(),
                 method: call.method.clone(),
@@ -602,14 +661,31 @@ mod tests {
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
+                    height: Height::Average,
+                    hair_colour: HairColour::DarkBrown,
+                    eye_colour: EyeColour::Brown,
+                    skin_tone: SkinTone::Medium,
+                    penis_size: PenisSize::Average,
                     traits: HashSet::new(),
                 }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
-                breasts: BreastSize::Large,
-                eye_colour: "brown".into(),
-                hair_colour: "dark".into(),
+                breasts: BreastSize::Full,
+                eye_colour: EyeColour::Brown,
+                hair_colour: HairColour::DarkBrown,
+                height: Height::Average,
+                hair_length: HairLength::Shoulder,
+                skin_tone: SkinTone::Medium,
+                complexion: Complexion::Normal,
+                butt: ButtSize::Round,
+                waist: WaistSize::Average,
+                lips: LipShape::Average,
+                nipple_sensitivity: NippleSensitivity::Normal,
+                clit_sensitivity: ClitSensitivity::Normal,
+                pubic_hair: PubicHairStyle::Trimmed,
+                inner_labia: InnerLabiaSize::Average,
+                wetness_baseline: WetnessBaseline::Normal,
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 500,

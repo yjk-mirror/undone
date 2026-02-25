@@ -12,3 +12,233 @@ description = "Number of dates the player has gone on."
 id          = "WEEKS_WORKED"
 name        = "Weeks Worked"
 description = "Number of weeks the player has worked."
+
+# Social experience counters
+
+[[stat]]
+id          = "TIMES_CATCALLED"
+name        = "Times Catcalled"
+description = "Street harassment count."
+
+[[stat]]
+id          = "TIMES_HIT_ON"
+name        = "Times Hit On"
+description = "Unsolicited approaches."
+
+[[stat]]
+id          = "TIMES_CRIED"
+name        = "Times Cried"
+description = "Times she cried."
+
+[[stat]]
+id          = "COMPLIMENTS_RECEIVED"
+name        = "Compliments Received"
+description = "Compliments accumulated."
+
+[[stat]]
+id          = "ARGUMENTS_HAD"
+name        = "Arguments Had"
+description = "Conflicts and fights."
+
+[[stat]]
+id          = "NIGHTS_OUT"
+name        = "Nights Out"
+description = "Bars, clubs, parties attended."
+
+[[stat]]
+id          = "TIMES_DRUNK"
+name        = "Times Drunk"
+description = "Times she got drunk."
+
+[[stat]]
+id          = "BREAKDOWNS"
+name        = "Breakdowns"
+description = "Emotional collapses."
+
+# Sexual experience counters
+
+[[stat]]
+id          = "TIMES_HAD_SEX"
+name        = "Times Had Sex"
+description = "PIV encounters."
+
+[[stat]]
+id          = "TIMES_GAVE_ORAL"
+name        = "Times Gave Oral"
+description = "Blowjobs given."
+
+[[stat]]
+id          = "TIMES_RECEIVED_ORAL"
+name        = "Times Received Oral"
+description = "Times eaten out."
+
+[[stat]]
+id          = "TIMES_ANAL"
+name        = "Times Anal"
+description = "Anal encounters."
+
+[[stat]]
+id          = "TOTAL_ORGASMS"
+name        = "Total Orgasms"
+description = "Running orgasm count."
+
+[[stat]]
+id          = "FAKED_ORGASMS"
+name        = "Faked Orgasms"
+description = "Orgasms performed."
+
+[[stat]]
+id          = "TIMES_MASTURBATED"
+name        = "Times Masturbated"
+description = "Solo sessions."
+
+[[stat]]
+id          = "UNIQUE_PARTNERS"
+name        = "Unique Partners"
+description = "Different people she's been with."
+
+[[stat]]
+id          = "ONE_NIGHT_STANDS"
+name        = "One Night Stands"
+description = "Hookups."
+
+[[stat]]
+id          = "WALKS_OF_SHAME"
+name        = "Walks of Shame"
+description = "Morning afters in last night's clothes."
+
+[[stat]]
+id          = "TIMES_CUMMED_ON"
+name        = "Times Cummed On"
+description = "Facials, chest, stomach."
+
+[[stat]]
+id          = "TIMES_CUMMED_IN"
+name        = "Times Cummed In"
+description = "Creampies."
+
+[[stat]]
+id          = "TIMES_SWALLOWED"
+name        = "Times Swallowed"
+description = "Took him in her mouth and finished it."
+
+[[stat]]
+id          = "TIMES_CUM_MULTIPLE"
+name        = "Times Came Multiple"
+description = "Sessions where she came more than once."
+
+[[stat]]
+id          = "TIMES_MADE_HIM_CUM"
+name        = "Times Made Him Cum"
+description = "She made that happen."
+
+[[stat]]
+id          = "TIMES_CAUGHT"
+name        = "Times Caught"
+description = "Caught in a compromising position."
+
+[[stat]]
+id          = "TIMES_PUBLIC_SEX"
+name        = "Times Public Sex"
+description = "Fucked somewhere she shouldn't have."
+
+[[stat]]
+id          = "PHOTOS_SENT"
+name        = "Photos Sent"
+description = "Nudes sent."
+
+[[stat]]
+id          = "PHOTOS_TAKEN"
+name        = "Photos Taken"
+description = "Nudes taken of her."
+
+# Transformation-specific counters
+
+[[stat]]
+id          = "TIMES_MISGENDERED"
+name        = "Times Misgendered"
+description = "Called sir. The cold jolt."
+
+[[stat]]
+id          = "TIMES_CHECKED_OUT"
+name        = "Times Checked Out"
+description = "Caught men looking."
+
+[[stat]]
+id          = "TIMES_GROPED"
+name        = "Times Groped"
+description = "Unwanted hands."
+
+[[stat]]
+id          = "MALE_FLASHBACKS"
+name        = "Male Flashbacks"
+description = "The before-life intruding."
+
+[[stat]]
+id          = "MIRROR_CHECKS"
+name        = "Mirror Checks"
+description = "Looking in a mirror and seeing a stranger."
+
+[[stat]]
+id          = "TIMES_FELT_SMALL"
+name        = "Times Felt Small"
+description = "Physical vulnerability moments."
+
+[[stat]]
+id          = "TIMES_OBJECTIFIED"
+name        = "Times Objectified"
+description = "Reduced to her body."
+
+# Dark content counters (BLOCK_ROUGH gated in writing)
+
+[[stat]]
+id          = "DUBCON_ENCOUNTERS"
+name        = "Dubcon Encounters"
+description = "Consent was ambiguous."
+
+[[stat]]
+id          = "NONCON_ENCOUNTERS"
+name        = "Noncon Encounters"
+description = "Forced. No ambiguity."
+
+[[stat]]
+id          = "TIMES_COERCED"
+name        = "Times Coerced"
+description = "Pressured into compliance."
+
+[[stat]]
+id          = "TIMES_BLACKMAILED"
+name        = "Times Blackmailed"
+description = "Leveraged by someone."
+
+[[stat]]
+id          = "PANIC_ATTACKS"
+name        = "Panic Attacks"
+description = "Dissociative episodes."
+
+[[stat]]
+id          = "TIMES_DRUGGED"
+name        = "Times Drugged"
+description = "Drink spiked."
+
+# Body/physical tracking
+
+[[stat]]
+id          = "WARDROBE_MALFUNCTIONS"
+name        = "Wardrobe Malfunctions"
+description = "Nip slips, buttons, skirt incidents."
+
+[[stat]]
+id          = "TIMES_BRALESS"
+name        = "Times Braless"
+description = "Going without a bra."
+
+[[stat]]
+id          = "PREGNANCY_SCARES"
+name        = "Pregnancy Scares"
+description = "Late period dread."
+
+[[stat]]
+id          = "TIMES_COMPLIMENTED_ON_BODY"
+name        = "Times Complimented on Body"
+description = "Specific body compliments received."

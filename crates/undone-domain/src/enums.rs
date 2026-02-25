@@ -64,9 +64,13 @@ pub enum RelationshipStatus {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PlayerFigure {
+    Petite,
     Slim,
-    Toned,
-    Womanly,
+    Athletic,
+    Hourglass,
+    Curvy,
+    Thick,
+    Plus,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -96,10 +100,13 @@ impl std::fmt::Display for MaleFigure {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BreastSize {
-    Small,
-    MediumSmall,
-    MediumLarge,
-    Large,
+    Flat,
+    Perky,
+    Handful,
+    Average,
+    Full,
+    Big,
+    Huge,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -282,9 +289,13 @@ impl std::fmt::Display for RelationshipStatus {
 impl std::fmt::Display for PlayerFigure {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            PlayerFigure::Petite => write!(f, "Petite"),
             PlayerFigure::Slim => write!(f, "Slim"),
-            PlayerFigure::Toned => write!(f, "Toned"),
-            PlayerFigure::Womanly => write!(f, "Womanly"),
+            PlayerFigure::Athletic => write!(f, "Athletic"),
+            PlayerFigure::Hourglass => write!(f, "Hourglass"),
+            PlayerFigure::Curvy => write!(f, "Curvy"),
+            PlayerFigure::Thick => write!(f, "Thick"),
+            PlayerFigure::Plus => write!(f, "Plus"),
         }
     }
 }
@@ -292,10 +303,13 @@ impl std::fmt::Display for PlayerFigure {
 impl std::fmt::Display for BreastSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BreastSize::Small => write!(f, "Small"),
-            BreastSize::MediumSmall => write!(f, "Medium Small"),
-            BreastSize::MediumLarge => write!(f, "Medium Large"),
-            BreastSize::Large => write!(f, "Large"),
+            BreastSize::Flat => write!(f, "Flat"),
+            BreastSize::Perky => write!(f, "Perky"),
+            BreastSize::Handful => write!(f, "Handful"),
+            BreastSize::Average => write!(f, "Average"),
+            BreastSize::Full => write!(f, "Full"),
+            BreastSize::Big => write!(f, "Big"),
+            BreastSize::Huge => write!(f, "Huge"),
         }
     }
 }
@@ -311,6 +325,365 @@ impl std::fmt::Display for Age {
             Age::Forties => write!(f, "Forties"),
             Age::Fifties => write!(f, "Fifties"),
             Age::Old => write!(f, "Old"),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Physical attribute enums
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Height {
+    VeryShort,
+    Short,
+    Average,
+    Tall,
+    VeryTall,
+}
+
+impl std::fmt::Display for Height {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Height::VeryShort => write!(f, "Very Short"),
+            Height::Short => write!(f, "Short"),
+            Height::Average => write!(f, "Average"),
+            Height::Tall => write!(f, "Tall"),
+            Height::VeryTall => write!(f, "Very Tall"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum HairLength {
+    Buzzed,
+    Short,
+    Shoulder,
+    Long,
+    VeryLong,
+}
+
+impl std::fmt::Display for HairLength {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HairLength::Buzzed => write!(f, "Buzzed"),
+            HairLength::Short => write!(f, "Short"),
+            HairLength::Shoulder => write!(f, "Shoulder"),
+            HairLength::Long => write!(f, "Long"),
+            HairLength::VeryLong => write!(f, "Very Long"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SkinTone {
+    VeryFair,
+    Fair,
+    Light,
+    Medium,
+    Olive,
+    Tan,
+    Brown,
+    DarkBrown,
+    Deep,
+}
+
+impl std::fmt::Display for SkinTone {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SkinTone::VeryFair => write!(f, "Very Fair"),
+            SkinTone::Fair => write!(f, "Fair"),
+            SkinTone::Light => write!(f, "Light"),
+            SkinTone::Medium => write!(f, "Medium"),
+            SkinTone::Olive => write!(f, "Olive"),
+            SkinTone::Tan => write!(f, "Tan"),
+            SkinTone::Brown => write!(f, "Brown"),
+            SkinTone::DarkBrown => write!(f, "Dark Brown"),
+            SkinTone::Deep => write!(f, "Deep"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Complexion {
+    Clear,
+    Normal,
+    Rosy,
+    Acne,
+}
+
+impl std::fmt::Display for Complexion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Complexion::Clear => write!(f, "Clear"),
+            Complexion::Normal => write!(f, "Normal"),
+            Complexion::Rosy => write!(f, "Rosy"),
+            Complexion::Acne => write!(f, "Acne"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EyeColour {
+    Brown,
+    DarkBrown,
+    Hazel,
+    Green,
+    Blue,
+    LightBlue,
+    Grey,
+    Amber,
+    Black,
+}
+
+impl std::fmt::Display for EyeColour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EyeColour::Brown => write!(f, "Brown"),
+            EyeColour::DarkBrown => write!(f, "Dark Brown"),
+            EyeColour::Hazel => write!(f, "Hazel"),
+            EyeColour::Green => write!(f, "Green"),
+            EyeColour::Blue => write!(f, "Blue"),
+            EyeColour::LightBlue => write!(f, "Light Blue"),
+            EyeColour::Grey => write!(f, "Grey"),
+            EyeColour::Amber => write!(f, "Amber"),
+            EyeColour::Black => write!(f, "Black"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum HairColour {
+    Black,
+    DarkBrown,
+    Brown,
+    Chestnut,
+    Auburn,
+    Copper,
+    Red,
+    Strawberry,
+    Blonde,
+    HoneyBlonde,
+    PlatinumBlonde,
+    Silver,
+    White,
+}
+
+impl std::fmt::Display for HairColour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HairColour::Black => write!(f, "Black"),
+            HairColour::DarkBrown => write!(f, "Dark Brown"),
+            HairColour::Brown => write!(f, "Brown"),
+            HairColour::Chestnut => write!(f, "Chestnut"),
+            HairColour::Auburn => write!(f, "Auburn"),
+            HairColour::Copper => write!(f, "Copper"),
+            HairColour::Red => write!(f, "Red"),
+            HairColour::Strawberry => write!(f, "Strawberry"),
+            HairColour::Blonde => write!(f, "Blonde"),
+            HairColour::HoneyBlonde => write!(f, "Honey Blonde"),
+            HairColour::PlatinumBlonde => write!(f, "Platinum Blonde"),
+            HairColour::Silver => write!(f, "Silver"),
+            HairColour::White => write!(f, "White"),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Sexual/intimate attribute enums
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NippleSensitivity {
+    Low,
+    Normal,
+    High,
+    Extreme,
+}
+
+impl std::fmt::Display for NippleSensitivity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NippleSensitivity::Low => write!(f, "Low"),
+            NippleSensitivity::Normal => write!(f, "Normal"),
+            NippleSensitivity::High => write!(f, "High"),
+            NippleSensitivity::Extreme => write!(f, "Extreme"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ClitSensitivity {
+    Low,
+    Normal,
+    High,
+    Extreme,
+}
+
+impl std::fmt::Display for ClitSensitivity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ClitSensitivity::Low => write!(f, "Low"),
+            ClitSensitivity::Normal => write!(f, "Normal"),
+            ClitSensitivity::High => write!(f, "High"),
+            ClitSensitivity::Extreme => write!(f, "Extreme"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PubicHairStyle {
+    Natural,
+    Trimmed,
+    Landing,
+    Brazilian,
+    Bare,
+}
+
+impl std::fmt::Display for PubicHairStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PubicHairStyle::Natural => write!(f, "Natural"),
+            PubicHairStyle::Trimmed => write!(f, "Trimmed"),
+            PubicHairStyle::Landing => write!(f, "Landing Strip"),
+            PubicHairStyle::Brazilian => write!(f, "Brazilian"),
+            PubicHairStyle::Bare => write!(f, "Bare"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum InnerLabiaSize {
+    Small,
+    Average,
+    Prominent,
+}
+
+impl std::fmt::Display for InnerLabiaSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InnerLabiaSize::Small => write!(f, "Small"),
+            InnerLabiaSize::Average => write!(f, "Average"),
+            InnerLabiaSize::Prominent => write!(f, "Prominent"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum WetnessBaseline {
+    Dry,
+    Normal,
+    Wet,
+    Soaking,
+}
+
+impl std::fmt::Display for WetnessBaseline {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WetnessBaseline::Dry => write!(f, "Dry"),
+            WetnessBaseline::Normal => write!(f, "Normal"),
+            WetnessBaseline::Wet => write!(f, "Wet"),
+            WetnessBaseline::Soaking => write!(f, "Soaking"),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Body shape enums
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ButtSize {
+    Flat,
+    Small,
+    Pert,
+    Round,
+    Big,
+    Huge,
+}
+
+impl std::fmt::Display for ButtSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ButtSize::Flat => write!(f, "Flat"),
+            ButtSize::Small => write!(f, "Small"),
+            ButtSize::Pert => write!(f, "Pert"),
+            ButtSize::Round => write!(f, "Round"),
+            ButtSize::Big => write!(f, "Big"),
+            ButtSize::Huge => write!(f, "Huge"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum WaistSize {
+    Tiny,
+    Narrow,
+    Average,
+    Thick,
+    Wide,
+}
+
+impl std::fmt::Display for WaistSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WaistSize::Tiny => write!(f, "Tiny"),
+            WaistSize::Narrow => write!(f, "Narrow"),
+            WaistSize::Average => write!(f, "Average"),
+            WaistSize::Thick => write!(f, "Thick"),
+            WaistSize::Wide => write!(f, "Wide"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum LipShape {
+    Thin,
+    Average,
+    Full,
+    Plush,
+    BeeStung,
+}
+
+impl std::fmt::Display for LipShape {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LipShape::Thin => write!(f, "Thin"),
+            LipShape::Average => write!(f, "Average"),
+            LipShape::Full => write!(f, "Full"),
+            LipShape::Plush => write!(f, "Plush"),
+            LipShape::BeeStung => write!(f, "Bee-stung"),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Before-life / male attribute enums
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PenisSize {
+    None,
+    Micro,
+    Small,
+    Average,
+    AboveAverage,
+    Big,
+    Huge,
+    Massive,
+}
+
+impl std::fmt::Display for PenisSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PenisSize::None => write!(f, "None"),
+            PenisSize::Micro => write!(f, "Micro"),
+            PenisSize::Small => write!(f, "Small"),
+            PenisSize::Average => write!(f, "Average"),
+            PenisSize::AboveAverage => write!(f, "Above Average"),
+            PenisSize::Big => write!(f, "Big"),
+            PenisSize::Huge => write!(f, "Huge"),
+            PenisSize::Massive => write!(f, "Massive"),
         }
     }
 }

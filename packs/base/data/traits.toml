@@ -165,3 +165,801 @@ id          = "TRANS_WOMAN"
 name        = "Trans Woman"
 description = "PC was a trans woman before the magical transformation."
 hidden      = true
+
+# ---------------------------------------------------------------------------
+# hair — hair texture
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "STRAIGHT_HAIR"
+name        = "Straight Hair"
+description = "Falls flat, sleek, swings when she turns. Low maintenance."
+hidden      = false
+group       = "hair"
+conflicts   = ["WAVY_HAIR", "CURLY_HAIR", "COILY_HAIR"]
+
+[[trait]]
+id          = "WAVY_HAIR"
+name        = "Wavy Hair"
+description = "Natural movement, body. Looks effortlessly tousled after sex."
+hidden      = false
+group       = "hair"
+conflicts   = ["STRAIGHT_HAIR", "CURLY_HAIR", "COILY_HAIR"]
+
+[[trait]]
+id          = "CURLY_HAIR"
+name        = "Curly Hair"
+description = "Ringlets, volume. A handful for anyone who grabs it."
+hidden      = false
+group       = "hair"
+conflicts   = ["STRAIGHT_HAIR", "WAVY_HAIR", "COILY_HAIR"]
+
+[[trait]]
+id          = "COILY_HAIR"
+name        = "Coily Hair"
+description = "Tight coils, shrinkage, gorgeous texture. Men ask to touch it without asking."
+hidden      = false
+group       = "hair"
+conflicts   = ["STRAIGHT_HAIR", "WAVY_HAIR", "CURLY_HAIR"]
+
+# ---------------------------------------------------------------------------
+# voice
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "SOFT_VOICE"
+name        = "Soft Voice"
+description = "Quiet, makes people lean close. Intimate conversations feel like secrets."
+hidden      = false
+group       = "voice"
+conflicts   = ["BRIGHT_VOICE", "HUSKY_VOICE", "SWEET_VOICE", "BREATHY_VOICE"]
+
+[[trait]]
+id          = "BRIGHT_VOICE"
+name        = "Bright Voice"
+description = "Clear, carries, infectious laugh. The girl everyone can hear across the bar."
+hidden      = false
+group       = "voice"
+conflicts   = ["SOFT_VOICE", "HUSKY_VOICE", "SWEET_VOICE", "BREATHY_VOICE"]
+
+[[trait]]
+id          = "HUSKY_VOICE"
+name        = "Husky Voice"
+description = "Low, slightly rough, sounds like she just woke up. Or just finished something."
+hidden      = false
+group       = "voice"
+conflicts   = ["SOFT_VOICE", "BRIGHT_VOICE", "SWEET_VOICE", "BREATHY_VOICE"]
+
+[[trait]]
+id          = "SWEET_VOICE"
+name        = "Sweet Voice"
+description = "Warm, inviting. The kind men describe as \"cute.\" The kind that makes \"please\" dangerous."
+hidden      = false
+group       = "voice"
+conflicts   = ["SOFT_VOICE", "BRIGHT_VOICE", "HUSKY_VOICE", "BREATHY_VOICE"]
+
+[[trait]]
+id          = "BREATHY_VOICE"
+name        = "Breathy Voice"
+description = "Airy, Marilyn Monroe territory. Everything she says sounds slightly sexual whether she means it or not."
+hidden      = false
+group       = "voice"
+conflicts   = ["SOFT_VOICE", "BRIGHT_VOICE", "HUSKY_VOICE", "SWEET_VOICE"]
+
+# ---------------------------------------------------------------------------
+# eyes
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "BIG_EYES"
+name        = "Big Eyes"
+description = "Large, expressive. Doe-eyed. Makes her look younger and more innocent than she is."
+hidden      = false
+group       = "eyes"
+conflicts   = ["NARROW_EYES", "HEAVY_LIDDED"]
+
+[[trait]]
+id          = "NARROW_EYES"
+name        = "Narrow Eyes"
+description = "Sharp, calculating. She looks like she's evaluating you. She probably is."
+hidden      = false
+group       = "eyes"
+conflicts   = ["BIG_EYES"]
+
+[[trait]]
+id          = "BRIGHT_EYES"
+name        = "Bright Eyes"
+description = "Vivid colour, catch light. The kind people comment on."
+hidden      = false
+group       = "eyes"
+
+[[trait]]
+id          = "HEAVY_LIDDED"
+name        = "Heavy Lidded"
+description = "Sleepy, sultry. Bedroom eyes. She always looks like she's thinking about sex."
+hidden      = false
+group       = "eyes"
+conflicts   = ["BIG_EYES"]
+
+[[trait]]
+id          = "ALMOND_EYES"
+name        = "Almond Eyes"
+description = "Elegant shape, slightly exotic to some men."
+hidden      = false
+group       = "eyes"
+
+# ---------------------------------------------------------------------------
+# body_detail — additive physical details
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "LONG_LEGS"
+name        = "Long Legs"
+description = "Noticeable in skirts, devastating in heels."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "WIDE_HIPS"
+name        = "Wide Hips"
+description = "Pronounced hip curve. Sways when she walks even when she's not trying."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "NARROW_WAIST"
+name        = "Narrow Waist"
+description = "Emphasized by anything fitted. Hands almost encircle it."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "BROAD_SHOULDERS"
+name        = "Broad Shoulders"
+description = "Before-body artifact. Makes her feel large in strapless things."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "LONG_NECK"
+name        = "Long Neck"
+description = "Elegant, draws the eye to collarbones."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "SMALL_HANDS"
+name        = "Small Hands"
+description = "Delicate, feminine."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "LARGE_HANDS"
+name        = "Large Hands"
+description = "Before-body artifact. Self-conscious when she holds someone's hand."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "PRONOUNCED_COLLARBONES"
+name        = "Pronounced Collarbones"
+description = "Visible, elegant."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "THIGH_GAP"
+name        = "Thigh Gap"
+description = "Space between thighs. Visible in tight jeans."
+hidden      = false
+group       = "body_detail"
+conflicts   = ["NO_THIGH_GAP"]
+
+[[trait]]
+id          = "NO_THIGH_GAP"
+name        = "No Thigh Gap"
+description = "Thighs touch. Rubs. Skirts ride up."
+hidden      = false
+group       = "body_detail"
+conflicts   = ["THIGH_GAP"]
+
+[[trait]]
+id          = "DIMPLES"
+name        = "Dimples"
+description = "When she smiles. Disarming."
+hidden      = false
+group       = "body_detail"
+
+[[trait]]
+id          = "BEAUTY_MARK"
+name        = "Beauty Mark"
+description = "A mole in the right place. Memorable."
+hidden      = false
+group       = "body_detail"
+
+# ---------------------------------------------------------------------------
+# skin
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "SOFT_SKIN"
+name        = "Soft Skin"
+description = "Noticeably soft. People want to touch."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "FRECKLED"
+name        = "Freckled"
+description = "Scattered freckles. Cute. Multiplies in sun."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "SCARRED"
+name        = "Scarred"
+description = "Visible scarring from the before-life."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "TATTOOED"
+name        = "Tattooed"
+description = "Has visible tattoos."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "STRETCH_MARKS"
+name        = "Stretch Marks"
+description = "On hips, thighs, breasts. The body grew fast."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "SMOOTH_LEGS"
+name        = "Smooth Legs"
+description = "Always shaved. High maintenance."
+hidden      = false
+group       = "skin"
+
+# ---------------------------------------------------------------------------
+# scent
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "SWEET_SCENT"
+name        = "Sweet Scent"
+description = "Natural body chemistry smells sweet."
+hidden      = false
+group       = "scent"
+conflicts   = ["MUSKY_SCENT"]
+
+[[trait]]
+id          = "MUSKY_SCENT"
+name        = "Musky Scent"
+description = "Warm, animal. Her scent fills a bed by morning."
+hidden      = false
+group       = "scent"
+conflicts   = ["SWEET_SCENT"]
+
+[[trait]]
+id          = "CLEAN_SCENT"
+name        = "Clean Scent"
+description = "Soap, shampoo, freshly showered."
+hidden      = false
+group       = "scent"
+
+# ---------------------------------------------------------------------------
+# sexual — sexual response traits
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "HAIR_TRIGGER"
+name        = "Hair Trigger"
+description = "Cums embarrassingly fast."
+hidden      = false
+group       = "sexual"
+conflicts   = ["ANORGASMIC"]
+
+[[trait]]
+id          = "SQUIRTER"
+name        = "Squirter"
+description = "Gushes when she cums. Soaks the sheets."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "MULTI_ORGASMIC"
+name        = "Multi-Orgasmic"
+description = "Can cum again within seconds. Stacks them."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "ANORGASMIC"
+name        = "Anorgasmic"
+description = "Difficulty reaching orgasm."
+hidden      = false
+group       = "sexual"
+conflicts   = ["HAIR_TRIGGER"]
+
+[[trait]]
+id          = "ORAL_FIXATION"
+name        = "Oral Fixation"
+description = "Her mouth is wired directly to between her legs."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "SENSITIVE_NECK"
+name        = "Sensitive Neck"
+description = "Light touch on her neck short-circuits her brain."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "SENSITIVE_EARS"
+name        = "Sensitive Ears"
+description = "Whispering in her ear is foreplay."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "SENSITIVE_INNER_THIGHS"
+name        = "Sensitive Inner Thighs"
+description = "The lightest fingertip trace up her inner thigh makes her gasp."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "LIKES_PAIN"
+name        = "Likes Pain"
+description = "Pain registers as arousal."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "LOUD"
+name        = "Loud"
+description = "Can't stay quiet."
+hidden      = false
+group       = "sexual"
+conflicts   = ["QUIET_COMER"]
+
+[[trait]]
+id          = "QUIET_COMER"
+name        = "Quiet Comer"
+description = "Goes dead silent when she cums."
+hidden      = false
+group       = "sexual"
+conflicts   = ["LOUD"]
+
+[[trait]]
+id          = "EXHIBITIONIST"
+name        = "Exhibitionist"
+description = "Gets wet from the risk of being caught."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "SUBMISSIVE"
+name        = "Submissive"
+description = "Being told what to do makes her drip."
+hidden      = false
+group       = "sexual"
+conflicts   = ["DOMINANT"]
+
+[[trait]]
+id          = "DOMINANT"
+name        = "Dominant"
+description = "She wants control."
+hidden      = false
+group       = "sexual"
+conflicts   = ["SUBMISSIVE"]
+
+[[trait]]
+id          = "PRAISE_KINK"
+name        = "Praise Kink"
+description = "\"Good girl\" makes her clench."
+hidden      = false
+group       = "sexual"
+conflicts   = ["DEGRADATION_KINK"]
+
+[[trait]]
+id          = "DEGRADATION_KINK"
+name        = "Degradation Kink"
+description = "Being called names makes her cum."
+hidden      = false
+group       = "sexual"
+conflicts   = ["PRAISE_KINK"]
+
+[[trait]]
+id          = "SIZE_QUEEN"
+name        = "Size Queen"
+description = "Notices size. Every time. Average isn't enough."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "EASILY_WET"
+name        = "Easily Wet"
+description = "Gets aroused fast and her body shows it immediately."
+hidden      = false
+group       = "sexual"
+conflicts   = ["SLOW_TO_WARM"]
+
+[[trait]]
+id          = "SLOW_TO_WARM"
+name        = "Slow to Warm"
+description = "Her body takes time."
+hidden      = false
+group       = "sexual"
+conflicts   = ["EASILY_WET"]
+
+[[trait]]
+id          = "VOCAL_DIRTY_TALKER"
+name        = "Vocal Dirty Talker"
+description = "Says things during sex that would shock her outside of it."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "BACK_ARCHER"
+name        = "Back Archer"
+description = "Involuntary response when she's close."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "TOE_CURLER"
+name        = "Toe Curler"
+description = "When she cums, her toes curl."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "CRIER"
+name        = "Crier"
+description = "Cries when she cums. Not sadness — overflow."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "GUSHER"
+name        = "Gusher"
+description = "Gets so wet that it runs down her thighs."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "CREAMER"
+name        = "Creamer"
+description = "Produces thick, white arousal fluid."
+hidden      = false
+group       = "sexual"
+
+# ---------------------------------------------------------------------------
+# sexual_preference — what she's into
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "LIKES_ORAL_GIVING"
+name        = "Likes Oral (Giving)"
+description = "Enjoys sucking cock."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_ORAL_RECEIVING"
+name        = "Likes Oral (Receiving)"
+description = "Being eaten out is her favourite thing."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_ANAL"
+name        = "Likes Anal"
+description = "Enjoys it."
+hidden      = false
+group       = "sexual_preference"
+conflicts   = ["DISLIKES_ANAL"]
+
+[[trait]]
+id          = "DISLIKES_ANAL"
+name        = "Dislikes Anal"
+description = "Absolute no."
+hidden      = false
+group       = "sexual_preference"
+conflicts   = ["LIKES_ANAL"]
+
+[[trait]]
+id          = "LIKES_BEING_WATCHED"
+name        = "Likes Being Watched"
+description = "Gets off on knowing someone can see."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_TOYS"
+name        = "Likes Toys"
+description = "Owns vibrators. Uses them with partners."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "VANILLA"
+name        = "Vanilla"
+description = "Straightforward sex."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_FACIALS"
+name        = "Likes Facials"
+description = "Wants him to cum on her face."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_SWALLOWING"
+name        = "Likes Swallowing"
+description = "Swallows without hesitation."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_DEEPTHROAT"
+name        = "Likes Deepthroat"
+description = "Can take him all the way."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_CHOKING"
+name        = "Likes Choking"
+description = "Hand on her throat."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_BONDAGE"
+name        = "Likes Bondage"
+description = "Being tied up."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_SPANKING"
+name        = "Likes Spanking"
+description = "The sting, the heat."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_CREAMPIE"
+name        = "Likes Creampie"
+description = "Wants to be cummed in."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_HAIR_PULLING"
+name        = "Likes Hair Pulling"
+description = "Head yanked back by a fistful of hair."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_BITING"
+name        = "Likes Biting"
+description = "Teeth on skin."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_EDGING"
+name        = "Likes Edging"
+description = "Being brought to the edge and held there."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_FACE_FUCKING"
+name        = "Likes Face Fucking"
+description = "Mouth used."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_DOUBLE_PENETRATION"
+name        = "Likes Double Penetration"
+description = "Filled in both holes simultaneously."
+hidden      = false
+group       = "sexual_preference"
+
+[[trait]]
+id          = "LIKES_MULTIPLE_PARTNERS"
+name        = "Likes Multiple Partners"
+description = "Threesomes, moresomes."
+hidden      = false
+group       = "sexual_preference"
+
+# ---------------------------------------------------------------------------
+# dark_content — dubcon/noncon/extreme (ALL require BLOCK_ROUGH gating)
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "FREEZE_RESPONSE"
+name        = "Freeze Response"
+description = "When threatened, she freezes."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "SHAME_AROUSAL"
+name        = "Shame Arousal"
+description = "Her body responds to things that should disgust her."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "TRAUMA_RESPONSE"
+name        = "Trauma Response"
+description = "Certain touches trigger shutdown."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "COERCION_VULNERABLE"
+name        = "Coercion Vulnerable"
+description = "Can't say no when pressured."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "BLACKMAIL_TARGET"
+name        = "Blackmail Target"
+description = "Has something to hide."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "FEAR_AROUSAL"
+name        = "Fear Arousal"
+description = "Fear and arousal are cross-wired."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "CNC_KINK"
+name        = "CNC Kink"
+description = "Consensual non-consent."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "SOMNOPHILIA"
+name        = "Somnophilia"
+description = "Aroused by the idea of being used while she sleeps."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "HUMILIATION_RESPONSE"
+name        = "Humiliation Response"
+description = "Public embarrassment goes straight between her legs."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "STOCKHOLM_TENDENCY"
+name        = "Stockholm Tendency"
+description = "Develops feelings for people who control her."
+hidden      = false
+group       = "dark_content"
+
+[[trait]]
+id          = "CORRUPTION_FANTASY"
+name        = "Corruption Fantasy"
+description = "The innocent girl being slowly ruined."
+hidden      = false
+group       = "dark_content"
+
+# ---------------------------------------------------------------------------
+# lactation
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "LACTATING"
+name        = "Lactating"
+description = "Producing milk. Leaks through shirts."
+hidden      = false
+group       = "lactation"
+
+# ---------------------------------------------------------------------------
+# fertility
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "VERY_FERTILE"
+name        = "Very Fertile"
+description = "Gets pregnant easily."
+hidden      = false
+group       = "fertility"
+conflicts   = ["INFERTILE"]
+
+[[trait]]
+id          = "INFERTILE"
+name        = "Infertile"
+description = "Can't get pregnant."
+hidden      = false
+group       = "fertility"
+conflicts   = ["VERY_FERTILE"]
+
+# ---------------------------------------------------------------------------
+# menstruation
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "HEAVY_PERIODS"
+name        = "Heavy Periods"
+description = "Brutal cramps, heavy flow."
+hidden      = false
+group       = "menstruation"
+conflicts   = ["LIGHT_PERIODS"]
+
+[[trait]]
+id          = "LIGHT_PERIODS"
+name        = "Light Periods"
+description = "Barely notices."
+hidden      = false
+group       = "menstruation"
+conflicts   = ["HEAVY_PERIODS"]
+
+[[trait]]
+id          = "IRREGULAR"
+name        = "Irregular"
+description = "Unpredictable."
+hidden      = false
+group       = "menstruation"
+
+# ---------------------------------------------------------------------------
+# arousal_response — how her body shows it
+# ---------------------------------------------------------------------------
+
+[[trait]]
+id          = "NIPPLE_GETTER"
+name        = "Nipple Getter"
+description = "Her nipples visibly harden when she's turned on."
+hidden      = false
+group       = "arousal_response"
+
+[[trait]]
+id          = "FLUSHER"
+name        = "Flusher"
+description = "Flushes pink across her chest, neck, cheeks when aroused."
+hidden      = false
+group       = "arousal_response"
+
+[[trait]]
+id          = "LIP_BITER"
+name        = "Lip Biter"
+description = "Unconscious tell."
+hidden      = false
+group       = "arousal_response"
+
+[[trait]]
+id          = "THIGH_CLENCHER"
+name        = "Thigh Clencher"
+description = "Presses her thighs together when aroused."
+hidden      = false
+group       = "arousal_response"
+
+[[trait]]
+id          = "BREATH_CHANGER"
+name        = "Breath Changer"
+description = "Breathing gets shallow and fast when turned on."
+hidden      = false
+group       = "arousal_response"

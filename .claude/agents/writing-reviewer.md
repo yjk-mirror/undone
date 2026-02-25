@@ -141,7 +141,61 @@ In sexual or romantic content:
 **Implied else on gated content:**
 - `{% else %}` path must be a fully-written alternative, not a one-liner that implies the same thing happened
 
-### Tier 7: Structural
+### Tier 7: Physical and Sexual Attribute System
+
+This tier covers the attribute accessor API introduced with the char-attributes branch. Scenes can now query the PC's body and background.
+
+**Invalid accessor names (Critical):**
+
+Any `w.getXxx()` or `w.beforeXxx()` call that is not in the list below is a typo or invented accessor — it will silently return nothing at runtime. Flag as Critical.
+
+Valid physical/appearance accessors:
+- `w.getHeight()`, `w.getFigure()`, `w.getBreasts()`, `w.getButt()`, `w.getWaist()`
+- `w.getLips()`, `w.getHairColour()`, `w.getHairLength()`, `w.getEyeColour()`, `w.getSkinTone()`, `w.getComplexion()`
+- `w.getRace()`, `w.getAge()`
+
+Valid sexual/sensitivity accessors:
+- `w.getNippleSensitivity()`, `w.getClitSensitivity()`, `w.getPubicHair()`, `w.getInnerLabia()`, `w.getWetness()`
+
+Valid "before" accessors (pre-transformation body):
+- `w.beforeHeight()`, `w.beforeHairColour()`, `w.beforeEyeColour()`, `w.beforeSkinTone()`, `w.beforePenisSize()`, `w.beforeFigure()`
+
+If you see any other `w.get*()` or `w.before*()` pattern not listed here, flag it as Critical with the exact call quoted.
+
+**Missing BLOCK_ROUGH gate on dark-content traits (Critical):**
+
+Any scene that references or branches on the following dark-content traits MUST be wrapped in `{% if not w.hasTrait("BLOCK_ROUGH") %}`. If the gate is absent, flag as Critical.
+
+Dark-content traits requiring the gate:
+- `FREEZE_RESPONSE`, `SHAME_AROUSAL`, `TRAUMA_RESPONSE`, `COERCION_VULNERABLE`, `BLACKMAIL_TARGET`
+- `FEAR_AROUSAL`, `CNC_KINK`, `SOMNOPHILIA`, `HUMILIATION_RESPONSE`, `STOCKHOLM_TENDENCY`, `CORRUPTION_FANTASY`
+
+Also applies to any prose that depicts coercion, blackmail, non-consent, or somnophilia framing even without an explicit trait check — if the subject matter is dark, the gate must be present.
+
+**Generic physical description when attributes exist (Important):**
+
+If a prose block describes a physical feature in generic terms but the relevant accessor is available, flag as Important — it is a suggestion to improve differentiation, not a blocking issue.
+
+Examples to watch for:
+- "your hair" / "her hair" described generically → suggest checking `w.getHairColour()` and/or `w.getHairLength()`
+- "your breasts" / "her breasts" used as a flat reference → suggest `w.getBreasts()` for size-specific phrasing
+- "your figure" described as a single-adjective body type → suggest `w.getFigure()`
+- "your eyes" / "her eyes" without colour → suggest `w.getEyeColour()`
+
+This is not a hard requirement — sometimes generic is intentional. Report it as a suggestion: "Opportunity to use `w.getXxx()` here."
+
+**Missed branching opportunities on new trait groups (Minor):**
+
+The following new trait groups are now available for scene branching. Scenes do not have to use them, but the reviewer should note high-value spots where they would deepen differentiation:
+
+- Hair texture: `STRAIGHT_HAIR`, `WAVY_HAIR`, `CURLY_HAIR`, `COILY_HAIR`
+- Voice: `SOFT_VOICE`, `HUSKY_VOICE`, `HIGH_VOICE`, `LOW_VOICE`
+- Sexual traits: `SENSITIVE_NIPPLES`, `DEEP_CLITORIS`, `LARGE_INNER_LABIA`, `STAYS_WET`
+- Sexual preferences: `LIKES_ROUGH`, `LIKES_GENTLE`, `LIKES_ORAL`, `PREFERS_RECEIVING`
+
+Flag as Minor with a brief note: "Scene touches [relevant body part / sexual dynamic] — `SENSITIVE_NIPPLES` / `LIKES_ROUGH` branch possible here."
+
+### Tier 8: Structural
 
 **Scenes with no lasting consequence:**
 - Every scene must change at least one: game flag, NPC stat, or PC stat
@@ -161,18 +215,21 @@ Structure your findings by severity:
 **Critical** — Breaks immersion or signals AI authorship. Must fix before commit.
 - All Tier 1 items (staccato, em-dash reveals, over-naming, anaphoric repetition)
 - Wrong transformation register
-- Missing content gate
+- Missing content gate (BLOCK_ROUGH on rough content or dark-content traits)
+- Invalid `w.getXxx()` or `w.beforeXxx()` accessor name (Tier 7)
 
 **Important** — Noticeable quality issues. Should fix.
 - Emotion announcements, heart/pulse clichés
 - Adjective-swap branches (not structural)
 - British English
 - Missing transformation calibration by FEMININITY
+- Generic physical description when a specific attribute accessor exists (Tier 7)
 
 **Minor** — Polish issues.
 - Starting too many sentences with "You"
 - Passive observation chain (shorter forms)
 - Generic-ish NPC dialogue (still personality-present but weak)
+- Missed branching opportunity on hair texture, voice, sexual traits, or sexual preference groups (Tier 7)
 
 For each finding:
 - Quote the offending text

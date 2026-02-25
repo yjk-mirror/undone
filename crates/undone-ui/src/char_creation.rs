@@ -6,7 +6,8 @@ use rand::SeedableRng;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::{
-    Age, BeforeIdentity, BeforeSexuality, BreastSize, MaleFigure, PcOrigin, PlayerFigure,
+    Age, BeforeIdentity, BeforeSexuality, BreastSize, EyeColour, HairColour, Height, MaleFigure,
+    PcOrigin, PenisSize, PlayerFigure, SkinTone,
 };
 use undone_packs::char_creation::CharCreationConfig;
 
@@ -179,7 +180,7 @@ impl FemFormSignals {
             name_androg: RwSignal::new("Ev".to_string()),
             age: RwSignal::new(Age::EarlyTwenties),
             figure: RwSignal::new(PlayerFigure::Slim),
-            breasts: RwSignal::new(BreastSize::MediumLarge),
+            breasts: RwSignal::new(BreastSize::Full),
             race: RwSignal::new(String::new()),
         }
     }
@@ -337,9 +338,13 @@ pub fn fem_creation_view(
                 Dropdown::new_rw(
                     form.figure,
                     vec![
+                        PlayerFigure::Petite,
                         PlayerFigure::Slim,
-                        PlayerFigure::Toned,
-                        PlayerFigure::Womanly,
+                        PlayerFigure::Athletic,
+                        PlayerFigure::Hourglass,
+                        PlayerFigure::Curvy,
+                        PlayerFigure::Thick,
+                        PlayerFigure::Plus,
                     ],
                 )
                 .main_view(themed_trigger::<PlayerFigure>(signals))
@@ -352,10 +357,13 @@ pub fn fem_creation_view(
                 Dropdown::new_rw(
                     form.breasts,
                     vec![
-                        BreastSize::Small,
-                        BreastSize::MediumSmall,
-                        BreastSize::MediumLarge,
-                        BreastSize::Large,
+                        BreastSize::Flat,
+                        BreastSize::Perky,
+                        BreastSize::Handful,
+                        BreastSize::Average,
+                        BreastSize::Full,
+                        BreastSize::Big,
+                        BreastSize::Huge,
                     ],
                 )
                 .main_view(themed_trigger::<BreastSize>(signals))
@@ -942,6 +950,11 @@ fn build_next_button(
                     race: partial.before_race.clone(),
                     sexuality: partial.before_sexuality,
                     figure: MaleFigure::Average,
+                    height: Height::Average,
+                    hair_colour: HairColour::DarkBrown,
+                    eye_colour: EyeColour::Brown,
+                    skin_tone: SkinTone::Medium,
+                    penis_size: PenisSize::Average,
                     traits: std::collections::HashSet::new(),
                 });
                 let throwaway_config = CharCreationConfig {
@@ -951,7 +964,7 @@ fn build_next_button(
                     age: partial.before_age,
                     race: partial.before_race.clone(),
                     figure: PlayerFigure::Slim,
-                    breasts: BreastSize::MediumLarge,
+                    breasts: BreastSize::Full,
                     origin,
                     before: before_identity,
                     starting_traits: partial.starting_traits.clone(),
@@ -1044,6 +1057,11 @@ fn build_begin_button(
                     race: partial.before_race.clone(),
                     sexuality: partial.before_sexuality,
                     figure: MaleFigure::Average,
+                    height: Height::Average,
+                    hair_colour: HairColour::DarkBrown,
+                    eye_colour: EyeColour::Brown,
+                    skin_tone: SkinTone::Medium,
+                    penis_size: PenisSize::Average,
                     traits: std::collections::HashSet::new(),
                 })
             } else {

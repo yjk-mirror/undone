@@ -6,7 +6,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 /// Increment this whenever the save format changes in a breaking way.
-pub const SAVE_VERSION: u32 = 4;
+pub const SAVE_VERSION: u32 = 5;
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -105,6 +105,10 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 ///     `game_data` if missing.
 ///   - v3 → v4: renames `Age::Twenties` → `Age::MidLateTwenties` in player.age
 ///     and player.before.age.
+///   - v4 → v5: adds 12 new Player fields, 5 new BeforeIdentity fields, remaps
+///     `BreastSize` (Small→Handful, MediumSmall→Average, MediumLarge→Full, Large→Big)
+///     and `PlayerFigure` (Toned→Athletic, Womanly→Curvy), converts String eye_colour
+///     and hair_colour to enum variants.
 ///
 /// # Errors
 ///
@@ -127,26 +131,26 @@ pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveErro
         .unwrap_or(0);
 
     if version == 1 {
-        // v1 → v2 → v3 → v4
         raw = migrate_v1_to_v2(raw);
         raw = migrate_v2_to_v3(raw);
         raw = migrate_v3_to_v4(raw);
-        raw["version"] = serde_json::Value::Number(4u32.into());
+        raw = migrate_v4_to_v5(raw);
     } else if version == 2 {
-        // v2 → v3 → v4
         raw = migrate_v2_to_v3(raw);
         raw = migrate_v3_to_v4(raw);
-        raw["version"] = serde_json::Value::Number(4u32.into());
+        raw = migrate_v4_to_v5(raw);
     } else if version == 3 {
-        // v3 → v4: rename Age::Twenties → Age::MidLateTwenties
         raw = migrate_v3_to_v4(raw);
-        raw["version"] = serde_json::Value::Number(4u32.into());
+        raw = migrate_v4_to_v5(raw);
+    } else if version == 4 {
+        raw = migrate_v4_to_v5(raw);
     } else if version != SAVE_VERSION {
         return Err(SaveError::VersionMismatch {
             saved: version,
             expected: SAVE_VERSION,
         });
     }
+    raw["version"] = serde_json::Value::Number(SAVE_VERSION.into());
 
     let file: SaveFile = serde_json::from_value(raw)?;
 
@@ -352,6 +356,150 @@ fn migrate_v3_to_v4(mut save_json: serde_json::Value) -> serde_json::Value {
     save_json
 }
 
+/// Transform a v4 save JSON into a v5-compatible JSON structure.
+///
+/// v5 changes:
+///   - **New Player fields** (12): height, hair_length, skin_tone, complexion,
+///     butt, waist, lips, nipple_sensitivity, clit_sensitivity, pubic_hair,
+///     inner_labia, wetness_baseline. All get sensible defaults.
+///   - **String → enum**: `eye_colour` ("brown" → "Brown") and `hair_colour`
+///     ("dark" → "DarkBrown").
+///   - **BreastSize remap**: Small→Handful, MediumSmall→Average, MediumLarge→Full,
+///     Large→Big.
+///   - **PlayerFigure remap**: Toned→Athletic, Womanly→Curvy.
+///   - **New BeforeIdentity fields** (5): height, hair_colour, eye_colour,
+///     skin_tone, penis_size. All get sensible defaults.
+fn migrate_v4_to_v5(mut save_json: serde_json::Value) -> serde_json::Value {
+    fn remap_breast_size(val: &mut serde_json::Value) {
+        if let Some(s) = val.as_str() {
+            let new = match s {
+                "Small" => "Handful",
+                "MediumSmall" => "Average",
+                "MediumLarge" => "Full",
+                "Large" => "Big",
+                other => other,
+            };
+            *val = serde_json::Value::String(new.to_string());
+        }
+    }
+
+    fn remap_figure(val: &mut serde_json::Value) {
+        if let Some(s) = val.as_str() {
+            let new = match s {
+                "Toned" => "Athletic",
+                "Womanly" => "Curvy",
+                other => other,
+            };
+            *val = serde_json::Value::String(new.to_string());
+        }
+    }
+
+    fn migrate_eye_colour_string(val: &mut serde_json::Value) {
+        if let Some(s) = val.as_str() {
+            let new = match s.to_lowercase().as_str() {
+                "brown" => "Brown",
+                "dark brown" | "darkbrown" => "DarkBrown",
+                "hazel" => "Hazel",
+                "green" => "Green",
+                "blue" => "Blue",
+                "light blue" | "lightblue" => "LightBlue",
+                "grey" | "gray" => "Grey",
+                "amber" => "Amber",
+                "black" => "Black",
+                _ => "Brown", // safe fallback
+            };
+            *val = serde_json::Value::String(new.to_string());
+        }
+    }
+
+    fn migrate_hair_colour_string(val: &mut serde_json::Value) {
+        if let Some(s) = val.as_str() {
+            let new = match s.to_lowercase().as_str() {
+                "black" => "Black",
+                "dark brown" | "darkbrown" | "dark" => "DarkBrown",
+                "brown" => "Brown",
+                "chestnut" => "Chestnut",
+                "auburn" => "Auburn",
+                "copper" => "Copper",
+                "red" => "Red",
+                "strawberry" => "Strawberry",
+                "blonde" | "blond" => "Blonde",
+                "honey blonde" | "honeyblonde" => "HoneyBlonde",
+                "platinum blonde" | "platinumblonde" | "platinum" => "PlatinumBlonde",
+                "fair" => "Blonde", // "fair" was used in v4 spawner, closest match
+                "silver" => "Silver",
+                "white" => "White",
+                _ => "DarkBrown", // safe fallback
+            };
+            *val = serde_json::Value::String(new.to_string());
+        }
+    }
+
+    if let Some(player) = save_json.get_mut("world").and_then(|w| w.get_mut("player")) {
+        if let Some(obj) = player.as_object_mut() {
+            // Remap BreastSize variants
+            if let Some(breasts) = obj.get_mut("breasts") {
+                remap_breast_size(breasts);
+            }
+
+            // Remap PlayerFigure variants
+            if let Some(figure) = obj.get_mut("figure") {
+                remap_figure(figure);
+            }
+
+            // Migrate String eye_colour → enum variant
+            if let Some(eye) = obj.get_mut("eye_colour") {
+                migrate_eye_colour_string(eye);
+            }
+
+            // Migrate String hair_colour → enum variant
+            if let Some(hair) = obj.get_mut("hair_colour") {
+                migrate_hair_colour_string(hair);
+            }
+
+            // Insert new fields with defaults (only if absent)
+            let defaults = [
+                ("height", "Average"),
+                ("hair_length", "Shoulder"),
+                ("skin_tone", "Medium"),
+                ("complexion", "Normal"),
+                ("butt", "Round"),
+                ("waist", "Average"),
+                ("lips", "Average"),
+                ("nipple_sensitivity", "Normal"),
+                ("clit_sensitivity", "Normal"),
+                ("pubic_hair", "Trimmed"),
+                ("inner_labia", "Average"),
+                ("wetness_baseline", "Normal"),
+            ];
+            for (field, default) in defaults {
+                obj.entry(field)
+                    .or_insert_with(|| serde_json::Value::String(default.to_string()));
+            }
+
+            // Migrate BeforeIdentity: add new fields if `before` is an object
+            if let Some(before) = obj.get_mut("before") {
+                if let Some(before_obj) = before.as_object_mut() {
+                    let before_defaults = [
+                        ("height", "Average"),
+                        ("hair_colour", "DarkBrown"),
+                        ("eye_colour", "Brown"),
+                        ("skin_tone", "Medium"),
+                        ("penis_size", "Average"),
+                    ];
+                    for (field, default) in before_defaults {
+                        before_obj
+                            .entry(field)
+                            .or_insert_with(|| serde_json::Value::String(default.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
+    save_json
+}
+
 /// Verify that all IDs recorded in the save file still map to the same strings
 /// in the current registry.
 fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveError> {
@@ -419,14 +567,31 @@ mod tests {
                     race: "white".into(),
                     sexuality: BeforeSexuality::AttractedToWomen,
                     figure: MaleFigure::Average,
+                    height: Height::Average,
+                    hair_colour: HairColour::DarkBrown,
+                    eye_colour: EyeColour::Brown,
+                    skin_tone: SkinTone::Medium,
+                    penis_size: PenisSize::Average,
                     traits: HashSet::new(),
                 }),
                 age: Age::LateTeen,
                 race: "east_asian".into(),
                 figure: PlayerFigure::Slim,
-                breasts: BreastSize::Large,
-                eye_colour: "brown".into(),
-                hair_colour: "dark".into(),
+                breasts: BreastSize::Full,
+                eye_colour: EyeColour::Brown,
+                hair_colour: HairColour::DarkBrown,
+                height: Height::Average,
+                hair_length: HairLength::Shoulder,
+                skin_tone: SkinTone::Medium,
+                complexion: Complexion::Normal,
+                butt: ButtSize::Round,
+                waist: WaistSize::Average,
+                lips: LipShape::Average,
+                nipple_sensitivity: NippleSensitivity::Normal,
+                clit_sensitivity: ClitSensitivity::Normal,
+                pubic_hair: PubicHairStyle::Trimmed,
+                inner_labia: InnerLabiaSize::Average,
+                wetness_baseline: WetnessBaseline::Normal,
                 traits,
                 skills: HashMap::new(),
                 money: 500,

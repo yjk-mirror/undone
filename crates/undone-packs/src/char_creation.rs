@@ -1,8 +1,10 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, ArousalLevel, BeforeIdentity, BreastSize, PcOrigin, Player, PlayerFigure,
-    SkillValue, TraitId,
+    Age, AlcoholLevel, ArousalLevel, BeforeIdentity, BreastSize, ButtSize, ClitSensitivity,
+    Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize, LipShape,
+    NippleSensitivity, PcOrigin, Player, PlayerFigure, PubicHairStyle, SkillValue, SkinTone,
+    TraitId, WaistSize, WetnessBaseline,
 };
 use undone_world::{GameData, World};
 
@@ -59,9 +61,20 @@ pub fn new_game<R: Rng>(
         race: config.race,
         figure: config.figure,
         breasts: config.breasts,
-        // Placeholder defaults — char creation UI will expose these fields later
-        eye_colour: "brown".into(),
-        hair_colour: "dark".into(),
+        eye_colour: EyeColour::Brown,
+        hair_colour: HairColour::DarkBrown,
+        height: Height::Average,
+        hair_length: HairLength::Shoulder,
+        skin_tone: SkinTone::Medium,
+        complexion: Complexion::Normal,
+        butt: ButtSize::Round,
+        waist: WaistSize::Average,
+        lips: LipShape::Average,
+        nipple_sensitivity: NippleSensitivity::Normal,
+        clit_sensitivity: ClitSensitivity::Normal,
+        pubic_hair: PubicHairStyle::Trimmed,
+        inner_labia: InnerLabiaSize::Average,
+        wetness_baseline: WetnessBaseline::Normal,
         traits,
         skills: HashMap::new(),
         money: 500,
@@ -147,7 +160,8 @@ mod tests {
     use rand::SeedableRng;
     use std::path::PathBuf;
     use undone_domain::{
-        Age, BeforeIdentity, BeforeSexuality, BreastSize, MaleFigure, PcOrigin, PlayerFigure,
+        Age, BeforeIdentity, BeforeSexuality, BreastSize, EyeColour, HairColour, Height,
+        MaleFigure, PcOrigin, PenisSize, PlayerFigure, SkinTone,
     };
 
     fn packs_dir() -> PathBuf {
@@ -167,7 +181,7 @@ mod tests {
             age: Age::EarlyTwenties,
             race: "white".into(),
             figure: PlayerFigure::Slim,
-            breasts: BreastSize::MediumLarge,
+            breasts: BreastSize::Full,
             origin: PcOrigin::CisMaleTransformed,
             before: Some(BeforeIdentity {
                 name: "Evan".into(),
@@ -175,6 +189,11 @@ mod tests {
                 race: "white".into(),
                 sexuality: BeforeSexuality::AttractedToWomen,
                 figure: MaleFigure::Average,
+                height: Height::Average,
+                hair_colour: HairColour::DarkBrown,
+                eye_colour: EyeColour::Brown,
+                skin_tone: SkinTone::Medium,
+                penis_size: PenisSize::Average,
                 traits: std::collections::HashSet::new(),
             }),
             starting_traits: vec![],
@@ -253,7 +272,7 @@ mod tests {
             age: Age::EarlyTwenties,
             race: "white".into(),
             figure: PlayerFigure::Slim,
-            breasts: BreastSize::MediumLarge,
+            breasts: BreastSize::Full,
             origin: PcOrigin::TransWomanTransformed,
             before: Some(BeforeIdentity {
                 name: "Evan".into(),
@@ -261,6 +280,11 @@ mod tests {
                 race: "white".into(),
                 sexuality: BeforeSexuality::AttractedToWomen,
                 figure: MaleFigure::Average,
+                height: Height::Average,
+                hair_colour: HairColour::DarkBrown,
+                eye_colour: EyeColour::Brown,
+                skin_tone: SkinTone::Medium,
+                penis_size: PenisSize::Average,
                 traits: std::collections::HashSet::new(),
             }),
             starting_traits: vec![],

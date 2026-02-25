@@ -62,9 +62,29 @@ group       = "personality"            # "personality", "attitude", or "appearan
 conflicts   = ["OUTGOING", "FLIRTY"]   # traits that cannot coexist
 ```
 
-Groups: **personality** (SHY, POSH, CUTE, etc.), **attitude** (SEXIST, HOMOPHOBIC, OBJECTIFYING),
-**appearance** (PLAIN, BEAUTIFUL). Hidden traits are auto-injected by the engine (ALWAYS_FEMALE,
-NOT_TRANSFORMED, TRANS_WOMAN, BLOCK_ROUGH, LIKES_ROUGH).
+Groups (13 total, 126 traits in the base pack):
+
+| Group | Examples |
+|---|---|
+| `personality` | SHY, POSH, CUTE, OUTGOING, FLIRTY, … |
+| `attitude` | SEXIST, HOMOPHOBIC, OBJECTIFYING, ANALYTICAL, CONFIDENT |
+| `appearance` | PLAIN, BEAUTIFUL |
+| `hair` | hair-related appearance traits |
+| `voice` | voice quality traits |
+| `eyes` | eye-related appearance traits |
+| `body_detail` | detailed body appearance traits |
+| `skin` | skin-related appearance traits |
+| `scent` | scent traits |
+| `sexual` | sexual characteristic traits |
+| `sexual_preference` | attraction and preference traits |
+| `dark_content` | opt-in content gate traits |
+| `lactation` | lactation-related traits |
+| `fertility` | fertility-related traits |
+| `menstruation` | menstruation-related traits |
+| `arousal_response` | arousal response traits |
+
+Hidden traits are auto-injected by the engine based on PC origin (ALWAYS_FEMALE, NOT_TRANSFORMED,
+BLOCK_ROUGH, LIKES_ROUGH). Do not inject hidden traits manually in UI or scene code.
 
 ### Skills (`data/skills.toml`)
 
@@ -77,8 +97,10 @@ min = -100
 max = 100
 ```
 
-FEMININITY is the primary writing dial. Other skills (FITNESS, CHARM, FASHION, etc.) exist
-but are not yet used in scene content.
+FEMININITY is the primary writing dial. The base pack defines 48 skills covering body,
+mind, social, and domestic domains. Other skills (FITNESS, CHARM, FASHION, etc.) exist
+but are not yet used in scene content. Access any skill value in expressions with
+`w.getSkill("SKILL_ID")`.
 
 ### Stats (`data/stats.toml`)
 
@@ -89,7 +111,8 @@ name        = "Times Kissed"
 description = "Number of times the player has been kissed."
 ```
 
-Counters incremented by `add_stat` effects. No min/max. Currently unused in scene content.
+Counters incremented by `add_stat` effects. No min/max. The base pack defines 48 stats
+tracking lifetime event counts (TIMES_KISSED, etc.). Currently unused in scene conditions.
 
 ### Arcs (`data/arcs.toml`)
 
@@ -303,13 +326,80 @@ weighted-random selected. Their effects and prose are applied. NPC actions canno
 
 ---
 
+## Physical Attribute Accessors
+
+All `w.*` accessors below are available in **both** minijinja templates (`{% if w.getHeight() == "Tall" %}`)
+and condition expressions (`w.getHeight() == 'Tall'`). They return the Debug variant name of the
+underlying Rust enum as a string, exactly as listed.
+
+### Current Physical Attributes
+
+| Accessor | Return values |
+|---|---|
+| `w.getHeight()` | `"VeryShort"`, `"Short"`, `"Average"`, `"Tall"`, `"VeryTall"` |
+| `w.getFigure()` | `"Petite"`, `"Slim"`, `"Athletic"`, `"Hourglass"`, `"Curvy"`, `"Thick"`, `"Plus"` |
+| `w.getBreasts()` | `"Flat"`, `"Perky"`, `"Handful"`, `"Average"`, `"Full"`, `"Big"`, `"Huge"` |
+| `w.getButt()` | `"Flat"`, `"Small"`, `"Pert"`, `"Round"`, `"Big"`, `"Huge"` |
+| `w.getWaist()` | `"Tiny"`, `"Narrow"`, `"Average"`, `"Thick"`, `"Wide"` |
+| `w.getLips()` | `"Thin"`, `"Average"`, `"Full"`, `"Plush"`, `"BeeStung"` |
+| `w.getHairColour()` | `"Black"`, `"DarkBrown"`, `"Brown"`, `"Chestnut"`, `"Auburn"`, `"Copper"`, `"Red"`, `"Strawberry"`, `"Blonde"`, `"HoneyBlonde"`, `"PlatinumBlonde"`, `"Silver"`, `"White"` |
+| `w.getHairLength()` | `"Buzzed"`, `"Short"`, `"Shoulder"`, `"Long"`, `"VeryLong"` |
+| `w.getEyeColour()` | `"Brown"`, `"DarkBrown"`, `"Hazel"`, `"Green"`, `"Blue"`, `"LightBlue"`, `"Grey"`, `"Amber"`, `"Black"` |
+| `w.getSkinTone()` | `"VeryFair"`, `"Fair"`, `"Light"`, `"Medium"`, `"Olive"`, `"Tan"`, `"Brown"`, `"DarkBrown"`, `"Deep"` |
+| `w.getComplexion()` | `"Clear"`, `"Normal"`, `"Rosy"`, `"Acne"` |
+| `w.getRace()` | The player's race string (e.g. `"White"`, `"Black"`, etc.) |
+| `w.getAge()` | `"LateTeen"`, `"EarlyTwenties"`, `"MidLateTwenties"`, `"LateTwenties"`, `"Thirties"`, `"Forties"`, `"Fifties"`, `"Old"` |
+| `w.getNippleSensitivity()` | `"Low"`, `"Normal"`, `"High"`, `"Extreme"` |
+| `w.getClitSensitivity()` | `"Low"`, `"Normal"`, `"High"`, `"Extreme"` |
+| `w.getPubicHair()` | `"Natural"`, `"Trimmed"`, `"Landing"`, `"Brazilian"`, `"Bare"` |
+| `w.getInnerLabia()` | `"Small"`, `"Average"`, `"Prominent"` |
+| `w.getWetness()` | `"Dry"`, `"Normal"`, `"Wet"`, `"Soaking"` |
+
+### Before-Life Accessors
+
+These accessors return the PC's physical attributes from before transformation. They return an empty
+string (`""`) if the PC has no before-identity (i.e. `w.alwaysFemale()` is true). Always guard
+with `{% if not w.alwaysFemale() %}` before using them in prose.
+
+| Accessor | Return values |
+|---|---|
+| `w.beforeHeight()` | Height variant string (same values as `w.getHeight()`) |
+| `w.beforeHairColour()` | HairColour variant string (same values as `w.getHairColour()`) |
+| `w.beforeEyeColour()` | EyeColour variant string (same values as `w.getEyeColour()`) |
+| `w.beforeSkinTone()` | SkinTone variant string (same values as `w.getSkinTone()`) |
+| `w.beforePenisSize()` | `"None"`, `"Micro"`, `"Small"`, `"Average"`, `"AboveAverage"`, `"Big"`, `"Huge"`, `"Massive"` |
+| `w.beforeFigure()` | `"Average"`, `"Skinny"`, `"Toned"`, `"Muscular"`, `"Thickset"`, `"Paunchy"` |
+
+### Usage pattern
+
+In minijinja templates:
+
+```jinja
+{% if not w.alwaysFemale() %}
+  {% if w.beforeHeight() == "Tall" and w.getHeight() == "Average" %}
+You used to tower over most people. Now you slot into the middle of any crowd.
+  {% endif %}
+{% endif %}
+```
+
+In condition expressions (schedule or scene `condition` / `trigger` fields):
+
+```
+!w.alwaysFemale() && w.getHeight() == 'Tall'
+```
+
+**Important:** String comparisons in condition expressions use single quotes. In minijinja
+templates use double quotes (standard Jinja2 string syntax).
+
+---
+
 ## Expression Language
 
 All `condition`, `trigger`, and `if` fields use the custom expression parser.
 
 | Object | Key methods |
 |--------|-------------|
-| `w.` | `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()` |
+| `w.` | `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()`, plus all physical attribute accessors (`getHeight()`, `getFigure()`, `getBreasts()`, etc.) and before-life accessors (`beforeHeight()`, `beforeFigure()`, etc.) — see [Physical Attribute Accessors](#physical-attribute-accessors) above |
 | `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()` |
 | `scene.` | `hasFlag("FLAG")` |
 | `m.` | `hasTrait("ID")`, `isPartner()`, `isFriend()` (NPC receiver) |

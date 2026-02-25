@@ -191,3 +191,55 @@ prose = """..."""
 - CisMale-only: transformation content inside `{% if not w.alwaysFemale() %}` blocks, no `{% else %}` AlwaysFemale branches
 - No `TRANS_WOMAN` inner branches (deprioritized)
 - Content gating correct for ROUGH/DUBCON/NONCON paths
+
+## Physical Attribute Reference
+
+### Accessors (available in minijinja templates as `w.METHOD()`)
+
+**Body shape:**
+- `w.getHeight()` → `"VeryShort"` | `"Short"` | `"Average"` | `"Tall"` | `"VeryTall"`
+- `w.getFigure()` → `"Petite"` | `"Slim"` | `"Athletic"` | `"Hourglass"` | `"Curvy"` | `"Thick"` | `"Plus"`
+- `w.getBreasts()` → `"Flat"` | `"Perky"` | `"Handful"` | `"Average"` | `"Full"` | `"Big"` | `"Huge"`
+- `w.getButt()` → `"Flat"` | `"Small"` | `"Pert"` | `"Round"` | `"Big"` | `"Huge"`
+- `w.getWaist()` → `"Tiny"` | `"Narrow"` | `"Average"` | `"Thick"` | `"Wide"`
+- `w.getLips()` → `"Thin"` | `"Average"` | `"Full"` | `"Plush"` | `"BeeStung"`
+
+**Appearance:**
+- `w.getHairColour()`, `w.getHairLength()`, `w.getEyeColour()`, `w.getSkinTone()`, `w.getComplexion()`
+
+**Sexual attributes:**
+- `w.getNippleSensitivity()`, `w.getClitSensitivity()`, `w.getPubicHair()`, `w.getInnerLabia()`, `w.getWetness()`
+
+**Before-life (use inside `{% if not w.alwaysFemale() %}` blocks only):**
+- `w.beforeHeight()`, `w.beforeHairColour()`, `w.beforeEyeColour()`, `w.beforeSkinTone()`, `w.beforePenisSize()`, `w.beforeFigure()`
+
+---
+
+### Trait Groups (check with `w.hasTrait("TRAIT_ID")`)
+
+**hair:** `STRAIGHT_HAIR`, `WAVY_HAIR`, `CURLY_HAIR`, `COILY_HAIR`
+
+**voice:** `SOFT_VOICE`, `BRIGHT_VOICE`, `HUSKY_VOICE`, `SWEET_VOICE`, `BREATHY_VOICE`
+
+**eyes:** `BIG_EYES`, `NARROW_EYES`, `BRIGHT_EYES`, `HEAVY_LIDDED`, `ALMOND_EYES`
+
+**body_detail:** `LONG_LEGS`, `WIDE_HIPS`, `NARROW_WAIST`, `BROAD_SHOULDERS`, `LONG_NECK`, `SMALL_HANDS`, `LARGE_HANDS`, `PRONOUNCED_COLLARBONES`, `THIGH_GAP`, `NO_THIGH_GAP`, `DIMPLES`, `BEAUTY_MARK`
+
+**skin:** `SOFT_SKIN`, `FRECKLED`, `SCARRED`, `TATTOOED`, `STRETCH_MARKS`, `SMOOTH_LEGS`
+
+**scent:** `SWEET_SCENT`, `MUSKY_SCENT`, `CLEAN_SCENT`
+
+**sexual:** `HAIR_TRIGGER`, `SQUIRTER`, `MULTI_ORGASMIC`, `ANORGASMIC`, `ORAL_FIXATION`, `SENSITIVE_NECK`, `SENSITIVE_EARS`, `SENSITIVE_INNER_THIGHS`, `LIKES_PAIN`, `LOUD`, `QUIET_COMER`, `EXHIBITIONIST`, `SUBMISSIVE`, `DOMINANT`, `PRAISE_KINK`, `DEGRADATION_KINK`, `SIZE_QUEEN`, `EASILY_WET`, `SLOW_TO_WARM`, `VOCAL_DIRTY_TALKER`, `BACK_ARCHER`, `TOE_CURLER`, `CRIER`, `GUSHER`, `CREAMER`
+
+**sexual_preference:** `LIKES_ORAL_GIVING`, `LIKES_ORAL_RECEIVING`, `LIKES_ANAL`, `DISLIKES_ANAL`, `LIKES_BEING_WATCHED`, `LIKES_TOYS`, `VANILLA`, `LIKES_FACIALS`, `LIKES_SWALLOWING`, `LIKES_DEEPTHROAT`, `LIKES_CHOKING`, `LIKES_BONDAGE`, `LIKES_SPANKING`, `LIKES_CREAMPIE`, `LIKES_HAIR_PULLING`, `LIKES_BITING`, `LIKES_EDGING`, `LIKES_FACE_FUCKING`, `LIKES_DOUBLE_PENETRATION`, `LIKES_MULTIPLE_PARTNERS`
+
+**dark_content** — MUST wrap in `{% if not w.hasTrait("BLOCK_ROUGH") %}`:
+`FREEZE_RESPONSE`, `SHAME_AROUSAL`, `TRAUMA_RESPONSE`, `COERCION_VULNERABLE`, `BLACKMAIL_TARGET`, `FEAR_AROUSAL`, `CNC_KINK`, `SOMNOPHILIA`, `HUMILIATION_RESPONSE`, `STOCKHOLM_TENDENCY`, `CORRUPTION_FANTASY`
+
+**arousal_response:** `NIPPLE_GETTER`, `FLUSHER`, `LIP_BITER`, `THIGH_CLENCHER`, `BREATH_CHANGER`
+
+**lactation:** `LACTATING`
+
+**fertility:** `VERY_FERTILE`, `INFERTILE`
+
+**menstruation:** `HEAVY_PERIODS`, `LIGHT_PERIODS`, `IRREGULAR`

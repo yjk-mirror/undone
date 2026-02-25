@@ -406,15 +406,21 @@ of what she used to be on the other side of.
 
 ### FEMININITY as a Writing Dial
 
-`w.getSkill("FEMININITY")` tracks adaptation. The range is −100 to 100.
-Male-start PCs begin around 0–10. Always-female PCs begin at 75.
+`w.getSkill("FEMININITY")` tracks adaptation. The range is 0 to 100.
+`CisMaleTransformed` PCs begin at 10. Always-female PCs begin at 75.
 
-| Range | What she's like | Example texture |
-|-------|----------------|-----------------|
-| < 25 | Still strongly adjusting | Female experiences feel like thresholds crossed. Sex with a man is conceptually enormous. The body still surprises her sometimes. |
-| 25–49 | Conflicted | Recognises female feelings, doesn't fully own them. *Am I actually like this now?* — but less certainly than before. |
-| 50–74 | Adapted, not erased | Mostly inhabits female life. Occasional flicker of her former self. The past is real but not dominant. |
-| ≥ 75 | Fully adapted | Barely thinks about having been male. Don't impose transformation content here unless it's genuinely earned. |
+## FEMININITY Intervals (0-100)
+
+- **0–9**: Total alienation. This body is a stranger's body. She doesn't know how to walk in it. Breasts are foreign objects strapped to her chest. Every sensation is wrong. Being perceived as female is disorienting. Arousal happens in a body she doesn't recognize.
+- **10–19**: First adaptations. She's stopped reaching for a cock that isn't there. Female pronouns don't make her flinch every time. She's starting to understand why women cross their arms. Her reflection looks almost familiar if she doesn't look too long.
+- **20–29**: Functional. She passes. She's learning the rhythms — the way women move through space, the social shorthand, the danger calculus that operates below conscious thought. Male attention is uncomfortable but no longer alien. She's had her first orgasm in this body and it confused her for days.
+- **30–39**: Adapting. Catches herself thinking like a woman before correcting to thinking like a man pretending to be a woman. The correction comes later every week. She owns clothes she chose because she liked how they looked on her. She's felt desire in this body and didn't hate it.
+- **40–49**: The tipping point. The before-life is something that happened to someone else. She still knows she was a man — the knowledge is there — but it's *knowledge*, not *identity*. She looks in the mirror and sees *herself*. The gender dysphoria runs the other way now — imagining going back feels wrong.
+- **50–59**: Comfortable. Being a woman is normal. She has female friendships, female routines, female complaints. Transformation flickers are rare — a man's gesture that reminds her of who she used to be, a phantom memory during sex. She knows her body. She knows what she likes.
+- **60–69**: Settled. Only extreme gendered situations bring the before-life forward — being catcalled and recognizing the man she would have been, encountering a situation where her male history gives her unexpected insight. These moments are bittersweet, not traumatic.
+- **70–79**: Native with residue. She doesn't think about having been male in daily life. The transformation is biographical — something that happened, like being born in a different city. Sex is sex. Desire is desire. But sometimes, in the right moment, the *knowing* surfaces and makes everything sharper. She understands men in a way other women can't, and that knowledge is power.
+- **80–89**: The before-life is academic. She was a man the way someone was a child — technically true, experientially distant. Her body is *her* body. No flickers. No phantom memories. The transformation gave her life context but doesn't define it. The richest writing here is about what she's *built*, not what she lost.
+- **90–100**: Complete. The transformation is a fact about her past, not a lens on her present. She is a woman. Full stop. Writing at this tier should not reference the transformation unless something extreme forces it — a blood test, a magical echo, meeting someone from the before-life. At this level, the character is post-transformation. The game continues because life continues.
 
 Use `w.getSkill("FEMININITY")` directly in prose templates to branch on adaptation level:
 
@@ -427,6 +433,58 @@ You've stopped flinching. Mostly.
 You're not thinking about it.
 {% endif %}
 ```
+
+---
+
+### Physical Attributes
+
+The PC has a full set of physical attributes available for use in scene prose. These are
+set at character creation and remain stable unless explicitly changed by a scene effect.
+
+**Physical enums (accessible via template methods):**
+
+| Attribute | Accessor | Notes |
+|-----------|----------|-------|
+| Height | `w.getHeight()` | |
+| HairLength | `w.getHairLength()` | |
+| SkinTone | `w.getSkinTone()` | |
+| Complexion | `w.getComplexion()` | |
+| ButtSize | `w.getButt()` | |
+| WaistSize | `w.getWaist()` | |
+| LipShape | `w.getLips()` | |
+| NippleSensitivity | `w.getNippleSensitivity()` | |
+| ClitSensitivity | `w.getClitSensitivity()` | |
+| PubicHairStyle | `w.getPubicHair()` | |
+| InnerLabiaSize | `w.getInnerLabia()` | |
+| WetnessBaseline | `w.getWetness()` | |
+| EyeColour | `w.getEyeColour()` | |
+| HairColour | `w.getHairColour()` | |
+| PlayerFigure | `w.getFigure()` | 7 variants |
+| BreastSize | `w.getBreasts()` | 7 variants |
+| PenisSize | `w.beforePenisSize()` | On BeforeIdentity only |
+
+**Before-body accessors** (what she looked like before transformation — use inside
+`{% if not w.alwaysFemale() %}` blocks only):
+
+| Attribute | Accessor |
+|-----------|----------|
+| Height | `w.beforeHeight()` |
+| HairColour | `w.beforeHairColour()` |
+| EyeColour | `w.beforeEyeColour()` |
+| SkinTone | `w.beforeSkinTone()` |
+| PenisSize | `w.beforePenisSize()` |
+| Figure | `w.beforeFigure()` |
+
+**Usage notes:**
+- Use physical attributes to add specificity to body-awareness moments — but sparingly.
+  One well-placed physical detail grounds a scene. A catalogue of them reads like a
+  character sheet.
+- Before-body accessors are for transformation contrast only. A scene comparing her
+  current body to her before-body earns the detail. A scene that isn't about
+  transformation does not.
+- At low FEMININITY (0–29), physical unfamiliarity is high. Breast size, sensitivity,
+  wetness — these are things she's still learning about. Use accordingly.
+- At high FEMININITY (60+), physical attributes are simply *hers*. No contrast needed.
 
 ---
 

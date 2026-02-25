@@ -19,15 +19,22 @@ const MALE_FIGURES: &[MaleFigure] = &[
     MaleFigure::Paunchy,
 ];
 const FEMALE_FIGURES: &[PlayerFigure] = &[
+    PlayerFigure::Petite,
     PlayerFigure::Slim,
-    PlayerFigure::Toned,
-    PlayerFigure::Womanly,
+    PlayerFigure::Athletic,
+    PlayerFigure::Hourglass,
+    PlayerFigure::Curvy,
+    PlayerFigure::Thick,
+    PlayerFigure::Plus,
 ];
 const BREAST_SIZES: &[BreastSize] = &[
-    BreastSize::Small,
-    BreastSize::MediumSmall,
-    BreastSize::MediumLarge,
-    BreastSize::Large,
+    BreastSize::Flat,
+    BreastSize::Perky,
+    BreastSize::Handful,
+    BreastSize::Average,
+    BreastSize::Full,
+    BreastSize::Big,
+    BreastSize::Huge,
 ];
 const AGES: &[Age] = &[
     Age::EarlyTwenties,

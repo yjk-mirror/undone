@@ -60,3 +60,279 @@ name        = "Childcare"
 description = "Skill at looking after children."
 min         = 0
 max         = 100
+
+# Social / Professional
+
+[[skill]]
+id          = "PERSUASION"
+name        = "Persuasion"
+description = "Convincing people. Influence over likability."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "DECEPTION"
+name        = "Deception"
+description = "Concealing truth. Poker face."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "STREETWISE"
+name        = "Streetwise"
+description = "Reading situations. Knowing which men to avoid."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "TECH"
+name        = "Tech"
+description = "Computers, phones, social media."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "NETWORKING"
+name        = "Networking"
+description = "Building professional connections."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "NEGOTIATION"
+name        = "Negotiation"
+description = "Getting terms in her favour."
+min         = 0
+max         = 100
+
+# Creative / Self-expression
+
+[[skill]]
+id          = "MAKEUP"
+name        = "Makeup"
+description = "Foundation to contour. Knowing what works for her face."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "STYLE"
+name        = "Style"
+description = "Personal expression through clothes."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "ACTING"
+name        = "Acting"
+description = "Playing a role convincingly."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "SINGING"
+name        = "Singing"
+description = "Can she carry a tune."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "PHOTOGRAPHY"
+name        = "Photography"
+description = "Taking photos. Selfies. Nudes. The right angle."
+min         = 0
+max         = 100
+
+# Physical / Practical
+
+[[skill]]
+id          = "SELF_DEFENSE"
+name        = "Self-Defense"
+description = "Knowing when to run and how to hurt someone when she can't."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "DRIVING"
+name        = "Driving"
+description = "Car handling. The ability to leave."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "HOUSEWORK"
+name        = "Housework"
+description = "Domestic competence. Laundry, cleaning."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "ATHLETICS"
+name        = "Athletics"
+description = "Sports, running, physical coordination."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "FLEXIBILITY"
+name        = "Flexibility"
+description = "Yoga. Stretching. Useful."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "SWIMMING"
+name        = "Swimming"
+description = "Can she swim. Bikini confidence."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "RUNNING_IN_HEELS"
+name        = "Running in Heels"
+description = "Not a joke. A survival skill and a power move."
+min         = 0
+max         = 100
+
+# Sexual / Intimate
+
+[[skill]]
+id          = "KISSING"
+name        = "Kissing"
+description = "Technique. Pressure. The moment she opens her mouth."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "ORAL_SKILL"
+name        = "Oral Skill"
+description = "Tongue, lips, pressure, rhythm, depth."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "SEDUCTION"
+name        = "Seduction"
+description = "The art of making someone want her."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "STAMINA"
+name        = "Stamina"
+description = "Sexual endurance. How many rounds she has."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "KEGEL"
+name        = "Kegel"
+description = "Pelvic floor strength. Grip. Squeeze."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "DIRTY_TALK"
+name        = "Dirty Talk"
+description = "Narrating, begging, demanding during sex."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "STRIPTEASE"
+name        = "Striptease"
+description = "Taking clothes off as performance."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "ANAL_SKILL"
+name        = "Anal Skill"
+description = "Relaxation, angles, communication."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "HANDJOB"
+name        = "Handjob"
+description = "Grip, rhythm, speed, reading the response."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "RIDING"
+name        = "Riding"
+description = "On top. Rhythm, depth, angle."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "BONDAGE_SKILL"
+name        = "Bondage Skill"
+description = "Tying and being tied. Knots, safety."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "PAIN_TOLERANCE"
+name        = "Pain Tolerance"
+description = "How much she can take before pleasure becomes just pain."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "DEEPTHROAT"
+name        = "Deepthroat"
+description = "Suppressing the gag reflex."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "TEASE"
+name        = "Tease"
+description = "The art of denial. Making him wait."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "AFTERCARE"
+name        = "Aftercare"
+description = "The part after the intensity. Holding, talking, grounding."
+min         = 0
+max         = 100
+
+# Social / Emotional
+
+[[skill]]
+id          = "EMOTIONAL_RESILIENCE"
+name        = "Emotional Resilience"
+description = "Processing bad experiences without breaking."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "MANIPULATION"
+name        = "Manipulation"
+description = "Getting what she wants through indirect means."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "EMPATHY"
+name        = "Empathy"
+description = "Reading people's emotional states."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "COMPOSURE"
+name        = "Composure"
+description = "Maintaining a facade when falling apart inside."
+min         = 0
+max         = 100
+
+[[skill]]
+id          = "ALCOHOL_TOLERANCE"
+name        = "Alcohol Tolerance"
+description = "How much she can drink before she's sloppy."
+min         = 0
+max         = 100
