@@ -14,13 +14,71 @@
 
 ## ⚡ Next Action
 
-**More scenes** — second-week scenes for Robin/Camila routes, or additional standalone scenes. Use `scene-writer` agent for drafting, `writing-reviewer` for quality pass.
+**Playtest feedback pass + new scenes.** See "Playtest Feedback" section below for all issues. Priority order: Batch 1 (quick fixes) → Batch 2 (transformation_intro rewrite) → Batch 3 (origin presets) → Batch 4 (week-2 scenes).
 
-**Deferred content phases** (from `docs/plans/2026-02-24-prolific-session.md`):
-- Phase 5: Robin week 2 scenes (`working` arc state — `robin_work_meeting`, `robin_evening`)
-- Phase 6: Camila week 2 scenes (`first_week` arc state — `camila_study_session`, `camila_dining_hall`)
-- Phase 7: `plan_your_day.toml` prose depth (trait branches, weight, texture)
-- Phase 8: Free-time recurrence variety (return-visit prose variants using game flags)
+---
+
+## Playtest Feedback (2026-02-25)
+
+Issues found during first playtest. All need to be fixed next session.
+
+### Batch 1 — Quick Fixes (UI/data)
+
+**1. Dark mode dropdown text invisible.**
+Dropdowns (Age, Sexuality) have unreadable text in the Night theme. Fix the color tokens so dropdown option text is legible across all three themes.
+
+**2. "Evan" default name is wrong.**
+The Name Before field should be empty on load. Show suggestion/placeholder text (a random name from the existing names list). Add a "Randomize" button. Do not pre-fill with "Evan".
+
+**3. Age enum too granular — simplify.**
+Current variants have too many entries. Desired simplification:
+- Remove plain `Twenties`
+- Add `EarlyTwenties` ("Early 20s") and `MidLate Twenties` ("Mid to Late 20s")
+- Audit the full enum and remove anything overly fine-grained
+- Update all match arms, display, save migration as needed
+
+**4. Clarify origin radio labels.**
+"Something happened to me — I was a woman" vs "I was always a woman" is confusing. Needs a short descriptive line under each option explaining the difference. Suggested:
+- `CisMaleTransformed`: "Something happened to me — I was a man" → *subtext: "Transformed from male. The core experience."*
+- `TransWomanTransformed`: "Something happened to me — I was a trans woman" → *subtext: "Already knew yourself. The transformation was recognition."*
+- `CisFemaleTransformed`: "Something happened to me — I was a woman" → *subtext: "You were female. Something still changed."*
+- `AlwaysFemale`: "I was always a woman" → *subtext: "No transformation. Play as yourself."*
+
+### Batch 2 — Transformation Intro Rewrite
+
+**5. transformation_intro.toml is in third person. This is a critical violation.**
+All prose must be second-person present tense. The current scene uses "she/her". Rewrite entirely.
+
+**6. Transformation intro doesn't reflect male character's traits/attributes.**
+The scene should branch on the traits the player selected in BeforeCreation (SHY, AMBITIOUS, etc.) and reference physical attributes where relevant. Use scene-writer agent; use writing-reviewer to audit.
+
+**7. Transformation intro is too short and has AI-isms.**
+Too brief for a moment of this weight. Should be longer — the character doesn't immediately realise what happened; it takes a few moments to register. Fix all staccato/dramatising patterns per writing guide.
+
+### Batch 3 — Origin Character Presets (New Feature)
+
+**8. Add Robin and Camila as selectable preset origins.**
+On the BeforeCreation screen, give the player three options:
+- **Start as [Robin's male name]** — shows a brief description of who they were before (no female spoilers), locks all fields, auto-fills everything
+- **Start as [Camila's male name]** — same treatment
+- **Create your own** — existing form, fully editable
+
+When a preset is selected: show the character description, display all their traits/attributes as read-only, and proceed straight to TransformationIntro. The user cannot change anything.
+
+Read `docs/characters/robin.md` and `docs/characters/camila.md` for their pre-transformation identities. Write the short "who were you before" blurb (second person, no female spoilers) as part of this task.
+
+### Batch 4 — Week-2 Scenes (Content)
+
+**9. Robin week 2:** `robin_work_meeting.toml`, `robin_evening.toml` (arc state: `"working"`)
+**10. Camila week 2:** `camila_study_session.toml`, `camila_dining_hall.toml` (arc state: `"first_week"`)
+
+Use parallel scene-writer agents + writing-reviewer audit.
+
+---
+
+**Deferred content phases** (lower priority, from `docs/plans/2026-02-24-prolific-session.md`):
+- Phase 7: `plan_your_day.toml` prose depth
+- Phase 8: Free-time recurrence variety
 
 ---
 
