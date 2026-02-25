@@ -1,12 +1,15 @@
 # Shared build configuration for the undone game workspace.
 # This file is read by cargo regardless of which git worktree is active.
 
-[build]
-# All worktrees share one target directory so switching branches stays fast.
-# Absolute path — this is a single-developer machine, no portability concern.
-target-dir = "C:/Users/YJK/dev/mirror/undone/target"
-
 # Release profile: 16 codegen units instead of 1 roughly halves link time
 # at the cost of marginal optimization — acceptable for a single-player game.
 [profile.release]
 codegen-units = 16
+
+# Worktree build-cache sharing (optional, per-machine):
+# When working across git worktrees (.worktrees/<branch>), all worktrees can share
+# one cargo target directory so switching branches doesn't cause cold builds.
+# Set CARGO_TARGET_DIR in your shell profile to the main repo's target/ dir:
+#   export CARGO_TARGET_DIR=/path/to/undone/target        # Linux/Mac
+#   $env:CARGO_TARGET_DIR = "C:\path\to\undone\target"   # Windows PowerShell
+# Do not set target-dir here — it would be machine-specific and break other devs.

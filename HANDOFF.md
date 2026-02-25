@@ -192,6 +192,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Linux/Mac dev readiness: removed hardcoded Windows `target-dir` from `.cargo/config.toml` (use `CARGO_TARGET_DIR` env var instead), added `enabledMcpjsonServers` for cross-platform servers to committed `settings.json`, added Linux setup section to CLAUDE.md. Also cleaned stale test binary from deleted arc-system worktree (had embedded old CARGO_MANIFEST_DIR). 204 tests, 0 failures. |
 | 2026-02-25 | Arc system implementation (worktree: arc-system). Scheduler: added pick_next() — evaluates triggers across ALL slots first (alphabetical), then weighted pick from all eligible events. Arc scenes now reachable via ROUTE_* flags. GameState: removed default_slot (vestigial). UI: PartialCharState.arc_flag flows from char creation → starting_flags. PresetData gets arc_flag field (each preset declares its own flag). Custom players start freeform (no arc picker). Build: .cargo/config.toml with shared target dir (no more cold worktree builds) + codegen-units=16. 204 tests, 0 failures. |
 | 2026-02-25 | Reorientation + cleanup: merged prolific-session branch (6 commits), code review (15 findings, fixed C1+C2+I3+M5), code simplifier pass (4 cleanups), created scene-writer + writing-reviewer custom agents in .claude/agents/. 200 tests, 0 failures. Pushed to origin. |
 | 2026-02-21 | Design session: decompiled Newlife, designed Undone engine, wrote scaffold plan |

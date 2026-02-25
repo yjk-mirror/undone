@@ -45,6 +45,51 @@ emotional register for trans woman PCs.
 - `HANDOFF.md` — Current state and session log. **Always read this first.**
 - `docs/status.md` — Scaffold progress history (all 13 tasks done).
 
+## Setup (Linux / Mac)
+
+### Prerequisites
+
+```bash
+# Rust toolchain
+curl https://sh.rustup.rs -sSf | sh
+
+# Node (for MCP launchers and hooks) — use your distro's package manager or nvm
+# Debian/Ubuntu:
+sudo apt install nodejs
+
+# Linux system libs required by floem (GUI toolkit)
+# Debian/Ubuntu:
+sudo apt install libx11-dev libxcursor-dev libxrandr-dev libxi-dev \
+  libgl1-mesa-dev libfontconfig1-dev libxkbcommon-dev libwayland-dev
+
+# Build the cross-platform MCP tools
+cd tools && cargo build --release && cd ..
+```
+
+### Settings
+
+`settings.local.json` is gitignored (machine-local). Create `.claude/settings.local.json`:
+
+```json
+{
+  "enabledMcpjsonServers": ["rhai", "minijinja", "rust"]
+}
+```
+
+On **Windows**, also add `"screenshot"` and `"game-input"` to the list (those two MCP
+servers use WinAPI and are no-ops on Linux/Mac).
+
+### Worktree target-dir sharing (optional)
+
+To share the cargo build cache across git worktrees and avoid cold builds:
+
+```bash
+# Add to ~/.bashrc / ~/.zshrc:
+export CARGO_TARGET_DIR=/path/to/undone/target
+```
+
+---
+
 ## Tech Stack
 
 | Concern | Choice |
