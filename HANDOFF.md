@@ -15,7 +15,18 @@
 
 ## ⚡ Next Action
 
-**Three audits complete. Engine bugs and arc flow issues identified. Content focus narrowed to CisMale→Woman.**
+**Character attribute schema complete. Char creation UI plan written.**
+
+### Char creation UI — physical attributes
+Plan ready at `docs/plans/2026-02-25-char-creation-ui-attributes.md`. 6 tasks:
+1. Expand PartialCharState (+6 before fields) and CharCreationConfig (+14 fem fields)
+2. Before-panel dropdowns (height, eye/hair colour, skin tone, figure, penis size)
+3. Fem-panel dropdowns (14 fields in Shape/Appearance/Intimate sections)
+4. Update test helpers
+5. Physical trait pickers (hair texture, voice, eyes, body_detail, skin, scent)
+6. Sexual trait pickers (gated by include_rough)
+
+### Engine bugs — blocks correctness
 
 ### Engine bugs — blocks correctness
 1. **NPC action `next` field missing from engine** — 6 scene files have `[[npc_actions.next]]` blocks that are silently dropped. Either add `next` to `NpcActionDef` or remove dead TOML. See arc flow audit B1.
@@ -206,6 +217,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Char creation UI attributes plan written (`docs/plans/2026-02-25-char-creation-ui-attributes.md`). 6 tasks: PartialCharState/CharCreationConfig expansion, before-panel dropdowns (6 fields), fem-panel dropdowns (14 fields in 3 sections), test helpers, physical trait pickers (6 groups), sexual trait pickers (BLOCK_ROUGH gated). |
 | 2026-02-25 | Character attribute schema (worktree: char-attributes). 15 new enums: Height, HairLength, SkinTone, Complexion, EyeColour, HairColour, NippleSensitivity, ClitSensitivity, PubicHairStyle, InnerLabiaSize, WetnessBaseline, ButtSize, WaistSize, LipShape, PenisSize. PlayerFigure expanded 3→7 (Petite/Slim/Athletic/Hourglass/Curvy/Thick/Plus), BreastSize 4→7 (Flat/Perky/Handful/Average/Full/Big/Huge). Player struct: 12 new fields + String→enum for eye_colour/hair_colour. BeforeIdentity: 5 new fields (height, hair_colour, eye_colour, skin_tone, penis_size). 126 traits across 13 groups (hair, voice, eyes, body_detail, skin, scent, sexual 25, sexual_preference 20, dark_content 11, lactation, fertility, menstruation, arousal_response). 48 skills (9+39 new). 48 stats (3+45 new). ~27 new PlayerCtx template methods + eval_call_string condition accessors. Save migration v4→v5 (field defaults, String→enum conversion, variant remaps). NPC spawner updated for new enum variants. Docs: writing-guide 10-tier FEMININITY, content-schema accessor table, scene-writer + writing-reviewer agent updates. 20 files changed, +2581/-102. 204 tests, 0 failures. |
 | 2026-02-25 | Content focus narrowed + arc flow audit. User directed: CisMale→Woman only (AlwaysFemale/TransWoman/CisFemale all deprioritized). Removed TRANS_WOMAN branches from all 7 scene files. Rewrote `docs/writing-samples.md` (removed 3rd-person robin_arrival sample — root cause of POV violations). Updated writing-guide, scene-writer, writing-reviewer to CisMale-only focus. Created `docs/content-schema.md` (complete schema reference). Arc flow audit found 3 engine bugs: NPC `next` field missing (6 scenes affected), `once_only` inert, `add_npc_liking` fails silently. `robin_first_clothes` confirmed unreachable. 13 named NPCs have no character docs. Full report: `docs/audits/2026-02-25-arc-flow-audit.md`. |
 | 2026-02-25 | Writing & game design audit: 4 parallel agents (Robin prose, Camila prose, universal prose, game design). Found 16 Critical, 34 Important, 21 Minor. Systemic: both arcs in third-person (guide says second-person), TRANS_WOMAN register missing from 13/19 scenes, post-arc content void (3-scene loop after arcs exhaust), 8 skills with zero scene usage. Key writing criticals: over-naming ("specific quality", "geometry of being a woman"), staccato closers ("the city goes on"), adjective-swap branches, alwaysFemale gating gaps, `plan_your_day` is a placeholder stub. Full report: `docs/audits/2026-02-25-writing-design-audit.md`. |
