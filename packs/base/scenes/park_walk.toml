@@ -1,0 +1,102 @@
+[scene]
+id          = "base::park_walk"
+pack        = "base"
+description = "Late afternoon. The park. Moving through outdoor space differently."
+
+[intro]
+prose = """
+Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock. The sun is low enough now to come through the trees at an angle that hits everything sideways, turns the grass a color it isn't at noon. Nobody needs anything from you here and you pick a direction.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock.
+
+You're still recalibrating how you move in public space. The speed, the path choices — which side of the path you default to, when you make eye contact with approaching strangers and when you don't. You used to walk without thinking about it. You're still mapping it.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*You walk like you're going somewhere. That hasn't changed. Something in the periphery has — the way the space around you reads, how much of it you take up and how, the way strangers route around or toward you. You're still mapping it.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "walk_the_loop"
+label = "Do the full loop"
+detail = "An hour. A man jogs past, nods."
+prose = """
+You do the full loop around the park — the outer path, past the dog run, past the fountain that's been turned off for the season, back around to the entrance. A man in a running jacket jogs past and nods without breaking stride. You nod back. The exchange is nothing.
+
+{% if not w.alwaysFemale() %}
+You've given that nod before, from the other side of it. It's the same nod. What's different is how it arrives now — without the half-second sizing-up that used to happen below the surface. Just the nod, and then he's gone around the bend.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "sit_for_a_while"
+label = "Find a bench. Sit."
+detail = "Nobody asks why."
+prose = """
+You find a bench that gets the late-afternoon light — the kind that comes in sideways at this hour and makes everything more than it is. You sit.
+
+A woman with a double stroller navigates around a group of pigeons that are extremely committed to not moving. Two teenagers on the grass have their backs to each other, both on their phones. A man on the outer path glances over as he passes — brief, automatic — and his gaze moves back to the path ahead.
+
+You notice the glance. You notice that you noticed it. You sit with that for a minute.
+
+{% if w.hasTrait("SHY") %}
+Twenty minutes pass without your permission. Alone in a public space, visible but not required — there's a specific quality to this kind of alone that you couldn't have explained six months ago. The park keeps going around you. You sit until the light shifts, and then a little longer.
+{% else %}
+The sun works its way across. You track it without meaning to — the warmth on one side of your face and then the other — and somewhere in there you stop keeping track of anything.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -10
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "run_into_someone"
+label     = "Jake. With a dog."
+detail    = "Of all people."
+condition = "gd.hasGameFlag('MET_JAKE')"
+prose = """
+Jake comes around the corner with a dog — a medium-sized dog of uncertain breed, pulling in the direction of a squirrel with the full conviction of an animal that has never not caught a squirrel. He clocks you about two seconds before you could reasonably pretend you hadn't seen each other.
+
+"Hey." He reins the dog in, not quite successfully. "Small world."
+
+The dog decides you're worth investigating and that resolves the question of what to do with your hands for the next thirty seconds.
+
+He's walking the whole loop, it turns out. So are you. The conversation that happens over the next twenty minutes is the kind that happens when two people are going the same direction and there's no particular reason to stop it. He doesn't make the meeting into anything — just talks, lets the dog set the pace, occasionally tells the dog to leave it. The dog does not leave it.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true

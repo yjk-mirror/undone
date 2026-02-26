@@ -1,0 +1,138 @@
+[scene]
+id          = "base::work_lunch"
+pack        = "base"
+description = "The office lunch calculation. Where you eat, who you eat with, what that means."
+
+[intro]
+prose = """
+12:15. The office energy shifts — keyboards quiet, chairs roll back, people start collecting their things. The question of what to do with forty-five minutes.
+
+You wait a beat to see which way the current goes before committing.
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') < 20"
+prose = """
+12:15. The office energy shifts and you're still learning what it means.
+
+You don't know the lunch patterns yet. You watch which clusters form and which don't, where people go when they have the choice. Nobody explicitly excludes you, but the clusters have their own gravity — accumulated history, shorthand, in-jokes that aren't going to be explained. You're waiting to understand where you fit in a geography that doesn't have your name on it yet.
+"""
+
+# ── Thoughts ──────────────────────────────────────────────────────────
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose = "*You used to pick up whatever was in the conference room or eat at your desk without thinking about it. The question of lunch never had social texture before.*"
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "eat_at_desk"
+label  = "Order in, eat at your desk"
+detail = "Through the Slack channel. Food arrives. Nobody asks."
+prose  = """
+You order through the Slack channel. Your lunch arrives twenty minutes later and you eat at your desk with one window open and something ambient in your earbuds. Nobody comments. You get forty minutes of uninterrupted work out of the deal, which in a different mood you'd call a win and in this mood you're calling practical.
+
+{% if w.hasTrait("SHY") %}
+This is actively comfortable, not just efficient. The option to be alone without explanation — no having to decide whether to join a group you're not sure wants you, no finding somewhere to put your hands at a table of people who all seem to already know what to say. You get your work done. Your shoulders unknot by about 12:45.
+{% else %}
+The open floor empties out around you. A few others stay too — one guy has headphones on and clearly isn't looking up, another is on a call, talking in the careful voice people use when they don't want to be overheard. You eat your lunch while the open floor sits quiet around you.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "go_out_alone"
+label  = "Go out by yourself"
+detail = "A table to yourself. Nobody wants anything from you."
+prose  = """
+Two blocks from the office there's a sandwich place with a long counter facing the window. You get a table to yourself. You read your phone and eat your lunch and watch the sidewalk, which is doing what sidewalks do at this hour — people in motion, someone on a call, a bike courier cutting through the gap between a delivery truck and a cab.
+
+{% if not w.alwaysFemale() %}
+Being a woman alone at a lunch counter is a different read than being a man alone. The man eating alone in the middle of the day carries an assumption of something not quite working — nobody volunteers what, but it's there. The woman alone reads as a choice. You've been on the other side of that assumption, made it about other people without meaning to.
+{% endif %}
+
+You finish your sandwich and get back before 1:00.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "join_the_group"
+label  = "Go with the team"
+detail = "Someone asks if you're coming. You go."
+prose  = """
+One of the people from your immediate team — Priya, you think, though you're still matching faces to Slack handles — asks on the way out if you're headed to Corrigan's. You say sure. Three others come along. The conversation on the walk is about a migration that's running behind, which you're tangentially connected to and mostly listening to.
+
+Corrigan's is a bar that does lunch, the kind of place where the menu is laminated and the food is reliably what it says it is. You sit at the far end of the group and order the same thing you'd have ordered anywhere.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You're mapping the social geometry while they talk shop. Who drives the conversation, who waits for an opening, whose opinions get repeated back as someone else's fifteen minutes later. Priya defers to the senior developer on engineering calls and doesn't defer to anyone on everything else, which tells you something about how she reads the room. The migration is two weeks behind and nobody at this table owns that problem, so it functions as neutral territory — safe to complain about, nothing at stake.
+
+You contribute once, a question about the database snapshot cadence, and watch how it lands. It lands fine.
+
+{% else %}
+The conversation is about a project you're tangentially connected to, which means you nod at the right moments and eat your lunch and learn more about the internal politics of a system you're not responsible for. The food is decent, the company adequate. You come back to the office with a slightly better handle on who these people are, which is the kind of thing that compounds slowly and isn't worth rushing.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "ask_marcus"
+label     = "Catch Marcus in the kitchen"
+detail    = "Ask if he's going out. Real conversation, not performance."
+condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && !gd.hasGameFlag('LUNCH_WITH_MARCUS')"
+prose     = """
+You catch Marcus in the kitchen, one hand on the coffee machine, coat still over his arm. Ask if he's going out. He says sure, like it wasn't a question — not casual exactly, just no friction.
+
+The place he goes to is a deli two blocks east. Counter seating. You order. The conversation starts where the last one left off, which is somewhere in the middle of a real problem.
+
+He has opinions about the latency numbers — not complaints, opinions, which is different. You disagree with one of his assumptions about the read pattern. He stops, actually considers it, says "okay, walk me through that." You do. He doesn't flinch and he doesn't capitulate either — he pushes back with a specific counterexample, which you weren't expecting, and the conversation goes somewhere that neither of you planned for it to go.
+
+By the time you're back in the elevator he's already drafting a message on his phone. "I want to try something," he says, which from him sounds less like small talk than it probably does from most people.
+
+{% if not w.alwaysFemale() %}
+You've had lunches like this before — the good kind, the kind where the work is what it is and nobody's performing at each other. You know how rare they are. The thing you're still working out is how it lands differently now, being taken seriously across a table, the specific way someone listens when they're actually interested.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LUNCH_WITH_MARCUS"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true

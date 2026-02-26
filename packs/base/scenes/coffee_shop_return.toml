@@ -1,0 +1,108 @@
+[scene]
+id          = "base::coffee_shop_return"
+pack        = "base"
+description = "Back at the coffee shop. Jake is there. The question of whether you're going to be someone who acknowledges him."
+
+[intro]
+prose = """
+The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. The barista with the sleeve tattoos is running two drinks at once without looking flustered. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up, in the specific posture of someone who's been there a while and intends to stay.
+
+You've met this person, you know his name, there's no good reason to pretend otherwise — but doing something about it requires a choice.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up.
+
+You know what you'd have done before. Nodded once if you happened to make eye contact, gotten your coffee, gotten on with it. Clean and unremarkable. You're not sure if that's still the right call, or if "right" means something different in this body than it used to, or if you're overthinking a Tuesday morning in a coffee shop. Probably the third one. You get in line.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "acknowledge_him"
+label             = "Catch his eye on the way to the counter"
+detail            = "He nods. You nod. The thing is acknowledged."
+allow_npc_actions = false
+prose = """
+You catch his eye on the way to the counter — the half-second of recognition that settles who's going to make the call. He nods. You nod. Clean.
+
+You order, you wait. The owner writes nothing on the cup, which means you're a regular now whether you meant to be.
+
+On your way out, he glances up. "Hey — you come here a lot?" Not a line. Just a small recognition of coincidence, the tone of someone noting a fact.
+
+"Most mornings," you say, which is close enough to true.
+
+"Good taste," he says, and goes back to his laptop.
+
+{% if not w.alwaysFemale() %}
+You've been in his position before — the one who acknowledges, who makes it easy, who does the small social maintenance and then returns to his own thing. You know the shape of it from the inside. It lands differently when you're on the other end of it. The coffee is still good.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "sit_near_him"
+label     = "Take the table next to his"
+detail    = "You've already met. This isn't a thing."
+condition = "gd.npcLiking('ROLE_JAKE') == 'Ok'"
+prose = """
+You've already met. You take the table next to his — the one by the window, which happens to also be the good table — and open your own laptop.
+
+Quiet for a few minutes. He's in the middle of something. Then: "What is that?"
+
+You look up. He's gesturing at your screen — the thing you're working on, the project, whatever's currently in front of you. You explain it. You expect the explanation to take thirty seconds and land politely. Instead he asks a question that's actually about it, and then another one. He understands it better than he was supposed to in twenty minutes of a coffee shop conversation.
+
+You end up working next to each other for forty minutes. The conversation picks up and goes quiet in natural intervals, like a radio finding a signal. When he finally packs up he says "same time Thursday?" in the way someone says something they've already decided.
+
+You tell him probably.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "COFFEE_SHOP_SECOND_VISIT"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "pretend_not_to_see_him"
+label = "Get your coffee. Find a seat at the back."
+detail = "It's a quiet morning. That's allowed."
+prose = """
+You order, pay, and take the table by the radiator at the back — the one nobody wants because it runs warm — and sit down with your coffee.
+
+You don't look in his direction. You've decided what kind of morning this is going to be.
+
+{% if not w.alwaysFemale() %}
+He clocked you when you came in. You know that the way you know a lot of things now — from having been on the other side of it enough times that the mechanics are familiar. He's back on his laptop. Whatever he made of the non-acknowledgment, he's filed it and moved on. So have you.
+{% endif %}
+
+The coffee is fine. The table by the radiator is warmer than it needs to be, and you're fine with both.
+"""
+
+  [[actions.next]]
+  finish = true

@@ -1,0 +1,117 @@
+[scene]
+id          = "base::work_marcus_coffee"
+pack        = "base"
+description = "Break room, Tuesday. Marcus asks what you thought of Kevin's presentation."
+
+[intro]
+prose = """
+10:30, and the break room smells like burnt coffee from the first pot someone made at seven and forgot about. You're making your second cup — the machine grinds through its cycle, which you've timed to about forty seconds if you're not watching it.
+
+Marcus comes in. He pours from the pot you just refreshed, doesn't thank the machine or acknowledge the timing, and turns to lean against the counter. He's looking at you like someone who already has a thought and wants to see if you have the same one.
+
+"What did you think of Kevin's deck?"
+
+Not *how did the presentation go*. Not *what feedback did you have*. He wants to know what you actually think. The space between the question and an answer is short — he's not giving you room to locate a diplomatic version.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+10:30, and the break room smells like burnt coffee from the first pot someone made at seven and forgot about. You're making your second cup — the machine grinds through its cycle, which you've timed to about forty seconds if you're not watching it.
+
+Marcus comes in. He pours from the pot you just refreshed, doesn't thank the machine or acknowledge the timing, and turns to lean against the counter.
+
+"What did you think of Kevin's deck?"
+
+You still clock the moment when someone asks your opinion as a first move — not the act of being asked, which is ordinary, but your own reaction to it. You've noticed Marcus does this. He asks the person in front of him things, and the person in front of him is currently you. You file the reaction away beside the others you're collecting, the ones you can't fully account for yet.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*Marcus asks you things like a person asks another person things. You know this is normal. You're still recalibrating to normal.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "give_honest_take"
+label  = "Tell him what you actually think"
+detail = "Kevin buried the risk section. He knows it. Say so."
+prose  = """
+"The risk section was buried," you say. "Third-to-last slide, half a page, no quantification. Kevin knows it's there — it wasn't an oversight, it was a choice." You pause. "Whether that was the right choice depends on who he was trying not to alarm."
+
+{% if w.hasTrait("ANALYTICAL") %}
+Marcus's expression does something before the word arrives. You catch it — the slight compression, the exhale that stops before it becomes a sound — and you recognize it: he had the same read, and he was waiting to see if you'd say it. The "yeah" is confirmation of both things.
+
+"Yeah," he says, and gets his coffee.
+{% else %}
+Marcus nods. Something in his face settles — not surprise, more like confirmation. "Yeah," he says, and gets his coffee.
+{% endif %}
+
+The exchange takes maybe a minute. You take your cup back to your desk without needing to say anything else about it.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "hedge"
+label  = "Say something measured"
+detail = "It's not your place to criticize Kevin's work directly."
+prose  = """
+"It covered the main points," you say. "The Q&A went long, but the questions were good." You leave it there.
+
+Marcus nods, gets his coffee, and goes. The kind of answer that produces no follow-up questions because it contains nothing worth following up on.
+
+{% if not w.alwaysFemale() %}
+On the walk back to your desk you think, not for the first time, that you used to have opinions faster than this — whether the hesitation is caution that makes sense in a new situation or something you've picked up that you didn't mean to, you can't say yet.
+{% endif %}
+"""
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "turn_it_back"
+label  = "Ask what he thought"
+detail = "\"What did *you* think?\""
+prose  = """
+"What did *you* think?" you ask.
+
+Marcus considers this for longer than you expected. Not stalling — he's actually thinking, the kind of pause that means the answer is getting assembled rather than retrieved. Then he gives it to you.
+
+Two structural problems with the deck that aren't the ones you noticed. The first is a gap in the dependency mapping that won't matter until it does, which is going to be somewhere in Q3 and will be annoying to untangle. The second is a choice Kevin made in how he framed the migration timeline — technically accurate, but framed in a way that will mean re-explaining it to the same people in six weeks.
+
+Neither of these is the risk section. You had the risk section. He had the other two.
+
+"Okay," you say. "Thanks."
+
+You take your coffee back to your desk with better information than you came in with.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_REAL_CONVERSATION"
+
+  [[actions.next]]
+  finish = true

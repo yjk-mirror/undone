@@ -1,0 +1,99 @@
+[scene]
+id          = "base::grocery_store"
+pack        = "base"
+description = "The weekly grocery run. Small navigations in domestic space."
+
+[intro]
+prose = """
+Thursday evening, the grocery store two blocks from your apartment. You have a list. Two months of shopping here — long enough to know where things are and which checkout lane is fastest. There's a particular satisfaction to a task with clear parameters, and the grocery run is close to perfect: finite, completable, with a beginning and an end.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+Thursday evening, the grocery store two blocks from your apartment. You have a list.
+
+Two months of shopping here, and you're still making small adjustments. How you hold the basket. How you navigate around someone at the dairy case — the contact zone calibration that happens without being thought through, most of the time, but that you're still sometimes catching yourself on. You got here fine. You'll get out fine. It's the middle part that takes attention.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*You used to shop fast. Get in, get the things, get out. You've slowed down without deciding to. You take the long way around the produce section sometimes. You don't know why exactly, but you suspect it's not random.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "shop_the_list"
+label             = "Get what's on the list. Get out."
+detail            = "Clean run. Someone reaches across you for the pasta."
+allow_npc_actions = false
+prose = """
+You move through the store efficiently — produce first, then the middle aisles, then dairy last to keep it cold. A man reaches across you at the pasta shelf with an "excuse me" that's more reflex than request. You shift slightly. He takes what he needed and moves on.
+
+{% if not w.alwaysFemale() %}
+{% if w.getSkill("FEMININITY") < 20 %}
+The contact zone calibration happened — you moved before he asked, read the angle of his reach, cleared the space. Still deliberate, not yet automatic.
+{% else %}
+The contact zone calibration happened automatically. You moved before he asked, read the angle of his reach, cleared the space. Two months of this and it's close to instinct.
+{% endif %}
+{% endif %}
+
+The list is done in twenty minutes. That's the correct number of minutes for this list.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "take_your_time"
+label             = "No rush. Read labels you don't need to read."
+detail            = "Someone asks if you know where to find something. You do."
+allow_npc_actions = false
+prose = """
+You're not in a hurry tonight. You read two ingredients lists for things you've bought a dozen times, spend four minutes in the olive oil section for a decision that doesn't require four minutes, pick up something you didn't have on the list because it looked good.
+
+A woman in the next aisle asks if you know whether the store stocks miso paste. You do — Asian ingredients, back wall, middle shelf. She thanks you and goes.
+
+The whole thing takes fifteen seconds, and it turns out knowing where the miso is, and knowing you know, is its own minor satisfaction.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "checkout_exchange"
+label             = "The checkout lane. An ordinary transaction."
+detail            = "The clerk says 'have a good night.' It lands."
+allow_npc_actions = false
+prose = """
+You get the short lane — only two people ahead of you. The clerk has the practiced speed of someone who does this for eight hours a day and has made a kind of peace with it. She scans everything without looking at it and makes brief eye contact when she gives you the total.
+
+"Have a good night," she says when you take your bags.
+
+{% if not w.alwaysFemale() %}
+It's a phrase she says to everyone. But you're on the receiving end of it, which is not where you used to stand in this kind of exchange. You used to be the one dispensing that particular casual warmth — a bartender, a checkout clerk, a guy holding a door. Now it's directed at you, and it lands the way it was meant to.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true

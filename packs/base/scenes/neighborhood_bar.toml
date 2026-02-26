@@ -1,0 +1,139 @@
+[scene]
+id          = "base::neighborhood_bar"
+pack        = "base"
+description = "Going for a drink alone. The social read of a woman at a bar by herself."
+
+[intro]
+prose = """
+The bar two blocks from your apartment has a name — McAllister's, in faded gold above the door — but you think of it as the bar two blocks from your apartment, which is how locals think of places they actually use. Tuesday evening, the kind of quiet that means the after-work crowd has gone home and the late crowd hasn't started. Three guys at the far end watching something on the TV above the bottles. Two women at a high-top talking about someone. The bartender restocking.
+
+You make the positioning call before you sit down. Bar stool or table. Table by the wall, or the one in the middle. The math runs fast: bar stool is easier to leave, easier to talk to people if it comes to that and you want it to. A table by the wall is solo in a different way — more purposeful, less accessible, the kind of alone that signals you're waiting for something even if you're not. The table in the middle is worse than both.
+
+You take the bar stool.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The bar two blocks from your apartment has a name — McAllister's, in faded gold above the door — but you think of it as the bar two blocks from your apartment, which is how locals think of places they actually use. Tuesday evening, the kind of quiet that means the after-work crowd has gone home and the late crowd hasn't started. Three guys at the far end watching something on the TV above the bottles. Two women at a high-top talking about someone. The bartender restocking.
+
+You've been in bars like this from the other side. Ordered drinks and done the ambient scan — not the predatory kind, just the automatic kind — and not registered the women sitting alone except as data points. Available. Not available. Worth approaching. Don't bother. You didn't think about what the woman herself was doing with her drink, what math she was running, what she was hoping wouldn't happen. The read ran below thought. You didn't know you were running it.
+
+You do the positioning math before you sit down. Bar stool: easier to leave, easier to manage on your own terms if something comes up. Table by the wall: more alone, less accessible. Table in the middle: worse than both. You take the bar stool and face forward and think about what it means that you're now the data point.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+style = "inner_voice"
+prose = "*You know exactly what a man in this bar is thinking when he sees you sitting here. You know it from the inside. You drink your drink and figure out what to do with that.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "drink_and_decompress"
+label             = "Nurse your drink. Let the evening happen."
+detail            = "The bartender makes conversation. Nobody bothers you."
+allow_npc_actions = false
+prose = """
+You order something simple — whiskey, neat, the universal signal for *I know what I'm doing and I don't want to talk about it*. The bartender doesn't interpret it that way or any way. She just pours it and sets it down and goes back to restocking.
+
+The conversations at the other end of the bar stay at the other end of the bar. Someone scores on the TV and one of the three guys reacts and the other two don't. The bartender makes a comment from behind the bar that you don't quite catch. The evening does its thing.
+
+In the intervals when business is slow, she asks something low-stakes — whether you live in the neighborhood, whether you caught what the score is. You answer in kind and don't encourage or discourage it. The conversation goes nowhere in a comfortable way. By the time you finish your second drink, the apartment sounds fine to go back to, which was the whole point.
+
+{% if not w.alwaysFemale() %}
+Somewhere in the second drink you notice you've been doing the thing without thinking about it: shoulders angled slightly forward, gaze on your glass, the particular quality of focus that reads as *occupied*, not *available, not waiting*. You learned it by watching. You didn't learn it consciously. It's working — nobody has tried anything, and you're starting to understand that this is not an accident, it's a skill. You just didn't know you were practicing it.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -15
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "someone_buys_a_drink"
+label             = "A man offers to buy you a drink"
+detail            = "Assess. Decide."
+allow_npc_actions = false
+prose = """
+A man two stools down — mid-thirties, the kind of good-looking that probably works for him more often than not — asks if you want another. He's been holding his glass at a particular angle for the last ten minutes. You noticed because you know that angle. You've used that angle.
+
+He asks directly, looking at you when he does it. You give him credit for that.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Sure," you say.
+
+The drink arrives. The conversation that follows has a shape — he establishes that he's interesting, you decide whether to agree, the negotiation runs without either of you naming it as one. He's reasonably good at it. You're better at it than you expected to be, which is the more interesting thing to find out.
+
+You leave at eight on your own terms. The "good night" you give him covers exactly as much as you mean it to, and he reads it correctly. You think about that on the walk home — not about him. About who decided how it ended.
+
+{% elif w.hasTrait("SHY") %}
+"I'm good, thanks." Said to the glass more than to him, which isn't ideal. But it comes out even.
+
+A beat. He nods once — no comment, no negotiation — and turns back to his drink. The bar settles around you, ordinary again.
+
+The relief has a specific texture: not just the no, but what the no turned out to mean. You'd understood, theoretically, that it could go like that. Now you know it from the inside.
+
+{% elif w.hasTrait("OBJECTIFYING") %}
+You accept.
+
+You watch the whole transaction with the attention of someone who has run it before, from a different seat. The scan he did before he asked — you know what he was clocking, what he discounted, what made the calculation come out yes.
+
+{% if not w.alwaysFemale() %}
+You've run the same math yourself, from this same kind of stool at this same kind of bar, and you didn't think about what the woman at the other end of it was making of it. Now you're the other end of it.
+{% endif %}
+
+The conversation goes where conversations like this go. He monitors for signals. You give him some and withhold others and watch what he does with the information. He's not bad at this. You leave when you've decided the experiment is over, and he takes it the right way, which tells you something about him.
+
+{% else %}
+You accept. The drink arrives. There's a moment where you're aware of everything — what you look like sitting here, what he's hoping for, the exact calculation he made before he asked.
+
+The conversation stays at the surface. The neighborhood. Something about the renovation on the corner. He moves on eventually, or you do.
+
+{% if not w.alwaysFemale() %}
+On the walk home the evening sits warm somewhere in your chest, and you think about the particular view from this side of the exchange — what you couldn't see before, what you can see now.
+{% endif %}
+
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "talk_to_the_bartender"
+label             = "Get into a conversation with the bartender"
+detail            = "An hour at the bar. Nothing in particular."
+allow_npc_actions = false
+prose = """
+The opening is a question about a bottle on the top shelf — something you don't recognize, short and wide with a hand-applied label — and she says it's a rye from a distillery in Vermont that the owner brought back from a road trip, which means she's heard the question before and has a practiced answer. You order it. It's good.
+
+The conversation branches into nothing in particular, the way bar conversations do when both people are willing to let it go somewhere unplanned. She's got opinions about the neighborhood, about some renovation project two blocks over, about a regular she can't quite get a read on. You offer yours when you have them and don't manufacture them when you don't. An hour goes by without you tracking it.
+
+You don't know her name by the end of it and she doesn't ask for yours, which seems right. You leave a good tip — enough to be generous without being weird about it — and walk the two blocks home. The apartment is quieter than when you left, in a way that's easier to be in.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -10
+
+  [[actions.next]]
+  finish = true

@@ -27,6 +27,42 @@ name = "free_time"
   trigger   = "gd.week() >= 2"
   once_only = true
 
+  [[slot.events]]
+  scene     = "base::bookstore"
+  weight    = 8
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::park_walk"
+  weight    = 10
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::grocery_store"
+  weight    = 9
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::evening_home"
+  weight    = 12
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::neighborhood_bar"
+  weight    = 7
+  condition = "gd.week() >= 2"
+
+  # Jake follow-up scenes — gated by having met Jake at the coffee shop
+  [[slot.events]]
+  scene     = "base::coffee_shop_return"
+  weight    = 9
+  condition = "gd.week() >= 2 && gd.hasGameFlag('MET_JAKE')"
+
+  [[slot.events]]
+  scene     = "base::jake_outside"
+  weight    = 7
+  condition = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE')"
+
 # ── Workplace opening arc ────────────────────────────────────────────────
 
 [[slot]]
@@ -80,6 +116,47 @@ name = "workplace_opening"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && gd.hasGameFlag('FIRST_MEETING_DONE')"
   once_only = true
+
+# ── Work slot (post-arc, settled state) ──────────────────────────────
+
+[[slot]]
+name = "work"
+
+  [[slot.events]]
+  scene     = "base::work_standup"
+  weight    = 10
+  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.isWeekday()"
+
+  [[slot.events]]
+  scene     = "base::work_lunch"
+  weight    = 10
+  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+
+  [[slot.events]]
+  scene     = "base::work_late"
+  weight    = 8
+  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+
+  [[slot.events]]
+  scene     = "base::work_corridor"
+  weight    = 12
+  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+
+  [[slot.events]]
+  scene     = "base::work_friday"
+  weight    = 8
+  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.isWeekday()"
+
+  # Marcus follow-up scenes — gated by having had the work meeting
+  [[slot.events]]
+  scene     = "base::work_marcus_coffee"
+  weight    = 9
+  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE')"
+
+  [[slot.events]]
+  scene     = "base::work_marcus_favor"
+  weight    = 7
+  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
 
 # ── Campus opening arc ────────────────────────────────────────────────
 

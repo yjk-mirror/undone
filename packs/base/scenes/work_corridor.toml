@@ -1,0 +1,95 @@
+[scene]
+id          = "base::work_corridor"
+pack        = "base"
+description = "A hallway exchange that lands differently than it should."
+
+[intro]
+prose = """
+The corridor between engineering and the kitchen is narrow enough that two people walking in opposite directions have to make a small decision about who yields. Most people have learned to read the approach and adjust early, which means the actual moment of passing is unremarkable — a slight angle of the shoulder, maybe a nod, then it's done. You've been here long enough to know the rhythm.
+
+You're heading for the water refill station, or back from a meeting, or somewhere in between. It doesn't matter. The corridor is just the corridor.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The corridor between engineering and the kitchen is narrow enough that two people walking in opposite directions have to make a small decision about who yields. You still sometimes get it wrong — still sometimes hold your line the way you used to, expecting the other person to step around you, before you catch yourself and shift. Nobody notices when you correct it. That's maybe the strangest part. Two weeks of this and the corrections happen faster, but they still happen, which means you still notice them, which means the corridor is not just a corridor.
+
+You're heading for the water refill station. It's a sixty-second walk.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "pass_kevin"
+label  = "Kevin in the hallway"
+detail = "He nods. You nod. It lands correctly."
+prose  = """
+Kevin Marsh is coming the other way, laptop bag over one shoulder, looking at his phone. He glances up at the right moment, adjusts his path without thinking about it, and gives you the small nod of colleague recognition — the kind that means *I see you, I have nothing to say to you, this is fine*. You give it back. He keeps moving.
+
+That's it. The whole transaction takes maybe two seconds.
+
+{% if not w.alwaysFemale() %}
+Kevin filed you where he files everyone in this building — by team, by role, by whether he's had a substantive conversation with you yet. No prior version of you to compare against, no recalibration happening mid-stride. You're not sure when you started noticing when something lands correctly. You're noticing it now.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "overhear_something"
+label  = "Overhear a conversation"
+detail = "Two coworkers around the corner. Not about you."
+prose  = """
+There are voices around the corner before you reach it — two of them, low and unhurried. Something about the promotion cycle, or a performance review, or who's getting pulled into the Harmon project. Not about you. You can tell immediately, from the cadence, that you're not the subject; you're not even adjacent to it.
+
+You keep walking at the same pace. They don't stop talking as you pass.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You catch about twelve seconds of it. Enough to identify both speakers by voice, enough to place the conversation in context — this is the tail end of something that started elsewhere, the part where the conclusion is being stated rather than argued. The name they mention is someone two levels above you. You file it, not because it's immediately useful, but because information about how this place works doesn't stop being useful just because you can't use it yet.
+{% else %}
+You don't slow down. Whatever they're working out, they're working it out without you, which is most of how an office functions — a hundred conversations happening in parallel, most of them nothing to do with you, all of them the texture of a place that has its own life.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "small_talk_wins"
+label     = "Marcus, arms full of printouts"
+detail    = "Six seconds. He keeps moving."
+condition = "gd.hasGameFlag('FIRST_MEETING_DONE')"
+prose     = """
+Marcus is coming the other way carrying a stack of printouts that would be reasonable if he were presenting to a full boardroom, and is slightly absurd for a Tuesday afternoon in a building with adequate screens. He sees you see them.
+
+"Printer room's out of staples," he says, with the flat delivery of someone who has made his peace with it. "Decided to commit anyway."
+
+"Brave," you say.
+
+He makes a small sound that might be agreement and keeps walking, printouts and all. The stack bobs slightly as he turns the corner.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true

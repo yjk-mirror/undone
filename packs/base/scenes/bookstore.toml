@@ -1,0 +1,145 @@
+[scene]
+id          = "base::bookstore"
+pack        = "base"
+description = "A secondhand bookstore. Browsing. Being addressed as 'miss.'"
+
+[intro]
+prose = """
+The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you — no line to hold, no order to place, no transaction until you decide there is one. The shop smells like old paper and someone's coffee from the back room, and a ceiling fan turns at a speed that moves the air without doing much about it.
+
+The clerk is deep in something behind the counter and doesn't look up. Two other customers are in here: a man in the history section pulling out spines and sliding them back, and a woman at the front table with a canvas bag already half full. Neither of them are paying attention to you.
+
+{% if gd.hasGameFlag("BOOKSTORE_VISITED") %}
+The clerk glances up when the door opens. "Back again," he says, then goes back to whatever he was reading. It's not unfriendly. It's a fact.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you. That particular pleasure of browsing — no agenda, no transaction until you decide there is one.
+
+You're still sometimes performing browsing rather than just doing it. Calibrating what your hands do, where you look, how long you linger at a shelf. In a hardware store or a coffee shop there's a script; here the script is just *person looking at books*, and you're not sure you've got it right yet. The clerk doesn't look up, which helps.
+
+{% if gd.hasGameFlag("BOOKSTORE_VISITED") %}
+The clerk glances up when the door opens. "Back again," he says, then goes back to whatever he was reading. It's not unfriendly. It's a fact.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = """*The clerk said "miss" when you asked about the biography section. It's not the first time. Not bad, not good. Just: still landing.*"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "browse_and_buy"
+label = "Find something. Buy it."
+detail = "The clerk wraps it in tissue paper without being asked."
+prose = """
+{% if w.hasTrait("POSH") %}
+You spend twenty minutes in the literature section before you find something worth owning — a first edition of a reissue, which is not the same as a first edition but close enough for fourteen dollars. The clerk wraps it in tissue paper without asking, which you note approvingly. You don't say anything about it, but you note it.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+You go straight for the wall of paperbacks in the back, where nothing is precious and everything is two dollars. You find a biography you've been meaning to read buried between a diet book and something called *The Winning Mindset* that nobody has ever needed. You bring both to the counter. The clerk wraps them in tissue paper without asking. You didn't need the tissue paper, but it's a nice touch.
+{% else %}
+You find a biography in the back corner — a figure you've been meaning to read — and bring it to the counter. The clerk wraps it in tissue paper without asking, out of habit or out of care for the books, you can't tell which. You overpay by two dollars in the calculation and don't correct it.
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+The transaction was ordinary. The clerk said "have a good day" to the register as he made change, and you said it back, and then you were outside with a book in a bag. It went the way it was supposed to go, and you're holding onto that.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -15
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "just_browse"
+label  = "Stay an hour. Don't buy anything."
+detail = "Nobody bothers you."
+prose = """
+You spend an hour moving through the shop. The biography section, then local history, then the wall of paperbacks where the spines are faded to the point of illegibility. You read the first page of two things. You don't buy either of them.
+
+Nobody asks if you need help. The man in the history section leaves without acknowledging you, and the woman with the canvas bag buys four things and goes. The clerk makes a note in whatever he was reading. At some point the ceiling fan clicks twice and keeps going.
+
+You leave an hour later without having bought anything, which was always the plan.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "talk_to_the_clerk"
+label     = "Get into it with the clerk about memoirs"
+detail    = "He has opinions. Strong ones."
+condition = "!gd.hasGameFlag('BOOKSTORE_VISITED')"
+prose = """
+You ask about the biography section — whether there's anything recent worth reading. He looks up for the first time.
+
+"Depends what you mean by recent." He sets his book down. "If you mean the last two years, most of it is memoir dressed as journalism, and I have strong feelings about that."
+
+{% if w.hasTrait("ANALYTICAL") %}
+You ask him to be specific. He is. The journalist in question has a new book — first person, present tense, embedded reporting, except she wasn't actually embedded, she was following up on other people's embedding and calling it experience. He can tell the difference.
+
+You can too, as it turns out. You've read two of her pieces and clocked the same gap without naming it. You say so. He straightens up slightly, which is not a gesture you were expecting.
+
+The next fifteen minutes involve both of you building the argument from different ends and meeting somewhere in the middle, which is not the middle either of you started at. He writes down three things on a scrap of receipt paper. You remember your two without writing them down. He notices and doesn't say anything, which is its own form of acknowledgment.
+{% elif w.hasTrait("BITCHY") %}
+"What kind of feelings."
+
+He gives you a look like he's deciding whether you're worth explaining this to, then decides yes. The journalist in question is calling embedded reporting what is technically follow-up coverage, and calling it journalism what is technically a very long personal essay, and the problem isn't the content — the content is fine — it's the framing.
+
+"She could've just said it was a memoir," you say. "She didn't because memoir doesn't move units."
+
+He points at you. "Yes. That's exactly it."
+
+"That's not a strong opinion, that's just correct."
+
+He laughs. It's surprised out of him. You buy his recommendation because it's cheaper than agreeing out loud that the conversation was good.
+{% else %}
+He has opinions, as advertised. The journalist in question published a memoir last spring that is being called journalism in the press materials, and the distinction matters to him — not pedantically, but structurally. Embedded reporting earns certain credibility claims. First-person narrative about being adjacent to embedded reporting does not. The gap is where the problem lives.
+
+You disagree on the conclusion. Not the diagnosis — the diagnosis seems right — but the implication that the framing invalidates the work. You say so. He says the work stands or falls separately from the framing, and the framing is its own problem.
+
+The next ten minutes involve neither of you conceding the central point, both of you updating the supporting arguments, and a recommendation on both sides for things the other person should actually read before having this argument. He writes his down on a scrap of receipt paper. You remember yours.
+{% endif %}
+
+{% if not w.alwaysFemale() %}
+The conversation went without either of you navigating around anything. Two people in a bookstore with opinions, the way that used to be the whole transaction.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -15
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BOOKSTORE_VISITED"
+
+  [[actions.next]]
+  finish = true
