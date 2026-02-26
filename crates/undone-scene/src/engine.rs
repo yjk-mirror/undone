@@ -308,16 +308,23 @@ impl SceneEngine {
         }
 
         // Apply effects
-        {
+        let effect_errors: Vec<String> = {
             let frame = self
                 .stack
                 .last_mut()
                 .expect("engine stack must not be empty");
+            let mut errors = Vec::new();
             for effect in &action.effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
-                    eprintln!("[scene-engine] effect error: {e}");
+                    let msg = format!("[scene-engine] effect error: {e}");
+                    eprintln!("{msg}");
+                    errors.push(msg);
                 }
             }
+            errors
+        };
+        for msg in effect_errors {
+            self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
 
         // Run NPC actions if allowed
@@ -492,16 +499,23 @@ impl SceneEngine {
         }
 
         // Apply NPC action effects
-        {
+        let npc_effect_errors: Vec<String> = {
             let frame = self
                 .stack
                 .last_mut()
                 .expect("engine stack must not be empty");
+            let mut errors = Vec::new();
             for effect in &effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
-                    eprintln!("[scene-engine] npc effect error: {e}");
+                    let msg = format!("[scene-engine] npc effect error: {e}");
+                    eprintln!("{msg}");
+                    errors.push(msg);
                 }
             }
+            errors
+        };
+        for msg in npc_effect_errors {
+            self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
 
         // Evaluate NPC action next branches (if any)
@@ -1269,6 +1283,65 @@ mod tests {
                     if text.contains("right call") && style == "anxiety"
             )),
             "expected ThoughtAdded with 'right call' prose after action"
+        );
+    }
+
+    #[test]
+    fn effect_error_emits_error_occurred_event() {
+        // A scene with AddNpcLiking but no active male NPC — apply_effect returns an error.
+        // The engine must emit ErrorOccurred rather than silently eprintln.
+        let scene = SceneDefinition {
+            id: "test::effect_error".into(),
+            pack: "test".into(),
+            intro_prose: "Something happens.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![EffectDef::AddNpcLiking {
+                    npc: "male".into(),
+                    delta: 1,
+                }],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: None,
+                    slot: None,
+                    finish: true,
+                }],
+                thoughts: vec![],
+            }],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world(); // no active male NPC
+        let registry = undone_packs::PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::effect_error".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("go".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, EngineEvent::ErrorOccurred(_))),
+            "expected ErrorOccurred event when effect fails; got: {:?}",
+            events
         );
     }
 }
