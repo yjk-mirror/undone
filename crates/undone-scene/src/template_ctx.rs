@@ -47,6 +47,7 @@ pub struct PlayerCtx {
     pub eye_colour: String,
     pub skin_tone: String,
     pub complexion: String,
+    pub appearance: String,
     pub race: String,
     pub age: String,
 
@@ -54,10 +55,16 @@ pub struct PlayerCtx {
     pub nipple_sensitivity: String,
     pub clit_sensitivity: String,
     pub pubic_hair: String,
+    pub natural_pubic_hair: String,
     pub inner_labia: String,
     pub wetness: String,
 
+    // Names
+    pub name: String,
+
     // Before-life attributes (empty string if no before identity)
+    pub before_name: String,
+    pub before_voice: String,
     pub before_height: String,
     pub before_hair_colour: String,
     pub before_eye_colour: String,
@@ -126,17 +133,29 @@ impl Object for PlayerCtx {
             "getEyeColour" => Ok(Value::from(self.eye_colour.as_str())),
             "getSkinTone" => Ok(Value::from(self.skin_tone.as_str())),
             "getComplexion" => Ok(Value::from(self.complexion.as_str())),
+            "getAppearance" => Ok(Value::from(self.appearance.as_str())),
             "getRace" => Ok(Value::from(self.race.as_str())),
             "getAge" => Ok(Value::from(self.age.as_str())),
+            "getName" => Ok(Value::from(self.name.as_str())),
 
             // Sexual/intimate attributes
             "getNippleSensitivity" => Ok(Value::from(self.nipple_sensitivity.as_str())),
             "getClitSensitivity" => Ok(Value::from(self.clit_sensitivity.as_str())),
             "getPubicHair" => Ok(Value::from(self.pubic_hair.as_str())),
+            "getNaturalPubicHair" => Ok(Value::from(self.natural_pubic_hair.as_str())),
             "getInnerLabia" => Ok(Value::from(self.inner_labia.as_str())),
             "getWetness" => Ok(Value::from(self.wetness.as_str())),
 
+            // Compound boolean accessors
+            "hasSmoothLegs" => {
+                let smooth = self.trait_strings.contains("NATURALLY_SMOOTH")
+                    || self.trait_strings.contains("SMOOTH_LEGS");
+                Ok(Value::from(smooth))
+            }
+
             // Before-life attributes
+            "beforeName" => Ok(Value::from(self.before_name.as_str())),
+            "beforeVoice" => Ok(Value::from(self.before_voice.as_str())),
             "beforeHeight" => Ok(Value::from(self.before_height.as_str())),
             "beforeHairColour" => Ok(Value::from(self.before_hair_colour.as_str())),
             "beforeEyeColour" => Ok(Value::from(self.before_eye_colour.as_str())),
@@ -299,7 +318,7 @@ pub fn render_prose(
     let p = &world.player;
 
     // Extract before-life attribute strings
-    let (bh, bhc, bec, bst, bps, bf) = match &p.before {
+    let (bh, bhc, bec, bst, bps, bf, bn, bv) = match &p.before {
         Some(b) => (
             format!("{:?}", b.height),
             format!("{:?}", b.hair_colour),
@@ -307,6 +326,8 @@ pub fn render_prose(
             format!("{:?}", b.skin_tone),
             format!("{:?}", b.penis_size),
             format!("{:?}", b.figure),
+            b.name.clone(),
+            format!("{:?}", b.voice),
         ),
         None => (
             String::new(),
@@ -315,7 +336,21 @@ pub fn render_prose(
             String::new(),
             String::new(),
             String::new(),
+            String::new(),
+            String::new(),
         ),
+    };
+
+    // Compute active display name from femininity skill
+    let active_name = {
+        let fem_val = skills.get("FEMININITY").copied().unwrap_or(0);
+        if fem_val >= 70 {
+            p.name_fem.clone()
+        } else if fem_val >= 31 {
+            p.name_androg.clone()
+        } else {
+            p.name_masc.clone()
+        }
     };
 
     let player_ctx = PlayerCtx {
@@ -344,6 +379,7 @@ pub fn render_prose(
         eye_colour: format!("{:?}", p.eye_colour),
         skin_tone: format!("{:?}", p.skin_tone),
         complexion: format!("{:?}", p.complexion),
+        appearance: format!("{:?}", p.appearance),
         race: p.race.clone(),
         age: format!("{:?}", p.age),
 
@@ -351,10 +387,16 @@ pub fn render_prose(
         nipple_sensitivity: format!("{:?}", p.nipple_sensitivity),
         clit_sensitivity: format!("{:?}", p.clit_sensitivity),
         pubic_hair: format!("{:?}", p.pubic_hair),
+        natural_pubic_hair: format!("{:?}", p.natural_pubic_hair),
         inner_labia: format!("{:?}", p.inner_labia),
         wetness: format!("{:?}", p.wetness_baseline),
 
+        // Names
+        name: active_name,
+
         // Before-life attributes
+        before_name: bn,
+        before_voice: bv,
         before_height: bh,
         before_hair_colour: bhc,
         before_eye_colour: bec,

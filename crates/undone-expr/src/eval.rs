@@ -226,6 +226,19 @@ pub fn eval_call_bool(
             }
             "wasMale" => Ok(world.player.origin.was_male_bodied()),
             "wasTransformed" => Ok(world.player.origin.was_transformed()),
+            "hasSmoothLegs" => {
+                let has_naturally_smooth = registry
+                    .resolve_trait("NATURALLY_SMOOTH")
+                    .ok()
+                    .map(|id| world.player.has_trait(id))
+                    .unwrap_or(false);
+                let has_smooth_legs = registry
+                    .resolve_trait("SMOOTH_LEGS")
+                    .ok()
+                    .map(|id| world.player.has_trait(id))
+                    .unwrap_or(false);
+                Ok(has_naturally_smooth || has_smooth_legs)
+            }
             "checkSkill" => {
                 let skill_id_str = str_arg(0)?;
                 let dc = match call.args.get(1) {
@@ -479,7 +492,7 @@ pub fn eval_call_string(
     call: &Call,
     world: &World,
     ctx: &SceneCtx,
-    _registry: &PackRegistry,
+    registry: &PackRegistry,
 ) -> Result<String, EvalError> {
     let str_arg = |i: usize| -> Result<&str, EvalError> {
         match call.args.get(i) {
@@ -522,6 +535,12 @@ pub fn eval_call_string(
                 .as_ref()
                 .map(|b| format!("{:?}", b.sexuality))
                 .unwrap_or_default()),
+            "getName" => {
+                let fem_id = registry
+                    .resolve_skill("FEMININITY")
+                    .map_err(|_| EvalError::UnknownSkill("FEMININITY".into()))?;
+                Ok(world.player.active_name(fem_id).to_string())
+            }
             "getRace" => Ok(world.player.race.clone()),
             "getAge" => Ok(format!("{:?}", world.player.age)),
             "getArousal" => Ok(format!("{:?}", world.player.arousal)),
@@ -539,15 +558,23 @@ pub fn eval_call_string(
             "getEyeColour" => Ok(format!("{:?}", world.player.eye_colour)),
             "getSkinTone" => Ok(format!("{:?}", world.player.skin_tone)),
             "getComplexion" => Ok(format!("{:?}", world.player.complexion)),
+            "getAppearance" => Ok(format!("{:?}", world.player.appearance)),
 
             // Sexual/intimate attributes
             "getNippleSensitivity" => Ok(format!("{:?}", world.player.nipple_sensitivity)),
             "getClitSensitivity" => Ok(format!("{:?}", world.player.clit_sensitivity)),
             "getPubicHair" => Ok(format!("{:?}", world.player.pubic_hair)),
+            "getNaturalPubicHair" => Ok(format!("{:?}", world.player.natural_pubic_hair)),
             "getInnerLabia" => Ok(format!("{:?}", world.player.inner_labia)),
             "getWetness" => Ok(format!("{:?}", world.player.wetness_baseline)),
 
             // Before-life attributes
+            "beforeVoice" => Ok(world
+                .player
+                .before
+                .as_ref()
+                .map(|b| format!("{:?}", b.voice))
+                .unwrap_or_default()),
             "beforeHeight" => Ok(world
                 .player
                 .before
