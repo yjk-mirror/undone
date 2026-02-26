@@ -48,12 +48,16 @@ id    = "sit_for_a_while"
 label = "Find a bench. Sit."
 detail = "Nobody asks why."
 prose = """
-You find a bench that gets the late-afternoon sun and sit down. A woman with a double stroller navigates around a group of pigeons that are extremely committed to not moving. Two teenagers sit on the grass with their backs to each other, both on their phones. After twenty minutes you still don't want to leave, which tells you something.
+You find a bench that gets the late-afternoon light — the kind that comes in sideways at this hour and makes everything more than it is. You sit.
+
+A woman with a double stroller navigates around a group of pigeons that are extremely committed to not moving. Two teenagers on the grass have their backs to each other, both on their phones. A man on the outer path glances over as he passes — brief, automatic — and his gaze moves back to the path ahead.
+
+You notice the glance. You notice that you noticed it. You sit with that for a minute.
 
 {% if w.hasTrait("SHY") %}
-This is actively restorative. Not just pleasant — restorative in the specific way that being alone without having to explain the alone is. The park around you goes on being the park. You sit until the light shifts and then a little longer.
+Twenty minutes pass without your permission. Alone in a public space, visible but not required — there's a specific quality to this kind of alone that you couldn't have explained six months ago. The park keeps going around you. You sit until the light shifts, and then a little longer.
 {% else %}
-The sun moves by degrees. You track it without meaning to, the warmth on one side of your face and then the other, and somewhere in there you stop keeping track of anything.
+The sun works its way across. You track it without meaning to — the warmth on one side of your face and then the other — and somewhere in there you stop keeping track of anything.
 {% endif %}
 """
 

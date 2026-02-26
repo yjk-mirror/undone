@@ -751,6 +751,24 @@ A scene with three of these five qualities is a good scene:
 
 ---
 
+### The scene must earn its place
+
+Ask of every scene and every action: **what is the one thing that happens here that couldn't happen anywhere else?**
+
+If the answer is "a woman goes to a park / bar / grocery store and notices it's different now" — that's a description, not a scene. Every location-based scene can produce that description. It's not enough.
+
+**Positive requirements:**
+
+1. **One irreplaceable detail** — a specific person, event, or exchange that is pinned to this time and place. Not "a man glances at her" — a man with a specific posture doing a specific thing, in a way that produces a specific internal response. The kind of detail that would be cut if it weren't true.
+
+2. **At least one beat of unresolved tension or desire** — not everything resolves to "and that was fine." A glance that registered. A conversation that went longer than intended. A decision she made that surprised her. Something slightly open when the scene ends.
+
+3. **The transformation lens used, not merely referenced** — "You're on this side of it now" is a reference. Showing her recognize the exact calculation a man is running because she used to run it herself is using the lens. The difference between announcing the irony and demonstrating it.
+
+**The "fine" test:** If you can summarize an action as "she did the thing and it was fine," the action needs work. Even mundane scenes need one moment where something actually happens — desire is registered, tension doesn't resolve cleanly, the world surprises her.
+
+---
+
 ## Scene Authorship Checklist
 
 Before submitting any scene, verify:
@@ -769,6 +787,8 @@ Before submitting any scene, verify:
 - [ ] Sentence structure varies (not every line starting with "You")
 - [ ] No emotion announcements, no heart/pulse clichés, no generic NPC dialogue
 - [ ] NPC dialogue reflects that NPC's personality and current goal, not a generic type
+- [ ] At least one action has a beat of unresolved tension or desire — not everything resolves to "fine"
+- [ ] At least one specific detail that is irreplaceable — pinned to this place, person, moment
 
 **Transformation:**
 - [ ] Does this scene earn a transformation branch? If yes, is it written for CisMale→Woman?

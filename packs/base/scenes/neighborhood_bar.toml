@@ -64,20 +64,44 @@ label             = "A man offers to buy you a drink"
 detail            = "Assess. Decide."
 allow_npc_actions = false
 prose = """
-A man two stools down — mid-thirties, not unpleasant about it — asks if you want another. He does it directly, looking at you when he says it, which is something at least.
+A man two stools down — mid-thirties, the kind of good-looking that probably works for him more often than not — asks if you want another. He's been holding his glass at a particular angle for the last ten minutes. You noticed because you know that angle. You've used that angle.
+
+He asks directly, looking at you when he does it. You give him credit for that.
 
 {% if w.hasTrait("CONFIDENT") %}
-You accept. The conversation that follows is easy in the way conversations are when neither person has anything to prove — he's not particularly interesting, but he's not bad either, and the drink is free. You keep it brief and on your terms. When you're ready to go, you say something gracious and leave without making it complicated, and he takes it the right way.
+"Sure," you say.
+
+The drink arrives. The conversation that follows has a shape — he establishes that he's interesting, you decide whether to agree, the negotiation runs without either of you naming it as one. He's reasonably good at it. You're better at it than you expected to be, which is the more interesting thing to find out.
+
+You leave at eight on your own terms. The "good night" you give him covers exactly as much as you mean it to, and he reads it correctly. You think about that on the walk home — not about him. About who decided how it ended.
+
 {% elif w.hasTrait("SHY") %}
-"I'm good, thanks." You say it to your glass more than to him, and for a second you think it came out wrong — too flat, or too abrupt — but he just nods and goes back to his drink without making anything of it. The relief is quiet and specific.
+"I'm good, thanks." Said to the glass more than to him, which isn't ideal. But it comes out even.
+
+A beat. He nods once — no comment, no negotiation — and turns back to his drink. The bar settles around you, ordinary again.
+
+The relief has a specific texture: not just the no, but what the no turned out to mean. You'd understood, theoretically, that it could go like that. Now you know it from the inside.
+
 {% elif w.hasTrait("OBJECTIFYING") %}
-You see the whole transaction very clearly: the scan he ran before he asked, the assessment, the decision to try. You've done the same math from this exact stool, from the other side of it. You accept the drink and give him a conversation about something he didn't come here to talk about — his job, it turns out, which he did not expect to discuss — and you leave when you've had enough. He seems satisfied with some version of the evening. You're not entirely sure which one.
-{% else %}
-You accept. The drink arrives and the conversation stays at the surface — the neighborhood, how long you've lived here, whether the food is any good. He moves on before it becomes anything. Fine.
-{% endif %}
+You accept.
+
+You watch the whole transaction with the attention of someone who has run it before, from a different seat. The scan he did before he asked — you know what he was clocking, what he discounted, what made the calculation come out yes.
 
 {% if not w.alwaysFemale() %}
-You're on this side of it now, which is something you hold while you finish the drink.
+You've run the same math yourself, from this same kind of stool at this same kind of bar, and you didn't think about what the woman at the other end of it was making of it. Now you're the other end of it.
+{% endif %}
+
+The conversation goes where conversations like this go. He monitors for signals. You give him some and withhold others and watch what he does with the information. He's not bad at this. You leave when you've decided the experiment is over, and he takes it the right way, which tells you something about him.
+
+{% else %}
+You accept. The drink arrives. There's a moment where you're aware of everything — what you look like sitting here, what he's hoping for, the exact calculation he made before he asked.
+
+The conversation stays at the surface. The neighborhood. Something about the renovation on the corner. He moves on eventually, or you do.
+
+{% if not w.alwaysFemale() %}
+On the walk home the evening sits warm somewhere in your chest, and you think about the particular view from this side of the exchange — what you couldn't see before, what you can see now.
+{% endif %}
+
 {% endif %}
 """
 
