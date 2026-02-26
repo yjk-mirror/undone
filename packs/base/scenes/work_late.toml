@@ -1,0 +1,113 @@
+[scene]
+id          = "base::work_late"
+pack        = "base"
+description = "Staying past six. The office empties. You work alone — or nearly alone."
+
+[intro]
+prose = """
+6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles at a different register when it's only cooling the room rather than a roomful of people, and the air has that particular late-office quality: stale in a way that doesn't bother you anymore, quiet in a way that does.
+
+This is when the work goes better.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles differently when it's only cooling the room rather than a roomful of people.
+
+The late office is one of the places where the world hasn't gotten around to having expectations about you. You're just someone staying late. That's all anyone knows, and it's all you've ever needed to be.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose = """*You always stayed late. It was a thing about you — not a boast, just a fact. The work ran longer than the day and you stayed with it. You wonder if the same thing still makes you stay, or if it's something else now.*"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "work_through"
+label  = "Work through till eight"
+detail = "Head down. Let the quiet do what it does."
+prose  = """
+Head down. The work takes over the way it does when no one needs anything from you and the interruptions have all gone home. Two hours pass in a way that doesn't feel like two hours.
+
+At 8 PM you close the laptop. The build is green. The spec holds up. Three tickets closed, one opened against a dependency you didn't trust when you first wired it in — and you weren't wrong. Good work isn't always satisfying in a legible way, but tonight it is.
+
+{% if w.hasTrait("ANALYTICAL") %}
+On the way out you pass a dark stretch of desks and a bathroom with a motion sensor that fires late, flooding the hallway with light for the three seconds it takes to decide you haven't stopped. The note you're carrying in your head — the calibration, the knowledge that a woman working alone in an empty office past dark carries a different set of considerations than a man doing the same — you've already run through it. The building. The route to the parking garage. The floor of the elevator. You made those decisions when you decided to stay, which is before it becomes an emergency rather than after. The work was good. You are fine.
+{% endif %}
+
+The night air outside is cold and clean, a significant improvement over the recycled late-office air you've been breathing for the last two hours.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -10
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "leave_at_six_thirty"
+label  = "Pack up at 6:30"
+detail = "Hit a natural stopping point and go."
+prose  = """
+You find a reasonable place to stop — not a perfect one, there's no such thing — and close the laptop at 6:28. File that task for tomorrow. Send that message in the morning. The work will still be there.
+
+{% if not w.alwaysFemale() %}
+You leave before the office empties completely, which means you leave alongside a handful of other people heading for the elevator. You notice you made this choice. You don't do anything with that information yet — you just carry it home with you, along with the laptop.
+{% endif %}
+
+Outside it's colder than when you came in this morning. The responsible choice, as it turns out, also comes with better air.
+"""
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "someone_is_still_here"
+label     = "Marcus is still here"
+detail    = "Pass his desk on the way to the elevator. It would be strange not to acknowledge it."
+condition = "gd.hasGameFlag('FIRST_MEETING_DONE')"
+prose     = """
+Marcus is at his desk. You clock him on the way to the elevator — the overhead fixture above his workstation is one of the few still lit at full brightness, and he's leaning into a monitor with the posture of someone who has stopped noticing the time.
+
+You're going to walk past. Then you don't.
+
+"Deployment deadline?" you ask.
+
+"Migration script." He doesn't look up from the screen. "Third time it's taken down the staging environment. I'm starting to think it's personal."
+
+"Which table?"
+
+He looks up. "Users."
+
+"FK cascade order. If you're dropping and recreating, the foreign keys don't always run in the sequence you think they do." You say the constraint name. He stares at the screen for three seconds.
+
+"Yeah," he says. "Yeah, that's it."
+
+Two people in a half-empty office past six on a Thursday, talking about database constraints. Six seconds of actual communication — no performance, no navigation, just the work. Something in the frequency between you shifts. Not attraction. Just recognition. He goes back to his screen. You go to the elevator.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LATE_OFFICE_MARCUS"
+
+  [[actions.next]]
+  finish = true

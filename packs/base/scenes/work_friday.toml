@@ -1,0 +1,104 @@
+[scene]
+id          = "base::work_friday"
+pack        = "base"
+description = "Friday 4pm. Someone wants drinks. The decision."
+
+[intro]
+prose = """
+The Slack message lands at 4:07 from someone in DevRel you've seen twice, maybe three times. Drinks at Corrigan's, 5pm, all welcome. Friday ritual. You read it once, then read it again, slower, working out what the question actually is underneath it — whether you're the kind of person who goes to these.
+
+You didn't use to have to think about it. You just went, or didn't, based on whether you felt like it, because there was never any variable other than whether you felt like it.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The Slack message lands at 4:07 from someone in DevRel you've seen twice, maybe three times. Drinks at Corrigan's, 5pm, all welcome. Friday ritual.
+
+You've been here a month. You don't know who goes to these, or whether the invitation extends to you in the same way it extends to the people it was written for. "All welcome" can mean a lot of different things depending on which version of you is reading it. You read it again, trying to work out which version the DevRel person had in mind when she typed it.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose = """*You went to things like this without thinking about it. The decision to go somewhere was never a calibration. You're recalibrating now.*"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "go_to_drinks"
+label  = "Go to Corrigan's"
+detail = "Show up. See who's there."
+prose  = """
+{% if w.hasTrait("CONFIDENT") %}
+You know where to stand — bar, not booth, facing the room. You get there before the crowd thins, pick up something off the menu you've been meaning to try, and someone from a different team asks what you're working on about eight minutes in. The evening unfolds from there. You're someone who goes to things like this. You've always been someone who goes to things like this.
+
+{% elif w.hasTrait("SHY") %}
+You go. You position yourself at the bar rather than a booth — easier to manage, easier to leave — and you have the exit prepared before you walk in: early morning tomorrow, not a big deal, just need to get going. Someone from a different team asks what you're working on. Real question, real answer. You stay thirty minutes. The thirty minutes were fine. You use the exit at 5:33 and it lands exactly the way you planned it.
+
+{% else %}
+You go. Corrigan's is a block from the office, the kind of bar that does a good enough happy hour to make the walk reasonable. You take the bar rather than a booth — easier to talk to people on your terms, easier to leave when the evening reaches its natural end. Someone from a different team asks what you're working on. You give a real answer, he gives a real follow-up question, and the conversation runs for twenty minutes before the group rearranges around something else.
+
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "skip_with_excuse"
+label  = "Send your regrets"
+detail = "Message back. Another time."
+prose  = """
+You message back: another time, deadline. It lands fine. Someone sends a thumbs-up. Nobody is keeping score on this particular thing.
+
+{% if not w.alwaysFemale() %}
+*You used to be someone who didn't have to think about whether to go to a thing. The thinking is new.*
+{% endif %}
+
+The office quiets out over the next forty minutes as people leave. By 5:30 it's down to the people who are either on deadline or have nowhere to be. You finish what you're working on, pack up, and head out into the tail end of a Friday evening that has nothing particular in it.
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "go_with_marcus"
+label     = "Walk over with Marcus"
+detail    = "He's going anyway. You end up leaving at the same time."
+condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
+prose     = """
+Marcus mentions he's going in the way people mention things when they're not inviting you but aren't not inviting you either — it's information, offered without expectation. You end up leaving the building at the same time because that's how it works when two people reach the elevator at 4:52.
+
+The walk over is easy. He asks about the load test data you sent him and whether the distribution shape was what you expected. It was. He nods at that in the way he nods at things — not performing interest, just registering it, adding it to whatever model he's building.
+
+Corrigan's is already half-full. You find space at the bar. The conversation stays technical for a while, drifts into project gossip, drifts into a disagreement about a methodology that you're probably both right about from different angles. You leave at eight having said nothing important and having felt, for most of the evening, like a person in the right place.
+
+He says "good talk" when you head out, which from Marcus is roughly equivalent to enthusiasm.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "DRINKS_WITH_MARCUS"
+
+  [[actions.next]]
+  finish = true
