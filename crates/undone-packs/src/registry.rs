@@ -31,7 +31,6 @@ pub struct PackRegistry {
     categories: HashMap<String, CategoryDef>,
     arcs: HashMap<String, ArcDef>,
     opening_scene: Option<String>,
-    default_slot: Option<String>,
     transformation_scene: Option<String>,
 }
 
@@ -48,7 +47,6 @@ impl PackRegistry {
             categories: HashMap::new(),
             arcs: HashMap::new(),
             opening_scene: None,
-            default_slot: None,
             transformation_scene: None,
         }
     }
@@ -246,22 +244,9 @@ impl PackRegistry {
         }
     }
 
-    /// Set the default scheduler slot for the first pack that declares one.
-    /// Subsequent packs cannot override it (first-writer wins).
-    pub fn set_default_slot(&mut self, slot: String) {
-        if self.default_slot.is_none() {
-            self.default_slot = Some(slot);
-        }
-    }
-
     /// Return the opening scene ID declared by the pack, if any.
     pub fn opening_scene(&self) -> Option<&str> {
         self.opening_scene.as_deref()
-    }
-
-    /// Return the default scheduler slot declared by the pack, if any.
-    pub fn default_slot(&self) -> Option<&str> {
-        self.default_slot.as_deref()
     }
 
     /// Set the transformation scene ID for the first pack that declares one.
