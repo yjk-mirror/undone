@@ -84,16 +84,7 @@ She reads the next sentence in the chapter. She understands it. She writes it do
 
 Okay. Okay.
 {% endif %}
-"""
 
-  [[actions.next]]
-  goto = "back"
-
-[[actions]]
-id     = "back"
-label  = "Continue"
-detail = "She forces herself back to the work."
-prose = """
 {% if w.hasTrait("SEXIST") %}
 She works through the rest of the problem set in order. It takes her an hour. The work is fine; the problems go the way problems go when you understand the material, which she does, and she finishes before she expected to.
 

@@ -74,9 +74,6 @@ fn load_one_pack(
     if let Some(ref scene) = manifest.pack.opening_scene {
         registry.set_opening_scene(scene.clone());
     }
-    if let Some(ref slot) = manifest.pack.default_slot {
-        registry.set_default_slot(slot.clone());
-    }
     if let Some(ref scene) = manifest.pack.transformation_scene {
         registry.set_transformation_scene(scene.clone());
     }
@@ -254,12 +251,6 @@ mod tests {
     fn base_pack_has_opening_scene() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         assert_eq!(registry.opening_scene(), Some("base::rain_shelter"));
-    }
-
-    #[test]
-    fn base_pack_has_default_slot() {
-        let (registry, _) = load_packs(&packs_dir()).unwrap();
-        assert_eq!(registry.default_slot(), Some("free_time"));
     }
 
     #[test]

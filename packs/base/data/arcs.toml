@@ -1,9 +1,7 @@
 [[arc]]
-id            = "base::workplace_opening"
-states        = ["arrived", "week_one", "working", "settled"]
-initial_state = "arrived"
+id     = "base::workplace_opening"
+states = ["arrived", "week_one", "clothes_done", "working", "settled"]
 
 [[arc]]
-id            = "base::campus_opening"
-states        = ["arrived", "orientation", "dorm_life", "first_week"]
-initial_state = "arrived"
+id     = "base::campus_opening"
+states = ["arrived", "orientation", "dorm_life", "first_week"]

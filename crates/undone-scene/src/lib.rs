@@ -202,6 +202,115 @@ mod integration_tests {
     }
 
     #[test]
+    fn workplace_arc_full_playthrough() {
+        use crate::scheduler::load_schedule;
+        use rand::rngs::SmallRng;
+        use rand::SeedableRng;
+
+        // Load packs + schedule + scenes
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas).unwrap();
+        let scenes_dir = packs_dir().join("base").join("scenes");
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
+
+        // Start world with ROUTE_WORKPLACE flag (what the Robin preset provides)
+        let mut world = make_world_with_shy(&registry);
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+
+        let mut engine = SceneEngine::new(scenes);
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let mut visited: Vec<String> = Vec::new();
+        let mut all_errors: Vec<String> = Vec::new();
+
+        // Simulate the arc from start to settled
+        'arc: for _ in 0..30 {
+            let Some(pick) = scheduler.pick_next(&world, &registry, &mut rng) else {
+                break;
+            };
+
+            let scene_id = pick.scene_id.clone();
+
+            // Game loop responsibility: mark once-only scenes as played
+            if pick.once_only {
+                world.game_data.set_flag(&format!("ONCE_{}", scene_id));
+            }
+
+            visited.push(scene_id.clone());
+
+            engine.send(
+                EngineCommand::StartScene(scene_id.clone()),
+                &mut world,
+                &registry,
+            );
+
+            // Play through the scene until SceneFinished
+            for _ in 0..10 {
+                let events = engine.drain();
+
+                for e in &events {
+                    if let EngineEvent::ErrorOccurred(msg) = e {
+                        all_errors.push(format!("[{}] {}", scene_id, msg));
+                    }
+                }
+
+                if events
+                    .iter()
+                    .any(|e| matches!(e, EngineEvent::SceneFinished))
+                {
+                    break;
+                }
+
+                let available = events.iter().find_map(|e| {
+                    if let EngineEvent::ActionsAvailable(a) = e {
+                        Some(a.clone())
+                    } else {
+                        None
+                    }
+                });
+
+                match available {
+                    Some(actions) if !actions.is_empty() => {
+                        engine.send(
+                            EngineCommand::ChooseAction(actions[0].id.clone()),
+                            &mut world,
+                            &registry,
+                        );
+                    }
+                    _ => break, // no actions and not finished
+                }
+            }
+
+            if world.game_data.arc_state("base::workplace_opening") == Some("settled") {
+                break 'arc;
+            }
+        }
+
+        let expected = [
+            "base::workplace_arrival",
+            "base::workplace_landlord",
+            "base::workplace_first_night",
+            "base::workplace_first_clothes",
+            "base::workplace_first_day",
+            "base::workplace_work_meeting",
+            "base::workplace_evening",
+        ];
+        for scene in &expected {
+            assert!(
+                visited.iter().any(|v| v == scene),
+                "scene '{}' was never visited; visited order: {:?}",
+                scene,
+                visited
+            );
+        }
+        assert!(
+            all_errors.is_empty(),
+            "unexpected errors during arc playthrough: {:?}",
+            all_errors
+        );
+    }
+
+    #[test]
     fn rain_shelter_npc_fires_and_umbrella_becomes_available() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");

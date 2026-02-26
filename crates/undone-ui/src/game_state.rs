@@ -115,8 +115,7 @@ pub fn init_game() -> PreGameState {
     let scheduler = match load_schedule(&metas) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("[init] scheduler load error: {e}");
-            Scheduler::empty()
+            return failed_pre(registry, scenes, format!("Schedule load error: {e}"));
         }
     };
 

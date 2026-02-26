@@ -46,16 +46,7 @@ She doesn't say anything. She finds another table. This is probably the clearest
 {% else %}
 She scans for a different table. There are other options. She takes one, a two-person table against the wall, and eats alone, which is fine. She's not bothered by eating alone. She catches herself watching the big table in the center — who gets waved over, who gets the backpack moved, who gets the half-second look and who doesn't get it — and she's taking notes she didn't mean to take.
 {% endif %}
-"""
 
-  [[actions.next]]
-  goto = "week"
-
-[[actions]]
-id     = "week"
-label  = "Sit with the week"
-detail = "One week. The shape of what she doesn't know."
-prose = """
 She finishes the grain bowl. Gets coffee. Sits.
 
 The dining hall noise is steady around her — trays, conversations, the scrape of chairs, someone across the room who laughs loud and specific, the kind of laugh that other people's tables hear. The world has its own life in here. She's just eating in it.
@@ -73,7 +64,6 @@ She called home this week. Her dad asked about her classes. Her mom asked if she
 She's been at this for a week and she's made a list, not on paper but in the back of her head, of things she was wrong about. The list is longer than she thought it would be. Not catastrophically longer. Just longer.
 
 She called her dad yesterday. He wanted to hear about her classes. She told him about her classes. He sounded proud in the way he always sounds proud, which is the thing she misses — being known well enough to be predicted. Here, nobody knows what to expect from her, and she doesn't know what to expect from herself.
-{% endif %}
 {% endif %}
 {% else %}
 The first week of anything is mostly information gathering. She's gotten some. The dining hall, the library, the specific texture of lectures where nobody asks questions versus ones where half the room has opinions. The kindness in the lunch line. The backpack.

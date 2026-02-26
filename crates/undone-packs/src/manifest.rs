@@ -17,8 +17,6 @@ pub struct PackMeta {
     #[serde(default)]
     pub opening_scene: Option<String>,
     #[serde(default)]
-    pub default_slot: Option<String>,
-    #[serde(default)]
     pub transformation_scene: Option<String>,
 }
 
@@ -56,7 +54,6 @@ mod tests {
             author   = "Undone"
             requires = []
             opening_scene = "base::rain_shelter"
-            default_slot  = "free_time"
 
             [content]
             traits     = "data/traits.toml"
@@ -71,6 +68,5 @@ mod tests {
             manifest.pack.opening_scene.as_deref(),
             Some("base::rain_shelter")
         );
-        assert_eq!(manifest.pack.default_slot.as_deref(), Some("free_time"));
     }
 }

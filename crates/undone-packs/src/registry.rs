@@ -30,8 +30,8 @@ pub struct PackRegistry {
     races: Vec<String>,
     categories: HashMap<String, CategoryDef>,
     arcs: HashMap<String, ArcDef>,
+    registered_stats: HashSet<StatId>,
     opening_scene: Option<String>,
-    default_slot: Option<String>,
     transformation_scene: Option<String>,
 }
 
@@ -47,8 +47,8 @@ impl PackRegistry {
             races: Vec::new(),
             categories: HashMap::new(),
             arcs: HashMap::new(),
+            registered_stats: HashSet::new(),
             opening_scene: None,
-            default_slot: None,
             transformation_scene: None,
         }
     }
@@ -85,8 +85,18 @@ impl PackRegistry {
     /// Register stats from a pack data file, interning each stat id at load time.
     pub fn register_stats(&mut self, defs: Vec<StatDef>) {
         for def in defs {
-            self.intern_stat(&def.id);
+            let sid = self.intern_stat(&def.id);
+            self.registered_stats.insert(sid);
         }
+    }
+
+    /// Return true if the stat id was declared in a pack's stats file.
+    /// Unlike `get_stat`, this distinguishes registered stats from other interned strings.
+    pub fn is_registered_stat(&self, id: &str) -> bool {
+        self.rodeo
+            .get(id)
+            .map(|s| self.registered_stats.contains(&StatId(s)))
+            .unwrap_or(false)
     }
 
     /// Resolve a string to a TraitId. Errors if the id is unknown.
@@ -110,6 +120,11 @@ impl PackRegistry {
                 self.npc_trait_defs.contains_key(&tid).then_some(tid)
             })
             .ok_or_else(|| RegistryError::UnknownNpcTrait(id.to_string()))
+    }
+
+    /// Look up a SkillDef by SkillId.
+    pub fn get_skill_def(&self, id: &SkillId) -> Option<&SkillDef> {
+        self.skill_defs.get(id)
     }
 
     /// Resolve a string to a SkillId.
@@ -246,22 +261,9 @@ impl PackRegistry {
         }
     }
 
-    /// Set the default scheduler slot for the first pack that declares one.
-    /// Subsequent packs cannot override it (first-writer wins).
-    pub fn set_default_slot(&mut self, slot: String) {
-        if self.default_slot.is_none() {
-            self.default_slot = Some(slot);
-        }
-    }
-
     /// Return the opening scene ID declared by the pack, if any.
     pub fn opening_scene(&self) -> Option<&str> {
         self.opening_scene.as_deref()
-    }
-
-    /// Return the default scheduler slot declared by the pack, if any.
-    pub fn default_slot(&self) -> Option<&str> {
-        self.default_slot.as_deref()
     }
 
     /// Set the transformation scene ID for the first pack that declares one.

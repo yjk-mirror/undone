@@ -133,19 +133,6 @@ pub struct NpcSnapshot {
     pub pc_attraction: String,
 }
 
-impl From<&undone_domain::NpcCore> for NpcSnapshot {
-    fn from(npc: &undone_domain::NpcCore) -> Self {
-        Self {
-            name: npc.name.clone(),
-            age: format!("{}", npc.age),
-            personality: format!("{:?}", npc.personality),
-            relationship: format!("{}", npc.relationship),
-            pc_liking: format!("{}", npc.pc_liking),
-            pc_attraction: format!("{}", npc.pc_attraction),
-        }
-    }
-}
-
 pub fn app_view() -> impl View {
     let signals = AppSignals::new();
 

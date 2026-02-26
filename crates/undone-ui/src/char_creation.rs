@@ -1267,7 +1267,7 @@ fn build_begin_button(
 
             let config = if let Some(p) = preset_ref {
                 // Preset mode: all physical/sexual attributes come from PresetData
-                let before = if origin.has_before_life() {
+                let before = if origin.was_transformed() {
                     Some(BeforeIdentity {
                         name: partial.before_name.clone(),
                         age: partial.before_age,
@@ -1320,7 +1320,7 @@ fn build_begin_button(
             } else {
                 // Custom mode: form signals + defaults for unexposed fields
                 let fem_race = form.race.get_untracked();
-                let before = if origin.has_before_life() {
+                let before = if origin.was_transformed() {
                     Some(BeforeIdentity {
                         name: partial.before_name.clone(),
                         age: partial.before_age,

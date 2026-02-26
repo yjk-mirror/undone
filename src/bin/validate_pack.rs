@@ -59,6 +59,15 @@ fn main() {
         }
     }
 
+    // Trait conflict validation
+    let conflict_errors = registry.validate_trait_conflicts();
+    if !conflict_errors.is_empty() {
+        for e in &conflict_errors {
+            eprintln!("  ERROR: {e}");
+        }
+        error_count += conflict_errors.len();
+    }
+
     // Cross-reference check: all goto targets must exist
     if let Err(e) = validate_cross_references(&all_scenes) {
         eprintln!("ERROR cross-reference: {e}");

@@ -62,16 +62,7 @@ You grip the edge of the sink for a moment, then turn off the light and go back 
 {% else %}
 The kettle starts to rumble in the other room. You go back out to deal with it.
 {% endif %}
-"""
 
-  [[actions.next]]
-  goto = "settle"
-
-[[actions]]
-id     = "settle"
-label  = "Continue"
-detail = "You are not okay. You are operational. There is a difference."
-prose = """
 {% if w.hasTrait("ANALYTICAL") %}
 You make tea — the box of green tea you bought on Sunday because it was the familiar brand and you weren't prepared to make any additional decisions — and sit at the kitchen table with your laptop. Not working. You open a notes file and write: *light switch L→R. bathroom mirror. adaptation lag normal, cached motor patterns. no action required.*
 

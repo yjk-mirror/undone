@@ -37,7 +37,7 @@ max         = 100
 id          = "FEMININITY"
 name        = "Femininity"
 description = "Adaptation to female identity. Low = still adjusting."
-min         = -100
+min         = 0
 max         = 100
 
 [[skill]]

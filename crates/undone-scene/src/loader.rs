@@ -48,6 +48,10 @@ pub enum SceneLoadError {
         arc: String,
         state: String,
     },
+    #[error("unknown stat '{id}' in scene {scene_id}")]
+    UnknownStat { scene_id: String, id: String },
+    #[error("unknown category '{id}' in scene {scene_id}")]
+    UnknownCategory { scene_id: String, id: String },
 }
 
 /// Load all `.toml` scene files from `scenes_dir`.
@@ -125,12 +129,12 @@ fn resolve_scene(
 ) -> Result<SceneDefinition, SceneLoadError> {
     let mut intro_variants = Vec::with_capacity(raw.intro_variants.len());
     for v in raw.intro_variants {
-        intro_variants.push(resolve_narrator_variant(v, scene_id)?);
+        intro_variants.push(resolve_narrator_variant(v, registry, scene_id)?);
     }
 
     let mut intro_thoughts = Vec::with_capacity(raw.thoughts.len());
     for t in raw.thoughts {
-        intro_thoughts.push(resolve_thought(t, scene_id)?);
+        intro_thoughts.push(resolve_thought(t, registry, scene_id)?);
     }
 
     let mut actions = Vec::with_capacity(raw.actions.len());
@@ -154,11 +158,15 @@ fn resolve_scene(
     })
 }
 
-fn resolve_thought(raw: ThoughtDef, scene_id: &str) -> Result<Thought, SceneLoadError> {
+fn resolve_thought(
+    raw: ThoughtDef,
+    registry: &PackRegistry,
+    scene_id: &str,
+) -> Result<Thought, SceneLoadError> {
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, scene_id))
+        .map(|s| parse_condition(s, registry, scene_id))
         .transpose()?;
 
     Ok(Thought {
@@ -170,9 +178,10 @@ fn resolve_thought(raw: ThoughtDef, scene_id: &str) -> Result<Thought, SceneLoad
 
 fn resolve_narrator_variant(
     raw: NarratorVariantDef,
+    registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<NarratorVariant, SceneLoadError> {
-    let condition = parse_condition(&raw.condition, scene_id)?;
+    let condition = parse_condition(&raw.condition, registry, scene_id)?;
     Ok(NarratorVariant {
         condition,
         prose: raw.prose,
@@ -181,13 +190,91 @@ fn resolve_narrator_variant(
 
 fn parse_condition(
     expr_str: &str,
+    registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<undone_expr::parser::Expr, SceneLoadError> {
-    undone_expr::parse(expr_str).map_err(|e| SceneLoadError::BadCondition {
+    let expr = undone_expr::parse(expr_str).map_err(|e| SceneLoadError::BadCondition {
         scene_id: scene_id.to_string(),
         expr: expr_str.to_string(),
         message: e.to_string(),
-    })
+    })?;
+    validate_condition_ids(&expr, registry, scene_id)?;
+    Ok(expr)
+}
+
+/// Walk a parsed `Expr` tree and validate that any content IDs referenced in
+/// method calls (trait names, skill names, category IDs) are known to the registry.
+fn validate_condition_ids(
+    expr: &undone_expr::parser::Expr,
+    registry: &PackRegistry,
+    scene_id: &str,
+) -> Result<(), SceneLoadError> {
+    use undone_expr::parser::{Expr, Receiver, Value};
+
+    match expr {
+        Expr::Call(call) => match call.receiver {
+            Receiver::Player => match call.method.as_str() {
+                "hasTrait" | "hadTraitBefore" => {
+                    if let Some(Value::Str(id)) = call.args.first() {
+                        registry
+                            .resolve_trait(id)
+                            .map_err(|_| SceneLoadError::UnknownTrait {
+                                scene_id: scene_id.to_string(),
+                                id: id.clone(),
+                            })?;
+                    }
+                }
+                "getSkill" | "checkSkill" | "checkSkillRed" => {
+                    if let Some(Value::Str(id)) = call.args.first() {
+                        registry
+                            .resolve_skill(id)
+                            .map_err(|_| SceneLoadError::UnknownSkill {
+                                scene_id: scene_id.to_string(),
+                                id: id.clone(),
+                            })?;
+                    }
+                }
+                "inCategory" | "beforeInCategory" => {
+                    if let Some(Value::Str(id)) = call.args.first() {
+                        if registry.get_category(id).is_none() {
+                            return Err(SceneLoadError::UnknownCategory {
+                                scene_id: scene_id.to_string(),
+                                id: id.clone(),
+                            });
+                        }
+                    }
+                }
+                _ => {}
+            },
+            Receiver::MaleNpc => {
+                if call.method.as_str() == "hasTrait" {
+                    if let Some(Value::Str(id)) = call.args.first() {
+                        registry.resolve_npc_trait(id).map_err(|_| {
+                            SceneLoadError::UnknownTrait {
+                                scene_id: scene_id.to_string(),
+                                id: id.clone(),
+                            }
+                        })?;
+                    }
+                }
+            }
+            _ => {}
+        },
+        Expr::Not(e) => validate_condition_ids(e, registry, scene_id)?,
+        Expr::And(l, r)
+        | Expr::Or(l, r)
+        | Expr::Eq(l, r)
+        | Expr::Ne(l, r)
+        | Expr::Lt(l, r)
+        | Expr::Gt(l, r)
+        | Expr::Le(l, r)
+        | Expr::Ge(l, r) => {
+            validate_condition_ids(l, registry, scene_id)?;
+            validate_condition_ids(r, registry, scene_id)?;
+        }
+        Expr::Lit(_) => {}
+    }
+    Ok(())
 }
 
 fn resolve_action(
@@ -198,12 +285,12 @@ fn resolve_action(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, scene_id))
+        .map(|s| parse_condition(s, registry, scene_id))
         .transpose()?;
 
     let mut next = Vec::with_capacity(raw.next.len());
     for nb in raw.next {
-        next.push(resolve_next_branch(nb, scene_id)?);
+        next.push(resolve_next_branch(nb, registry, scene_id)?);
     }
 
     // Validate effects at load time
@@ -211,7 +298,7 @@ fn resolve_action(
 
     let mut thoughts = Vec::with_capacity(raw.thoughts.len());
     for t in raw.thoughts {
-        thoughts.push(resolve_thought(t, scene_id)?);
+        thoughts.push(resolve_thought(t, registry, scene_id)?);
     }
 
     Ok(Action {
@@ -235,7 +322,7 @@ fn resolve_npc_action(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, scene_id))
+        .map(|s| parse_condition(s, registry, scene_id))
         .transpose()?;
 
     validate_effects(&raw.effects, registry, scene_id)?;
@@ -243,7 +330,7 @@ fn resolve_npc_action(
     let next = raw
         .next
         .into_iter()
-        .map(|n| resolve_next_branch(n, scene_id))
+        .map(|n| resolve_next_branch(n, registry, scene_id))
         .collect::<Result<Vec<_>, _>>()?;
 
     Ok(NpcAction {
@@ -256,11 +343,15 @@ fn resolve_npc_action(
     })
 }
 
-fn resolve_next_branch(raw: NextBranchDef, scene_id: &str) -> Result<NextBranch, SceneLoadError> {
+fn resolve_next_branch(
+    raw: NextBranchDef,
+    registry: &PackRegistry,
+    scene_id: &str,
+) -> Result<NextBranch, SceneLoadError> {
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, scene_id))
+        .map(|s| parse_condition(s, registry, scene_id))
         .transpose()?;
 
     Ok(NextBranch {
@@ -296,6 +387,22 @@ fn validate_effects(
                     })?;
             }
             EffectDef::SkillIncrease { skill, .. } => {
+                registry
+                    .resolve_skill(skill)
+                    .map_err(|_| SceneLoadError::UnknownSkill {
+                        scene_id: scene_id.to_string(),
+                        id: skill.clone(),
+                    })?;
+            }
+            EffectDef::AddStat { stat, .. } | EffectDef::SetStat { stat, .. } => {
+                if !registry.is_registered_stat(stat) {
+                    return Err(SceneLoadError::UnknownStat {
+                        scene_id: scene_id.to_string(),
+                        id: stat.clone(),
+                    });
+                }
+            }
+            EffectDef::FailRedCheck { skill } => {
                 registry
                     .resolve_skill(skill)
                     .map_err(|_| SceneLoadError::UnknownSkill {
@@ -452,5 +559,124 @@ mod tests {
 
         let result = validate_cross_references(&scenes);
         assert!(result.is_ok(), "valid goto should pass");
+    }
+
+    fn make_registry_with_stat(stat_id: &str) -> undone_packs::PackRegistry {
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_stats(vec![undone_packs::data::StatDef {
+            id: stat_id.into(),
+            name: stat_id.into(),
+            description: "test stat".into(),
+        }]);
+        reg
+    }
+
+    #[test]
+    fn validate_effects_rejects_unknown_stat_in_add_stat() {
+        let registry = undone_packs::PackRegistry::new(); // no stats registered
+        let effects = vec![crate::types::EffectDef::AddStat {
+            stat: "NONEXISTENT_STAT".into(),
+            amount: 1,
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownStat { .. })),
+            "expected UnknownStat error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_effects_accepts_known_stat_in_add_stat() {
+        let registry = make_registry_with_stat("TIMES_KISSED");
+        let effects = vec![crate::types::EffectDef::AddStat {
+            stat: "TIMES_KISSED".into(),
+            amount: 1,
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(result.is_ok(), "known stat should pass validation");
+    }
+
+    #[test]
+    fn validate_effects_rejects_unknown_skill_in_fail_red_check() {
+        let registry = undone_packs::PackRegistry::new(); // no skills registered
+        let effects = vec![crate::types::EffectDef::FailRedCheck {
+            skill: "NONEXISTENT_SKILL".into(),
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownSkill { .. })),
+            "expected UnknownSkill error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_condition_rejects_unknown_category() {
+        let registry = undone_packs::PackRegistry::new(); // no categories registered
+        let result = parse_condition("w.inCategory('NONEXISTENT_CAT')", &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownCategory { .. })),
+            "expected UnknownCategory error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_condition_rejects_unknown_trait_in_has_trait() {
+        let registry = undone_packs::PackRegistry::new(); // no traits registered
+        let result = parse_condition("w.hasTrait('NONEXISTENT_TRAIT')", &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownTrait { .. })),
+            "expected UnknownTrait error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_condition_rejects_unknown_skill_in_get_skill() {
+        let registry = undone_packs::PackRegistry::new(); // no skills registered
+        let result = parse_condition(
+            "w.getSkill('NONEXISTENT_SKILL') > 50",
+            &registry,
+            "test::scene",
+        );
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownSkill { .. })),
+            "expected UnknownSkill error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_condition_accepts_known_ids() {
+        let mut registry = undone_packs::PackRegistry::new();
+        registry.register_traits(vec![undone_packs::data::TraitDef {
+            id: "SHY".into(),
+            name: "Shy".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        registry.register_skills(vec![undone_packs::data::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "...".into(),
+            min: 0,
+            max: 100,
+        }]);
+        registry.register_categories(vec![undone_packs::data::CategoryDef {
+            id: "AGE_YOUNG".into(),
+            description: "...".into(),
+            category_type: undone_packs::data::CategoryType::Age,
+            members: vec!["LateTeen".into()],
+        }]);
+        let result = parse_condition(
+            "w.hasTrait('SHY') && w.getSkill('FEMININITY') < 50 && w.inCategory('AGE_YOUNG')",
+            &registry,
+            "test::scene",
+        );
+        assert!(result.is_ok(), "known IDs should pass, got: {:?}", result);
     }
 }

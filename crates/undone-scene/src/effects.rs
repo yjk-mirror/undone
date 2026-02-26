@@ -196,6 +196,9 @@ pub fn apply_effect(
                 modifier: 0,
             });
             entry.value += amount;
+            if let Some(def) = registry.get_skill_def(&sid) {
+                entry.value = entry.value.clamp(def.min, def.max);
+            }
         }
         EffectDef::AddNpcLiking { npc, delta } => match resolve_npc_ref(npc, ctx)? {
             NpcRef::Male(key) => {
@@ -1114,5 +1117,65 @@ mod tests {
         assert!(world
             .game_data
             .has_failed_red_check("base::rain_shelter", "CHARM"));
+    }
+
+    fn make_registry_with_femininity() -> PackRegistry {
+        let mut reg = PackRegistry::new();
+        reg.register_skills(vec![undone_packs::data::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "Adaptation.".into(),
+            min: 0,
+            max: 100,
+        }]);
+        reg
+    }
+
+    #[test]
+    fn skill_increase_clamps_to_max() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let registry = make_registry_with_femininity();
+        let fem_id = registry.resolve_skill("FEMININITY").unwrap();
+        world.player.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
+
+        let effect = EffectDef::SkillIncrease {
+            skill: "FEMININITY".into(),
+            amount: 500,
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+
+        let val = world.player.skills[&fem_id].value;
+        assert_eq!(val, 100, "skill value must be clamped to SkillDef.max");
+    }
+
+    #[test]
+    fn skill_increase_clamps_to_min() {
+        let mut world = make_world();
+        let mut ctx = SceneCtx::new();
+        let registry = make_registry_with_femininity();
+        let fem_id = registry.resolve_skill("FEMININITY").unwrap();
+        world.player.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
+
+        let effect = EffectDef::SkillIncrease {
+            skill: "FEMININITY".into(),
+            amount: -500,
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+
+        let val = world.player.skills[&fem_id].value;
+        assert_eq!(val, 0, "skill value must be clamped to SkillDef.min");
     }
 }

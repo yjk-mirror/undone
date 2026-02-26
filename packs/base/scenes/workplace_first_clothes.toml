@@ -89,6 +89,11 @@ Boxes Monday. Work Monday. You're ahead of schedule, approximately.
   type   = "change_stress"
   amount = -4
 
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "clothes_done"
+
   [[actions.next]]
   finish = true
 
@@ -119,6 +124,11 @@ You get dressed. You take what you need to the register.
   [[actions.effects]]
   type   = "change_anxiety"
   amount = 2
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "clothes_done"
 
   [[actions.next]]
   finish = true

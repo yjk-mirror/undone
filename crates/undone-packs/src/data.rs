@@ -109,9 +109,6 @@ pub struct ArcDef {
     /// Optional NPC role tag for the arc's primary NPC.
     #[serde(default)]
     pub npc_role: Option<String>,
-    /// If set, new games auto-start the arc in this state.
-    #[serde(default)]
-    pub initial_state: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

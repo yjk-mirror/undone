@@ -78,19 +78,6 @@ The rest of the deck goes cleanly. The platform engineer asks two sharp question
 
 You finish at 11:47.
 
-{% if not w.alwaysFemale() %}
-You close the laptop. Carter says "great work" on the way out and you say thanks. You've held two things at once before — the technical outcome and the other thing, the layer underneath it — but not in this specific configuration. Not where the other thing is this legible and this familiar and also, apparently, this unavoidable. You know how to run this experiment. You'll keep running it.
-{% endif %}
-"""
-
-  [[actions.next]]
-  goto = "after"
-
-[[actions]]
-id     = "after"
-label  = "After the meeting."
-detail = "Hallway. The work was good. None of that is the point."
-prose  = """
 The hallway outside the meeting room runs between the elevator bank and the open floor, quieter than both. You stop at the water refill station and fill your bottle.
 
 Marcus comes out behind you. He stops two feet away, because the water station is next to the hall and there's no particular way to avoid it.
@@ -123,7 +110,7 @@ The meeting was good. The technical content held. Kevin did what Kevin did and t
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-Back at your desk, you know the work was good because you know what good work looks like; you've been producing it for over a decade. The thing you're less certain about is whether the room knows the work was good in the way you need it to know, or whether that's a longer project than a single forty-five minute meeting. You think it's probably a longer project.
+You close the laptop. Carter says "great work" on the way out and you say thanks. Back at your desk, you know the work was good because you know what good work looks like — you've been producing it for over a decade. The thing you're less certain about is whether the room knows it in the way you need it to. You think that's a longer project than a single forty-five minute meeting.
 
 You open Slack. Carter has already messaged you. You weren't wrong about that part.
 {% endif %}
