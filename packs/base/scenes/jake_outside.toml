@@ -1,0 +1,116 @@
+[scene]
+id          = "base::jake_outside"
+pack        = "base"
+description = "Running into Jake on the street. A different context than the counter."
+
+[intro]
+prose = """
+Lexington Ave, a Tuesday afternoon. Jake, going the other way, a grocery bag in one hand, his phone in the other. He sees you before you've fully decided whether you've seen him — that particular street physics where the other person's recognition arrives before you've committed to yours.
+
+He smiles. Not the careful smile of a man working out whether to approach, just the easy reflex of someone who remembers you and isn't complicated about it. "Hey."
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+Coffee shop Jake was at a table, approximately eye-level, at a remove. Street Jake is taller than you expected. You didn't used to have a frame for noticing that first. The grocery bag and the phone put him in a particular register — not polished, just a person running an errand — and you clock all of this in the time it takes him to smile.
+
+He sees you and the smile comes without delay. "Hey."
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 45"
+style     = "inner_voice"
+prose     = "*You know what this dynamic looks like. A man and a woman stopped on the street, talking. You know it from the inside and you're learning it from the other side. They're the same dynamic. The difference is which edge you can see.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stop_and_talk"
+label  = "Stop. Let it be a conversation."
+detail = "Five minutes on the sidewalk."
+prose  = """
+You both stop. He shifts the grocery bag to his other hand, which puts his phone away by necessity — a small adjustment that signals he's staying.
+
+Five minutes. Where he's going (home, obviously), something about the neighborhood (the dry cleaners on 47th closed, he found this out the hard way), a dry observation about the weather being what it is. The conversation doesn't go anywhere particular, which is fine. That's what sidewalk conversations are.
+
+{% if w.hasTrait("CONFIDENT") %}
+You steer it slightly — not control, just direction. You ask about the thing in the grocery bag because you're curious. He says it's an ingredient for something he's been meaning to try cooking, which is a more interesting answer than "groceries," and you end up standing there a minute longer than you planned.
+{% else %}
+It finds its own shape. He does most of the moving — not dominantly, just the rhythm of how conversations go when both people are equally willing to let it go somewhere unplanned.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_JAKE_OUTSIDE"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "quick_hi"
+label  = "A wave. Keep moving."
+detail = "Clean. He doesn't make it a thing."
+prose  = """
+You catch his eye, give the nod-and-wave that covers "I know you, I'm busy, this is fine." He returns it without complication — "hey" — and keeps moving. You both do. The street closes back around you, already onto the next thing.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_JAKE_OUTSIDE"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "he_suggests_coffee"
+label     = "He mentions the coffee shop"
+detail    = "Not quite an invitation. You pick up the thread anyway."
+condition = "gd.npcLiking('ROLE_JAKE') == 'Like'"
+prose     = """
+You've been talking for a few minutes when he mentions the coffee shop — not as an invitation, just as a thing. "I keep meaning to go back." He's looking at his phone now, checking something, which is either multitasking or diffidence.
+
+You say: "I'm usually there Tuesday mornings."
+
+He looks up. "Yeah?" And then: "Okay." Like it was already decided, and he was just waiting for the confirmation.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+The wanting registers before the complication does. That's been happening more than you'd expect. He's easy to talk to, he's good-looking in an uncomplicated way, and you said something that sounds like a standing invitation, and some part of you knew it was before you finished saying it. The complication arrives a second later, as it does. You file both things and keep moving.
+{% elif w.hasTrait("OBJECTIFYING") %}
+You see the whole negotiation clearly from both sides at once — his assessment, the mild gamble, the "okay" that covers more than it says. You've made the same calculation in different shoes. You're curious how it plays out.
+{% else %}
+He says "okay" and there's something easy in it. No performance. You both keep walking in your respective directions, and you find yourself looking forward to Tuesday.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_JAKE_OUTSIDE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_COFFEE_PLANNED"
+
+  [[actions.next]]
+  finish = true
