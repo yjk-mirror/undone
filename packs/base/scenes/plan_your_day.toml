@@ -1,43 +1,155 @@
 [scene]
 id          = "base::plan_your_day"
 pack        = "base"
-description = "Choose what to do with your time."
+description = "A pause in week two. Small decisions, small observations."
 
 [intro]
 prose = """
 {% if gd.timeSlot() == "Morning" %}
-Morning light through the kitchen window. Coffee in hand, the day stretching out ahead.
-{% elif gd.timeSlot() == "Afternoon" %}
-The afternoon opens up. What now?
-{% elif gd.timeSlot() == "Evening" %}
-The evening is yours.
-{% else %}
-It's late. Not much left of the day.
-{% endif %}
+The coffee is still hot. You've been sitting with it long enough that you had to check.
 
-What do you want to do?
+Outside, someone is doing something loud with a recycling bin. The city is already going. You don't have anywhere to be for another hour, which used to feel like nothing and now feels like a decision waiting to get made.
+
+The list is on your phone. It's not a long list.
+{% elif gd.timeSlot() == "Afternoon" %}
+The morning did what mornings do. Something got dealt with; something else didn't. The afternoon is what's left.
+
+There's enough daylight to do something with it, if you're going to. You've been standing in the kitchen for the past ninety seconds doing the math on what that something might be.
+{% elif gd.timeSlot() == "Evening" %}
+Most of the day is behind you now. The light through the window is the kind that only happens for twenty minutes, low and orange, and by the time you figure out what to do with yourself it'll be gone.
+
+There's still time to make a decision about the evening. Not a lot, but some.
+{% else %}
+Late. The day already happened; what's left is the aftermath of it.
+
+Somewhere down the block someone's running a restaurant kitchen at full noise. The apartment is quiet by comparison. You still have options, more or less.
+{% endif %}
 """
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+{% if gd.timeSlot() == "Morning" %}
+Coffee, window, list. The list is on your phone: dry-cleaning, the CVS run you've been putting off, a call you told yourself you'd make by end of week.
+
+The dry-cleaning is not the dry-cleaning you had two weeks ago. Neither are the clothes. You worked that out pretty fast — the old stuff isn't the right shape anymore, so you bought things that are, and now you take them to the same dry-cleaners three blocks north and the woman at the counter doesn't look at you like you're anything except a customer who showed up.
+
+The coffee is good. You bought the same brand you always bought because it was the one thing that didn't need rethinking.
+{% elif gd.timeSlot() == "Afternoon" %}
+You've been moving through the afternoon like it's a problem set. The grocery run is crossed off. The other thing — the form, the one with three pages of checkboxes and a section that required you to decide which name to put in the box — is mostly crossed off. You'll finish it tonight.
+
+There's still time in the afternoon. Not a lot, but enough that standing here deciding is starting to feel like a category error.
+{% elif gd.timeSlot() == "Evening" %}
+Two weeks in, you know how the apartment sounds at this hour: the HVAC cycling, the woman upstairs with the dog, traffic on the through-street. You know the light from the window goes orange and then gray. You know which drawer the takeout menus are in even though you've been ordering off your phone.
+
+The routine is stacking up faster than you expected. You're not sure when that started.
+{% else %}
+Late. The productive part of the day is behind you.
+
+The apartment has gotten normal faster than expected. You can move through it in the dark without thinking — which you noticed last week. The subway route. The building entry code. The side of the bed. Things that took up attention two weeks ago have stopped doing that.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') >= 20 && w.getSkill('FEMININITY') < 50"
+prose = """
+{% if gd.timeSlot() == "Morning" %}
+The coffee routine runs itself now. Grind, brew, window. The same order every morning, and you stopped noticing you were doing it about a week ago.
+
+The list is on your phone. It's shorter than it used to be — not because you've gotten better at crossing things off, but because you've stopped putting the obvious things on it.
+{% elif gd.timeSlot() == "Afternoon" %}
+The morning had a shape to it. Not a complicated shape, but a recognizable one: the kind that means you've been somewhere long enough to have a routine.
+
+The afternoon is open. That's not nothing.
+{% elif gd.timeSlot() == "Evening" %}
+The apartment is doing its evening thing. The HVAC cycling, the light going low, the street outside switching from afternoon traffic to dinner-hour foot traffic. You know the sequence now.
+
+There are things you could do with what's left of it.
+{% else %}
+Late. The day happened and is accounted for.
+
+The apartment is quiet. Not unsettlingly quiet — the ordinary quiet of a space you know well enough to not be startled by.
+{% endif %}
+"""
+
+# ── Thoughts ──────────────────────────────────────────────────────────
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+prose = "*You bought the same coffee two weeks running without looking at alternatives. At some point that became the brand you buy.*"
+style = "inner_voice"
 
 # ── Player Actions ────────────────────────────────────────────────────
 
 [[actions]]
-id    = "go_out"
-label = "Go out"
-detail = "See what the city has in store."
-prose = "You grab your jacket and head out."
+id     = "go_out"
+label  = "Go out"
+detail = "The city has things in it. You might as well look."
+prose = """
+You grab your jacket. The city has people in it doing city things — running errands, eating sandwiches on steps, walking to wherever they're going like they have a plan. You might as well be one of them.
+"""
 
   [[actions.next]]
   slot = "free_time"
 
 [[actions]]
-id    = "stay_home"
-label = "Stay home"
-detail = "A quiet day in."
-prose = "You settle in. Sometimes doing nothing is doing something."
+id     = "run_errands"
+label  = "Run errands"
+detail = "The list doesn't get shorter on its own."
+prose = """
+You check the list and put the phone back in your pocket. Three stops, maybe four: the dry-cleaners, CVS, the thing at the bank that's been sitting there since Monday. None of it is interesting, and none of it gets shorter on its own.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -20
 
   [[actions.next]]
-  finish = true
+  slot = "free_time"
+
+[[actions]]
+id        = "work_on_something"
+label     = "Work on something"
+detail    = "The laptop is right there."
+condition = "gd.hasGameFlag('STARTED_JOB')"
+prose = """
+You sit down with the laptop. The work is familiar in the way that work gets familiar: the same tabs, the same files, the specific problem that was the same problem yesterday and will probably still be the same problem tomorrow but is at least *your* problem to work on.
+
+An hour passes faster than expected. Something gets done — not everything, but something specific and completable, and you close the laptop when it's done with the window already gone dark and the city doing its evening thing outside.
+"""
 
   [[actions.effects]]
   type   = "change_stress"
   amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "stay_in"
+label  = "Stay in"
+detail = "Not every day needs to go anywhere."
+prose = """
+{% if w.hasTrait("AMBITIOUS") %}
+You think about the list for a moment — specifically, whether crossing nothing off it today is a strategic choice or a failure of follow-through. You decide it's a strategic choice. Rest is a resource. You've been running at full capacity for two weeks and the yield on additional effort at this particular hour is diminishing.
+
+You make tea and sit with it, which is probably what two weeks of running at full capacity earns you.
+{% elif w.hasTrait("ANALYTICAL") %}
+You run the numbers: three items on the list, two of which have no deadline before Friday, one of which is discretionary. Net cost of not doing them today: negligible. Net benefit of a low-stimulation evening: probably positive, given the last two weeks' stress load.
+
+You close the list, make tea anyway, and sit near the window with it.
+{% else %}
+You don't go anywhere. The apartment is fine. You make tea or order food — one of those — and settle into the couch and let the afternoon do whatever it's going to do, which turns out to be nothing that requires your attention.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -1
+
+  [[actions.next]]
+  finish = true

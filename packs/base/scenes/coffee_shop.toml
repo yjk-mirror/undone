@@ -24,9 +24,9 @@ He nods. You nod back. The universal coffee-shop acknowledgment — *we are both
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-There's a geometry to being a woman in a line. You're aware of the man in front of you and the empty space behind you, and the way your body occupies a different amount of room than it used to. You stand with your bag against your hip. Shoulders in. Taking up exactly the space you need and no more.
+You stand with your bag against your hip. Shoulders slightly in. The man ahead of you doesn't notice the three inches you've left between you, or the angle of your feet, or any of the small adjustments you've been making since you got in this line. He's just waiting for coffee.
 
-He didn't notice any of that. Men never do. That's the thing you know now that you didn't before: the negotiation is invisible to the people who don't have to do it.
+You used to be the one who didn't notice.
 {% endif %}
 """
 
