@@ -48,6 +48,8 @@ pub enum SceneLoadError {
         arc: String,
         state: String,
     },
+    #[error("unknown stat '{id}' in scene {scene_id}")]
+    UnknownStat { scene_id: String, id: String },
 }
 
 /// Load all `.toml` scene files from `scenes_dir`.
@@ -303,6 +305,22 @@ fn validate_effects(
                         id: skill.clone(),
                     })?;
             }
+            EffectDef::AddStat { stat, .. } | EffectDef::SetStat { stat, .. } => {
+                if !registry.is_registered_stat(stat) {
+                    return Err(SceneLoadError::UnknownStat {
+                        scene_id: scene_id.to_string(),
+                        id: stat.clone(),
+                    });
+                }
+            }
+            EffectDef::FailRedCheck { skill } => {
+                registry
+                    .resolve_skill(skill)
+                    .map_err(|_| SceneLoadError::UnknownSkill {
+                        scene_id: scene_id.to_string(),
+                        id: skill.clone(),
+                    })?;
+            }
             EffectDef::AdvanceArc { arc, to_state } => {
                 let arc_def = registry
                     .get_arc(arc)
@@ -452,5 +470,55 @@ mod tests {
 
         let result = validate_cross_references(&scenes);
         assert!(result.is_ok(), "valid goto should pass");
+    }
+
+    fn make_registry_with_stat(stat_id: &str) -> undone_packs::PackRegistry {
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_stats(vec![undone_packs::data::StatDef {
+            id: stat_id.into(),
+            name: stat_id.into(),
+            description: "test stat".into(),
+        }]);
+        reg
+    }
+
+    #[test]
+    fn validate_effects_rejects_unknown_stat_in_add_stat() {
+        let registry = undone_packs::PackRegistry::new(); // no stats registered
+        let effects = vec![crate::types::EffectDef::AddStat {
+            stat: "NONEXISTENT_STAT".into(),
+            amount: 1,
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownStat { .. })),
+            "expected UnknownStat error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_effects_accepts_known_stat_in_add_stat() {
+        let registry = make_registry_with_stat("TIMES_KISSED");
+        let effects = vec![crate::types::EffectDef::AddStat {
+            stat: "TIMES_KISSED".into(),
+            amount: 1,
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(result.is_ok(), "known stat should pass validation");
+    }
+
+    #[test]
+    fn validate_effects_rejects_unknown_skill_in_fail_red_check() {
+        let registry = undone_packs::PackRegistry::new(); // no skills registered
+        let effects = vec![crate::types::EffectDef::FailRedCheck {
+            skill: "NONEXISTENT_SKILL".into(),
+        }];
+        let result = validate_effects(&effects, &registry, "test::scene");
+        assert!(
+            matches!(result, Err(SceneLoadError::UnknownSkill { .. })),
+            "expected UnknownSkill error, got: {:?}",
+            result
+        );
     }
 }

@@ -30,6 +30,7 @@ pub struct PackRegistry {
     races: Vec<String>,
     categories: HashMap<String, CategoryDef>,
     arcs: HashMap<String, ArcDef>,
+    registered_stats: HashSet<StatId>,
     opening_scene: Option<String>,
     transformation_scene: Option<String>,
 }
@@ -46,6 +47,7 @@ impl PackRegistry {
             races: Vec::new(),
             categories: HashMap::new(),
             arcs: HashMap::new(),
+            registered_stats: HashSet::new(),
             opening_scene: None,
             transformation_scene: None,
         }
@@ -83,8 +85,18 @@ impl PackRegistry {
     /// Register stats from a pack data file, interning each stat id at load time.
     pub fn register_stats(&mut self, defs: Vec<StatDef>) {
         for def in defs {
-            self.intern_stat(&def.id);
+            let sid = self.intern_stat(&def.id);
+            self.registered_stats.insert(sid);
         }
+    }
+
+    /// Return true if the stat id was declared in a pack's stats file.
+    /// Unlike `get_stat`, this distinguishes registered stats from other interned strings.
+    pub fn is_registered_stat(&self, id: &str) -> bool {
+        self.rodeo
+            .get(id)
+            .map(|s| self.registered_stats.contains(&StatId(s)))
+            .unwrap_or(false)
     }
 
     /// Resolve a string to a TraitId. Errors if the id is unknown.
