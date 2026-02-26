@@ -160,11 +160,6 @@ impl PcOrigin {
         )
     }
 
-    /// Should the "before" section show in character creation?
-    pub fn has_before_life(self) -> bool {
-        self.was_transformed()
-    }
-
     /// For backward compat: equivalent to the old `always_female` bool.
     /// True for CisFemaleTransformed and AlwaysFemale.
     pub fn is_always_female(self) -> bool {
