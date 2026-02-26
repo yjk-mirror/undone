@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_arrival"
+id          = "base::workplace_arrival"
 pack        = "base"
 description = "Robin arrives in the city. Airport, exit screening, the subway. First hours in the new body in a new place."
 
@@ -88,11 +88,11 @@ Twenty-two minutes. She counts the stops.
 
   [[actions.effects]]
   type = "set_game_flag"
-  flag = "ROUTE_ROBIN"
+  flag = "ROUTE_WORKPLACE"
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "arrived"
 
   [[actions.next]]
@@ -120,11 +120,11 @@ She gets out into the early spring cold and looks at her building and thinks: *o
 
   [[actions.effects]]
   type = "set_game_flag"
-  flag = "ROUTE_ROBIN"
+  flag = "ROUTE_WORKPLACE"
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "arrived"
 
   [[actions.next]]

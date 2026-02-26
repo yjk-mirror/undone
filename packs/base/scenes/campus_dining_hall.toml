@@ -1,5 +1,5 @@
 [scene]
-id          = "base::camila_dining_hall"
+id          = "base::campus_dining_hall"
 pack        = "base"
 description = "The dining hall. Social hierarchies, inverted. The shape of what she doesn't know."
 
@@ -86,7 +86,7 @@ She finishes the coffee, drops the tray, and walks back to the dorm.
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "first_week"
 
   [[actions.next]]

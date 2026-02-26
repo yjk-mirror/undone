@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_first_night"
+id          = "base::workplace_first_night"
 pack        = "base"
 description = "Robin's first night in her empty apartment. The boxes aren't here. The city is outside. The bra problem is tonight's problem."
 
@@ -83,7 +83,7 @@ Tomorrow: shopping. The bra problem specifically. The rest of the list after tha
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "week_one"
 
   [[actions.next]]
@@ -115,7 +115,7 @@ She adds *specialty store??* to her list and goes to sleep.
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "week_one"
 
   [[actions.next]]
@@ -167,7 +167,7 @@ She plugs her phone in on the floor beside her. The radiator ticks. Outside, the
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "week_one"
 
   [[actions.next]]

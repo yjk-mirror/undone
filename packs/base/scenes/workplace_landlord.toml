@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_landlord"
+id          = "base::workplace_landlord"
 pack        = "base"
 description = "Robin meets her landlord. The lease, the ID, the voice that doesn't match the photo. She waits him out."
 

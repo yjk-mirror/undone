@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_first_day"
+id          = "base::workplace_first_day"
 pack        = "base"
 description = "Robin's first day at the tech company. The lobby, the manager, the coworker who explains something she invented."
 
@@ -86,7 +86,7 @@ The day moves forward at the speed of days.
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "working"
 
   [[actions.effects]]
@@ -119,7 +119,7 @@ She turns back to her screen. This is established now. She doesn't have to do it
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "working"
 
   [[actions.effects]]
@@ -158,7 +158,7 @@ The gap between what she knows and what he thinks she knows is going to close ev
 
   [[npc_actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "working"
 
   [[npc_actions.effects]]

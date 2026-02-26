@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_work_meeting"
+id          = "base::workplace_work_meeting"
 pack        = "base"
 description = "Design review. Robin presents. Someone explains her own work back to her."
 

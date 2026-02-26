@@ -1,5 +1,5 @@
 [scene]
-id          = "base::camila_arrival"
+id          = "base::campus_arrival"
 pack        = "base"
 description = "Camila arrives on campus. Move-in day. Being greeted as a girl for the first time in public."
 
@@ -80,11 +80,11 @@ She has a room at college. She has a name on the lanyard. She is at the Ivy, whi
 
   [[actions.effects]]
   type = "set_game_flag"
-  flag = "ROUTE_CAMILA"
+  flag = "ROUTE_CAMPUS"
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "arrived"
 
   [[actions.next]]
@@ -116,11 +116,11 @@ She goes back to her unpacking.
 
   [[npc_actions.effects]]
   type = "set_game_flag"
-  flag = "ROUTE_CAMILA"
+  flag = "ROUTE_CAMPUS"
 
   [[npc_actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "arrived"
 
   [[npc_actions.next]]

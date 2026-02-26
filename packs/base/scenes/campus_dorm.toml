@@ -1,5 +1,5 @@
 [scene]
-id          = "base::camila_dorm"
+id          = "base::campus_dorm"
 pack        = "base"
 description = "Camila's first night in the dorm. The body, what happens in the dark, the phone call home."
 
@@ -59,7 +59,7 @@ In the morning she feels fine. Janette is already up and getting coffee. College
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "orientation"
 
   [[actions.next]]
@@ -101,7 +101,7 @@ She puts the phone face-down. She's not going to explain it. She can't explain i
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "orientation"
 
   [[actions.next]]
@@ -132,7 +132,7 @@ She doesn't fall asleep for another hour. When she does, she doesn't have the ot
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "orientation"
 
   [[actions.next]]

@@ -1,5 +1,5 @@
 [scene]
-id          = "base::robin_evening"
+id          = "base::workplace_evening"
 pack        = "base"
 description = "After work. The apartment. She has been competent all day. Something small undoes her."
 
@@ -112,7 +112,7 @@ The switch will retrain itself eventually. The body catches up to where it lives
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::robin_opening"
+  arc      = "base::workplace_opening"
   to_state = "settled"
 
   [[actions.effects]]

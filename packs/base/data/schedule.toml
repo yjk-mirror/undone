@@ -27,106 +27,106 @@ name = "free_time"
   trigger   = "gd.week() >= 2"
   once_only = true
 
-# ── Robin opening arc ────────────────────────────────────────────────
+# ── Workplace opening arc ────────────────────────────────────────────────
 
 [[slot]]
-name = "robin_opening"
+name = "workplace_opening"
 
   [[slot.events]]
-  scene     = "base::robin_arrival"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN')"
+  scene     = "base::workplace_arrival"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN')"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE')"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_landlord"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && !gd.hasGameFlag('MET_LANDLORD')"
+  scene     = "base::workplace_landlord"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && !gd.hasGameFlag('MET_LANDLORD')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && !gd.hasGameFlag('MET_LANDLORD')"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && !gd.hasGameFlag('MET_LANDLORD')"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_first_night"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'arrived'"
+  scene     = "base::workplace_first_night"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'arrived'"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived'"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_first_clothes"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  scene     = "base::workplace_first_clothes"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
   weight    = 10
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_first_day"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  scene     = "base::workplace_first_day"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'week_one'"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_work_meeting"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  scene     = "base::workplace_work_meeting"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::robin_evening"
-  condition = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working'"
+  scene     = "base::workplace_evening"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_ROBIN') && gd.arcState('base::robin_opening') == 'working' && gd.hasGameFlag('FIRST_MEETING_DONE')"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && gd.hasGameFlag('FIRST_MEETING_DONE')"
   once_only = true
 
-# ── Camila opening arc ────────────────────────────────────────────────
+# ── Campus opening arc ────────────────────────────────────────────────
 
 [[slot]]
-name = "camila_opening"
+name = "campus_opening"
 
   [[slot.events]]
-  scene     = "base::camila_arrival"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA')"
+  scene     = "base::campus_arrival"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMILA')"
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS')"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_dorm"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'arrived'"
+  scene     = "base::campus_dorm"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'arrived'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'arrived'"
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'arrived'"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_orientation"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'orientation'"
+  scene     = "base::campus_orientation"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'orientation'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'orientation'"
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'orientation'"
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_library"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life'"
+  scene     = "base::campus_library"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life'"
   weight    = 10
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_call_raul"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && !gd.hasGameFlag('CALL_HOME_DONE')"
+  scene     = "base::campus_call_home"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && !gd.hasGameFlag('CALL_HOME_DONE')"
   weight    = 8
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_study_session"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && !gd.hasGameFlag('STUDY_SESSION_DONE')"
+  scene     = "base::campus_study_session"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && !gd.hasGameFlag('STUDY_SESSION_DONE')"
   weight    = 10
   once_only = true
 
   [[slot.events]]
-  scene     = "base::camila_dining_hall"
-  condition = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
+  scene     = "base::campus_dining_hall"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMILA') && gd.arcState('base::camila_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
   once_only = true

@@ -1,5 +1,5 @@
 [scene]
-id          = "base::camila_orientation"
+id          = "base::campus_orientation"
 pack        = "base"
 description = "Freshman orientation. The quad, the panels, the men who talk to her like she's someone new — which she is."
 
@@ -72,7 +72,7 @@ Janette is in the room, already complaining cheerfully about the icebreaker card
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "dorm_life"
 
   [[actions.next]]
@@ -96,7 +96,7 @@ One of them looks over. She doesn't slow down.
 
   [[actions.effects]]
   type     = "advance_arc"
-  arc      = "base::camila_opening"
+  arc      = "base::campus_opening"
   to_state = "dorm_life"
 
   [[actions.next]]

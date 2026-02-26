@@ -274,10 +274,10 @@ mod tests {
     #[test]
     fn loads_base_pack_arcs() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
-        let arc = registry.get_arc("base::robin_opening");
+        let arc = registry.get_arc("base::workplace_opening");
         assert!(
             arc.is_some(),
-            "base::robin_opening arc should be registered"
+            "base::workplace_opening arc should be registered"
         );
         let arc = arc.unwrap();
         assert!(arc.states.contains(&"arrived".to_string()));
