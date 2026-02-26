@@ -32,10 +32,30 @@ pub struct CharCreationConfig {
     pub starting_traits: Vec<TraitId>,
     pub male_count: usize,
     pub female_count: usize,
-    /// Game flags set at game start (e.g. "ROUTE_ROBIN").
+    /// Game flags set at game start (e.g. "ROUTE_WORKPLACE").
     pub starting_flags: HashSet<String>,
     /// Arc states to initialise at game start. Maps arc_id → initial state name.
     pub starting_arc_states: HashMap<String, String>,
+
+    // Physical attributes
+    pub height: Height,
+    pub butt: ButtSize,
+    pub waist: WaistSize,
+    pub lips: LipShape,
+    pub hair_colour: HairColour,
+    pub hair_length: HairLength,
+    pub eye_colour: EyeColour,
+    pub skin_tone: SkinTone,
+    pub complexion: Complexion,
+    pub appearance: Appearance,
+    pub pubic_hair: PubicHairStyle,
+    pub natural_pubic_hair: NaturalPubicHair,
+
+    // Sexual attributes
+    pub nipple_sensitivity: NippleSensitivity,
+    pub clit_sensitivity: ClitSensitivity,
+    pub inner_labia: InnerLabiaSize,
+    pub wetness_baseline: WetnessBaseline,
 }
 
 /// Create a brand-new World from character creation choices.
@@ -61,22 +81,22 @@ pub fn new_game<R: Rng>(
         race: config.race,
         figure: config.figure,
         breasts: config.breasts,
-        eye_colour: EyeColour::Brown,
-        hair_colour: HairColour::DarkBrown,
-        height: Height::Average,
-        hair_length: HairLength::Shoulder,
-        skin_tone: SkinTone::Medium,
-        complexion: Complexion::Normal,
-        appearance: Appearance::Average,
-        butt: ButtSize::Round,
-        waist: WaistSize::Average,
-        lips: LipShape::Average,
-        nipple_sensitivity: NippleSensitivity::Normal,
-        clit_sensitivity: ClitSensitivity::Normal,
-        pubic_hair: PubicHairStyle::Trimmed,
-        natural_pubic_hair: NaturalPubicHair::Full,
-        inner_labia: InnerLabiaSize::Average,
-        wetness_baseline: WetnessBaseline::Normal,
+        eye_colour: config.eye_colour,
+        hair_colour: config.hair_colour,
+        height: config.height,
+        hair_length: config.hair_length,
+        skin_tone: config.skin_tone,
+        complexion: config.complexion,
+        appearance: config.appearance,
+        butt: config.butt,
+        waist: config.waist,
+        lips: config.lips,
+        nipple_sensitivity: config.nipple_sensitivity,
+        clit_sensitivity: config.clit_sensitivity,
+        pubic_hair: config.pubic_hair,
+        natural_pubic_hair: config.natural_pubic_hair,
+        inner_labia: config.inner_labia,
+        wetness_baseline: config.wetness_baseline,
         traits,
         skills: HashMap::new(),
         money: 500,
@@ -162,8 +182,8 @@ mod tests {
     use rand::SeedableRng;
     use std::path::PathBuf;
     use undone_domain::{
-        Age, BeforeIdentity, BeforeSexuality, BreastSize, EyeColour, HairColour, Height,
-        MaleFigure, PcOrigin, PenisSize, PlayerFigure, SkinTone,
+        BeforeSexuality, BeforeVoice, EyeColour, HairColour, Height, MaleFigure, PcOrigin,
+        PenisSize, SkinTone,
     };
 
     fn packs_dir() -> PathBuf {
@@ -196,7 +216,7 @@ mod tests {
                 eye_colour: EyeColour::Brown,
                 skin_tone: SkinTone::Medium,
                 penis_size: PenisSize::Average,
-                voice: undone_domain::BeforeVoice::Average,
+                voice: BeforeVoice::Average,
                 traits: std::collections::HashSet::new(),
             }),
             starting_traits: vec![],
@@ -204,6 +224,22 @@ mod tests {
             female_count: 2,
             starting_flags: HashSet::new(),
             starting_arc_states: HashMap::new(),
+            height: Height::Average,
+            butt: ButtSize::Round,
+            waist: WaistSize::Average,
+            lips: LipShape::Average,
+            hair_colour: HairColour::DarkBrown,
+            hair_length: HairLength::Shoulder,
+            eye_colour: EyeColour::Brown,
+            skin_tone: SkinTone::Medium,
+            complexion: Complexion::Normal,
+            appearance: Appearance::Average,
+            pubic_hair: PubicHairStyle::Trimmed,
+            natural_pubic_hair: NaturalPubicHair::Full,
+            nipple_sensitivity: NippleSensitivity::Normal,
+            clit_sensitivity: ClitSensitivity::Normal,
+            inner_labia: InnerLabiaSize::Average,
+            wetness_baseline: WetnessBaseline::Normal,
         }
     }
 
@@ -268,35 +304,8 @@ mod tests {
     #[test]
     fn new_game_trans_woman_sets_femininity_70() {
         let (mut registry, _) = load_packs(&packs_dir()).unwrap();
-        let config = CharCreationConfig {
-            name_fem: "Eva".into(),
-            name_androg: "Ev".into(),
-            name_masc: "Evan".into(),
-            age: Age::EarlyTwenties,
-            race: "white".into(),
-            figure: PlayerFigure::Slim,
-            breasts: BreastSize::Full,
-            origin: PcOrigin::TransWomanTransformed,
-            before: Some(BeforeIdentity {
-                name: "Evan".into(),
-                age: Age::MidLateTwenties,
-                race: "white".into(),
-                sexuality: BeforeSexuality::AttractedToWomen,
-                figure: MaleFigure::Average,
-                height: Height::Average,
-                hair_colour: HairColour::DarkBrown,
-                eye_colour: EyeColour::Brown,
-                skin_tone: SkinTone::Medium,
-                penis_size: PenisSize::Average,
-                voice: undone_domain::BeforeVoice::Average,
-                traits: std::collections::HashSet::new(),
-            }),
-            starting_traits: vec![],
-            male_count: 7,
-            female_count: 2,
-            starting_flags: HashSet::new(),
-            starting_arc_states: HashMap::new(),
-        };
+        let mut config = base_config();
+        config.origin = PcOrigin::TransWomanTransformed;
         let mut rng = rand::rngs::SmallRng::seed_from_u64(5);
         let world = new_game(config, &mut registry, &mut rng);
 

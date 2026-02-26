@@ -6,8 +6,10 @@ use rand::SeedableRng;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::{
-    Age, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, EyeColour, HairColour, Height,
-    MaleFigure, PcOrigin, PenisSize, PlayerFigure, SkinTone,
+    Age, Appearance, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, ButtSize,
+    ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize,
+    LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize, PlayerFigure,
+    PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
 };
 use undone_packs::char_creation::CharCreationConfig;
 
@@ -18,6 +20,7 @@ use crate::{AppPhase, AppSignals, PartialCharState};
 // ── Preset character data ─────────────────────────────────────────────────────
 
 struct PresetData {
+    // Identity
     before_name: &'static str,
     before_age: Age,
     origin: PcOrigin,
@@ -25,27 +28,147 @@ struct PresetData {
     before_race: &'static str,
     trait_ids: &'static [&'static str],
     blurb: &'static str,
-    /// Starting circumstance flag set at game start (e.g. `"ROUTE_ROBIN"`).
-    /// Defined by the pack — the engine stores whatever string the preset declares.
-    /// `None` for freeform / no fixed starting scenario.
+    /// Starting circumstance flag set at game start (e.g. `"ROUTE_WORKPLACE"`).
     arc_flag: Option<&'static str>,
+
+    // Before-life physical
+    before_figure: MaleFigure,
+    before_height: Height,
+    before_hair_colour: HairColour,
+    before_eye_colour: EyeColour,
+    before_skin_tone: SkinTone,
+    before_penis_size: PenisSize,
+    before_voice: BeforeVoice,
+
+    // After-transformation physical
+    age: Age,
+    race: &'static str,
+    figure: PlayerFigure,
+    height: Height,
+    breasts: BreastSize,
+    butt: ButtSize,
+    waist: WaistSize,
+    lips: LipShape,
+    hair_colour: HairColour,
+    hair_length: HairLength,
+    eye_colour: EyeColour,
+    skin_tone: SkinTone,
+    complexion: Complexion,
+    appearance: Appearance,
+    pubic_hair: PubicHairStyle,
+    natural_pubic_hair: NaturalPubicHair,
+
+    // Sexual attributes
+    nipple_sensitivity: NippleSensitivity,
+    clit_sensitivity: ClitSensitivity,
+    inner_labia: InnerLabiaSize,
+    wetness_baseline: WetnessBaseline,
+
+    // Names (post-transformation)
+    name_fem: &'static str,
+    name_androg: &'static str,
+    name_masc: &'static str,
 }
 
 const PRESET_ROBIN: PresetData = PresetData {
+    // Identity
     before_name: "Robin",
     before_age: Age::Thirties,
     origin: PcOrigin::CisMaleTransformed,
     before_sexuality: BeforeSexuality::AttractedToWomen,
     before_race: "White",
-    trait_ids: &["AMBITIOUS", "ANALYTICAL", "DOWN_TO_EARTH", "OBJECTIFYING"],
+    trait_ids: &[
+        // Personality
+        "AMBITIOUS",
+        "ANALYTICAL",
+        "DOWN_TO_EARTH",
+        "OBJECTIFYING",
+        // Physical
+        "STRAIGHT_HAIR",
+        "SWEET_VOICE",
+        "ALMOND_EYES",
+        "WIDE_HIPS",
+        "NARROW_WAIST",
+        "SMALL_HANDS",
+        "PRONOUNCED_COLLARBONES",
+        "THIGH_GAP",
+        "SOFT_SKIN",
+        "NATURALLY_SMOOTH",
+        "INTOXICATING_SCENT",
+        // Sexual response
+        "HAIR_TRIGGER",
+        "HEAVY_SQUIRTER",
+        "MULTI_ORGASMIC",
+        "ORAL_FIXATION",
+        "SENSITIVE_NECK",
+        "SENSITIVE_EARS",
+        "SENSITIVE_INNER_THIGHS",
+        "SUBMISSIVE",
+        "PRAISE_KINK",
+        "EASILY_WET",
+        "BACK_ARCHER",
+        "TOE_CURLER",
+        // Arousal response
+        "NIPPLE_GETTER",
+        "FLUSHER",
+        "THIGH_CLENCHER",
+        "BREATH_CHANGER",
+        "LIP_BITER",
+        // Sexual preference
+        "LIKES_ORAL_GIVING",
+        "LIKES_DOUBLE_PENETRATION",
+        // Dark content
+        "FREEZE_RESPONSE",
+        // Body
+        "REGULAR_PERIODS",
+    ],
     blurb: "You're thirty-two, a software engineer with ten years of experience. \
             You took a job offer in a city you didn't know — new company, new start, \
             boxes shipped to an apartment you've never seen. When things go sideways, \
             you inventory and solve. You're very good at that.",
-    arc_flag: Some("ROUTE_ROBIN"),
+    arc_flag: Some("ROUTE_WORKPLACE"),
+
+    // Before-life physical (all unremarkable)
+    before_figure: MaleFigure::Average,
+    before_height: Height::Average,
+    before_hair_colour: HairColour::Brown,
+    before_eye_colour: EyeColour::Brown,
+    before_skin_tone: SkinTone::Light,
+    before_penis_size: PenisSize::Average,
+    before_voice: BeforeVoice::Average,
+
+    // After physical
+    age: Age::LateTeen,
+    race: "East Asian",
+    figure: PlayerFigure::Petite,
+    height: Height::Short,
+    breasts: BreastSize::Huge,
+    butt: ButtSize::Big,
+    waist: WaistSize::Narrow,
+    lips: LipShape::Full,
+    hair_colour: HairColour::Black,
+    hair_length: HairLength::Long,
+    eye_colour: EyeColour::DarkBrown,
+    skin_tone: SkinTone::Light,
+    complexion: Complexion::Glowing,
+    appearance: Appearance::Stunning,
+    pubic_hair: PubicHairStyle::Bare,
+    natural_pubic_hair: NaturalPubicHair::None,
+
+    // Sexual
+    nipple_sensitivity: NippleSensitivity::High,
+    clit_sensitivity: ClitSensitivity::High,
+    inner_labia: InnerLabiaSize::Average,
+    wetness_baseline: WetnessBaseline::Wet,
+
+    // Names: Robin keeps the same name (gender-neutral)
+    name_fem: "Robin",
+    name_androg: "Robin",
+    name_masc: "Robin",
 };
 
 const PRESET_RAUL: PresetData = PresetData {
+    // Identity
     before_name: "Raul",
     before_age: Age::LateTeen,
     origin: PcOrigin::CisMaleTransformed,
@@ -56,7 +179,45 @@ const PRESET_RAUL: PresetData = PresetData {
             You arrived with your expectations calibrated: you knew who you were, where you \
             were headed, and what the next four years were supposed to look like. \
             Things have always worked out. You've never had a real reason to think they wouldn't.",
-    arc_flag: Some("ROUTE_CAMILA"),
+    arc_flag: Some("ROUTE_CAMPUS"),
+
+    // Before-life physical
+    before_figure: MaleFigure::Toned,
+    before_height: Height::Tall,
+    before_hair_colour: HairColour::Black,
+    before_eye_colour: EyeColour::DarkBrown,
+    before_skin_tone: SkinTone::Olive,
+    before_penis_size: PenisSize::AboveAverage,
+    before_voice: BeforeVoice::Average,
+
+    // After physical
+    age: Age::LateTeen,
+    race: "Latina",
+    figure: PlayerFigure::Hourglass,
+    height: Height::Average,
+    breasts: BreastSize::Full,
+    butt: ButtSize::Round,
+    waist: WaistSize::Average,
+    lips: LipShape::Average,
+    hair_colour: HairColour::DarkBrown,
+    hair_length: HairLength::Shoulder,
+    eye_colour: EyeColour::DarkBrown,
+    skin_tone: SkinTone::Olive,
+    complexion: Complexion::Normal,
+    appearance: Appearance::Attractive,
+    pubic_hair: PubicHairStyle::Trimmed,
+    natural_pubic_hair: NaturalPubicHair::Full,
+
+    // Sexual
+    nipple_sensitivity: NippleSensitivity::Normal,
+    clit_sensitivity: ClitSensitivity::Normal,
+    inner_labia: InnerLabiaSize::Average,
+    wetness_baseline: WetnessBaseline::Normal,
+
+    // Names
+    name_fem: "Camila",
+    name_androg: "Cami",
+    name_masc: "Raul",
 };
 
 // ── PC origin helpers ─────────────────────────────────────────────────────────
@@ -118,8 +279,7 @@ struct BeforeFormSignals {
     trait_sexist: RwSignal<bool>,
     trait_homophobic: RwSignal<bool>,
     trait_objectifying: RwSignal<bool>,
-    trait_beautiful: RwSignal<bool>,
-    trait_plain: RwSignal<bool>,
+    appearance: RwSignal<Appearance>,
     // content prefs
     include_rough: RwSignal<bool>,
     likes_rough: RwSignal<bool>,
@@ -152,8 +312,7 @@ impl BeforeFormSignals {
             trait_sexist: RwSignal::new(false),
             trait_homophobic: RwSignal::new(false),
             trait_objectifying: RwSignal::new(false),
-            trait_beautiful: RwSignal::new(false),
-            trait_plain: RwSignal::new(false),
+            appearance: RwSignal::new(Appearance::Average),
             include_rough: RwSignal::new(false),
             likes_rough: RwSignal::new(false),
             char_mode: RwSignal::new(0u8),
@@ -583,45 +742,6 @@ fn section_your_past(
 // ── section: Personality ──────────────────────────────────────────────────────
 
 fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl View {
-    let beautiful = form.trait_beautiful;
-    let plain = form.trait_plain;
-
-    let beautiful_cb = h_stack((
-        Checkbox::new_rw(beautiful).style(|s| s.margin_right(8.0)),
-        label(|| "Beautiful").style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.font_size(14.0)
-                .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
-        }),
-    ))
-    .style(|s| s.items_center().cursor(floem::style::CursorStyle::Pointer))
-    .on_click_stop(move |_| {
-        let new_val = !beautiful.get();
-        beautiful.set(new_val);
-        if new_val {
-            plain.set(false);
-        }
-    });
-
-    let plain_cb = h_stack((
-        Checkbox::new_rw(plain).style(|s| s.margin_right(8.0)),
-        label(|| "Plain").style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.font_size(14.0)
-                .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
-        }),
-    ))
-    .style(|s| s.items_center().cursor(floem::style::CursorStyle::Pointer))
-    .on_click_stop(move |_| {
-        let new_val = !plain.get();
-        plain.set(new_val);
-        if new_val {
-            beautiful.set(false);
-        }
-    });
-
     let trait_grid = v_stack((
         h_stack((
             trait_checkbox("Shy", form.trait_shy, signals),
@@ -676,7 +796,24 @@ fn section_personality(signals: AppSignals, form: BeforeFormSignals) -> impl Vie
             .margin_vert(12.0)
     });
 
-    let appearance_row = h_stack((beautiful_cb, plain_cb)).style(|s| s.gap(24.0).items_center());
+    let appearance_row = form_row(
+        "Appearance",
+        signals,
+        Dropdown::new_rw(
+            form.appearance,
+            vec![
+                Appearance::Plain,
+                Appearance::Average,
+                Appearance::Attractive,
+                Appearance::Beautiful,
+                Appearance::Stunning,
+                Appearance::Devastating,
+            ],
+        )
+        .main_view(themed_trigger::<Appearance>(signals))
+        .list_item_view(themed_item::<Appearance>(signals))
+        .style(field_style(signals)),
+    );
 
     let attitude_grid = h_stack((
         trait_checkbox("Sexist", form.trait_sexist, signals),
@@ -893,12 +1030,6 @@ fn build_next_button(
                 if form.trait_objectifying.get_untracked() {
                     tn.push("OBJECTIFYING");
                 }
-                if form.trait_beautiful.get_untracked() {
-                    tn.push("BEAUTIFUL");
-                }
-                if form.trait_plain.get_untracked() {
-                    tn.push("PLAIN");
-                }
                 if !form.include_rough.get_untracked() {
                     tn.push("BLOCK_ROUGH");
                 }
@@ -926,6 +1057,11 @@ fn build_next_button(
             let arc_flag: Option<String> =
                 preset_ref.and_then(|p| p.arc_flag).map(|s| s.to_string());
 
+            let appearance = if let Some(p) = preset_ref {
+                p.appearance
+            } else {
+                form.appearance.get_untracked()
+            };
             let partial = PartialCharState {
                 origin,
                 before_name: before_name.clone(),
@@ -934,6 +1070,8 @@ fn build_next_button(
                 before_sexuality,
                 starting_traits,
                 arc_flag,
+                preset_idx: preset_ref.map(|_| char_mode),
+                appearance,
             };
             partial_char.set(Some(partial.clone()));
 
@@ -944,35 +1082,103 @@ fn build_next_button(
                 // Create a throwaway world for the transformation intro scene.
                 // This world is discarded after the intro — the real world is
                 // created at FemCreation submit via new_game().
-                let before_identity = Some(BeforeIdentity {
-                    name: partial.before_name.clone(),
-                    age: partial.before_age,
-                    race: partial.before_race.clone(),
-                    sexuality: partial.before_sexuality,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: std::collections::HashSet::new(),
-                });
-                let throwaway_config = CharCreationConfig {
-                    name_fem: String::new(),
-                    name_androg: String::new(),
-                    name_masc: partial.before_name.clone(),
-                    age: partial.before_age,
-                    race: partial.before_race.clone(),
-                    figure: PlayerFigure::Slim,
-                    breasts: BreastSize::Full,
-                    origin,
-                    before: before_identity,
-                    starting_traits: partial.starting_traits.clone(),
-                    male_count: 0,
-                    female_count: 0,
-                    starting_flags: std::collections::HashSet::new(),
-                    starting_arc_states: std::collections::HashMap::new(),
+                let before_identity = if let Some(p) = preset_ref {
+                    Some(BeforeIdentity {
+                        name: partial.before_name.clone(),
+                        age: partial.before_age,
+                        race: partial.before_race.clone(),
+                        sexuality: partial.before_sexuality,
+                        figure: p.before_figure,
+                        height: p.before_height,
+                        hair_colour: p.before_hair_colour,
+                        eye_colour: p.before_eye_colour,
+                        skin_tone: p.before_skin_tone,
+                        penis_size: p.before_penis_size,
+                        voice: p.before_voice,
+                        traits: std::collections::HashSet::new(),
+                    })
+                } else {
+                    Some(BeforeIdentity {
+                        name: partial.before_name.clone(),
+                        age: partial.before_age,
+                        race: partial.before_race.clone(),
+                        sexuality: partial.before_sexuality,
+                        figure: MaleFigure::Average,
+                        height: Height::Average,
+                        hair_colour: HairColour::DarkBrown,
+                        eye_colour: EyeColour::Brown,
+                        skin_tone: SkinTone::Medium,
+                        penis_size: PenisSize::Average,
+                        voice: BeforeVoice::Average,
+                        traits: std::collections::HashSet::new(),
+                    })
+                };
+                let throwaway_config = if let Some(p) = preset_ref {
+                    CharCreationConfig {
+                        name_fem: p.name_fem.to_string(),
+                        name_androg: p.name_androg.to_string(),
+                        name_masc: p.name_masc.to_string(),
+                        age: p.age,
+                        race: p.race.to_string(),
+                        figure: p.figure,
+                        breasts: p.breasts,
+                        origin,
+                        before: before_identity,
+                        starting_traits: partial.starting_traits.clone(),
+                        male_count: 0,
+                        female_count: 0,
+                        starting_flags: std::collections::HashSet::new(),
+                        starting_arc_states: std::collections::HashMap::new(),
+                        height: p.height,
+                        butt: p.butt,
+                        waist: p.waist,
+                        lips: p.lips,
+                        hair_colour: p.hair_colour,
+                        hair_length: p.hair_length,
+                        eye_colour: p.eye_colour,
+                        skin_tone: p.skin_tone,
+                        complexion: p.complexion,
+                        appearance: p.appearance,
+                        pubic_hair: p.pubic_hair,
+                        natural_pubic_hair: p.natural_pubic_hair,
+                        nipple_sensitivity: p.nipple_sensitivity,
+                        clit_sensitivity: p.clit_sensitivity,
+                        inner_labia: p.inner_labia,
+                        wetness_baseline: p.wetness_baseline,
+                    }
+                } else {
+                    CharCreationConfig {
+                        name_fem: String::new(),
+                        name_androg: String::new(),
+                        name_masc: partial.before_name.clone(),
+                        age: partial.before_age,
+                        race: partial.before_race.clone(),
+                        figure: PlayerFigure::Slim,
+                        breasts: BreastSize::Full,
+                        origin,
+                        before: before_identity,
+                        starting_traits: partial.starting_traits.clone(),
+                        male_count: 0,
+                        female_count: 0,
+                        starting_flags: std::collections::HashSet::new(),
+                        starting_arc_states: std::collections::HashMap::new(),
+                        height: Height::Average,
+                        butt: ButtSize::Round,
+                        waist: WaistSize::Average,
+                        lips: LipShape::Average,
+                        hair_colour: HairColour::DarkBrown,
+                        hair_length: HairLength::Shoulder,
+                        eye_colour: EyeColour::Brown,
+                        skin_tone: SkinTone::Medium,
+                        complexion: Complexion::Normal,
+                        appearance: Appearance::Average,
+                        pubic_hair: PubicHairStyle::Trimmed,
+                        natural_pubic_hair: NaturalPubicHair::Full,
+                        nipple_sensitivity: NippleSensitivity::Normal,
+                        clit_sensitivity: ClitSensitivity::Normal,
+                        inner_labia: InnerLabiaSize::Average,
+                        wetness_baseline: WetnessBaseline::Normal,
+                    }
                 };
 
                 {
@@ -1045,52 +1251,130 @@ fn build_begin_button(
                     before_sexuality: BeforeSexuality::AttractedToWomen,
                     starting_traits: vec![],
                     arc_flag: None,
+                    preset_idx: None,
+                    appearance: Appearance::Average,
                 }
             });
 
             let origin = partial.origin;
-            let fem_race = form.race.get_untracked();
 
-            let before = if origin.has_before_life() {
-                Some(BeforeIdentity {
-                    name: partial.before_name.clone(),
-                    age: partial.before_age,
-                    race: partial.before_race.clone(),
-                    sexuality: partial.before_sexuality,
-                    figure: MaleFigure::Average,
+            // Resolve preset reference (if any) so we can pull physical attributes
+            let preset_ref: Option<&'static PresetData> = match partial.preset_idx {
+                Some(0) => Some(&PRESET_ROBIN),
+                Some(1) => Some(&PRESET_RAUL),
+                _ => None,
+            };
+
+            let config = if let Some(p) = preset_ref {
+                // Preset mode: all physical/sexual attributes come from PresetData
+                let before = if origin.has_before_life() {
+                    Some(BeforeIdentity {
+                        name: partial.before_name.clone(),
+                        age: partial.before_age,
+                        race: partial.before_race.clone(),
+                        sexuality: partial.before_sexuality,
+                        figure: p.before_figure,
+                        height: p.before_height,
+                        hair_colour: p.before_hair_colour,
+                        eye_colour: p.before_eye_colour,
+                        skin_tone: p.before_skin_tone,
+                        penis_size: p.before_penis_size,
+                        voice: p.before_voice,
+                        traits: std::collections::HashSet::new(),
+                    })
+                } else {
+                    None
+                };
+                CharCreationConfig {
+                    name_fem: p.name_fem.to_string(),
+                    name_androg: p.name_androg.to_string(),
+                    name_masc: p.name_masc.to_string(),
+                    age: p.age,
+                    race: p.race.to_string(),
+                    figure: p.figure,
+                    breasts: p.breasts,
+                    origin,
+                    before,
+                    starting_traits: partial.starting_traits,
+                    male_count: 6,
+                    female_count: 2,
+                    starting_flags: partial.arc_flag.into_iter().collect(),
+                    starting_arc_states: std::collections::HashMap::new(),
+                    height: p.height,
+                    butt: p.butt,
+                    waist: p.waist,
+                    lips: p.lips,
+                    hair_colour: p.hair_colour,
+                    hair_length: p.hair_length,
+                    eye_colour: p.eye_colour,
+                    skin_tone: p.skin_tone,
+                    complexion: p.complexion,
+                    appearance: p.appearance,
+                    pubic_hair: p.pubic_hair,
+                    natural_pubic_hair: p.natural_pubic_hair,
+                    nipple_sensitivity: p.nipple_sensitivity,
+                    clit_sensitivity: p.clit_sensitivity,
+                    inner_labia: p.inner_labia,
+                    wetness_baseline: p.wetness_baseline,
+                }
+            } else {
+                // Custom mode: form signals + defaults for unexposed fields
+                let fem_race = form.race.get_untracked();
+                let before = if origin.has_before_life() {
+                    Some(BeforeIdentity {
+                        name: partial.before_name.clone(),
+                        age: partial.before_age,
+                        race: partial.before_race.clone(),
+                        sexuality: partial.before_sexuality,
+                        figure: MaleFigure::Average,
+                        height: Height::Average,
+                        hair_colour: HairColour::DarkBrown,
+                        eye_colour: EyeColour::Brown,
+                        skin_tone: SkinTone::Medium,
+                        penis_size: PenisSize::Average,
+                        voice: BeforeVoice::Average,
+                        traits: std::collections::HashSet::new(),
+                    })
+                } else {
+                    None
+                };
+                let pc_age = if origin == PcOrigin::AlwaysFemale {
+                    form.age.get_untracked()
+                } else {
+                    partial.before_age
+                };
+                CharCreationConfig {
+                    name_fem: form.name_fem.get_untracked(),
+                    name_androg: form.name_androg.get_untracked(),
+                    name_masc: partial.before_name.clone(),
+                    age: pc_age,
+                    race: fem_race,
+                    figure: form.figure.get_untracked(),
+                    breasts: form.breasts.get_untracked(),
+                    origin,
+                    before,
+                    starting_traits: partial.starting_traits,
+                    male_count: 6,
+                    female_count: 2,
+                    starting_flags: partial.arc_flag.into_iter().collect(),
+                    starting_arc_states: std::collections::HashMap::new(),
                     height: Height::Average,
+                    butt: ButtSize::Round,
+                    waist: WaistSize::Average,
+                    lips: LipShape::Average,
                     hair_colour: HairColour::DarkBrown,
+                    hair_length: HairLength::Shoulder,
                     eye_colour: EyeColour::Brown,
                     skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: std::collections::HashSet::new(),
-                })
-            } else {
-                None
-            };
-
-            let pc_age = if origin == PcOrigin::AlwaysFemale {
-                form.age.get_untracked()
-            } else {
-                partial.before_age
-            };
-
-            let config = CharCreationConfig {
-                name_fem: form.name_fem.get_untracked(),
-                name_androg: form.name_androg.get_untracked(),
-                name_masc: partial.before_name.clone(),
-                age: pc_age,
-                race: fem_race,
-                figure: form.figure.get_untracked(),
-                breasts: form.breasts.get_untracked(),
-                origin,
-                before,
-                starting_traits: partial.starting_traits,
-                male_count: 6,
-                female_count: 2,
-                starting_flags: partial.arc_flag.into_iter().collect(),
-                starting_arc_states: std::collections::HashMap::new(),
+                    complexion: Complexion::Normal,
+                    appearance: partial.appearance,
+                    pubic_hair: PubicHairStyle::Trimmed,
+                    natural_pubic_hair: NaturalPubicHair::Full,
+                    nipple_sensitivity: NippleSensitivity::Normal,
+                    clit_sensitivity: ClitSensitivity::Normal,
+                    inner_labia: InnerLabiaSize::Average,
+                    wetness_baseline: WetnessBaseline::Normal,
+                }
             };
 
             let gs = start_game(pre, config);
