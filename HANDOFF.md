@@ -3,45 +3,43 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 208 passing, 0 failures.
+**Tests:** 219 passing, 0 failures.
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
-**Writing pipeline plan:** `docs/plans/2026-02-25-writing-pipeline.md` — 9 batches (0–8), ALL COMPLETE. Merged to master.
-**Audits complete:** Engineering, Writing & Design, Arc Flow (see `docs/audits/`).
+**Sprint 1 complete:** "The Engine Works" — 6 batches, 11 tasks, 208→219 tests. All engine bugs fixed, all arc scenes reachable, load-time validation comprehensive.
 **TRANS_WOMAN branches removed** from all scene files. CisMale-only pattern: `{% if not w.alwaysFemale() %}` with no `{% else %}`.
 **Archetype-based naming:** robin_* → workplace_*, camila_* → campus_*. Scene files, arcs.toml, schedule.toml, Rust test fixtures all updated.
 **All prose second-person present tense.** 7 workplace scenes + morning_routine rewritten. Zero third-person PC narration.
 **Preset docs:** `docs/presets/robin.md`, `docs/presets/camila.md`. Character docs removed (`docs/characters/` deleted).
 **Arc docs:** `docs/arcs/workplace-opening.md`, `docs/arcs/campus-opening.md`.
-**Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer all updated with new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) and traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS).
+**Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer all updated with new accessors and traits.
 
 ---
 
 ## ⚡ Next Action
 
-**Sprint 1: "The Engine Works"** — Plan at `docs/plans/2026-02-25-sprint1-engine-works.md`.
-Sprint roadmap at `docs/plans/2026-02-25-sprint-roadmap.md` (5 sprints total).
+**Sprint 2: "FEMININITY Moves"** — Sprint roadmap at `docs/plans/2026-02-25-sprint-roadmap.md`.
 
-Execute Sprint 1 plan. 6 batches, ~12 tasks, TDD throughout. Worktree required.
+FEMININITY never increments during gameplay. FEMININITY-gated content is unreachable. Hub scene (`plan_your_day`) is a placeholder stub. Sprint 2 fixes all three.
 
-### Remaining engine bugs
-4. **`add_npc_liking npc = "m"` silently fails** — no active NPC set before `coffee_shop`/`rain_shelter`. See arc flow audit B3.
+Tasks:
+1. **Design** FEMININITY progression curve — which scenes grant how much, expected value at each arc stage. Write to `docs/plans/`.
+2. **Content** — Add `skill_increase FEMININITY` effects to appropriate workplace scene actions.
+3. **Content** — `plan_your_day` full rewrite (hub scene, real choices, FEMININITY-appropriate branches). Full writing pipeline.
+4. **Content** — Coffee_shop prose fix: remove "geometry to being a woman" over-naming.
+5. **Verification** — Test that simulates playthrough and asserts FEMININITY reaches 25+ by arc end.
 
-### Schedule/reachability
-5. **`workplace_first_clothes` unreachable** — `workplace_first_day` trigger always fires first. Restructure `week_one` state. See arc flow audit R1.
-6. **`workplace_landlord` trigger doesn't check arc state** — uses only game flags, inconsistent with other arc scenes.
+Done when: Playthrough naturally reaches FEMININITY 25+. `plan_your_day` passes writing-reviewer with zero Criticals.
 
-### Content (CisMale-only)
-7. **`plan_your_day` full rewrite** — placeholder stub.
-8. **FEMININITY never increments** — no scene has `skill_increase FEMININITY`. FEMININITY branching is unreachable.
-9. **Post-arc content void** — `settled` (workplace) and `first_week` (campus) have zero scenes. 3-scene free_time loop.
-10. **Prose polish pass** — writing-reviewer flagged Important items across workplace scenes (staccato closers, adjective-swap branches, emotion announcements, over-naming). No Criticals.
-11. **Free_time expansion** — more universal scenes needed.
-12. **NPC character docs missing** — 13 named NPCs have no character docs (Marcus name collision, David, Jake, Frank, etc.).
-
-### Design debt
-13. **Presets as pack data** — `PRESET_WORKPLACE` / `PRESET_CAMPUS` are static Rust structs. Should load from TOML.
-14. **Custom character starting scenario** — freeform, no arc scenes. Deferred.
-15. **Test fixture DRY** — 8+ nearly identical `make_world()`/`make_player()` test helpers across crates. Fix: create a `test-fixtures` dev-dependency crate with shared helpers.
+### Remaining open items (post-Sprint 1)
+- **`plan_your_day` full rewrite** — placeholder stub. → Sprint 2.
+- **FEMININITY never increments** — no scene has `skill_increase FEMININITY`. → Sprint 2.
+- **Post-arc content void** — `settled` (workplace) and `first_week` (campus) have zero scenes. 3-scene free_time loop. → Sprint 4.
+- **Prose polish pass** — Important items across workplace scenes (staccato closers, adjective-swap branches, emotion announcements, over-naming). → Post-Sprint 3.
+- **Free_time expansion** — more universal scenes needed. → Sprint 4.
+- **NPC character docs missing** — 13 named NPCs have no character docs (Marcus, David, Jake, Frank, etc.). → As needed.
+- **Presets as pack data** — `PRESET_WORKPLACE` / `PRESET_CAMPUS` are static Rust structs. → Sprint 5.
+- **Test fixture DRY** — 8+ identical `make_world()` helpers across crates. → Sprint 5.
+- **Campus arc rewrite** — scenes still have prose issues from audit. → Sprint 3.
 
 ### Writing sessions — no compilation needed
 For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
@@ -194,4 +192,5 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 | 2026-02-24 | Char creation redesign: 10-task plan (worktree: char-creation-redesign). AppPhase expanded to 4 variants (BeforeCreation/TransformationIntro/FemCreation/InGame). PartialCharState accumulates before-choices. PackRegistry+Scheduler derive Clone (throwaway world for intro scene). transformation_scene field in manifest/registry/loader. char_creation_view (BeforeCreation) + fem_creation_view (FemCreation). TransformationIntro phase runs transformation_intro scene against throwaway world. dispatch_action phase check transitions scene-finish → FemCreation. AlwaysFemale skips TransformationIntro. transformation_intro.toml scene with CisMale/TransWoman voice branches. Writing guide: AI-ism anti-patterns (staccato declaratives, over-naming), BG3 narrator reference. dev/CLAUDE.md skill overrides: finishing-a-development-branch auto-merges (no options prompt). 198 tests, 0 failures. |
 | 2026-02-24 | Prolific session (partial — phases 1–3 of 8). Engine: gd.arcState() added to prose template context (2 new tests, 200 total). Writing guide: removed stale notes for getSkill/arcState, expanded template objects table with all current methods, updated FEMININITY section with live usage, added arcState branching example. Prose revision: rain_shelter AI-isms fixed (default nod named→shown, CisMale interiority shows-the-look-not-names-category, trailing staccato cut, NPC action prose upgraded), transformation_intro CisMale branch rewritten (removed anaphoric repetition, removed isolated staccato), CisFemaleTransformed branch added. Char creation: OUTGOING + OVERACTIVE_IMAGINATION added to trait grid (14 traits total), Next button guards empty before_name, FemCreation race defaults to before_race carry-forward. Phases 4–8 deferred. 200 tests, 0 failures. |
 | 2026-02-24 | Playtest feedback pass (Batches 1–3). Batch 1: Dropdown Night-mode theming fixed (list_item_view + themed_item helper), "Evan" default removed + Randomize button added, Age::Twenties → MidLateTwenties + v4 save migration, origin radio subtitles. Batch 2: transformation_intro.toml full rewrite — second person, 4 beats, alwaysFemale/TRANS_WOMAN/default 3-way branches, SHY/AMBITIOUS/OUTGOING/OVERACTIVE_IMAGINATION trait branches, TRANSFORMATION_WITNESSED flag. Writing-reviewer audit: 4 Critical + Important fixes applied. Batch 3: Robin/Raul preset character selection (3-way mode: Robin/Raul/Custom), dyn_container for preset-vs-custom UI, section_preset_detail with blurb+read-only rows, build_next_button unified for preset+custom paths. New traits: ANALYTICAL, CONFIDENT, SEXIST, HOMOPHOBIC, OBJECTIFYING (traits.toml + custom mode UI + preset trait lists). Design doc updated with trait philosophy, race-change mechanics, "coming soon" greyout notes. 200 tests, 0 failures. Branch: playtest-fixes. |
+| 2026-02-26 | Sprint 1: "The Engine Works" (worktree: sprint1-engine-works). 6 batches, 11 tasks, TDD throughout. Batch 0: removed dead default_slot field + has_before_life alias + unused anyhow dep + dead NpcSnapshot impl. Batch 1: scheduler load failure → visible init error; ArcDef.initial_state removed (dead field); SkillIncrease clamped to SkillDef min/max; FEMININITY min fixed 0→correct. Batch 2: validate stat/skill names in AddStat/SetStat/FailRedCheck at load time; validate_trait_conflicts wired into validate-pack binary; condition expression IDs (trait/skill/category) validated at load time. Batch 3: workplace_first_clothes made reachable by splitting week_one into sequential states (clothes_done); workplace_landlord trigger requires arcState=='arrived'. Batch 4: effect errors emit ErrorOccurred event instead of silent eprintln. Batch 5: full workplace arc playthrough integration test (7 scenes, scheduler to settled, no errors). 208→219 tests, 0 failures. validate-pack clean. Merged to master, worktree removed. |
 | 2026-02-25 | Playtest feedback Batch 4 (week-2 scenes) + Batch 1 dropdown fix. Dark-mode dropdown trigger text fixed via themed_trigger helper applied to all 5 Dropdown instances in char_creation.rs. Four week-2 scenes written (parallel scene-writer agents), writing-reviewer audits run on all four, all Criticals and Importants addressed: staccato closers, em-dash reveals, over-naming, POV leaks (you/your in third-person), desire/shame ordering (HOMOPHOBIC branch), missing alwaysFemale() guards (Raul references), SEXIST hierarchy insight unlocked as default !alwaysFemale() path. schedule.toml updated with all 4 scene entries. All 200 tests pass. Merged playtest-fixes to master, worktree removed. |
