@@ -110,6 +110,11 @@ impl PackRegistry {
             .ok_or_else(|| RegistryError::UnknownNpcTrait(id.to_string()))
     }
 
+    /// Look up a SkillDef by SkillId.
+    pub fn get_skill_def(&self, id: &SkillId) -> Option<&SkillDef> {
+        self.skill_defs.get(id)
+    }
+
     /// Resolve a string to a SkillId.
     pub fn resolve_skill(&self, id: &str) -> Result<SkillId, RegistryError> {
         self.rodeo
