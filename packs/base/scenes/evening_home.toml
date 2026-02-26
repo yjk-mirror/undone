@@ -1,0 +1,113 @@
+[scene]
+id          = "base::evening_home"
+pack        = "base"
+description = "A free evening with no agenda. What you do with it."
+
+[intro]
+prose = """
+Seven in the evening and nobody expects anything from you. The apartment is quiet in the ordinary way — not the wrong way, not the heavy way, just the low hum of a building going about its business and the light changing outside your window the way it does in late afternoon when the day has decided to wrap up without consulting you.
+
+You have the whole evening. That's the situation.
+
+The question of what to do with unstructured time, when you're not trying to fill a gap or be somewhere or perform being fine, is its own specific kind of question. The sofa. The kitchen. The phone on the counter with its three notifications you haven't looked at yet.
+
+The evening is yours. Do something with it.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+Seven in the evening and nobody expects anything. The apartment is yours for the night.
+
+The free evening sits there slightly strange. You used to know exactly what shape evenings took when you were alone — the game, the playlist, the particular order of things that added up to not thinking about anything too hard. That shape has shifted without being replaced by something equally clear. You've been building the new routine incrementally, a few habits here and a few there, and the evenings are still the part where the scaffolding shows.
+
+You've got the time. You'll figure out what to do with it.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = "*Your evenings have changed shape. There are things you do now that you didn't used to do, and things you don't do anymore. The ratio is still shifting. You're not sure where it ends up.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "watch_something"
+label = "Find something to watch"
+detail = "An hour becomes two. Fine."
+prose = """
+You find something — a documentary you've had queued since whenever, or the third episode of that show you started a month ago and keep meaning to get back to. An hour becomes two without any particular effort. Dinner happens in front of it, without guilt, which is the correct way to eat dinner.
+
+The apartment does its evening thing around you. Pipes, upstairs neighbor, the faint sound of someone's TV through the shared wall doing something with a laugh track. None of it needs your attention.
+
+{% if w.hasTrait("ANALYTICAL") %}
+Halfway through you find yourself working out the structure of the thing — the edit choices, the arc, what they're trying to do and whether it's working. You can't entirely turn it off. At some point this becomes thinking about something else entirely, which is fine. The screen is still there when you come back.
+{% elif w.hasTrait("ROMANTIC") %}
+There's a scene near the end that gets to you slightly more than you expected. Nothing dramatic. Just a moment that lands. You sit with it for a few seconds before the next thing starts.
+{% else %}
+It's a fine evening. By the end you feel more like a person than you did at the start, which is what evenings are for.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -10
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "read_or_work"
+label  = "Open a book. Or a side project."
+detail = "The good kind of evening."
+prose = """
+You settle in — book, or the side project you've been picking at in the margins of actual work. There's a difference between the thing you have to do and the thing you work on when you want to, and this is the second kind. The apartment is quiet in the right way.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You get into it properly. One of those stretches where the problem clarifies itself and you find yourself close to something you didn't know you were close to. You look up and an hour has gone, which is the best thing that can happen with an hour.
+{% elif w.hasTrait("AMBITIOUS") %}
+You finish something. Not a big thing, but a task that wasn't technically due and that you've been carrying around as a low-level irritant for two weeks. The particular satisfaction of clearing it is disproportionate to the task, which is exactly how it should be.
+{% else %}
+You lose track of time in the way that means you were actually present for it. By the time you surface, the light has gone completely and you haven't thought about anything you didn't want to think about for a couple of hours, which is worth something.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -15
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "spend_time_on_yourself"
+label  = "Spend the evening on your appearance"
+detail = "No occasion. Just because."
+prose = """
+You spend the evening on your appearance without a reason for it — something with your hair, or the makeup you've been learning, or the outfit you bought two weeks ago and still haven't actually worn. The bathroom mirror gets a fair amount of your time. So does your reflection in the dark window above the kitchen sink, which gives a different angle.
+
+{% if not w.alwaysFemale() %}
+{% if w.getSkill("FEMININITY") < 25 %}
+It's not vanity. It's something closer to practice — working out the register, what reads how, what you actually like versus what you assumed you'd like. You've been doing this in small increments for months, a few minutes here and there, but tonight there's actual time for it. You stand at the mirror long enough to stop seeing a stranger and start seeing someone figuring something out.
+
+You feel, at the end of it, approximately fine. That's further along than you were this morning.
+{% elif w.getSkill("FEMININITY") < 50 %}
+There's a version of this you used to think of as maintenance, mechanical, something women did because they had to. That wasn't right. You know that now from the other side of it. Tonight it's just the thing you're doing with your evening, and you're good enough at it by now to do it without thinking too hard, which is its own kind of progress.
+{% else %}
+You take your time. No particular reason, no particular outcome — this is just the evening and this is how you're spending it. You know what you like and you like how it comes out, and that's the whole thing.
+{% endif %}
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true

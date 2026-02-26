@@ -27,6 +27,31 @@ name = "free_time"
   trigger   = "gd.week() >= 2"
   once_only = true
 
+  [[slot.events]]
+  scene     = "base::bookstore"
+  weight    = 8
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::park_walk"
+  weight    = 10
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::grocery_store"
+  weight    = 9
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::evening_home"
+  weight    = 12
+  condition = "gd.week() >= 1"
+
+  [[slot.events]]
+  scene     = "base::neighborhood_bar"
+  weight    = 7
+  condition = "gd.week() >= 2"
+
 # ── Workplace opening arc ────────────────────────────────────────────────
 
 [[slot]]
