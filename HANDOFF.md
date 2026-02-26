@@ -18,7 +18,10 @@
 
 ## ⚡ Next Action
 
-Writing pipeline complete. Pick from open items below.
+**Sprint 1: "The Engine Works"** — Plan at `docs/plans/2026-02-25-sprint1-engine-works.md`.
+Sprint roadmap at `docs/plans/2026-02-25-sprint-roadmap.md` (5 sprints total).
+
+Execute Sprint 1 plan. 6 batches, ~12 tasks, TDD throughout. Worktree required.
 
 ### Remaining engine bugs
 4. **`add_npc_liking npc = "m"` silently fails** — no active NPC set before `coffee_shop`/`rain_shelter`. See arc flow audit B3.
