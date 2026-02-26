@@ -246,7 +246,7 @@ fn validate_condition_ids(
                 }
                 _ => {}
             },
-            Receiver::MaleNpc => {
+            Receiver::MaleNpc | Receiver::FemaleNpc => {
                 if call.method.as_str() == "hasTrait" {
                     if let Some(Value::Str(id)) = call.args.first() {
                         registry.resolve_npc_trait(id).map_err(|_| {

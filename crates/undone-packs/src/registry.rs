@@ -143,7 +143,10 @@ impl PackRegistry {
         StatId(self.intern(id))
     }
 
-    /// Look up an already-interned stat name without mutating. Returns None if never interned.
+    /// Look up an already-interned stat name. Returns `None` if the string has never been
+    /// interned — but returns `Some` for **any** previously interned string, including ones
+    /// never declared as a `StatDef`. Use `is_registered_stat` to distinguish declared stats
+    /// from strings merely interned as a side effect of another operation.
     pub fn get_stat(&self, id: &str) -> Option<StatId> {
         self.rodeo.get(id).map(StatId)
     }

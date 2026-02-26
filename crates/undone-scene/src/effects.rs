@@ -35,6 +35,8 @@ pub enum EffectError {
     UnknownBehaviour(String),
     #[error("unknown virgin_type '{0}'")]
     UnknownVirginType(String),
+    #[error("trait conflict: {0}")]
+    TraitConflict(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -175,11 +177,9 @@ pub fn apply_effect(
                 .resolve_trait(trait_id)
                 .map_err(|_| EffectError::UnknownTrait(trait_id.clone()))?;
             if let Some(conflict_msg) = registry.check_trait_conflict(&world.player.traits, tid) {
-                eprintln!("[effect] trait conflict: {}", conflict_msg);
-                // Skip the effect — don't add the conflicting trait
-            } else {
-                world.player.traits.insert(tid);
+                return Err(EffectError::TraitConflict(conflict_msg));
             }
+            world.player.traits.insert(tid);
         }
         EffectDef::RemoveTrait { trait_id } => {
             let tid = registry
@@ -196,9 +196,10 @@ pub fn apply_effect(
                 modifier: 0,
             });
             entry.value += amount;
-            if let Some(def) = registry.get_skill_def(&sid) {
-                entry.value = entry.value.clamp(def.min, def.max);
-            }
+            let def = registry
+                .get_skill_def(&sid)
+                .expect("skill resolved above — def must exist");
+            entry.value = entry.value.clamp(def.min, def.max);
         }
         EffectDef::AddNpcLiking { npc, delta } => match resolve_npc_ref(npc, ctx)? {
             NpcRef::Male(key) => {
