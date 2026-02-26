@@ -80,6 +80,8 @@ pub struct NpcActionDef {
     pub weight: u32,
     #[serde(default)]
     pub effects: Vec<EffectDef>,
+    #[serde(default)]
+    pub next: Vec<NextBranchDef>,
 }
 
 fn default_weight() -> u32 {
@@ -275,6 +277,7 @@ pub struct NpcAction {
     pub prose: String,
     pub weight: u32,
     pub effects: Vec<EffectDef>,
+    pub next: Vec<NextBranch>,
 }
 
 /// Immutable scene definition. Wrap in Arc for cheap cloning.

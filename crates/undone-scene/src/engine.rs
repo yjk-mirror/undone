@@ -262,6 +262,23 @@ impl SceneEngine {
             None => return,
         };
 
+        // Re-check action condition — it may have become invalid since actions were displayed
+        if let Some(ref expr) = action.condition {
+            if !Self::eval_condition(
+                expr,
+                world,
+                &frame.ctx,
+                registry,
+                &frame.def.id,
+                &format!("action '{}'", action.id),
+            ) {
+                // Condition no longer passes — silently ignore the stale click.
+                // Re-emit current actions so the UI refreshes.
+                self.emit_actions(world, registry);
+                return;
+            }
+        }
+
         let allow_npc = action.allow_npc_actions;
 
         // Render action prose (if non-empty)
@@ -457,10 +474,10 @@ impl SceneEngine {
         let Some(idx) = selected_idx else { return };
 
         // Clone data we need before borrowing mutably
-        let (prose, effects): (String, Vec<_>) = {
+        let (prose, effects, next_branches): (String, Vec<_>, Vec<_>) = {
             let frame = self.stack.last().expect("engine stack must not be empty");
             let na = &frame.def.npc_actions[idx];
-            (na.prose.clone(), na.effects.clone())
+            (na.prose.clone(), na.effects.clone(), na.next.clone())
         };
 
         // Render NPC prose
@@ -485,6 +502,11 @@ impl SceneEngine {
                     eprintln!("[scene-engine] npc effect error: {e}");
                 }
             }
+        }
+
+        // Evaluate NPC action next branches (if any)
+        if !next_branches.is_empty() {
+            self.evaluate_next(next_branches, world, registry);
         }
     }
 

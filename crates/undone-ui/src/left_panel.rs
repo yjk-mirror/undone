@@ -202,6 +202,11 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
                 // (The throwaway world is discarded; FemCreation builds the real one.)
                 signals.phase.set(crate::AppPhase::FemCreation);
             } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                if result.once_only {
+                    world
+                        .game_data
+                        .set_flag(format!("ONCE_{}", result.scene_id));
+                }
                 engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
                 let events = engine.drain();
                 crate::process_events(events, signals, world, femininity_id);

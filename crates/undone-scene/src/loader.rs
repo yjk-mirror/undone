@@ -240,12 +240,19 @@ fn resolve_npc_action(
 
     validate_effects(&raw.effects, registry, scene_id)?;
 
+    let next = raw
+        .next
+        .into_iter()
+        .map(|n| resolve_next_branch(n, scene_id))
+        .collect::<Result<Vec<_>, _>>()?;
+
     Ok(NpcAction {
         id: raw.id,
         condition,
         prose: raw.prose,
         weight: raw.weight,
         effects: raw.effects,
+        next,
     })
 }
 

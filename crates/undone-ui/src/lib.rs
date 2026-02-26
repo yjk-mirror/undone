@@ -256,6 +256,11 @@ pub fn app_view() -> impl View {
                                 if finished {
                                     if let Some(result) = scheduler.pick_next(world, registry, rng)
                                     {
+                                        if result.once_only {
+                                            world
+                                                .game_data
+                                                .set_flag(format!("ONCE_{}", result.scene_id));
+                                        }
                                         engine.send(
                                             EngineCommand::StartScene(result.scene_id),
                                             world,
