@@ -26,7 +26,7 @@ It is.
 {% endif %}
 """
 
-# ── Beat 1: sitting up, hands, voice ──────────────────────────────────────
+# ── All four beats merged into a single action ────────────────────────────
 
 [[actions]]
 id    = "waking"
@@ -41,6 +41,26 @@ They're your hands. The hands you've had for your entire life, the nails the way
 You take stock anyway. Voice, when you clear your throat — your voice. Body — yours, the one you've always had, the one you grew up in. You run through the inventory methodically and everything comes back correct.
 
 And yet something happened last night. You're certain of it the way you're certain of things you can't prove — a quality to the morning, a sense of having been handled and replaced. You feel entirely yourself. You also feel like you passed through something and came out the other side, and the something isn't visible from here.
+
+You get up and move through the apartment. The apartment is the same apartment.
+
+You look at yourself in the darkened screen of your phone on the nightstand — small, reversed, incomplete — and your reflection looks back. Still you. Still the face you're used to.
+
+Your face in the mirror is your face.
+
+You look at it for a long time anyway. The jaw, the eyes, the line of your nose — everything where it should be, everything as it's always been. The left eye fractionally larger than the right. The specific shade of your hair in this particular light. The small crease on your forehead you made your peace with years ago.
+
+All of it is there.
+
+Something is still different. You can't place it in the mirror. It's not in the reflection — it's behind the reflection, in whatever is doing the looking. You are yourself. Something also happened to you. You don't know yet how both of these things can be true at once.
+
+You go back to the bedroom and sit on the edge of the bed.
+
+You were something last night and you are something this morning and the something is the same thing, mostly. You are yourself. You are intact. Whatever happened in the night didn't change your body, your voice, your face — nothing you can point to and say: that's it, that's what's different.
+
+But something is different. You are going to find out what.
+
+Outside, the city is starting its day. A bus goes by. The radiator ticks once and goes quiet. Whatever moved through this apartment last night is gone now, and you're the only one who knows it was here.
 {% else %}
 You sit up.
 
@@ -59,26 +79,7 @@ You look at your hands for a while longer. At some point you realize you're wait
 {% endif %}
 
 The sound of traffic outside is perfectly normal. Somewhere a door closes.
-{% endif %}
-"""
 
-  [[actions.next]]
-  goto = "discovery"
-
-# ── Beat 2: standing, moving through the room ─────────────────────────────
-
-[[actions]]
-id    = "discovery"
-label = "Continue"
-detail = "Get up. See what you're working with."
-prose = """
-{% if w.alwaysFemale() %}
-You get up and move through the apartment. The apartment is the same apartment.
-
-You look at yourself in the darkened screen of your phone on the nightstand — small, reversed, incomplete — and your reflection looks back. Still you. Still the face you're used to.
-
-The mirror will be clearer. You go to the bathroom.
-{% else %}
 You get up.
 
 The mechanics of getting up are wrong in ways that take a second to isolate. Your balance is off — different, not worse, just wrong relative to thirty years of calibration. You stand at the side of the bed and your legs are your legs but they're not the legs you went to sleep with. Smoother. The muscle distribution is different. You are smaller in some specific sense that you can't fully quantify from the inside.
@@ -98,28 +99,7 @@ You stand there for a moment doing nothing in particular.
 {% endif %}
 
 Whatever happened last night happened, and now it's morning, and the bathroom is six feet away, and there's a mirror in the bathroom.
-{% endif %}
-"""
 
-  [[actions.next]]
-  goto = "mirror"
-
-# ── Beat 3: the mirror ────────────────────────────────────────────────────
-
-[[actions]]
-id    = "mirror"
-label = "Continue"
-detail = "The mirror. The thing you need to see."
-prose = """
-{% if w.alwaysFemale() %}
-Your face in the mirror is your face.
-
-You look at it for a long time anyway. The jaw, the eyes, the line of your nose — everything where it should be, everything as it's always been. The left eye fractionally larger than the right. The specific shade of your hair in this particular light. The small crease on your forehead you made your peace with years ago.
-
-All of it is there.
-
-Something is still different. You can't place it in the mirror. It's not in the reflection — it's behind the reflection, in whatever is doing the looking. You are yourself. Something also happened to you. You don't know yet how both of these things can be true at once.
-{% else %}
 {% if w.hasTrait("SHY") %}
 You stand in front of the bathroom mirror for three seconds and then you turn away and sit on the edge of the tub.
 
@@ -143,28 +123,7 @@ The thought arrives before you can stop it: *someone else has to know about this
 {% else %}
 You look at yourself in the mirror for a long time. The face looks back. Neither of you looks away.
 {% endif %}
-{% endif %}
-"""
 
-  [[actions.next]]
-  goto = "aftermath"
-
-# ── Beat 4: first interior reckoning ──────────────────────────────────────
-
-[[actions]]
-id    = "aftermath"
-label = "Continue"
-detail = "The world is still out there. That's the next problem."
-prose = """
-{% if w.alwaysFemale() %}
-You go back to the bedroom and sit on the edge of the bed.
-
-You were something last night and you are something this morning and the something is the same thing, mostly. You are yourself. You are intact. Whatever happened in the night didn't change your body, your voice, your face — nothing you can point to and say: that's it, that's what's different.
-
-But something is different. You are going to find out what.
-
-Outside, the city is starting its day. A bus goes by. The radiator ticks once and goes quiet. Whatever moved through this apartment last night is gone now, and you're the only one who knows it was here.
-{% else %}
 You go back to the bedroom and sit on the edge of the bed.
 
 Your body is different. You have tested this thoroughly. The evidence is not going to change.
