@@ -1,31 +1,31 @@
 [scene]
 id          = "base::workplace_first_night"
 pack        = "base"
-description = "Robin's first night in her empty apartment. The boxes aren't here. The city is outside. The bra problem is tonight's problem."
+description = "First night in the empty apartment. The boxes aren't here. The city is outside. The bra problem is tonight's problem."
 
 [intro]
 prose = """
 Unit 4B is empty.
 
-She knew the boxes weren't here yet — the shipping company said Monday, which she'd confirmed, which means she knew — but knowing it and standing in an empty apartment with a carry-on bag and a body that has been awake for thirty-three hours are two different things.
+You knew the boxes weren't here yet — the shipping company said Monday, which you'd confirmed, which means you knew — but knowing it and standing in an empty apartment with a carry-on bag and a body that has been awake for thirty-three hours are two different things.
 
 The apartment is fine. The apartment is actually fine: pre-war floors, good light from the windows, a kitchen with actual counter space. There is a radiator in the bedroom. It's not on yet. It will take a few minutes.
 
-She sets her carry-on down and does a circuit of the rooms. Bedroom, kitchen, bathroom, living room. She notes the things she needs: furniture (Monday), bedding (she forgot this), towels (she forgot this), food (obviously). She mentally adds items to the list and then realizes she doesn't have anything to write them on, which means her phone, which means she opens a note and starts typing.
+You set your carry-on down and do a circuit of the rooms. Bedroom, kitchen, bathroom, living room. You note the things you need: furniture (Monday), bedding (you forgot this), towels (you forgot this), food (obviously). You mentally add items to the list and then realize you don't have anything to write them on, which means your phone, which means you open a note and start typing.
 
 {% if w.hasTrait("AMBITIOUS") %}
-She has the list organized in twenty minutes. Priority-ranked. She texts the shipping company to confirm the Monday window before she remembers it's 11 PM. She sends it anyway.
+The list is organized in twenty minutes. Priority-ranked. You text the shipping company to confirm the Monday window before you remember it's 11 PM. You send it anyway.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-The list is practical. She doesn't overthink it. She's slept on floors before. This is not the worst situation she's been in.
+The list is practical. You don't overthink it. You've slept on floors before. This is not the worst situation you've been in.
 {% else %}
-The list gets long. She looks at it for a moment. Adds *bra* and then looks at that word.
+The list gets long. You look at it for a moment. Add *bra* and then look at that word.
 {% endif %}
 
 Right. The bra problem.
 
-She'd managed all day on sheer forward momentum — airport, subway, landlord, deposit — without thinking about the fact that what she's wearing under her shirt is not — she's been in this body for forty-eight hours and she'd been so focused on getting to the city that she hadn't —
+You'd managed all day on sheer forward momentum — airport, subway, landlord, deposit — without thinking about the fact that what you're wearing under your shirt is not — you've been in this body for forty-eight hours and you'd been so focused on getting to the city that you hadn't —
 
-*Okay*, she thinks. *New problem. Same protocol.*
+*Okay*, you think. *New problem. Same protocol.*
 """
 
 [[intro_variants]]
@@ -33,28 +33,28 @@ condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
 prose = """
 Unit 4B is empty.
 
-He knew the boxes weren't here. He'd confirmed the Monday window. The confirmation is in his email.
+You knew the boxes weren't here. You'd confirmed the Monday window. The confirmation is in your email.
 
-He sets the carry-on down and does a circuit. Bedroom, bathroom, kitchen, living room, back to the door. He makes a list on his phone. Furniture. Bedding. Food. Towels. He tries to think of what he's forgetting.
+You set the carry-on down and do a circuit. Bedroom, bathroom, kitchen, living room, back to the door. You make a list on your phone. Furniture. Bedding. Food. Towels. You try to think of what you're forgetting.
 
-*Bra*, he thinks, and then doesn't think anything for a moment.
+*Bra*, you think, and then don't think anything for a moment.
 
-Right. He doesn't — she doesn't — Robin doesn't have one that fits. She'd been running on logistics all day and the logistics hadn't included that. His list said *clothes*, generally, meaning Monday, meaning he'd had a vague plan to deal with *clothes* and hadn't extended that plan to include the specific practical reality of —
+Right. You don't — the list said *clothes*, generally, meaning Monday, meaning you'd had a vague plan to deal with *clothes* and hadn't extended that plan to include the specific practical reality of —
 
-He adds *bra* to the list. The word looks wrong in the note. He stares at it.
+You add *bra* to the list. The word looks wrong in the note. You stare at it.
 
-*Okay*, he thinks. *It's on the list. Lists get solved in order.*
+*Okay*, you think. *It's on the list. Lists get solved in order.*
 """
 
 [[thoughts]]
 condition = "!w.alwaysFemale()"
 style     = "inner_voice"
 prose = """
-She sits on the floor — no furniture yet, the floor is clean enough — and looks at the city through the window. The building across the street has lit windows. Someone in 3C is watching something with the sound up. A siren moves through the neighborhood at a speed that suggests this isn't an emergency, just the city moving.
+You sit on the floor — no furniture yet, the floor is clean enough — and look at the city through the window. The building across the street has lit windows. Someone in 3C is watching something with the sound up. A siren moves through the neighborhood at a speed that suggests this isn't an emergency, just the city moving.
 
 *He* would have ordered food and gone to sleep.
 
-She's going to order food and go to sleep. That part is the same. The rest she'll figure out tomorrow.
+You're going to order food and go to sleep. That part is the same. The rest you'll figure out tomorrow.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -64,11 +64,11 @@ id    = "order_food_sleep"
 label = "Order food and sleep"
 detail = "Food. Phone charging on the floor. Eight hours. Tomorrow is tomorrow."
 prose = """
-She opens the delivery app and orders from the first Thai place with four stars and a fifteen-minute estimate. While she waits she sits on the floor with her back against the wall and reads the email from her new manager — the standard first-day logistics, parking that she doesn't need, badge pickup, the name of someone who will meet her in the lobby — and files it.
+You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait you sit on the floor with your back against the wall and read the email from your new manager — the standard first-day logistics, parking you don't need, badge pickup, the name of someone who will meet you in the lobby — and file it.
 
-The food arrives. She eats on the floor. The radiator has warmed up.
+The food arrives. You eat on the floor. The radiator has warmed up.
 
-She charges her phone, rolls her jacket into a pillow, and lies down on the floor of her bedroom. It's not comfortable. She's asleep in four minutes.
+You charge your phone, roll your jacket into a pillow, and lie down on the floor of your bedroom. It's not comfortable. You're asleep in four minutes.
 
 Tomorrow: shopping. The bra problem specifically. The rest of the list after that.
 """
@@ -94,18 +94,18 @@ id    = "research_bra_situation"
 label = "Figure out the bra situation"
 detail = "How hard can it be. Open a browser. Figure it out."
 prose = """
-She opens her phone and starts searching.
+You open your phone and start searching.
 
-Forty minutes later she has learned: bra sizing is a system that was apparently designed by someone who thought the metric system was too intuitive; that H-cup does not mean what she assumed it meant; that most department stores carry up to a DDD and then sort of stop; that there are specialty stores; that the specialty stores have names she's going to have to say out loud to a sales associate; and that she has, apparently, been categorically misunderstanding how underwire works for the entire time she's had opinions about it.
+Forty minutes later you have learned: bra sizing is a system that was apparently designed by someone who thought the metric system was too intuitive; that H-cup does not mean what you assumed it meant; that most department stores carry up to a DDD and then sort of stop; that there are specialty stores; that the specialty stores have names you're going to have to say out loud to a sales associate; and that you have, apparently, been categorically misunderstanding how underwire works for the entire time you've had opinions about it.
 
-She puts her phone down.
+You put your phone down.
 
 {% if w.hasTrait("DOWN_TO_EARTH") %}
-*Okay*, she thinks. *Tomorrow I go to the department store, I tell them my situation in factual terms, and I get what I need.* She adds *department store, early* to her list and goes to sleep.
+*Okay*, you think. *Tomorrow I go to the department store, I tell them my situation in factual terms, and I get what I need.* You add *department store, early* to your list and go to sleep.
 {% else %}
-The city is outside being the city. Someone is honking. A dog is barking. She sits on the floor of her empty apartment and thinks about H-cups and specialty stores and the number of times in her life she walked past a lingerie department without thinking anything at all.
+The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups and specialty stores and the number of times in your life you walked past a lingerie department without thinking anything at all.
 
-She adds *specialty store??* to her list and goes to sleep.
+You add *specialty store??* to your list and go to sleep.
 {% endif %}
 """
 
@@ -126,11 +126,11 @@ id    = "call_someone"
 label = "Call someone back home"
 detail = "There's a name in the contacts. You're not going to explain anything. You just need to hear a voice."
 prose = """
-She picks a contact without thinking too hard about it: Marcus, who she's known since grad school, who would pick up no matter what time it is.
+You pick a contact without thinking too hard about it: Marcus, who you've known since grad school, who would pick up no matter what time it is.
 
 He picks up on the second ring. "Hey, where'd you end up landing?"
 
-"The city," she says. "Just got in."
+"The city," you say. "Just got in."
 
 "How's the apartment?"
 
@@ -139,26 +139,26 @@ He picks up on the second ring. "Hey, where'd you end up landing?"
 "Classic." A pause. "You okay? You sound weird."
 
 {% if w.hasTrait("SHY") %}
-"I'm tired," she says. Which is true. She leaves it there. He lets her.
+"I'm tired," you say. Which is true. You leave it there. He lets you.
 
 "Get some sleep," he says. "Text me when you're settled."
 
-"Yeah," she says. "Yeah."
+"Yeah," you say. "Yeah."
 
-They hang up. She holds the phone for a moment. She couldn't explain it even if she tried. She's not going to try.
+You hang up and hold the phone for a moment. You couldn't explain it even if you tried. You're not going to try.
 {% else %}
-"Just tired," she says. "Long day."
+"Just tired," you say. "Long day."
 
 "Thirty-one hours or something, right? You're insane." He says it like it's a compliment.
 
-"Thirty-three now," she says, and somehow that's the funniest thing either of them have said all week. He laughs. She laughs. It doesn't explain anything. It doesn't need to.
+"Thirty-three now," you say, and somehow that's the funniest thing either of you have said all week. He laughs. You laugh. It doesn't explain anything. It doesn't need to.
 
 "Go to sleep," he says. "Text when you're alive."
 
-"Yeah." She leans her head against the wall. "Good night."
+"Yeah." You lean your head against the wall. "Good night."
 {% endif %}
 
-She plugs her phone in on the floor beside her. The radiator ticks. Outside, the city goes on.
+You plug your phone in on the floor beside you. The radiator ticks.
 """
 
   [[actions.effects]]

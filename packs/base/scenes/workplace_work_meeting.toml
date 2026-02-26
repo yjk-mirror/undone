@@ -1,32 +1,32 @@
 [scene]
 id          = "base::workplace_work_meeting"
 pack        = "base"
-description = "Design review. Robin presents. Someone explains her own work back to her."
+description = "Design review. You present. Someone explains your own work back to you."
 
 [intro]
 prose = """
-The meeting room has a glass wall facing the open floor, a projector that still runs hot, and seven chairs around a table that seats eight. She's the first one in.
+The meeting room has a glass wall facing the open floor, a projector that still runs hot, and seven chairs around a table that seats eight. You're the first one in.
 
-Her laptop is open. The slides are up. She's reviewed the deck four times since last night, not because she's uncertain about the content — she designed this system, she can present it in her sleep — but because the deck has forty slides and she wants to know which ones she'll skip when the conversation goes long. She has opinions about which slides matter. She has opinions about which slides she put in to satisfy people who need to feel consulted. She's been in enough design reviews to know the difference.
+Your laptop is open. The slides are up. You've reviewed the deck four times since last night, not because you're uncertain about the content — you designed this system, you can present it in your sleep — but because the deck has forty slides and you want to know which ones you'll skip when the conversation goes long. You have opinions about which slides matter. You have opinions about which slides you put in to satisfy people who need to feel consulted. You've been in enough design reviews to know the difference.
 
-People filter in at 10:02. Two from her immediate team, one she hasn't met. A product manager named Carter who writes things down even when the thing isn't worth writing down. A senior engineer from the platform side who is going to have opinions about the API layer regardless of what the slides say. And Marcus from adjacent infrastructure, who she knows by reputation and who settles into the chair directly across from her.
+People filter in at 10:02. Two from your immediate team, one you haven't met. A product manager named Carter who writes things down even when the thing isn't worth writing down. A senior engineer from the platform side who is going to have opinions about the API layer regardless of what the slides say. And Marcus from adjacent infrastructure, who you know by reputation and who settles into the chair directly across from you.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-Marcus looks at her. He looks at her slides. He looks at her again, and she can read the specific sequence of adjustments happening in his expression — the involuntary first take on a young East Asian woman in a meeting, followed by the recalibration to professional context, followed by the second take that doesn't fully commit to the recalibration. She knows this because she used to do it. Not with malice. Not with awareness. Just as a default setting she never examined.
+Marcus looks at you. He looks at your slides. He looks at you again, and you can read the specific sequence of adjustments happening in his expression — the involuntary first take, followed by the recalibration to professional context, followed by the second take that doesn't fully commit to the recalibration. You know this because you used to do it. Not with malice. Not with awareness. Just as a default setting you never examined.
 
-She opens the deck to slide three and says, "Okay. Thanks for coming — let's get started."
+You open the deck to slide three and say, "Okay. Thanks for coming — let's get started."
 
 {% elif w.hasTrait("ANALYTICAL") %}
-She categorizes the room before anyone speaks. Carter will ask about timelines. The platform engineer — Devin, she thinks — will push back on the interface contract. Marcus will be quiet for the first half and then ask one question that reframes everything, which she's seen people mistake for insight and which she's privately concluded is just a thing he does. She's been in enough of these rooms to know the shape of the meeting before it starts.
+You categorize the room before anyone speaks. Carter will ask about timelines. The platform engineer — Devin, you think — will push back on the interface contract. Marcus will be quiet for the first half and then ask one question that reframes everything, which you've seen people mistake for insight and which you've privately concluded is just a thing he does. You've been in enough of these rooms to know the shape of the meeting before it starts.
 
-What she can't fully account for yet is how the room is categorizing her. She's aware of it the way weather is a condition — something she's operating in, not a thing she's chosen to have feelings about. She's run through most of the variables. She'll know in about ten minutes how the room adjusts to her.
+What you can't fully account for yet is how the room is categorizing you. You're aware of it the way weather is a condition — something you're operating in, not a thing you've chosen to have feelings about. You've run through most of the variables. You'll know in about ten minutes how the room adjusts.
 
-She opens the deck and says, "Let's get started. I'll move fast and leave room for questions at the end."
+You open the deck and say, "Let's get started. I'll move fast and leave room for questions at the end."
 
 {% else %}
-She knows these faces reasonably well by now — two weeks of standups will do that. She knows who interrupts and who defers and who writes things down that don't need to be written down. She's been read as younger than she is in every meeting she's sat in, and she's made her peace with it, or something approximating peace, which is that she's decided to treat it as information about the room rather than information about herself.
+You know these faces reasonably well by now — two weeks of standups will do that. You know who interrupts and who defers and who writes things down that don't need to be written down. You've been read as younger than you are in every meeting you've sat in, and you've made your peace with it, or something approximating peace, which is that you've decided to treat it as information about the room rather than information about yourself.
 
-She opens the deck to slide three. "Thanks for coming. I'll go through the architecture and then we'll have time for questions."
+You open the deck to slide three. "Thanks for coming. I'll go through the architecture and then we'll have time for questions."
 
 {% endif %}
 """
@@ -35,12 +35,12 @@ She opens the deck to slide three. "Thanks for coming. I'll go through the archi
 condition = "!w.alwaysFemale()"
 style     = "inner_voice"
 prose = """
-She's given this presentation before. Not this version — the system is new — but the shape of it. The logic tree, the tradeoffs, the section where she explains what she decided not to do and why. She knows how this goes.
+You've given this presentation before. Not this version — the system is new — but the shape of it. The logic tree, the tradeoffs, the section where you explain what you decided not to do and why. You know how this goes.
 
 {% if w.hasTrait("ANALYTICAL") %}
-What she doesn't have good data on yet is how she's going to be heard. That's the variable she can't control for. She's been running the experiment for two weeks now and the results are still coming in.
+What you don't have good data on yet is how you're going to be heard. That's the variable you can't control for. You've been running the experiment for two weeks now and the results are still coming in.
 {% else %}
-What she can't work out yet is how she's going to be heard. She knows the content. She knows how to run this kind of room. She doesn't know this version of herself in it — not with two weeks of data.
+What you can't work out yet is how you're going to be heard. You know the content. You know how to run this kind of room. You don't know this version of yourself in it — not with two weeks of data.
 {% endif %}
 """
 
@@ -51,37 +51,35 @@ id     = "present"
 label  = "Present the design."
 detail = "Get through the deck. Answer questions. Absorb what happens when someone explains your own work to you."
 prose  = """
-She gets through the first fifteen slides without interruption, which is better than she expected. The architecture is clean and she knows it — the kind of clean that comes from having done something similar three times before and finally having enough scar tissue to know what to leave out. Carter writes things down. The platform engineer nods at the interface diagram without objecting. Marcus is quiet.
+You get through the first fifteen slides without interruption, which is better than you expected. The architecture is clean and you know it — the kind of clean that comes from having done something similar three times before and finally having enough scar tissue to know what to leave out. Carter writes things down. The platform engineer nods at the interface diagram without objecting. Marcus is quiet.
 
-They're on slide nineteen — the authentication flow — when Kevin Marsh, the platform-side engineer she hadn't met before today, leans forward. "So this is the token exchange," he says, gesturing at her slide, and then begins explaining it. Not asking about it. Explaining it. To her. The woman who drew the diagram.
+You're on slide nineteen — the authentication flow — when Kevin Marsh, the platform-side engineer you hadn't met before today, leans forward. "So this is the token exchange," he says, gesturing at your slide, and then begins explaining it. Not asking about it. Explaining it. To you. The person who drew the diagram.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-She lets him finish the sentence. The room goes still — Carter's pen stops, the platform engineer glances between her and the slide — and Kevin keeps going, unaware of the gap between what he's explaining and who he's explaining it to. She's been on the wrong side of that gap before. Not in meetings like this, but in a life spent being a man who didn't examine things he should have examined.
+You let him finish the sentence. The room goes still — Carter's pen stops, the platform engineer glances between you and the slide — and Kevin keeps going, unaware of the gap between what he's explaining and who he's explaining it to. You've been on the wrong side of that gap before. Not in meetings like this, but in a life spent being someone who didn't examine things he should have examined.
 
-Kevin's explanation is technically correct. She's going to let him have that.
+Kevin's explanation is technically correct. You're going to let him have that.
 
-"Yes," she says. "That's the design. The implementation note on the next slide covers the edge case you're probably about to ask about." She advances the deck. He is, in fact, about to ask about it. She answers the question before he finishes asking it, with enough specificity that the room recalibrates — not perfectly, but enough to move on.
+"Yes," you say. "That's the design. The implementation note on the next slide covers the edge case you're probably about to ask about." You advance the deck. He is, in fact, about to ask about it. You answer the question before he finishes asking it, with enough specificity that the room recalibrates — not perfectly, but enough to move on.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-She observes it happening in real time. Kevin is explaining her diagram to her, with the confident incorrectness of someone who hasn't read the spec but has enough context to sound like he has. He is wrong about one thing — a nuance in the token lifespan that matters for the edge case she spent two days on — and she gives him about forty seconds before she interrupts.
+You observe it happening in real time. Kevin is explaining your diagram to you, with the confident incorrectness of someone who hasn't read the spec but has enough context to sound like he has. He is wrong about one thing — a nuance in the token lifespan that matters for the edge case you spent two days on — and you give him about forty seconds before you interrupt.
 
-"The lifespan is asymmetric," she says, and points at the relevant section of the diagram she drew. "Refresh tokens have a longer window. It's in the spec — section 4.2. The reason is here." She explains it. He nods. He writes something down. He says "right, right" which means he is updating his model.
+"The lifespan is asymmetric," you say, and point at the relevant section of the diagram you drew. "Refresh tokens have a longer window. It's in the spec — section 4.2. The reason is here." You explain it. He nods. He writes something down. He says "right, right" which means he is updating his model.
 
-The meeting continues. She was not impolite. She was precise. She is aware this is not always how precision lands but the room is moving forward and the content is correct, which is all she came here to guarantee.
+The meeting continues. You were not impolite. You were precise. You're aware this is not always how precision lands but the room is moving forward and the content is correct, which is all you came here to guarantee.
 
 {% else %}
-She finishes Kevin's sentence for him. Not dramatically — she just reaches the end of it before he does, with enough specific terminology that the distinction between explaining the thing and having designed the thing becomes evident without needing to be stated. Kevin trails off, picks it back up, says "right" in a way that suggests he's recalibrated, and she moves to the next slide.
+You finish Kevin's sentence for him. Not dramatically — you just reach the end of it before he does, with enough specific terminology that the distinction between explaining the thing and having designed the thing becomes evident without needing to be stated. Kevin trails off, picks it back up, says "right" in a way that suggests he's recalibrated, and you move to the next slide.
 
 {% endif %}
 
-The rest of the deck goes cleanly. The platform engineer asks two sharp questions and she has good answers to both. Marcus waits until slide thirty-four to ask the one about operational latency, which is the one she would have asked if she'd been in his seat, and she has the benchmarks ready and pulls them up from her notes. The answer lands. He nods.
+The rest of the deck goes cleanly. The platform engineer asks two sharp questions and you have good answers to both. Marcus waits until slide thirty-four to ask the one about operational latency, which is the one you would have asked if you'd been in his seat, and you have the benchmarks ready and pull them up from your notes. The answer lands. He nods.
 
-They finish at 11:47.
+You finish at 11:47.
 
 {% if not w.alwaysFemale() %}
-She closes the laptop. Carter says "great work" on the way out and she says thanks. She's held two things at once before — the technical outcome and the other thing, the layer underneath it — but not in this specific configuration. Not where the other thing is this legible and this familiar and also, apparently, this unavoidable. She knows how to run this experiment. She'll keep running it.
-{% else %}
-She closes the laptop. Carter says "great work" on the way out. The work was good. What she's turning over is Kevin — the room, the way it absorbed it and moved on, whether "moved on" is accurate or just what the room needed to do to function.
+You close the laptop. Carter says "great work" on the way out and you say thanks. You've held two things at once before — the technical outcome and the other thing, the layer underneath it — but not in this specific configuration. Not where the other thing is this legible and this familiar and also, apparently, this unavoidable. You know how to run this experiment. You'll keep running it.
 {% endif %}
 """
 
@@ -93,43 +91,41 @@ id     = "after"
 label  = "After the meeting."
 detail = "Hallway. The work was good. None of that is the point."
 prose  = """
-The hallway outside the meeting room runs between the elevator bank and the open floor, quieter than both. She stops at the water refill station and fills her bottle.
+The hallway outside the meeting room runs between the elevator bank and the open floor, quieter than both. You stop at the water refill station and fill your bottle.
 
-Marcus comes out behind her. He stops two feet away, because the water station is next to the hall and there's no particular way to avoid it.
+Marcus comes out behind you. He stops two feet away, because the water station is next to the hall and there's no particular way to avoid it.
 
-"Good presentation," he says. He means it, she thinks. He's not performing it.
+"Good presentation," he says. He means it, you think. He's not performing it.
 
 "Thanks."
 
 He's quiet for a moment. Then: "The latency benchmarks — were those from the load test last week, or did you run something new?"
 
-This is, she recognizes, a real question. Not a social question. He wants to know because he's going to do something with the answer.
+This is, you recognize, a real question. Not a social question. He wants to know because he's going to do something with the answer.
 
-"Last week's load test," she says. "I'll send you the raw data if you want it — the slides have the summary but the shape of the distribution is more interesting."
+"Last week's load test," you say. "I'll send you the raw data if you want it — the slides have the summary but the shape of the distribution is more interesting."
 
 "Yeah," he says, "send it over." And then he goes.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-She stands at the water station for a moment longer than she needs to. The meeting was forty-five minutes. Kevin's explanation was maybe ninety seconds of it. She knows exactly why it happened — she's run that calculation herself, without knowing she was running it — and knowing why doesn't change that it happened. She puts the cap back on her bottle. She goes back to her desk.
+You stand at the water station for a moment longer than you need to. The meeting was forty-five minutes. Kevin's explanation was maybe ninety seconds of it. You know exactly why it happened — you've run that calculation yourself, without knowing you were running it — and knowing why doesn't change that it happened. You put the cap back on your bottle and go back to your desk.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-The meeting cost her forty-five minutes and produced two follow-up tasks: send Marcus the load test data, reply to the question Carter wrote down that he'll definitely send by the end of the day. Ninety seconds of Kevin explaining her diagram. A clean technical record that she is now in the building's memory as someone with opinions that hold up under questioning. This is how it works. The work is its own argument, and eventually the room knows it. She's run this process before.
+The meeting cost you forty-five minutes and produced two follow-up tasks: send Marcus the load test data, reply to the question Carter wrote down that he'll definitely send by the end of the day. Ninety seconds of Kevin explaining your diagram. A clean technical record that you are now in the building's memory as someone with opinions that hold up under questioning. This is how it works. The work is its own argument, and eventually the room knows it. You've run this process before.
 
-The version of this she ran before took about three months. She's curious how long this version takes. She has data from the first two weeks and it's not enough to generalize from yet.
+The version of this you ran before took about three months. You're curious how long this version takes. You have data from the first two weeks and it's not enough to generalize from yet.
 
 {% else %}
-The hallway is quiet. She drinks the water. Down the hall someone is on a call, talking fast and too loud for an inside space, something about a deadline, something about capacity.
+The hallway is quiet. You drink the water. Down the hall someone is on a call, talking fast and too loud for an inside space, something about a deadline, something about capacity.
 
-The meeting was good. The technical content held. Kevin did what Kevin did and the room moved past it, which is all that could have happened and probably all that should have happened. She's not going to sit with it long. She has things to get back to.
+The meeting was good. The technical content held. Kevin did what Kevin did and the room moved past it, which is all that could have happened and probably all that should have happened. You're not going to sit with it long. You have things to get back to.
 
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-She goes back to her desk. She knows the work was good because she knows what good work looks like; she's been producing it for over a decade. The thing she's less certain about is whether the room knows the work was good in the way she needs it to know, or whether that's a longer project than a single forty-five minute meeting. She thinks it's probably a longer project.
+Back at your desk, you know the work was good because you know what good work looks like; you've been producing it for over a decade. The thing you're less certain about is whether the room knows the work was good in the way you need it to know, or whether that's a longer project than a single forty-five minute meeting. You think it's probably a longer project.
 
-She opens Slack. Carter has already messaged her. She wasn't wrong about that part.
-{% else %}
-She goes back to her desk. The afternoon has its tasks and she knows what they are. The work was good. The next thing is to make sure the work is remembered as good, which is a different task and one she's had to run before. She opens her laptop and starts on the follow-ups.
+You open Slack. Carter has already messaged you. You weren't wrong about that part.
 {% endif %}
 """
 

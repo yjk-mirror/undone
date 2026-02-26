@@ -5,60 +5,60 @@ description = "Robin arrives in the city. Airport, exit screening, the subway. F
 
 [intro]
 prose = """
-The seat belt sign clicks off before she's ready.
+The seat belt sign clicks off before you're ready.
 
-She's been awake since — she does the math — thirty-one hours. The man in 14C reclined into her space somewhere over Ohio and she didn't say anything. She would have, before. The thought arrives without context.
+You've been awake since — you do the math — thirty-one hours. The man in 14C reclined into your space somewhere over Ohio and you didn't say anything. You would have, before. The thought arrives without context.
 
 The flight attendant crouches at the row ahead, smiling at something the woman there said. The aisle is narrow and people are already standing before they're supposed to, pulling bags from overheads with the focused expression of people who have not slept enough and have somewhere to be.
 
-She stands.
+You stand.
 
-The first thing she notices is the weight — she keeps forgetting and remembering the weight, a rhythm she's been doing since Saturday morning and apparently hasn't stopped doing. Forget. Stand up. Remember. The carry-on is in the overhead. She reaches for it and a man behind her reaches past her and takes it down.
+The first thing you notice is the weight — you keep forgetting and remembering the weight, a rhythm you've been doing since Saturday morning and apparently haven't stopped doing. Forget. Stand up. Remember. The carry-on is in the overhead. You reach for it and a man behind you reaches past and takes it down.
 
-"Got it," he says, and hands it to her.
+"Got it," he says, and hands it to you.
 
-He means it kindly. She knows this. She says thank you and means it, and files the interaction somewhere, and keeps moving.
+He means it kindly. You know this. You say thank you and mean it, and file the interaction somewhere, and keep moving.
 
-Through the jetbridge. Into the terminal. The airport is large and bright and indifferent in the specific way airports are: it has been processing people since before she got here and will continue after. The signs for Ground Transportation are adequate.
+Through the jetbridge. Into the terminal. The airport is large and bright and indifferent in the specific way airports are: it has been processing people since before you got here and will continue after. The signs for Ground Transportation are adequate.
 
-At the exit checkpoint, the agent looks at her ID. Then at her. The ID is correct. The face in the photo is a white man in his early thirties.
+At the exit checkpoint, the agent looks at your ID. Then at you. The ID is correct. The face in the photo is a white man in his early thirties.
 
-"I know," she says, before he can figure out the sentence. "I just look young."
+"I know," you say, before he can figure out the sentence. "I just look young."
 
-The line behind her is long. He waves her through.
+The line behind you is long. He waves you through.
 """
 
 [[intro_variants]]
 condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
 prose = """
-The seat belt sign clicks off before she's ready.
+The seat belt sign clicks off before you're ready.
 
-Thirty-one hours. He — she — Robin does the math like it's a ticket number and waits.
+Thirty-one hours. You do the math like it's a ticket number and wait.
 
-The aisle fills with people who have places to be. She has a place to be. She has a place to be and a job starting Monday and an apartment she's never seen and a body that keeps — she reaches for the carry-on and a man behind her takes it down first.
+The aisle fills with people who have places to be. You have a place to be. You have a place to be and a job starting Monday and an apartment you've never seen and a body that keeps — you reach for the carry-on and a man behind you takes it down first.
 
 "Got it," he says.
 
-*Okay*, she thinks. She says thank you. She keeps moving.
+*Okay*, you think. You say thank you. You keep moving.
 
-The terminal is large. The signs for Ground Transportation say what they say. She follows them.
+The terminal is large. The signs for Ground Transportation say what they say. You follow them.
 
-At the exit checkpoint, the agent looks at her ID. The ID is correct. The face in the photo is not her face.
+At the exit checkpoint, the agent looks at your ID. The ID is correct. The face in the photo is not your face.
 
-"I know," she says. "I just look young."
+"I know," you say. "I just look young."
 
-He waves her through. She walks into the city and starts making a list of problems to solve and their order.
+He waves you through. You walk into the city and start making a list of problems to solve and their order.
 """
 
 [[thoughts]]
 condition = "!w.alwaysFemale()"
 style     = "inner_voice"
 prose = """
-*Okay*, she thinks — he thinks — *okay*. There is a problem. Several problems. They are going to be solved in order.
+*Okay* — *okay*. There is a problem. Several problems. They are going to be solved in order.
 
-The first problem is: she's in a city she doesn't know. The second is: the subway map looked fine on her phone but she needs to know which platform. The third is: she's been awake for thirty-one hours and her body — this body — handles fatigue differently than she expected. Her hands are cold. They didn't used to get cold.
+The first problem is: you're in a city you don't know. The second is: the subway map looked fine on your phone but you need to know which platform. The third is: you've been awake for thirty-one hours and this body handles fatigue differently than you expected. Your hands are cold. They didn't used to get cold.
 
-She finds the platform. The train is three minutes out.
+You find the platform. The train is three minutes out.
 
 *Okay.*
 """
@@ -71,19 +71,17 @@ label             = "Take the subway"
 detail            = "Platform B. Change at Central. The map said twenty-two minutes."
 allow_npc_actions = true
 prose = """
-The train arrives with a rush of displaced air and a screech that the city has apparently decided is normal. She boards. The car is about half full — evening commuters, a man with a bike, two women talking about something that made one of them laugh hard enough to grab the pole.
+The train arrives with a rush of displaced air and a screech that the city has apparently decided is normal. You board. The car is about half full — evening commuters, a man with a bike, two women talking about something that made one of them laugh hard enough to grab the pole.
 
-She finds a seat near the door.
+You find a seat near the door.
 
 {% if not w.alwaysFemale() %}
-A man across the aisle notices her. Not aggressively — just the quick inventory, the two-second read, the look that slides away when she meets it. She knows exactly what he's doing. She used to do it herself without thinking. The thing she didn't know then is how specific it feels from this side. *Catalogued*, she thinks. *Filed.*
+A man across the aisle notices you. Not aggressively — just the quick inventory, the two-second read, the look that slides away when you meet it. You know exactly what he's doing. You used to do it yourself without thinking. The thing you didn't know then is how specific it feels from this side. *Catalogued*, you think. *Filed.*
 
-She looks out the window. The city moves past in strips of light.
-{% else %}
-Across the aisle a man is reading something on his phone with the total absorption of someone who has successfully tuned out the world. She looks out the window. The city moves past in strips of light.
+You look out the window. The city moves past in strips of light.
 {% endif %}
 
-Twenty-two minutes. She counts the stops.
+Twenty-two minutes. You count the stops.
 """
 
   [[actions.effects]]
@@ -103,15 +101,15 @@ id    = "call_a_cab"
 label = "Call a cab"
 detail = "Skip the subway. Get there faster. Costs money."
 prose = """
-She opens her phone and requests a ride. Forty dollars. She approves it without hesitation — she has a job starting Monday, she has money, and she has been awake for thirty-one hours and cannot read a transit map right now.
+You open your phone and request a ride. Forty dollars. You approve it without hesitation — you have a job starting Monday, you have money, and you have been awake for thirty-one hours and cannot read a transit map right now.
 
-The driver is a middle-aged man who asks where she's headed and then doesn't talk for the rest of the trip, which is exactly what she needed. The city scrolls past the window. Brick buildings, a park, a stretch of fast food, then suddenly residential — trees, actual trees — and then the neighborhood the listing called "up-and-coming" and which looks like someone's about halfway through the up-and-coming.
+The driver is a middle-aged man who asks where you're headed and then doesn't talk for the rest of the trip, which is exactly what you needed. The city scrolls past the window. Brick buildings, a park, a stretch of fast food, then suddenly residential — trees, actual trees — and then the neighborhood the listing called "up-and-coming" and which looks like someone's about halfway through the up-and-coming.
 
-The car stops in front of her building.
+The car stops in front of your building.
 
 "Here you go," the driver says.
 
-She gets out into the early spring cold and looks at her building and thinks: *okay*.
+You get out into the early spring cold and look at your building and think: *okay*.
 """
 
   [[actions.effects]]

@@ -1,37 +1,41 @@
 [scene]
 id          = "base::workplace_first_day"
 pack        = "base"
-description = "Robin's first day at the tech company. The lobby, the manager, the coworker who explains something she invented."
+description = "First day at the tech company. The lobby, the manager, the coworker who explains something you invented."
 
 [intro]
 prose = """
 The subway runs on time, which is a good sign or a coincidence.
 
-The financial district is twenty minutes from Clement by train, which she tested yesterday with the transit app and is now confirming with her actual body on an actual train. Business casual feels different than she remembered — the pants sit differently, the blouse has a collar that does something she's still calibrating. She had someone else dress her in her forties and this is the first time she's had to figure out what *professional* means from the other side.
+The financial district is twenty minutes from Clement by train, which you tested yesterday with the transit app and are now confirming with your actual body on an actual train. Business casual feels different than you remembered — the pants sit differently, the blouse has a collar that does something you're still calibrating.
 
-She arrives at the building at 8:47. The lobby is glass and steel and the security desk has two guards and a badge reader. She approaches.
+{% if not w.alwaysFemale() %}
+You had someone else dress you in your forties and this is the first time you've had to figure out what *professional* means from the other side.
+{% endif %}
 
-The guard looks at her ID. He looks at the badge reader. He looks at her.
+You arrive at the building at 8:47. The lobby is glass and steel and the security desk has two guards and a badge reader.
+
+The guard looks at your ID. He looks at the badge reader. He looks at you.
 
 "First day?" he says.
 
-"Yes," she says. "Robin. Software engineering."
+"Yes," you say. "Robin. Software engineering."
 
 He types something. The system takes a moment. "Okay," he says. "Visitor badge until your card is issued. Someone will meet you."
 
-She takes the badge and finds a seat in the lobby to wait. Around her, the morning rush moves through with the specific focus of people who know exactly where they're going and don't have time to notice anyone who doesn't.
+You take the badge and find a seat in the lobby to wait. Around you, the morning rush moves through with the focus of people who know exactly where they're going and don't have time to notice anyone who doesn't.
 
-At 9:02 her new manager comes through the turnstile looking for her.
+At 9:02 your new manager comes through the turnstile looking for you.
 
 {% if w.hasTrait("SHY") %}
-She stands up too quickly and almost drops her bag.
+You stand up too quickly and almost drop your bag.
 {% else %}
-She stands. He finds her by the process of elimination.
+You stand. He finds you by the process of elimination.
 {% endif %}
 
-His face does the thing she expected it to do.
+His face does the thing you expected it to do.
 
-She gives him a professional smile and says her name before he can work out how to ask if she's the person he's looking for.
+You give him a professional smile and say your name before he can work out how to ask if you're the person he's looking for.
 """
 
 [[intro_variants]]
@@ -39,26 +43,26 @@ condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
 prose = """
 The financial district. Twenty minutes. The transit app was right.
 
-He gets off the train and walks to the building and shows his ID at the desk and waits for the manager. He's been at this company for approximately ninety minutes in total counting the onboarding calls. He's read the architecture docs. He knows the codebase language. He's prepared for everything except how he's going to be read.
+You get off the train and walk to the building and show your ID at the desk and wait for the manager. You've been at this company for approximately ninety minutes in total, counting the onboarding calls. You've read the architecture docs. You know the codebase language. You've prepared for everything except how you're going to be read.
 
 The manager comes through the turnstile.
 
 His face does the thing.
 
-She — Robin — says her name before he can figure out what to say. Professional. Clear. He extends his hand and she shakes it.
+You say your name before he can figure out what to say. Professional. Clear. He extends his hand and you shake it.
 
-*Okay*, she thinks. *We're doing this.*
+*Okay*, you think. *We're doing this.*
 """
 
 [[thoughts]]
 condition = "!w.alwaysFemale()"
 style     = "inner_voice"
 prose = """
-She has institutional knowledge. She knows the vocabulary, the stack, the architecture patterns. She's been doing this for ten years.
+You have institutional knowledge. You know the vocabulary, the stack, the architecture patterns. You've been doing this for ten years.
 
-Her manager has decided she might be an intern. She watched him make this decision in real time. She's going to spend today correcting it by means of doing the work.
+Your manager has decided you might be an intern. You watched him make this decision in real time. You're going to spend today correcting it by means of doing the work.
 
-This is, she thinks, exactly how she would have managed this as a senior engineer before. Work the problem. Let the results speak. She just didn't expect to have to start over.
+This is, you think, exactly how you would have managed this as a senior engineer before. Work the problem. Let the results speak. You just didn't expect to have to start over.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -69,17 +73,17 @@ label = "Meet the team. Get oriented."
 detail = "The standup is at ten. You know what standups are."
 allow_npc_actions = true
 prose = """
-The open plan office has the specific organized chaos of a team that's grown faster than its process. She finds her desk — a temporary one, pending a permanent assignment — and sets up her laptop with the practiced efficiency of someone who's done this in new codebases many times.
+The open plan office has the organized chaos of a team that's grown faster than its process. You find your desk — a temporary one, pending a permanent assignment — and set up your laptop with the efficiency of someone who's done this in new codebases many times.
 
 {% if w.hasTrait("AMBITIOUS") %}
-She's in the codebase before 9:30. She's found three things she'd do differently and has said nothing about two of them.
+You're in the codebase before 9:30. You've found three things you'd do differently and have said nothing about two of them.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-She gets the machine configured and then asks her neighbor who to talk to about a monitor. The neighbor is helpful. This is fine.
+You get the machine configured and then ask your neighbor who to talk to about a monitor. The neighbor is helpful. This is fine.
 {% else %}
-She gets the machine configured and opens the README. It's out of date. She takes notes.
+You get the machine configured and open the README. It's out of date. You take notes.
 {% endif %}
 
-At ten the team gathers for standup. Someone introduces her as "Robin from the Seattle office, she's transferring in." She shakes hands with seven people and remembers four of their names.
+At ten the team gathers for standup. Someone introduces you as "Robin from the Seattle office, she's transferring in." You shake hands with seven people and remember four of their names.
 
 The day moves forward at the speed of days.
 """
@@ -102,19 +106,19 @@ label = "Establish your position early"
 detail = "The first day is the day it's easiest to set a baseline. Don't wait."
 condition = "w.hasTrait('AMBITIOUS') || w.hasTrait('BITCHY')"
 prose = """
-The coworker — Dan, she's already forgotten his last name — starts explaining the authentication system to her at 11:15 like it's a concept she might not know.
+The coworker — Dan, you've already forgotten his last name — starts explaining the authentication system to you at 11:15 like it's a concept you might not know.
 
-She waits until he finishes the sentence.
+You wait until he finishes the sentence.
 
 {% if w.hasTrait("BITCHY") %}
-"The spec for that," she says, "is in the repo. The one I wrote during the design phase. I can send you the link if you want a refresher." She says it without inflection. She's smiling. He stops.
+"The spec for that," you say, "is in the repo. The one I wrote during the design phase. I can send you the link if you want a refresher." You say it without inflection. You're smiling. He stops.
 {% else %}
-"I know," she says, without edge. "I was in the design review. I wrote the original requirements doc — the one in the repo, not the deck." She says it matter-of-factly, like she's noting a fact. "But thank you."
+"I know," you say, without edge. "I was in the design review. I wrote the original requirements doc — the one in the repo, not the deck." You say it matter-of-factly, like you're noting a fact. "But thank you."
 {% endif %}
 
 He processes this. Then he nods, slowly, and finds something else to do.
 
-She turns back to her screen. This is established now. She doesn't have to do it again.
+You turn back to your screen. This is established now. You don't have to do it again.
 """
 
   [[actions.effects]]
@@ -137,18 +141,18 @@ label     = "Coworker explains something she knows"
 weight    = 10
 condition = "!scene.hasFlag('dan_done')"
 prose = """
-The coworker — Dan, from the backend team — finds her at her temporary desk around eleven and starts explaining the authentication architecture with the helpful energy of someone orienting a new hire who might be lost.
+The coworker — Dan, from the backend team — finds you at your temporary desk around eleven and starts explaining the authentication architecture with the helpful energy of someone orienting a new hire who might be lost.
 
-She listens. He knows what he's talking about. He's just telling it to the wrong person.
+You listen. He knows what he's talking about. He's just telling it to the wrong person.
 
 {% if w.hasTrait("AMBITIOUS") %}
-She waits until he reaches the end of his explanation and then says, "I actually designed the initial spec for this — I'm in the commit history if you want to check. But I appreciate the walkthrough." She says it without edge. He pauses, recalibrates, and moves on.
+You wait until he reaches the end of his explanation and then say, "I actually designed the initial spec for this — I'm in the commit history if you want to check. But I appreciate the walkthrough." You say it without edge. He pauses, recalibrates, and moves on.
 {% elif w.hasTrait("SHY") %}
-She lets him finish. She says, "Got it, thanks." She writes it down, even though she already knows it, because writing it down is what she does when she's decided not to correct someone. She spends the rest of the morning wondering if she made the right call.
+You let him finish. "Got it, thanks," you say. You write it down, even though you already know it, because writing it down is what you do when you've decided not to correct someone. You spend the rest of the morning wondering if you made the right call.
 {% else %}
-She lets him finish. "Thanks," she says. She turns back to her screen. She has the codebase open. She's been in this specific module since 9:30.
+You let him finish. "Thanks," you say, and turn back to your screen. You've had the codebase open. You've been in this specific module since 9:30.
 
-The gap between what she knows and what he thinks she knows is going to close eventually. She can wait.
+The gap between what you know and what he thinks you know is going to close eventually. You can wait.
 {% endif %}
 """
 

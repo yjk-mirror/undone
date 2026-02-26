@@ -24,7 +24,7 @@ You spend actual minutes deciding what to wear. Not because you don't know — y
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
 Jeans. That black top that works with everything. Done. Some women spend an hour getting dressed. You can't figure out what they're doing in there.
 {% elif w.hasTrait("CUTE") %}
-You grab the yellow sweater — the one that makes you look like someone who has her life together, even when the evidence is against it. You catch yourself smiling at your reflection and decide not to interrogate that.
+You grab the yellow sweater — the one that makes you look like you have your life together, even when the evidence is against it. You catch yourself smiling at your reflection and decide not to interrogate that.
 {% elif w.hasTrait("SULTRY") %}
 The dress or the skirt. You hold both up. The dress says *try me*. The skirt says *I already know*. The skirt wins.
 {% else %}
