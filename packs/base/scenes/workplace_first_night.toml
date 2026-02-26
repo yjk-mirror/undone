@@ -86,6 +86,11 @@ Tomorrow: shopping. The bra problem specifically. The rest of the list after tha
   arc      = "base::workplace_opening"
   to_state = "week_one"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
   [[actions.next]]
   finish = true
 
@@ -117,6 +122,11 @@ You add *specialty store??* to your list and go to sleep.
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
 
   [[actions.next]]
   finish = true
@@ -169,6 +179,11 @@ You plug your phone in on the floor beside you. The radiator ticks.
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
 
   [[actions.next]]
   finish = true

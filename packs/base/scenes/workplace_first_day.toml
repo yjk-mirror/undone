@@ -97,6 +97,11 @@ The day moves forward at the speed of days.
   type = "set_game_flag"
   flag = "STARTED_JOB"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
   [[actions.next]]
   finish = true
 
@@ -129,6 +134,11 @@ You turn back to your screen. This is established now. You don't have to do it a
   [[actions.effects]]
   type = "set_game_flag"
   flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
 
   [[actions.next]]
   finish = true
@@ -168,6 +178,11 @@ The gap between what you know and what he thinks you know is going to close even
   [[npc_actions.effects]]
   type = "set_game_flag"
   flag = "STARTED_JOB"
+
+  [[npc_actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
 
   [[npc_actions.next]]
   finish = true

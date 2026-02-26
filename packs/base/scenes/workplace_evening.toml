@@ -105,5 +105,10 @@ You get up and figure out dinner.
   type   = "change_stress"
   amount = -3
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
   [[actions.next]]
   finish = true

@@ -311,6 +311,97 @@ mod integration_tests {
     }
 
     #[test]
+    fn femininity_reaches_25_by_workplace_arc_end() {
+        use crate::scheduler::load_schedule;
+        use rand::rngs::SmallRng;
+        use rand::SeedableRng;
+
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas).unwrap();
+        let scenes_dir = packs_dir().join("base").join("scenes");
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
+
+        let mut world = make_world_with_shy(&registry);
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+
+        // Set FEMININITY to 10 — CisMaleTransformed starting value (new_game() does this)
+        let fem_id = registry
+            .resolve_skill("FEMININITY")
+            .expect("FEMININITY skill must be registered");
+        world.player.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
+
+        let mut engine = SceneEngine::new(scenes);
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        // Simulate full workplace arc
+        'arc: for _ in 0..30 {
+            let Some(pick) = scheduler.pick_next(&world, &registry, &mut rng) else {
+                break;
+            };
+            let scene_id = pick.scene_id.clone();
+            if pick.once_only {
+                world.game_data.set_flag(&format!("ONCE_{}", scene_id));
+            }
+
+            engine.send(
+                EngineCommand::StartScene(scene_id.clone()),
+                &mut world,
+                &registry,
+            );
+
+            for _ in 0..10 {
+                let events = engine.drain();
+                if events
+                    .iter()
+                    .any(|e| matches!(e, EngineEvent::SceneFinished))
+                {
+                    break;
+                }
+                let available = events.iter().find_map(|e| {
+                    if let EngineEvent::ActionsAvailable(a) = e {
+                        Some(a.clone())
+                    } else {
+                        None
+                    }
+                });
+                match available {
+                    Some(actions) if !actions.is_empty() => {
+                        engine.send(
+                            EngineCommand::ChooseAction(actions[0].id.clone()),
+                            &mut world,
+                            &registry,
+                        );
+                    }
+                    _ => break,
+                }
+            }
+
+            if world.game_data.arc_state("base::workplace_opening") == Some("settled") {
+                break 'arc;
+            }
+        }
+
+        assert_eq!(
+            world.game_data.arc_state("base::workplace_opening"),
+            Some("settled"),
+            "arc should have reached settled"
+        );
+
+        let femininity = world.player.skill(fem_id);
+        assert!(
+            femininity >= 25,
+            "FEMININITY should be >= 25 after arc completion, got {}",
+            femininity
+        );
+    }
+
+    #[test]
     fn rain_shelter_npc_fires_and_umbrella_becomes_available() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");

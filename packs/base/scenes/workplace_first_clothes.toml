@@ -94,6 +94,11 @@ Boxes Monday. Work Monday. You're ahead of schedule, approximately.
   arc      = "base::workplace_opening"
   to_state = "clothes_done"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
   [[actions.next]]
   finish = true
 
@@ -129,6 +134,11 @@ You get dressed. You take what you need to the register.
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "clothes_done"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
 
   [[actions.next]]
   finish = true

@@ -70,6 +70,11 @@ You take the stairs.
   type = "set_game_flag"
   flag = "MET_LANDLORD"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
   [[actions.next]]
   finish = true
 
@@ -96,6 +101,11 @@ Unit 4B. Third floor. You thank him and find the stairs.
   [[actions.effects]]
   type = "set_game_flag"
   flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
 
   [[actions.next]]
   finish = true
@@ -124,6 +134,11 @@ He looks at your paperwork again, briefly, and then seems to give up on whatever
   [[npc_actions.effects]]
   type = "set_game_flag"
   flag = "MET_LANDLORD"
+
+  [[npc_actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
 
   [[npc_actions.next]]
   finish = true

@@ -120,5 +120,10 @@ You open Slack. Carter has already messaged you. You weren't wrong about that pa
   type = "set_game_flag"
   flag = "FIRST_MEETING_DONE"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
   [[actions.next]]
   finish = true

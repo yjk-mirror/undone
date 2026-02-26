@@ -93,6 +93,11 @@ Twenty-two minutes. You count the stops.
   arc      = "base::workplace_opening"
   to_state = "arrived"
 
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
   [[actions.next]]
   finish = true
 
@@ -124,6 +129,11 @@ You get out into the early spring cold and look at your building and think: *oka
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "arrived"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
 
   [[actions.next]]
   finish = true
