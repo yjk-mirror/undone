@@ -1,24 +1,133 @@
 [scene]
 id          = "base::work_standup"
 pack        = "base"
-description = "Monday standup. Status updates. Marcus."
+description = "Monday standup. Seven people. Someone explains your work back to you again."
 
 [intro]
 prose = """
-The standup circle forms at 9:05. Seven people. You give your update.
+The standup circle forms at 9:05. Seven people in the open floor, someone having dragged a chair over from the nearest desk to make the geometry work. Marcus is across from you. Kevin is to your left. Robin's not in yet — the empty chair has a jacket on it, which apparently counts.
+
+Status updates move clockwise. Carter leads, then Priya, then Devin from platform, each taking about ninety seconds and no more. The rhythm is familiar by now. You know who pads and who trims. You know who's listening and who's composing their own update behind polite eyes.
+
+The circle gets to you. Seven faces turn your way, mostly without meaning to. The update is a sentence and a half — you deployed the token service, you're waiting on platform sign-off before closing the branch — and you give it cleanly.
+
+Marcus nods once. Kevin doesn't look up from his phone.
 """
 
-[[actions]]
-id    = "stand_back"
-label = "Listen to the others"
+[[intro_variants]]
+condition = "w.hasTrait('ANALYTICAL')"
 prose = """
-Marcus gives his infrastructure update. You listen.
+The standup circle forms at 9:05. Seven people. You clock the room before anyone's said anything — Carter checking Slack while nodding at Priya's update, Devin with his arms crossed in a way that reads bored rather than hostile, Marcus genuinely listening. Kevin is running a count in his head, you can tell, just waiting for his turn.
+
+You've mapped the attention distribution in this circle over two weeks of standups. Marcus is the only one who consistently listens to other people's updates. Devin listens to infrastructure updates and nothing else. Carter is writing things in his notebook that aren't worth writing down.
+
+The circle gets to you. Seven faces turn your way. Token service deployed. Waiting on platform sign-off. One sentence and a half, nothing wasted.
+
+Marcus nods. Kevin looks up briefly, then back at his phone.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The standup circle forms at 9:05. Seven people. You're still calibrating where to stand in a circle of colleagues — not conspicuously, just the small adjustments that happen when the geometry is new. You end up two steps farther from the center than you need to be.
+
+Status updates go clockwise. Carter leads. Then Priya. Then Devin, who always runs a few seconds long on his platform updates, and no one ever mentions it. The circle is a piece of social machinery you haven't fully mapped yet — you know the people, you know the rhythms, but the version of yourself standing in it still needs occasional rechecks.
+
+The update gets to you. Token service deployed. Waiting on platform sign-off. You give it straight, and it comes out fine.
+
+Marcus nods once. Kevin doesn't look up from his phone.
+"""
+
+[[thoughts]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose = """
+*You hold yourself slightly smaller than you used to. You used to take up more space in these circles — both feet planted, elbows out, the body language of someone who doesn't think about body language. You notice the difference without deciding what it means.*
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "give_update"
+label  = "Give your status"
+detail = "Straight, clean, no hedging. The room hears it or it doesn't."
+prose  = """
+{% if w.hasTrait("ANALYTICAL") %}
+You give your update and watch who's hearing it versus who's waiting for their turn. The distinction is not subtle. Carter writes something down — that's reflex, not engagement. Devin's still on his phone. Marcus is in the first group, the one that's actually listening. He nods at the platform sign-off detail specifically, which means he knows something about the timeline that you don't. You file that.
+
+Kevin finally looks up from his phone when you finish. You can't tell if it was the content or just the timing.
+
+{% elif w.hasTrait("CONFIDENT") %}
+You give your update. No hedging, no qualifications — deployed, waiting on sign-off, that's the status. The room adjusts slightly, the way a room does when someone takes up the right amount of space. Kevin looks up from his phone. Marcus was already listening.
+
+You've been in enough standups to know that the update itself is almost never the thing. The thing is whether you own it when you say it. You do.
+
+{% else %}
+You give your update. Straight, clean — token service deployed, waiting on platform sign-off, nothing blocking. Marcus nods once. Kevin doesn't look up from his phone.
+
+The circle moves on to Kevin's update, which takes four minutes and involves a data pipeline migration that hasn't actually started yet.
+{% endif %}
 """
 
   [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "keep_it_brief"
+label  = "Keep it brief"
+detail = "Minimum viable update. Let the circle move."
+prose  = """
+Thirty seconds. Deployed. Waiting on sign-off. The circle moves to Kevin before anyone has a chance to ask a follow-up.
+
+{% if not w.alwaysFemale() %}
+*You used to take longer. Not because you had more to say.*
+{% endif %}
+
+Kevin's update runs four minutes. You listen to the first ninety seconds and then stop, which is the right amount of Kevin to absorb in a given standup. Marcus gives his infrastructure update in under a minute, with two concrete details and no padding, which is how you'd have done it too.
+
+The circle closes. Nine-eighteen. Everyone disperses back to their desks.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "ask_a_question"
+label  = "Ask Marcus something"
+detail = "His infrastructure update mentioned something worth following up on."
+prose  = """
+Marcus's update covered a load balancer migration you hadn't heard about, and you ask about it directly — not a social question, a real one, because the timing affects the platform sign-off you're waiting on and you want to know if it matters.
+
+He gives a real answer. Two minutes, no preamble, no condescension — the migration is on the staging environment this week and production next, which means your sign-off is probably fine but you should flag your timeline to Devin directly rather than waiting for the ticket to cycle through. He says it like that's already obvious, which it maybe should have been.
+
+The exchange lands correctly. Kevin has gone back to his phone. Carter writes something down.
+
+"Okay," you say. "I'll message Devin." And you mean it, because Marcus just saved you two days of waiting on a ticket that was going nowhere.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_DIALOGUE_1"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
 
   [[actions.next]]
   finish = true
