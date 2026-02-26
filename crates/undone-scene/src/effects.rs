@@ -1071,12 +1071,12 @@ mod tests {
         ctx.scene_id = Some("test::scene".into());
 
         let effect = EffectDef::AdvanceArc {
-            arc: "base::robin_opening".into(),
+            arc: "base::workplace_opening".into(),
             to_state: "week_one".into(),
         };
         apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
         assert_eq!(
-            world.game_data.arc_state("base::robin_opening"),
+            world.game_data.arc_state("base::workplace_opening"),
             Some("week_one")
         );
     }

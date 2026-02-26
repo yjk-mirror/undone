@@ -317,12 +317,12 @@ mod tests {
     fn new_game_sets_starting_flags() {
         let (mut registry, _) = load_packs(&packs_dir()).unwrap();
         let mut config = base_config();
-        config.starting_flags = ["ROUTE_ROBIN".to_string()].into();
+        config.starting_flags = ["ROUTE_WORKPLACE".to_string()].into();
         let mut rng = rand::rngs::SmallRng::seed_from_u64(42);
         let world = new_game(config, &mut registry, &mut rng);
         assert!(
-            world.game_data.has_flag("ROUTE_ROBIN"),
-            "ROUTE_ROBIN flag should be set"
+            world.game_data.has_flag("ROUTE_WORKPLACE"),
+            "ROUTE_WORKPLACE flag should be set"
         );
     }
 
@@ -332,11 +332,11 @@ mod tests {
         let mut config = base_config();
         config
             .starting_arc_states
-            .insert("base::robin_opening".to_string(), "arrived".to_string());
+            .insert("base::workplace_opening".to_string(), "arrived".to_string());
         let mut rng = rand::rngs::SmallRng::seed_from_u64(43);
         let world = new_game(config, &mut registry, &mut rng);
         assert_eq!(
-            world.game_data.arc_state("base::robin_opening"),
+            world.game_data.arc_state("base::workplace_opening"),
             Some("arrived")
         );
     }

@@ -595,10 +595,10 @@ mod tests {
         world
             .game_data
             .arc_states
-            .insert("base::robin_opening".to_string(), "working".to_string());
+            .insert("base::workplace_opening".to_string(), "working".to_string());
 
         let ctx = SceneCtx::new();
-        let template = r#"{% if gd.arcState("base::robin_opening") == "working" %}on-the-job{% else %}not-started{% endif %}"#;
+        let template = r#"{% if gd.arcState("base::workplace_opening") == "working" %}on-the-job{% else %}not-started{% endif %}"#;
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert!(
             result.contains("on-the-job"),
@@ -611,7 +611,7 @@ mod tests {
         let registry = undone_packs::PackRegistry::new();
         let world = make_world();
         let ctx = SceneCtx::new();
-        let template = r#"{% if gd.arcState("base::robin_opening") == "" %}not-started{% else %}started{% endif %}"#;
+        let template = r#"{% if gd.arcState("base::workplace_opening") == "" %}not-started{% else %}started{% endif %}"#;
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert!(
             result.contains("not-started"),

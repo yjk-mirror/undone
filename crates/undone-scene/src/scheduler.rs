@@ -217,7 +217,7 @@ impl Scheduler {
     ///    conditions are mutually exclusive by arc state and game flags.
     /// 2. Weighted random pick across all eligible events from all slots.
     ///    Each event's `condition` already gates it behind the appropriate
-    ///    route flags (e.g. `gd.hasGameFlag('ROUTE_ROBIN')`), so events from
+    ///    route flags (e.g. `gd.hasGameFlag('ROUTE_WORKPLACE')`), so events from
     ///    inactive arcs are naturally excluded without any special-casing here.
     ///
     /// Returns `None` if no eligible events exist in any slot.
@@ -799,7 +799,7 @@ mod tests {
             once_only: false,
             trigger: None,
         };
-        let route_condition = undone_expr::parse("gd.hasGameFlag('ROUTE_ROBIN')").unwrap();
+        let route_condition = undone_expr::parse("gd.hasGameFlag('ROUTE_WORKPLACE')").unwrap();
         let arc_event = ScheduleEvent {
             scene: "test::robin_scene".into(),
             condition: Some(route_condition),
@@ -809,7 +809,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![free_event]);
-        slots.insert("robin_opening".into(), vec![arc_event]);
+        slots.insert("workplace_opening".into(), vec![arc_event]);
         let scheduler = Scheduler { slots };
 
         // Without flag — only free_time eligible
@@ -825,7 +825,7 @@ mod tests {
 
         // With flag — arc slot also eligible; higher weight means it should win
         let mut world_with_flag = make_world();
-        world_with_flag.game_data.set_flag("ROUTE_ROBIN");
+        world_with_flag.game_data.set_flag("ROUTE_WORKPLACE");
         let mut rng2 = SmallRng::seed_from_u64(42);
         let r2 = scheduler
             .pick_next(&world_with_flag, &registry, &mut rng2)
