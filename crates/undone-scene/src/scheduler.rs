@@ -790,6 +790,38 @@ mod tests {
     }
 
     #[test]
+    #[test]
+    fn pick_next_workplace_first_clothes_reachable_at_week_one() {
+        // After fix: workplace_first_clothes must trigger on week_one (not workplace_first_day).
+        // workplace_first_day's trigger is moved to require clothes_done.
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas).unwrap();
+        let mut world = make_world();
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world.game_data.advance_arc("base::workplace_opening", "week_one");
+        // Simulate that the once_only scenes that precede week_one have already been played.
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_arrival");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_landlord");
+        world.game_data.set_flag("MET_LANDLORD");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_night");
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let result = scheduler.pick_next(&world, &registry, &mut rng);
+        assert!(result.is_some(), "should pick something at week_one");
+        assert_eq!(
+            result.unwrap().scene_id,
+            "base::workplace_first_clothes",
+            "workplace_first_clothes should trigger at week_one (not workplace_first_day)"
+        );
+    }
+
+    #[test]
     fn pick_next_arc_event_only_eligible_when_flag_set() {
         let registry = PackRegistry::new();
         let free_event = ScheduleEvent {

@@ -41,9 +41,9 @@ name = "workplace_opening"
 
   [[slot.events]]
   scene     = "base::workplace_landlord"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && !gd.hasGameFlag('MET_LANDLORD')"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived' && !gd.hasGameFlag('MET_LANDLORD')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && !gd.hasGameFlag('MET_LANDLORD')"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived' && !gd.hasGameFlag('MET_LANDLORD')"
   once_only = true
 
   [[slot.events]]
@@ -56,14 +56,15 @@ name = "workplace_opening"
   [[slot.events]]
   scene     = "base::workplace_first_clothes"
   condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
-  weight    = 10
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_first_day"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
+  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'clothes_done'"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
+  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'clothes_done'"
   once_only = true
 
   [[slot.events]]
