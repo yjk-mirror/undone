@@ -18,9 +18,24 @@
 
 ## ⚡ Next Action
 
-**Sprint 3: Campus arc prose polish** — See `docs/plans/2026-02-25-sprint-roadmap.md`.
+**Sprint 3: "Robin's Playable Loop"** — Build the minimum viable ongoing loop before expanding Camila or polishing prose.
 
-The 5 campus arc scenes (workplace_arrival through workplace_work_meeting analogs: camila_arrival, camila_dorm, camila_orientation, camila_library, camila_call_raul) still have prose issues from the 2026-02-25 writing audit. No FEMININITY increments are wired to campus arc either. Sprint 3 covers both.
+**The problem:** After the workplace arc ends (`settled`), there are only 3 universal scenes in rotation (morning_routine, coffee_shop, rain_shelter). That's a waiting room, not a game.
+
+**What Sprint 3 needs to deliver:**
+
+| Pool | Slot | Target scenes |
+|---|---|---|
+| Weekday / work | `work` slot, `settled` state | 5–6 new scenes |
+| Free time | `free_time` slot | +5 new scenes (currently 3) |
+| NPC thread — Jake | `MET_JAKE` gated | 2 follow-up scenes |
+| NPC thread — Marcus | `FIRST_MEETING_DONE` gated | 2 follow-up scenes |
+
+**Engine check before writing:** Verify whether NPC liking scores are accessible in scene conditions (e.g. `npc.liking('jake') >= 2`). If not, wire it — this is needed for relationship-gated scenes.
+
+**Plan doc:** `docs/plans/2026-02-26-sprint3-campus-catches-up.md` exists but is WRONG — it was written for Camila. Discard or overwrite it. The next session should write the correct Sprint 3 plan from scratch using `superpowers:writing-plans`.
+
+**Camila arc:** Deferred. Campus scenes still in third-person but that's lower priority than the playable loop.
 
 ### Remaining open items (post-Sprint 1)
 - **`plan_your_day` full rewrite** — placeholder stub. → Sprint 2.
