@@ -1,10 +1,10 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, ArousalLevel, BeforeIdentity, BreastSize, ButtSize, ClitSensitivity,
-    Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize, LipShape,
-    NippleSensitivity, PcOrigin, Player, PlayerFigure, PubicHairStyle, SkillValue, SkinTone,
-    TraitId, WaistSize, WetnessBaseline,
+    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BreastSize, ButtSize,
+    ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize,
+    LipShape, NaturalPubicHair, NippleSensitivity, PcOrigin, Player, PlayerFigure, PubicHairStyle,
+    SkillValue, SkinTone, TraitId, WaistSize, WetnessBaseline,
 };
 use undone_world::{GameData, World};
 
@@ -67,12 +67,14 @@ pub fn new_game<R: Rng>(
         hair_length: HairLength::Shoulder,
         skin_tone: SkinTone::Medium,
         complexion: Complexion::Normal,
+        appearance: Appearance::Average,
         butt: ButtSize::Round,
         waist: WaistSize::Average,
         lips: LipShape::Average,
         nipple_sensitivity: NippleSensitivity::Normal,
         clit_sensitivity: ClitSensitivity::Normal,
         pubic_hair: PubicHairStyle::Trimmed,
+        natural_pubic_hair: NaturalPubicHair::Full,
         inner_labia: InnerLabiaSize::Average,
         wetness_baseline: WetnessBaseline::Normal,
         traits,
@@ -194,6 +196,7 @@ mod tests {
                 eye_colour: EyeColour::Brown,
                 skin_tone: SkinTone::Medium,
                 penis_size: PenisSize::Average,
+                voice: undone_domain::BeforeVoice::Average,
                 traits: std::collections::HashSet::new(),
             }),
             starting_traits: vec![],
@@ -285,6 +288,7 @@ mod tests {
                 eye_colour: EyeColour::Brown,
                 skin_tone: SkinTone::Medium,
                 penis_size: PenisSize::Average,
+                voice: undone_domain::BeforeVoice::Average,
                 traits: std::collections::HashSet::new(),
             }),
             starting_traits: vec![],

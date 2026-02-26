@@ -1,8 +1,8 @@
 use crate::{
-    Age, AlcoholLevel, ArousalLevel, BeforeSexuality, BreastSize, ButtSize, ClitSensitivity,
-    Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize, LipShape, MaleFigure,
-    NippleSensitivity, PcOrigin, PenisSize, PlayerFigure, PubicHairStyle, SkillId, SkinTone,
-    StuffId, TraitId, WaistSize, WetnessBaseline,
+    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeSexuality, BeforeVoice, BreastSize,
+    ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height,
+    InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize,
+    PlayerFigure, PubicHairStyle, SkillId, SkinTone, StuffId, TraitId, WaistSize, WetnessBaseline,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -22,6 +22,7 @@ pub struct BeforeIdentity {
     pub eye_colour: EyeColour,
     pub skin_tone: SkinTone,
     pub penis_size: PenisSize,
+    pub voice: BeforeVoice,
     pub traits: HashSet<TraitId>,
 }
 
@@ -75,6 +76,7 @@ pub struct Player {
     pub hair_length: HairLength,
     pub skin_tone: SkinTone,
     pub complexion: Complexion,
+    pub appearance: Appearance,
     pub butt: ButtSize,
     pub waist: WaistSize,
     pub lips: LipShape,
@@ -83,6 +85,7 @@ pub struct Player {
     pub nipple_sensitivity: NippleSensitivity,
     pub clit_sensitivity: ClitSensitivity,
     pub pubic_hair: PubicHairStyle,
+    pub natural_pubic_hair: NaturalPubicHair,
     pub inner_labia: InnerLabiaSize,
     pub wetness_baseline: WetnessBaseline,
 
@@ -179,6 +182,7 @@ mod tests {
                 eye_colour: crate::EyeColour::Brown,
                 skin_tone: crate::SkinTone::Medium,
                 penis_size: crate::PenisSize::Average,
+                voice: crate::BeforeVoice::Average,
                 traits: HashSet::new(),
             }),
             age: Age::LateTeen,
@@ -191,12 +195,14 @@ mod tests {
             hair_length: crate::HairLength::Shoulder,
             skin_tone: crate::SkinTone::Medium,
             complexion: crate::Complexion::Normal,
+            appearance: crate::Appearance::Average,
             butt: crate::ButtSize::Round,
             waist: crate::WaistSize::Average,
             lips: crate::LipShape::Average,
             nipple_sensitivity: crate::NippleSensitivity::Normal,
             clit_sensitivity: crate::ClitSensitivity::Normal,
             pubic_hair: crate::PubicHairStyle::Trimmed,
+            natural_pubic_hair: crate::NaturalPubicHair::Full,
             inner_labia: crate::InnerLabiaSize::Average,
             wetness_baseline: crate::WetnessBaseline::Normal,
             traits: HashSet::new(),

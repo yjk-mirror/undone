@@ -6,8 +6,8 @@ use rand::SeedableRng;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::{
-    Age, BeforeIdentity, BeforeSexuality, BreastSize, EyeColour, HairColour, Height, MaleFigure,
-    PcOrigin, PenisSize, PlayerFigure, SkinTone,
+    Age, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, EyeColour, HairColour, Height,
+    MaleFigure, PcOrigin, PenisSize, PlayerFigure, SkinTone,
 };
 use undone_packs::char_creation::CharCreationConfig;
 
@@ -955,6 +955,7 @@ fn build_next_button(
                     eye_colour: EyeColour::Brown,
                     skin_tone: SkinTone::Medium,
                     penis_size: PenisSize::Average,
+                    voice: BeforeVoice::Average,
                     traits: std::collections::HashSet::new(),
                 });
                 let throwaway_config = CharCreationConfig {
@@ -1062,6 +1063,7 @@ fn build_begin_button(
                     eye_colour: EyeColour::Brown,
                     skin_tone: SkinTone::Medium,
                     penis_size: PenisSize::Average,
+                    voice: BeforeVoice::Average,
                     traits: std::collections::HashSet::new(),
                 })
             } else {

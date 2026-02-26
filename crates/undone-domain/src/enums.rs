@@ -407,6 +407,7 @@ impl std::fmt::Display for SkinTone {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Complexion {
     Clear,
+    Glowing,
     Normal,
     Rosy,
     Acne,
@@ -416,9 +417,33 @@ impl std::fmt::Display for Complexion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Complexion::Clear => write!(f, "Clear"),
+            Complexion::Glowing => write!(f, "Glowing"),
             Complexion::Normal => write!(f, "Normal"),
             Complexion::Rosy => write!(f, "Rosy"),
             Complexion::Acne => write!(f, "Acne"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Appearance {
+    Plain,
+    Average,
+    Attractive,
+    Beautiful,
+    Stunning,
+    Devastating,
+}
+
+impl std::fmt::Display for Appearance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Appearance::Plain => write!(f, "Plain"),
+            Appearance::Average => write!(f, "Average"),
+            Appearance::Attractive => write!(f, "Attractive"),
+            Appearance::Beautiful => write!(f, "Beautiful"),
+            Appearance::Stunning => write!(f, "Stunning"),
+            Appearance::Devastating => write!(f, "Devastating"),
         }
     }
 }
@@ -553,6 +578,25 @@ impl std::fmt::Display for PubicHairStyle {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NaturalPubicHair {
+    Full,
+    Sparse,
+    Minimal,
+    None,
+}
+
+impl std::fmt::Display for NaturalPubicHair {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NaturalPubicHair::Full => write!(f, "Full"),
+            NaturalPubicHair::Sparse => write!(f, "Sparse"),
+            NaturalPubicHair::Minimal => write!(f, "Minimal"),
+            NaturalPubicHair::None => write!(f, "None"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum InnerLabiaSize {
     Small,
     Average,
@@ -660,6 +704,23 @@ impl std::fmt::Display for LipShape {
 // ---------------------------------------------------------------------------
 // Before-life / male attribute enums
 // ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BeforeVoice {
+    Deep,
+    Average,
+    Light,
+}
+
+impl std::fmt::Display for BeforeVoice {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BeforeVoice::Deep => write!(f, "Deep"),
+            BeforeVoice::Average => write!(f, "Average"),
+            BeforeVoice::Light => write!(f, "Light"),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PenisSize {
