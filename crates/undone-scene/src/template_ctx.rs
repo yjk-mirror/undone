@@ -618,4 +618,79 @@ mod tests {
             "expected 'not-started' in '{result}'"
         );
     }
+
+    #[test]
+    fn getAppearance_in_template() {
+        let registry = undone_packs::PackRegistry::new();
+        let mut world = make_world();
+        world.player.appearance = Appearance::Stunning;
+        let ctx = SceneCtx::new();
+        let template = r#"{% if w.getAppearance() == "Stunning" %}wow{% else %}meh{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(result.contains("wow"), "expected 'wow' in '{result}'");
+    }
+
+    #[test]
+    fn beforeVoice_in_template() {
+        let registry = undone_packs::PackRegistry::new();
+        let mut world = make_world();
+        world.player.before.as_mut().unwrap().voice = BeforeVoice::Deep;
+        let ctx = SceneCtx::new();
+        let template = r#"{{ w.beforeVoice() }}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert_eq!(result.trim(), "Deep");
+    }
+
+    #[test]
+    fn hasSmoothLegs_true_with_naturally_smooth() {
+        let mut registry = undone_packs::PackRegistry::new();
+        registry.register_traits(vec![undone_packs::TraitDef {
+            id: "NATURALLY_SMOOTH".into(),
+            name: "Naturally Smooth".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        let trait_id = registry.resolve_trait("NATURALLY_SMOOTH").unwrap();
+        let mut world = make_world();
+        world.player.traits.insert(trait_id);
+
+        let ctx = SceneCtx::new();
+        let template = r#"{% if w.hasSmoothLegs() %}smooth{% else %}hairy{% endif %}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(result.contains("smooth"), "expected 'smooth' in '{result}'");
+    }
+
+    #[test]
+    fn getName_returns_active_name() {
+        let mut registry = undone_packs::PackRegistry::new();
+        registry.register_skills(vec![undone_packs::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "".into(),
+            min: 0,
+            max: 100,
+        }]);
+        let fem_id = registry.resolve_skill("FEMININITY").unwrap();
+        let mut world = make_world();
+        // FEMININITY = 10 → should use name_masc ("Evan")
+        world.player.skills.insert(
+            fem_id,
+            undone_domain::SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
+
+        let ctx = SceneCtx::new();
+        let template = r#"{{ w.getName() }}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert_eq!(result.trim(), "Evan");
+
+        // FEMININITY = 75 → should use name_fem ("Eva")
+        world.player.skills.get_mut(&fem_id).unwrap().value = 75;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert_eq!(result.trim(), "Eva");
+    }
 }
