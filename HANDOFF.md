@@ -3,23 +3,22 @@
 ## Current State
 
 **Branch:** `writing-pipeline` (worktree at `.worktrees/writing-pipeline`, branched from master at `3327b1b`)
-**Tests:** 204 passing, 0 failures.
+**Tests:** 208 passing, 0 failures.
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
-**Writing pipeline plan:** `docs/plans/2026-02-25-writing-pipeline.md` — 8 batches, Batches 0–3 complete.
-**Batches 0–3 done (4 commits on writing-pipeline):**
-- Batch 0: 3 new enums (Appearance/NaturalPubicHair/BeforeVoice), Complexion::Glowing, 3 new struct fields (Player.appearance, Player.natural_pubic_hair, BeforeIdentity.voice), save migration v4→v5 extended.
-- Batch 1: 4 new traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS), PLAIN/BEAUTIFUL removed (replaced by Appearance enum). **Note:** `coffee_shop.toml` and `rain_shelter.toml` still reference PLAIN/BEAUTIFUL — will error at load time until scene rewrite in Batch 7.
-- Batch 2: 6 new template+condition accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) in both template_ctx.rs and eval.rs.
-- Batch 3: 3 engine bugs fixed (once_only flag setting, stale action condition re-check, NPC action next branches).
-**Batches 4–8 remaining:**
-- Batch 4: Preset expansion (expand PresetData to lock all physical/sexual attributes, fully configure Robin, Appearance dropdown).
-- Batch 5–6: Content + Rust rename (robin→workplace, camila→campus — arcs, schedule, scene files, IDs, Rust test fixtures).
-- Batch 7: Scene prose rewrites (second-person, archetype-based references). Workplace scenes first, campus scenes deprioritized.
-- Batch 8: Documentation rewrites (character→preset docs, arc→archetype docs, writing tool updates, HANDOFF).
-**Audits complete:** Engineering (`docs/audits/2026-02-25-engineering-audit.md`), Writing & Design (`docs/audits/2026-02-25-writing-design-audit.md`), Arc Flow (`docs/audits/2026-02-25-arc-flow-audit.md`).
-**TRANS_WOMAN branches removed** from all 7 scene files that had them. Two-level pattern simplified to CisMale-only (`{% if not w.alwaysFemale() %}` with no `{% else %}`).
-**Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer, writing-samples all reflect CisMale-only focus + new physical/sexual attribute accessors. POV enforcement elevated to Critical, TRANS_WOMAN/AlwaysFemale branches flagged for removal.
-**Schema documented:** `docs/content-schema.md` — complete Pack→Schedule→Scene→Action→Effect reference + full physical attribute accessor table.
+**Writing pipeline plan:** `docs/plans/2026-02-25-writing-pipeline.md` — 9 batches (0–8), ALL COMPLETE.
+**All batches done (10 commits on writing-pipeline):**
+- Batch 0: 3 new enums (Appearance/NaturalPubicHair/BeforeVoice), Complexion::Glowing, 3 new struct fields.
+- Batch 1: 4 new traits, PLAIN/BEAUTIFUL removed (Appearance enum replaces).
+- Batch 2: 6 new template+condition accessors.
+- Batch 3: 3 engine bugs fixed (once_only, stale action condition, NPC action next branches).
+- Batch 4: PresetData expanded to ~40 fields, Robin fully configured (38 traits, all physical/sexual attributes), Appearance dropdown replaces BEAUTIFUL/PLAIN checkboxes.
+- Batch 5: Content rename — all scene files, arcs.toml, schedule.toml from character-specific to archetype-based (robin→workplace, camila→campus).
+- Batch 6: Rust test fixtures and comments updated to archetype-based names.
+- Batch 7: All 7 workplace scenes rewritten to second-person present tense (parallel scene-writer agents), `{% else %}` AlwaysFemale branches stripped, morning_routine.toml ambiguous "her" fixed. Zero Criticals from writing-reviewer audits.
+- Batch 8: Documentation rewrite — `docs/characters/` → `docs/presets/` (robin.md, camila.md), `docs/arcs/` renamed (workplace-opening.md, campus-opening.md), writing tools updated with new accessors+traits.
+**Audits complete:** Engineering, Writing & Design, Arc Flow (see `docs/audits/`).
+**TRANS_WOMAN branches removed** from all scene files. CisMale-only pattern: `{% if not w.alwaysFemale() %}` with no `{% else %}`.
+**Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer all updated with new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) and traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS).
 
 ---
 

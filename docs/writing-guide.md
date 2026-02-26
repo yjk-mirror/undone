@@ -467,6 +467,10 @@ set at character creation and remain stable unless explicitly changed by a scene
 | HairColour | `w.getHairColour()` | |
 | PlayerFigure | `w.getFigure()` | 7 variants |
 | BreastSize | `w.getBreasts()` | 7 variants |
+| Appearance | `w.getAppearance()` | Plain → Devastating (6 tiers) |
+| NaturalPubicHair | `w.getNaturalPubicHair()` | Bare → Heavy (5 tiers) |
+| ActiveName | `w.getName()` | Selects masc/androg/fem name by FEMININITY |
+| SmoothLegs | `w.hasSmoothLegs()` | true if NATURALLY_SMOOTH or SMOOTH_LEGS |
 | PenisSize | `w.beforePenisSize()` | On BeforeIdentity only |
 
 **Before-body accessors** (what she looked like before transformation — use inside
@@ -480,6 +484,8 @@ set at character creation and remain stable unless explicitly changed by a scene
 | SkinTone | `w.beforeSkinTone()` |
 | PenisSize | `w.beforePenisSize()` |
 | Figure | `w.beforeFigure()` |
+| Name | `w.beforeName()` |
+| Voice | `w.beforeVoice()` | High, Average, Deep, VeryDeep |
 
 **Usage notes:**
 - Use physical attributes to add specificity to body-awareness moments — but sparingly.

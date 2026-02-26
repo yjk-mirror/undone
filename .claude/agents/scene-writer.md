@@ -15,7 +15,7 @@ Always read the following files first if you haven't in this session:
 - `docs/writing-guide.md` — the complete prose standard. This is law.
 - `docs/writing-samples.md` — reference examples of the voice
 - An existing scene from `packs/base/scenes/` for format reference (e.g. `rain_shelter.toml`)
-- Any relevant character docs in `docs/characters/` if writing an NPC scene
+- Any relevant preset docs in `docs/presets/` if writing a preset-specific scene
 - Any relevant arc docs in `docs/arcs/` if writing within an arc
 
 ## The Voice
@@ -89,7 +89,7 @@ Pick 2–4 traits where the trait genuinely changes whether this situation is en
 Prose uses Minijinja (Jinja2). Conditions use the custom expression language (not Minijinja).
 
 **Template objects:**
-- `w`: `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `isVirgin()`, `alwaysFemale()`, `isSingle()`, `wasMale()`, `wasTransformed()`, `pcOrigin()`
+- `w`: `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `isVirgin()`, `alwaysFemale()`, `isSingle()`, `wasMale()`, `wasTransformed()`, `pcOrigin()`, `getName()`, `getAppearance()`, `getNaturalPubicHair()`, `hasSmoothLegs()`, `beforeName()`, `beforeVoice()`
 - `gd`: `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()`, `isWeekend()`
 - `scene`: `hasFlag("FLAG")`
 
@@ -125,7 +125,7 @@ prose = """
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('TRANS_WOMAN')"
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
 prose = """...variant intro overrides default if condition matches..."""
 
 [[thoughts]]
@@ -207,13 +207,19 @@ prose = """..."""
 - `w.getLips()` → `"Thin"` | `"Average"` | `"Full"` | `"Plush"` | `"BeeStung"`
 
 **Appearance:**
+- `w.getAppearance()` → `"Plain"` | `"Average"` | `"Attractive"` | `"Beautiful"` | `"Stunning"` | `"Devastating"`
 - `w.getHairColour()`, `w.getHairLength()`, `w.getEyeColour()`, `w.getSkinTone()`, `w.getComplexion()`
+- `w.getName()` → active display name (selects masc/androg/fem by FEMININITY level)
+- `w.getNaturalPubicHair()` → `"Bare"` | `"Sparse"` | `"Moderate"` | `"Full"` | `"Heavy"`
+- `w.hasSmoothLegs()` → `true` if player has `NATURALLY_SMOOTH` or `SMOOTH_LEGS` trait
 
 **Sexual attributes:**
 - `w.getNippleSensitivity()`, `w.getClitSensitivity()`, `w.getPubicHair()`, `w.getInnerLabia()`, `w.getWetness()`
 
 **Before-life (use inside `{% if not w.alwaysFemale() %}` blocks only):**
 - `w.beforeHeight()`, `w.beforeHairColour()`, `w.beforeEyeColour()`, `w.beforeSkinTone()`, `w.beforePenisSize()`, `w.beforeFigure()`
+- `w.beforeName()` → before-identity name string
+- `w.beforeVoice()` → `"High"` | `"Average"` | `"Deep"` | `"VeryDeep"`
 
 ---
 
@@ -227,9 +233,9 @@ prose = """..."""
 
 **body_detail:** `LONG_LEGS`, `WIDE_HIPS`, `NARROW_WAIST`, `BROAD_SHOULDERS`, `LONG_NECK`, `SMALL_HANDS`, `LARGE_HANDS`, `PRONOUNCED_COLLARBONES`, `THIGH_GAP`, `NO_THIGH_GAP`, `DIMPLES`, `BEAUTY_MARK`
 
-**skin:** `SOFT_SKIN`, `FRECKLED`, `SCARRED`, `TATTOOED`, `STRETCH_MARKS`, `SMOOTH_LEGS`
+**skin:** `SOFT_SKIN`, `FRECKLED`, `SCARRED`, `TATTOOED`, `STRETCH_MARKS`, `SMOOTH_LEGS`, `NATURALLY_SMOOTH`
 
-**scent:** `SWEET_SCENT`, `MUSKY_SCENT`, `CLEAN_SCENT`
+**scent:** `SWEET_SCENT`, `MUSKY_SCENT`, `CLEAN_SCENT`, `INTOXICATING_SCENT`
 
 **sexual:** `HAIR_TRIGGER`, `SQUIRTER`, `MULTI_ORGASMIC`, `ANORGASMIC`, `ORAL_FIXATION`, `SENSITIVE_NECK`, `SENSITIVE_EARS`, `SENSITIVE_INNER_THIGHS`, `LIKES_PAIN`, `LOUD`, `QUIET_COMER`, `EXHIBITIONIST`, `SUBMISSIVE`, `DOMINANT`, `PRAISE_KINK`, `DEGRADATION_KINK`, `SIZE_QUEEN`, `EASILY_WET`, `SLOW_TO_WARM`, `VOCAL_DIRTY_TALKER`, `BACK_ARCHER`, `TOE_CURLER`, `CRIER`, `GUSHER`, `CREAMER`
 
@@ -244,4 +250,6 @@ prose = """..."""
 
 **fertility:** `VERY_FERTILE`, `INFERTILE`
 
-**menstruation:** `HEAVY_PERIODS`, `LIGHT_PERIODS`, `IRREGULAR`
+**menstruation:** `HEAVY_PERIODS`, `LIGHT_PERIODS`, `IRREGULAR`, `REGULAR_PERIODS`
+
+**body_special:** `HEAVY_SQUIRTER`

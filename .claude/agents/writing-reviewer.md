@@ -155,12 +155,14 @@ Valid physical/appearance accessors:
 - `w.getHeight()`, `w.getFigure()`, `w.getBreasts()`, `w.getButt()`, `w.getWaist()`
 - `w.getLips()`, `w.getHairColour()`, `w.getHairLength()`, `w.getEyeColour()`, `w.getSkinTone()`, `w.getComplexion()`
 - `w.getRace()`, `w.getAge()`
+- `w.getAppearance()`, `w.getNaturalPubicHair()`, `w.getName()`, `w.hasSmoothLegs()`
 
 Valid sexual/sensitivity accessors:
 - `w.getNippleSensitivity()`, `w.getClitSensitivity()`, `w.getPubicHair()`, `w.getInnerLabia()`, `w.getWetness()`
 
 Valid "before" accessors (pre-transformation body):
 - `w.beforeHeight()`, `w.beforeHairColour()`, `w.beforeEyeColour()`, `w.beforeSkinTone()`, `w.beforePenisSize()`, `w.beforeFigure()`
+- `w.beforeName()`, `w.beforeVoice()`
 
 If you see any other `w.get*()` or `w.before*()` pattern not listed here, flag it as Critical with the exact call quoted.
 
@@ -192,8 +194,10 @@ The following new trait groups are now available for scene branching. Scenes do 
 
 - Hair texture: `STRAIGHT_HAIR`, `WAVY_HAIR`, `CURLY_HAIR`, `COILY_HAIR`
 - Voice: `SOFT_VOICE`, `HUSKY_VOICE`, `HIGH_VOICE`, `LOW_VOICE`
-- Sexual traits: `SENSITIVE_NIPPLES`, `DEEP_CLITORIS`, `LARGE_INNER_LABIA`, `STAYS_WET`
+- Sexual traits: `SENSITIVE_NIPPLES`, `DEEP_CLITORIS`, `LARGE_INNER_LABIA`, `STAYS_WET`, `HEAVY_SQUIRTER`
 - Sexual preferences: `LIKES_ROUGH`, `LIKES_GENTLE`, `LIKES_ORAL`, `PREFERS_RECEIVING`
+- Skin/body: `NATURALLY_SMOOTH` (check with `w.hasSmoothLegs()`), `INTOXICATING_SCENT`
+- Menstruation: `REGULAR_PERIODS`
 
 Flag as Minor with a brief note: "Scene touches [relevant body part / sexual dynamic] — `SENSITIVE_NIPPLES` / `LIKES_ROUGH` branch possible here."
 
