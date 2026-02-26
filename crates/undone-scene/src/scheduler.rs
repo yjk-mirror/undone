@@ -790,7 +790,6 @@ mod tests {
     }
 
     #[test]
-    #[test]
     fn pick_next_workplace_first_clothes_reachable_at_week_one() {
         // After fix: workplace_first_clothes must trigger on week_one (not workplace_first_day).
         // workplace_first_day's trigger is moved to require clothes_done.
@@ -798,18 +797,14 @@ mod tests {
         let scheduler = load_schedule(&metas).unwrap();
         let mut world = make_world();
         world.game_data.set_flag("ROUTE_WORKPLACE");
-        world.game_data.advance_arc("base::workplace_opening", "week_one");
+        world
+            .game_data
+            .advance_arc("base::workplace_opening", "week_one");
         // Simulate that the once_only scenes that precede week_one have already been played.
-        world
-            .game_data
-            .set_flag("ONCE_base::workplace_arrival");
-        world
-            .game_data
-            .set_flag("ONCE_base::workplace_landlord");
+        world.game_data.set_flag("ONCE_base::workplace_arrival");
+        world.game_data.set_flag("ONCE_base::workplace_landlord");
         world.game_data.set_flag("MET_LANDLORD");
-        world
-            .game_data
-            .set_flag("ONCE_base::workplace_first_night");
+        world.game_data.set_flag("ONCE_base::workplace_first_night");
         let mut rng = SmallRng::seed_from_u64(42);
 
         let result = scheduler.pick_next(&world, &registry, &mut rng);
