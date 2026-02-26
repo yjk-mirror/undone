@@ -157,6 +157,11 @@ His hand is warm and bigger than yours, and the handshake lasts exactly the righ
   flag = "MET_JAKE"
 
   [[actions.effects]]
+  type = "set_npc_role"
+  npc  = "m"
+  role = "ROLE_JAKE"
+
+  [[actions.effects]]
   type = "set_game_flag"
   flag = "COFFEE_SHOP_VISITED"
 

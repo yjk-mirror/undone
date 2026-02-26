@@ -121,6 +121,11 @@ You open Slack. Carter has already messaged you. You weren't wrong about that pa
   flag = "FIRST_MEETING_DONE"
 
   [[actions.effects]]
+  type = "set_npc_role"
+  npc  = "m"
+  role = "ROLE_MARCUS"
+
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 3

@@ -1,0 +1,24 @@
+[scene]
+id          = "base::work_standup"
+pack        = "base"
+description = "Monday standup. Status updates. Marcus."
+
+[intro]
+prose = """
+The standup circle forms at 9:05. Seven people. You give your update.
+"""
+
+[[actions]]
+id    = "stand_back"
+label = "Listen to the others"
+prose = """
+Marcus gives his infrastructure update. You listen.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true

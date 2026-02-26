@@ -624,6 +624,23 @@ pub fn eval_call_string(
                 let arc_id = str_arg(0)?;
                 Ok(world.game_data.arc_state(arc_id).unwrap_or("").to_string())
             }
+            "npcLiking" => {
+                let role = str_arg(0)?;
+                let liking = world
+                    .male_npcs
+                    .values()
+                    .find(|npc| npc.core.roles.contains(role))
+                    .map(|npc| npc.core.pc_liking.to_string())
+                    .or_else(|| {
+                        world
+                            .female_npcs
+                            .values()
+                            .find(|npc| npc.core.roles.contains(role))
+                            .map(|npc| npc.core.pc_liking.to_string())
+                    })
+                    .unwrap_or_else(|| "Neutral".to_string());
+                Ok(liking)
+            }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "gd".into(),
                 method: call.method.clone(),
@@ -1304,5 +1321,15 @@ mod tests {
         }]);
         let expr = parse("w.hadTraitBefore('SHY')").unwrap();
         assert!(!eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_npcLiking_returns_neutral_when_role_not_found() {
+        let world = make_world();
+        let reg = undone_packs::PackRegistry::new();
+        let ctx = SceneCtx::new();
+        // No NPC with ROLE_NOBODY exists — should return "Neutral"
+        let expr = parse("gd.npcLiking('ROLE_NOBODY') == 'Neutral'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
     }
 }

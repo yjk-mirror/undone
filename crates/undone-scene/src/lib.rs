@@ -216,6 +216,8 @@ mod integration_tests {
         // Start world with ROUTE_WORKPLACE flag (what the Robin preset provides)
         let mut world = make_world_with_shy(&registry);
         world.game_data.set_flag("ROUTE_WORKPLACE");
+        // Spawn a male NPC (Marcus stand-in) so scenes with set_npc_role / add_npc_liking work
+        let male_npc_key = world.male_npcs.insert(make_male_npc());
 
         let mut engine = SceneEngine::new(scenes);
         let mut rng = SmallRng::seed_from_u64(42);
@@ -240,6 +242,12 @@ mod integration_tests {
 
             engine.send(
                 EngineCommand::StartScene(scene_id.clone()),
+                &mut world,
+                &registry,
+            );
+            // Wire in the male NPC so effects like set_npc_role and add_npc_liking work
+            engine.send(
+                EngineCommand::SetActiveMale(male_npc_key),
                 &mut world,
                 &registry,
             );
@@ -402,6 +410,37 @@ mod integration_tests {
     }
 
     #[test]
+    fn work_slot_fires_when_settled() {
+        use crate::scheduler::load_schedule;
+        use rand::rngs::SmallRng;
+        use rand::SeedableRng;
+
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas).unwrap();
+
+        let mut world = make_world_with_shy(&registry);
+        // Set arc to settled state (post-arc)
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .arc_states
+            .insert("base::workplace_opening".to_string(), "settled".to_string());
+        world.game_data.week = 3;
+
+        // The work slot should produce at least one eligible event with the settled arc state.
+        let mut rng = SmallRng::seed_from_u64(42);
+        let result = scheduler.pick("work", &world, &registry, &mut rng);
+        assert!(
+            result.is_some(),
+            "No work scene scheduled in settled state — work slot missing or conditions wrong"
+        );
+        assert!(
+            result.unwrap().scene_id.starts_with("base::work_"),
+            "Scheduled scene should start with 'base::work_'"
+        );
+    }
+
+    #[test]
     fn rain_shelter_npc_fires_and_umbrella_becomes_available() {
         let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
@@ -465,5 +504,24 @@ mod integration_tests {
 
         // NPC pc_liking should have increased by 1 step (Neutral → Ok)
         assert_eq!(world.male_npcs[npc_key].core.pc_liking, LikingLevel::Ok);
+    }
+
+    #[test]
+    fn gd_npcLiking_returns_liking_for_npc_with_role() {
+        use undone_expr::{eval, parser::parse, SceneCtx};
+        let (registry, _metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let mut world = make_world_with_shy(&registry);
+        let ctx = SceneCtx::new();
+
+        // Assign ROLE_TEST to one male NPC and set its liking to Ok
+        let key = world.male_npcs.insert(make_male_npc());
+        world.male_npcs[key].core.pc_liking = LikingLevel::Ok;
+        world.male_npcs[key]
+            .core
+            .roles
+            .insert("ROLE_TEST".to_string());
+
+        let expr = parse("gd.npcLiking('ROLE_TEST') == 'Ok'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &registry).unwrap());
     }
 }
