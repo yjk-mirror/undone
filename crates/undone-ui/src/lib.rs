@@ -133,7 +133,6 @@ pub struct NpcSnapshot {
     pub pc_attraction: String,
 }
 
-
 pub fn app_view() -> impl View {
     let signals = AppSignals::new();
 

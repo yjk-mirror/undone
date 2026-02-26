@@ -1137,7 +1137,13 @@ mod tests {
         let mut ctx = SceneCtx::new();
         let registry = make_registry_with_femininity();
         let fem_id = registry.resolve_skill("FEMININITY").unwrap();
-        world.player.skills.insert(fem_id, SkillValue { value: 10, modifier: 0 });
+        world.player.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
 
         let effect = EffectDef::SkillIncrease {
             skill: "FEMININITY".into(),
@@ -1155,7 +1161,13 @@ mod tests {
         let mut ctx = SceneCtx::new();
         let registry = make_registry_with_femininity();
         let fem_id = registry.resolve_skill("FEMININITY").unwrap();
-        world.player.skills.insert(fem_id, SkillValue { value: 10, modifier: 0 });
+        world.player.skills.insert(
+            fem_id,
+            SkillValue {
+                value: 10,
+                modifier: 0,
+            },
+        );
 
         let effect = EffectDef::SkillIncrease {
             skill: "FEMININITY".into(),

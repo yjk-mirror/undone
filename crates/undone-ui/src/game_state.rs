@@ -115,11 +115,7 @@ pub fn init_game() -> PreGameState {
     let scheduler = match load_schedule(&metas) {
         Ok(s) => s,
         Err(e) => {
-            return failed_pre(
-                registry,
-                scenes,
-                format!("Schedule load error: {e}"),
-            );
+            return failed_pre(registry, scenes, format!("Schedule load error: {e}"));
         }
     };
 
