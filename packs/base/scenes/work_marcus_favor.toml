@@ -1,0 +1,104 @@
+[scene]
+id          = "base::work_marcus_favor"
+pack        = "base"
+description = "Marcus messages: can you look at this spec? Not a big ask. Just an ask."
+
+[intro]
+prose = """
+The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
+
+The link goes to a twelve-page infrastructure spec. You open it and spend thirty seconds skimming the structure. Section headers, latency assumptions, a rollback plan on page nine, a dependency diagram that's going to need to be explained to at least four people. This is not a ten-minute ask.
+
+You send back: "Sure — give me a bit." He doesn't reply. He assumed you'd just look at it.
+"""
+
+[[intro_variants]]
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+prose = """
+The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
+
+You read the message twice. An ask, not an assignment. No deadline in it, no CC'd manager, no implication that this is already on your plate and he's waiting for confirmation. Just a colleague seeing if you have time.
+
+You file that and open the spec.
+
+Twelve pages. Infrastructure. The rollback plan is on page nine and is going to be a problem. You send back: "Sure — give me a bit." He doesn't reply. He just assumed you'd look.
+"""
+
+# ── Actions ────────────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "review_and_comment"
+label  = "Give it real attention"
+detail = "Forty minutes. Two structural concerns, one thing he got right that nobody will catch."
+prose  = """
+You spend forty minutes on it.
+
+Your comments are specific. The latency assumptions in section four don't account for the weekend load pattern — whoever wrote the benchmarks ran them on a Tuesday. The rollback plan assumes state recovery time that's optimistic by about forty percent under realistic failure conditions. And in section seven, there's an architectural choice that the rest of the team is going to dismiss on sight, and they'll be wrong to. You flag all three.
+
+He responds the same day with three lines. Concedes on the latency section without argument — he knows. Concedes on the rollback timeline and adds a number to justify his original estimate that is, in fact, better than your number. Pushes back on the section seven note with a detail about how the data layer is actually structured, which changes your read of it.
+
+Four messages total. You come out of it with an updated position on two out of three points, which is what a useful technical conversation produces. You close the thread and get back to what you were doing.
+
+{% if not w.alwaysFemale() %}
+*This is what it used to look like*, you think, and then correct yourself — not used to look like. Still looks like. Same conversation. Different person in it.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "REVIEWED_MARCUS_SPEC"
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "quick_pass"
+label  = "Skim it, leave two comments"
+detail = "Twenty minutes. Efficient."
+prose  = """
+You skim the spec in twenty minutes, surfacing two high-level comments — the kind that signal you read it without proving how carefully. One on the latency section, one on the rollback assumptions. Both defensible. Neither goes deep enough to catch the section seven thing, which you clock and don't flag.
+
+He messages back: "Thanks." Professional. Enough.
+
+{% if not w.alwaysFemale() %}
+*You used to do the full read*, you think, scrolling back to your own work. You're not sure if this was efficiency or something else you're doing differently now without having decided to.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "decline"
+label  = "Tell him you're buried"
+detail = "Honest. He'll understand."
+prose  = """
+You send back: "Buried this week — can you give it to Priya? She'd have better context on the latency piece anyway."
+
+He responds: "Fair."
+
+That's the whole exchange. No friction, no hedge, no follow-up. You close the notification and get back to what you were doing.
+"""
+
+  [[actions.next]]
+  finish = true
