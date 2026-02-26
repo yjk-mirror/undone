@@ -121,22 +121,6 @@ hidden      = false
 group       = "attitude"
 
 [[trait]]
-id          = "PLAIN"
-name        = "Plain"
-description = "A modelling career is out of the question."
-hidden      = false
-group       = "appearance"
-conflicts   = ["BEAUTIFUL"]
-
-[[trait]]
-id          = "BEAUTIFUL"
-name        = "Beautiful"
-description = "Draws attention wherever she goes."
-hidden      = false
-group       = "appearance"
-conflicts   = ["PLAIN"]
-
-[[trait]]
 id          = "BLOCK_ROUGH"
 name        = "Block Rough Content"
 description = "Player preference: no rough or non-consensual content."
@@ -420,7 +404,14 @@ group       = "skin"
 [[trait]]
 id          = "SMOOTH_LEGS"
 name        = "Smooth Legs"
-description = "Always shaved. High maintenance."
+description = "Smooth, hair-free legs — maintained through shaving or waxing, not natural."
+hidden      = false
+group       = "skin"
+
+[[trait]]
+id          = "NATURALLY_SMOOTH"
+name        = "Naturally Smooth"
+description = "Little to no body hair anywhere — a naturally hairless body."
 hidden      = false
 group       = "skin"
 
@@ -451,6 +442,13 @@ description = "Soap, shampoo, freshly showered."
 hidden      = false
 group       = "scent"
 
+[[trait]]
+id          = "INTOXICATING_SCENT"
+name        = "Intoxicating Scent"
+description = "Something about how you smell makes men lean in. An effect, not a specific fragrance."
+hidden      = false
+group       = "scent"
+
 # ---------------------------------------------------------------------------
 # sexual — sexual response traits
 # ---------------------------------------------------------------------------
@@ -467,6 +465,13 @@ conflicts   = ["ANORGASMIC"]
 id          = "SQUIRTER"
 name        = "Squirter"
 description = "Gushes when she cums. Soaks the sheets."
+hidden      = false
+group       = "sexual"
+
+[[trait]]
+id          = "HEAVY_SQUIRTER"
+name        = "Heavy Squirter"
+description = "Squirting isn't subtle — it's dramatic, drenching, and unmistakable."
 hidden      = false
 group       = "sexual"
 
@@ -922,6 +927,13 @@ conflicts   = ["HEAVY_PERIODS"]
 id          = "IRREGULAR"
 name        = "Irregular"
 description = "Unpredictable."
+hidden      = false
+group       = "menstruation"
+
+[[trait]]
+id          = "REGULAR_PERIODS"
+name        = "Regular Periods"
+description = "Predictable cycle, no surprises."
 hidden      = false
 group       = "menstruation"
 
