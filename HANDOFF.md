@@ -2,60 +2,43 @@
 
 ## Current State
 
-**Branch:** `writing-pipeline` (worktree at `.worktrees/writing-pipeline`, branched from master at `3327b1b`)
+**Branch:** `master`
 **Tests:** 208 passing, 0 failures.
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
-**Writing pipeline plan:** `docs/plans/2026-02-25-writing-pipeline.md` — 9 batches (0–8), ALL COMPLETE.
-**All batches done (10 commits on writing-pipeline):**
-- Batch 0: 3 new enums (Appearance/NaturalPubicHair/BeforeVoice), Complexion::Glowing, 3 new struct fields.
-- Batch 1: 4 new traits, PLAIN/BEAUTIFUL removed (Appearance enum replaces).
-- Batch 2: 6 new template+condition accessors.
-- Batch 3: 3 engine bugs fixed (once_only, stale action condition, NPC action next branches).
-- Batch 4: PresetData expanded to ~40 fields, Robin fully configured (38 traits, all physical/sexual attributes), Appearance dropdown replaces BEAUTIFUL/PLAIN checkboxes.
-- Batch 5: Content rename — all scene files, arcs.toml, schedule.toml from character-specific to archetype-based (robin→workplace, camila→campus).
-- Batch 6: Rust test fixtures and comments updated to archetype-based names.
-- Batch 7: All 7 workplace scenes rewritten to second-person present tense (parallel scene-writer agents), `{% else %}` AlwaysFemale branches stripped, morning_routine.toml ambiguous "her" fixed. Zero Criticals from writing-reviewer audits.
-- Batch 8: Documentation rewrite — `docs/characters/` → `docs/presets/` (robin.md, camila.md), `docs/arcs/` renamed (workplace-opening.md, campus-opening.md), writing tools updated with new accessors+traits.
+**Writing pipeline plan:** `docs/plans/2026-02-25-writing-pipeline.md` — 9 batches (0–8), ALL COMPLETE. Merged to master.
 **Audits complete:** Engineering, Writing & Design, Arc Flow (see `docs/audits/`).
 **TRANS_WOMAN branches removed** from all scene files. CisMale-only pattern: `{% if not w.alwaysFemale() %}` with no `{% else %}`.
+**Archetype-based naming:** robin_* → workplace_*, camila_* → campus_*. Scene files, arcs.toml, schedule.toml, Rust test fixtures all updated.
+**All prose second-person present tense.** 7 workplace scenes + morning_routine rewritten. Zero third-person PC narration.
+**Preset docs:** `docs/presets/robin.md`, `docs/presets/camila.md`. Character docs removed (`docs/characters/` deleted).
+**Arc docs:** `docs/arcs/workplace-opening.md`, `docs/arcs/campus-opening.md`.
 **Writing toolchain updated:** writing-guide, scene-writer, writing-reviewer all updated with new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) and traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS).
 
 ---
 
 ## ⚡ Next Action
 
-**Continue writing-pipeline plan from Batch 4.** Plan at `docs/plans/2026-02-25-writing-pipeline.md`.
+Writing pipeline complete. Pick from open items below.
 
-### Immediate — Batch 4: Preset expansion
-- Expand PresetData to lock ALL physical/sexual attributes (currently only identity fields)
-- Fully configure Robin preset (all 40+ fields)
-- Expand CharCreationConfig with new fields, wire through new_game()
-- Add Appearance dropdown to char creation UI for custom characters
-
-### Then — Batches 5–8
-- Batch 5–6: Rename robin→workplace, camila→campus (arcs, schedule, scene files, IDs, Rust test fixtures)
-- Batch 7: Rewrite all scene prose to second-person (scene-writer agents)
-- Batch 8: Documentation rewrites
-
-### Remaining engine bugs (not fixed by Batch 3)
+### Remaining engine bugs
 4. **`add_npc_liking npc = "m"` silently fails** — no active NPC set before `coffee_shop`/`rain_shelter`. See arc flow audit B3.
 
 ### Schedule/reachability
-5. **`robin_first_clothes` unreachable** — `robin_first_day` trigger always fires first. Restructure `week_one` state. See arc flow audit R1.
-6. **`robin_landlord` trigger doesn't check arc state** — uses only game flags, inconsistent with other arc scenes.
+5. **`workplace_first_clothes` unreachable** — `workplace_first_day` trigger always fires first. Restructure `week_one` state. See arc flow audit R1.
+6. **`workplace_landlord` trigger doesn't check arc state** — uses only game flags, inconsistent with other arc scenes.
 
 ### Content (CisMale-only)
 7. **`plan_your_day` full rewrite** — placeholder stub.
 8. **FEMININITY never increments** — no scene has `skill_increase FEMININITY`. FEMININITY branching is unreachable.
-9. **Post-arc content void** — `settled` (Robin) and `first_week` (Camila) have zero scenes. 3-scene free_time loop.
-10. **Staccato/over-naming cleanup** — scattered AI prose artifacts.
+9. **Post-arc content void** — `settled` (workplace) and `first_week` (campus) have zero scenes. 3-scene free_time loop.
+10. **Prose polish pass** — writing-reviewer flagged Important items across workplace scenes (staccato closers, adjective-swap branches, emotion announcements, over-naming). No Criticals.
 11. **Free_time expansion** — more universal scenes needed.
-12. **Character docs missing** — 13 named NPCs have no character docs (Marcus name collision, David, Jake, Frank, etc.).
+12. **NPC character docs missing** — 13 named NPCs have no character docs (Marcus name collision, David, Jake, Frank, etc.).
 
 ### Design debt
-13. **Presets as pack data** — `PRESET_ROBIN` / `PRESET_RAUL` are static Rust structs. Should load from TOML.
+13. **Presets as pack data** — `PRESET_WORKPLACE` / `PRESET_CAMPUS` are static Rust structs. Should load from TOML.
 14. **Custom character starting scenario** — freeform, no arc scenes. Deferred.
-15. **Test fixture DRY** — 8+ nearly identical `make_world()`/`make_player()` test helpers across crates (domain, packs, expr, scene/engine, scene/scheduler, scene/effects, scene/template_ctx, scene/lib, save, ui/lib). Every new Player/BeforeIdentity field requires updating all of them. Fix: create a `test-fixtures` dev-dependency crate with a shared `make_player()` + `make_world()`. Not urgent but saves friction on every future schema change.
+15. **Test fixture DRY** — 8+ nearly identical `make_world()`/`make_player()` test helpers across crates. Fix: create a `test-fixtures` dev-dependency crate with shared helpers.
 
 ### Writing sessions — no compilation needed
 For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
@@ -160,6 +143,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-25 | Writing pipeline Batches 4–8 (worktree: writing-pipeline). Batch 4: PresetData expanded to ~40 fields, Robin fully configured (38 traits, all physical/sexual attributes), Appearance dropdown replaces BEAUTIFUL/PLAIN checkboxes. Batch 5: Content rename — scene files, arcs.toml, schedule.toml from character-specific to archetype-based (robin→workplace, camila→campus). Batch 6: Rust test fixtures and comments updated. Batch 7: 7 parallel scene-writer agents rewrote all workplace scenes to second-person, stripped AlwaysFemale else branches, morning_routine.toml fixed. 3 writing-reviewer audits (0 Criticals). Batch 8: docs/characters/ → docs/presets/, arc docs renamed, writing tools updated with new accessors+traits. 11 commits, 53 files changed (+2554/−1750). 208 tests, 0 failures. Merged to master, worktree removed. |
 | 2026-02-25 | Writing pipeline Batches 0–3 (worktree: writing-pipeline). Batch 0: Appearance/NaturalPubicHair/BeforeVoice enums, Complexion::Glowing, Player.appearance + Player.natural_pubic_hair + BeforeIdentity.voice fields, all 12 construction sites updated, v4→v5 migration extended. Batch 1: 4 new traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS), PLAIN/BEAUTIFUL removed (Appearance enum replaces). Batch 2: 6 new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) in template_ctx.rs + eval.rs. Batch 3: 3 engine bugs fixed — once_only flag setting at both pick_next call sites, stale action condition re-check in choose_action, NPC action next branches (NpcActionDef/NpcAction.next + loader resolution + engine evaluation). Identified test fixture DRY issue (8+ identical make_world helpers). 204 tests, 0 failures. 4 commits. |
 | 2026-02-25 | Char creation UI attributes plan written (`docs/plans/2026-02-25-char-creation-ui-attributes.md`). 6 tasks: PartialCharState/CharCreationConfig expansion, before-panel dropdowns (6 fields), fem-panel dropdowns (14 fields in 3 sections), test helpers, physical trait pickers (6 groups), sexual trait pickers (BLOCK_ROUGH gated). |
 | 2026-02-25 | Character attribute schema (worktree: char-attributes). 15 new enums: Height, HairLength, SkinTone, Complexion, EyeColour, HairColour, NippleSensitivity, ClitSensitivity, PubicHairStyle, InnerLabiaSize, WetnessBaseline, ButtSize, WaistSize, LipShape, PenisSize. PlayerFigure expanded 3→7 (Petite/Slim/Athletic/Hourglass/Curvy/Thick/Plus), BreastSize 4→7 (Flat/Perky/Handful/Average/Full/Big/Huge). Player struct: 12 new fields + String→enum for eye_colour/hair_colour. BeforeIdentity: 5 new fields (height, hair_colour, eye_colour, skin_tone, penis_size). 126 traits across 13 groups (hair, voice, eyes, body_detail, skin, scent, sexual 25, sexual_preference 20, dark_content 11, lactation, fertility, menstruation, arousal_response). 48 skills (9+39 new). 48 stats (3+45 new). ~27 new PlayerCtx template methods + eval_call_string condition accessors. Save migration v4→v5 (field defaults, String→enum conversion, variant remaps). NPC spawner updated for new enum variants. Docs: writing-guide 10-tier FEMININITY, content-schema accessor table, scene-writer + writing-reviewer agent updates. 20 files changed, +2581/-102. 204 tests, 0 failures. |
