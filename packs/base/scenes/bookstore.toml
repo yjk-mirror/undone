@@ -29,7 +29,7 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 [[thoughts]]
 condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose     = """*The clerk said "miss" when you asked about the biography section. It's not the first time. It still does something small and unresolved inside you every time — not bad, not good. Just: still landing.*"""
+prose     = """*The clerk said "miss" when you asked about the biography section. It's not the first time. Not bad, not good. Just: still landing.*"""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ You find a biography in the back corner — a figure you've been meaning to read
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-The transaction was ordinary. The clerk said "have a good day" to the register as he made change, and you said it back, and then you were outside with a book in a bag. It went the way it was supposed to go. You're holding onto that — the unremarkable quality of it.
+The transaction was ordinary. The clerk said "have a good day" to the register as he made change, and you said it back, and then you were outside with a book in a bag. It went the way it was supposed to go, and you're holding onto that.
 {% endif %}
 """
 
@@ -72,7 +72,7 @@ You spend an hour moving through the shop. The biography section, then local his
 
 Nobody asks if you need help. The man in the history section leaves without acknowledging you, and the woman with the canvas bag buys four things and goes. The clerk makes a note in whatever he was reading. At some point the ceiling fan clicks twice and keeps going.
 
-You leave feeling oddly restored, the way you do after a long walk when you didn't see anyone you knew.
+You leave an hour later without having bought anything, which was always the plan.
 """
 
   [[actions.effects]]
@@ -124,7 +124,7 @@ The next ten minutes involve neither of you conceding the central point, both of
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-The conversation went without either of you navigating around anything. Two people in a bookstore with opinions, the way that used to be the whole transaction. You walk out and let yourself sit with that for a minute before the street takes it.
+The conversation went without either of you navigating around anything. Two people in a bookstore with opinions, the way that used to be the whole transaction.
 {% endif %}
 """
 

@@ -21,7 +21,7 @@ You've been here a month. You don't know who goes to these, or whether the invit
 [[thoughts]]
 condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose = """*You went to things like this without thinking about it. The decision to go somewhere was never a calibration. You're recalibrating now.*"""
+prose = """*You went to things like this without thinking about it. The decision to go somewhere was never a calibration.*"""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -61,7 +61,7 @@ You message back: another time, deadline. It lands fine. Someone sends a thumbs-
 *You used to be someone who didn't have to think about whether to go to a thing. The thinking is new.*
 {% endif %}
 
-The office quiets out over the next forty minutes as people leave. By 5:30 it's down to the people who are either on deadline or have nowhere to be. You finish what you're working on, pack up, and head out into the tail end of a Friday evening that has nothing particular in it.
+The office quiets out over the next forty minutes as people leave. By 5:30 it's down to the people who are either on deadline or have nowhere to be. You finish what you're working on, pack up, and head out into the tail end of a Friday evening.
 """
 
   [[actions.effects]]

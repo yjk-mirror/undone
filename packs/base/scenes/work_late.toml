@@ -5,9 +5,7 @@ description = "Staying past six. The office empties. You work alone — or nearl
 
 [intro]
 prose = """
-6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles at a different register when it's only cooling the room rather than a roomful of people, and the air has that particular late-office quality: stale in a way that doesn't bother you anymore, quiet in a way that does.
-
-This is when the work goes better.
+6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles at a different register when it's only cooling the room rather than a roomful of people, and the air has that particular late-office quality: stale in a way that doesn't bother you anymore, quiet in a way that does, and the work tends to go better for it.
 """
 
 [[intro_variants]]
@@ -35,7 +33,7 @@ Head down. The work takes over the way it does when no one needs anything from y
 At 8 PM you close the laptop. The build is green. The spec holds up. Three tickets closed, one opened against a dependency you didn't trust when you first wired it in — and you weren't wrong. Good work isn't always satisfying in a legible way, but tonight it is.
 
 {% if w.hasTrait("ANALYTICAL") %}
-On the way out you pass a dark stretch of desks and a bathroom with a motion sensor that fires late, flooding the hallway with light for the three seconds it takes to decide you haven't stopped. The note you're carrying in your head — the calibration, the knowledge that a woman working alone in an empty office past dark carries a different set of considerations than a man doing the same — you've already run through it. The building. The route to the parking garage. The floor of the elevator. You made those decisions when you decided to stay, which is before it becomes an emergency rather than after. The work was good. You are fine.
+On the way out you pass a dark stretch of desks and a bathroom with a motion sensor that fires late, flooding the hallway with light for the three seconds it takes to decide you haven't stopped. The note you're carrying in your head — the calibration, the knowledge that a woman working alone in an empty office past dark carries a different set of considerations than a man doing the same — you've already run through it. The building. The route to the parking garage. The floor of the elevator. You made those decisions when you decided to stay, which is before it becomes an emergency rather than after.
 {% endif %}
 
 The night air outside is cold and clean, a significant improvement over the recycled late-office air you've been breathing for the last two hours.
@@ -92,7 +90,7 @@ He looks up. "Users."
 
 "Yeah," he says. "Yeah, that's it."
 
-Two people in a half-empty office past six on a Thursday, talking about database constraints. Six seconds of actual communication — no performance, no navigation, just the work. Something in the frequency between you shifts. Not attraction. Just recognition. He goes back to his screen. You go to the elevator.
+Two people in a half-empty office past six on a Thursday, talking about database constraints. Six seconds of actual communication — no performance, no navigation, just the work. Something in the frequency between you shifts — not attraction, just recognition. He goes back to his screen and you go to the elevator.
 """
 
   [[actions.effects]]

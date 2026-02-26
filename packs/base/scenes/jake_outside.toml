@@ -21,7 +21,7 @@ He sees you and the smile comes without delay. "Hey."
 [[thoughts]]
 condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 45"
 style     = "inner_voice"
-prose     = "*You know what this dynamic looks like. A man and a woman stopped on the street, talking. You know it from the inside and you're learning it from the other side. They're the same dynamic. The difference is which edge you can see.*"
+prose     = "*You've walked past this scene before — a man and a woman stopped on the sidewalk, talking. You barely clocked her side of it.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 

@@ -9,9 +9,9 @@ Seven in the evening and nobody expects anything from you. The apartment is quie
 
 You have the whole evening. That's the situation.
 
-The question of what to do with unstructured time, when you're not trying to fill a gap or be somewhere or perform being fine, is its own specific kind of question. The sofa. The kitchen. The phone on the counter with its three notifications you haven't looked at yet.
+The sofa. The kitchen. The phone on the counter with its three notifications you haven't looked at yet.
 
-The evening is yours. Do something with it.
+The evening is yours.
 """
 
 [[intro_variants]]
@@ -45,7 +45,7 @@ Halfway through you find yourself working out the structure of the thing — the
 {% elif w.hasTrait("ROMANTIC") %}
 There's a scene near the end that gets to you slightly more than you expected. Nothing dramatic. Just a moment that lands. You sit with it for a few seconds before the next thing starts.
 {% else %}
-It's a fine evening. By the end you feel more like a person than you did at the start, which is what evenings are for.
+It's a fine evening, and the notifications are answered at some point; you're not sure when.
 {% endif %}
 """
 
@@ -93,9 +93,7 @@ You spend the evening on your appearance without a reason for it — something w
 
 {% if not w.alwaysFemale() %}
 {% if w.getSkill("FEMININITY") < 25 %}
-It's not vanity. It's something closer to practice — working out the register, what reads how, what you actually like versus what you assumed you'd like. You've been doing this in small increments for months, a few minutes here and there, but tonight there's actual time for it. You stand at the mirror long enough to stop seeing a stranger and start seeing someone figuring something out.
-
-You feel, at the end of it, approximately fine. That's further along than you were this morning.
+It's not vanity. It's something closer to practice — working out the register, what reads how, what you actually like versus what you assumed you'd like. You've been doing this in small increments for months, a few minutes here and there, but tonight there's actual time for it. You stand at the mirror long enough to stop seeing a stranger and start seeing someone figuring something out, and that's enough for tonight.
 {% elif w.getSkill("FEMININITY") < 50 %}
 There's a version of this you used to think of as maintenance, mechanical, something women did because they had to. That wasn't right. You know that now from the other side of it. Tonight it's just the thing you're doing with your evening, and you're good enough at it by now to do it without thinking too hard, which is its own kind of progress.
 {% else %}

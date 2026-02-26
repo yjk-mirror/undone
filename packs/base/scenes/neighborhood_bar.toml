@@ -71,13 +71,13 @@ You accept. The conversation that follows is easy in the way conversations are w
 {% elif w.hasTrait("SHY") %}
 "I'm good, thanks." You say it to your glass more than to him, and for a second you think it came out wrong — too flat, or too abrupt — but he just nods and goes back to his drink without making anything of it. The relief is quiet and specific.
 {% elif w.hasTrait("OBJECTIFYING") %}
-You see the whole transaction very clearly: the scan he ran before he asked, the assessment, the decision to try. You've done the same math from this exact stool, from the other side of it. You accept the drink and give him a conversation about something he didn't come here to talk about — his job, it turns out, which he did not expect to discuss — and you leave when you've had enough. He seems satisfied. You're not sure with what.
+You see the whole transaction very clearly: the scan he ran before he asked, the assessment, the decision to try. You've done the same math from this exact stool, from the other side of it. You accept the drink and give him a conversation about something he didn't come here to talk about — his job, it turns out, which he did not expect to discuss — and you leave when you've had enough. He seems satisfied with some version of the evening. You're not entirely sure which one.
 {% else %}
 You accept. The drink arrives and the conversation stays at the surface — the neighborhood, how long you've lived here, whether the food is any good. He moves on before it becomes anything. Fine.
 {% endif %}
 
 {% if not w.alwaysFemale() %}
-You're on this side of it now. You hold that thought and finish the drink.
+You're on this side of it now, which is something you hold while you finish the drink.
 {% endif %}
 """
 

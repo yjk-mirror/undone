@@ -30,9 +30,7 @@ Kevin Marsh is coming the other way, laptop bag over one shoulder, looking at hi
 That's it. The whole transaction takes maybe two seconds.
 
 {% if not w.alwaysFemale() %}
-It landed correctly. Kevin filed you where he files everyone in this building — by team, by role, by whether he's had a substantive conversation with you yet. No prior version of you to compare against, no recalibration happening mid-stride. Just a colleague in a hallway.
-
-You're not sure when you started noticing when something lands correctly. You're noticing it now.
+Kevin filed you where he files everyone in this building — by team, by role, by whether he's had a substantive conversation with you yet. No prior version of you to compare against, no recalibration happening mid-stride. You're not sure when you started noticing when something lands correctly. You're noticing it now.
 {% endif %}
 """
 

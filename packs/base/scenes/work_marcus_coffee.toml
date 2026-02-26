@@ -24,8 +24,6 @@ Marcus comes in. He pours from the pot you just refreshed, doesn't thank the mac
 "What did you think of Kevin's deck?"
 
 You still clock the moment when someone asks your opinion as a first move — not the act of being asked, which is ordinary, but your own reaction to it. You've noticed Marcus does this. He asks the person in front of him things, and the person in front of him is currently you. You file the reaction away beside the others you're collecting, the ones you can't fully account for yet.
-
-The space between the question and an answer is short.
 """
 
 [[thoughts]]
@@ -76,7 +74,7 @@ prose  = """
 Marcus nods, gets his coffee, and goes. The kind of answer that produces no follow-up questions because it contains nothing worth following up on.
 
 {% if not w.alwaysFemale() %}
-On the walk back to your desk you think, not for the first time, that you used to have opinions faster than this. The hedging is new. You're not certain yet whether it's caution that makes sense in a new situation or something you've picked up that you didn't mean to.
+On the walk back to your desk you think, not for the first time, that you used to have opinions faster than this — whether the hesitation is caution that makes sense in a new situation or something you've picked up that you didn't mean to, you can't say yet.
 {% endif %}
 """
 

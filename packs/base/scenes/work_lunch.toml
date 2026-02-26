@@ -37,7 +37,7 @@ You order through the Slack channel. Your lunch arrives twenty minutes later and
 {% if w.hasTrait("SHY") %}
 This is actively comfortable, not just efficient. The option to be alone without explanation — no having to decide whether to join a group you're not sure wants you, no finding somewhere to put your hands at a table of people who all seem to already know what to say. You get your work done. Your shoulders unknot by about 12:45.
 {% else %}
-The open floor empties out around you. A few others stay too — one guy has headphones on and clearly isn't looking up, another is on a call, talking in the careful voice people use when they don't want to be overheard. You eat your lunch. The work is still there when you're done.
+The open floor empties out around you. A few others stay too — one guy has headphones on and clearly isn't looking up, another is on a call, talking in the careful voice people use when they don't want to be overheard. You eat your lunch while the open floor sits quiet around you.
 {% endif %}
 """
 
@@ -56,10 +56,10 @@ prose  = """
 Two blocks from the office there's a sandwich place with a long counter facing the window. You get a table to yourself. You read your phone and eat your lunch and watch the sidewalk, which is doing what sidewalks do at this hour — people in motion, someone on a call, a bike courier cutting through the gap between a delivery truck and a cab.
 
 {% if not w.alwaysFemale() %}
-Being a woman alone at a lunch counter is a different read than being a man alone. The man eating alone in the middle of the day carries an assumption of something not quite working — nobody volunteers what, but it's there. The woman alone reads as a choice. You've been on the other side of that assumption, made it about other people without meaning to. You're sitting with that, a little.
+Being a woman alone at a lunch counter is a different read than being a man alone. The man eating alone in the middle of the day carries an assumption of something not quite working — nobody volunteers what, but it's there. The woman alone reads as a choice. You've been on the other side of that assumption, made it about other people without meaning to.
 {% endif %}
 
-You finish your sandwich and get back before 1:00. The afternoon is there waiting for you, which is the most you could have asked.
+You finish your sandwich and get back before 1:00.
 """
 
   [[actions.effects]]
@@ -85,7 +85,7 @@ You're mapping the social geometry while they talk shop. Who drives the conversa
 You contribute once, a question about the database snapshot cadence, and watch how it lands. It lands fine.
 
 {% else %}
-The conversation is about a project you're tangentially connected to, which means you nod at the right moments and eat your lunch and learn more about the internal politics of a system you're not responsible for. It's fine. The food is fine. The company is fine. You come back to the office with a slightly better handle on who these people are, which is the kind of thing that compounds slowly and isn't worth rushing.
+The conversation is about a project you're tangentially connected to, which means you nod at the right moments and eat your lunch and learn more about the internal politics of a system you're not responsible for. The food is decent, the company adequate. You come back to the office with a slightly better handle on who these people are, which is the kind of thing that compounds slowly and isn't worth rushing.
 {% endif %}
 """
 
@@ -116,7 +116,7 @@ He has opinions about the latency numbers — not complaints, opinions, which is
 By the time you're back in the elevator he's already drafting a message on his phone. "I want to try something," he says, which from him sounds less like small talk than it probably does from most people.
 
 {% if not w.alwaysFemale() %}
-You've had lunches like this before — the good kind, the kind where the work is what it is and nobody's performing at each other. You know how rare they are. The thing you're still working out is how it lands differently now, being taken seriously across a table, the specific way someone listens when they're actually interested. It's the same feeling. The furniture is just arranged differently.
+You've had lunches like this before — the good kind, the kind where the work is what it is and nobody's performing at each other. You know how rare they are. The thing you're still working out is how it lands differently now, being taken seriously across a table, the specific way someone listens when they're actually interested.
 {% endif %}
 """
 

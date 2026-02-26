@@ -32,7 +32,11 @@ prose = """
 You move through the store efficiently — produce first, then the middle aisles, then dairy last to keep it cold. A man reaches across you at the pasta shelf with an "excuse me" that's more reflex than request. You shift slightly. He takes what he needed and moves on.
 
 {% if not w.alwaysFemale() %}
-The contact zone calibration happened automatically. You moved before he asked, read the angle of his reach, cleared the space. Two months of this and it's close to instinct, which is either progress or just adaptation — hard to know which without a comparison point.
+{% if w.getSkill("FEMININITY") < 20 %}
+The contact zone calibration happened — you moved before he asked, read the angle of his reach, cleared the space. Still deliberate, not yet automatic.
+{% else %}
+The contact zone calibration happened automatically. You moved before he asked, read the angle of his reach, cleared the space. Two months of this and it's close to instinct.
+{% endif %}
 {% endif %}
 
 The list is done in twenty minutes. That's the correct number of minutes for this list.
@@ -82,10 +86,8 @@ You get the short lane — only two people ahead of you. The clerk has the pract
 "Have a good night," she says when you take your bags.
 
 {% if not w.alwaysFemale() %}
-It's a phrase she says to everyone. But you're on the receiving end of it, which is not where you used to stand in this kind of exchange. You used to be the one dispensing that particular casual warmth — a bartender, a checkout clerk, a guy holding a door. Now it's directed at you, and it lands the way it was meant to, which is neither a big thing nor a small one, just a fact about the position you're in now.
+It's a phrase she says to everyone. But you're on the receiving end of it, which is not where you used to stand in this kind of exchange. You used to be the one dispensing that particular casual warmth — a bartender, a checkout clerk, a guy holding a door. Now it's directed at you, and it lands the way it was meant to.
 {% endif %}
-
-You take your bags and go.
 """
 
   [[actions.effects]]

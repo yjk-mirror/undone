@@ -5,7 +5,7 @@ description = "Late afternoon. The park. Moving through outdoor space differentl
 
 [intro]
 prose = """
-Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock. The sun is low enough now to come through the trees at an angle that hits everything sideways, turns the grass a color it isn't at noon. Nobody needs anything from you here. You pick a direction and go.
+Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock. The sun is low enough now to come through the trees at an angle that hits everything sideways, turns the grass a color it isn't at noon. Nobody needs anything from you here and you pick a direction.
 """
 
 [[intro_variants]]
@@ -13,7 +13,7 @@ condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
 prose = """
 Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock.
 
-You're still recalibrating how you move in public space. The speed, the path choices — which side of the path you default to, when you make eye contact with approaching strangers and when you don't. You used to walk without thinking about it. The recalibration isn't distressing. It's just more information than before. You pick a direction and go.
+You're still recalibrating how you move in public space. The speed, the path choices — which side of the path you default to, when you make eye contact with approaching strangers and when you don't. You used to walk without thinking about it. You're still mapping it.
 """
 
 [[thoughts]]
@@ -31,7 +31,7 @@ prose = """
 You do the full loop around the park — the outer path, past the dog run, past the fountain that's been turned off for the season, back around to the entrance. A man in a running jacket jogs past and nods without breaking stride. You nod back. The exchange is nothing.
 
 {% if not w.alwaysFemale() %}
-You've been on the other end of that nod before — the between-joggers acknowledgment, quick peer recognition with no weight behind it. It's the same nod. What's different is how it arrives now: without the male-to-male assessment underneath it, the half-second sizing-up that used to happen below the surface. Just the nod. You're not sure what to do with that being unremarkable.
+You've given that nod before, from the other side of it. It's the same nod. What's different is how it arrives now — without the half-second sizing-up that used to happen below the surface. Just the nod, and then he's gone around the bend.
 {% endif %}
 """
 

@@ -7,7 +7,7 @@ description = "Back at the coffee shop. Jake is there. The question of whether y
 prose = """
 The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. The barista with the sleeve tattoos is running two drinks at once without looking flustered. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up, in the specific posture of someone who's been there a while and intends to stay.
 
-The split-second calculation runs automatically: you've met this person, you know his name, there's no good reason to pretend otherwise, but doing something about it requires a choice.
+You've met this person, you know his name, there's no good reason to pretend otherwise — but doing something about it requires a choice.
 """
 
 [[intro_variants]]
@@ -101,7 +101,7 @@ You don't look in his direction. You've decided what kind of morning this is goi
 He clocked you when you came in. You know that the way you know a lot of things now — from having been on the other side of it enough times that the mechanics are familiar. He's back on his laptop. Whatever he made of the non-acknowledgment, he's filed it and moved on. So have you.
 {% endif %}
 
-The coffee is fine. The table by the radiator is warmer than it needs to be. It's a perfectly ordinary Tuesday.
+The coffee is fine. The table by the radiator is warmer than it needs to be, and you're fine with both.
 """
 
   [[actions.next]]

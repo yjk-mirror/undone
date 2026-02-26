@@ -85,7 +85,7 @@ prose  = """
 Thirty seconds. Deployed. Waiting on sign-off. The circle moves to Kevin before anyone has a chance to ask a follow-up.
 
 {% if not w.alwaysFemale() %}
-*You used to take longer. Not because you had more to say.*
+*You used to take longer, and not because you had more to say.*
 {% endif %}
 
 Kevin's update runs four minutes. You listen to the first ninety seconds and then stop, which is the right amount of Kevin to absorb in a given standup. Marcus gives his infrastructure update in under a minute, with two concrete details and no padding, which is how you'd have done it too.

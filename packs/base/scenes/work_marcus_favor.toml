@@ -40,7 +40,7 @@ He responds the same day with three lines. Concedes on the latency section witho
 Four messages total. You come out of it with an updated position on two out of three points, which is what a useful technical conversation produces. You close the thread and get back to what you were doing.
 
 {% if not w.alwaysFemale() %}
-*This is what it used to look like*, you think, and then correct yourself — not used to look like. Still looks like. Same conversation. Different person in it.
+*This is what it used to look like*, you think, and then correct yourself — it still looks like this. Same conversation, different person in it.
 {% endif %}
 """
 
@@ -99,6 +99,10 @@ He responds: "Fair."
 
 That's the whole exchange. No friction, no hedge, no follow-up. You close the notification and get back to what you were doing.
 """
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "DECLINED_MARCUS_SPEC"
 
   [[actions.next]]
   finish = true
