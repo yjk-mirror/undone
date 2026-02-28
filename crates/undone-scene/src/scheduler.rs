@@ -137,7 +137,7 @@ impl Scheduler {
                         Some(expr) => match eval(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
-                                eprintln!(
+                                log::warn!(
                                     "[scheduler] condition error in slot '{}', scene '{}': {}",
                                     slot_name, e.scene, err
                                 );
@@ -191,7 +191,7 @@ impl Scheduler {
                         Some(expr) => match eval(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
-                                eprintln!(
+                                log::warn!(
                                     "[scheduler] trigger error in slot '{}', scene '{}': {}",
                                     slot_name, e.scene, err
                                 );
@@ -242,7 +242,7 @@ impl Scheduler {
                             Some(expr) => match eval(expr, world, &ctx, registry) {
                                 Ok(val) => val,
                                 Err(err) => {
-                                    eprintln!(
+                                    log::warn!(
                                         "[scheduler] trigger error in slot '{}', scene '{}': {}",
                                         slot_name, e.scene, err
                                     );
@@ -272,7 +272,7 @@ impl Scheduler {
                         Some(expr) => match eval(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
-                                eprintln!(
+                                log::warn!(
                                     "[scheduler] condition error in scene '{}': {}",
                                     e.scene, err
                                 );

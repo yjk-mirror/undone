@@ -178,7 +178,7 @@ impl SceneEngine {
         match eval(expr, world, ctx, registry) {
             Ok(val) => val,
             Err(e) => {
-                eprintln!(
+                log::warn!(
                     "[scene-engine] condition error in scene '{}' ({}): {}",
                     scene_id, context, e
                 );
@@ -194,7 +194,7 @@ impl SceneEngine {
     fn start_scene(&mut self, id: String, world: &World, registry: &PackRegistry) {
         self.transition_count += 1;
         if self.transition_count > MAX_TRANSITIONS_PER_COMMAND {
-            eprintln!(
+            log::error!(
                 "[scene-engine] transition limit: {} transitions reached starting '{id}'",
                 self.transition_count
             );
@@ -211,7 +211,7 @@ impl SceneEngine {
         let def = match self.scenes.get(&id) {
             Some(d) => Arc::clone(d),
             None => {
-                eprintln!("[scene-engine] unknown scene: {id}");
+                log::error!("[scene-engine] unknown scene: {id}");
                 self.events.push_back(EngineEvent::ProseAdded(format!(
                     "[Error: scene not found: '{id}']"
                 )));
@@ -317,7 +317,7 @@ impl SceneEngine {
             for effect in &action.effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     let msg = format!("[scene-engine] effect error: {e}");
-                    eprintln!("{msg}");
+                    log::warn!("{msg}");
                     errors.push(msg);
                 }
             }
@@ -508,7 +508,7 @@ impl SceneEngine {
             for effect in &effects {
                 if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
                     let msg = format!("[scene-engine] npc effect error: {e}");
-                    eprintln!("{msg}");
+                    log::warn!("{msg}");
                     errors.push(msg);
                 }
             }

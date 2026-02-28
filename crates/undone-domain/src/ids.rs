@@ -29,18 +29,3 @@ pub struct StuffId(pub Spur);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct StatId(pub Spur);
 
-/// A scene ID — e.g. "base::rain_shelter"
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct SceneId(pub String); // scene IDs are not interned (too varied)
-
-impl SceneId {
-    pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
-    }
-}
-
-impl std::fmt::Display for SceneId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}

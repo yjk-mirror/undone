@@ -55,7 +55,7 @@ fn failed_pre(
     scenes: HashMap<String, std::sync::Arc<SceneDefinition>>,
     msg: String,
 ) -> PreGameState {
-    eprintln!("[init] {msg}");
+    log::error!("[init] {msg}");
     PreGameState {
         registry,
         scenes,
