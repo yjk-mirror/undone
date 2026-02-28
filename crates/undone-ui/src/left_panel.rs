@@ -15,7 +15,7 @@ use floem::views::dyn_stack;
 use pulldown_cmark::{Event as MdEvent, Options, Parser, Tag, TagEnd};
 use std::cell::RefCell;
 use std::rc::Rc;
-use undone_scene::engine::{ActionView, EngineCommand};
+use undone_scene::engine::ActionView;
 
 /// Convert a markdown string into a floem `TextLayout` with styled spans.
 ///
@@ -207,7 +207,7 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
                         .game_data
                         .set_flag(format!("ONCE_{}", result.scene_id));
                 }
-                engine.send(EngineCommand::StartScene(result.scene_id), world, registry);
+                crate::start_scene(engine, world, registry, result.scene_id);
                 let events = engine.drain();
                 crate::process_events(events, signals, world, femininity_id);
             }

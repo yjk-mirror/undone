@@ -102,6 +102,10 @@ You get up and figure out dinner.
   to_state = "settled"
 
   [[actions.effects]]
+  type  = "advance_time"
+  slots = 28
+
+  [[actions.effects]]
   type   = "change_stress"
   amount = -3
 

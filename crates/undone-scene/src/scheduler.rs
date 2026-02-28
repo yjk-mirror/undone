@@ -862,4 +862,58 @@ mod tests {
             "arc event should win due to higher weight when flag is present"
         );
     }
+
+    #[test]
+    fn pick_next_free_time_appears_after_arc_settles_with_advance_time() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas).unwrap();
+        let mut world = make_world();
+
+        // Simulate post-arc state: ROUTE_WORKPLACE, arc settled, all once_only flags set
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        world.game_data.set_flag("ONCE_base::workplace_arrival");
+        world.game_data.set_flag("ONCE_base::workplace_landlord");
+        world.game_data.set_flag("ONCE_base::workplace_first_night");
+        world.game_data.set_flag("ONCE_base::workplace_first_clothes");
+        world.game_data.set_flag("ONCE_base::workplace_first_day");
+        world.game_data.set_flag("ONCE_base::workplace_work_meeting");
+        world.game_data.set_flag("ONCE_base::workplace_evening");
+        world.game_data.set_flag("MET_LANDLORD");
+        world.game_data.set_flag("FIRST_MEETING_DONE");
+
+        // Simulate advance_time slots=28 (as workplace_evening does)
+        // TimeSlot has 4 variants (Morning/Afternoon/Evening/Night), so 7 days × 4 = 28.
+        for _ in 0..28 {
+            world.game_data.advance_time_slot();
+        }
+        assert_eq!(world.game_data.week, 1, "28 slots should advance to week 1");
+
+        // Run pick_next 20 times — we should see at least one free_time scene
+        let mut rng = SmallRng::seed_from_u64(42);
+        let mut free_time_count = 0;
+        let free_time_scenes = [
+            "base::rain_shelter",
+            "base::morning_routine",
+            "base::coffee_shop",
+            "base::bookstore",
+            "base::park_walk",
+            "base::grocery_store",
+            "base::evening_home",
+        ];
+        for _ in 0..20 {
+            let result = scheduler
+                .pick_next(&world, &registry, &mut rng)
+                .expect("should always pick something");
+            if free_time_scenes.contains(&result.scene_id.as_str()) {
+                free_time_count += 1;
+            }
+        }
+        assert!(
+            free_time_count > 0,
+            "at least one free_time scene should appear in 20 picks (got 0)"
+        );
+    }
 }

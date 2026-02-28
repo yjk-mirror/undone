@@ -10,7 +10,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::game_state::GameState;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
-use undone_scene::engine::EngineCommand;
 
 // ---------------------------------------------------------------------------
 // Data types
@@ -232,11 +231,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                 ..
                             } = *gs;
                             if let Some(scene_id) = opening_scene {
-                                engine.send(
-                                    EngineCommand::StartScene(scene_id.clone()),
-                                    world,
-                                    registry,
-                                );
+                                crate::start_scene(engine, world, registry, scene_id.clone());
                             }
                             let events = engine.drain();
                             (events, fem_id)

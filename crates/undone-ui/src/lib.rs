@@ -185,7 +185,7 @@ pub fn app_view() -> impl View {
                             } = *gs;
                             if let Some(scene_id) = registry.transformation_scene() {
                                 let scene_id = scene_id.to_owned();
-                                engine.send(EngineCommand::StartScene(scene_id), world, registry);
+                                start_scene(engine, world, registry, scene_id);
                             }
                             let events = engine.drain();
                             process_events(events, signals, world, fem_id);
@@ -237,11 +237,7 @@ pub fn app_view() -> impl View {
                                     ..
                                 } = *gs;
                                 if let Some(scene_id) = opening_scene {
-                                    engine.send(
-                                        EngineCommand::StartScene(scene_id.clone()),
-                                        world,
-                                        registry,
-                                    );
+                                    start_scene(engine, world, registry, scene_id.clone());
                                 }
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
@@ -253,11 +249,7 @@ pub fn app_view() -> impl View {
                                                 .game_data
                                                 .set_flag(format!("ONCE_{}", result.scene_id));
                                         }
-                                        engine.send(
-                                            EngineCommand::StartScene(result.scene_id),
-                                            world,
-                                            registry,
-                                        );
+                                        start_scene(engine, world, registry, result.scene_id);
                                         let events = engine.drain();
                                         process_events(events, signals, world, fem_id);
                                     }
@@ -382,6 +374,27 @@ pub fn app_view() -> impl View {
         bottom_right,
     )
         .style(|s| s.size_full())
+}
+
+/// Start a scene and wire in the active NPCs so effects like `set_npc_role` and
+/// `add_npc_liking` can resolve their `npc = "m"` / `npc = "f"` references.
+///
+/// The game loop is responsible for this — the engine only stores the active NPC
+/// keys, it doesn't pick them. For now we activate the first male and first female
+/// NPC in the world's slotmaps (the spawner guarantees at least one of each).
+pub fn start_scene(
+    engine: &mut undone_scene::engine::SceneEngine,
+    world: &mut World,
+    registry: &undone_packs::PackRegistry,
+    scene_id: String,
+) {
+    engine.send(EngineCommand::StartScene(scene_id), world, registry);
+    if let Some((key, _)) = world.male_npcs.iter().next() {
+        engine.send(EngineCommand::SetActiveMale(key), world, registry);
+    }
+    if let Some((key, _)) = world.female_npcs.iter().next() {
+        engine.send(EngineCommand::SetActiveFemale(key), world, registry);
+    }
 }
 
 /// Process engine events, updating signals. Returns `true` if `SceneFinished` was among them.

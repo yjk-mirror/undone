@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 223 passing, 0 failures.
+**Tests:** 224 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -17,29 +17,24 @@
 
 ## ⚡ Next Action
 
-**MCP Playtest — IN PROGRESS (resume after session restart)**
+**MCP Playtest — COMPLETE ✅**
 
-The game is running (PID 59612, Robin preset, reached transformation_intro scene).
-Screenshot MCP had a zombie-session bug — fixed in `tools/screenshot-mcp/src/capture.rs`
-(auto-recreate sessions that stop producing frames). Binary rebuilt and swapped in.
-**Need Claude Code restart to re-spawn screenshot MCP server with the new binary.**
+Full 9-step playtest passed with Robin preset (ANALYTICAL trait, Night theme). Two bugs found and fixed during playtest:
 
-Game-input MCP works fine (click and keypress both verified).
+1. **NPC wiring bug** — `StartScene` without `SetActiveMale`/`SetActiveFemale` caused "effect requires active male NPC but none is set" errors. Fix: `start_scene()` helper in lib.rs wraps StartScene + NPC wiring. 5 callsites replaced.
+2. **`gd.week()` stuck at 0** — No scene fired `advance_time`, so week counter never incremented. All free_time scenes gate on `gd.week() >= 1` → permanently unreachable. Fix: added `advance_time slots=28` to `workplace_evening.toml` (final arc scene). TimeSlot has 4 variants (Morning/Afternoon/Evening/Night), so 7 days × 4 = 28 slots = 1 week.
 
-**Playtest plan — pick up here:**
-1. Game is at transformation_intro (pressed "Continue" via key 1). Take screenshot to confirm state.
-2. Continue through transformation_intro → fem creation phase → start game
-3. Play through workplace arc: arrival → landlord → first_night → first_clothes → first_day → work_meeting → evening (7 scenes, linear triggers)
-4. Verify `settled` state reached, work slot scenes start firing
-5. Verify free_time scenes rotate (bookstore, park_walk, grocery_store, evening_home, neighborhood_bar)
-6. Verify Jake thread: coffee_shop sets MET_JAKE → coffee_shop_return + jake_outside gate on it
-7. Verify Marcus thread: workplace_work_meeting sets FIRST_MEETING_DONE → work_marcus_coffee + work_marcus_favor gate on it
-8. Check FEMININITY-gated intro_variants display at the right thresholds
-9. Check trait branches fire (CONFIDENT, SHY, ANALYTICAL, OBJECTIFYING, HOMOPHOBIC)
+**Playtest results:**
+1. ✅ Char creation → transformation_intro → fem creation → game start
+2. ✅ Workplace arc (7 scenes, linear triggers, FEMININITY 10→35)
+3. ✅ `settled` state reached, work slot scenes firing (plan_your_day, work_corridor, work_late)
+4. ✅ Free_time scenes rotating (grocery_store, morning_routine, evening_home, bookstore, rain_shelter, park_walk, coffee_shop — all seen)
+5. ✅ Jake thread: coffee_shop → MET_JAKE set → "Jake. With a dog." appears in park_walk
+6. ✅ Marcus thread: "Marcus is still here" action in work_late scene
+7. ✅ FEMININITY-gated intro_variants (ANALYTICAL branches firing at FEMININITY 20–49 range)
+8. ✅ Trait branches (ANALYTICAL branch content visible in workplace_evening, evening_home, plan_your_day, work_corridor)
 
-**Fix protocol:** correct fixes only, no workarounds. If something is structurally broken, fix it at the root.
-
-**After playtest:** User will do their own testing and provide feedback. Then plan Sprint 4.
+**After playtest:** User testing and feedback. Then plan Sprint 4.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
@@ -156,6 +151,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-27 | MCP playtest session. Full 9-step playtest via screenshot + game-input MCPs. Found and fixed 2 bugs: (1) NPC wiring — StartScene without SetActiveMale/SetActiveFemale caused silent NPC effect failures; added `start_scene()` helper in lib.rs, replaced 5 callsites. (2) `gd.week()` stuck at 0 — no scene fired advance_time, free_time scenes permanently unreachable; added `advance_time slots=28` to workplace_evening.toml. TimeSlot has 4 variants (not 3), so 7×4=28. New test `pick_next_free_time_appears_after_arc_settles_with_advance_time`. All 9 playtest steps verified: char creation, 7-scene arc, settled state, free_time rotation (7 scenes seen), Jake thread (coffee_shop→MET_JAKE→park_walk), Marcus thread, FEMININITY-gated variants, ANALYTICAL trait branches. 223→224 tests, 0 failures. |
 | 2026-02-27 | Project audit + tooling session. Full status review: 223 tests confirmed, 33 scenes, validate-pack clean. Cross-referenced all 3 audit files against Sprint 1–3 fixes — built definitive resolved/unresolved table (28 fixed, 8 by policy, 7 partial, 41 open). Key finding: C1 (once_only) and C2 (choose_action) were ALREADY FIXED — audit files and content-schema.md were stale. Updated content-schema.md (removed "NOT YET IMPLEMENTED" once_only note), HANDOFF.md open items, MEMORY.md sprint status. Writing toolchain audit: scene-writer.md missing gd.npcLiking + m./f. receivers + "scene must earn its place" checklist items; writing-reviewer.md had 8 invented trait IDs (HIGH_VOICE, SENSITIVE_NIPPLES, etc.) + missing Critical patterns (desire/shame ordering, trait-gated best content); writing-guide.md condition tables incomplete. All three files fixed. Screenshot MCP zombie-session bug: WGC PersistentCapture stops delivering frames after window surface recreation (floem phase transition) but is_finished() returns false. Fixed capture.rs to detect and auto-recreate zombie sessions. Binary rebuilt. Pushed 11 commits to origin. MCP playtest started — game boots, char creation works, transformation_intro renders. Playtest paused for session restart (screenshot MCP needs respawn). |
 | 2026-02-25 | Writing pipeline Batches 4–8 (worktree: writing-pipeline). Batch 4: PresetData expanded to ~40 fields, Robin fully configured (38 traits, all physical/sexual attributes), Appearance dropdown replaces BEAUTIFUL/PLAIN checkboxes. Batch 5: Content rename — scene files, arcs.toml, schedule.toml from character-specific to archetype-based (robin→workplace, camila→campus). Batch 6: Rust test fixtures and comments updated. Batch 7: 7 parallel scene-writer agents rewrote all workplace scenes to second-person, stripped AlwaysFemale else branches, morning_routine.toml fixed. 3 writing-reviewer audits (0 Criticals). Batch 8: docs/characters/ → docs/presets/, arc docs renamed, writing tools updated with new accessors+traits. 11 commits, 53 files changed (+2554/−1750). 208 tests, 0 failures. Merged to master, worktree removed. |
 | 2026-02-25 | Writing pipeline Batches 0–3 (worktree: writing-pipeline). Batch 0: Appearance/NaturalPubicHair/BeforeVoice enums, Complexion::Glowing, Player.appearance + Player.natural_pubic_hair + BeforeIdentity.voice fields, all 12 construction sites updated, v4→v5 migration extended. Batch 1: 4 new traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS), PLAIN/BEAUTIFUL removed (Appearance enum replaces). Batch 2: 6 new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) in template_ctx.rs + eval.rs. Batch 3: 3 engine bugs fixed — once_only flag setting at both pick_next call sites, stale action condition re-check in choose_action, NPC action next branches (NpcActionDef/NpcAction.next + loader resolution + engine evaluation). Identified test fixture DRY issue (8+ identical make_world helpers). 204 tests, 0 failures. 4 commits. |
