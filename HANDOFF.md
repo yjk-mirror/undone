@@ -17,24 +17,15 @@
 
 ## ⚡ Next Action
 
-**MCP Playtest — COMPLETE ✅**
+**User playtest feedback collected. 7/16 issues fixed. Ready to plan next work.**
 
-Full 9-step playtest passed with Robin preset (ANALYTICAL trait, Night theme). Two bugs found and fixed during playtest:
-
-1. **NPC wiring bug** — `StartScene` without `SetActiveMale`/`SetActiveFemale` caused "effect requires active male NPC but none is set" errors. Fix: `start_scene()` helper in lib.rs wraps StartScene + NPC wiring. 5 callsites replaced.
-2. **`gd.week()` stuck at 0** — No scene fired `advance_time`, so week counter never incremented. All free_time scenes gate on `gd.week() >= 1` → permanently unreachable. Fix: added `advance_time slots=28` to `workplace_evening.toml` (final arc scene). TimeSlot has 4 variants (Morning/Afternoon/Evening/Night), so 7 days × 4 = 28 slots = 1 week.
-
-**Playtest results:**
-1. ✅ Char creation → transformation_intro → fem creation → game start
-2. ✅ Workplace arc (7 scenes, linear triggers, FEMININITY 10→35)
-3. ✅ `settled` state reached, work slot scenes firing (plan_your_day, work_corridor, work_late)
-4. ✅ Free_time scenes rotating (grocery_store, morning_routine, evening_home, bookstore, rain_shelter, park_walk, coffee_shop — all seen)
-5. ✅ Jake thread: coffee_shop → MET_JAKE set → "Jake. With a dog." appears in park_walk
-6. ✅ Marcus thread: "Marcus is still here" action in work_late scene
-7. ✅ FEMININITY-gated intro_variants (ANALYTICAL branches firing at FEMININITY 20–49 range)
-8. ✅ Trait branches (ANALYTICAL branch content visible in workplace_evening, evening_home, plan_your_day, work_corridor)
-
-**After playtest:** User testing and feedback. Then plan Sprint 4.
+### Priority order (agreed with user):
+1. **Landing page** (#2) — New Game / Continue / Load / Settings. Structural UX change, needs a small plan.
+2. **Opening scene redesign** (#8) — Needs creative discussion. Current `transformation_intro` is wrong; the agreed opening is a plane arrival scene. User needs to clarify: does plane scene replace transformation_intro or precede it?
+3. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
+4. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
+5. **NPC sidebar redesign** (#13) — Needs design discussion. Only show met NPCs, appropriate info.
+6. **Writing quality sprint** (#14-15) — User wants to discuss using DeepSeek API for writing agents before starting. Do not start writing work without this discussion.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
