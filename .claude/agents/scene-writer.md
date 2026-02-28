@@ -167,7 +167,17 @@ prose = """..."""
   flag = "flag_name"
 ```
 
-**Common effect types:** `change_stress`, `change_money`, `change_anxiety`, `add_arousal`, `set_scene_flag`, `remove_scene_flag`, `set_game_flag`, `remove_game_flag`, `skill_increase`, `add_trait`, `remove_trait`, `add_npc_liking`, `add_npc_love`, `set_relationship`, `set_npc_role`, `advance_arc`, `fail_red_check`, `add_stuff`, `remove_stuff`
+**All effect types (35 total):**
+
+PC state: `change_stress`, `change_money`, `change_anxiety`, `add_arousal`, `change_alcohol`, `add_stat`, `set_stat`, `skill_increase`, `add_trait`, `remove_trait`, `set_virgin`, `set_player_partner`, `add_player_friend`, `set_job_title`, `add_stuff`, `remove_stuff`
+
+Scene/game flags: `set_scene_flag`, `remove_scene_flag`, `set_game_flag`, `remove_game_flag`
+
+NPC state: `add_npc_liking`, `add_npc_love`, `add_w_liking`, `set_npc_flag`, `add_npc_trait`, `set_relationship`, `set_npc_attraction`, `set_npc_behaviour`, `set_contactable`, `add_sexual_activity`, `set_npc_role`
+
+Navigation: `transition`, `advance_arc`, `advance_time`
+
+Misc: `fail_red_check`
 
 ## Workflow
 

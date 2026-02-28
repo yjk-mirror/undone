@@ -283,20 +283,65 @@ prose = """...result prose..."""
 
 Tagged by `type`:
 
+**PC state**
+
 | Type | Fields | Description |
 |---|---|---|
-| `change_stress` | `amount: i32` | Modify stress |
-| `change_money` | `amount: i32` | Modify money |
-| `change_anxiety` | `amount: i32` | Modify anxiety |
-| `set_scene_flag` | `flag: String` | Scene-local flag (cleared on exit) |
-| `set_game_flag` | `flag: String` | Persistent game flag |
-| `skill_increase` | `skill, amount` | Increase a skill |
-| `add_trait` | `trait_id` | Add PC trait |
-| `add_npc_liking` | `npc, delta` | NPC's liking of PC |
-| `advance_arc` | `arc, to_state` | Transition arc state |
-| `set_npc_role` | `npc, role` | Bind NPC role for scene |
+| `change_stress` | `amount: i32` | Add to PC stress (positive = more stress) |
+| `change_money` | `amount: i32` | Add to PC money (negative = spend) |
+| `change_anxiety` | `amount: i32` | Add to PC anxiety |
+| `add_arousal` | `delta: i8` | Add to PC arousal level |
+| `change_alcohol` | `delta: i8` | Add to PC alcohol level |
+| `add_stat` | `stat, amount: i32` | Increment a named stat counter |
+| `set_stat` | `stat, value: i32` | Set a named stat to an exact value |
+| `skill_increase` | `skill, amount: i32` | Increase a skill by amount (clamped to skill max) |
+| `add_trait` | `trait_id` | Add a trait to the PC |
+| `remove_trait` | `trait_id` | Remove a trait from the PC |
+| `set_virgin` | `value: bool`, `virgin_type` (optional) | Set PC virgin status (optionally by type) |
+| `set_player_partner` | `npc` | Set an NPC as PC's romantic partner |
+| `add_player_friend` | `npc` | Add an NPC as PC's friend |
+| `set_job_title` | `title` | Set PC's job title string |
+| `add_stuff` | `item` | Add an item to PC's inventory |
+| `remove_stuff` | `item` | Remove an item from PC's inventory |
 
-See `crates/undone-scene/src/types.rs` `EffectDef` enum for the complete list.
+**Scene and game flags**
+
+| Type | Fields | Description |
+|---|---|---|
+| `set_scene_flag` | `flag` | Set a scene-local flag (cleared when scene exits) |
+| `remove_scene_flag` | `flag` | Clear a scene-local flag |
+| `set_game_flag` | `flag` | Set a persistent game flag |
+| `remove_game_flag` | `flag` | Clear a persistent game flag |
+
+**NPC state**
+
+| Type | Fields | Description |
+|---|---|---|
+| `add_npc_liking` | `npc, delta: i8` | NPC's liking of the PC (positive or negative) |
+| `add_npc_love` | `npc, delta: i8` | NPC's love for the PC |
+| `add_w_liking` | `npc, delta: i8` | PC's liking of the NPC |
+| `set_npc_flag` | `npc, flag` | Set a flag on a specific NPC |
+| `add_npc_trait` | `npc, trait_id` | Add a trait to an NPC |
+| `set_relationship` | `npc, status` | Set relationship status between PC and NPC |
+| `set_npc_attraction` | `npc, delta: i8` | Set NPC's attraction to the PC |
+| `set_npc_behaviour` | `npc, behaviour` | Set NPC's behaviour state |
+| `set_contactable` | `npc, value: bool` | Mark an NPC as contactable (or not) |
+| `add_sexual_activity` | `npc, activity` | Record a sexual activity with an NPC |
+| `set_npc_role` | `npc, role` | Bind an NPC to a named role for the current scene |
+
+**Navigation**
+
+| Type | Fields | Description |
+|---|---|---|
+| `transition` | `target` | Jump to a different scene by ID |
+| `advance_arc` | `arc, to_state` | Transition an arc to a new state |
+| `advance_time` | `slots: u32` | Advance the game clock by N time slots |
+
+**Checks and misc**
+
+| Type | Fields | Description |
+|---|---|---|
+| `fail_red_check` | `skill` | Trigger a red-check failure for a skill (used by the check system) |
 
 ### Next Branches (`[[actions.next]]`)
 
@@ -402,9 +447,10 @@ All `condition`, `trigger`, and `if` fields use the custom expression parser.
 | Object | Key methods |
 |--------|-------------|
 | `w.` | `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()`, plus all physical attribute accessors (`getHeight()`, `getFigure()`, `getBreasts()`, etc.) and before-life accessors (`beforeHeight()`, `beforeFigure()`, etc.) — see [Physical Attribute Accessors](#physical-attribute-accessors) above |
-| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()` |
+| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE")` |
 | `scene.` | `hasFlag("FLAG")` |
-| `m.` | `hasTrait("ID")`, `isPartner()`, `isFriend()` (NPC receiver) |
+| `m.` | `hasTrait("ID")`, `isPartner()`, `isFriend()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag("FLAG")`, `hasRole("ROLE")`, `hadOrgasm()` (male NPC receiver) |
+| `f.` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")` (female NPC receiver) |
 
 Operators: `&&`, `||`, `!`, `==`, `!=`, `<`, `>`, `<=`, `>=`. String literals use single quotes.
 

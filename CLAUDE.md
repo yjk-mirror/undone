@@ -211,6 +211,15 @@ These are constraints, not aspirations. Violating them is a bug.
    speed. This applies to game code, tooling, infrastructure, and agent workflows
    equally. Workarounds accumulate; correct solutions compose.
 
+9. **`log` crate in library code, never `eprintln!`.** Library crates (`undone-scene`,
+   `undone-world`, etc.) must use `log::warn!` / `log::error!` — never `eprintln!`.
+   Only `main.rs` may use `eprintln!` directly. This ensures structured logging and
+   lets consumers control output.
+
+10. **Docs track implementation.** When adding a new effect type, expression method,
+    trait group, or engine capability: update `docs/content-schema.md` and
+    `docs/plans/2026-02-21-engine-design.md` in the same commit. Stale docs are bugs.
+
 ## UI — Current State
 
 Layout: title bar (UNDONE branding, Game/Saves/Settings tabs, window controls) always
@@ -223,7 +232,7 @@ For UI changes see `.interface-design/system.md` (design system spec) and
 ## Writing and Content — Current State
 
 Engine is fully end-to-end. Writing guide is established (`docs/writing-guide.md`).
-19 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
+33 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
 and `writing-reviewer` for quality passes. See `docs/arcs/` for arc structure and
 `docs/characters/` for NPC profiles. See `docs/content-schema.md` for the complete
 content schema reference (pack → schedule → scenes → actions → effects).

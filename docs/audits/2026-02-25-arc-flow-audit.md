@@ -6,6 +6,7 @@ Complete audit of how arcs, schedule, scenes, and engine interact.
 
 ## Engine Bugs (Structural — must fix)
 
+✅ **RESOLVED** (writing-pipeline / Sprint 1) — `NpcActionDef` and `NpcAction` now have a `next: Vec<NextBranchDef>` / `next: Vec<NextBranch>` field. The engine evaluates `next` branches after NPC action effects fire. All six scenes with `[[npc_actions.next]]` blocks now route correctly.
 ### B1. `NpcAction` struct has no `next` field — all `[[npc_actions.next]]` blocks silently dropped
 
 `NpcActionDef` in `types.rs` defines `id`, `condition`, `prose`, `weight`, `effects` — no `next`.
@@ -27,6 +28,7 @@ but intended NPC-driven scene flow is broken.
 **Fix:** Either add `next: Vec<NextBranch>` to `NpcActionDef` and wire it in the engine, or
 remove the dead `[[npc_actions.next]]` blocks from TOML and redesign those scenes.
 
+✅ **RESOLVED** (Sprint 1) — The caller of `pick_next()` now sets `ONCE_<scene_id>` game flags when `result.once_only == true`, at both call sites in `left_panel.rs:205` and `lib.rs:247`.
 ### B2. `once_only` flag mechanism is inert — `ONCE_<scene_id>` flags never set
 
 The scheduler checks `world.game_data.has_flag(&format!("ONCE_{}", scene_id))` for once_only events.
@@ -41,6 +43,7 @@ flag protection — it can fire repeatedly during `dorm_life`.
 
 **Fix:** The caller of `pick_next()` must set the `ONCE_` flag when the scene fires.
 
+✅ **RESOLVED** (playtest-fix session) — `start_scene()` helper in `lib.rs:385` wraps `StartScene` with `SetActiveMale`/`SetActiveFemale` commands before the scene runs. All 5 call sites replaced. NPC liking effects no longer fail silently.
 ### B3. `add_npc_liking npc = "m"` silently fails — no active NPC set
 
 `coffee_shop` and `rain_shelter` both use `add_npc_liking npc = "m"` effects. This requires
@@ -55,6 +58,7 @@ until the NPC system is ready for these encounters.
 
 ## Reachability Gaps
 
+✅ **RESOLVED** (Sprint 1) — `workplace_first_clothes` is now a `trigger` for `arcState == 'week_one'`. `workplace_first_day` fires on `arcState == 'clothes_done'` (a distinct state advanced by first_clothes). Both scenes are reachable in sequence.
 ### R1. `robin_first_clothes` is unreachable (Critical)
 
 `robin_first_clothes` has `weight = 10`, no trigger, condition `arcState == 'week_one'`.
@@ -66,6 +70,7 @@ The scene will never run.
 **Fix:** Either give `robin_first_clothes` a trigger that fires before `robin_first_day`,
 or restructure the arc so both scenes can fire during `week_one`.
 
+✅ **RESOLVED** (Sprint 1) — `ArcDef.initial_state` field removed from `data.rs` and all TOML arc definitions. The field no longer exists to be misread or misunderstood by pack authors.
 ### R2. `initial_state` in `arcs.toml` is dead data
 
 Both arcs declare `initial_state = "arrived"` but the engine never reads this field at game start.

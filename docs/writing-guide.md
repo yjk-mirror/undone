@@ -117,7 +117,7 @@ You nod at the man already there. He nods back.
 | Object | Methods |
 |--------|---------|
 | `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()`, `getSkill("ID")`, `getMoney()`, `getStress()`, `wasMale()`, `wasTransformed()` |
-| `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")` |
+| `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `npcLiking("ROLE")` |
 | `scene` | `hasFlag("FLAG")` |
 
 > **Note:** `m` (male NPC) and `f` (female NPC) are **not available in prose templates**.

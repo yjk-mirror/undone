@@ -22,21 +22,25 @@ The critical findings are real bugs or principle violations that should be fixed
 
 ## Critical Findings
 
+✅ **RESOLVED** (Sprint 1) — `once_only` flag is now set after `pick_next` returns a result with `once_only == true`, via `set_flag(format!("ONCE_{}", result.scene_id))` at both call sites in `left_panel.rs:205` and `lib.rs:247`.
 ### C1. `once_only` flag is never set — once-only scenes fire repeatedly
 **Crate:** undone-ui (`left_panel.rs:204`, `lib.rs:257`)
 **Issue:** `pick_next()` returns `PickResult` with `once_only: bool`, but the caller drops it unused. The `ONCE_<scene_id>` game flag is never set. Scenes marked `once_only = true` in `schedule.toml` will repeat indefinitely.
 **Fix:** After `pick_next` returns a result with `once_only == true`, set the game flag before starting the scene.
 
+✅ **RESOLVED** (Sprint 1) — `choose_action` in `engine.rs:266` now re-evaluates the action condition and returns early with a re-emit of current actions if the condition fails.
 ### C2. `choose_action` does not re-check conditions on the chosen action
 **Crate:** undone-scene (`engine.rs:253`)
 **Issue:** Actions whose condition evaluates to `false` (hidden from UI) can still be executed if the caller sends their ID. No condition guard in `choose_action`.
 **Fix:** Re-evaluate the action's condition in `choose_action` before executing. Return silently or emit `ErrorOccurred` if it fails.
 
+✅ **RESOLVED** (Sprint 1) — `load_schedule` failure now calls `failed_pre(registry, scenes, format!("Schedule load error: {e}"))` instead of falling back to `Scheduler::empty()`.
 ### C3. Scheduler load failure is silent — game goes blank after first scene
 **Crate:** undone-ui (`game_state.rs:115`)
 **Issue:** `load_schedule` failure falls back to `Scheduler::empty()` with only an `eprintln!`. After the opening scene finishes, `pick_next` returns `None` and the player is stuck at a blank story panel.
 **Fix:** Treat scheduler load failure the same as scene load failure — set `init_error` and return via `failed_pre`.
 
+✅ **RESOLVED** (Sprint 1) — `ArcDef.initial_state` field has been removed from `data.rs` and from `arcs.toml`. `ArcDef` now only has `id`, `states`, and `npc_role`.
 ### C4. `ArcDef.initial_state` is declared, populated in TOML, never consumed
 **Crate:** undone-packs (`data.rs:114`, `arcs.toml`)
 **Issue:** Both arcs set `initial_state = "arrived"` but no code reads this field. Pack authors who rely on it will see no effect silently.
@@ -52,11 +56,13 @@ The critical findings are real bugs or principle violations that should be fixed
 **Issue:** Engineering Principle 2 violation. The trait injections use `if let Ok(...)` which silently skips if the trait is absent.
 **Fix:** Define required-skills/required-traits in the pack manifest and validate at load time. Or document as a known design compromise and make the silent skips into loud warnings.
 
+✅ **RESOLVED** (Sprint 1) — The dead `From<&NpcCore>` impl has been removed. `NpcSnapshot` struct introduced in its place, populated via explicit fields at the `NpcActivated` event handler.
 ### C7. Dead `From<&NpcCore>` impl with Debug-format bug
 **Crate:** undone-ui (`lib.rs:131`)
 **Issue:** Never called. Would produce `PersonalityId(Spur { ... })` as the personality string if invoked. False interface.
 **Fix:** Remove entirely.
 
+✅ **RESOLVED** (Sprint 1) — `SkillIncrease` in `effects.rs` now clamps to `SkillDef.min`/`SkillDef.max`. `skills.toml` FEMININITY `min` changed from `-100` to `0`.
 ### C8. FEMININITY skill `min=-100` contradicts documentation and is not enforced
 **Pack data:** `skills.toml`
 **Issue:** `SkillIncrease` in effects.rs does not clamp to declared min/max. CLAUDE.md says range is 0–100+.
@@ -66,14 +72,17 @@ The critical findings are real bugs or principle violations that should be fixed
 
 ## Important Findings
 
+✅ **RESOLVED** (Sprint 1) — `validate_effects` now validates `AddStat`/`SetStat` against `registry.is_registered_stat()` and `FailRedCheck` against `registry.resolve_skill()`, both returning `SceneLoadError` on failure.
 ### I1. `validate_effects` does not validate `AddStat`/`SetStat`/`FailRedCheck` stat/skill names at load time
 **Crate:** undone-scene (`loader.rs:274`)
 **Principle:** No silent defaults for content errors.
 
+✅ **RESOLVED** (Sprint 1) — `validate_trait_conflicts` is now called in `validate_pack.rs:63` as well as in `game_state.rs:85`.
 ### I2. `validate_trait_conflicts` not called in `validate-pack` binary
 **Crate:** undone-packs (`validate_pack.rs`)
 **Impact:** Offline pack validation tool misses conflict errors.
 
+✅ **RESOLVED** (Sprint 1) — Category IDs in `inCategory`/`beforeInCategory` conditions are now validated at load time in `loader.rs:237`, returning `SceneLoadError::UnknownCategory` for unknown IDs.
 ### I3. Category IDs in conditions not validated at load time — `inCategory('TYPO')` silently returns false
 **Crate:** undone-expr (`eval.rs:293`)
 **Principle:** Fail fast, fail loud.
@@ -86,6 +95,7 @@ The critical findings are real bugs or principle violations that should be fixed
 **Crate:** undone-expr (`parser.rs:111`)
 **Principle:** Bounded resources.
 
+✅ **RESOLVED** (Sprint 1) — Stats are now registered via `register_stats()` into `PackRegistry.registered_stats` (a `HashSet<StatId>`). `is_registered_stat()` distinguishes declared stats from other interned strings. Used by `validate_effects` for `AddStat`/`SetStat` validation.
 ### I6. `stat_defs` name/description discarded at registration — no stat validation possible
 **Crate:** undone-packs (`registry.rs:86`)
 
@@ -98,6 +108,7 @@ The critical findings are real bugs or principle violations that should be fixed
 ### I9. Saves panel scroll missing `shrink_to_fit()` + `flex_basis(0.0)` — scrolling may not activate
 **Crate:** undone-ui (`saves_panel.rs:332`)
 
+⚠️ **PARTIAL** — `BEAUTIFUL` and `PLAIN` removed (replaced by `Appearance` enum). `BLOCK_ROUGH` and `LIKES_ROUGH` still hardcoded as string literals in `char_creation.rs:1034-1037`.
 ### I10. Hardcoded content trait IDs in UI (`BLOCK_ROUGH`, `LIKES_ROUGH`, `BEAUTIFUL`, `PLAIN`)
 **Crate:** undone-ui (`char_creation.rs:889`)
 
@@ -110,15 +121,19 @@ The critical findings are real bugs or principle violations that should be fixed
 ### I13. No tests for `process_events`, paragraph cap, or `AppPhase` transitions
 **Crate:** undone-ui
 
+✅ **RESOLVED** (Sprint 1) — `SceneId` newtype removed from `ids.rs`. Scene identities are now plain `String` throughout.
 ### I14. `SceneId` newtype defined in domain but unused everywhere else — false type safety
 **Crate:** undone-domain (`ids.rs:33`)
 
+✅ **RESOLVED** (Sprint 1) — `has_before_life()` alias removed from `enums.rs`. All call sites use `was_transformed()` directly.
 ### I15. `has_before_life()` is a redundant alias for `was_transformed()`
 **Crate:** undone-domain (`enums.rs:156`)
 
+✅ **RESOLVED** (Sprint 1) — `anyhow` removed from `undone-scene/Cargo.toml`.
 ### I16. Unused `anyhow` dependency in undone-scene
 **Crate:** undone-scene (`Cargo.toml`)
 
+✅ **RESOLVED** (arc-system sprint) — `default_slot` field removed from `GameState`/`GameData`. `pick_next()` is the single entry point and evaluates all slots.
 ### I17. `default_slot` in pack.toml is stale after arc-system refactor
 **Pack data:** `pack.toml`
 

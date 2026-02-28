@@ -38,7 +38,7 @@ content format, full ownership.
 
 ```
 undone/
-├── Cargo.toml               # workspace root
+├── Cargo.toml               # game workspace root
 ├── src/
 │   └── main.rs              # entry point, launches floem
 │
@@ -58,9 +58,22 @@ undone/
 │       │   ├── traits.toml
 │       │   ├── npc_traits.toml
 │       │   ├── skills.toml
-│       │   └── stats.toml
+│       │   ├── stats.toml
+│       │   ├── arcs.toml
+│       │   ├── categories.toml
+│       │   ├── names.toml
+│       │   ├── races.toml
+│       │   └── schedule.toml
 │       ├── scenes/
 │       └── ui/              # fonts, theme (packs can reskin)
+│
+├── tools/                   # ⚠ separate Cargo workspace — devtools, not game code
+│   ├── Cargo.toml
+│   ├── rhai-mcp-server/     # Rhai script validation
+│   ├── minijinja-mcp-server/# Minijinja template validation + preview
+│   ├── screenshot-mcp/      # screen capture (Windows only)
+│   ├── game-input-mcp/      # keyboard/mouse injection (Windows only)
+│   └── rust-mcp/            # rust-analyzer LSP integration
 │
 └── docs/
     └── plans/
@@ -98,7 +111,6 @@ pub struct World {
     pub male_npcs: SlotMap<MaleNpcKey, MaleNpc>,
     pub female_npcs: SlotMap<FemaleNpcKey, FemaleNpc>,
     pub game_data: GameData,
-    pub week: u32,
 }
 ```
 
@@ -106,25 +118,47 @@ pub struct World {
 
 ```rust
 pub struct Player {
-    // Identity
-    pub name: String,
+    // Identity — three-name system
+    pub name_fem: String,
+    pub name_androg: String,
+    pub name_masc: String,
     pub age: Age,
     pub race: String,
-    pub figure: PlayerFigure,       // Slim | Toned | Womanly
+    pub figure: PlayerFigure,
     pub breasts: BreastSize,
+    pub eye_colour: EyeColour,
+    pub hair_colour: HairColour,
 
-    // Content-driven (data files, not hardcoded)
+    // Physical attributes
+    pub height: Height,
+    pub hair_length: HairLength,
+    pub skin_tone: SkinTone,
+    pub complexion: Complexion,
+    pub appearance: Appearance,
+    pub butt: ButtSize,
+    pub waist: WaistSize,
+    pub lips: LipShape,
+
+    // Sexual/intimate attributes
+    pub nipple_sensitivity: NippleSensitivity,
+    pub clit_sensitivity: ClitSensitivity,
+    pub pubic_hair: PubicHairStyle,
+    pub natural_pubic_hair: NaturalPubicHair,
+    pub inner_labia: InnerLabiaSize,
+    pub wetness_baseline: WetnessBaseline,
+
+    // Content-driven (loaded from pack data files)
     pub traits: HashSet<TraitId>,
-    pub skills: HashMap<SkillId, SkillValue>,  // { value, modifier }
+    pub skills: HashMap<SkillId, SkillValue>,
 
-    // State — engine-level enums
+    // Economy & wellbeing
     pub money: i32,
     pub stress: i32,
     pub anxiety: i32,
     pub arousal: ArousalLevel,
     pub alcohol: AlcoholLevel,
 
-    // Relationships (keys, never references)
+    // Relationships (keys into World's NPC maps)
     pub partner: Option<NpcKey>,
     pub friends: Vec<NpcKey>,
 
@@ -143,9 +177,28 @@ pub struct Player {
     pub custom_ints: HashMap<String, i32>,
 
     // Transformation axis
-    pub always_female: bool,   // false = male-start PC
+    pub origin: PcOrigin,
+    pub before: Option<BeforeIdentity>,
+}
+
+pub struct BeforeIdentity {
+    pub name: String,
+    pub age: Age,
+    pub race: String,
+    pub sexuality: BeforeSexuality,
+    pub figure: MaleFigure,
+    pub height: Height,
+    pub hair_colour: HairColour,
+    pub eye_colour: EyeColour,
+    pub skin_tone: SkinTone,
+    pub penis_size: PenisSize,
+    pub voice: BeforeVoice,
+    pub traits: HashSet<TraitId>,
 }
 ```
+
+The active display name is selected by FEMININITY level:
+0–30 → `name_masc`, 31–69 → `name_androg`, 70+ → `name_fem`.
 
 ### NPC Core (shared via composition)
 
@@ -153,13 +206,16 @@ pub struct Player {
 pub struct NpcCore {
     pub name: String,
     pub age: Age,
-    pub personality: PersonalityId,      // data-driven
+    pub race: String,
+    pub eye_colour: String,
+    pub hair_colour: String,
+    pub personality: PersonalityId,
     pub traits: HashSet<NpcTraitId>,
 
     // Relationship state — all engine-level enums
     pub relationship: RelationshipStatus,
-    pub pc_liking: LikingLevel,
-    pub npc_liking: LikingLevel,
+    pub pc_liking: LikingLevel,    // PC's liking of NPC
+    pub npc_liking: LikingLevel,   // NPC's liking of PC
     pub pc_love: LoveLevel,
     pub npc_love: LoveLevel,
     pub pc_attraction: AttractionLevel,
@@ -176,23 +232,8 @@ pub struct NpcCore {
     pub contactable: bool,
     pub arousal: ArousalLevel,
     pub alcohol: AlcoholLevel,
-}
 
-pub struct MaleNpc {
-    pub core: NpcCore,
-    pub figure: MaleFigure,
-    pub clothing: MaleClothing,
-    pub had_orgasm: bool,
-}
-
-pub struct FemaleNpc {
-    pub core: NpcCore,
-    pub char_type: CharTypeId,      // data-driven
-    pub figure: PlayerFigure,
-    pub breasts: BreastSize,
-    pub clothing: FemaleClothing,
-    pub pregnancy: Option<PregnancyState>,
-    pub virgin: bool,
+    pub roles: HashSet<String>,    // named roles ("COLLEAGUE", "BOSS", etc.)
 }
 ```
 
@@ -239,6 +280,11 @@ pub struct GameData {
     pub stats: HashMap<StatId, i32>,
     pub job_title: String,
     pub allow_anal: bool,
+    pub week: u32,
+    pub day: u8,                               // 0–6 (Mon–Sun)
+    pub time_slot: TimeSlot,                   // Morning | Afternoon | Evening | Night
+    pub arc_states: HashMap<String, String>,   // arc_id → current state name
+    pub red_check_failures: HashSet<String>,   // "scene_id::skill_id" permanent failures
 }
 ```
 
@@ -260,10 +306,16 @@ author   = "Undone"
 requires = []
 
 [content]
-traits      = "data/traits.toml"
-npc_traits  = "data/npc_traits.toml"
-skills      = "data/skills.toml"
-scenes_dir  = "scenes/"
+traits          = "data/traits.toml"
+npc_traits      = "data/npc_traits.toml"
+skills          = "data/skills.toml"
+scenes_dir      = "scenes/"
+schedule_file   = "data/schedule.toml"
+names_file      = "data/names.toml"
+stats_file      = "data/stats.toml"
+races_file      = "data/races.toml"
+categories_file = "data/categories.toml"
+arcs_file       = "data/arcs.toml"
 ```
 
 ### Trait Definition File
@@ -291,25 +343,27 @@ Packs can add scenes to existing slots or define new ones:
 
 ```toml
 [[slot]]
-name        = "free_time"
-weight_base = 10
+name = "free_time"
 
   [[slot.events]]
   scene     = "base::rain_shelter"
-  condition = "gd.week > 1"
-  weight    = 5
+  condition = "gd.week() >= 1"
+  weight    = 10
 
   [[slot.events]]
-  scene  = "base::corner_store"
-  weight = 8
+  scene     = "base::coffee_shop"
+  condition = "gd.week() >= 1"
+  weight    = 10
+  once_only = false
 ```
 
 The scheduler evaluates conditions against `&World`, weights eligible scenes,
 picks one. Community packs inject scenes by adding entries to slots.
+See `pick_next()` below for the full selection algorithm.
 
 ---
 
-## Scene Format (Approach B)
+## Scene Format
 
 Single `.toml` file per scene. Prose inline as Jinja2 multi-line strings.
 Effects are typed structs — validated at load time, zero runtime string parsing.
@@ -323,7 +377,6 @@ pack        = "base"
 description = "Caught in the rain at a bus shelter."
 
 [intro]
-next  = "main"
 prose = """
 The rain started ten minutes from home.
 {% if w.hasTrait("SHY") %}
@@ -334,30 +387,29 @@ You nod at the man already there. He nods back.
 """
 
 [[actions]]
-id                  = "main"
-label               = "Wait it out"
-detail              = "Stand here until it eases off."
-allow_npc_actions   = true
-use_default_actions = true
+id                = "wait"
+label             = "Wait it out"
+detail            = "Stand here until it eases off."
+allow_npc_actions = true
 
 [[actions]]
 id        = "leave"
 label     = "Make a run for it"
 detail    = "Get soaked. At least you'll be moving."
-condition = "!scene.has_flag('offered_umbrella')"
+condition = "!scene.hasFlag('umbrella_offered')"
 prose     = "You pull your jacket over your head and step out into it."
 
   [[actions.effects]]
   type   = "change_stress"
   amount = 2
 
-  [actions.next]
+  [[actions.next]]
   finish = true
 
 [[actions]]
 id        = "accept_umbrella"
 label     = "Share his umbrella"
-condition = "scene.has_flag('umbrella_offered')"
+condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
 You hesitate, then step closer. "Thanks," you manage.
@@ -368,25 +420,20 @@ You step under without much ceremony. "Cheers."
   [[actions.effects]]
   type  = "add_npc_liking"
   npc   = "m"
-  delta = "small"
+  delta = 1
 
   [[actions.effects]]
   type = "set_game_flag"
-  flag = "base::SHELTERED_WITH_STRANGER"
+  flag = "RAIN_SHELTER_MET"
 
-  [actions.next]
+  [[actions.next]]
   finish = true
 
 [[npc_actions]]
 id        = "offers_umbrella"
-condition = "!scene.has_flag('umbrella_offered')"
-prose     = ""
-
-  [[npc_actions.weight_multipliers]]
-  condition = "m.hasTrait('CHARMING')"
-
-  [[npc_actions.weight_divisors]]
-  condition = "true"
+condition = "!scene.hasFlag('umbrella_offered')"
+weight    = 10
+prose     = """He tilts the umbrella toward you."""
 
   [[npc_actions.effects]]
   type = "set_scene_flag"
@@ -410,39 +457,59 @@ goto = "polite_decline"
 # no 'if' = unconditional fallthrough
 ```
 
-### Typed Effects Enum
+### EffectDef Enum (35 variants)
+
+See `content-schema.md` for the complete TOML-level reference. The Rust enum
+in `crates/undone-scene/src/types.rs`:
 
 ```rust
-pub enum Effect {
-    // Scene state (session-local)
-    SetSceneFlag    { flag: String },
+pub enum EffectDef {
+    // Player state
+    ChangeStress { amount: i32 },
+    ChangeMoney { amount: i32 },
+    ChangeAnxiety { amount: i32 },
+    AddArousal { delta: i8 },
+    ChangeAlcohol { delta: i8 },
+    SkillIncrease { skill: String, amount: i32 },
+    AddTrait { trait_id: String },
+    RemoveTrait { trait_id: String },
+    SetVirgin { value: bool, virgin_type: Option<String> },
+    SetJobTitle { title: String },
+
+    // Scene flags (session-local)
+    SetSceneFlag { flag: String },
     RemoveSceneFlag { flag: String },
 
-    // Game state (persistent)
-    SetGameFlag     { flag: String },
-    RemoveGameFlag  { flag: String },
-    AddStat         { stat: StatId, amount: i32 },
-    SetStat         { stat: StatId, value: i32 },
+    // Game flags (persistent)
+    SetGameFlag { flag: String },
+    RemoveGameFlag { flag: String },
+    AddStat { stat: String, amount: i32 },
+    SetStat { stat: String, value: i32 },
 
-    // Player
-    ChangeStress    { amount: i32 },
-    ChangeMoney     { amount: i32 },
-    ChangeAnxiety   { amount: i32 },
-    SkillIncrease   { skill: SkillId, amount: i32 },
-    AddTrait        { trait_id: TraitId },
-    RemoveTrait     { trait_id: TraitId },
-    AddArousal      { delta: ArousalDelta },
+    // NPC state
+    AddNpcLiking { npc: String, delta: i8 },
+    AddNpcLove { npc: String, delta: i8 },
+    AddWLiking { npc: String, delta: i8 },
+    SetNpcFlag { npc: String, flag: String },
+    AddNpcTrait { npc: String, trait_id: String },
+    SetNpcAttraction { npc: String, delta: i8 },
+    SetNpcBehaviour { npc: String, behaviour: String },
+    SetContactable { npc: String, value: bool },
+    AddSexualActivity { npc: String, activity: String },
+    SetPlayerPartner { npc: String },
+    AddPlayerFriend { npc: String },
+    SetRelationship { npc: String, status: String },
+    SetNpcRole { npc: String, role: String },
 
-    // NPC (npc = "m", "f", or named id from scene context)
-    AddNpcLiking    { npc: String, delta: LikingDelta },
-    AddNpcLove      { npc: String, delta: LoveDelta },
-    AddWLiking      { npc: String, delta: LikingDelta },
-    SetNpcFlag      { npc: String, flag: String },
-    AddNpcTrait     { npc: String, trait_id: NpcTraitId },
+    // Inventory
+    AddStuff { item: String },
+    RemoveStuff { item: String },
 
-    // Flow
-    Transition      { target: SceneId },
-    Finish,
+    // Flow / time
+    Transition { target: String },
+    AdvanceTime { slots: u32 },
+    AdvanceArc { arc: String, to_state: String },
+    FailRedCheck { skill: String },
 }
 ```
 
@@ -543,23 +610,28 @@ change (quit job → clear ROUTE_ROBIN, take new job → set new flag).
 
 ## UI (`undone-ui`)
 
-floem (Lapce reactive UI). Three-panel layout:
+floem (Lapce reactive UI). Two-panel layout at 1200×800:
 
 ```
-┌─────────────────────┬──────────────────────────────┐
-│                     │                              │
-│   STORY TEXT        │   CHARACTER / NPC INFO       │
-│   (scrollable)      │   (stats, relationship,      │
-│                     │    traits on hover)          │
-│                     │                              │
-├─────────────────────┴──────────────────────────────┤
-│  [ Action A ]  [ Action B ]  [ Action C ]          │
-└────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  UNDONE          Game │ Saves │ Settings    ─ □ ×    │
+├──────────┬───────────────────────────────────────────┤
+│          │                                           │
+│  STATS   │   STORY TEXT (scrollable)                 │
+│  SIDEBAR │                                           │
+│  (280px) │   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│  Name    │   Detail strip (shown on action hover)    │
+│  FEM: 10 │   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│  Money   │   [ Action A ]  [ Action B ]  [ Action C ]│
+│  Stress  │                                           │
+│  ...     │                                           │
+└──────────┴───────────────────────────────────────────┘
 ```
 
-- Story text: floem text view, rich text, variable font size
-- Action buttons: tooltip shows `detail` field
-- Right panel: contextual — collapses when no NPC present
+- Title bar: UNDONE branding, Game/Saves/Settings tabs, window controls
+- Stats sidebar left (280px): player stats, NPC info when active
+- Story panel right: scrollable prose, choices bar at bottom, detail strip on hover
+- Three themes: Warm Paper (default), Sepia, Night
 - Theme and fonts loaded from `packs/base/ui/` — packs can reskin
 
 ---
@@ -576,23 +648,10 @@ See `docs/plans/2026-02-22-design-decisions.md` for full rationale.
 | Character creation flow | Two-phase hybrid: narrative "Before" scene + configured form. Three-name system. |
 | NPC spawning / pool seeding | Newlife model: 6–8 men + 2–3 women at game start, diversity guarantees |
 
-### New fields required on `Player`
-
-```rust
-pub before_age: u32,
-pub before_race: String,
-pub before_sexuality: Sexuality,   // engine enum
-pub name_masc: String,
-pub name_androg: String,
-pub name_fem: String,
-```
-
-### New engine enum required
-
-```rust
-pub enum Sexuality { StraightMale, GayMale, BiMale, AlwaysFemale }
-pub enum Personality { Romantic, Jerk, Friend, Intellectual, Lad }
-```
+All fields from the original design decisions are now implemented. The three-name
+system (`name_fem`, `name_androg`, `name_masc`) lives on `Player`. Before-life
+identity lives in `Player.before: Option<BeforeIdentity>`. See the Player struct
+above for the full current state.
 
 ---
 
@@ -638,9 +697,9 @@ Asian, and also carries `OBJECTIFYING`. Scenes involving the male gaze on East
 Asian women can fire with specific interiority for Robin: she knows that gaze
 because it was hers.
 
-Scene conditions for race-change combinations follow this pattern:
-- `w.player().race` — current race (string)
-- `w.player().before.race` — before-transformation race (string, may be empty for AlwaysFemale)
+Scene conditions for race-change combinations use the expression accessors:
+- `w.getRace()` — current race (string)
+- `w.beforeSkinTone()` — before-transformation skin tone (empty string if AlwaysFemale)
 - Both can appear in conditions alongside trait checks
 
 ### "Coming soon" greyout for initial release (not implemented in dev)
@@ -657,3 +716,4 @@ remain selectable — content gaps show as missing branches in existing scenes.
 
 *Design session: 2026-02-21. Authors: YJK + Claude.*
 *Trait philosophy section added: 2026-02-24.*
+*Structs, effects, UI, pack manifest updated to match implementation: 2026-02-27.*
