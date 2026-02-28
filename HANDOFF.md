@@ -48,7 +48,37 @@ Full 9-step playtest passed with Robin preset (ANALYTICAL trait, Night theme). T
 - **Saves panel scroll** — `saves_panel.rs` is missing `shrink_to_fit()` on its scroll container; scrolling may not activate with many saves.
 - **Tab buttons active during char creation** — clicking Game/Saves/Settings tabs during char creation has no visible effect but the buttons appear clickable (no disabled state).
 
-### Char creation bugs (user-reported)
+### User playtest feedback (2026-02-27, second session)
+
+**UX / Navigation:**
+1. **Settings inaccessible from "Your Story Begins"** — Can't click Settings tab during char creation. User wants to adjust text size before starting. Related: I12 in engineering audit (tab buttons active but no effect).
+2. **No landing page / load game screen** — No way to load a saved game before starting a new one. Game launches straight into char creation. Needs a title screen or launcher with New Game / Continue / Load / Settings.
+3. **Deferred Settings teleport** — User clicked Settings during char creation (no effect), then later got randomly teleported to the Settings tab mid-game. Tab click was queued or state leaked across phases.
+4. **Default text size too small** — Feels small on first launch. User wants to be able to change it before playing.
+
+**Char creation:**
+5. **"Who Are You Now" screen extremely lacking** — Known issue (attribute dropdowns not implemented). But user is hitting it now as a real blocker to the experience feeling complete.
+6. **Names wrong** — Character names don't match what was discussed/decided on. Need to update preset names to the agreed-upon names.
+7. *(Previous)* Trait list runoff, post-transformation attributes in before-phase, attribute formatting — still open.
+
+**Opening scene:**
+8. **Wrong opening scene** — Current `transformation_intro` is not what was discussed. The agreed opening is: he gets off a plane, arrives in the city. The transformation scene should follow the arrival framing, not precede it as an abstract standalone.
+
+**Story panel layout:**
+9. **Flavor text box too small** — The detail strip (action hover/highlight description area) feels too cramped.
+10. **Action buttons misaligned with prose** — Selections/choices should start at the same left edge as the prose text, not be offset from it.
+
+**Sidebar:**
+11. **NPC display — wrong character showing** — Left sidebar shows a random NPC the user doesn't recognize. No context for who they are or why they're shown.
+12. **NPC formatting broken** — Whatever is displayed isn't properly formatted.
+13. **Multiple NPC display unclear** — No visible plan for how the sidebar handles multiple NPCs.
+
+**Writing quality:**
+14. **Rain scene writing bad** — Too much telling-not-showing. Narrator puts thoughts directly into PC's brain ("you know what they think because you've been him"). Violates the show-don't-tell principle. The "you know what men think because you were one" angle is too explicit and repetitive — it should be shown through specific moments, not stated as narration.
+15. **Repetitive transformation narration** — Multiple scenes hammer the same "you used to be a man so you understand" beat explicitly instead of letting it emerge from concrete observations. Needs subtlety — the insight should be demonstrated through what the PC notices, not announced by the narrator.
+16. **User considering DeepSeek API for writing agents** — Wants to discuss using DeepSeek alongside Claude for scene writing before next writing sprint. Do not act on this yet.
+
+### Char creation bugs (previous session)
 - **Trait list runoff** — "Starting traits" row overflows off-screen. No wrapping, no colon/space between label and values. Runs off the right edge.
 - **Post-transformation attributes in before-phase** — preset detail shows post-transformation physical traits (Straight hair, Sweet voice, Almond eyes, Wide hips, Narrow waist, Small hands) in the "Who Were You?" phase. Before-phase should only show before-life attributes (name, age, race).
 - **Attribute formatting** — trait/attribute display is a raw comma list with no structure. Needs proper layout (grouped, wrapped, styled).
