@@ -1379,6 +1379,7 @@ fn build_begin_button(
 
             let gs = start_game(pre, config);
             *game_state.borrow_mut() = Some(gs);
+            signals.tab.set(crate::AppTab::Game);
             signals.phase.set(AppPhase::InGame);
         })
         .style(move |s| {

@@ -27,14 +27,14 @@ use crate::settings_panel::settings_view;
 use crate::theme::{ThemeColors, UserPrefs};
 use crate::title_bar::title_bar;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AppTab {
     Game,
     Saves,
     Settings,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AppPhase {
     BeforeCreation,
     TransformationIntro,
@@ -160,8 +160,14 @@ pub fn app_view() -> impl View {
     let phase = signals.phase;
 
     let content = dyn_container(
-        move || phase.get(),
-        move |current_phase| match current_phase {
+        move || (phase.get(), signals.tab.get()),
+        move |(current_phase, current_tab)| {
+            // Settings tab is accessible from any phase.
+            if current_tab == AppTab::Settings {
+                return settings_view(signals).into_any();
+            }
+
+            match current_phase {
             AppPhase::BeforeCreation => char_creation_view(
                 signals,
                 Rc::clone(&pre_state_cc),
@@ -272,20 +278,19 @@ pub fn app_view() -> impl View {
                 dyn_container(move || signals.tab.get(), {
                     let gs_cell = Rc::clone(&gs_cell);
                     move |tab| match tab {
-                        AppTab::Game => h_stack((
+                        AppTab::Game | AppTab::Settings => h_stack((
                             sidebar_panel(signals),
                             story_panel(signals, Rc::clone(&gs_cell)),
                         ))
                         .style(|s| s.size_full())
                         .into_any(),
                         AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
-                        AppTab::Settings => settings_view(signals).into_any(),
                     }
                 })
                 .style(|s| s.flex_grow(1.0))
                 .into_any()
             }
-        },
+        }},
     )
     .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 

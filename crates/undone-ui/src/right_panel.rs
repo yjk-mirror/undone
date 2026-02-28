@@ -7,7 +7,8 @@ use floem::reactive::RwSignal;
 pub fn sidebar_panel(signals: AppSignals) -> impl View {
     v_stack((
         stats_panel(signals.player, signals),
-        npc_panel(signals.active_npc, signals),
+        // NPC panel hidden until proper design is in place.
+        // npc_panel(signals.active_npc, signals),
         mode_toggle(signals),
     ))
     .style(move |s| {

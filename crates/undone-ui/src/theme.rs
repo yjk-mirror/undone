@@ -53,7 +53,7 @@ impl Default for UserPrefs {
         Self {
             mode: ThemeMode::Light,
             font_family: "Literata, Palatino, Georgia, serif".to_string(),
-            font_size: 17,
+            font_size: 19,
             line_height: 1.5,
             number_key_mode: NumberKeyMode::Instant,
         }

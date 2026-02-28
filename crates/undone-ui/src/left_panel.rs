@@ -367,11 +367,11 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.width_full()
-            .min_height(28.0)
+            .min_height(40.0)
             .max_width(680.0)
             .padding_horiz(24.0)
-            .padding_vert(6.0)
-            .font_size(13.0)
+            .padding_vert(10.0)
+            .font_size(14.0)
             .font_family("system-ui, -apple-system, sans-serif".to_string())
             .color(colors.ink_ghost)
             .background(colors.page)
@@ -507,11 +507,11 @@ fn choices_bar(
             })
         },
     )
-    .style(|s| s.flex_row().flex_wrap(FlexWrap::Wrap).max_width(680.0));
+    .style(|s| s.flex_row().flex_wrap(FlexWrap::Wrap).max_width(680.0).padding_horiz(24.0));
 
     container(buttons).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.padding(12.0)
+        s.padding_vert(12.0)
             .border_top(1.0)
             .border_color(colors.seam)
             .min_height(64.0)
