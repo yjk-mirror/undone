@@ -209,6 +209,13 @@ Flag as Minor with a brief note: "Scene touches [relevant body part / sexual dyn
 
 ### Tier 8: Structural
 
+**Stolen player agency (Important — flag immediately):**
+- The intro or NPC action prose has the PC speak, decide, or act in a way that should be a player choice
+- Example: intro prose says "You tell him you're not interested" — that's a decision the player should make via an action button
+- The world can act on her freely (men approach, situations develop, the city does its thing) — but her responses are the player's choices, not the narrator's
+- Action prose (after the player clicks) can write her dialogue and decisions — the player chose to act, the writer decides what that sounds like
+- Exception: minimal social reflexes ("You nod back", "You shift slightly") are acceptable background — the test is whether the reflex is a meaningful choice the player would want to make differently
+
 **Scenes with no lasting consequence:**
 - Every scene must change at least one: game flag, NPC stat, or PC stat
 - Scenes that leave no trace did not happen

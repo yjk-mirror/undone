@@ -118,9 +118,12 @@ You nod at the man already there. He nods back.
 |--------|---------|
 | `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()`, `getSkill("ID")`, `getMoney()`, `getStress()`, `wasMale()`, `wasTransformed()` |
 | `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")` |
-| `m` | `hasTrait("ID")`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `isNpcLoveCrush()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag("FLAG")`, `hasRole("ROLE")` |
-| `f` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")` — only valid when a female NPC is active in the scene |
 | `scene` | `hasFlag("FLAG")` |
+
+> **Note:** `m` (male NPC) and `f` (female NPC) are **not available in prose templates**.
+> They only work in `condition` expression fields (see below). To vary prose based on NPC
+> state, use condition-gated `[[intro_variants]]`, `[[thoughts]]`, or separate actions with
+> `condition` fields that check `m.` / `f.` receivers.
 
 **PC origin helpers:**
 - `w.alwaysFemale()` — `true` if `CisFemaleTransformed` or `AlwaysFemale`; `false` if transformed from male
@@ -700,6 +703,34 @@ something the player does?**
 We want the first. The world interrupts. Events have consequences the player didn't choose.
 NPCs have their own agendas. The player is a person in a city that has its own life.
 
+### Player agency
+
+**Actions are choices the player makes.** Every `[[actions]]` entry is a button the player
+clicks. It represents *her* decision — what she does, says, or chooses next.
+
+Never write action prose that decides what the player says or does without the player
+having chosen it. The intro and NPC actions can describe the world acting on her — men
+approach, situations develop, the city does its thing. But when the player clicks an action,
+that action is *her* agency. She chose it.
+
+**What this means in practice:**
+
+- **Action labels and prose are the player's voice.** If an action says "Say something,"
+  the prose can show her speaking. But the intro should not have her speak unprompted —
+  that is a choice the player hasn't made yet.
+- **The world acts on her freely.** Intro prose, NPC actions, and environmental description
+  can put her in any situation. A man can approach. The rain can start. A coworker can say
+  something that changes the dynamic. The world does not ask permission.
+- **The player responds through actions.** Her responses — what she says, whether she
+  engages, how she handles the situation — are the action buttons. Don't pre-decide them
+  in intro prose.
+- **Dialogue in action prose is fine.** When the player picks "Say something," writing
+  the specific line she says is expected — the player chose to speak, and the writer
+  decides what that sounds like for this character. The distinction is between the player
+  *choosing to act* (her agency) and the writer *deciding she acts* (stolen agency).
+
+This is roleplay. She is an agent of the world. Every action is "what would you do?"
+
 ### Anatomy of a good scene
 
 1. **An inciting situation** — something happens before the player decides anything.
@@ -784,6 +815,7 @@ Before submitting any scene, verify:
 - [ ] Does at least one path set a lasting game flag or NPC/PC stat?
 - [ ] Is the inciting situation something that happens TO her, not something she chose?
 - [ ] Does the world behave as if it has its own life, independent of her?
+- [ ] Are actions the player's choices? (Intro/NPC prose doesn't pre-decide her dialogue or responses)
 
 **Prose:**
 - [ ] All trait branches are structurally different (not adjective swaps)

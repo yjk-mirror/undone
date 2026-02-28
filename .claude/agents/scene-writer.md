@@ -181,6 +181,7 @@ prose = """..."""
 ## Scene Quality Checklist (built-in)
 
 - Something happens in the intro BEFORE the player makes any choice
+- Actions are the PLAYER'S choices — never write dialogue or decisions in intro/NPC prose that the player should be choosing via an action button
 - At least one beat of unresolved tension — something the player cannot fully resolve in this scene
 - Transformation lens is *used* (shows concrete difference), not merely referenced
 - 1–3 choices where different paths produce genuinely different outcomes

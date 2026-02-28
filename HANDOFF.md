@@ -48,6 +48,25 @@ Full 9-step playtest passed with Robin preset (ANALYTICAL trait, Night theme). T
 - **Saves panel scroll** — `saves_panel.rs` is missing `shrink_to_fit()` on its scroll container; scrolling may not activate with many saves.
 - **Tab buttons active during char creation** — clicking Game/Saves/Settings tabs during char creation has no visible effect but the buttons appear clickable (no disabled state).
 
+### Char creation bugs (user-reported)
+- **Trait list runoff** — "Starting traits" row overflows off-screen. No wrapping, no colon/space between label and values. Runs off the right edge.
+- **Post-transformation attributes in before-phase** — preset detail shows post-transformation physical traits (Straight hair, Sweet voice, Almond eyes, Wide hips, Narrow waist, Small hands) in the "Who Were You?" phase. Before-phase should only show before-life attributes (name, age, race).
+- **Attribute formatting** — trait/attribute display is a raw comma list with no structure. Needs proper layout (grouped, wrapped, styled).
+- **Needs test coverage** — these visual/layout bugs should be caught by integration tests or a structured playtest checklist, not manual user testing.
+
+### Design principles to document
+- **Conditional actions (BG3-style)** — actions can show/hide or be grayed out based on player traits, skills, stats, personality. Already supported via `condition` fields in TOML. Needs design documentation with examples: stat checks, personality-locked dialogue, skill-gated options. BG3 is the reference.
+- **Player agency** — actions are the player's choices. Intro/NPC prose describes the world acting on her; actions are her responses. Already added to writing-guide.md + agent docs (2026-02-27 session).
+- **Testing philosophy** — anything that can be considered broken should be covered by tests. Not just unit tests — integration tests, layout validation, playtest checklists. Current gap: UI layout issues only caught by manual playtesting.
+
+### Code audit findings (2026-02-27)
+- **~25 hardcoded content IDs** across 6 engine files — already in open items, audit confirmed scope
+- **9 `eprintln!` in library code** — 5 in engine.rs are redundant (ErrorOccurred already emitted), 4 in scheduler.rs are the only error path
+- **1 `expect` risk** in `new_game()` FEMININITY resolve — panics if pack broken
+- **Dead code** — `SceneId` struct (never used), 3 `pub fn` eval helpers should be private
+- **`pub` field leaks** — registry internals (trait_defs, npc_trait_defs, skill_defs), lasso Spur on ID newtypes, TOML deser types
+- **Scene agency violations** — 5 scenes have PC speaking/deciding in intro/NPC prose (campus_call_home, campus_arrival, campus_orientation, rain_shelter small_talk, workplace_first_day dan_explains). 27/33 scenes clean.
+
 ### Writing sessions — no compilation needed
 For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
 1. Write `.toml` files in `packs/base/scenes/`
