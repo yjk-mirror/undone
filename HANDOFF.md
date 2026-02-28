@@ -51,27 +51,27 @@ Full 9-step playtest passed with Robin preset (ANALYTICAL trait, Night theme). T
 ### User playtest feedback (2026-02-27, second session)
 
 **UX / Navigation:**
-1. **Settings inaccessible from "Your Story Begins"** — Can't click Settings tab during char creation. User wants to adjust text size before starting. Related: I12 in engineering audit (tab buttons active but no effect).
+1. ✅ **Settings inaccessible from "Your Story Begins"** — Fixed: Settings tab now works from any phase (char creation, transformation intro, fem creation, in-game).
 2. **No landing page / load game screen** — No way to load a saved game before starting a new one. Game launches straight into char creation. Needs a title screen or launcher with New Game / Continue / Load / Settings.
-3. **Deferred Settings teleport** — User clicked Settings during char creation (no effect), then later got randomly teleported to the Settings tab mid-game. Tab click was queued or state leaked across phases.
-4. **Default text size too small** — Feels small on first launch. User wants to be able to change it before playing.
+3. ✅ **Deferred Settings teleport** — Fixed: tab state resets to Game on InGame transition. Settings accessible from all phases eliminates the deferred-click problem.
+4. ✅ **Default text size too small** — Fixed: default bumped 17→19. (User's existing prefs file still shows 17 — only affects fresh installs.)
 
 **Char creation:**
 5. **"Who Are You Now" screen extremely lacking** — Known issue (attribute dropdowns not implemented). But user is hitting it now as a real blocker to the experience feeling complete.
-6. **Names wrong** — Character names don't match what was discussed/decided on. Need to update preset names to the agreed-upon names.
+6. **FemCreation ignores preset names** — When using Robin preset, "Who Are You Now?" shows "Eva"/"Ev" (custom form defaults) instead of "Robin"/"Robin". `FemFormSignals::new()` hardcodes Eva/Ev; it should carry forward from the preset's `name_fem`/`name_androg` fields. Fix: pass preset names into `fem_creation_view` or store them on `PartialCharState`.
 7. *(Previous)* Trait list runoff, post-transformation attributes in before-phase, attribute formatting — still open.
 
 **Opening scene:**
 8. **Wrong opening scene** — Current `transformation_intro` is not what was discussed. The agreed opening is: he gets off a plane, arrives in the city. The transformation scene should follow the arrival framing, not precede it as an abstract standalone.
 
 **Story panel layout:**
-9. **Flavor text box too small** — The detail strip (action hover/highlight description area) feels too cramped.
-10. **Action buttons misaligned with prose** — Selections/choices should start at the same left edge as the prose text, not be offset from it.
+9. ✅ **Flavor text box too small** — Fixed: detail strip enlarged (min_height 28→40, padding 6→10, font 13→14).
+10. ✅ **Action buttons misaligned with prose** — Fixed: buttons now have horizontal padding matching prose column.
 
 **Sidebar:**
-11. **NPC display — wrong character showing** — Left sidebar shows a random NPC the user doesn't recognize. No context for who they are or why they're shown.
-12. **NPC formatting broken** — Whatever is displayed isn't properly formatted.
-13. **Multiple NPC display unclear** — No visible plan for how the sidebar handles multiple NPCs.
+11. ✅ **NPC display — wrong character showing** — Fixed: NPC panel hidden entirely. Will redesign when ready (should only show NPCs the player has met, with appropriate information).
+12. ✅ **NPC formatting broken** — Resolved by hiding panel.
+13. **Multiple NPC display unclear** — Needs design work. Deferred until NPC panel redesign.
 
 **Writing quality:**
 14. **Rain scene writing bad** — Too much telling-not-showing. Narrator puts thoughts directly into PC's brain ("you know what they think because you've been him"). Violates the show-don't-tell principle. The "you know what men think because you were one" angle is too explicit and repetitive — it should be shown through specific moments, not stated as narration.
@@ -201,6 +201,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-27 | UI quick wins session. Fixed 7 of 16 user-reported issues: Settings accessible from any phase (was broken during char creation + caused teleport bug), NPC sidebar hidden (was showing unmet NPCs with raw data), detail strip enlarged, button alignment padded to match prose, default font size 17→19, NPC coworker name collision (Robin→Alex in work_standup). Found new bug: FemCreation form ignores preset names (shows Eva/Ev instead of Robin/Robin). Documented remaining open items. 224 tests, 0 failures. |
 | 2026-02-27 | Systematic cleanup session. Code: replaced all 9 `eprintln!` calls in library crates with `log` crate (`log::warn!`/`log::error!`), added `log = "0.4"` as workspace dependency. Removed dead `SceneId` newtype from `ids.rs`. Docs: major `engine-design.md` refresh (Player struct, GameData, NpcCore, EffectDef 35 variants, pack manifest, UI layout, workspace structure with tools/). `content-schema.md` fully updated (35 effect types grouped, gd./m./f. expression methods completed). `writing-guide.md` gd. methods updated. `scene-writer.md` effect types list synced. All three audit files annotated with ✅ RESOLVED / ⚠️ PARTIAL markers (engineering: 13 annotated, arc flow: 5 annotated, writing: systemic + per-scene annotations with file renames). `CLAUDE.md`: scene count 19→33, added Engineering Principles 9 (log crate in library code) and 10 (docs track implementation). 224 tests, 0 failures. |
 | 2026-02-27 | MCP playtest session. Full 9-step playtest via screenshot + game-input MCPs. Found and fixed 2 bugs: (1) NPC wiring — StartScene without SetActiveMale/SetActiveFemale caused silent NPC effect failures; added `start_scene()` helper in lib.rs, replaced 5 callsites. (2) `gd.week()` stuck at 0 — no scene fired advance_time, free_time scenes permanently unreachable; added `advance_time slots=28` to workplace_evening.toml. TimeSlot has 4 variants (not 3), so 7×4=28. New test `pick_next_free_time_appears_after_arc_settles_with_advance_time`. All 9 playtest steps verified: char creation, 7-scene arc, settled state, free_time rotation (7 scenes seen), Jake thread (coffee_shop→MET_JAKE→park_walk), Marcus thread, FEMININITY-gated variants, ANALYTICAL trait branches. 223→224 tests, 0 failures. |
 | 2026-02-27 | Project audit + tooling session. Full status review: 223 tests confirmed, 33 scenes, validate-pack clean. Cross-referenced all 3 audit files against Sprint 1–3 fixes — built definitive resolved/unresolved table (28 fixed, 8 by policy, 7 partial, 41 open). Key finding: C1 (once_only) and C2 (choose_action) were ALREADY FIXED — audit files and content-schema.md were stale. Updated content-schema.md (removed "NOT YET IMPLEMENTED" once_only note), HANDOFF.md open items, MEMORY.md sprint status. Writing toolchain audit: scene-writer.md missing gd.npcLiking + m./f. receivers + "scene must earn its place" checklist items; writing-reviewer.md had 8 invented trait IDs (HIGH_VOICE, SENSITIVE_NIPPLES, etc.) + missing Critical patterns (desire/shame ordering, trait-gated best content); writing-guide.md condition tables incomplete. All three files fixed. Screenshot MCP zombie-session bug: WGC PersistentCapture stops delivering frames after window surface recreation (floem phase transition) but is_finished() returns false. Fixed capture.rs to detect and auto-recreate zombie sessions. Binary rebuilt. Pushed 11 commits to origin. MCP playtest started — game boots, char creation works, transformation_intro renders. Playtest paused for session restart (screenshot MCP needs respawn). |
