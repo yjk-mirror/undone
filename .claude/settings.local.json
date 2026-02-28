@@ -36,10 +36,10 @@
       "Bash(git add:*)"
     ]
   },
-  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "rhai",
     "minijinja",
+    "rust",
     "screenshot",
     "game-input"
   ]

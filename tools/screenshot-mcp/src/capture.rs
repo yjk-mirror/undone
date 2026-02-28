@@ -147,7 +147,7 @@ impl SessionManager {
             self.sessions.remove(title);
         }
 
-        // Start session if needed.
+        // Start or get existing session.
         let is_new = !self.sessions.contains_key(title);
         if is_new {
             let session = Session::start(title)?;
@@ -156,15 +156,32 @@ impl SessionManager {
 
         let session = self.sessions.get(title).unwrap();
 
-        // On first call, wait for the initial frame (WGC needs a GPU round-trip).
-        if is_new {
-            for _ in 0..50 {
-                // 50 × 20ms = 1 second max wait
-                if session.shared.lock().unwrap().is_some() {
-                    break;
-                }
-                std::thread::sleep(Duration::from_millis(20));
+        // Wait for a frame (new sessions need a GPU round-trip; existing sessions
+        // may have had their last frame consumed by a previous take()).
+        let wait_iters = if is_new { 50 } else { 10 }; // 1s for new, 200ms for existing
+        for _ in 0..wait_iters {
+            if session.shared.lock().unwrap().is_some() {
+                break;
             }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+
+        if let Some(frame) = session.latest_frame() {
+            return Ok(frame);
+        }
+
+        // No frame after waiting — session is zombie (WGC lost its capture target,
+        // e.g. the window recreated its GPU surface). Tear down and retry once.
+        self.sessions.remove(title);
+        let session = Session::start(title)?;
+        self.sessions.insert(title.to_string(), session);
+        let session = self.sessions.get(title).unwrap();
+
+        for _ in 0..50 {
+            if session.shared.lock().unwrap().is_some() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(20));
         }
 
         session

@@ -17,31 +17,41 @@
 
 ## ⚡ Next Action
 
-**MCP Playtest Session** — Click through the game using game-input + screenshot MCPs to verify the Sprint 3 content actually works end-to-end. Fix anything broken.
+**MCP Playtest — IN PROGRESS (resume after session restart)**
 
-**What to verify:**
-- Workplace arc reaches `settled` state correctly, work slot scenes fire
-- Free_time scenes load and rotate (bookstore, park_walk, grocery_store, evening_home, neighborhood_bar)
-- Jake thread: coffee_shop sets MET_JAKE, coffee_shop_return + jake_outside gate correctly on it
-- Marcus thread: workplace_work_meeting sets FIRST_MEETING_DONE, work_marcus_coffee + work_marcus_favor gate correctly
-- NPC liking gating works (sit_near_him gates on gd.npcLiking('ROLE_JAKE') == 'Ok', he_suggests_coffee on 'Like')
-- FEMININITY-gated intro_variants display at the right thresholds
-- Trait branches fire (CONFIDENT, SHY, ANALYTICAL, OBJECTIFYING, HOMOPHOBIC)
+The game is running (PID 59612, Robin preset, reached transformation_intro scene).
+Screenshot MCP had a zombie-session bug — fixed in `tools/screenshot-mcp/src/capture.rs`
+(auto-recreate sessions that stop producing frames). Binary rebuilt and swapped in.
+**Need Claude Code restart to re-spawn screenshot MCP server with the new binary.**
+
+Game-input MCP works fine (click and keypress both verified).
+
+**Playtest plan — pick up here:**
+1. Game is at transformation_intro (pressed "Continue" via key 1). Take screenshot to confirm state.
+2. Continue through transformation_intro → fem creation phase → start game
+3. Play through workplace arc: arrival → landlord → first_night → first_clothes → first_day → work_meeting → evening (7 scenes, linear triggers)
+4. Verify `settled` state reached, work slot scenes start firing
+5. Verify free_time scenes rotate (bookstore, park_walk, grocery_store, evening_home, neighborhood_bar)
+6. Verify Jake thread: coffee_shop sets MET_JAKE → coffee_shop_return + jake_outside gate on it
+7. Verify Marcus thread: workplace_work_meeting sets FIRST_MEETING_DONE → work_marcus_coffee + work_marcus_favor gate on it
+8. Check FEMININITY-gated intro_variants display at the right thresholds
+9. Check trait branches fire (CONFIDENT, SHY, ANALYTICAL, OBJECTIFYING, HOMOPHOBIC)
 
 **Fix protocol:** correct fixes only, no workarounds. If something is structurally broken, fix it at the root.
 
-**After playtest:** Sprint 4 — writing quality pass on the worst scenes (free_time especially). The Sprint 3 batch is functional but several scenes still resolve too cleanly. See writing-guide "scene must earn its place" rule.
+**After playtest:** User will do their own testing and provide feedback. Then plan Sprint 4.
 
-### Remaining open items (post-Sprint 1)
-- **`plan_your_day` full rewrite** — placeholder stub. → Sprint 2.
-- **FEMININITY never increments** — no scene has `skill_increase FEMININITY`. → Sprint 2.
-- **Post-arc content void** — `settled` (workplace) and `first_week` (campus) have zero scenes. 3-scene free_time loop. → Sprint 4.
-- **Prose polish pass** — Important items across workplace scenes (staccato closers, adjective-swap branches, emotion announcements, over-naming). → Post-Sprint 3.
+### Remaining open items (post-Sprint 3)
+- **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
+- **Prose polish pass** — Workplace arc prose is mostly clean after Sprint 2–3 audit passes. Campus arc has ~20 open Critical/Important writing findings from the 2026-02-25 audit. → Sprint 4+.
 - **Free_time expansion** — more universal scenes needed. → Sprint 4.
 - **NPC character docs missing** — 13 named NPCs have no character docs (Marcus, David, Jake, Frank, etc.). → As needed.
 - **Presets as pack data** — `PRESET_WORKPLACE` / `PRESET_CAMPUS` are static Rust structs. → Sprint 5.
 - **Test fixture DRY** — 8+ identical `make_world()` helpers across crates. → Sprint 5.
-- **Campus arc rewrite** — scenes still have prose issues from audit. → Sprint 3.
+- **Hardcoded content IDs in engine code** — `FEMININITY`, `TRANS_WOMAN`, `ALWAYS_FEMALE`, `NOT_TRANSFORMED`, `BLOCK_ROUGH`, `LIKES_ROUGH` appear as string literals in Rust code. Engineering Principle 2 violation.
+- **Parser recursion depth limit** — `undone-expr` recursive descent parser has no depth guard. Engineering Principle 5 violation (unbounded growth).
+- **Saves panel scroll** — `saves_panel.rs` is missing `shrink_to_fit()` on its scroll container; scrolling may not activate with many saves.
+- **Tab buttons active during char creation** — clicking Game/Saves/Settings tabs during char creation has no visible effect but the buttons appear clickable (no disabled state).
 
 ### Writing sessions — no compilation needed
 For pure writing (authoring `.toml` scene files), no Rust compilation is needed. Scenes load at runtime. The workflow is:
@@ -146,6 +156,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-02-27 | Project audit + tooling session. Full status review: 223 tests confirmed, 33 scenes, validate-pack clean. Cross-referenced all 3 audit files against Sprint 1–3 fixes — built definitive resolved/unresolved table (28 fixed, 8 by policy, 7 partial, 41 open). Key finding: C1 (once_only) and C2 (choose_action) were ALREADY FIXED — audit files and content-schema.md were stale. Updated content-schema.md (removed "NOT YET IMPLEMENTED" once_only note), HANDOFF.md open items, MEMORY.md sprint status. Writing toolchain audit: scene-writer.md missing gd.npcLiking + m./f. receivers + "scene must earn its place" checklist items; writing-reviewer.md had 8 invented trait IDs (HIGH_VOICE, SENSITIVE_NIPPLES, etc.) + missing Critical patterns (desire/shame ordering, trait-gated best content); writing-guide.md condition tables incomplete. All three files fixed. Screenshot MCP zombie-session bug: WGC PersistentCapture stops delivering frames after window surface recreation (floem phase transition) but is_finished() returns false. Fixed capture.rs to detect and auto-recreate zombie sessions. Binary rebuilt. Pushed 11 commits to origin. MCP playtest started — game boots, char creation works, transformation_intro renders. Playtest paused for session restart (screenshot MCP needs respawn). |
 | 2026-02-25 | Writing pipeline Batches 4–8 (worktree: writing-pipeline). Batch 4: PresetData expanded to ~40 fields, Robin fully configured (38 traits, all physical/sexual attributes), Appearance dropdown replaces BEAUTIFUL/PLAIN checkboxes. Batch 5: Content rename — scene files, arcs.toml, schedule.toml from character-specific to archetype-based (robin→workplace, camila→campus). Batch 6: Rust test fixtures and comments updated. Batch 7: 7 parallel scene-writer agents rewrote all workplace scenes to second-person, stripped AlwaysFemale else branches, morning_routine.toml fixed. 3 writing-reviewer audits (0 Criticals). Batch 8: docs/characters/ → docs/presets/, arc docs renamed, writing tools updated with new accessors+traits. 11 commits, 53 files changed (+2554/−1750). 208 tests, 0 failures. Merged to master, worktree removed. |
 | 2026-02-25 | Writing pipeline Batches 0–3 (worktree: writing-pipeline). Batch 0: Appearance/NaturalPubicHair/BeforeVoice enums, Complexion::Glowing, Player.appearance + Player.natural_pubic_hair + BeforeIdentity.voice fields, all 12 construction sites updated, v4→v5 migration extended. Batch 1: 4 new traits (NATURALLY_SMOOTH/INTOXICATING_SCENT/HEAVY_SQUIRTER/REGULAR_PERIODS), PLAIN/BEAUTIFUL removed (Appearance enum replaces). Batch 2: 6 new accessors (getAppearance/getNaturalPubicHair/getName/beforeName/beforeVoice/hasSmoothLegs) in template_ctx.rs + eval.rs. Batch 3: 3 engine bugs fixed — once_only flag setting at both pick_next call sites, stale action condition re-check in choose_action, NPC action next branches (NpcActionDef/NpcAction.next + loader resolution + engine evaluation). Identified test fixture DRY issue (8+ identical make_world helpers). 204 tests, 0 failures. 4 commits. |
 | 2026-02-25 | Char creation UI attributes plan written (`docs/plans/2026-02-25-char-creation-ui-attributes.md`). 6 tasks: PartialCharState/CharCreationConfig expansion, before-panel dropdowns (6 fields), fem-panel dropdowns (14 fields in 3 sections), test helpers, physical trait pickers (6 groups), sexual trait pickers (BLOCK_ROUGH gated). |

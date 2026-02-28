@@ -118,6 +118,8 @@ You nod at the man already there. He nods back.
 |--------|---------|
 | `w` | `hasTrait("ID")`, `isVirgin()`, `alwaysFemale()`, `pcOrigin()`, `isSingle()`, `isOnPill()`, `isPregnant()`, `getSkill("ID")`, `getMoney()`, `getStress()`, `wasMale()`, `wasTransformed()` |
 | `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")` |
+| `m` | `hasTrait("ID")`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `isNpcLoveCrush()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag("FLAG")`, `hasRole("ROLE")` |
+| `f` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")` — only valid when a female NPC is active in the scene |
 | `scene` | `hasFlag("FLAG")` |
 
 **PC origin helpers:**
@@ -151,8 +153,9 @@ condition = "w.getMoney() > 50"
 | Receiver | Examples |
 |----------|---------|
 | `w.` | `hasTrait('ID')`, `getSkill('ID')`, `getMoney()`, `getStress()`, `isVirgin()`, `alwaysFemale()`, `isDrunk()`, `isSingle()` |
-| `m.` | `hasTrait('ID')`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `isNpcLoveCrush()` |
-| `gd.` | `hasGameFlag('FLAG')`, `week()`, `getStat('ID')` |
+| `m.` | `hasTrait('ID')`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `isNpcLoveCrush()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag('FLAG')`, `hasRole('ROLE')` |
+| `f.` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag('FLAG')`, `hasRole('ROLE')` |
+| `gd.` | `hasGameFlag('FLAG')`, `week()`, `getStat('ID')`, `isWeekday()`, `isWeekend()`, `arcStarted('arc_id')`, `arcState('arc_id')`, `npcLiking('ROLE_X')`, `getJobTitle()` |
 | `scene.` | `hasFlag('FLAG')` |
 
 ---
@@ -451,6 +454,8 @@ set at character creation and remain stable unless explicitly changed by a scene
 
 | Attribute | Accessor | Notes |
 |-----------|----------|-------|
+| Age | `w.getAge()` | |
+| Race | `w.getRace()` | |
 | Height | `w.getHeight()` | |
 | HairLength | `w.getHairLength()` | |
 | SkinTone | `w.getSkinTone()` | |

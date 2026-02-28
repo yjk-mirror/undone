@@ -134,6 +134,12 @@ In sexual or romantic content:
 **Transformation reference in non-earning scenes:**
 - "Does this scene earn a transformation branch?" Ask: would this moment feel different to a woman who used to be a man? If no, don't include it.
 
+**HOMOPHOBIC branch desire/shame ordering (Critical if violated):**
+- HOMOPHOBIC branches must show desire concretely BEFORE shame/resistance. If the branch only references desire abstractly ("you feel something") and goes straight to recoil or internal denial, that is a Critical finding. The desire must land on the page — specific, physical, undeniable — before the shame response. Shame without visible desire is just moralising.
+
+**Trait-gated transformation insight (Important if found):**
+- "I used to be that guy" moments and transformation insight belong in the default `{% if not w.alwaysFemale() %}` block, accessible to all CisMale players. If the best transformation beat in a scene requires e.g. `ANALYTICAL` or `CONFIDENT` to see, flag as Important. Best content should not be locked behind a personality trait — it should be in the base branch with trait branches adding texture, not replacing the core insight.
+
 ### Tier 6: Content Gating
 
 **Missing BLOCK_ROUGH gate on rough content:**
@@ -193,13 +199,13 @@ This is not a hard requirement — sometimes generic is intentional. Report it a
 The following new trait groups are now available for scene branching. Scenes do not have to use them, but the reviewer should note high-value spots where they would deepen differentiation:
 
 - Hair texture: `STRAIGHT_HAIR`, `WAVY_HAIR`, `CURLY_HAIR`, `COILY_HAIR`
-- Voice: `SOFT_VOICE`, `HUSKY_VOICE`, `HIGH_VOICE`, `LOW_VOICE`
-- Sexual traits: `SENSITIVE_NIPPLES`, `DEEP_CLITORIS`, `LARGE_INNER_LABIA`, `STAYS_WET`, `HEAVY_SQUIRTER`
-- Sexual preferences: `LIKES_ROUGH`, `LIKES_GENTLE`, `LIKES_ORAL`, `PREFERS_RECEIVING`
+- Voice: `SOFT_VOICE`, `BRIGHT_VOICE`, `HUSKY_VOICE`, `SWEET_VOICE`, `BREATHY_VOICE`
+- Sexual traits (group `sexual`): `EASILY_WET`, `SLOW_TO_WARM`, `HAIR_TRIGGER`, `SQUIRTER`, `HEAVY_SQUIRTER`, `SENSITIVE_NECK`, `SENSITIVE_EARS`, `SENSITIVE_INNER_THIGHS`, `ORAL_FIXATION`
+- Sexual preferences (group `sexual_preference`): `LIKES_ORAL_GIVING`, `LIKES_ORAL_RECEIVING`, `LIKES_ANAL`, `LIKES_BONDAGE`, `LIKES_SPANKING`, `LIKES_CHOKING`, `LIKES_HAIR_PULLING`, `LIKES_BITING`, `LIKES_EDGING`, `VANILLA`
 - Skin/body: `NATURALLY_SMOOTH` (check with `w.hasSmoothLegs()`), `INTOXICATING_SCENT`
 - Menstruation: `REGULAR_PERIODS`
 
-Flag as Minor with a brief note: "Scene touches [relevant body part / sexual dynamic] — `SENSITIVE_NIPPLES` / `LIKES_ROUGH` branch possible here."
+Flag as Minor with a brief note: "Scene touches [relevant body part / sexual dynamic] — `EASILY_WET` / `SENSITIVE_NECK` / `LIKES_BONDAGE` branch possible here."
 
 ### Tier 8: Structural
 

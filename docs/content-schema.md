@@ -181,12 +181,10 @@ The scheduler evaluates ALL slots in two phases:
 
 ### `once_only` mechanism
 
-**STATUS: NOT YET IMPLEMENTED.** The `once_only` field is parsed and stored but the
-engine does not currently set the `ONCE_<scene_id>` flag after firing. Scenes marked
-`once_only = true` will repeat until this is fixed.
-
-Intended behavior: when `once_only = true` and a scene fires, the engine sets game flag
-`ONCE_<scene_id>`. On subsequent evaluations, events with that flag set are skipped.
+When `once_only = true` and a scene fires, the caller sets a persistent game flag
+`ONCE_<scene_id>` (e.g. `ONCE_base::workplace_arrival`). On subsequent calls to
+`pick_next()`, the scheduler filters out any event whose `ONCE_` flag is already set,
+preventing the scene from firing again. This is fully implemented.
 
 ### Example: trigger-only mandatory scene
 

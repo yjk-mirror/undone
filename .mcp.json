@@ -2,32 +2,32 @@
   "mcpServers": {
     "rhai": {
       "type": "stdio",
-      "command": "bash",
-      "args": ["tools/mcp-launcher.sh", "rhai-mcp-server"],
+      "command": "tools/target/release/rhai-mcp-server.exe",
+      "args": [],
       "env": {}
     },
     "minijinja": {
       "type": "stdio",
-      "command": "bash",
-      "args": ["tools/mcp-launcher.sh", "minijinja-mcp-server"],
+      "command": "tools/target/release/minijinja-mcp-server.exe",
+      "args": [],
       "env": {}
     },
     "screenshot": {
       "type": "stdio",
-      "command": "bash",
-      "args": ["tools/mcp-launcher.sh", "screenshot-mcp"],
+      "command": "tools/target/release/screenshot-mcp.exe",
+      "args": [],
       "env": {}
     },
     "game-input": {
       "type": "stdio",
-      "command": "bash",
-      "args": ["tools/mcp-launcher.sh", "game-input-mcp"],
+      "command": "tools/target/release/game-input-mcp.exe",
+      "args": [],
       "env": {}
     },
     "rust": {
       "type": "stdio",
-      "command": "bash",
-      "args": ["tools/mcp-launcher.sh", "rust-mcp"],
+      "command": "tools/target/release/rust-mcp.exe",
+      "args": [],
       "env": {}
     }
   }

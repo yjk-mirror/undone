@@ -90,7 +90,9 @@ Prose uses Minijinja (Jinja2). Conditions use the custom expression language (no
 
 **Template objects:**
 - `w`: `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `isVirgin()`, `alwaysFemale()`, `isSingle()`, `wasMale()`, `wasTransformed()`, `pcOrigin()`, `getName()`, `getAppearance()`, `getNaturalPubicHair()`, `hasSmoothLegs()`, `beforeName()`, `beforeVoice()`
-- `gd`: `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()`, `isWeekend()`
+- `gd`: `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE_X")` (liking level string for a named NPC role), `arcStarted("arc_id")` (boolean — has arc started)
+- `m.` (male NPC — only valid when a male NPC is active in the scene): `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasTrait("ID")`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
+- `f.` (female NPC — only valid when a female NPC is active in the scene): `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
 - `scene`: `hasFlag("FLAG")`
 
 **Condition expressions (in TOML `condition` fields — NOT Minijinja):**
@@ -179,6 +181,8 @@ prose = """..."""
 ## Scene Quality Checklist (built-in)
 
 - Something happens in the intro BEFORE the player makes any choice
+- At least one beat of unresolved tension — something the player cannot fully resolve in this scene
+- Transformation lens is *used* (shows concrete difference), not merely referenced
 - 1–3 choices where different paths produce genuinely different outcomes
 - At least one path sets a lasting game flag or NPC/PC stat
 - Trait branches are structurally different (not adjective swaps)
