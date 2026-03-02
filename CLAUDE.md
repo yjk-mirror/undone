@@ -40,9 +40,12 @@ manually in UI code.
 
 ## Key Documents (Read Before Working)
 
+- **`docs/creative-direction.md`** — **The creative bible. Read this first for any
+  work involving game flow, scenes, presets, or player experience.** All creative
+  decisions live here. Never invent creative direction — if it's not in this document
+  or the docs it references, ask the user.
 - `docs/plans/2026-02-21-engine-design.md` — Living architecture document. The
   authoritative design reference. **Update it when implementation reveals surprises.**
-- `docs/plans/2026-02-21-scaffold.md` — 13-task scaffold plan. ✅ Complete.
 - `docs/writing-guide.md` — Prose standard for all scene content. **Read before
   writing any scene prose or designing a prose-writing agent.**
 - `HANDOFF.md` — Current state and session log. **Always read this first.**
@@ -220,6 +223,21 @@ These are constraints, not aspirations. Violating them is a bug.
     trait group, or engine capability: update `docs/content-schema.md` and
     `docs/plans/2026-02-21-engine-design.md` in the same commit. Stale docs are bugs.
 
+11. **Never generate creative content without user direction.** Scene prose, character
+    creation flow, preset configurations, opening sequences, and narrative structure
+    are creative decisions. When a scene slot, phase, or content gap needs to be filled,
+    create the infrastructure and flag the gap — do not write placeholder content to
+    fill it. The `transformation_intro` bedroom scene is the canonical example of this
+    failure: an agent wrote a scene for a slot without asking what it should be. The
+    result was technically functional and creatively wrong. Read
+    `docs/creative-direction.md` before any work that touches game flow or content.
+
+12. **DeepSeek API key lives in `.env` at project root.** Used by writing agents for
+    prose generation. `.env` is gitignored. Never send personal information, file paths,
+    git identity, or anything outside pack content data to the DeepSeek API. Only send:
+    writing guide rules, scene specs, trait/skill IDs, sample prose — all fictional
+    game content.
+
 ## UI — Current State
 
 Layout: title bar (UNDONE branding, Game/Saves/Settings tabs, window controls) always
@@ -277,18 +295,18 @@ When a writing audit completes, always feed findings back into the writing tools
 
 | Situation | Required skill |
 |---|---|
-| Any creative/feature work (new scenes, new features) | `superpowers:brainstorming` |
-| Multi-step plan with spec | `superpowers:writing-plans` |
-| Executing a written plan | `superpowers:executing-plans` |
-| Before touching code on a plan | `superpowers:using-git-worktrees` (worktree per plan) |
-| Parallel independent tasks (2+) | `superpowers:dispatching-parallel-agents` |
-| Parallel tasks with coordination | `superpowers:subagent-driven-development` |
-| Implementing any feature or fix | `superpowers:test-driven-development` |
-| Debugging any failure | `superpowers:systematic-debugging` |
-| After completing major feature | `superpowers:requesting-code-review` |
-| Receiving code review feedback | `superpowers:receiving-code-review` |
-| About to claim done | `superpowers:verification-before-completion` |
-| Finishing a branch | `superpowers:finishing-a-development-branch` |
+| Any creative/feature work (new scenes, new features) | `ops:brainstorming` |
+| Multi-step plan with spec | `ops:writing-plans` |
+| Executing a written plan | `ops:executing-plans` |
+| Before touching code on a plan | `ops:using-git-worktrees` (worktree per plan) |
+| Parallel independent tasks (2+) | `ops:dispatching-parallel-agents` |
+| Parallel tasks with coordination | `ops:subagent-driven-development` |
+| Implementing any feature or fix | `ops:test-driven-development` |
+| Debugging any failure | `ops:systematic-debugging` |
+| After completing major feature | `ops:requesting-code-review` |
+| Receiving code review feedback | `ops:receiving-code-review` |
+| About to claim done | `ops:verification-before-completion` |
+| Finishing a branch | `ops:finishing-a-development-branch` |
 
 ### Skill overrides
 
@@ -333,12 +351,12 @@ The rust MCP server provides a long-lived rust-analyzer instance for
 
 ### Workflow for implementing a plan
 
-1. Invoke `superpowers:executing-plans`
-2. Invoke `superpowers:using-git-worktrees` — create a worktree for the plan
+1. Invoke `ops:executing-plans`
+2. Invoke `ops:using-git-worktrees` — create a worktree for the plan
 3. Execute tasks in batches of ~3, reporting between batches
 4. After writing each `.rs` file: run `cargo fmt` and `cargo check -p <crate>` via Bash
 5. After writing each `.j2` file: call `mcp__minijinja__jinja_validate_template`
-6. When all tasks done: invoke `superpowers:finishing-a-development-branch`
+6. When all tasks done: invoke `ops:finishing-a-development-branch`
 
 ### Custom Agents (`.claude/agents/`)
 
@@ -350,7 +368,7 @@ Project-specific agents invoked via `subagent_type` in the Task tool.
 | writing-reviewer | `writing-reviewer` | Quality review of scene prose. Read-only. Returns Critical/Important/Minor findings. |
 
 **Prolific writing sessions:** Dispatch multiple `scene-writer` agents in parallel (one per
-scene), then run `writing-reviewer` on each result. Use `superpowers:dispatching-parallel-agents`
+scene), then run `writing-reviewer` on each result. Use `ops:dispatching-parallel-agents`
 to coordinate.
 
 **Writing workflow per scene:**
