@@ -51,7 +51,11 @@ pub enum ParseError {
     UnclosedArgs,
     #[error("empty expression")]
     Empty,
+    #[error("expression nesting exceeds maximum depth ({max_depth})")]
+    MaxDepthExceeded { max_depth: usize },
 }
+
+const MAX_EXPR_DEPTH: usize = 128;
 
 struct Parser {
     tokens: Vec<Token>,
@@ -84,41 +88,46 @@ impl Parser {
         }
     }
 
-    fn parse_expr(&mut self) -> Result<Expr, ParseError> {
-        self.parse_or()
+    fn parse_expr(&mut self, depth: usize) -> Result<Expr, ParseError> {
+        self.parse_or(depth)
     }
 
-    fn parse_or(&mut self) -> Result<Expr, ParseError> {
-        let mut left = self.parse_and()?;
+    fn parse_or(&mut self, depth: usize) -> Result<Expr, ParseError> {
+        let mut left = self.parse_and(depth)?;
         while self.peek() == &Token::Or {
             self.advance();
-            let right = self.parse_and()?;
+            let right = self.parse_and(depth)?;
             left = Expr::Or(Box::new(left), Box::new(right));
         }
         Ok(left)
     }
 
-    fn parse_and(&mut self) -> Result<Expr, ParseError> {
-        let mut left = self.parse_not()?;
+    fn parse_and(&mut self, depth: usize) -> Result<Expr, ParseError> {
+        let mut left = self.parse_not(depth)?;
         while self.peek() == &Token::And {
             self.advance();
-            let right = self.parse_not()?;
+            let right = self.parse_not(depth)?;
             left = Expr::And(Box::new(left), Box::new(right));
         }
         Ok(left)
     }
 
-    fn parse_not(&mut self) -> Result<Expr, ParseError> {
+    fn parse_not(&mut self, depth: usize) -> Result<Expr, ParseError> {
+        if depth >= MAX_EXPR_DEPTH {
+            return Err(ParseError::MaxDepthExceeded {
+                max_depth: MAX_EXPR_DEPTH,
+            });
+        }
         if self.peek() == &Token::Bang {
             self.advance();
-            let inner = self.parse_not()?;
+            let inner = self.parse_not(depth + 1)?;
             return Ok(Expr::Not(Box::new(inner)));
         }
-        self.parse_compare()
+        self.parse_compare(depth)
     }
 
-    fn parse_compare(&mut self) -> Result<Expr, ParseError> {
-        let left = self.parse_primary()?;
+    fn parse_compare(&mut self, depth: usize) -> Result<Expr, ParseError> {
+        let left = self.parse_primary(depth)?;
         let op = match self.peek() {
             Token::Eq => {
                 self.advance();
@@ -147,7 +156,7 @@ impl Parser {
             _ => None,
         };
         if let Some(op) = op {
-            let right = self.parse_primary()?;
+            let right = self.parse_primary(depth)?;
             Ok(match op {
                 "==" => Expr::Eq(Box::new(left), Box::new(right)),
                 "!=" => Expr::Ne(Box::new(left), Box::new(right)),
@@ -162,7 +171,7 @@ impl Parser {
         }
     }
 
-    fn parse_primary(&mut self) -> Result<Expr, ParseError> {
+    fn parse_primary(&mut self, depth: usize) -> Result<Expr, ParseError> {
         match self.peek().clone() {
             Token::StringLit(s) => {
                 self.advance();
@@ -216,8 +225,13 @@ impl Parser {
                 }))
             }
             Token::LParen => {
+                if depth >= MAX_EXPR_DEPTH {
+                    return Err(ParseError::MaxDepthExceeded {
+                        max_depth: MAX_EXPR_DEPTH,
+                    });
+                }
                 self.advance();
-                let inner = self.parse_expr()?;
+                let inner = self.parse_expr(depth + 1)?;
                 self.expect(&Token::RParen)?;
                 Ok(inner)
             }
@@ -232,7 +246,11 @@ pub fn parse(src: &str) -> Result<Expr, ParseError> {
         return Err(ParseError::Empty);
     }
     let mut parser = Parser::new(tokens);
-    parser.parse_expr()
+    let expr = parser.parse_expr(0)?;
+    if parser.peek() != &Token::Eof {
+        return Err(ParseError::Unexpected(parser.peek().clone(), parser.pos));
+    }
+    Ok(expr)
 }
 
 #[cfg(test)]
@@ -284,5 +302,32 @@ mod tests {
     #[test]
     fn errors_on_empty() {
         assert!(parse("").is_err());
+    }
+
+    #[test]
+    fn errors_on_trailing_tokens() {
+        let result = parse("w.hasTrait('SHY') w.hasTrait('POSH')");
+        assert!(matches!(
+            result,
+            Err(ParseError::Unexpected(Token::Ident(_), _))
+        ));
+    }
+
+    #[test]
+    fn errors_when_not_chain_exceeds_max_depth() {
+        let expr = format!("{}true", "!".repeat(MAX_EXPR_DEPTH + 1));
+        let result = parse(&expr);
+        assert!(matches!(result, Err(ParseError::MaxDepthExceeded { .. })));
+    }
+
+    #[test]
+    fn errors_when_paren_nesting_exceeds_max_depth() {
+        let expr = format!(
+            "{}true{}",
+            "(".repeat(MAX_EXPR_DEPTH + 1),
+            ")".repeat(MAX_EXPR_DEPTH + 1)
+        );
+        let result = parse(&expr);
+        assert!(matches!(result, Err(ParseError::MaxDepthExceeded { .. })));
     }
 }
