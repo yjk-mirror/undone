@@ -235,7 +235,7 @@ mod integration_tests {
 
             // Game loop responsibility: mark once-only scenes as played
             if pick.once_only {
-                world.game_data.set_flag(&format!("ONCE_{}", scene_id));
+                world.game_data.set_flag(format!("ONCE_{}", scene_id));
             }
 
             visited.push(scene_id.clone());
@@ -354,7 +354,7 @@ mod integration_tests {
             };
             let scene_id = pick.scene_id.clone();
             if pick.once_only {
-                world.game_data.set_flag(&format!("ONCE_{}", scene_id));
+                world.game_data.set_flag(format!("ONCE_{}", scene_id));
             }
 
             engine.send(
@@ -507,7 +507,7 @@ mod integration_tests {
     }
 
     #[test]
-    fn gd_npcLiking_returns_liking_for_npc_with_role() {
+    fn gd_npc_liking_returns_liking_for_npc_with_role() {
         use undone_expr::{eval, parser::parse, SceneCtx};
         let (registry, _metas) = undone_packs::load_packs(&packs_dir()).unwrap();
         let mut world = make_world_with_shy(&registry);

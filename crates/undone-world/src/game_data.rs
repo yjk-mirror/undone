@@ -119,9 +119,11 @@ mod tests {
 
     #[test]
     fn advance_time_slot_night_rolls_day() {
-        let mut gd = GameData::default();
-        gd.time_slot = TimeSlot::Night;
-        gd.day = 0; // Monday
+        let mut gd = GameData {
+            time_slot: TimeSlot::Night,
+            day: 0, // Monday
+            ..GameData::default()
+        };
         assert!(!gd.advance_time_slot());
         assert_eq!(gd.time_slot, TimeSlot::Morning);
         assert_eq!(gd.day, 1); // Tuesday
@@ -129,10 +131,12 @@ mod tests {
 
     #[test]
     fn advance_time_slot_sunday_night_rolls_week() {
-        let mut gd = GameData::default();
-        gd.time_slot = TimeSlot::Night;
-        gd.day = 6; // Sunday
-        gd.week = 0;
+        let mut gd = GameData {
+            time_slot: TimeSlot::Night,
+            day: 6, // Sunday
+            week: 0,
+            ..GameData::default()
+        };
         assert!(gd.advance_time_slot()); // week rolled over
         assert_eq!(gd.time_slot, TimeSlot::Morning);
         assert_eq!(gd.day, 0); // Monday
@@ -185,12 +189,18 @@ mod tests {
 
     #[test]
     fn is_weekday_and_weekend() {
-        let mut gd = GameData::default();
-        gd.day = 0;
-        assert!(gd.is_weekday());
-        assert!(!gd.is_weekend());
-        gd.day = 5;
-        assert!(!gd.is_weekday());
-        assert!(gd.is_weekend());
+        let weekday = GameData {
+            day: 0,
+            ..GameData::default()
+        };
+        assert!(weekday.is_weekday());
+        assert!(!weekday.is_weekend());
+
+        let weekend = GameData {
+            day: 5,
+            ..GameData::default()
+        };
+        assert!(!weekend.is_weekday());
+        assert!(weekend.is_weekend());
     }
 }

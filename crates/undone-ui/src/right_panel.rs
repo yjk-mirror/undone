@@ -1,5 +1,5 @@
 use crate::theme::{ThemeColors, ThemeMode};
-use crate::{AppSignals, NpcSnapshot, PlayerSnapshot};
+use crate::{AppSignals, PlayerSnapshot};
 use floem::peniko::Color;
 use floem::prelude::*;
 use floem::reactive::RwSignal;
@@ -69,37 +69,6 @@ fn stats_panel(player: RwSignal<PlayerSnapshot>, signals: AppSignals) -> impl Vi
         stat_row("Alcohol", move || player.get().alcohol.clone(), signals),
     ))
     .style(|s| s.padding(16.0))
-}
-
-fn npc_panel(active_npc: RwSignal<Option<NpcSnapshot>>, signals: AppSignals) -> impl View {
-    container(dyn_view(move || {
-        if let Some(npc) = active_npc.get() {
-            v_stack((
-                label(move || format!("── {} ──", npc.name.clone())).style(move |s| {
-                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    s.font_weight(floem::text::Weight::BOLD)
-                        .font_size(13.0)
-                        .color(colors.ink)
-                        .padding_bottom(8.0)
-                        .items_center()
-                        .width_full()
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
-                }),
-                stat_row("Age", move || npc.age.clone(), signals),
-                stat_row("Personality", move || npc.personality.clone(), signals),
-                stat_row("Relationship", move || npc.relationship.clone(), signals),
-                stat_row("Liking", move || npc.pc_liking.clone(), signals),
-                stat_row("Attraction", move || npc.pc_attraction.clone(), signals),
-            ))
-            .into_any()
-        } else {
-            empty().into_any()
-        }
-    }))
-    .style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.padding(16.0).border_top(1.0).border_color(colors.seam)
-    })
 }
 
 fn mode_toggle(signals: AppSignals) -> impl View {

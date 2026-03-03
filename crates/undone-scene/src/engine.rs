@@ -19,6 +19,17 @@ use crate::{
 /// and flat goto cycles (where the stack stays at depth 1 but transitions loop).
 const MAX_TRANSITIONS_PER_COMMAND: usize = 32;
 
+const _: () = {
+    assert!(
+        MAX_TRANSITIONS_PER_COMMAND >= 8,
+        "transition guard too low for legitimate scene chains"
+    );
+    assert!(
+        MAX_TRANSITIONS_PER_COMMAND <= 128,
+        "transition guard too high for runaway protection"
+    );
+};
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -1068,23 +1079,6 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::ProseAdded(s) if s.contains("exceeded"))),
             "normal goto should not trigger transition guard"
-        );
-    }
-
-    #[test]
-    fn transition_guard_constant_is_reasonable() {
-        // Verify the transition guard constant exists and is bounded.
-        // The guard protects against future code paths that could cause
-        // recursive transitions (currently the engine architecture only
-        // allows one transition per command via goto). This is defensive
-        // programming per engineering principle #5 (bounded resources).
-        assert!(
-            MAX_TRANSITIONS_PER_COMMAND >= 8,
-            "limit too low — would block legitimate scene chains"
-        );
-        assert!(
-            MAX_TRANSITIONS_PER_COMMAND <= 128,
-            "limit too high — would allow runaway before tripping"
         );
     }
 
