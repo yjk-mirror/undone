@@ -193,24 +193,38 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref mut rng,
         ..
     } = *gs;
-    if let Ok(femininity_id) = registry.resolve_skill("FEMININITY") {
-        let events = engine.advance_with_action(&action_id, world, registry);
-        let finished = crate::process_events(events, signals, world, femininity_id);
-        if finished {
-            if signals.phase.get_untracked() == crate::AppPhase::TransformationIntro {
-                // Transformation intro complete — move to female customisation.
-                // (The throwaway world is discarded; FemCreation builds the real one.)
-                signals.phase.set(crate::AppPhase::FemCreation);
-            } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
-                if result.once_only {
-                    world
-                        .game_data
-                        .set_flag(format!("ONCE_{}", result.scene_id));
+    let femininity_id = match registry.femininity_skill() {
+        Ok(id) => id,
+        Err(err) => {
+            let msg = format!("[Engine error: required skill FEMININITY missing: {err}]");
+            log::error!("{msg}");
+            signals.story.update(|s| {
+                if !s.is_empty() {
+                    s.push_str("\n\n");
                 }
-                crate::start_scene(engine, world, registry, result.scene_id);
-                let events = engine.drain();
-                crate::process_events(events, signals, world, femininity_id);
+                s.push_str(&msg);
+            });
+            signals.actions.set(vec![]);
+            return;
+        }
+    };
+
+    let events = engine.advance_with_action(&action_id, world, registry);
+    let finished = crate::process_events(events, signals, world, femininity_id);
+    if finished {
+        if signals.phase.get_untracked() == crate::AppPhase::TransformationIntro {
+            // Transformation intro complete — move to female customisation.
+            // (The throwaway world is discarded; FemCreation builds the real one.)
+            signals.phase.set(crate::AppPhase::FemCreation);
+        } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+            if result.once_only {
+                world
+                    .game_data
+                    .set_flag(format!("ONCE_{}", result.scene_id));
             }
+            crate::start_scene(engine, world, registry, result.scene_id);
+            let events = engine.drain();
+            crate::process_events(events, signals, world, femininity_id);
         }
     }
 }
@@ -507,7 +521,12 @@ fn choices_bar(
             })
         },
     )
-    .style(|s| s.flex_row().flex_wrap(FlexWrap::Wrap).max_width(680.0).padding_horiz(24.0));
+    .style(|s| {
+        s.flex_row()
+            .flex_wrap(FlexWrap::Wrap)
+            .max_width(680.0)
+            .padding_horiz(24.0)
+    });
 
     container(buttons).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);

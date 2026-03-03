@@ -75,8 +75,10 @@ pub fn spawn_npcs<R: Rng>(
 
     // Build personality assignment list with diversity guarantees.
     // Required slots first (ROMANTIC, JERK, FRIEND), then random fills.
+    let required_count = config.male_count.min(REQUIRED_PERSONALITIES.len());
     let mut personality_ids: Vec<PersonalityId> = REQUIRED_PERSONALITIES
         .iter()
+        .take(required_count)
         .map(|s| registry.intern_personality(s))
         .collect();
     while personality_ids.len() < config.male_count {
@@ -339,5 +341,31 @@ mod tests {
             .values()
             .any(|n| reg.core_personality(n.core.personality) == Some(Personality::Friend));
         assert!(has_romantic && has_jerk && has_friend);
+    }
+
+    #[test]
+    fn spawn_respects_zero_male_count() {
+        let mut reg = make_registry();
+        let config = NpcSpawnConfig {
+            male_count: 0,
+            female_count: 2,
+        };
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(123);
+        let (males, females) = spawn_npcs(&config, &mut reg, &mut rng);
+        assert_eq!(males.len(), 0);
+        assert_eq!(females.len(), 2);
+    }
+
+    #[test]
+    fn spawn_respects_small_male_count() {
+        let mut reg = make_registry();
+        let config = NpcSpawnConfig {
+            male_count: 1,
+            female_count: 0,
+        };
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(5);
+        let (males, females) = spawn_npcs(&config, &mut reg, &mut rng);
+        assert_eq!(males.len(), 1);
+        assert_eq!(females.len(), 0);
     }
 }

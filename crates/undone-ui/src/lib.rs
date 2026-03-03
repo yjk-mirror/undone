@@ -168,129 +168,159 @@ pub fn app_view() -> impl View {
             }
 
             match current_phase {
-            AppPhase::BeforeCreation => char_creation_view(
-                signals,
-                Rc::clone(&pre_state_cc),
-                Rc::clone(&game_state_cc),
-                partial_char,
-            )
-            .into_any(),
-            AppPhase::TransformationIntro => {
-                // Start the transformation_intro scene against the throwaway world
-                // (created in the "Next" button handler in char_creation.rs).
-                let gs_ref = Rc::clone(&game_state_ig);
-                {
-                    let mut gs_opt = gs_ref.borrow_mut();
-                    if let Some(ref mut gs) = *gs_opt {
-                        if let Ok(fem_id) = gs.registry.resolve_skill("FEMININITY") {
-                            let GameState {
-                                ref mut engine,
-                                ref mut world,
-                                ref registry,
-                                ..
-                            } = *gs;
-                            if let Some(scene_id) = registry.transformation_scene() {
-                                let scene_id = scene_id.to_owned();
-                                start_scene(engine, world, registry, scene_id);
+                AppPhase::BeforeCreation => char_creation_view(
+                    signals,
+                    Rc::clone(&pre_state_cc),
+                    Rc::clone(&game_state_cc),
+                    partial_char,
+                )
+                .into_any(),
+                AppPhase::TransformationIntro => {
+                    // Start the transformation_intro scene against the throwaway world
+                    // (created in the "Next" button handler in char_creation.rs).
+                    let gs_ref = Rc::clone(&game_state_ig);
+                    {
+                        let mut gs_opt = gs_ref.borrow_mut();
+                        if let Some(ref mut gs) = *gs_opt {
+                            match gs.registry.femininity_skill() {
+                                Ok(fem_id) => {
+                                    let GameState {
+                                        ref mut engine,
+                                        ref mut world,
+                                        ref registry,
+                                        ..
+                                    } = *gs;
+                                    if let Some(scene_id) = registry.transformation_scene() {
+                                        let scene_id = scene_id.to_owned();
+                                        start_scene(engine, world, registry, scene_id);
+                                    }
+                                    let events = engine.drain();
+                                    process_events(events, signals, world, fem_id);
+                                }
+                                Err(err) => {
+                                    let msg = format!(
+                                        "[Init error: required skill FEMININITY missing: {err}]"
+                                    );
+                                    log::error!("{msg}");
+                                    signals.story.set(msg);
+                                    signals.actions.set(vec![]);
+                                }
                             }
-                            let events = engine.drain();
-                            process_events(events, signals, world, fem_id);
                         }
                     }
+
+                    let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                        Some(gs) => gs,
+                        None => {
+                            return placeholder_panel(
+                                "Transformation intro: game state missing",
+                                signals,
+                            )
+                            .into_any();
+                        }
+                    };
+                    let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                    h_stack((
+                        sidebar_panel(signals),
+                        story_panel(signals, Rc::clone(&gs_cell)),
+                    ))
+                    .style(|s| s.size_full())
+                    .into_any()
                 }
-
-                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
-                    Some(gs) => gs,
-                    None => {
-                        return placeholder_panel(
-                            "Transformation intro: game state missing",
-                            signals,
-                        )
-                        .into_any();
-                    }
-                };
-                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
-
-                h_stack((
-                    sidebar_panel(signals),
-                    story_panel(signals, Rc::clone(&gs_cell)),
-                ))
-                .style(|s| s.size_full())
-                .into_any()
-            }
-            AppPhase::FemCreation => fem_creation_view(
-                signals,
-                Rc::clone(&pre_state_cc),
-                Rc::clone(&game_state_cc),
-                partial_char,
-            )
-            .into_any(),
-            AppPhase::InGame => {
-                // On first transition to InGame, start the opening scene.
-                let gs_ref = Rc::clone(&game_state_ig);
-                {
-                    let mut gs_opt = gs_ref.borrow_mut();
-                    if let Some(ref mut gs) = *gs_opt {
-                        if gs.init_error.is_none() {
-                            if let Ok(fem_id) = gs.registry.resolve_skill("FEMININITY") {
-                                let GameState {
-                                    ref mut engine,
-                                    ref mut world,
-                                    ref registry,
-                                    ref scheduler,
-                                    ref mut rng,
-                                    ref opening_scene,
-                                    ..
-                                } = *gs;
-                                if let Some(scene_id) = opening_scene {
-                                    start_scene(engine, world, registry, scene_id.clone());
-                                }
-                                let events = engine.drain();
-                                let finished = process_events(events, signals, world, fem_id);
-                                if finished {
-                                    if let Some(result) = scheduler.pick_next(world, registry, rng)
-                                    {
-                                        if result.once_only {
-                                            world
-                                                .game_data
-                                                .set_flag(format!("ONCE_{}", result.scene_id));
+                AppPhase::FemCreation => fem_creation_view(
+                    signals,
+                    Rc::clone(&pre_state_cc),
+                    Rc::clone(&game_state_cc),
+                    partial_char,
+                )
+                .into_any(),
+                AppPhase::InGame => {
+                    // On first transition to InGame, start the opening scene.
+                    let gs_ref = Rc::clone(&game_state_ig);
+                    {
+                        let mut gs_opt = gs_ref.borrow_mut();
+                        if let Some(ref mut gs) = *gs_opt {
+                            if gs.init_error.is_none() {
+                                match gs.registry.femininity_skill() {
+                                    Ok(fem_id) => {
+                                        let GameState {
+                                            ref mut engine,
+                                            ref mut world,
+                                            ref registry,
+                                            ref scheduler,
+                                            ref mut rng,
+                                            ref opening_scene,
+                                            ..
+                                        } = *gs;
+                                        if let Some(scene_id) = opening_scene {
+                                            start_scene(engine, world, registry, scene_id.clone());
                                         }
-                                        start_scene(engine, world, registry, result.scene_id);
                                         let events = engine.drain();
-                                        process_events(events, signals, world, fem_id);
+                                        let finished =
+                                            process_events(events, signals, world, fem_id);
+                                        if finished {
+                                            if let Some(result) =
+                                                scheduler.pick_next(world, registry, rng)
+                                            {
+                                                if result.once_only {
+                                                    world.game_data.set_flag(format!(
+                                                        "ONCE_{}",
+                                                        result.scene_id
+                                                    ));
+                                                }
+                                                start_scene(
+                                                    engine,
+                                                    world,
+                                                    registry,
+                                                    result.scene_id,
+                                                );
+                                                let events = engine.drain();
+                                                process_events(events, signals, world, fem_id);
+                                            }
+                                        }
+                                    }
+                                    Err(err) => {
+                                        let msg = format!(
+                                            "[Init error: required skill FEMININITY missing: {err}]"
+                                        );
+                                        log::error!("{msg}");
+                                        gs.init_error = Some(msg.clone());
+                                        signals.story.set(msg);
+                                        signals.actions.set(vec![]);
                                     }
                                 }
                             }
                         }
                     }
+
+                    // Convert Rc<RefCell<Option<GameState>>> into Rc<RefCell<GameState>>
+                    // by extracting the value once at transition time.
+                    let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                        Some(gs) => gs,
+                        None => {
+                            return placeholder_panel("Game state missing", signals).into_any();
+                        }
+                    };
+                    let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                    dyn_container(move || signals.tab.get(), {
+                        let gs_cell = Rc::clone(&gs_cell);
+                        move |tab| match tab {
+                            AppTab::Game | AppTab::Settings => h_stack((
+                                sidebar_panel(signals),
+                                story_panel(signals, Rc::clone(&gs_cell)),
+                            ))
+                            .style(|s| s.size_full())
+                            .into_any(),
+                            AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
+                        }
+                    })
+                    .style(|s| s.flex_grow(1.0))
+                    .into_any()
                 }
-
-                // Convert Rc<RefCell<Option<GameState>>> into Rc<RefCell<GameState>>
-                // by extracting the value once at transition time.
-                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
-                    Some(gs) => gs,
-                    None => {
-                        return placeholder_panel("Game state missing", signals).into_any();
-                    }
-                };
-                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
-
-                dyn_container(move || signals.tab.get(), {
-                    let gs_cell = Rc::clone(&gs_cell);
-                    move |tab| match tab {
-                        AppTab::Game | AppTab::Settings => h_stack((
-                            sidebar_panel(signals),
-                            story_panel(signals, Rc::clone(&gs_cell)),
-                        ))
-                        .style(|s| s.size_full())
-                        .into_any(),
-                        AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
-                    }
-                })
-                .style(|s| s.flex_grow(1.0))
-                .into_any()
             }
-        }},
+        },
     )
     .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 
@@ -402,6 +432,37 @@ pub fn start_scene(
     }
 }
 
+const MAX_STORY_PARAGRAPHS: usize = 200;
+
+fn trim_story_paragraphs(story: &mut String) {
+    let para_count = story.split("\n\n").count();
+    if para_count <= MAX_STORY_PARAGRAPHS {
+        return;
+    }
+
+    let to_drop = para_count - MAX_STORY_PARAGRAPHS;
+    let mut remaining = to_drop;
+    let mut byte_offset = 0;
+    for (i, _) in story.match_indices("\n\n") {
+        remaining -= 1;
+        if remaining == 0 {
+            byte_offset = i + 2;
+            break;
+        }
+    }
+    if byte_offset > 0 {
+        *story = story[byte_offset..].to_string();
+    }
+}
+
+fn append_story_paragraph(story: &mut String, text: &str) {
+    if !story.is_empty() {
+        story.push_str("\n\n");
+    }
+    story.push_str(text);
+    trim_story_paragraphs(story);
+}
+
 /// Process engine events, updating signals. Returns `true` if `SceneFinished` was among them.
 pub fn process_events(
     events: Vec<EngineEvent>,
@@ -418,28 +479,7 @@ pub fn process_events(
                 // scene the story starts empty — we want the viewport at the top.
                 let should_scroll = !signals.story.get_untracked().is_empty();
                 signals.story.update(|s| {
-                    if !s.is_empty() {
-                        s.push_str("\n\n");
-                    }
-                    s.push_str(&text);
-                    // Cap at 200 paragraphs to prevent unbounded growth.
-                    const MAX_PARAGRAPHS: usize = 200;
-                    let para_count = s.split("\n\n").count();
-                    if para_count > MAX_PARAGRAPHS {
-                        let to_drop = para_count - MAX_PARAGRAPHS;
-                        let mut remaining = to_drop;
-                        let mut byte_offset = 0;
-                        for (i, _) in s.match_indices("\n\n") {
-                            remaining -= 1;
-                            if remaining == 0 {
-                                byte_offset = i + 2;
-                                break;
-                            }
-                        }
-                        if byte_offset > 0 {
-                            *s = s[byte_offset..].to_string();
-                        }
-                    }
+                    append_story_paragraph(s, &text);
                 });
                 if should_scroll {
                     // Delay the scroll-to-bottom by one frame. The scroll_to
@@ -475,10 +515,7 @@ pub fn process_events(
                 // Thoughts append to the story text. Style differentiation (italic,
                 // anxiety register, etc.) is deferred to the UI design session.
                 signals.story.update(|s| {
-                    if !s.is_empty() {
-                        s.push_str("\n\n");
-                    }
-                    s.push_str(&text);
+                    append_story_paragraph(s, &text);
                 });
                 let sg = signals.scroll_gen;
                 floem::action::exec_after(std::time::Duration::ZERO, move |_| {
@@ -491,10 +528,7 @@ pub fn process_events(
             }
             EngineEvent::ErrorOccurred(msg) => {
                 signals.story.update(|s| {
-                    if !s.is_empty() {
-                        s.push_str("\n\n");
-                    }
-                    s.push_str(&format!("[Scene error: {}]", msg));
+                    append_story_paragraph(s, &format!("[Scene error: {}]", msg));
                 });
                 let sg = signals.scroll_gen;
                 floem::action::exec_after(std::time::Duration::ZERO, move |_| {
@@ -606,5 +640,26 @@ mod tests {
         let p = test_player();
         let snap = PlayerSnapshot::from_player(&p, fem_id);
         assert_eq!(snap.money, 200);
+    }
+
+    #[test]
+    fn append_story_paragraph_trims_to_latest_limit() {
+        let mut story = String::new();
+        for i in 0..205 {
+            append_story_paragraph(&mut story, &format!("p{i}"));
+        }
+
+        let paragraphs: Vec<&str> = story.split("\n\n").collect();
+        assert_eq!(paragraphs.len(), MAX_STORY_PARAGRAPHS);
+        assert_eq!(paragraphs.first().copied(), Some("p5"));
+        assert_eq!(paragraphs.last().copied(), Some("p204"));
+    }
+
+    #[test]
+    fn append_story_paragraph_separates_entries() {
+        let mut story = String::new();
+        append_story_paragraph(&mut story, "one");
+        append_story_paragraph(&mut story, "two");
+        assert_eq!(story, "one\n\ntwo");
     }
 }

@@ -162,6 +162,14 @@ impl SceneEngine {
         self.drain()
     }
 
+    /// Clear runtime state before starting a fresh flow (for example after loading a save).
+    /// Scene definitions are kept; only stack, queued events, and transition counter are reset.
+    pub fn reset_runtime(&mut self) {
+        self.stack.clear();
+        self.events.clear();
+        self.transition_count = 0;
+    }
+
     // -----------------------------------------------------------------------
     // Private: condition evaluation helper
     // -----------------------------------------------------------------------
@@ -180,7 +188,9 @@ impl SceneEngine {
             Err(e) => {
                 log::warn!(
                     "[scene-engine] condition error in scene '{}' ({}): {}",
-                    scene_id, context, e
+                    scene_id,
+                    context,
+                    e
                 );
                 false
             }
@@ -1099,6 +1109,35 @@ mod tests {
                 .any(|e| matches!(e, EngineEvent::SceneFinished)),
             "expected SceneFinished from advance_with_action"
         );
+    }
+
+    #[test]
+    fn reset_runtime_clears_stack_and_pending_events() {
+        let mut engine = make_engine_with(make_simple_scene());
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        assert!(!engine.drain().is_empty());
+
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        engine.reset_runtime();
+        assert!(engine.drain().is_empty());
+
+        engine.send(
+            EngineCommand::ChooseAction("leave".into()),
+            &mut world,
+            &registry,
+        );
+        assert!(engine.drain().is_empty());
     }
 
     #[test]

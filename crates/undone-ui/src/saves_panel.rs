@@ -195,10 +195,10 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 let load_btn = label(|| "Load".to_string())
                     .keyboard_navigable()
                     .on_click_stop(move |_| {
-                        // Phase 1: load world and start the scene while holding the RefMut.
+                        // Phase 1: load world and start a fresh scheduled scene while holding the RefMut.
                         // Collect all engine events so we can release the borrow before
                         // calling process_events (which needs only &World, not &mut).
-                        let events_and_fem = {
+                        let loaded = {
                             let mut gs = load_state.borrow_mut();
                             match undone_save::load_game(&entry_path_load, &gs.registry) {
                                 Err(e) => {
@@ -221,27 +221,48 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                     .unwrap_or_else(|| "Loaded.".into()),
                             );
 
-                            // Start the opening scene so the player isn't staring at blank text
-                            let fem_id = gs.registry.resolve_skill("FEMININITY").ok();
+                            // Reset runtime scene state and schedule the next scene from loaded world state.
+                            let fem_id = match gs.registry.femininity_skill() {
+                                Ok(id) => id,
+                                Err(err) => {
+                                    status_msg.set(format!(
+                                        "Load failed: required skill FEMININITY missing: {err}"
+                                    ));
+                                    return;
+                                }
+                            };
                             let GameState {
                                 ref mut engine,
                                 ref mut world,
                                 ref registry,
-                                ref opening_scene,
+                                ref scheduler,
+                                ref mut rng,
                                 ..
                             } = *gs;
-                            if let Some(scene_id) = opening_scene {
-                                crate::start_scene(engine, world, registry, scene_id.clone());
+                            engine.reset_runtime();
+                            let mut scene_started = false;
+                            if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                                if result.once_only {
+                                    world
+                                        .game_data
+                                        .set_flag(format!("ONCE_{}", result.scene_id));
+                                }
+                                crate::start_scene(engine, world, registry, result.scene_id);
+                                scene_started = true;
                             }
                             let events = engine.drain();
-                            (events, fem_id)
+                            (events, fem_id, scene_started)
                         }; // RefMut dropped here
 
                         // Phase 2: process events with only a shared borrow
-                        let (events, fem_id_opt) = events_and_fem;
-                        if let Some(fem_id) = fem_id_opt {
-                            let gs = load_state.borrow();
-                            crate::process_events(events, signals, &gs.world, fem_id);
+                        let (events, fem_id, scene_started) = loaded;
+                        let gs = load_state.borrow();
+                        crate::process_events(events, signals, &gs.world, fem_id);
+                        if !scene_started {
+                            signals.story.set(
+                                "[Loaded save. No eligible scene is currently available.]".into(),
+                            );
+                            signals.actions.set(vec![]);
                         }
 
                         signals.tab.set(crate::AppTab::Game);
