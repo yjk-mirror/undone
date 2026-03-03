@@ -20,6 +20,11 @@ pub enum PackLoadError {
     Toml { path: PathBuf, message: String },
     #[error("packs directory not found: {0}")]
     PacksDirNotFound(PathBuf),
+    #[error("required {kind} '{id}' is missing from loaded packs")]
+    MissingRequiredId {
+        kind: &'static str,
+        id: &'static str,
+    },
 }
 
 pub struct LoadedPackMeta {
@@ -57,7 +62,50 @@ pub fn load_packs(packs_dir: &Path) -> Result<(PackRegistry, Vec<LoadedPackMeta>
         metas.push(meta);
     }
 
+    validate_required_ids(&registry)?;
+
     Ok((registry, metas))
+}
+
+fn validate_required_ids(registry: &PackRegistry) -> Result<(), PackLoadError> {
+    registry
+        .femininity_skill()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "skill",
+            id: "FEMININITY",
+        })?;
+    registry
+        .trans_woman_trait()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "trait",
+            id: "TRANS_WOMAN",
+        })?;
+    registry
+        .always_female_trait()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "trait",
+            id: "ALWAYS_FEMALE",
+        })?;
+    registry
+        .not_transformed_trait()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "trait",
+            id: "NOT_TRANSFORMED",
+        })?;
+    registry
+        .naturally_smooth_trait()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "trait",
+            id: "NATURALLY_SMOOTH",
+        })?;
+    registry
+        .smooth_legs_trait()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "trait",
+            id: "SMOOTH_LEGS",
+        })?;
+
+    Ok(())
 }
 
 fn load_one_pack(
@@ -273,5 +321,16 @@ mod tests {
         let arc = arc.unwrap();
         assert!(arc.states.contains(&"arrived".to_string()));
         assert!(arc.states.contains(&"working".to_string()));
+    }
+
+    #[test]
+    fn required_ids_validation_fails_when_missing() {
+        let registry = PackRegistry::new();
+        let result = validate_required_ids(&registry);
+        assert!(
+            matches!(result, Err(PackLoadError::MissingRequiredId { .. })),
+            "expected missing required id error, got: {:?}",
+            result
+        );
     }
 }

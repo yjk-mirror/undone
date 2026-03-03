@@ -36,6 +36,13 @@ pub struct PackRegistry {
 }
 
 impl PackRegistry {
+    const SKILL_FEMININITY: &'static str = "FEMININITY";
+    const TRAIT_TRANS_WOMAN: &'static str = "TRANS_WOMAN";
+    const TRAIT_ALWAYS_FEMALE: &'static str = "ALWAYS_FEMALE";
+    const TRAIT_NOT_TRANSFORMED: &'static str = "NOT_TRANSFORMED";
+    const TRAIT_NATURALLY_SMOOTH: &'static str = "NATURALLY_SMOOTH";
+    const TRAIT_SMOOTH_LEGS: &'static str = "SMOOTH_LEGS";
+
     pub fn new() -> Self {
         Self {
             rodeo: Rodeo::new(),
@@ -136,6 +143,30 @@ impl PackRegistry {
                 self.skill_defs.contains_key(&sid).then_some(sid)
             })
             .ok_or_else(|| RegistryError::UnknownSkill(id.to_string()))
+    }
+
+    pub fn femininity_skill(&self) -> Result<SkillId, RegistryError> {
+        self.resolve_skill(Self::SKILL_FEMININITY)
+    }
+
+    pub fn trans_woman_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_TRANS_WOMAN)
+    }
+
+    pub fn always_female_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_ALWAYS_FEMALE)
+    }
+
+    pub fn not_transformed_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_NOT_TRANSFORMED)
+    }
+
+    pub fn naturally_smooth_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_NATURALLY_SMOOTH)
+    }
+
+    pub fn smooth_legs_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_SMOOTH_LEGS)
     }
 
     /// Intern a stat name (stat names don't need definitions, just interning).

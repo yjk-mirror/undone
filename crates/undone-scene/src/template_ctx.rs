@@ -342,13 +342,12 @@ pub fn render_prose(
     };
 
     // Compute active display name from femininity skill
-    let active_name = {
-        let fem_val = skills.get("FEMININITY").copied().unwrap_or(0);
-        if fem_val >= 70 {
-            p.name_fem.clone()
-        } else if fem_val >= 31 {
-            p.name_androg.clone()
-        } else {
+    let active_name = match registry.femininity_skill() {
+        Ok(femininity_id) => p.active_name(femininity_id).to_string(),
+        Err(err) => {
+            log::warn!(
+                "[template] required skill FEMININITY missing in registry: {err}; defaulting active name to masculine"
+            );
             p.name_masc.clone()
         }
     };

@@ -120,7 +120,7 @@ pub fn new_game<R: Rng>(
 
     // Seed FEMININITY skill in the skills map.
     let femininity_skill = registry
-        .resolve_skill("FEMININITY")
+        .femininity_skill()
         .expect("FEMININITY skill must be registered by base pack");
     player.skills.insert(
         femininity_skill,
@@ -133,22 +133,27 @@ pub fn new_game<R: Rng>(
     // Auto-inject origin-based hidden traits
     match config.origin {
         PcOrigin::TransWomanTransformed => {
-            if let Ok(id) = registry.resolve_trait("TRANS_WOMAN") {
-                player.traits.insert(id);
-            }
+            let id = registry
+                .trans_woman_trait()
+                .expect("TRANS_WOMAN trait must be registered by base pack");
+            player.traits.insert(id);
         }
         PcOrigin::CisFemaleTransformed => {
-            if let Ok(id) = registry.resolve_trait("ALWAYS_FEMALE") {
-                player.traits.insert(id);
-            }
+            let id = registry
+                .always_female_trait()
+                .expect("ALWAYS_FEMALE trait must be registered by base pack");
+            player.traits.insert(id);
         }
         PcOrigin::AlwaysFemale => {
-            if let Ok(id) = registry.resolve_trait("ALWAYS_FEMALE") {
-                player.traits.insert(id);
-            }
-            if let Ok(id) = registry.resolve_trait("NOT_TRANSFORMED") {
-                player.traits.insert(id);
-            }
+            let always_female = registry
+                .always_female_trait()
+                .expect("ALWAYS_FEMALE trait must be registered by base pack");
+            player.traits.insert(always_female);
+
+            let not_transformed = registry
+                .not_transformed_trait()
+                .expect("NOT_TRANSFORMED trait must be registered by base pack");
+            player.traits.insert(not_transformed);
         }
         PcOrigin::CisMaleTransformed => {} // no auto-injected traits
     }

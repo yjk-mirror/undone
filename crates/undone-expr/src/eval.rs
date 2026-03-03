@@ -228,15 +228,13 @@ pub fn eval_call_bool(
             "wasTransformed" => Ok(world.player.origin.was_transformed()),
             "hasSmoothLegs" => {
                 let has_naturally_smooth = registry
-                    .resolve_trait("NATURALLY_SMOOTH")
-                    .ok()
-                    .map(|id| world.player.has_trait(id))
-                    .unwrap_or(false);
+                    .naturally_smooth_trait()
+                    .map_err(|_| EvalError::UnknownTrait("NATURALLY_SMOOTH".into()))
+                    .map(|id| world.player.has_trait(id))?;
                 let has_smooth_legs = registry
-                    .resolve_trait("SMOOTH_LEGS")
-                    .ok()
-                    .map(|id| world.player.has_trait(id))
-                    .unwrap_or(false);
+                    .smooth_legs_trait()
+                    .map_err(|_| EvalError::UnknownTrait("SMOOTH_LEGS".into()))
+                    .map(|id| world.player.has_trait(id))?;
                 Ok(has_naturally_smooth || has_smooth_legs)
             }
             "checkSkill" => {
@@ -537,7 +535,7 @@ pub fn eval_call_string(
                 .unwrap_or_default()),
             "getName" => {
                 let fem_id = registry
-                    .resolve_skill("FEMININITY")
+                    .femininity_skill()
                     .map_err(|_| EvalError::UnknownSkill("FEMININITY".into()))?;
                 Ok(world.player.active_name(fem_id).to_string())
             }
