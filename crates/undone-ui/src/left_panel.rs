@@ -191,23 +191,9 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref registry,
         ref scheduler,
         ref mut rng,
+        femininity_id,
         ..
     } = *gs;
-    let femininity_id = match registry.femininity_skill() {
-        Ok(id) => id,
-        Err(err) => {
-            let msg = format!("[Engine error: required skill FEMININITY missing: {err}]");
-            log::error!("{msg}");
-            signals.story.update(|s| {
-                if !s.is_empty() {
-                    s.push_str("\n\n");
-                }
-                s.push_str(&msg);
-            });
-            signals.actions.set(vec![]);
-            return;
-        }
-    };
 
     let events = engine.advance_with_action(&action_id, world, registry);
     let finished = crate::process_events(events, signals, world, femininity_id);

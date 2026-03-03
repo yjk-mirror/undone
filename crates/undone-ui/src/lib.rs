@@ -182,30 +182,19 @@ pub fn app_view() -> impl View {
                     {
                         let mut gs_opt = gs_ref.borrow_mut();
                         if let Some(ref mut gs) = *gs_opt {
-                            match gs.registry.femininity_skill() {
-                                Ok(fem_id) => {
-                                    let GameState {
-                                        ref mut engine,
-                                        ref mut world,
-                                        ref registry,
-                                        ..
-                                    } = *gs;
-                                    if let Some(scene_id) = registry.transformation_scene() {
-                                        let scene_id = scene_id.to_owned();
-                                        start_scene(engine, world, registry, scene_id);
-                                    }
-                                    let events = engine.drain();
-                                    process_events(events, signals, world, fem_id);
-                                }
-                                Err(err) => {
-                                    let msg = format!(
-                                        "[Init error: required skill FEMININITY missing: {err}]"
-                                    );
-                                    log::error!("{msg}");
-                                    signals.story.set(msg);
-                                    signals.actions.set(vec![]);
-                                }
+                            let fem_id = gs.femininity_id;
+                            let GameState {
+                                ref mut engine,
+                                ref mut world,
+                                ref registry,
+                                ..
+                            } = *gs;
+                            if let Some(scene_id) = registry.transformation_scene() {
+                                let scene_id = scene_id.to_owned();
+                                start_scene(engine, world, registry, scene_id);
                             }
+                            let events = engine.drain();
+                            process_events(events, signals, world, fem_id);
                         }
                     }
 
@@ -242,52 +231,32 @@ pub fn app_view() -> impl View {
                         let mut gs_opt = gs_ref.borrow_mut();
                         if let Some(ref mut gs) = *gs_opt {
                             if gs.init_error.is_none() {
-                                match gs.registry.femininity_skill() {
-                                    Ok(fem_id) => {
-                                        let GameState {
-                                            ref mut engine,
-                                            ref mut world,
-                                            ref registry,
-                                            ref scheduler,
-                                            ref mut rng,
-                                            ref opening_scene,
-                                            ..
-                                        } = *gs;
-                                        if let Some(scene_id) = opening_scene {
-                                            start_scene(engine, world, registry, scene_id.clone());
+                                let fem_id = gs.femininity_id;
+                                let GameState {
+                                    ref mut engine,
+                                    ref mut world,
+                                    ref registry,
+                                    ref scheduler,
+                                    ref mut rng,
+                                    ref opening_scene,
+                                    ..
+                                } = *gs;
+                                if let Some(scene_id) = opening_scene {
+                                    start_scene(engine, world, registry, scene_id.clone());
+                                }
+                                let events = engine.drain();
+                                let finished = process_events(events, signals, world, fem_id);
+                                if finished {
+                                    if let Some(result) = scheduler.pick_next(world, registry, rng)
+                                    {
+                                        if result.once_only {
+                                            world
+                                                .game_data
+                                                .set_flag(format!("ONCE_{}", result.scene_id));
                                         }
+                                        start_scene(engine, world, registry, result.scene_id);
                                         let events = engine.drain();
-                                        let finished =
-                                            process_events(events, signals, world, fem_id);
-                                        if finished {
-                                            if let Some(result) =
-                                                scheduler.pick_next(world, registry, rng)
-                                            {
-                                                if result.once_only {
-                                                    world.game_data.set_flag(format!(
-                                                        "ONCE_{}",
-                                                        result.scene_id
-                                                    ));
-                                                }
-                                                start_scene(
-                                                    engine,
-                                                    world,
-                                                    registry,
-                                                    result.scene_id,
-                                                );
-                                                let events = engine.drain();
-                                                process_events(events, signals, world, fem_id);
-                                            }
-                                        }
-                                    }
-                                    Err(err) => {
-                                        let msg = format!(
-                                            "[Init error: required skill FEMININITY missing: {err}]"
-                                        );
-                                        log::error!("{msg}");
-                                        gs.init_error = Some(msg.clone());
-                                        signals.story.set(msg);
-                                        signals.actions.set(vec![]);
+                                        process_events(events, signals, world, fem_id);
                                     }
                                 }
                             }

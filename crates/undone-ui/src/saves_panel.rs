@@ -222,15 +222,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                             );
 
                             // Reset runtime scene state and schedule the next scene from loaded world state.
-                            let fem_id = match gs.registry.femininity_skill() {
-                                Ok(id) => id,
-                                Err(err) => {
-                                    status_msg.set(format!(
-                                        "Load failed: required skill FEMININITY missing: {err}"
-                                    ));
-                                    return;
-                                }
-                            };
+                            let fem_id = gs.femininity_id;
                             let GameState {
                                 ref mut engine,
                                 ref mut world,

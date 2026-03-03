@@ -1190,6 +1190,10 @@ fn build_next_button(
                             &mut pre.rng,
                         );
                         let engine = undone_scene::engine::SceneEngine::new(pre.scenes.clone());
+                        let femininity_id = pre
+                            .registry
+                            .femininity_skill()
+                            .expect("PackRegistry must include required skill id FEMININITY");
                         let throwaway_gs = GameState {
                             world: throwaway_world,
                             registry: pre.registry.clone(),
@@ -1198,6 +1202,7 @@ fn build_next_button(
                             rng: rand::rngs::SmallRng::from_entropy(),
                             init_error: None,
                             opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
+                            femininity_id,
                         };
                         *game_state.borrow_mut() = Some(throwaway_gs);
                     }

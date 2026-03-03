@@ -1,6 +1,7 @@
 use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
 use std::path::PathBuf;
+use undone_domain::SkillId;
 
 use undone_packs::{
     char_creation::{new_game, CharCreationConfig},
@@ -32,6 +33,7 @@ pub struct GameState {
     /// Set when pack loading fails; checked by app_view to surface the error.
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
+    pub femininity_id: SkillId,
 }
 
 /// Resolve the packs directory. Tries:
@@ -138,6 +140,9 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         init_error,
     } = pre;
     let opening_scene = registry.opening_scene().map(|s| s.to_owned());
+    let femininity_id = registry
+        .femininity_skill()
+        .expect("PackRegistry must include required skill id FEMININITY");
     let world = new_game(config, &mut registry, &mut rng);
     let engine = SceneEngine::new(scenes);
     GameState {
@@ -148,6 +153,7 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         rng,
         init_error,
         opening_scene,
+        femininity_id,
     }
 }
 
