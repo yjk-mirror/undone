@@ -31,7 +31,7 @@ hardcoded into engine code.
 
 This is the intended experience from launch to gameplay. Every step has been decided.
 
-### 1. Landing Page (not yet built)
+### 1. Landing Page
 
 New Game / Continue / Load / Settings. The game does not launch straight into char
 creation. A player returning to the game can load a save before starting anything new.

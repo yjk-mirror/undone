@@ -1,5 +1,6 @@
 use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
+use std::path::Path;
 use std::path::PathBuf;
 use undone_domain::SkillId;
 
@@ -155,6 +156,41 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         opening_scene,
         femininity_id,
     }
+}
+
+/// Build `GameState` from a loaded save world, using already-loaded pack content.
+///
+/// `opening_scene` is intentionally `None` so resuming from save does not replay
+/// the new-game opening scene.
+pub fn start_loaded_game(pre: PreGameState, world: World) -> GameState {
+    let PreGameState {
+        registry,
+        scenes,
+        scheduler,
+        rng,
+        init_error,
+    } = pre;
+    let femininity_id = registry
+        .femininity_skill()
+        .expect("PackRegistry must include required skill id FEMININITY");
+    let engine = SceneEngine::new(scenes);
+    GameState {
+        world,
+        registry,
+        engine,
+        scheduler,
+        rng,
+        init_error,
+        opening_scene: None,
+        femininity_id,
+    }
+}
+
+/// Validate and load a save file into a full `GameState`.
+pub fn load_game_state_from_save(pre: PreGameState, save_path: &Path) -> Result<GameState, String> {
+    let loaded_world = undone_save::load_game(save_path, &pre.registry)
+        .map_err(|e| format!("Load failed: {e}"))?;
+    Ok(start_loaded_game(pre, loaded_world))
 }
 
 #[cfg(test)]

@@ -107,7 +107,13 @@ fn tab_button(
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             let is_active = active.get() == tab;
-            let tabs_enabled = signals.phase.get() == crate::AppPhase::InGame;
+            let phase = signals.phase.get();
+            let tabs_enabled = match tab {
+                AppTab::Settings => true,
+                AppTab::Game | AppTab::Saves => {
+                    phase == crate::AppPhase::Landing || phase == crate::AppPhase::InGame
+                }
+            };
             let s = s
                 .padding_horiz(16.0)
                 .height(40.0)
@@ -129,7 +135,14 @@ fn tab_button(
             }
         })
         .on_click_stop(move |_| {
-            if signals.phase.get_untracked() == crate::AppPhase::InGame {
+            let phase = signals.phase.get_untracked();
+            let tab_enabled = match tab {
+                AppTab::Settings => true,
+                AppTab::Game | AppTab::Saves => {
+                    phase == crate::AppPhase::Landing || phase == crate::AppPhase::InGame
+                }
+            };
+            if tab_enabled {
                 active.set(tab);
             }
         })

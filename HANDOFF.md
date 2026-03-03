@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 224 passing, 0 failures.
+**Tests:** 236 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -17,15 +17,14 @@
 
 ## ⚡ Next Action
 
-**Creative direction consolidated. Opening scene flow decided. Ready to plan next work.**
+**Landing page implemented and shipped. Opening scene replacement is next.**
 
 ### Priority order (agreed with user):
-1. **Landing page** (#2) — New Game / Continue / Load / Settings. Structural UX change, needs a small plan.
-2. **Opening scene: replace transformation_intro** (#8) — DECIDED (2026-03-01): The TransformationIntro phase should be a plane boarding scene (he boards, reflects on background, falls asleep over Ohio). Current bedroom wake-up scene is agent-generated and wrong — replace it. The transformation happens in the gap between falling asleep and FemCreation. `workplace_arrival` stays as the first in-game scene (seat belt sign off, airport, subway/cab).
-3. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
-4. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
-5. **NPC sidebar redesign** (#13) — Needs design discussion. Only show met NPCs, appropriate info.
-6. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
+1. **Opening scene: replace transformation_intro** (#8) — DECIDED (2026-03-01): The TransformationIntro phase should be a plane boarding scene (he boards, reflects on background, falls asleep over Ohio). Current bedroom wake-up scene is agent-generated and wrong — replace it. The transformation happens in the gap between falling asleep and FemCreation. `workplace_arrival` stays as the first in-game scene (seat belt sign off, airport, subway/cab).
+2. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
+3. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
+4. **NPC sidebar redesign** (#13) — Needs design discussion. Only show met NPCs, appropriate info.
+5. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
@@ -34,16 +33,13 @@
 - **NPC character docs missing** — 13 named NPCs have no character docs (Marcus, David, Jake, Frank, etc.). → As needed.
 - **Presets as pack data** — `PRESET_WORKPLACE` / `PRESET_CAMPUS` are static Rust structs. → Sprint 5.
 - **Test fixture DRY** — 8+ identical `make_world()` helpers across crates. → Sprint 5.
-- **Hardcoded content IDs in engine code** — `FEMININITY`, `TRANS_WOMAN`, `ALWAYS_FEMALE`, `NOT_TRANSFORMED`, `BLOCK_ROUGH`, `LIKES_ROUGH` appear as string literals in Rust code. Engineering Principle 2 violation.
-- **Parser recursion depth limit** — `undone-expr` recursive descent parser has no depth guard. Engineering Principle 5 violation (unbounded growth).
-- **Saves panel scroll** — `saves_panel.rs` is missing `shrink_to_fit()` on its scroll container; scrolling may not activate with many saves.
-- **Tab buttons active during char creation** — clicking Game/Saves/Settings tabs during char creation has no visible effect but the buttons appear clickable (no disabled state).
+- **Hardcoded content IDs in engine code** — reduced significantly, but still audit remaining callsites for full Principle 2 compliance.
 
 ### User playtest feedback (2026-02-27, second session)
 
 **UX / Navigation:**
 1. ✅ **Settings inaccessible from "Your Story Begins"** — Fixed: Settings tab now works from any phase (char creation, transformation intro, fem creation, in-game).
-2. **No landing page / load game screen** — No way to load a saved game before starting a new one. Game launches straight into char creation. Needs a title screen or launcher with New Game / Continue / Load / Settings.
+2. ✅ **No landing page / load game screen** — Fixed: startup now opens landing page with New Game / Continue / Load / Settings and supports loading saves before character creation.
 3. ✅ **Deferred Settings teleport** — Fixed: tab state resets to Game on InGame transition. Settings accessible from all phases eliminates the deferred-click problem.
 4. ✅ **Default text size too small** — Fixed: default bumped 17→19. (User's existing prefs file still shows 17 — only affects fresh installs.)
 
@@ -192,6 +188,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-03 | Landing page + resume flow session. Added new startup Landing phase with New Game / Continue / Load / Settings, wired Continue/Load to validated save loading before character creation, and updated phase/tab behavior so Game/Saves are available in Landing and InGame while Settings remains global. Added `start_loaded_game()` / `load_game_state_from_save()` in UI game_state wiring. Also completed hardening/simplification batches: parser depth guard + EOF consume, condition method signature validation, structural ID enforcement, save-load runtime reset, race registry usage in spawner, saves scroll fix, FEMININITY caching, and docs/tooling alignment (`docs/creative-direction.md`, writing agents, guide updates). 236 tests, 0 failures. |
 | 2026-02-27 | UI quick wins session. Fixed 7 of 16 user-reported issues: Settings accessible from any phase (was broken during char creation + caused teleport bug), NPC sidebar hidden (was showing unmet NPCs with raw data), detail strip enlarged, button alignment padded to match prose, default font size 17→19, NPC coworker name collision (Robin→Alex in work_standup). Found new bug: FemCreation form ignores preset names (shows Eva/Ev instead of Robin/Robin). Documented remaining open items. 224 tests, 0 failures. |
 | 2026-02-27 | Systematic cleanup session. Code: replaced all 9 `eprintln!` calls in library crates with `log` crate (`log::warn!`/`log::error!`), added `log = "0.4"` as workspace dependency. Removed dead `SceneId` newtype from `ids.rs`. Docs: major `engine-design.md` refresh (Player struct, GameData, NpcCore, EffectDef 35 variants, pack manifest, UI layout, workspace structure with tools/). `content-schema.md` fully updated (35 effect types grouped, gd./m./f. expression methods completed). `writing-guide.md` gd. methods updated. `scene-writer.md` effect types list synced. All three audit files annotated with ✅ RESOLVED / ⚠️ PARTIAL markers (engineering: 13 annotated, arc flow: 5 annotated, writing: systemic + per-scene annotations with file renames). `CLAUDE.md`: scene count 19→33, added Engineering Principles 9 (log crate in library code) and 10 (docs track implementation). 224 tests, 0 failures. |
 | 2026-02-27 | MCP playtest session. Full 9-step playtest via screenshot + game-input MCPs. Found and fixed 2 bugs: (1) NPC wiring — StartScene without SetActiveMale/SetActiveFemale caused silent NPC effect failures; added `start_scene()` helper in lib.rs, replaced 5 callsites. (2) `gd.week()` stuck at 0 — no scene fired advance_time, free_time scenes permanently unreachable; added `advance_time slots=28` to workplace_evening.toml. TimeSlot has 4 variants (not 3), so 7×4=28. New test `pick_next_free_time_appears_after_arc_settles_with_advance_time`. All 9 playtest steps verified: char creation, 7-scene arc, settled state, free_time rotation (7 scenes seen), Jake thread (coffee_shop→MET_JAKE→park_walk), Marcus thread, FEMININITY-gated variants, ANALYTICAL trait branches. 223→224 tests, 0 failures. |

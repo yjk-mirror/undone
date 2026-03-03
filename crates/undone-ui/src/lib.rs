@@ -1,5 +1,6 @@
 pub mod char_creation;
 pub mod game_state;
+pub mod landing_page;
 pub mod left_panel;
 pub mod right_panel;
 pub mod saves_panel;
@@ -20,6 +21,7 @@ use undone_world::World;
 
 use crate::char_creation::{char_creation_view, fem_creation_view};
 use crate::game_state::{init_game, GameState, PreGameState};
+use crate::landing_page::landing_view;
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
 use crate::saves_panel::saves_panel;
@@ -36,6 +38,7 @@ pub enum AppTab {
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AppPhase {
+    Landing,
     BeforeCreation,
     TransformationIntro,
     FemCreation,
@@ -89,7 +92,7 @@ impl AppSignals {
             active_npc: RwSignal::new(None),
             prefs: RwSignal::new(crate::theme::load_prefs()),
             tab: RwSignal::new(AppTab::Game),
-            phase: RwSignal::new(AppPhase::BeforeCreation),
+            phase: RwSignal::new(AppPhase::Landing),
             scroll_gen: RwSignal::new(0),
         }
     }
@@ -155,95 +158,140 @@ pub fn app_view() -> impl View {
 
     let pre_state_cc = Rc::clone(&pre_state);
     let game_state_cc = Rc::clone(&game_state);
+    let pre_state_lp = Rc::clone(&pre_state);
+    let game_state_lp = Rc::clone(&game_state);
     let game_state_ig = Rc::clone(&game_state);
 
     let phase = signals.phase;
 
     let content = dyn_container(
-        move || (phase.get(), signals.tab.get()),
-        move |(current_phase, current_tab)| {
-            // Settings tab is accessible from any phase.
-            if current_tab == AppTab::Settings {
-                return settings_view(signals).into_any();
-            }
+        move || phase.get(),
+        move |current_phase| match current_phase {
+            AppPhase::Landing => dyn_container(move || signals.tab.get(), {
+                let pre_state_lp = Rc::clone(&pre_state_lp);
+                let game_state_lp = Rc::clone(&game_state_lp);
+                move |tab| match tab {
+                    AppTab::Settings => settings_view(signals).into_any(),
+                    AppTab::Game | AppTab::Saves => {
+                        landing_view(signals, Rc::clone(&pre_state_lp), Rc::clone(&game_state_lp))
+                            .into_any()
+                    }
+                }
+            })
+            .into_any(),
+            AppPhase::BeforeCreation => dyn_container(move || signals.tab.get(), {
+                let pre_state_cc = Rc::clone(&pre_state_cc);
+                let game_state_cc = Rc::clone(&game_state_cc);
+                move |tab| match tab {
+                    AppTab::Settings => settings_view(signals).into_any(),
+                    _ => char_creation_view(
+                        signals,
+                        Rc::clone(&pre_state_cc),
+                        Rc::clone(&game_state_cc),
+                        partial_char,
+                    )
+                    .into_any(),
+                }
+            })
+            .into_any(),
+            AppPhase::TransformationIntro => {
+                // Start the transformation scene against the throwaway world
+                // (created in the "Next" button handler in char_creation.rs).
+                let gs_ref = Rc::clone(&game_state_ig);
+                {
+                    let mut gs_opt = gs_ref.borrow_mut();
+                    if let Some(ref mut gs) = *gs_opt {
+                        let fem_id = gs.femininity_id;
+                        let GameState {
+                            ref mut engine,
+                            ref mut world,
+                            ref registry,
+                            ..
+                        } = *gs;
+                        if let Some(scene_id) = registry.transformation_scene() {
+                            let scene_id = scene_id.to_owned();
+                            start_scene(engine, world, registry, scene_id);
+                        }
+                        let events = engine.drain();
+                        process_events(events, signals, world, fem_id);
+                    }
+                }
 
-            match current_phase {
-                AppPhase::BeforeCreation => char_creation_view(
-                    signals,
-                    Rc::clone(&pre_state_cc),
-                    Rc::clone(&game_state_cc),
-                    partial_char,
-                )
-                .into_any(),
-                AppPhase::TransformationIntro => {
-                    // Start the transformation_intro scene against the throwaway world
-                    // (created in the "Next" button handler in char_creation.rs).
-                    let gs_ref = Rc::clone(&game_state_ig);
-                    {
-                        let mut gs_opt = gs_ref.borrow_mut();
-                        if let Some(ref mut gs) = *gs_opt {
+                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                    Some(gs) => gs,
+                    None => {
+                        return placeholder_panel(
+                            "Transformation intro: game state missing",
+                            signals,
+                        )
+                        .into_any();
+                    }
+                };
+                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                dyn_container(move || signals.tab.get(), {
+                    let gs_cell = Rc::clone(&gs_cell);
+                    move |tab| match tab {
+                        AppTab::Settings => settings_view(signals).into_any(),
+                        _ => h_stack((
+                            sidebar_panel(signals),
+                            story_panel(signals, Rc::clone(&gs_cell)),
+                        ))
+                        .style(|s| s.size_full())
+                        .into_any(),
+                    }
+                })
+                .into_any()
+            }
+            AppPhase::FemCreation => dyn_container(move || signals.tab.get(), {
+                let pre_state_cc = Rc::clone(&pre_state_cc);
+                let game_state_cc = Rc::clone(&game_state_cc);
+                move |tab| match tab {
+                    AppTab::Settings => settings_view(signals).into_any(),
+                    _ => fem_creation_view(
+                        signals,
+                        Rc::clone(&pre_state_cc),
+                        Rc::clone(&game_state_cc),
+                        partial_char,
+                    )
+                    .into_any(),
+                }
+            })
+            .into_any(),
+            AppPhase::InGame => {
+                // On first transition to InGame, start either opening scene (new game)
+                // or the next eligible scheduled scene (loaded save).
+                let gs_ref = Rc::clone(&game_state_ig);
+                {
+                    let mut gs_opt = gs_ref.borrow_mut();
+                    if let Some(ref mut gs) = *gs_opt {
+                        if gs.init_error.is_none() {
                             let fem_id = gs.femininity_id;
                             let GameState {
                                 ref mut engine,
                                 ref mut world,
                                 ref registry,
+                                ref scheduler,
+                                ref mut rng,
+                                ref mut opening_scene,
                                 ..
                             } = *gs;
-                            if let Some(scene_id) = registry.transformation_scene() {
-                                let scene_id = scene_id.to_owned();
+
+                            let mut started_scene = false;
+                            if let Some(scene_id) = opening_scene.take() {
                                 start_scene(engine, world, registry, scene_id);
-                            }
-                            let events = engine.drain();
-                            process_events(events, signals, world, fem_id);
-                        }
-                    }
-
-                    let inner_gs: GameState = match gs_ref.borrow_mut().take() {
-                        Some(gs) => gs,
-                        None => {
-                            return placeholder_panel(
-                                "Transformation intro: game state missing",
-                                signals,
-                            )
-                            .into_any();
-                        }
-                    };
-                    let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
-
-                    h_stack((
-                        sidebar_panel(signals),
-                        story_panel(signals, Rc::clone(&gs_cell)),
-                    ))
-                    .style(|s| s.size_full())
-                    .into_any()
-                }
-                AppPhase::FemCreation => fem_creation_view(
-                    signals,
-                    Rc::clone(&pre_state_cc),
-                    Rc::clone(&game_state_cc),
-                    partial_char,
-                )
-                .into_any(),
-                AppPhase::InGame => {
-                    // On first transition to InGame, start the opening scene.
-                    let gs_ref = Rc::clone(&game_state_ig);
-                    {
-                        let mut gs_opt = gs_ref.borrow_mut();
-                        if let Some(ref mut gs) = *gs_opt {
-                            if gs.init_error.is_none() {
-                                let fem_id = gs.femininity_id;
-                                let GameState {
-                                    ref mut engine,
-                                    ref mut world,
-                                    ref registry,
-                                    ref scheduler,
-                                    ref mut rng,
-                                    ref opening_scene,
-                                    ..
-                                } = *gs;
-                                if let Some(scene_id) = opening_scene {
-                                    start_scene(engine, world, registry, scene_id.clone());
+                                started_scene = true;
+                            } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                                if result.once_only {
+                                    world
+                                        .game_data
+                                        .set_flag(format!("ONCE_{}", result.scene_id));
                                 }
+                                start_scene(engine, world, registry, result.scene_id);
+                                started_scene = true;
+                            }
+
+                            if started_scene {
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
@@ -259,35 +307,44 @@ pub fn app_view() -> impl View {
                                         process_events(events, signals, world, fem_id);
                                     }
                                 }
+                            } else {
+                                signals
+                                    .story
+                                    .set("[No eligible scene is currently available.]".to_string());
+                                signals.actions.set(vec![]);
+                                signals
+                                    .player
+                                    .set(PlayerSnapshot::from_player(&world.player, fem_id));
                             }
                         }
                     }
-
-                    // Convert Rc<RefCell<Option<GameState>>> into Rc<RefCell<GameState>>
-                    // by extracting the value once at transition time.
-                    let inner_gs: GameState = match gs_ref.borrow_mut().take() {
-                        Some(gs) => gs,
-                        None => {
-                            return placeholder_panel("Game state missing", signals).into_any();
-                        }
-                    };
-                    let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
-
-                    dyn_container(move || signals.tab.get(), {
-                        let gs_cell = Rc::clone(&gs_cell);
-                        move |tab| match tab {
-                            AppTab::Game | AppTab::Settings => h_stack((
-                                sidebar_panel(signals),
-                                story_panel(signals, Rc::clone(&gs_cell)),
-                            ))
-                            .style(|s| s.size_full())
-                            .into_any(),
-                            AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
-                        }
-                    })
-                    .style(|s| s.flex_grow(1.0))
-                    .into_any()
                 }
+
+                // Convert Rc<RefCell<Option<GameState>>> into Rc<RefCell<GameState>>
+                // by extracting the value once at transition time.
+                let inner_gs: GameState = match gs_ref.borrow_mut().take() {
+                    Some(gs) => gs,
+                    None => {
+                        return placeholder_panel("Game state missing", signals).into_any();
+                    }
+                };
+                let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+
+                dyn_container(move || signals.tab.get(), {
+                    let gs_cell = Rc::clone(&gs_cell);
+                    move |tab| match tab {
+                        AppTab::Settings => settings_view(signals).into_any(),
+                        AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
+                        AppTab::Game => h_stack((
+                            sidebar_panel(signals),
+                            story_panel(signals, Rc::clone(&gs_cell)),
+                        ))
+                        .style(|s| s.size_full())
+                        .into_any(),
+                    }
+                })
+                .style(|s| s.flex_grow(1.0))
+                .into_any()
             }
         },
     )
