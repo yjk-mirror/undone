@@ -42,7 +42,6 @@ const AGES: &[Age] = &[
     Age::LateTwenties,
     Age::Thirties,
 ];
-const RACES: &[&str] = &["white", "black", "south_asian", "east_asian", "mixed"];
 const EYE_COLOURS: &[&str] = &["brown", "blue", "green", "grey", "hazel"];
 const HAIR_COLOURS: &[&str] = &["dark", "fair", "auburn", "black", "blonde"];
 const CORE_PERSONALITIES: &[&str] = &["ROMANTIC", "JERK", "FRIEND", "INTELLECTUAL", "LAD"];
@@ -106,7 +105,9 @@ pub fn spawn_npcs<R: Rng>(
             .cloned()
             .unwrap_or_else(|| format!("NPC{}", i));
         let age = *AGES.choose(rng).expect("AGES is non-empty");
-        let race = RACES.choose(rng).expect("RACES is non-empty").to_string();
+        let race = registry.races().choose(rng).cloned().expect(
+            "PackRegistry.races is non-empty; loader must register races before spawning NPCs",
+        );
         let eye_colour = EYE_COLOURS
             .choose(rng)
             .expect("EYE_COLOURS is non-empty")
@@ -142,7 +143,9 @@ pub fn spawn_npcs<R: Rng>(
             .cloned()
             .unwrap_or_else(|| format!("FNPC{}", i));
         let age = *AGES.choose(rng).expect("AGES is non-empty");
-        let race = RACES.choose(rng).expect("RACES is non-empty").to_string();
+        let race = registry.races().choose(rng).cloned().expect(
+            "PackRegistry.races is non-empty; loader must register races before spawning NPCs",
+        );
         let eye_colour = EYE_COLOURS
             .choose(rng)
             .expect("EYE_COLOURS is non-empty")
@@ -258,6 +261,7 @@ mod tests {
             ],
             vec!["Emma".into(), "Sophie".into()],
         );
+        reg.register_races(vec!["white".into(), "black".into(), "mixed".into()]);
         reg
     }
 

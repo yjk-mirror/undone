@@ -103,28 +103,34 @@ fn tab_button(
     signals: AppSignals,
 ) -> impl View {
     label(move || name.to_string())
+        .keyboard_navigable()
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             let is_active = active.get() == tab;
+            let tabs_enabled = signals.phase.get() == crate::AppPhase::InGame;
             let s = s
                 .padding_horiz(16.0)
                 .height(40.0)
                 .items_center()
                 .justify_center()
-                .font_size(13.0)
-                .hover(move |s| {
-                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    s.color(colors.ink_dim)
-                });
-            if is_active {
+                .font_size(13.0);
+
+            if !tabs_enabled {
+                s.color(colors.ink_ghost)
+            } else if is_active {
                 s.color(colors.ink)
                     .border_bottom(2.0)
                     .border_color(colors.lamp)
             } else {
-                s.color(colors.ink_ghost)
+                s.color(colors.ink_ghost).hover(move |s| {
+                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                    s.color(colors.ink_dim)
+                })
             }
         })
         .on_click_stop(move |_| {
-            active.set(tab);
+            if signals.phase.get_untracked() == crate::AppPhase::InGame {
+                active.set(tab);
+            }
         })
 }

@@ -346,7 +346,13 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     // --- Scrollable list area ---
     let list_area =
         scroll(v_stack((entries_list, empty_label)).style(|s| s.padding(16.0).width_full()))
-            .style(|s| s.flex_grow(1.0).width_full());
+            .scroll_style(|s| s.shrink_to_fit())
+            .style(|s| {
+                s.flex_grow(1.0)
+                    .flex_basis(0.0)
+                    .min_height(0.0)
+                    .width_full()
+            });
 
     v_stack((top_bar, list_area)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
