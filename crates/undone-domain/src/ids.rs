@@ -28,4 +28,3 @@ pub struct StuffId(pub Spur);
 /// A named stat ID — e.g. "WEEKS_SINCE_SEX", "ALL_ORGASMS"
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct StatId(pub Spur);
-

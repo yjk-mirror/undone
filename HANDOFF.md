@@ -17,15 +17,15 @@
 
 ## ⚡ Next Action
 
-**User playtest feedback collected. 7/16 issues fixed. Ready to plan next work.**
+**Creative direction consolidated. Opening scene flow decided. Ready to plan next work.**
 
 ### Priority order (agreed with user):
 1. **Landing page** (#2) — New Game / Continue / Load / Settings. Structural UX change, needs a small plan.
-2. **Opening scene redesign** (#8) — Needs creative discussion. Current `transformation_intro` is wrong; the agreed opening is a plane arrival scene. User needs to clarify: does plane scene replace transformation_intro or precede it?
+2. **Opening scene: replace transformation_intro** (#8) — DECIDED (2026-03-01): The TransformationIntro phase should be a plane boarding scene (he boards, reflects on background, falls asleep over Ohio). Current bedroom wake-up scene is agent-generated and wrong — replace it. The transformation happens in the gap between falling asleep and FemCreation. `workplace_arrival` stays as the first in-game scene (seat belt sign off, airport, subway/cab).
 3. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
 4. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
 5. **NPC sidebar redesign** (#13) — Needs design discussion. Only show met NPCs, appropriate info.
-6. **Writing quality sprint** (#14-15) — User wants to discuss using DeepSeek API for writing agents before starting. Do not start writing work without this discussion.
+6. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.

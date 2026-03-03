@@ -340,6 +340,35 @@ The narrator names the emotional category instead of showing the thing.
 - ❌ "more like being *placed*" — italicised coinage in place of observation
 - ✅ Show the nod. Show the look. The reader names it themselves.
 
+### 11. Overused words and phrases
+
+AI prose gravitates to the same vocabulary across scenes. Ration these aggressively —
+at most once per scene, ideally once per several scenes:
+
+| Word/phrase | Problem | Fix |
+|---|---|---|
+| "specific" / "specifically" | The #1 AI-prose tell. Empty intensifier. | Say the specific thing instead of calling it specific. |
+| "something about" | Vague hand-wave | Name the something or show it |
+| "the way" / "in the way that" | Filler connector | Cut or restructure the sentence |
+| "a quality" / "a certain" | Empty frame | Name it or show it |
+| "you notice" / "you realize" | Filters through observation | Just state the thing directly |
+| "somehow" | Vague qualifier | Explain how or don't qualify |
+| "deliberate" / "deliberately" | Tells intent | Show the action; let intent be inferred |
+| "something shifts" | Vague atmospheric gesture | What shifted? Show it. |
+| "the weight of" (metaphorical) | Abstract. Overused for gravity/significance. | Find a concrete detail that carries the weight instead. |
+
+**Post-writing test:** Search the scene for these words. More than 2–3 hits means
+rewriting those sentences. Scenes should not sound like each other.
+
+### 12. Scene distinctiveness across the game
+
+Before writing, answer: **what makes this scene impossible to confuse with any other
+scene in the game?** If the answer relies on the location name, it's not distinct enough.
+
+Two bar scenes should feel like completely different experiences — different NPCs,
+different dynamics, different stakes. If you swapped the location names and nothing
+broke, they're the same scene.
+
 ---
 
 ## The World Has Its Own Life

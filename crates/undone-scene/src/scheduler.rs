@@ -139,7 +139,9 @@ impl Scheduler {
                             Err(err) => {
                                 log::warn!(
                                     "[scheduler] condition error in slot '{}', scene '{}': {}",
-                                    slot_name, e.scene, err
+                                    slot_name,
+                                    e.scene,
+                                    err
                                 );
                                 false
                             }
@@ -193,7 +195,9 @@ impl Scheduler {
                             Err(err) => {
                                 log::warn!(
                                     "[scheduler] trigger error in slot '{}', scene '{}': {}",
-                                    slot_name, e.scene, err
+                                    slot_name,
+                                    e.scene,
+                                    err
                                 );
                                 false
                             }
@@ -236,22 +240,24 @@ impl Scheduler {
         // 1. Triggers — first active trigger across all slots wins.
         for slot_name in &slot_names {
             if let Some(events) = self.slots.get(*slot_name) {
-                if let Some(e) = events.iter().find(|e| {
-                    !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
-                        && match &e.trigger {
-                            Some(expr) => match eval(expr, world, &ctx, registry) {
-                                Ok(val) => val,
-                                Err(err) => {
-                                    log::warn!(
+                if let Some(e) =
+                    events.iter().find(|e| {
+                        !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
+                            && match &e.trigger {
+                                Some(expr) => match eval(expr, world, &ctx, registry) {
+                                    Ok(val) => val,
+                                    Err(err) => {
+                                        log::warn!(
                                         "[scheduler] trigger error in slot '{}', scene '{}': {}",
                                         slot_name, e.scene, err
                                     );
-                                    false
-                                }
-                            },
-                            None => false,
-                        }
-                }) {
+                                        false
+                                    }
+                                },
+                                None => false,
+                            }
+                    })
+                {
                     return Some(PickResult {
                         scene_id: e.scene.clone(),
                         once_only: e.once_only,
@@ -274,7 +280,8 @@ impl Scheduler {
                             Err(err) => {
                                 log::warn!(
                                     "[scheduler] condition error in scene '{}': {}",
-                                    e.scene, err
+                                    e.scene,
+                                    err
                                 );
                                 false
                             }
@@ -877,9 +884,13 @@ mod tests {
         world.game_data.set_flag("ONCE_base::workplace_arrival");
         world.game_data.set_flag("ONCE_base::workplace_landlord");
         world.game_data.set_flag("ONCE_base::workplace_first_night");
-        world.game_data.set_flag("ONCE_base::workplace_first_clothes");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
         world.game_data.set_flag("ONCE_base::workplace_first_day");
-        world.game_data.set_flag("ONCE_base::workplace_work_meeting");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
         world.game_data.set_flag("ONCE_base::workplace_evening");
         world.game_data.set_flag("MET_LANDLORD");
         world.game_data.set_flag("FIRST_MEETING_DONE");
