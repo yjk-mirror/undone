@@ -1,163 +1,81 @@
 [scene]
 id          = "base::transformation_intro"
 pack        = "base"
-description = "The morning after. Waking up wrong. Discovery, mirror, first reckoning."
+description = "Night flight to the new city. You board as the person you were and fall asleep."
 
 # Content level: VANILLA — no sexual content.
 
 [intro]
 prose = """
-Tuesday. The alarm goes off at seven like it always does.
+Gate C31 smells like coffee, disinfectant, and wet coat sleeves.
 
-{% if w.alwaysFemale() %}
-You reach over and kill the alarm. The room is the same room it was last night. You lie still for a moment, running inventory: ceiling, the gray light through the curtains, the specific weight of the duvet, the sound of the building.
+Your boarding pass says **{{ w.beforeName() }}**. Your old name still fits in your hand like a tool you have used for years.
 
-Everything checks out. But there's something underneath the inventory — a quality to the morning you can't immediately locate, like the room had weather while you slept and is waiting to see if you'll notice.
+The gate agent scans your phone. A green light, a nod, and you step into the jet bridge with everyone else.
 
-You notice.
+{% if gd.hasFlag("ROUTE_WORKPLACE") %}
+You are not flying for a vacation. You are flying because a company in a city you barely know offered you a job, and you said yes.
+
+The apartment lease starts tomorrow. Your boxes are already in transit. There is a badge photo waiting somewhere in a new HR system with your old face attached to your old name.
+{% elif gd.hasFlag("ROUTE_CAMPUS") %}
+You are not flying for a vacation. You are flying toward orientation week, dorm check-in, and a campus that has been described to you as if it were a destiny.
+
+You have the student portal bookmarked, a class schedule screenshot in your camera roll, and exactly enough confidence to believe the city will make room for you.
 {% else %}
-Seven AM. You reach over and kill the alarm with the reflex of someone who has done it a thousand times. You close your eyes again for thirty seconds, which is how most mornings start. The room is the same room it was last night.
+You are not flying for a vacation. You are flying toward a new city and a life you have not tested yet.
 
-But the weight of you inside the sheets is wrong — lighter somewhere, redistributed in ways you can't immediately account for, your hand resting against the blanket in a shape that isn't the shape you went to sleep with.
+Your old place is behind you, your next place is waiting, and the middle distance between those two facts is this airplane aisle.
+{% endif %}
 
-You lie very still, the way you lie still when you're trying to decide whether the strange noise downstairs is something or nothing.
-
-It is.
+{% if w.hasTrait("AMBITIOUS") %}
+You count next steps without meaning to: landing, ride, keys, sleep, first morning, first impression. The list calms you.
+{% elif w.hasTrait("ANALYTICAL") %}
+You run inventory because that is how you move through uncertainty: route, timing, contingencies, expected failures.
+{% elif w.hasTrait("OUTGOING") %}
+You clock people automatically: who looks approachable, who looks tired, who might be interesting after one drink and a little luck.
+{% elif w.hasTrait("SHY") %}
+You keep your shoulders narrow and your movements efficient, hoping to pass through without becoming anyone's small interaction.
+{% else %}
+You move with the practiced neutrality of someone who has flown enough to know every step by feel.
 {% endif %}
 """
 
 # ── All four beats merged into a single action ────────────────────────────
 
 [[actions]]
-id    = "waking"
-label = "Continue"
-detail = "Something is different. Work out what."
+id    = "fall_asleep"
+label = "Settle in and close your eyes"
+detail = "The city can wait until morning."
 prose = """
-{% if w.alwaysFemale() %}
-You sit up and look at your hands.
+The aisle is a slow negotiation of elbows and carry-ons.
 
-They're your hands. The hands you've had for your entire life, the nails the way they were when you went to sleep, the small scar at the base of your left thumb. Nothing has changed.
+You find your row, lift your bag, sit, buckle, wait.
 
-You take stock anyway. Voice, when you clear your throat — your voice. Body — yours, the one you've always had, the one you grew up in. You run through the inventory methodically and everything comes back correct.
+The plane pushes back. Runway lights smear into short gold lines against the window as the engines rise and hold.
 
-And yet something happened last night. You're certain of it the way you're certain of things you can't prove — a quality to the morning, a sense of having been handled and replaced. You feel entirely yourself. You also feel like you passed through something and came out the other side, and the something isn't visible from here.
-
-You get up and move through the apartment. The apartment is the same apartment.
-
-You look at yourself in the darkened screen of your phone on the nightstand — small, reversed, incomplete — and your reflection looks back. Still you. Still the face you're used to.
-
-Your face in the mirror is your face.
-
-You look at it for a long time anyway. The jaw, the eyes, the line of your nose — everything where it should be, everything as it's always been. The left eye fractionally larger than the right. The specific shade of your hair in this particular light. The small crease on your forehead you made your peace with years ago.
-
-All of it is there.
-
-Something is still different. You can't place it in the mirror. It's not in the reflection — it's behind the reflection, in whatever is doing the looking. You are yourself. Something also happened to you. You don't know yet how both of these things can be true at once.
-
-You go back to the bedroom and sit on the edge of the bed.
-
-You were something last night and you are something this morning and the something is the same thing, mostly. You are yourself. You are intact. Whatever happened in the night didn't change your body, your voice, your face — nothing you can point to and say: that's it, that's what's different.
-
-But something is different. You are going to find out what.
-
-Outside, the city is starting its day. A bus goes by. The radiator ticks once and goes quiet. Whatever moved through this apartment last night is gone now, and you're the only one who knows it was here.
+{% if gd.hasFlag("ROUTE_WORKPLACE") %}
+When the wheels leave the ground, you think about your first day in that office. You can picture the lobby before you have ever seen it.
+{% elif gd.hasFlag("ROUTE_CAMPUS") %}
+When the wheels leave the ground, you think about the first walk across campus, the first room full of strangers who are supposed to become your people.
 {% else %}
-You sit up.
+When the wheels leave the ground, you think about the version of yourself that will step out on the other side of this flight.
+{% endif %}
 
-The first thing you see are your hands and they are not your hands. Or they are your hands but they have been — revised, somehow, reduced, the knuckles softer, the fingers longer in proportion, the skin looking like it belongs to someone younger or just someone else. You stare at them for a solid five seconds doing nothing else.
-
-You try to say something. The sound that comes out is not your voice. Higher than it should be, and lighter, and you close your mouth immediately as if that will help. It does not help.
+The seat belt sign stays on. Cabin lights dim.
 
 {% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
-The worst part is that you're not even that surprised. You've read enough, dreamed enough, half-expected enough that the scenario arriving is almost a relief from the anticipation. Almost. The difference between imagining something and standing inside it turns out to be significant.
-{% elif w.hasTrait("AMBITIOUS") %}
-Your first coherent thought is about work. You have a meeting at nine. You have a presentation Thursday. You have a year-end review in six weeks that you have been preparing for since August. All of this surfaces immediately and absurdly, because your brain would apparently rather inventory the professional calendar than process what your hands look like.
+Your brain keeps rendering possible tomorrows in fast sequence. None of them feel fully impossible.
+{% elif w.hasTrait("CONFIDENT") %}
+You decide, without drama, that you will handle whatever this city throws at you.
 {% elif w.hasTrait("SHY") %}
-You fold your hands in your lap. As if keeping them small and close to your body will contain the situation. You are aware that this is not a rational response. You're doing it anyway.
+You angle toward the window and make yourself smaller, grateful that nobody expects conversation.
 {% else %}
-You look at your hands for a while longer. At some point you realize you're waiting for them to correct themselves, and they're not going to do that.
+You let the engine noise flatten your thoughts into something manageable.
 {% endif %}
 
-The sound of traffic outside is perfectly normal. Somewhere a door closes.
+Somewhere over Ohio, exhaustion wins the argument.
 
-You get up.
-
-The mechanics of getting up are wrong in ways that take a second to isolate. Your balance is off — different, not worse, just wrong relative to thirty years of calibration. You stand at the side of the bed and your legs are your legs but they're not the legs you went to sleep with. Smoother. The muscle distribution is different. You are smaller in some specific sense that you can't fully quantify from the inside.
-
-You look down.
-
-The shirt you slept in doesn't fit right. It fits the way a shirt fits someone with a different body, which is correct, because you have a different body. There is something underneath the shirt that shouldn't be there. You look at it for a moment.
-
-{% if w.hasTrait("SHY") %}
-You pull the shirt down as far as it will go and hold it there. This helps nothing. You let go.
-{% elif w.hasTrait("AMBITIOUS") %}
-The part of your brain that manages logistics is already running. It's running because that's what it does — it ran through your commute, it ran through your performance reviews, it ran through every uncertain situation as a list of problems and their order. Right now it's running a list you haven't finished making yet, because you don't have all the variables.
-{% elif w.hasTrait("OUTGOING") %}
-You need to tell someone. The impulse is immediate and absolutely useless. You do not have a script for this phone call. "Hey, so something happened overnight" — no. You put the phone down without picking it up.
-{% else %}
-You stand there for a moment doing nothing in particular.
-{% endif %}
-
-Whatever happened last night happened, and now it's morning, and the bathroom is six feet away, and there's a mirror in the bathroom.
-
-{% if w.hasTrait("SHY") %}
-You stand in front of the bathroom mirror for three seconds and then you turn away and sit on the edge of the tub.
-
-Not because you can't look. Because you need a moment first. You look at the tile instead, the grout lines, the corner of the soap dish. You give yourself thirty seconds to breathe.
-
-Then you look.
-{% else %}
-You stand in front of the bathroom mirror and look.
-{% endif %}
-
-The face looking back is not your face. Or: it is your face now, and it isn't the face you've had for however many years you've been alive. The jaw is softer. The nose is different. The eyes look back with the full, specific attention of someone watching to see how you're going to react. Different bone structure. Different everything.
-
-You are — smaller. Not just the face. The shoulders behind you in the mirror are narrower. You can see the line of a collarbone that wasn't there yesterday. Below that there are things your shirt is trying and failing to conceal, and you look at those too, because there is no advantage in not looking.
-
-{% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
-The strangest thing is how concrete it is. The scenarios you've run in your head — disaster scenarios, mostly, because that's where your brain goes — none of them included this specific detail, this exact quality of light, the way the mirror has a slight lean to the left that makes the reflection slightly trapezoidal. You've been imagining catastrophes in abstract. The actual thing is extremely literal.
-{% elif w.hasTrait("AMBITIOUS") %}
-You find yourself thinking about logistics again. At some point this week you're going to need — your brain itemizes, and you let it, because it is genuinely easier than finishing the sentence *you are looking at a body that is not the body you had yesterday.*
-{% elif w.hasTrait("OUTGOING") %}
-The thought arrives before you can stop it: *someone else has to know about this.* Not because you need help, exactly. Because this is the kind of thing that doesn't feel real until you say it out loud to another person. But you look at yourself in the mirror and realize you don't know where you'd start.
-{% else %}
-You look at yourself in the mirror for a long time. The face looks back. Neither of you looks away.
-{% endif %}
-
-You go back to the bedroom and sit on the edge of the bed.
-
-Your body is different. You have tested this thoroughly. The evidence is not going to change.
-
-You have no framework for this. That's the part that keeps surfacing — not the fact of what happened, but the absence of any procedure for it. Every hard thing you have ever handled, you've handled by finding the right framework and applying it. This thing doesn't have a framework. There are no instructions. You have a body you don't recognize, a face that belongs to someone else, a voice that isn't yours, and it is seven in the morning on a Tuesday and you are sitting on the edge of your bed.
-
-{% if w.hasTrait("SHY") %}
-You pull the blanket around your shoulders and hold it there. This is the second time you've done something physically containing in the last ten minutes. You're aware of the pattern. You don't stop.
-
-Eventually you're going to have to engage with this. Stand up, make some kind of decision, do something. You know this. But not yet. A few more minutes of not yet.
-{% elif w.hasTrait("AMBITIOUS") %}
-The part of your brain that handles logistics will not stop running the list. Okay. Fine. Let it run the list. If you're going to deal with this — and you are going to deal with this, because you deal with things, that is what you do — then you need information. You need to understand what changed and what didn't and what the variables are, and you need to do it in the right order.
-
-You take a breath. You get a piece of paper. You start writing.
-{% elif w.hasTrait("OUTGOING") %}
-What you need, desperately and uselessly, is to talk to someone. This is always your first move. You process things out loud. You have a whole support network built around the principle that no problem is too weird to say out loud to the right person.
-
-The problem with this problem is that you genuinely do not know how to say it out loud. You try it quietly to yourself, in the empty bedroom. It sounds wrong. You try it a different way. Still wrong. The language you have doesn't fit what happened.
-
-You're going to figure out the language. You're going to have to.
-{% elif w.hasTrait("OVERACTIVE_IMAGINATION") %}
-You've thought about scenarios like this before — because your brain produces scenarios constantly, including the unlikely ones, including the impossible ones. You have run the tape on disasters of many kinds, and in all of them you handled it with more grace than you're currently managing.
-
-The thing about finally being inside the scenario is that all the mental preparation turns out to have been preparation for the wrong thing. You weren't preparing for this. You were preparing for a version of this that your brain could render from the outside. The inside is different.
-{% else %}
-You sit there for a while. No plan. Just the room, and the morning, and the weight of a body you've never met before sitting on the edge of your bed.
-
-Eventually you'll have to do something. Everyone always has to do something eventually. Right now you're doing nothing, which feels approximately correct.
-{% endif %}
-
-Outside, the city is starting. A bus goes by. Someone's car somewhere gives up honking on its own.
-
-You're going to have to figure out what to do next.
-{% endif %}
+You close your eyes.
 """
 
   [[actions.effects]]

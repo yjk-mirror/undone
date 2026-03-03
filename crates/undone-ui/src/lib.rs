@@ -131,9 +131,23 @@ pub struct NpcSnapshot {
     pub name: String,
     pub age: String,
     pub personality: String,
-    pub relationship: String,
-    pub pc_liking: String,
-    pub pc_attraction: String,
+    pub relationship: undone_domain::RelationshipStatus,
+    pub pc_liking: undone_domain::LikingLevel,
+    pub pc_attraction: undone_domain::AttractionLevel,
+}
+
+impl NpcSnapshot {
+    /// Returns true once the NPC has moved beyond an unknown stranger state.
+    pub fn is_known(&self) -> bool {
+        !matches!(
+            self.relationship,
+            undone_domain::RelationshipStatus::Stranger
+        ) || !matches!(self.pc_liking, undone_domain::LikingLevel::Neutral)
+            || !matches!(
+                self.pc_attraction,
+                undone_domain::AttractionLevel::Unattracted
+            )
+    }
 }
 
 pub fn app_view() -> impl View {
@@ -524,14 +538,25 @@ pub fn process_events(
                 signals.actions.set(actions);
             }
             EngineEvent::NpcActivated(data) => {
-                signals.active_npc.set(data.as_ref().map(|d| NpcSnapshot {
-                    name: d.name.clone(),
-                    age: format!("{}", d.age),
-                    personality: d.personality.clone(),
-                    relationship: format!("{}", d.relationship),
-                    pc_liking: format!("{}", d.pc_liking),
-                    pc_attraction: format!("{}", d.pc_attraction),
-                }));
+                if let Some(d) = data.as_ref() {
+                    let next = NpcSnapshot {
+                        name: d.name.clone(),
+                        age: format!("{}", d.age),
+                        personality: d.personality.clone(),
+                        relationship: d.relationship.clone(),
+                        pc_liking: d.pc_liking,
+                        pc_attraction: d.pc_attraction,
+                    };
+                    signals.active_npc.update(|slot| match slot {
+                        Some(current) if current.is_known() && !next.is_known() => {
+                            // Keep meaningful context if a placeholder stranger activation
+                            // event arrives after a known NPC in the same event burst.
+                        }
+                        _ => *slot = Some(next),
+                    });
+                } else {
+                    signals.active_npc.set(None);
+                }
             }
             EngineEvent::SceneFinished => {
                 signals.actions.set(vec![]);
@@ -687,5 +712,31 @@ mod tests {
         append_story_paragraph(&mut story, "one");
         append_story_paragraph(&mut story, "two");
         assert_eq!(story, "one\n\ntwo");
+    }
+
+    #[test]
+    fn npc_snapshot_is_known_false_for_stranger_defaults() {
+        let npc = NpcSnapshot {
+            name: "Alex".to_string(),
+            age: "Twenty".to_string(),
+            personality: "Calm".to_string(),
+            relationship: RelationshipStatus::Stranger,
+            pc_liking: LikingLevel::Neutral,
+            pc_attraction: AttractionLevel::Unattracted,
+        };
+        assert!(!npc.is_known());
+    }
+
+    #[test]
+    fn npc_snapshot_is_known_true_after_relationship_progress() {
+        let npc = NpcSnapshot {
+            name: "Alex".to_string(),
+            age: "Twenty".to_string(),
+            personality: "Calm".to_string(),
+            relationship: RelationshipStatus::Acquaintance,
+            pc_liking: LikingLevel::Neutral,
+            pc_attraction: AttractionLevel::Unattracted,
+        };
+        assert!(npc.is_known());
     }
 }

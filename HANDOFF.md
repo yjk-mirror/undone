@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 236 passing, 0 failures.
+**Tests:** 240 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -17,14 +17,13 @@
 
 ## ⚡ Next Action
 
-**Landing page implemented and shipped. Opening scene replacement is next.**
+**Plane intro and Sidebar Phase 1 shipped. Next focus is char-creation polish + Sidebar Phase 2.**
 
 ### Priority order (agreed with user):
-1. **Opening scene: replace transformation_intro** (#8) — DECIDED (2026-03-01): The TransformationIntro phase should be a plane boarding scene (he boards, reflects on background, falls asleep over Ohio). Current bedroom wake-up scene is agent-generated and wrong — replace it. The transformation happens in the gap between falling asleep and FemCreation. `workplace_arrival` stays as the first in-game scene (seat belt sign off, airport, subway/cab).
-2. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
-3. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
-4. **NPC sidebar redesign** (#13) — Needs design discussion. Only show met NPCs, appropriate info.
-5. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
+1. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
+2. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
+3. **NPC sidebar redesign Phase 2** (#13) — Phase 1 shipped (single known NPC card). Next: multi-NPC chips + selection model per `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`.
+4. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
@@ -49,16 +48,16 @@
 7. *(Previous)* Trait list runoff, post-transformation attributes in before-phase, attribute formatting — still open.
 
 **Opening scene:**
-8. **Wrong opening scene** — Current `transformation_intro` is not what was discussed. The agreed opening is: he gets off a plane, arrives in the city. The transformation scene should follow the arrival framing, not precede it as an abstract standalone.
+8. ✅ **Wrong opening scene** — Fixed: `transformation_intro` is now the plane boarding + in-flight sleep scene. Transformation occurs in the gap before FemCreation.
 
 **Story panel layout:**
 9. ✅ **Flavor text box too small** — Fixed: detail strip enlarged (min_height 28→40, padding 6→10, font 13→14).
 10. ✅ **Action buttons misaligned with prose** — Fixed: buttons now have horizontal padding matching prose column.
 
 **Sidebar:**
-11. ✅ **NPC display — wrong character showing** — Fixed: NPC panel hidden entirely. Will redesign when ready (should only show NPCs the player has met, with appropriate information).
-12. ✅ **NPC formatting broken** — Resolved by hiding panel.
-13. **Multiple NPC display unclear** — Needs design work. Deferred until NPC panel redesign.
+11. ✅ **NPC display — wrong character showing** — Fixed with Sidebar Phase 1 guardrails: known-NPC-only visibility and stable active-NPC handling.
+12. ✅ **NPC formatting broken** — Fixed with new `People Here` card layout and qualitative bands.
+13. ⚠️ **Multiple NPC display unclear** — Phase 2 pending (multi-NPC chips/selection).
 
 **Writing quality:**
 14. **Rain scene writing bad** — Too much telling-not-showing. Narrator puts thoughts directly into PC's brain ("you know what they think because you've been him"). Violates the show-don't-tell principle. The "you know what men think because you were one" angle is too explicit and repetitive — it should be shown through specific moments, not stated as narration.
@@ -113,7 +112,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 **Layout:**
 - Title bar always visible: UNDONE branding, Game/Saves/Settings tabs, window controls
-- Stats sidebar on the **left** (280px fixed): player name, stats, NPC panel, mode toggle
+- Stats sidebar on the **left** (280px fixed): player name, stats, `People Here` (known-NPC only), mode toggle
 - Story + choices on the **right** (flex-grow): scrollable prose + choices bar
 - Window opens at 1200×800, titled "Undone"
 
@@ -140,7 +139,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 - `crates/undone-ui/src/saves_panel.rs` — save/load/delete UI
 - `crates/undone-ui/src/title_bar.rs` — custom title bar, tab nav, window controls
 - `crates/undone-ui/src/story_panel.rs` — story panel, centered prose, detail strip, choices bar
-- `crates/undone-ui/src/right_panel.rs` — stats sidebar, NPC panel, mode toggle
+- `crates/undone-ui/src/right_panel.rs` — stats sidebar, People Here module, mode toggle
 - `crates/undone-ui/src/settings_panel.rs` — settings tab (theme, font size, line height, number key mode)
 - `crates/undone-ui/src/theme.rs` — ThemeColors, ThemeMode, NumberKeyMode, UserPrefs, save/load prefs
 - `crates/undone-ui/src/game_state.rs` — PreGameState, GameState, init_game(), start_game()
@@ -188,6 +187,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-03 | Opening+sidebar UX session. Replaced `transformation_intro` with the creative-direction plane scene (board flight as before-self, route-aware setup, fall asleep in air), and wired throwaway intro world to carry preset route flags so workplace/campus intro branches render correctly. Implemented Sidebar Phase 1 in `right_panel`: `People Here` module, known-NPC-only visibility policy (no info leakage), qualitative liking/attraction bands, and active-NPC event handling guard to avoid unknown placeholders overwriting known context. Added tests for known-NPC gating and band mapping. Added UX spec for Phase 2+ at `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`. Verified playability with `cargo check --workspace`, `cargo test --workspace`, and `validate-pack`. 240 tests, 0 failures. |
 | 2026-03-03 | Landing page + resume flow session. Added new startup Landing phase with New Game / Continue / Load / Settings, wired Continue/Load to validated save loading before character creation, and updated phase/tab behavior so Game/Saves are available in Landing and InGame while Settings remains global. Added `start_loaded_game()` / `load_game_state_from_save()` in UI game_state wiring. Also completed hardening/simplification batches: parser depth guard + EOF consume, condition method signature validation, structural ID enforcement, save-load runtime reset, race registry usage in spawner, saves scroll fix, FEMININITY caching, and docs/tooling alignment (`docs/creative-direction.md`, writing agents, guide updates). 236 tests, 0 failures. |
 | 2026-02-27 | UI quick wins session. Fixed 7 of 16 user-reported issues: Settings accessible from any phase (was broken during char creation + caused teleport bug), NPC sidebar hidden (was showing unmet NPCs with raw data), detail strip enlarged, button alignment padded to match prose, default font size 17→19, NPC coworker name collision (Robin→Alex in work_standup). Found new bug: FemCreation form ignores preset names (shows Eva/Ev instead of Robin/Robin). Documented remaining open items. 224 tests, 0 failures. |
 | 2026-02-27 | Systematic cleanup session. Code: replaced all 9 `eprintln!` calls in library crates with `log` crate (`log::warn!`/`log::error!`), added `log = "0.4"` as workspace dependency. Removed dead `SceneId` newtype from `ids.rs`. Docs: major `engine-design.md` refresh (Player struct, GameData, NpcCore, EffectDef 35 variants, pack manifest, UI layout, workspace structure with tools/). `content-schema.md` fully updated (35 effect types grouped, gd./m./f. expression methods completed). `writing-guide.md` gd. methods updated. `scene-writer.md` effect types list synced. All three audit files annotated with ✅ RESOLVED / ⚠️ PARTIAL markers (engineering: 13 annotated, arc flow: 5 annotated, writing: systemic + per-scene annotations with file renames). `CLAUDE.md`: scene count 19→33, added Engineering Principles 9 (log crate in library code) and 10 (docs track implementation). 224 tests, 0 failures. |
