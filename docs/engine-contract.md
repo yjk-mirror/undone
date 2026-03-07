@@ -54,6 +54,8 @@ Scene content contracts:
 - scene conditions are parsed and semantically validated at load time
 - scene condition trait/skill/category IDs are validated at load time
 - effect stat/skill/trait/arc references are validated at load time
+- duplicate scene IDs fail scene load
+- duplicate `actions[].id` and `npc_actions[].id` fail scene load
 - goto targets are validated after all scenes load
 - schedule conditions and triggers go through the same expression validation path during schedule load
 
@@ -108,9 +110,10 @@ Startup-time failures:
 Scene-time failures:
 
 - unknown scene IDs emit visible prose and `SceneFinished`
-- template render failures emit visible error prose or `ErrorOccurred`
+- template render failures emit `ErrorOccurred`
 - effect failures emit `ErrorOccurred`
-- condition-evaluation failures are logged and treated as false
+- scene condition-evaluation failures emit `ErrorOccurred`, are logged, and are treated as false
+- scheduler condition / trigger evaluation failures are logged and treated as false
 
 UI contract:
 
@@ -148,6 +151,8 @@ Runtime reset invariant:
 - loading a save rebuilds a fresh `GameState` and `SceneEngine`
 - runtime scene stack / queued events are not part of the persisted world contract
 - loaded games do not replay `opening_scene`
+- loading a save into an existing in-memory game state must call the same runtime reset before resuming
+- resume picks the next eligible scheduled scene from persisted world state, using the current scheduler/registry
 
 ## 6. NPC State Semantics
 
@@ -164,6 +169,7 @@ The engine does not pick semantic NPCs on its own. The caller supplies active NP
 Current UI helper behavior:
 
 - `start_scene()` starts the scene, then binds the first male NPC and first female NPC in the world as fallback active receivers
+- because the fallback binding happens after scene start, intro prose / intro thoughts / intro variants must not rely on fallback `m` / `f` bindings
 
 Persistent NPC mutations include:
 

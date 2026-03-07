@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 240 passing, 0 failures.
+**Tests:** 254 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -28,10 +28,10 @@ Trust these docs first:
 
 Immediate priorities:
 
-1. **Save / resume hardening** — add end-to-end coverage for runtime reset and post-load behavior.
-2. **Runtime diagnostics hardening** — make authoring/runtime failures easier to detect during QA.
-3. **Authoring validation hardening** — keep pushing failures into startup and `validate-pack`.
-4. **NPC context contract decision** — either ratify the current one-active-`m`/`f` model for the next writing phase or replace it before writing depends on it.
+1. **Save / resume hardening** — core end-to-end runtime-reset coverage now exists; extend only if a new save/resume edge appears.
+2. **Runtime diagnostics hardening** — scene condition/template failures now surface through `ErrorOccurred`; keep visibility rules aligned with the contract.
+3. **Authoring validation hardening** — duplicate scene IDs and duplicate action IDs now fail scene load / `validate-pack`; broader warning-vs-error audit still remains if more authoring risks appear.
+4. **NPC context contract decision** — current one-active-`m`/`f` model is ratified for the next writing phase, with the explicit limitation that fallback UI binding happens after scene start.
 
 Do not restart content writing until the ironclad-engine hardening plan is reviewed against current code and the remaining risks are explicitly accepted.
 
@@ -197,6 +197,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-07 | Ironclad engine hardening session. Save/resume: added authoritative UI-side resume helpers in `game_state.rs`, centralized in-place save reload through runtime reset, and added end-to-end coverage that saves a real workplace-route world, reloads it through UI helpers, proves no opening-scene replay, and proves scheduler resume follows persisted arc state (`workplace_landlord`) with no stale runtime leakage. Runtime diagnostics: scene condition failures now emit visible `ErrorOccurred` diagnostics while still gating false; template render failures now surface through the same diagnostic path; UI tests confirm `ErrorOccurred` reaches story output. Authoring validation: scene load now rejects duplicate scene IDs plus duplicate `actions[].id` / `npc_actions[].id`, and `validate-pack` now rejects cross-pack duplicate scene IDs instead of silently overwriting. NPC contract: added UI coverage proving fallback male binding is valid for post-start action effects, and documented the important limitation that fallback `m`/`f` binding is not available during intro rendering. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
 | 2026-03-03 | Opening+sidebar UX session. Replaced `transformation_intro` with the creative-direction plane scene (board flight as before-self, route-aware setup, fall asleep in air), and wired throwaway intro world to carry preset route flags so workplace/campus intro branches render correctly. Implemented Sidebar Phase 1 in `right_panel`: `People Here` module, known-NPC-only visibility policy (no info leakage), qualitative liking/attraction bands, and active-NPC event handling guard to avoid unknown placeholders overwriting known context. Added tests for known-NPC gating and band mapping. Added UX spec for Phase 2+ at `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`. Verified playability with `cargo check --workspace`, `cargo test --workspace`, and `validate-pack`. 240 tests, 0 failures. |
 | 2026-03-03 | Landing page + resume flow session. Added new startup Landing phase with New Game / Continue / Load / Settings, wired Continue/Load to validated save loading before character creation, and updated phase/tab behavior so Game/Saves are available in Landing and InGame while Settings remains global. Added `start_loaded_game()` / `load_game_state_from_save()` in UI game_state wiring. Also completed hardening/simplification batches: parser depth guard + EOF consume, condition method signature validation, structural ID enforcement, save-load runtime reset, race registry usage in spawner, saves scroll fix, FEMININITY caching, and docs/tooling alignment (`docs/creative-direction.md`, writing agents, guide updates). 236 tests, 0 failures. |
 | 2026-02-27 | UI quick wins session. Fixed 7 of 16 user-reported issues: Settings accessible from any phase (was broken during char creation + caused teleport bug), NPC sidebar hidden (was showing unmet NPCs with raw data), detail strip enlarged, button alignment padded to match prose, default font size 17→19, NPC coworker name collision (Robin→Alex in work_standup). Found new bug: FemCreation form ignores preset names (shows Eva/Ev instead of Robin/Robin). Documented remaining open items. 224 tests, 0 failures. |
