@@ -4,7 +4,6 @@ use undone_packs::load_packs;
 use undone_scene::{
     loader::{load_scenes, validate_cross_references},
     scheduler::validate_entry_scene_references,
-    types::EffectDef,
 };
 
 fn extend_scenes_checked(
@@ -57,20 +56,9 @@ fn main() {
                     meta.manifest.pack.id
                 );
                 for (id, scene) in &scenes {
-                    // Warn: scene has no lasting effects
-                    let has_lasting = scene.actions.iter().any(|a| {
-                        a.effects.iter().any(|e| {
-                            matches!(
-                                e,
-                                EffectDef::SetGameFlag { .. }
-                                    | EffectDef::AddNpcLiking { .. }
-                                    | EffectDef::AdvanceArc { .. }
-                            )
-                        })
-                    });
-                    if !has_lasting {
+                    if !scene.has_persistent_world_mutation() {
                         eprintln!(
-                            "WARN  [{}] no lasting effects (game flag, NPC liking, or arc advance)",
+                            "WARN  [{}] no persistent world mutation (scene-local flags and navigation do not count)",
                             id
                         );
                     }

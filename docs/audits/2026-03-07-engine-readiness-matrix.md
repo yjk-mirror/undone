@@ -16,6 +16,7 @@ Status meanings:
 | Preset FemCreation values shown accurately | implemented/tested | FemCreation now derives preset defaults from the selected preset instead of hardcoded `Eva` / `Ev`. |
 | Structural ID contract | implemented/tested | Core structural IDs are validated at pack load; scene/stat/skill/category references are validated before runtime. |
 | Scene TOML parsing + condition validation | implemented/tested | Scene conditions, effect IDs, goto targets, duplicate scene IDs, and duplicate action / npc_action IDs fail during load. |
+| `validate-pack` persistent-mutation warning policy | implemented/tested | Warning now keys off any persistent world mutation in player actions or NPC actions; scene-local flags and pure navigation no longer create false-positive "no lasting effects" warnings. |
 | Scheduler condition / trigger validation | implemented/tested | Schedule expressions now use the same semantic and ID validation path as scene conditions. |
 | Scheduler scene references | implemented/tested | Schedule event scene IDs are validated during startup and `validate-pack`. |
 | Opening / transformation scene references | implemented/tested | Manifest entry scenes are validated against the loaded scene set before gameplay starts. |

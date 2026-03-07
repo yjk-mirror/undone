@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 254 passing, 0 failures.
+**Tests:** 257 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -13,12 +13,13 @@
 **All prose second-person present tense.** Zero third-person PC narration.
 **Writing toolchain:** writing-guide updated with positive "scene must earn its place" rule. scene-writer + writing-reviewer custom agents current.
 **Writing-agent research documented:** repo-local audit plus external lorebook/caching research captured for a future tooling pass; no behavior changes landed yet.
+**Authoring validation policy tightened:** `validate-pack` now warns on scenes with no persistent world mutation, not just missing game flags / NPC liking / arc advance. Scene-local flags and pure navigation no longer trigger false positives.
 
 ---
 
 ## ⚡ Next Action
 
-**Engine readiness sprint is complete. Next focus is selecting the next engineering task from current repo reality, with writing-agent/tooling cleanup documented but deferred.**
+**Engine readiness sprint is complete. Current authoring validation warnings are aligned with persistent runtime state. Next focus is auditing remaining hardcoded content-ID assumptions, with writing-agent/tooling cleanup still documented but deferred.**
 
 Trust these docs first:
 
@@ -33,7 +34,7 @@ Trust these docs first:
 Immediate priorities:
 
 1. **Reconcile current code vs docs before coding** — do not trust stale assumptions; confirm what still needs engineering work.
-2. **Authoring validation policy audit** — current "no lasting effects" warnings may need refinement, smarter detection, or narrower escalation.
+2. **Hardcoded content-ID audit** — continue reducing runtime assumptions baked into engine/UI code paths.
 3. **Writer-facing contract cleanup** — at least one documented mismatch exists in writing-agent docs around `m` / `f` prose-template assumptions; fix when doing the writing-agent/tooling pass.
 4. **Remaining engine backlog selection** — if no correctness blocker remains, choose the highest-value non-content engineering task that reduces false assumptions for future writers/tool builders.
 
@@ -202,6 +203,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-07 | Authoring validation policy refinement session. Reconciled current code/docs first, then tightened `validate-pack`'s "no lasting effects" heuristic to match actual persistent world mutations instead of only `set_game_flag` / `add_npc_liking` / `advance_arc`. Added reusable `EffectDef::mutates_persistent_world()` and `SceneDefinition::has_persistent_world_mutation()` helpers with unit coverage, including NPC-action coverage. `validate-pack` now warns only when a scene truly lacks persistent world mutation; scene-local flags and pure navigation no longer create false positives. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. Current warning inventory: `base::campus_library` still warns because it only mutates scene-local state. |
 | 2026-03-07 | Documentation + research session. Audited the current writing-agent path (`scene-writer`, `writing-reviewer`, `CLAUDE.md`, `writing-guide`, `deepseek-helper`) and documented that it is usable but not yet minimal-friction or fully contract-clean. Wrote `docs/audits/2026-03-07-writing-agent-tooling-audit.md` covering the current state and the highest-signal local gap: `.claude/agents/scene-writer.md` teaches `m`/`f` prose-template access while `docs/writing-guide.md` and current engine contract do not guarantee that. Wrote `docs/research/2026-03-07-writing-context-lorebooks-and-caching.md` with public research on Anthropic subagents/memory/prompt caching, DeepSeek context caching and pricing, SillyTavern lorebooks/personas/Data Bank, and public Janitor-ecosystem script patterns. Added `docs/prompts/2026-03-07-engineering-fresh-session-prompt.md` for the next fresh engineering session. No code changes; no verification run needed. |
 | 2026-03-07 | Ironclad engine hardening session. Save/resume: added authoritative UI-side resume helpers in `game_state.rs`, centralized in-place save reload through runtime reset, and added end-to-end coverage that saves a real workplace-route world, reloads it through UI helpers, proves no opening-scene replay, and proves scheduler resume follows persisted arc state (`workplace_landlord`) with no stale runtime leakage. Runtime diagnostics: scene condition failures now emit visible `ErrorOccurred` diagnostics while still gating false; template render failures now surface through the same diagnostic path; UI tests confirm `ErrorOccurred` reaches story output. Authoring validation: scene load now rejects duplicate scene IDs plus duplicate `actions[].id` / `npc_actions[].id`, and `validate-pack` now rejects cross-pack duplicate scene IDs instead of silently overwriting. NPC contract: added UI coverage proving fallback male binding is valid for post-start action effects, and documented the important limitation that fallback `m`/`f` binding is not available during intro rendering. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
 | 2026-03-03 | Opening+sidebar UX session. Replaced `transformation_intro` with the creative-direction plane scene (board flight as before-self, route-aware setup, fall asleep in air), and wired throwaway intro world to carry preset route flags so workplace/campus intro branches render correctly. Implemented Sidebar Phase 1 in `right_panel`: `People Here` module, known-NPC-only visibility policy (no info leakage), qualitative liking/attraction bands, and active-NPC event handling guard to avoid unknown placeholders overwriting known context. Added tests for known-NPC gating and band mapping. Added UX spec for Phase 2+ at `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`. Verified playability with `cargo check --workspace`, `cargo test --workspace`, and `validate-pack`. 240 tests, 0 failures. |

@@ -226,6 +226,48 @@ pub enum EffectDef {
     },
 }
 
+impl EffectDef {
+    /// Returns true when the effect mutates persistent world state rather than
+    /// only the current scene frame or immediate control flow.
+    pub fn mutates_persistent_world(&self) -> bool {
+        matches!(
+            self,
+            Self::ChangeStress { .. }
+                | Self::ChangeMoney { .. }
+                | Self::ChangeAnxiety { .. }
+                | Self::SetGameFlag { .. }
+                | Self::RemoveGameFlag { .. }
+                | Self::AddStat { .. }
+                | Self::SetStat { .. }
+                | Self::SkillIncrease { .. }
+                | Self::AddTrait { .. }
+                | Self::RemoveTrait { .. }
+                | Self::AddArousal { .. }
+                | Self::AddNpcLiking { .. }
+                | Self::AddNpcLove { .. }
+                | Self::AddWLiking { .. }
+                | Self::SetNpcFlag { .. }
+                | Self::AddNpcTrait { .. }
+                | Self::AddStuff { .. }
+                | Self::RemoveStuff { .. }
+                | Self::SetRelationship { .. }
+                | Self::SetNpcAttraction { .. }
+                | Self::SetNpcBehaviour { .. }
+                | Self::SetContactable { .. }
+                | Self::AddSexualActivity { .. }
+                | Self::SetPlayerPartner { .. }
+                | Self::AddPlayerFriend { .. }
+                | Self::SetJobTitle { .. }
+                | Self::ChangeAlcohol { .. }
+                | Self::SetVirgin { .. }
+                | Self::AdvanceTime { .. }
+                | Self::AdvanceArc { .. }
+                | Self::SetNpcRole { .. }
+                | Self::FailRedCheck { .. }
+        )
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Resolved runtime types (after TOML structs)
 // ---------------------------------------------------------------------------
@@ -292,6 +334,22 @@ pub struct SceneDefinition {
     pub intro_thoughts: Vec<Thought>,
     pub actions: Vec<Action>,
     pub npc_actions: Vec<NpcAction>,
+}
+
+impl SceneDefinition {
+    /// Returns true when any player or NPC action in the scene can mutate
+    /// persistent world state.
+    pub fn has_persistent_world_mutation(&self) -> bool {
+        self.actions
+            .iter()
+            .flat_map(|action| action.effects.iter())
+            .chain(
+                self.npc_actions
+                    .iter()
+                    .flat_map(|action| action.effects.iter()),
+            )
+            .any(EffectDef::mutates_persistent_world)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -361,5 +419,100 @@ prose = "You leave."
         let raw: SceneToml = toml::from_str(MINIMAL_SCENE).unwrap();
         let wait = raw.actions.iter().find(|a| a.id == "wait").unwrap();
         assert!(wait.next.is_empty());
+    }
+
+    #[test]
+    fn persistent_world_mutation_excludes_scene_local_and_navigation_effects() {
+        assert!(EffectDef::ChangeStress { amount: 1 }.mutates_persistent_world());
+        assert!(EffectDef::SetGameFlag {
+            flag: "SEEN".into()
+        }
+        .mutates_persistent_world());
+        assert!(EffectDef::SetNpcRole {
+            npc: "m".into(),
+            role: "ROLE_TEST".into(),
+        }
+        .mutates_persistent_world());
+        assert!(!EffectDef::SetSceneFlag {
+            flag: "local".into()
+        }
+        .mutates_persistent_world());
+        assert!(!EffectDef::RemoveSceneFlag {
+            flag: "local".into()
+        }
+        .mutates_persistent_world());
+        assert!(!EffectDef::Transition {
+            target: "base::next".into()
+        }
+        .mutates_persistent_world());
+    }
+
+    #[test]
+    fn scene_persistent_world_mutation_counts_player_and_npc_actions() {
+        let scene = SceneDefinition {
+            id: "test::scene".into(),
+            pack: "test".into(),
+            intro_prose: "Intro.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "look".into(),
+                label: "Look".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![EffectDef::SetSceneFlag {
+                    flag: "local".into(),
+                }],
+                next: vec![],
+                thoughts: vec![],
+            }],
+            npc_actions: vec![NpcAction {
+                id: "answer".into(),
+                condition: None,
+                prose: String::new(),
+                weight: 1,
+                effects: vec![EffectDef::AddNpcLiking {
+                    npc: "male".into(),
+                    delta: 1,
+                }],
+                next: vec![],
+            }],
+        };
+
+        assert!(scene.has_persistent_world_mutation());
+    }
+
+    #[test]
+    fn scene_without_persistent_mutation_returns_false() {
+        let scene = SceneDefinition {
+            id: "test::scene".into(),
+            pack: "test".into(),
+            intro_prose: "Intro.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "move".into(),
+                label: "Move".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![
+                    EffectDef::SetSceneFlag {
+                        flag: "local".into(),
+                    },
+                    EffectDef::Transition {
+                        target: "base::next".into(),
+                    },
+                ],
+                next: vec![],
+                thoughts: vec![],
+            }],
+            npc_actions: vec![],
+        };
+
+        assert!(!scene.has_persistent_world_mutation());
     }
 }

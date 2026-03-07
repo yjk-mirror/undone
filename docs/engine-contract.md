@@ -58,6 +58,7 @@ Scene content contracts:
 - duplicate `actions[].id` and `npc_actions[].id` fail scene load
 - goto targets are validated after all scenes load
 - schedule conditions and triggers go through the same expression validation path during schedule load
+- `validate-pack` warns when a scene has no persistent world mutation; scene-local flags and pure navigation do not satisfy that warning, while persistent player/NPC/world/time mutations do
 
 ## 3. Scene, Scheduler, and Action Semantics
 
