@@ -210,6 +210,15 @@ prose     = """He offers his umbrella."""
 
 **All effect types:** `change_stress`, `change_money`, `change_anxiety`, `add_arousal`, `change_alcohol`, `add_stat`, `set_stat`, `skill_increase`, `add_trait`, `remove_trait`, `set_virgin`, `set_player_partner`, `add_player_friend`, `set_job_title`, `add_stuff`, `remove_stuff`, `set_scene_flag`, `remove_scene_flag`, `set_game_flag`, `remove_game_flag`, `add_npc_liking`, `add_npc_love`, `add_w_liking`, `set_npc_flag`, `add_npc_trait`, `set_relationship`, `set_npc_attraction`, `set_npc_behaviour`, `set_contactable`, `add_sexual_activity`, `set_npc_role`, `transition`, `advance_arc`, `advance_time`.
 
+## Output Requirements
+
+- **Write LONG.** Each prose field should be 3–8 paragraphs. A full scene should be 150–300 lines of TOML. Do not abbreviate.
+- **Include ALL player choices from the brief.** If the brief says "choices: wait, run, accept," the output must have all three as `[[actions]]`.
+- **Trait branches in action prose too.** Don't only branch in the intro — action prose should also branch on relevant traits. Different PCs experience the same choice differently.
+- **NPC trait branching goes INSIDE a single NPC action's prose**, not as separate NPC actions. Use `{% if w.hasTrait("BEAUTIFUL") %}...{% elif w.hasTrait("PLAIN") %}...{% endif %}` within one `[[npc_actions]]` block.
+- **Every action needs effects.** At minimum: set a game flag or change a stat. Include `detail` fields on every action.
+- **Include `add_npc_liking` effects** when the PC does something that would change an NPC's opinion.
+
 ## Scene Design Checklist
 
 - Something happens in the intro before the player decides anything
