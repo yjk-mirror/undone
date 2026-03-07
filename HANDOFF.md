@@ -21,7 +21,20 @@
 
 ## ⚡ Next Action
 
-**Writing overhaul planned.** Transformation writing direction overhauled: "you used to do this" pattern banned, replaced with involuntary physical/emotional reactions. Androgynous name removed (two-name system: fem + masc). Char creation preset display fixed: before-life physical attributes on "Who Were You?", post-transformation traits on FemCreation. All writing docs updated (writing-guide, creative-direction, writer-core, review-core). Next: autonomous DeepSeek writing session to rewrite all 33 scenes.
+**Writing overhaul — calibrating prose direction with user.**
+Transformation writing direction overhauled: "you used to do this" pattern banned, replaced
+with involuntary physical/emotional reactions. Androgynous name removed (two-name system:
+fem + masc). Scene roster designed (33→25, 8 scrapped). Three example scenes drafted
+(transformation_intro, workplace_arrival, neighborhood_bar) — stashed, not at quality bar.
+User feedback: (a) drop `{% if not w.alwaysFemale() %}` guards — write transformation
+content directly; (b) still too much telling — narrator puts thoughts in player's head;
+show body/events, let player interpret; (c) calibrate before going autonomous.
+
+**After calibration — update ALL writing docs before autonomous work:**
+writing-guide.md, creative-direction.md, writer-core.md, review-core.md, writing-samples.md,
+scene-writer agent, writing-reviewer agent. These docs still allow patterns the user has
+rejected (too much interiority, narrator thinking for the player). Must be fixed BEFORE any
+autonomous writing session or agents will reproduce the same problems.
 
 Trust these docs first:
 
