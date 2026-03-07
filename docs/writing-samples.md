@@ -13,8 +13,7 @@
 ## Sample 1: Rain shelter intro — the city has its own life
 
 **Demonstrates:** World texture. Trait-branching that changes what happens (not adjective
-swaps). Transformation interiority that comes *after* the scene sets up, not before.
-Second-person voice.
+swaps). Second-person voice.
 
 *(From `packs/base/scenes/rain_shelter.toml`)*
 
@@ -32,21 +31,18 @@ Second-person voice.
 > He looks up when you step in.
 
 *(Then trait branches — SHY, POSH, CUTE, BITCHY, default — each changing what the player does,
-not just how they feel about it. Then:)*
-
-> *[for non-alwaysFemale, cis-male-start]*
-> The man glances at you — quick, automatic, the whole read done in under two seconds. You know
-> that look. You've made that look, in spaces like this, more times than you've ever thought to
-> count. You just never stood on the receiving end of it before.
->
-> *You used to do this*, you think, *without knowing you were doing anything.*
+not just how they feel about it.)*
 
 ---
 
 **Annotation:** The city (rain, moped, puddle, the lawyer ad) exists before the player arrives.
-The transformation content — the recognition of the gaze — comes *after* the scene establishes
-the world, earned by the setup. The trait branches change the scene: SHY ends the scene socially;
-CUTE opens a conversation; BITCHY closes one down.
+The trait branches change the scene: SHY ends the scene socially; CUTE opens a conversation;
+BITCHY closes one down.
+
+> **Note:** This sample previously included a transformation excerpt using "You used to do
+> this" — that pattern is now **banned**. Transformation content should use involuntary
+> physical/emotional reactions (body acts, mind catches up), not moralistic recognition.
+> See `docs/writing-guide.md` for the correct approach.
 
 ---
 
