@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 use rand::Rng;
 use thiserror::Error;
 use undone_domain::{FemaleNpcKey, MaleNpcKey, PcOrigin};
-use undone_packs::{CategoryType, PackRegistry};
+use undone_packs::{CategoryType, PackRegistry, RegistryError};
 use undone_world::World;
 
 use crate::parser::{Call, Expr, Receiver, Value};
@@ -226,17 +226,9 @@ pub fn eval_call_bool(
             }
             "wasMale" => Ok(world.player.origin.was_male_bodied()),
             "wasTransformed" => Ok(world.player.origin.was_transformed()),
-            "hasSmoothLegs" => {
-                let has_naturally_smooth = registry
-                    .naturally_smooth_trait()
-                    .map_err(|_| EvalError::UnknownTrait("NATURALLY_SMOOTH".into()))
-                    .map(|id| world.player.has_trait(id))?;
-                let has_smooth_legs = registry
-                    .smooth_legs_trait()
-                    .map_err(|_| EvalError::UnknownTrait("SMOOTH_LEGS".into()))
-                    .map(|id| world.player.has_trait(id))?;
-                Ok(has_naturally_smooth || has_smooth_legs)
-            }
+            "hasSmoothLegs" => registry
+                .player_has_smooth_legs(&world.player)
+                .map_err(map_registry_unknown_trait),
             "checkSkill" => {
                 let skill_id_str = str_arg(0)?;
                 let dc = match call.args.get(1) {
@@ -429,6 +421,14 @@ pub fn eval_call_bool(
                 }),
             }
         }
+    }
+}
+
+fn map_registry_unknown_trait(err: RegistryError) -> EvalError {
+    match err {
+        RegistryError::UnknownTrait(id) => EvalError::UnknownTrait(id),
+        RegistryError::UnknownNpcTrait(id) => EvalError::UnknownNpcTrait(id),
+        RegistryError::UnknownSkill(id) => EvalError::UnknownSkill(id),
     }
 }
 

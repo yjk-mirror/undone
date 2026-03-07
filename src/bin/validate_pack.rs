@@ -80,7 +80,7 @@ fn main() {
         }
     }
 
-    match undone_scene::load_schedule(&pack_metas, &registry) {
+    let scheduler = match undone_scene::load_schedule(&pack_metas, &registry) {
         Ok(scheduler) => {
             if let Err(e) = scheduler.validate_scene_references(&all_scenes) {
                 eprintln!("ERROR schedule validation: {e}");
@@ -94,12 +94,14 @@ fn main() {
                 eprintln!("ERROR entry scene validation: {e}");
                 error_count += 1;
             }
+            Some(scheduler)
         }
         Err(e) => {
             eprintln!("ERROR loading schedule: {e}");
             error_count += 1;
+            None
         }
-    }
+    };
 
     // Trait conflict validation
     let conflict_errors = registry.validate_trait_conflicts();
@@ -116,10 +118,13 @@ fn main() {
         error_count += 1;
     }
 
-    let char_creation_errors = undone_ui::char_creation::validate_registry_contract(&registry);
-    for error in char_creation_errors {
-        eprintln!("ERROR char creation contract: {error}");
-        error_count += 1;
+    if let Some(ref scheduler) = scheduler {
+        let char_creation_errors =
+            undone_ui::char_creation::validate_runtime_contract(&registry, scheduler);
+        for error in char_creation_errors {
+            eprintln!("ERROR char creation contract: {error}");
+            error_count += 1;
+        }
     }
 
     if error_count > 0 {

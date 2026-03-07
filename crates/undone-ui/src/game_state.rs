@@ -157,7 +157,8 @@ pub fn init_game() -> PreGameState {
         );
     }
 
-    let char_creation_errors = crate::char_creation::validate_registry_contract(&registry);
+    let char_creation_errors =
+        crate::char_creation::validate_runtime_contract(&registry, &scheduler);
     if !char_creation_errors.is_empty() {
         return failed_pre(
             registry,
@@ -346,7 +347,8 @@ mod tests {
         )
         .unwrap();
 
-        let char_creation_errors = crate::char_creation::validate_registry_contract(&registry);
+        let char_creation_errors =
+            crate::char_creation::validate_runtime_contract(&registry, &scheduler);
         assert!(char_creation_errors.is_empty());
 
         PreGameState {

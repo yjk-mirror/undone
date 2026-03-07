@@ -12,9 +12,10 @@ Status meanings:
 |---|---|---|
 | Pack load bootstrap | implemented/tested | `load_packs()` now fails if required structural IDs, names, or races are missing. |
 | Character creation registry contract | implemented/tested | Startup validates all trait IDs referenced by custom mode, presets, and rough-content preferences. |
+| Preset starting-flag contract | implemented/tested | Built-in character-creation presets now seed explicit starting flags, and startup/`validate-pack` fail if the scheduler never references one of those flags. |
 | Player init from `CharCreationConfig` | implemented/tested | `new_game()` seeds player state, flags, arcs, FEMININITY, and origin traits with unit coverage. |
 | Preset FemCreation values shown accurately | implemented/tested | FemCreation now derives preset defaults from the selected preset instead of hardcoded `Eva` / `Ev`. |
-| Structural ID contract | implemented/tested | Core structural IDs are validated at pack load; scene/stat/skill/category references are validated before runtime. |
+| Structural ID contract | implemented/tested | Core structural IDs are validated at pack load; scene/stat/skill/category references are validated before runtime, and structural smooth-legs / rough-content trait lookups are now centralized through `PackRegistry`. |
 | Scene TOML parsing + condition validation | implemented/tested | Scene conditions, effect IDs, goto targets, duplicate scene IDs, and duplicate action / npc_action IDs fail during load. |
 | `validate-pack` persistent-mutation warning policy | implemented/tested | Warning now keys off any persistent world mutation in player actions or NPC actions; scene-local flags and pure navigation no longer create false-positive "no lasting effects" warnings. |
 | Scheduler condition / trigger validation | implemented/tested | Schedule expressions now use the same semantic and ID validation path as scene conditions. |

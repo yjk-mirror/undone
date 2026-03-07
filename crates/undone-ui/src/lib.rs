@@ -54,9 +54,9 @@ pub struct PartialCharState {
     pub before_race: String,
     pub before_sexuality: undone_domain::BeforeSexuality,
     pub starting_traits: Vec<undone_domain::TraitId>,
-    /// Route flag to set at game start (e.g. "ROUTE_WORKPLACE", "ROUTE_CAMPUS").
-    /// `None` means freeform — no arc selected.
-    pub arc_flag: Option<String>,
+    /// Starting game flags to seed at game start. Presets currently use this to
+    /// opt into a route; custom players start freeform with no preset flags.
+    pub starting_flags: Vec<String>,
     /// Preset index: 0=Robin, 1=Raul, None=custom.
     /// When set, FemCreation uses preset data for all physical attributes.
     pub preset_idx: Option<u8>,

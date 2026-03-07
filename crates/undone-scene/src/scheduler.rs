@@ -7,7 +7,7 @@ use std::{
 use rand::Rng;
 use serde::Deserialize;
 use thiserror::Error;
-use undone_expr::{eval, Expr, SceneCtx};
+use undone_expr::{eval, Expr, Receiver, SceneCtx, Value};
 use undone_packs::{LoadedPackMeta, PackRegistry};
 use undone_world::World;
 
@@ -113,6 +113,21 @@ impl Scheduler {
     /// Return the names of all defined slots.
     pub fn slot_names(&self) -> impl Iterator<Item = &str> {
         self.slots.keys().map(|s| s.as_str())
+    }
+
+    /// Return true when any schedule condition or trigger references the given
+    /// game flag via `gd.hasGameFlag("...")`.
+    pub fn references_game_flag(&self, flag: &str) -> bool {
+        self.slots.values().flatten().any(|event| {
+            event
+                .condition
+                .as_ref()
+                .is_some_and(|expr| expr_references_game_flag(expr, flag))
+                || event
+                    .trigger
+                    .as_ref()
+                    .is_some_and(|expr| expr_references_game_flag(expr, flag))
+        })
     }
 
     /// Pick a scene for the given slot. Evaluates conditions against the current
@@ -332,6 +347,28 @@ impl Scheduler {
         }
 
         Ok(())
+    }
+}
+
+fn expr_references_game_flag(expr: &Expr, flag: &str) -> bool {
+    match expr {
+        Expr::Call(call) => {
+            call.receiver == Receiver::GameData
+                && call.method == "hasGameFlag"
+                && matches!(call.args.first(), Some(Value::Str(candidate)) if candidate == flag)
+        }
+        Expr::Not(inner) => expr_references_game_flag(inner, flag),
+        Expr::And(left, right)
+        | Expr::Or(left, right)
+        | Expr::Eq(left, right)
+        | Expr::Ne(left, right)
+        | Expr::Lt(left, right)
+        | Expr::Gt(left, right)
+        | Expr::Le(left, right)
+        | Expr::Ge(left, right) => {
+            expr_references_game_flag(left, flag) || expr_references_game_flag(right, flag)
+        }
+        Expr::Lit(_) => false,
     }
 }
 
@@ -1085,5 +1122,39 @@ mod tests {
             free_time_count > 0,
             "at least one free_time scene should appear in 20 picks (got 0)"
         );
+    }
+
+    #[test]
+    fn references_game_flag_detects_condition_reference() {
+        let event = ScheduleEvent {
+            scene: "test::scene".into(),
+            condition: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_WORKPLACE')").unwrap()),
+            weight: 1,
+            once_only: false,
+            trigger: None,
+        };
+        let scheduler = Scheduler {
+            slots: HashMap::from([("intro".into(), vec![event])]),
+        };
+
+        assert!(scheduler.references_game_flag("ROUTE_WORKPLACE"));
+        assert!(!scheduler.references_game_flag("ROUTE_CAMPUS"));
+    }
+
+    #[test]
+    fn references_game_flag_detects_trigger_reference() {
+        let event = ScheduleEvent {
+            scene: "test::scene".into(),
+            condition: None,
+            weight: 1,
+            once_only: false,
+            trigger: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_CAMPUS')").unwrap()),
+        };
+        let scheduler = Scheduler {
+            slots: HashMap::from([("intro".into(), vec![event])]),
+        };
+
+        assert!(scheduler.references_game_flag("ROUTE_CAMPUS"));
+        assert!(!scheduler.references_game_flag("ROUTE_WORKPLACE"));
     }
 }

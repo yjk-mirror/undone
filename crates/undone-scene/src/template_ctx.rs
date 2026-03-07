@@ -20,6 +20,7 @@ use undone_world::World;
 #[derive(Debug)]
 pub struct PlayerCtx {
     pub trait_strings: HashSet<String>,
+    pub has_smooth_legs: bool,
     pub virgin: bool,
     pub origin: PcOrigin,
     pub partner: bool, // true = has partner (i.e. NOT single)
@@ -147,11 +148,7 @@ impl Object for PlayerCtx {
             "getWetness" => Ok(Value::from(self.wetness.as_str())),
 
             // Compound boolean accessors
-            "hasSmoothLegs" => {
-                let smooth = self.trait_strings.contains("NATURALLY_SMOOTH")
-                    || self.trait_strings.contains("SMOOTH_LEGS");
-                Ok(Value::from(smooth))
-            }
+            "hasSmoothLegs" => Ok(Value::from(self.has_smooth_legs)),
 
             // Before-life attributes
             "beforeName" => Ok(Value::from(self.before_name.as_str())),
@@ -354,6 +351,7 @@ pub fn render_prose(
 
     let player_ctx = PlayerCtx {
         trait_strings,
+        has_smooth_legs: registry.player_has_smooth_legs(p).unwrap_or(false),
         virgin: p.virgin,
         origin: p.origin,
         partner: p.partner.is_some(),

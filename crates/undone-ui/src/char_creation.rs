@@ -12,6 +12,7 @@ use undone_domain::{
     PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
 };
 use undone_packs::{char_creation::CharCreationConfig, PackRegistry};
+use undone_scene::scheduler::Scheduler;
 
 use crate::game_state::{start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
@@ -28,8 +29,9 @@ struct PresetData {
     before_race: &'static str,
     trait_ids: &'static [&'static str],
     blurb: &'static str,
-    /// Starting circumstance flag set at game start (e.g. `"ROUTE_WORKPLACE"`).
-    arc_flag: Option<&'static str>,
+    /// Starting game flags seeded at game start. Presets use these to opt into
+    /// a route; custom players start freeform with no preset flags.
+    starting_flags: &'static [&'static str],
 
     // Before-life physical
     before_figure: MaleFigure,
@@ -126,7 +128,7 @@ const PRESET_ROBIN: PresetData = PresetData {
             You took a job offer in a city you didn't know — new company, new start, \
             boxes shipped to an apartment you've never seen. When things go sideways, \
             you inventory and solve. You're very good at that.",
-    arc_flag: Some("ROUTE_WORKPLACE"),
+    starting_flags: &["ROUTE_WORKPLACE"],
 
     // Before-life physical (all unremarkable)
     before_figure: MaleFigure::Average,
@@ -179,7 +181,7 @@ const PRESET_RAUL: PresetData = PresetData {
             You arrived with your expectations calibrated: you knew who you were, where you \
             were headed, and what the next four years were supposed to look like. \
             Things have always worked out. You've never had a real reason to think they wouldn't.",
-    arc_flag: Some("ROUTE_CAMPUS"),
+    starting_flags: &["ROUTE_CAMPUS"],
 
     // Before-life physical
     before_figure: MaleFigure::Toned,
@@ -238,8 +240,6 @@ const CUSTOM_STARTING_TRAIT_IDS: &[&str] = &[
     "SEXIST",
     "HOMOPHOBIC",
     "OBJECTIFYING",
-    "BLOCK_ROUGH",
-    "LIKES_ROUGH",
 ];
 
 #[derive(Clone, Debug, PartialEq)]
@@ -265,6 +265,38 @@ pub fn validate_registry_contract(registry: &PackRegistry) -> Vec<String> {
             errors.push(format!(
                 "character creation requires trait '{trait_id}', but it is not registered"
             ));
+        }
+    }
+
+    if registry.block_rough_trait().is_err() {
+        errors.push(
+            "character creation requires rough-content opt-out trait 'BLOCK_ROUGH', but it is not registered"
+                .to_string(),
+        );
+    }
+    if registry.likes_rough_trait().is_err() {
+        errors.push(
+            "character creation requires rough-content preference trait 'LIKES_ROUGH', but it is not registered"
+                .to_string(),
+        );
+    }
+
+    errors.sort();
+    errors.dedup();
+    errors
+}
+
+pub fn validate_runtime_contract(registry: &PackRegistry, scheduler: &Scheduler) -> Vec<String> {
+    let mut errors = validate_registry_contract(registry);
+
+    for preset in [PRESET_ROBIN, PRESET_RAUL] {
+        for flag in preset.starting_flags {
+            if !scheduler.references_game_flag(flag) {
+                errors.push(format!(
+                    "character creation preset '{}' seeds starting flag '{flag}', but the scheduler never references it",
+                    preset.before_name
+                ));
+            }
         }
     }
 
@@ -1166,17 +1198,11 @@ fn build_next_button(
                 if form.trait_objectifying.get_untracked() {
                     tn.push("OBJECTIFYING");
                 }
-                if !form.include_rough.get_untracked() {
-                    tn.push("BLOCK_ROUGH");
-                }
-                if form.likes_rough.get_untracked() {
-                    tn.push("LIKES_ROUGH");
-                }
                 trait_names = tn;
             }
 
             // Resolve trait IDs from registry
-            let starting_traits: Vec<_> = {
+            let mut starting_traits: Vec<_> = {
                 let pre_borrow = pre_state.borrow();
                 if let Some(ref pre) = *pre_borrow {
                     trait_names
@@ -1193,11 +1219,30 @@ fn build_next_button(
                     vec![]
                 }
             };
+            if let Some(ref pre) = *pre_state.borrow() {
+                if !form.include_rough.get_untracked() {
+                    starting_traits.push(pre.registry.block_rough_trait().unwrap_or_else(|_| {
+                        panic!("character creation trait 'BLOCK_ROUGH' must be validated during init")
+                    }));
+                }
+                if form.likes_rough.get_untracked() {
+                    starting_traits.push(pre.registry.likes_rough_trait().unwrap_or_else(|_| {
+                        panic!("character creation trait 'LIKES_ROUGH' must be validated during init")
+                    }));
+                }
+            }
 
-            // Derive route arc flag from the preset definition.
-            // Presets declare their own starting circumstance flag; custom players start freeform.
-            let arc_flag: Option<String> =
-                preset_ref.and_then(|p| p.arc_flag).map(|s| s.to_string());
+            // Presets declare their own starting game flags; custom players
+            // start freeform with no preset routing flags.
+            let starting_flags = preset_ref
+                .map(|preset| {
+                    preset
+                        .starting_flags
+                        .iter()
+                        .map(|flag| (*flag).to_string())
+                        .collect()
+                })
+                .unwrap_or_default();
 
             let appearance = if let Some(p) = preset_ref {
                 p.appearance
@@ -1211,7 +1256,7 @@ fn build_next_button(
                 before_race: before_race.clone(),
                 before_sexuality,
                 starting_traits,
-                arc_flag,
+                starting_flags,
                 preset_idx: preset_ref.map(|_| char_mode),
                 appearance,
             };
@@ -1269,7 +1314,7 @@ fn build_next_button(
                         starting_traits: partial.starting_traits.clone(),
                         male_count: 0,
                         female_count: 0,
-                        starting_flags: partial.arc_flag.clone().into_iter().collect(),
+                        starting_flags: partial.starting_flags.iter().cloned().collect(),
                         starting_arc_states: std::collections::HashMap::new(),
                         height: p.height,
                         butt: p.butt,
@@ -1302,7 +1347,7 @@ fn build_next_button(
                         starting_traits: partial.starting_traits.clone(),
                         male_count: 0,
                         female_count: 0,
-                        starting_flags: partial.arc_flag.clone().into_iter().collect(),
+                        starting_flags: partial.starting_flags.iter().cloned().collect(),
                         starting_arc_states: std::collections::HashMap::new(),
                         height: Height::Average,
                         butt: ButtSize::Round,
@@ -1397,7 +1442,7 @@ fn build_begin_button(
                     before_race: form.race.get_untracked(),
                     before_sexuality: BeforeSexuality::AttractedToWomen,
                     starting_traits: vec![],
-                    arc_flag: None,
+                    starting_flags: vec![],
                     preset_idx: None,
                     appearance: Appearance::Average,
                 }
@@ -1441,7 +1486,7 @@ fn build_begin_button(
                     starting_traits: partial.starting_traits,
                     male_count: 6,
                     female_count: 2,
-                    starting_flags: partial.arc_flag.into_iter().collect(),
+                    starting_flags: partial.starting_flags.into_iter().collect(),
                     starting_arc_states: std::collections::HashMap::new(),
                     height: p.height,
                     butt: p.butt,
@@ -1499,7 +1544,7 @@ fn build_begin_button(
                     starting_traits: partial.starting_traits,
                     male_count: 6,
                     female_count: 2,
-                    starting_flags: partial.arc_flag.into_iter().collect(),
+                    starting_flags: partial.starting_flags.into_iter().collect(),
                     starting_arc_states: std::collections::HashMap::new(),
                     height: Height::Average,
                     butt: ButtSize::Round,
@@ -1773,6 +1818,9 @@ fn field_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::st
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
+    use undone_packs::load_packs;
+    use undone_scene::scheduler::load_schedule;
 
     #[test]
     fn validate_registry_contract_reports_missing_traits() {
@@ -1794,7 +1842,7 @@ mod tests {
             before_race: "White".into(),
             before_sexuality: BeforeSexuality::AttractedToWomen,
             starting_traits: vec![],
-            arc_flag: Some("ROUTE_WORKPLACE".into()),
+            starting_flags: vec!["ROUTE_WORKPLACE".into()],
             preset_idx: Some(0),
             appearance: Appearance::Average,
         };
@@ -1816,7 +1864,7 @@ mod tests {
             before_race: "Latina".into(),
             before_sexuality: BeforeSexuality::AttractedToWomen,
             starting_traits: vec![],
-            arc_flag: None,
+            starting_flags: vec![],
             preset_idx: None,
             appearance: Appearance::Average,
         };
@@ -1826,5 +1874,28 @@ mod tests {
         assert_eq!(defaults.name_androg, "Ev");
         assert_eq!(defaults.race, "Latina");
         assert_eq!(defaults.age, Age::EarlyTwenties);
+    }
+
+    fn packs_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("packs")
+    }
+
+    #[test]
+    fn validate_runtime_contract_accepts_base_pack_routes() {
+        let (registry, metas) = load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+
+        let errors = validate_runtime_contract(&registry, &scheduler);
+
+        assert!(
+            errors.is_empty(),
+            "expected no runtime contract errors, got: {:?}",
+            errors
+        );
     }
 }

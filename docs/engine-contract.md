@@ -13,6 +13,7 @@ Startup succeeds only if pack loading produces:
 - a valid opening scene and transformation scene, if declared
 - a scheduler whose event scene IDs point at loaded scenes
 - a character-creation registry that contains every trait ID referenced by custom mode, presets, and rough-content preferences
+- a scheduler that references every preset starting flag declared by the built-in character-creation presets
 
 `new_game(CharCreationConfig, registry, rng)` must:
 
@@ -48,6 +49,12 @@ In addition, character creation validates every trait ID directly referenced by 
 - preset trait payloads
 - `BLOCK_ROUGH`
 - `LIKES_ROUGH`
+
+Character creation runtime contracts:
+
+- built-in presets currently remain UI-defined, not pack-defined
+- each built-in preset starting flag must be referenced by at least one scheduler condition or trigger
+- `PartialCharState.starting_flags` carries preset routing flags explicitly; it is not an arc-id field
 
 Scene content contracts:
 

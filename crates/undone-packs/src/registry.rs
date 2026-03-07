@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use lasso::{Key, Rodeo, Spur};
 use thiserror::Error;
-use undone_domain::{NpcTraitId, PersonalityId, SkillId, StatId, StuffId, TraitId};
+use undone_domain::{NpcTraitId, PersonalityId, Player, SkillId, StatId, StuffId, TraitId};
 
 use crate::data::{ArcDef, CategoryDef, NpcTraitDef, SkillDef, StatDef, TraitDef};
 
@@ -42,6 +42,8 @@ impl PackRegistry {
     const TRAIT_NOT_TRANSFORMED: &'static str = "NOT_TRANSFORMED";
     const TRAIT_NATURALLY_SMOOTH: &'static str = "NATURALLY_SMOOTH";
     const TRAIT_SMOOTH_LEGS: &'static str = "SMOOTH_LEGS";
+    const TRAIT_BLOCK_ROUGH: &'static str = "BLOCK_ROUGH";
+    const TRAIT_LIKES_ROUGH: &'static str = "LIKES_ROUGH";
 
     pub fn new() -> Self {
         Self {
@@ -167,6 +169,19 @@ impl PackRegistry {
 
     pub fn smooth_legs_trait(&self) -> Result<TraitId, RegistryError> {
         self.resolve_trait(Self::TRAIT_SMOOTH_LEGS)
+    }
+
+    pub fn block_rough_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_BLOCK_ROUGH)
+    }
+
+    pub fn likes_rough_trait(&self) -> Result<TraitId, RegistryError> {
+        self.resolve_trait(Self::TRAIT_LIKES_ROUGH)
+    }
+
+    pub fn player_has_smooth_legs(&self, player: &Player) -> Result<bool, RegistryError> {
+        Ok(player.has_trait(self.naturally_smooth_trait()?)
+            || player.has_trait(self.smooth_legs_trait()?))
     }
 
     /// Intern a stat name (stat names don't need definitions, just interning).
@@ -386,6 +401,12 @@ impl Default for PackRegistry {
 mod tests {
     use super::*;
     use crate::data::{CategoryType, TraitDef};
+    use undone_domain::{
+        Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BeforeSexuality, BeforeVoice,
+        BreastSize, ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour, HairLength,
+        Height, InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity,
+        PcOrigin, PenisSize, PlayerFigure, PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
+    };
 
     fn make_registry() -> PackRegistry {
         let mut reg = PackRegistry::new();
@@ -408,6 +429,66 @@ mod tests {
             },
         ]);
         reg
+    }
+
+    fn make_player() -> Player {
+        Player {
+            name_fem: "Eva".into(),
+            name_androg: "Ev".into(),
+            name_masc: "Evan".into(),
+            before: Some(BeforeIdentity {
+                name: "Evan".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                sexuality: BeforeSexuality::AttractedToWomen,
+                figure: MaleFigure::Average,
+                height: Height::Average,
+                hair_colour: HairColour::DarkBrown,
+                eye_colour: EyeColour::Brown,
+                skin_tone: SkinTone::Medium,
+                penis_size: PenisSize::Average,
+                voice: BeforeVoice::Average,
+                traits: HashSet::new(),
+            }),
+            age: Age::LateTeen,
+            race: "east_asian".into(),
+            figure: PlayerFigure::Slim,
+            breasts: BreastSize::Full,
+            eye_colour: EyeColour::Brown,
+            hair_colour: HairColour::DarkBrown,
+            height: Height::Average,
+            hair_length: HairLength::Shoulder,
+            skin_tone: SkinTone::Medium,
+            complexion: Complexion::Normal,
+            appearance: Appearance::Average,
+            butt: ButtSize::Round,
+            waist: WaistSize::Average,
+            lips: LipShape::Average,
+            nipple_sensitivity: NippleSensitivity::Normal,
+            clit_sensitivity: ClitSensitivity::Normal,
+            pubic_hair: PubicHairStyle::Trimmed,
+            natural_pubic_hair: NaturalPubicHair::Full,
+            inner_labia: InnerLabiaSize::Average,
+            wetness_baseline: WetnessBaseline::Normal,
+            traits: HashSet::new(),
+            skills: HashMap::new(),
+            money: 500,
+            stress: 0,
+            anxiety: 0,
+            arousal: ArousalLevel::Comfort,
+            alcohol: AlcoholLevel::Sober,
+            partner: None,
+            friends: vec![],
+            virgin: true,
+            anal_virgin: true,
+            lesbian_virgin: true,
+            on_pill: false,
+            pregnancy: None,
+            stuff: HashSet::new(),
+            custom_flags: HashMap::new(),
+            custom_ints: HashMap::new(),
+            origin: PcOrigin::CisMaleTransformed,
+        }
     }
 
     #[test]
@@ -583,5 +664,45 @@ mod tests {
         assert!(reg.in_category("RACE_PRIVILEGED", "White"));
         assert!(!reg.in_category("RACE_PRIVILEGED", "Black"));
         assert!(!reg.in_category("NONEXISTENT", "White"));
+    }
+
+    #[test]
+    fn player_has_smooth_legs_is_true_for_naturally_smooth_trait() {
+        let mut reg = PackRegistry::new();
+        reg.register_traits(vec![
+            TraitDef {
+                id: "NATURALLY_SMOOTH".into(),
+                name: "Naturally Smooth".into(),
+                description: "...".into(),
+                hidden: false,
+                group: None,
+                conflicts: vec![],
+            },
+            TraitDef {
+                id: "SMOOTH_LEGS".into(),
+                name: "Smooth Legs".into(),
+                description: "...".into(),
+                hidden: false,
+                group: None,
+                conflicts: vec![],
+            },
+        ]);
+        let naturally_smooth = reg.naturally_smooth_trait().unwrap();
+
+        let mut player = make_player();
+        player.traits.insert(naturally_smooth);
+
+        assert!(reg.player_has_smooth_legs(&player).unwrap());
+    }
+
+    #[test]
+    fn player_has_smooth_legs_errors_when_structural_traits_are_missing() {
+        let reg = PackRegistry::new();
+        let player = make_player();
+
+        assert!(matches!(
+            reg.player_has_smooth_legs(&player),
+            Err(RegistryError::UnknownTrait(id)) if id == "NATURALLY_SMOOTH"
+        ));
     }
 }
