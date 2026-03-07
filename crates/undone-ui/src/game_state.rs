@@ -8,7 +8,7 @@ use undone_packs::{
     char_creation::{new_game, CharCreationConfig},
     load_packs, PackRegistry,
 };
-use undone_scene::engine::SceneEngine;
+use undone_scene::engine::{EngineEvent, SceneEngine};
 use undone_scene::loader::load_scenes;
 use undone_scene::scheduler::{load_schedule, validate_entry_scene_references, Scheduler};
 use undone_scene::types::SceneDefinition;
@@ -35,6 +35,11 @@ pub struct GameState {
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
     pub femininity_id: SkillId,
+}
+
+pub struct ResumeGameResult {
+    pub events: Vec<EngineEvent>,
+    pub started_scene_id: Option<String>,
 }
 
 /// Resolve the packs directory. Tries:
@@ -96,10 +101,24 @@ pub fn init_game() -> PreGameState {
 
     // Load scenes from all packs into a combined map
     let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
+    let mut scene_sources: HashMap<String, String> = HashMap::new();
     for meta in &metas {
         let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
         match load_scenes(&scene_dir, &registry) {
-            Ok(pack_scenes) => scenes.extend(pack_scenes),
+            Ok(pack_scenes) => {
+                if let Err(e) = extend_scenes_checked(
+                    &mut scenes,
+                    &mut scene_sources,
+                    pack_scenes,
+                    &meta.manifest.pack.id,
+                ) {
+                    return failed_pre(
+                        registry,
+                        scenes,
+                        format!("Scene load error in pack '{}': {e}", meta.manifest.pack.id),
+                    );
+                }
+            }
             Err(e) => {
                 return failed_pre(
                     registry,
@@ -186,6 +205,23 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
     }
 }
 
+fn extend_scenes_checked(
+    scenes: &mut HashMap<String, std::sync::Arc<SceneDefinition>>,
+    scene_sources: &mut HashMap<String, String>,
+    incoming: HashMap<String, std::sync::Arc<SceneDefinition>>,
+    source: &str,
+) -> Result<(), String> {
+    for (scene_id, scene) in incoming {
+        if let Some(first_source) = scene_sources.insert(scene_id.clone(), source.to_string()) {
+            return Err(format!(
+                "duplicate scene id '{scene_id}': '{source}' conflicts with already-loaded '{first_source}'"
+            ));
+        }
+        scenes.insert(scene_id, scene);
+    }
+    Ok(())
+}
+
 /// Build `GameState` from a loaded save world, using already-loaded pack content.
 ///
 /// `opening_scene` is intentionally `None` so resuming from save does not replay
@@ -221,13 +257,288 @@ pub fn load_game_state_from_save(pre: PreGameState, save_path: &Path) -> Result<
     Ok(start_loaded_game(pre, loaded_world))
 }
 
+/// Reset transient runtime state, then resume from the current persisted world.
+///
+/// This is the authoritative resume path for loading a save into an existing
+/// `GameState`. It guarantees that stale scene frames and queued events do not
+/// survive across the load boundary.
+pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
+    gs.engine.reset_runtime();
+    gs.opening_scene = None;
+
+    let mut started_scene_id = None;
+    if let Some(result) = gs.scheduler.pick_next(&gs.world, &gs.registry, &mut gs.rng) {
+        if result.once_only {
+            gs.world
+                .game_data
+                .set_flag(format!("ONCE_{}", result.scene_id));
+        }
+        started_scene_id = Some(result.scene_id.clone());
+        crate::start_scene(&mut gs.engine, &mut gs.world, &gs.registry, result.scene_id);
+    }
+
+    ResumeGameResult {
+        events: gs.engine.drain(),
+        started_scene_id,
+    }
+}
+
+/// Load a save into an existing `GameState`, then resume from the persisted world.
+pub fn reload_current_game_from_save(
+    gs: &mut GameState,
+    save_path: &Path,
+) -> Result<ResumeGameResult, String> {
+    let loaded_world =
+        undone_save::load_game(save_path, &gs.registry).map_err(|e| format!("Load failed: {e}"))?;
+    gs.world = loaded_world;
+    Ok(resume_current_world(gs))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::SeedableRng;
+    use std::collections::{HashMap, HashSet};
+    use std::time::{SystemTime, UNIX_EPOCH};
+    use undone_domain::{
+        Age, Appearance, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, ButtSize,
+        ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize,
+        LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize,
+        PlayerFigure, PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
+    };
+    use undone_packs::char_creation::CharCreationConfig;
+    use undone_scene::engine::{EngineCommand, EngineEvent};
+    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
+
+    fn packs_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("packs")
+    }
+
+    fn test_pre_state() -> PreGameState {
+        let packs_dir = packs_dir();
+        let (registry, metas) = load_packs(&packs_dir).unwrap();
+
+        let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
+        let mut scene_sources: HashMap<String, String> = HashMap::new();
+        for meta in &metas {
+            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
+            extend_scenes_checked(
+                &mut scenes,
+                &mut scene_sources,
+                load_scenes(&scene_dir, &registry).unwrap(),
+                &meta.manifest.pack.id,
+            )
+            .unwrap();
+        }
+        undone_scene::loader::validate_cross_references(&scenes).unwrap();
+
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+        scheduler.validate_scene_references(&scenes).unwrap();
+        validate_entry_scene_references(
+            &scenes,
+            registry.opening_scene(),
+            registry.transformation_scene(),
+        )
+        .unwrap();
+
+        let char_creation_errors = crate::char_creation::validate_registry_contract(&registry);
+        assert!(char_creation_errors.is_empty());
+
+        PreGameState {
+            registry,
+            scenes,
+            scheduler,
+            rng: SmallRng::seed_from_u64(7),
+            init_error: None,
+        }
+    }
+
+    fn workplace_config() -> CharCreationConfig {
+        CharCreationConfig {
+            name_fem: "Robin".into(),
+            name_androg: "Robin".into(),
+            name_masc: "Robin".into(),
+            age: Age::EarlyTwenties,
+            race: "white".into(),
+            figure: PlayerFigure::Slim,
+            breasts: BreastSize::Handful,
+            origin: PcOrigin::CisMaleTransformed,
+            before: Some(BeforeIdentity {
+                name: "Robin".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                sexuality: BeforeSexuality::AttractedToWomen,
+                figure: MaleFigure::Average,
+                height: Height::Average,
+                hair_colour: HairColour::DarkBrown,
+                eye_colour: EyeColour::Brown,
+                skin_tone: SkinTone::Medium,
+                penis_size: PenisSize::Average,
+                voice: BeforeVoice::Average,
+                traits: HashSet::new(),
+            }),
+            starting_traits: vec![],
+            male_count: 2,
+            female_count: 2,
+            starting_flags: ["ROUTE_WORKPLACE".to_string()].into(),
+            starting_arc_states: HashMap::new(),
+            height: Height::Average,
+            butt: ButtSize::Round,
+            waist: WaistSize::Average,
+            lips: LipShape::Average,
+            hair_colour: HairColour::DarkBrown,
+            hair_length: HairLength::Shoulder,
+            eye_colour: EyeColour::Brown,
+            skin_tone: SkinTone::Medium,
+            complexion: Complexion::Normal,
+            appearance: Appearance::Average,
+            pubic_hair: PubicHairStyle::Trimmed,
+            natural_pubic_hair: NaturalPubicHair::Full,
+            nipple_sensitivity: NippleSensitivity::Normal,
+            clit_sensitivity: ClitSensitivity::Normal,
+            inner_labia: InnerLabiaSize::Average,
+            wetness_baseline: WetnessBaseline::Normal,
+        }
+    }
+
+    fn play_scene_to_finish(gs: &mut GameState) {
+        loop {
+            let events = gs.engine.drain();
+            if events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished))
+            {
+                break;
+            }
+
+            let actions = events.iter().find_map(|event| {
+                if let EngineEvent::ActionsAvailable(actions) = event {
+                    Some(actions.clone())
+                } else {
+                    None
+                }
+            });
+
+            let actions =
+                actions.expect("scene should expose at least one action before finishing");
+            let action_id = actions
+                .first()
+                .expect("scene should expose a selectable action")
+                .id
+                .clone();
+            gs.engine.send(
+                EngineCommand::ChooseAction(action_id),
+                &mut gs.world,
+                &gs.registry,
+            );
+        }
+    }
+
+    fn temp_save_path(name: &str) -> PathBuf {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        std::env::temp_dir().join(format!("undone_{name}_{unique}.json"))
+    }
 
     #[test]
     fn resolve_packs_dir_returns_path_ending_in_packs() {
         let dir = resolve_packs_dir();
         assert_eq!(dir.file_name().unwrap(), "packs");
+    }
+
+    #[test]
+    fn reload_current_game_from_save_resets_runtime_and_resumes_from_persisted_world() {
+        let pre = test_pre_state();
+        let mut gs = start_game(pre, workplace_config());
+
+        assert_eq!(
+            gs.opening_scene.as_deref(),
+            Some("base::rain_shelter"),
+            "new game should retain the new-game opening scene until first launch"
+        );
+
+        let first_pick = gs
+            .scheduler
+            .pick_next(&gs.world, &gs.registry, &mut gs.rng)
+            .expect("workplace route should schedule arrival");
+        assert_eq!(first_pick.scene_id, "base::workplace_arrival");
+        if first_pick.once_only {
+            gs.world
+                .game_data
+                .set_flag(format!("ONCE_{}", first_pick.scene_id));
+        }
+        crate::start_scene(
+            &mut gs.engine,
+            &mut gs.world,
+            &gs.registry,
+            first_pick.scene_id,
+        );
+        play_scene_to_finish(&mut gs);
+
+        assert_eq!(
+            gs.world.game_data.arc_state("base::workplace_opening"),
+            Some("arrived"),
+            "workplace arrival should advance the persisted arc state"
+        );
+
+        let save_path = temp_save_path("resume_runtime_reset");
+        undone_save::save_game(&gs.world, &gs.registry, &save_path).unwrap();
+
+        gs.engine.send(
+            EngineCommand::StartScene("base::rain_shelter".into()),
+            &mut gs.world,
+            &gs.registry,
+        );
+
+        let resume = reload_current_game_from_save(&mut gs, &save_path).unwrap();
+
+        assert_eq!(
+            gs.opening_scene, None,
+            "loaded saves must not replay opening scene"
+        );
+        assert_eq!(
+            resume.started_scene_id.as_deref(),
+            Some("base::workplace_landlord"),
+            "resume should follow persisted arc state, not new-game opening flow"
+        );
+
+        let resumed_actions = resume
+            .events
+            .iter()
+            .find_map(|event| {
+                if let EngineEvent::ActionsAvailable(actions) = event {
+                    Some(
+                        actions
+                            .iter()
+                            .map(|action| action.id.clone())
+                            .collect::<Vec<_>>(),
+                    )
+                } else {
+                    None
+                }
+            })
+            .expect("resumed scene should expose actions");
+
+        assert!(
+            resumed_actions.iter().any(|id| id == "wait_him_out"),
+            "expected workplace_landlord actions after resume, got {:?}",
+            resumed_actions
+        );
+        assert!(
+            !resumed_actions
+                .iter()
+                .any(|id| id == "main" || id == "leave"),
+            "stale opening-scene actions leaked through load: {:?}",
+            resumed_actions
+        );
+
+        std::fs::remove_file(save_path).unwrap();
     }
 }

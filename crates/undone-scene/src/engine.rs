@@ -193,19 +193,36 @@ impl SceneEngine {
         registry: &PackRegistry,
         scene_id: &str,
         context: &str,
+        events: Option<&mut VecDeque<EngineEvent>>,
     ) -> bool {
         match eval(expr, world, ctx, registry) {
             Ok(val) => val,
             Err(e) => {
-                log::warn!(
+                let msg = format!(
                     "[scene-engine] condition error in scene '{}' ({}): {}",
-                    scene_id,
-                    context,
-                    e
+                    scene_id, context, e
                 );
+                log::warn!("{msg}");
+                if let Some(events) = events {
+                    events.push_back(EngineEvent::ErrorOccurred(msg));
+                }
                 false
             }
         }
+    }
+
+    fn emit_template_error(
+        events: &mut VecDeque<EngineEvent>,
+        scene_id: &str,
+        context: &str,
+        err: &impl std::fmt::Display,
+    ) {
+        let msg = format!(
+            "[scene-engine] template error in scene '{}' ({}): {}",
+            scene_id, context, err
+        );
+        log::warn!("{msg}");
+        events.push_back(EngineEvent::ErrorOccurred(msg));
     }
 
     // -----------------------------------------------------------------------
@@ -245,15 +262,20 @@ impl SceneEngine {
         ctx.scene_id = Some(def.id.clone());
 
         // Select intro prose: use first passing variant, fall back to base intro
-        let intro_prose =
-            Self::select_intro_prose(&def.intro_variants, &def.intro_prose, world, &ctx, registry);
+        let intro_prose = Self::select_intro_prose(
+            &def.intro_variants,
+            &def.intro_prose,
+            world,
+            &ctx,
+            registry,
+            &def.id,
+            &mut self.events,
+        );
 
         // Render intro prose
         match render_prose(intro_prose, world, &ctx, registry) {
             Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
-            Err(e) => self
-                .events
-                .push_back(EngineEvent::ProseAdded(format!("[template error: {e}]"))),
+            Err(e) => Self::emit_template_error(&mut self.events, &def.id, "intro prose", &e),
         }
 
         // Render intro thoughts
@@ -292,6 +314,7 @@ impl SceneEngine {
                 registry,
                 &frame.def.id,
                 &format!("action '{}'", action.id),
+                Some(&mut self.events),
             ) {
                 // Condition no longer passes — silently ignore the stale click.
                 // Re-emit current actions so the UI refreshes.
@@ -307,9 +330,12 @@ impl SceneEngine {
             let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&action.prose, world, &frame.ctx, registry) {
                 Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
-                Err(e) => self
-                    .events
-                    .push_back(EngineEvent::ProseAdded(format!("[template error: {e}]"))),
+                Err(e) => Self::emit_template_error(
+                    &mut self.events,
+                    &frame.def.id,
+                    &format!("action '{}'", action.id),
+                    &e,
+                ),
             }
         }
 
@@ -369,6 +395,8 @@ impl SceneEngine {
         world: &World,
         ctx: &SceneCtx,
         registry: &PackRegistry,
+        scene_id: &str,
+        events: &mut VecDeque<EngineEvent>,
     ) -> &'a str {
         for variant in variants {
             if Self::eval_condition(
@@ -376,8 +404,9 @@ impl SceneEngine {
                 world,
                 ctx,
                 registry,
-                "variant",
+                scene_id,
                 "intro_variant",
+                Some(events),
             ) {
                 return &variant.prose;
             }
@@ -397,7 +426,15 @@ impl SceneEngine {
         for thought in thoughts {
             let passes = match &thought.condition {
                 None => true,
-                Some(expr) => Self::eval_condition(expr, world, ctx, registry, scene_id, "thought"),
+                Some(expr) => Self::eval_condition(
+                    expr,
+                    world,
+                    ctx,
+                    registry,
+                    scene_id,
+                    "thought",
+                    Some(events),
+                ),
             };
             if passes {
                 match render_prose(&thought.prose, world, ctx, registry) {
@@ -408,9 +445,7 @@ impl SceneEngine {
                         });
                     }
                     Ok(_) => {}
-                    Err(e) => events.push_back(EngineEvent::ErrorOccurred(format!(
-                        "thought prose error in scene '{scene_id}': {e}"
-                    ))),
+                    Err(e) => Self::emit_template_error(events, scene_id, "thought prose", &e),
                 }
             }
         }
@@ -432,6 +467,7 @@ impl SceneEngine {
                     registry,
                     &frame.def.id,
                     &format!("action '{}'", action.id),
+                    Some(&mut self.events),
                 ),
                 None => true,
             };
@@ -465,6 +501,7 @@ impl SceneEngine {
                             registry,
                             &frame.def.id,
                             &format!("npc_action '{}'", na.id),
+                            Some(&mut self.events),
                         ),
                         None => true,
                     };
@@ -513,9 +550,12 @@ impl SceneEngine {
             let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&prose, world, &frame.ctx, registry) {
                 Ok(rendered) => self.events.push_back(EngineEvent::ProseAdded(rendered)),
-                Err(e) => self
-                    .events
-                    .push_back(EngineEvent::ProseAdded(format!("[template error: {e}]"))),
+                Err(e) => Self::emit_template_error(
+                    &mut self.events,
+                    &frame.def.id,
+                    "npc action prose",
+                    &e,
+                ),
             }
         }
 
@@ -563,6 +603,7 @@ impl SceneEngine {
                         registry,
                         &frame.def.id,
                         "next branch",
+                        Some(&mut self.events),
                     )
                 }
                 None => true,
@@ -1374,6 +1415,120 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::ErrorOccurred(_))),
             "expected ErrorOccurred event when effect fails; got: {:?}",
+            events
+        );
+    }
+
+    #[test]
+    fn action_condition_error_emits_error_occurred_and_hides_action() {
+        let cond = undone_expr::parse("m.hasFlag('READY')").unwrap();
+        let scene = SceneDefinition {
+            id: "test::condition_error".into(),
+            pack: "test".into(),
+            intro_prose: "Condition test.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![
+                Action {
+                    id: "safe".into(),
+                    label: "Safe".into(),
+                    detail: String::new(),
+                    condition: None,
+                    prose: String::new(),
+                    allow_npc_actions: false,
+                    effects: vec![],
+                    next: vec![],
+                    thoughts: vec![],
+                },
+                Action {
+                    id: "broken".into(),
+                    label: "Broken".into(),
+                    detail: String::new(),
+                    condition: Some(cond),
+                    prose: String::new(),
+                    allow_npc_actions: false,
+                    effects: vec![],
+                    next: vec![],
+                    thoughts: vec![],
+                },
+            ],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::condition_error".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events.iter().any(|event| matches!(
+                event,
+                EngineEvent::ErrorOccurred(msg) if msg.contains("condition error")
+            )),
+            "expected visible diagnostic for action condition error, got {:?}",
+            events
+        );
+
+        let action_ids = events
+            .iter()
+            .find_map(|event| {
+                if let EngineEvent::ActionsAvailable(actions) = event {
+                    Some(
+                        actions
+                            .iter()
+                            .map(|action| action.id.as_str())
+                            .collect::<Vec<_>>(),
+                    )
+                } else {
+                    None
+                }
+            })
+            .expect("scene should emit actions");
+        assert_eq!(action_ids, vec!["safe"]);
+    }
+
+    #[test]
+    fn intro_template_error_emits_error_occurred() {
+        let scene = SceneDefinition {
+            id: "test::template_error".into(),
+            pack: "test".into(),
+            intro_prose: "{{ m.getLiking() }}".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![],
+            npc_actions: vec![],
+        };
+
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let registry = PackRegistry::new();
+
+        engine.send(
+            EngineCommand::StartScene("test::template_error".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert!(
+            events.iter().any(|event| matches!(
+                event,
+                EngineEvent::ErrorOccurred(msg) if msg.contains("template error")
+            )),
+            "expected visible diagnostic for template error, got {:?}",
+            events
+        );
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::ProseAdded(text) if text.contains("template error"))),
+            "template failures should surface through ErrorOccurred, not ad-hoc prose: {:?}",
             events
         );
     }

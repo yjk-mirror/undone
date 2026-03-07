@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::game_state::GameState;
+use crate::game_state::{reload_current_game_from_save, GameState};
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
@@ -195,20 +195,16 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 let load_btn = label(|| "Load".to_string())
                     .keyboard_navigable()
                     .on_click_stop(move |_| {
-                        // Phase 1: load world and start a fresh scheduled scene while holding the RefMut.
-                        // Collect all engine events so we can release the borrow before
-                        // calling process_events (which needs only &World, not &mut).
                         let loaded = {
                             let mut gs = load_state.borrow_mut();
-                            match undone_save::load_game(&entry_path_load, &gs.registry) {
-                                Err(e) => {
-                                    status_msg.set(format!("Load failed: {e}"));
-                                    return;
-                                }
-                                Ok(loaded_world) => {
-                                    gs.world = loaded_world;
-                                }
-                            }
+                            let resume =
+                                match reload_current_game_from_save(&mut gs, &entry_path_load) {
+                                    Err(e) => {
+                                        status_msg.set(e);
+                                        return;
+                                    }
+                                    Ok(resume) => resume,
+                                };
 
                             // Clear UI signals first
                             signals.story.set(String::new());
@@ -221,29 +217,11 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                     .unwrap_or_else(|| "Loaded.".into()),
                             );
 
-                            // Reset runtime scene state and schedule the next scene from loaded world state.
-                            let fem_id = gs.femininity_id;
-                            let GameState {
-                                ref mut engine,
-                                ref mut world,
-                                ref registry,
-                                ref scheduler,
-                                ref mut rng,
-                                ..
-                            } = *gs;
-                            engine.reset_runtime();
-                            let mut scene_started = false;
-                            if let Some(result) = scheduler.pick_next(world, registry, rng) {
-                                if result.once_only {
-                                    world
-                                        .game_data
-                                        .set_flag(format!("ONCE_{}", result.scene_id));
-                                }
-                                crate::start_scene(engine, world, registry, result.scene_id);
-                                scene_started = true;
-                            }
-                            let events = engine.drain();
-                            (events, fem_id, scene_started)
+                            (
+                                resume.events,
+                                gs.femininity_id,
+                                resume.started_scene_id.is_some(),
+                            )
                         }; // RefMut dropped here
 
                         // Phase 2: process events with only a shared borrow

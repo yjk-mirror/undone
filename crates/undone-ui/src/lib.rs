@@ -606,8 +606,14 @@ fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
 mod tests {
     use super::*;
     use lasso::Key;
+    use slotmap::SlotMap;
     use std::collections::{HashMap, HashSet};
+    use std::sync::Arc;
     use undone_domain::*;
+    use undone_packs::PackRegistry;
+    use undone_scene::engine::{EngineCommand, SceneEngine};
+    use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
+    use undone_world::{GameData, World};
 
     fn test_player() -> Player {
         Player {
@@ -666,6 +672,50 @@ mod tests {
             custom_flags: HashMap::new(),
             custom_ints: HashMap::new(),
             origin: PcOrigin::CisMaleTransformed,
+        }
+    }
+
+    fn test_world() -> World {
+        World {
+            player: test_player(),
+            male_npcs: SlotMap::with_key(),
+            female_npcs: SlotMap::with_key(),
+            game_data: GameData::default(),
+        }
+    }
+
+    fn test_male_npc(personality: PersonalityId) -> MaleNpc {
+        MaleNpc {
+            core: NpcCore {
+                name: "Jake".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Stranger,
+                pc_liking: LikingLevel::Neutral,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: ArousalLevel::Comfort,
+                alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
         }
     }
 
@@ -738,5 +788,89 @@ mod tests {
             pc_attraction: AttractionLevel::Unattracted,
         };
         assert!(npc.is_known());
+    }
+
+    #[test]
+    fn process_events_appends_error_occurred_to_story_output() {
+        let signals = AppSignals::new();
+        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let world = test_world();
+
+        let finished = process_events(
+            vec![EngineEvent::ErrorOccurred(
+                "[scene-engine] template error in scene 'test::scene' (intro prose): boom".into(),
+            )],
+            signals,
+            &world,
+            fem_id,
+        );
+
+        assert!(!finished);
+        assert!(signals.story.get().contains("[Scene error:"));
+        assert!(signals.story.get().contains("template error"));
+    }
+
+    #[test]
+    fn start_scene_binds_first_male_for_followup_action_effects() {
+        let scene = SceneDefinition {
+            id: "test::npc_binding".into(),
+            pack: "test".into(),
+            intro_prose: "Intro.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: None,
+                prose: String::new(),
+                allow_npc_actions: false,
+                effects: vec![EffectDef::AddNpcLiking {
+                    npc: "m".into(),
+                    delta: 1,
+                }],
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: None,
+                    slot: None,
+                    finish: true,
+                }],
+                thoughts: vec![],
+            }],
+            npc_actions: vec![],
+        };
+
+        let mut scenes = HashMap::new();
+        scenes.insert(scene.id.clone(), Arc::new(scene));
+
+        let mut engine = SceneEngine::new(scenes);
+        let mut world = test_world();
+        let mut registry = PackRegistry::new();
+        let personality = registry.intern_personality("ROMANTIC");
+        let male_key = world.male_npcs.insert(test_male_npc(personality));
+
+        start_scene(
+            &mut engine,
+            &mut world,
+            &registry,
+            "test::npc_binding".into(),
+        );
+        engine.drain();
+
+        engine.send(
+            EngineCommand::ChooseAction("go".into()),
+            &mut world,
+            &registry,
+        );
+        let events = engine.drain();
+
+        assert_eq!(world.male_npcs[male_key].core.pc_liking, LikingLevel::Ok);
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::ErrorOccurred(_))),
+            "fallback binding should make active-male effects safe after scene start: {:?}",
+            events
+        );
     }
 }

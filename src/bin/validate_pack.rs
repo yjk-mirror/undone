@@ -7,6 +7,29 @@ use undone_scene::{
     types::EffectDef,
 };
 
+fn extend_scenes_checked(
+    all_scenes: &mut std::collections::HashMap<
+        String,
+        std::sync::Arc<undone_scene::types::SceneDefinition>,
+    >,
+    scene_sources: &mut std::collections::HashMap<String, String>,
+    incoming: std::collections::HashMap<
+        String,
+        std::sync::Arc<undone_scene::types::SceneDefinition>,
+    >,
+    source: &str,
+) -> Result<(), String> {
+    for (scene_id, scene) in incoming {
+        if let Some(first_source) = scene_sources.insert(scene_id.clone(), source.to_string()) {
+            return Err(format!(
+                "duplicate scene id '{scene_id}': '{source}' conflicts with already-loaded '{first_source}'"
+            ));
+        }
+        all_scenes.insert(scene_id, scene);
+    }
+    Ok(())
+}
+
 fn main() {
     let packs_dir = PathBuf::from("packs");
     println!("Loading packs from {:?}", packs_dir);
@@ -22,6 +45,7 @@ fn main() {
     println!("Packs loaded. Loading scenes...");
     let mut error_count = 0;
     let mut all_scenes = std::collections::HashMap::new();
+    let mut scene_sources = std::collections::HashMap::new();
 
     for meta in &pack_metas {
         let scenes_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
@@ -51,7 +75,15 @@ fn main() {
                         );
                     }
                 }
-                all_scenes.extend(scenes);
+                if let Err(e) = extend_scenes_checked(
+                    &mut all_scenes,
+                    &mut scene_sources,
+                    scenes,
+                    &meta.manifest.pack.id,
+                ) {
+                    eprintln!("ERROR loading scenes for '{}': {e}", meta.manifest.pack.id);
+                    error_count += 1;
+                }
             }
             Err(e) => {
                 eprintln!("ERROR loading scenes for '{}': {e}", meta.manifest.pack.id);

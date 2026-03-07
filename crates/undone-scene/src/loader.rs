@@ -52,6 +52,18 @@ pub enum SceneLoadError {
     UnknownStat { scene_id: String, id: String },
     #[error("unknown category '{id}' in scene {scene_id}")]
     UnknownCategory { scene_id: String, id: String },
+    #[error(
+        "duplicate scene id '{scene_id}': '{second_source}' conflicts with already-loaded '{first_source}'"
+    )]
+    DuplicateSceneId {
+        scene_id: String,
+        first_source: String,
+        second_source: String,
+    },
+    #[error("duplicate action id '{action_id}' in scene {scene_id}")]
+    DuplicateActionId { scene_id: String, action_id: String },
+    #[error("duplicate npc_action id '{action_id}' in scene {scene_id}")]
+    DuplicateNpcActionId { scene_id: String, action_id: String },
 }
 
 /// Load all `.toml` scene files from `scenes_dir`.
@@ -65,6 +77,7 @@ pub fn load_scenes(
     }
 
     let mut map: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+    let mut scene_sources: HashMap<String, String> = HashMap::new();
 
     let entries = std::fs::read_dir(scenes_dir).map_err(|e| SceneLoadError::Io {
         path: scenes_dir.to_path_buf(),
@@ -93,6 +106,14 @@ pub fn load_scenes(
 
         let scene_id = raw.scene.id.clone();
         let def = resolve_scene(raw, registry, &scene_id)?;
+        let source = path.display().to_string();
+        if let Some(first_source) = scene_sources.insert(scene_id.clone(), source.clone()) {
+            return Err(SceneLoadError::DuplicateSceneId {
+                scene_id,
+                first_source,
+                second_source: source,
+            });
+        }
         map.insert(scene_id, Arc::new(def));
     }
 
@@ -141,11 +162,27 @@ fn resolve_scene(
     for a in raw.actions {
         actions.push(resolve_action(a, registry, scene_id)?);
     }
+    validate_unique_ids(
+        actions.iter().map(|action| action.id.as_str()),
+        scene_id,
+        |action_id| SceneLoadError::DuplicateActionId {
+            scene_id: scene_id.to_string(),
+            action_id: action_id.to_string(),
+        },
+    )?;
 
     let mut npc_actions = Vec::with_capacity(raw.npc_actions.len());
     for na in raw.npc_actions {
         npc_actions.push(resolve_npc_action(na, registry, scene_id)?);
     }
+    validate_unique_ids(
+        npc_actions.iter().map(|action| action.id.as_str()),
+        scene_id,
+        |action_id| SceneLoadError::DuplicateNpcActionId {
+            scene_id: scene_id.to_string(),
+            action_id: action_id.to_string(),
+        },
+    )?;
 
     Ok(SceneDefinition {
         id: raw.scene.id,
@@ -156,6 +193,24 @@ fn resolve_scene(
         actions,
         npc_actions,
     })
+}
+
+fn validate_unique_ids<'a, I, F>(
+    ids: I,
+    _scene_id: &str,
+    duplicate_error: F,
+) -> Result<(), SceneLoadError>
+where
+    I: IntoIterator<Item = &'a str>,
+    F: Fn(&'a str) -> SceneLoadError,
+{
+    let mut seen = std::collections::HashSet::new();
+    for id in ids {
+        if !seen.insert(id) {
+            return Err(duplicate_error(id));
+        }
+    }
+    Ok(())
 }
 
 fn resolve_thought(
@@ -743,6 +798,7 @@ fn validate_effects(
 mod tests {
     use super::*;
     use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -751,6 +807,16 @@ mod tests {
             .parent()
             .unwrap()
             .join("packs")
+    }
+
+    fn temp_scene_dir(prefix: &str) -> PathBuf {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!("undone_loader_{prefix}_{unique}"));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
     }
 
     #[test]
@@ -863,6 +929,83 @@ mod tests {
 
         let result = validate_cross_references(&scenes);
         assert!(result.is_ok(), "valid goto should pass");
+    }
+
+    #[test]
+    fn load_scenes_rejects_duplicate_scene_ids() {
+        let dir = temp_scene_dir("dup_scene");
+        std::fs::write(
+            dir.join("one.toml"),
+            r#"
+[scene]
+id = "test::dup"
+pack = "test"
+description = "one"
+
+[intro]
+prose = "one"
+"#,
+        )
+        .unwrap();
+        std::fs::write(
+            dir.join("two.toml"),
+            r#"
+[scene]
+id = "test::dup"
+pack = "test"
+description = "two"
+
+[intro]
+prose = "two"
+"#,
+        )
+        .unwrap();
+
+        let result = load_scenes(&dir, &PackRegistry::new());
+        assert!(
+            matches!(result, Err(SceneLoadError::DuplicateSceneId { .. })),
+            "expected duplicate scene id error, got {:?}",
+            result
+        );
+
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn load_scenes_rejects_duplicate_action_ids() {
+        let dir = temp_scene_dir("dup_action");
+        std::fs::write(
+            dir.join("scene.toml"),
+            r#"
+[scene]
+id = "test::dup_actions"
+pack = "test"
+description = "dup actions"
+
+[intro]
+prose = "intro"
+
+[[actions]]
+id = "same"
+label = "First"
+condition = "true"
+
+[[actions]]
+id = "same"
+label = "Second"
+condition = "true"
+"#,
+        )
+        .unwrap();
+
+        let result = load_scenes(&dir, &PackRegistry::new());
+        assert!(
+            matches!(result, Err(SceneLoadError::DuplicateActionId { .. })),
+            "expected duplicate action id error, got {:?}",
+            result
+        );
+
+        std::fs::remove_dir_all(dir).unwrap();
     }
 
     fn make_registry_with_stat(stat_id: &str) -> undone_packs::PackRegistry {
