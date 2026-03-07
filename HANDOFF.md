@@ -12,12 +12,13 @@
 **TRANS_WOMAN branches removed** from all scene files. CisMale-only pattern: `{% if not w.alwaysFemale() %}` with no `{% else %}`.
 **All prose second-person present tense.** Zero third-person PC narration.
 **Writing toolchain:** writing-guide updated with positive "scene must earn its place" rule. scene-writer + writing-reviewer custom agents current.
+**Writing-agent research documented:** repo-local audit plus external lorebook/caching research captured for a future tooling pass; no behavior changes landed yet.
 
 ---
 
 ## ⚡ Next Action
 
-**Engine readiness sprint is complete. Next focus is ironclad engine hardening before content writing resumes.**
+**Engine readiness sprint is complete. Next focus is selecting the next engineering task from current repo reality, with writing-agent/tooling cleanup documented but deferred.**
 
 Trust these docs first:
 
@@ -25,17 +26,21 @@ Trust these docs first:
 - `docs/audits/2026-03-07-engine-readiness-matrix.md`
 - `docs/plans/2026-03-07-ironclad-engine-hardening.md`
 - `docs/prompts/2026-03-07-ironclad-engine-next-session-prompt.md`
+- `docs/audits/2026-03-07-writing-agent-tooling-audit.md`
+- `docs/research/2026-03-07-writing-context-lorebooks-and-caching.md`
+- `docs/prompts/2026-03-07-engineering-fresh-session-prompt.md`
 
 Immediate priorities:
 
-1. **Save / resume hardening** — core end-to-end runtime-reset coverage now exists; extend only if a new save/resume edge appears.
-2. **Runtime diagnostics hardening** — scene condition/template failures now surface through `ErrorOccurred`; keep visibility rules aligned with the contract.
-3. **Authoring validation hardening** — duplicate scene IDs and duplicate action IDs now fail scene load / `validate-pack`; broader warning-vs-error audit still remains if more authoring risks appear.
-4. **NPC context contract decision** — current one-active-`m`/`f` model is ratified for the next writing phase, with the explicit limitation that fallback UI binding happens after scene start.
+1. **Reconcile current code vs docs before coding** — do not trust stale assumptions; confirm what still needs engineering work.
+2. **Authoring validation policy audit** — current "no lasting effects" warnings may need refinement, smarter detection, or narrower escalation.
+3. **Writer-facing contract cleanup** — at least one documented mismatch exists in writing-agent docs around `m` / `f` prose-template assumptions; fix when doing the writing-agent/tooling pass.
+4. **Remaining engine backlog selection** — if no correctness blocker remains, choose the highest-value non-content engineering task that reduces false assumptions for future writers/tool builders.
 
-Do not restart content writing until the ironclad-engine hardening plan is reviewed against current code and the remaining risks are explicitly accepted.
+Do not restart content writing until the documented writing-agent/tooling contract gaps are reviewed and the remaining risks are explicitly accepted.
 
 ### Remaining open items (post-Sprint 3)
+- **Writing-agent/tooling cleanup** — documented only, not implemented. See `docs/audits/2026-03-07-writing-agent-tooling-audit.md` and `docs/research/2026-03-07-writing-context-lorebooks-and-caching.md`. Key issues: `m`/`f` prose-template contract mismatch, prompt bloat, no cache-hit instrumentation in `deepseek-helper`, no repo-neutral writing-agent dispatch doc. → Future tooling/engineering session.
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
 - **Prose polish pass** — Workplace arc prose is mostly clean after Sprint 2–3 audit passes. Campus arc has ~20 open Critical/Important writing findings from the 2026-02-25 audit. → Sprint 4+.
 - **Free_time expansion** — more universal scenes needed. → Sprint 4.
@@ -197,6 +202,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-07 | Documentation + research session. Audited the current writing-agent path (`scene-writer`, `writing-reviewer`, `CLAUDE.md`, `writing-guide`, `deepseek-helper`) and documented that it is usable but not yet minimal-friction or fully contract-clean. Wrote `docs/audits/2026-03-07-writing-agent-tooling-audit.md` covering the current state and the highest-signal local gap: `.claude/agents/scene-writer.md` teaches `m`/`f` prose-template access while `docs/writing-guide.md` and current engine contract do not guarantee that. Wrote `docs/research/2026-03-07-writing-context-lorebooks-and-caching.md` with public research on Anthropic subagents/memory/prompt caching, DeepSeek context caching and pricing, SillyTavern lorebooks/personas/Data Bank, and public Janitor-ecosystem script patterns. Added `docs/prompts/2026-03-07-engineering-fresh-session-prompt.md` for the next fresh engineering session. No code changes; no verification run needed. |
 | 2026-03-07 | Ironclad engine hardening session. Save/resume: added authoritative UI-side resume helpers in `game_state.rs`, centralized in-place save reload through runtime reset, and added end-to-end coverage that saves a real workplace-route world, reloads it through UI helpers, proves no opening-scene replay, and proves scheduler resume follows persisted arc state (`workplace_landlord`) with no stale runtime leakage. Runtime diagnostics: scene condition failures now emit visible `ErrorOccurred` diagnostics while still gating false; template render failures now surface through the same diagnostic path; UI tests confirm `ErrorOccurred` reaches story output. Authoring validation: scene load now rejects duplicate scene IDs plus duplicate `actions[].id` / `npc_actions[].id`, and `validate-pack` now rejects cross-pack duplicate scene IDs instead of silently overwriting. NPC contract: added UI coverage proving fallback male binding is valid for post-start action effects, and documented the important limitation that fallback `m`/`f` binding is not available during intro rendering. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
 | 2026-03-03 | Opening+sidebar UX session. Replaced `transformation_intro` with the creative-direction plane scene (board flight as before-self, route-aware setup, fall asleep in air), and wired throwaway intro world to carry preset route flags so workplace/campus intro branches render correctly. Implemented Sidebar Phase 1 in `right_panel`: `People Here` module, known-NPC-only visibility policy (no info leakage), qualitative liking/attraction bands, and active-NPC event handling guard to avoid unknown placeholders overwriting known context. Added tests for known-NPC gating and band mapping. Added UX spec for Phase 2+ at `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`. Verified playability with `cargo check --workspace`, `cargo test --workspace`, and `validate-pack`. 240 tests, 0 failures. |
 | 2026-03-03 | Landing page + resume flow session. Added new startup Landing phase with New Game / Continue / Load / Settings, wired Continue/Load to validated save loading before character creation, and updated phase/tab behavior so Game/Saves are available in Landing and InGame while Settings remains global. Added `start_loaded_game()` / `load_game_state_from_save()` in UI game_state wiring. Also completed hardening/simplification batches: parser depth guard + EOF consume, condition method signature validation, structural ID enforcement, save-load runtime reset, race registry usage in spawner, saves scroll fix, FEMININITY caching, and docs/tooling alignment (`docs/creative-direction.md`, writing agents, guide updates). 236 tests, 0 failures. |
