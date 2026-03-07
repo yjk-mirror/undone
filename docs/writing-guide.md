@@ -120,10 +120,10 @@ You nod at the man already there. He nods back.
 | `gd` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `isWeekday()`, `isWeekend()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `npcLiking("ROLE")` |
 | `scene` | `hasFlag("FLAG")` |
 
-> **Note:** `m` (male NPC) and `f` (female NPC) are **not available in prose templates**.
-> They only work in `condition` expression fields (see below). To vary prose based on NPC
-> state, use condition-gated `[[intro_variants]]`, `[[thoughts]]`, or separate actions with
-> `condition` fields that check `m.` / `f.` receivers.
+> **Note:** `m` (male NPC) and `f` (female NPC) are available in **action and NPC-action
+> prose only** — NOT in intro prose, intro_variants, or thoughts. NPC bindings are not
+> established until after scene start. To vary intro prose based on NPC state, use
+> `gd.npcLiking("ROLE_X")` which reads from persistent world state.
 
 **PC origin helpers:**
 - `w.alwaysFemale()` — `true` if `CisFemaleTransformed` or `AlwaysFemale`; `false` if transformed from male
