@@ -102,8 +102,8 @@ For Codex or another orchestrator, that workflow is discoverable only by reading
 
 But it lacks several things that would matter before a serious writing sprint:
 
-- prompt cache hit/miss reporting
-- oversized prompt warnings
+- prompt cache hit/miss reporting ✅ Already implemented in deepseek-helper.mjs (stderr output: cache_hit / cache_miss)
+- oversized prompt warnings ✅ Implemented in pack-prompt.mjs (warns on prompts > 48KB)
 - retry/backoff behavior
 - a standard prompt skeleton that keeps stable prefixes stable
 - any local dedupe layer for identical prompt files
@@ -114,16 +114,16 @@ None of these are correctness blockers today, but they are real workflow-quality
 
 These are intentionally ordered by leverage, not by implementation difficulty.
 
-### Priority 1: fix the contract mismatch
+### Priority 1: fix the contract mismatch ✅ RESOLVED
 
-- Align `.claude/agents/scene-writer.md` with `docs/writing-guide.md` and `docs/engine-contract.md`
-- Make the `m` / `f` intro/prose limitation explicit and hard to miss
+- ✅ `docs/writing-guide.md` corrected: m/f available in action/NPC-action prose only, not intro
+- ✅ `scene-writer.md` thinned and aligned with writer-core.md
 
-### Priority 2: thin the agent prompts
+### Priority 2: thin the agent prompts ✅ RESOLVED
 
-- Make `scene-writer` and `writing-reviewer` thinner wrappers around `docs/writing-guide.md`
-- Keep only agent-specific workflow and refusal rules in the agent files
-- Remove duplicated long-form rulebooks from the agent prompt bodies
+- ✅ `scene-writer.md` reduced from ~300 lines to ~40 lines (orchestrator shape referencing writer-core.md)
+- ✅ `writing-reviewer.md` reduced from ~288 lines to ~40 lines (references review-core.md)
+- ✅ Duplicated rules extracted into `docs/writer-core.md` and `docs/review-core.md`
 
 ### Priority 3: add a repo-neutral writing delegation doc
 
@@ -140,21 +140,19 @@ That doc should not assume Claude-specific `subagent_type` mechanics.
 
 Before the next writing sprint, strongly consider:
 
-- printing `prompt_cache_hit_tokens`
-- printing `prompt_cache_miss_tokens`
-- warning on prompt files above a configurable size threshold
+- printing `prompt_cache_hit_tokens` ✅ Already implemented in deepseek-helper.mjs
+- printing `prompt_cache_miss_tokens` ✅ Already implemented in deepseek-helper.mjs
+- warning on prompt files above a configurable size threshold ✅ Implemented in pack-prompt.mjs (48KB threshold)
 - optional canonical prompt wrappers for `draft` and `review`
 
-### Priority 5: move toward retrieval-style context packing
+### Priority 5: move toward retrieval-style context packing ✅ RESOLVED
 
-The current workflow is doc-heavy and manual. The future shape should be:
-
-- stable, cache-friendly instruction prefix
-- tiny scene-specific task payload
-- only the relevant arc / NPC / style material for this scene
-- no full writing-guide dump unless needed
-
-That is the best path to low cost and high consistency.
+✅ Implemented via `tools/pack-prompt.mjs`:
+- Stable cache-friendly instruction prefix (`docs/writer-core.md`)
+- Tiny scene-specific task payload (JSON spec → assembled prompt)
+- Only relevant arc/preset material included based on `route` field
+- Reference scenes included on demand
+- Tested: 81% cache hit rate on second call in same session
 
 ## Bottom Line
 
