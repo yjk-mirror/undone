@@ -202,7 +202,7 @@ pub fn landing_view(
             .into_any()
     });
 
-    let body = v_stack((
+    let inner = v_stack((
         label(|| "Your Story Begins".to_string()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(34.0)
@@ -216,33 +216,32 @@ pub fn landing_view(
         })
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.max_width(720.0)
-                .margin_top(10.0)
+            s.margin_top(10.0)
                 .font_size(15.0)
                 .line_height(1.45)
                 .color(colors.ink_dim)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
-        h_stack((new_game_btn, continue_btn, load_btn, settings_btn))
-            .style(|s| s.gap(12.0).margin_top(26.0).flex_wrap(floem::style::FlexWrap::Wrap)),
+        h_stack((new_game_btn, continue_btn, load_btn, settings_btn)).style(|s| {
+            s.gap(12.0)
+                .margin_top(26.0)
+                .flex_wrap(floem::style::FlexWrap::Wrap)
+        }),
         status,
         save_section,
     ))
-    .style(move |s| {
+    .style(|s| s.width_full().max_width(720.0));
+
+    container(inner).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.width_full()
+        s.size_full()
+            .flex_col()
+            .items_center()
+            .justify_center()
             .padding_horiz(32.0)
             .padding_vert(36.0)
-            .items_center()
             .background(colors.ground)
-    });
-
-    scroll(body)
-        .scroll_style(|s| s.shrink_to_fit())
-        .style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.size_full().background(colors.ground)
-        })
+    })
 }
 
 fn primary_btn_style(s: floem::style::Style, signals: AppSignals) -> floem::style::Style {

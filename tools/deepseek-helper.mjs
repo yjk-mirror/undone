@@ -252,12 +252,18 @@ async function main() {
   }
 
   if (payload.usage) {
-    const usageLine = [
+    const parts = [
       `model=${payload.model ?? body.model}`,
       `prompt_tokens=${payload.usage.prompt_tokens ?? "?"}`,
       `completion_tokens=${payload.usage.completion_tokens ?? "?"}`,
-    ].join(" ");
-    process.stderr.write(`[deepseek-helper] ${usageLine}\n`);
+    ];
+    if (payload.usage.prompt_cache_hit_tokens != null) {
+      parts.push(`cache_hit=${payload.usage.prompt_cache_hit_tokens}`);
+    }
+    if (payload.usage.prompt_cache_miss_tokens != null) {
+      parts.push(`cache_miss=${payload.usage.prompt_cache_miss_tokens}`);
+    }
+    process.stderr.write(`[deepseek-helper] ${parts.join(" ")}\n`);
   }
 }
 

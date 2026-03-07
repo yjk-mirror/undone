@@ -192,6 +192,7 @@ pub fn app_view() -> impl View {
                     }
                 }
             })
+            .style(|s| s.size_full())
             .into_any(),
             AppPhase::BeforeCreation => dyn_container(move || signals.tab.get(), {
                 let pre_state_cc = Rc::clone(&pre_state_cc);
@@ -207,6 +208,7 @@ pub fn app_view() -> impl View {
                     .into_any(),
                 }
             })
+            .style(|s| s.size_full())
             .into_any(),
             AppPhase::TransformationIntro => {
                 // Start the transformation scene against the throwaway world
@@ -255,6 +257,7 @@ pub fn app_view() -> impl View {
                         .into_any(),
                     }
                 })
+                .style(|s| s.size_full())
                 .into_any()
             }
             AppPhase::FemCreation => dyn_container(move || signals.tab.get(), {
@@ -271,6 +274,7 @@ pub fn app_view() -> impl View {
                     .into_any(),
                 }
             })
+            .style(|s| s.size_full())
             .into_any(),
             AppPhase::InGame => {
                 // On first transition to InGame, start either opening scene (new game)

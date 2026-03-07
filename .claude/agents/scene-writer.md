@@ -111,12 +111,18 @@ Pick 2–4 traits where the trait genuinely changes whether this situation is en
 
 Prose uses Minijinja (Jinja2). Conditions use the custom expression language (not Minijinja).
 
-**Template objects:**
+**Template objects (available in all prose — intro, action, NPC action):**
 - `w`: `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `isVirgin()`, `alwaysFemale()`, `isSingle()`, `wasMale()`, `wasTransformed()`, `pcOrigin()`, `getName()`, `getAppearance()`, `getNaturalPubicHair()`, `hasSmoothLegs()`, `beforeName()`, `beforeVoice()`
 - `gd`: `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE_X")` (liking level string for a named NPC role), `arcStarted("arc_id")` (boolean — has arc started)
-- `m.` (male NPC — only valid when a male NPC is active in the scene): `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasTrait("ID")`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
-- `f.` (female NPC — only valid when a female NPC is active in the scene): `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
 - `scene`: `hasFlag("FLAG")`
+
+**NPC template objects (available in action/NPC-action prose ONLY — NOT in intro prose):**
+- `m.` (male NPC): `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasTrait("ID")`, `isPartner()`, `isFriend()`, `hadOrgasm()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
+- `f.` (female NPC): `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")`
+
+> **Important:** `m.` and `f.` are NOT available in intro prose or intro_variants. NPC bindings
+> are not established until after the scene starts. Use `gd.npcLiking("ROLE_X")` in intro prose
+> if you need NPC state there — it reads from persistent world state, not active NPC bindings.
 
 **Condition expressions (in TOML `condition` fields — NOT Minijinja):**
 - `w.hasTrait('SHY')`, `!w.alwaysFemale() && w.getSkill('FEMININITY') < 25`

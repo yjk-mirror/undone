@@ -13,11 +13,11 @@ Your boarding pass says **{{ w.beforeName() }}**. Your old name still fits in yo
 
 The gate agent scans your phone. A green light, a nod, and you step into the jet bridge with everyone else.
 
-{% if gd.hasFlag("ROUTE_WORKPLACE") %}
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
 You are not flying for a vacation. You are flying because a company in a city you barely know offered you a job, and you said yes.
 
 The apartment lease starts tomorrow. Your boxes are already in transit. There is a badge photo waiting somewhere in a new HR system with your old face attached to your old name.
-{% elif gd.hasFlag("ROUTE_CAMPUS") %}
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
 You are not flying for a vacation. You are flying toward orientation week, dorm check-in, and a campus that has been described to you as if it were a destiny.
 
 You have the student portal bookmarked, a class schedule screenshot in your camera roll, and exactly enough confidence to believe the city will make room for you.
@@ -53,9 +53,9 @@ You find your row, lift your bag, sit, buckle, wait.
 
 The plane pushes back. Runway lights smear into short gold lines against the window as the engines rise and hold.
 
-{% if gd.hasFlag("ROUTE_WORKPLACE") %}
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
 When the wheels leave the ground, you think about your first day in that office. You can picture the lobby before you have ever seen it.
-{% elif gd.hasFlag("ROUTE_CAMPUS") %}
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
 When the wheels leave the ground, you think about the first walk across campus, the first room full of strangers who are supposed to become your people.
 {% else %}
 When the wheels leave the ground, you think about the version of yourself that will step out on the other side of this flight.
