@@ -166,7 +166,7 @@ fn resolve_thought(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, registry, scene_id))
+        .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
     Ok(Thought {
@@ -181,14 +181,14 @@ fn resolve_narrator_variant(
     registry: &PackRegistry,
     scene_id: &str,
 ) -> Result<NarratorVariant, SceneLoadError> {
-    let condition = parse_condition(&raw.condition, registry, scene_id)?;
+    let condition = parse_condition_checked(&raw.condition, registry, scene_id)?;
     Ok(NarratorVariant {
         condition,
         prose: raw.prose,
     })
 }
 
-fn parse_condition(
+pub(crate) fn parse_condition_checked(
     expr_str: &str,
     registry: &PackRegistry,
     scene_id: &str,
@@ -589,7 +589,7 @@ fn resolve_action(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, registry, scene_id))
+        .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
     let mut next = Vec::with_capacity(raw.next.len());
@@ -626,7 +626,7 @@ fn resolve_npc_action(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, registry, scene_id))
+        .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
     validate_effects(&raw.effects, registry, scene_id)?;
@@ -655,7 +655,7 @@ fn resolve_next_branch(
     let condition = raw
         .condition
         .as_deref()
-        .map(|s| parse_condition(s, registry, scene_id))
+        .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
     Ok(NextBranch {
@@ -918,7 +918,8 @@ mod tests {
     #[test]
     fn validate_condition_rejects_unknown_category() {
         let registry = undone_packs::PackRegistry::new(); // no categories registered
-        let result = parse_condition("w.inCategory('NONEXISTENT_CAT')", &registry, "test::scene");
+        let result =
+            parse_condition_checked("w.inCategory('NONEXISTENT_CAT')", &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::UnknownCategory { .. })),
             "expected UnknownCategory error, got: {:?}",
@@ -929,7 +930,8 @@ mod tests {
     #[test]
     fn validate_condition_rejects_unknown_trait_in_has_trait() {
         let registry = undone_packs::PackRegistry::new(); // no traits registered
-        let result = parse_condition("w.hasTrait('NONEXISTENT_TRAIT')", &registry, "test::scene");
+        let result =
+            parse_condition_checked("w.hasTrait('NONEXISTENT_TRAIT')", &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::UnknownTrait { .. })),
             "expected UnknownTrait error, got: {:?}",
@@ -940,7 +942,7 @@ mod tests {
     #[test]
     fn validate_condition_rejects_unknown_skill_in_get_skill() {
         let registry = undone_packs::PackRegistry::new(); // no skills registered
-        let result = parse_condition(
+        let result = parse_condition_checked(
             "w.getSkill('NONEXISTENT_SKILL') > 50",
             &registry,
             "test::scene",
@@ -976,7 +978,7 @@ mod tests {
             category_type: undone_packs::data::CategoryType::Age,
             members: vec!["LateTeen".into()],
         }]);
-        let result = parse_condition(
+        let result = parse_condition_checked(
             "w.hasTrait('SHY') && w.getSkill('FEMININITY') < 50 && w.inCategory('AGE_YOUNG')",
             &registry,
             "test::scene",
@@ -987,7 +989,7 @@ mod tests {
     #[test]
     fn validate_condition_rejects_unknown_method_name() {
         let registry = undone_packs::PackRegistry::new();
-        let result = parse_condition("w.notARealMethod()", &registry, "test::scene");
+        let result = parse_condition_checked("w.notARealMethod()", &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::BadCondition { .. })),
             "expected BadCondition error, got: {:?}",
@@ -998,7 +1000,7 @@ mod tests {
     #[test]
     fn validate_condition_rejects_bad_arity() {
         let registry = undone_packs::PackRegistry::new();
-        let result = parse_condition("w.hasTrait('SHY', 'POSH')", &registry, "test::scene");
+        let result = parse_condition_checked("w.hasTrait('SHY', 'POSH')", &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::BadCondition { .. })),
             "expected BadCondition error, got: {:?}",
@@ -1009,7 +1011,8 @@ mod tests {
     #[test]
     fn validate_condition_rejects_bad_arg_type() {
         let registry = undone_packs::PackRegistry::new();
-        let result = parse_condition("w.checkSkill('FEMININITY', '50')", &registry, "test::scene");
+        let result =
+            parse_condition_checked("w.checkSkill('FEMININITY', '50')", &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::BadCondition { .. })),
             "expected BadCondition error, got: {:?}",
@@ -1020,7 +1023,7 @@ mod tests {
     #[test]
     fn validate_condition_accepts_gd_npc_liking_signature() {
         let registry = undone_packs::PackRegistry::new();
-        let result = parse_condition(
+        let result = parse_condition_checked(
             "gd.npcLiking('ROLE_BARISTA') == 'Ok'",
             &registry,
             "test::scene",

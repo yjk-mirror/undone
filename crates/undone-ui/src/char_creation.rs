@@ -11,7 +11,7 @@ use undone_domain::{
     LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize, PlayerFigure,
     PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
 };
-use undone_packs::char_creation::CharCreationConfig;
+use undone_packs::{char_creation::CharCreationConfig, PackRegistry};
 
 use crate::game_state::{start_game, GameState, PreGameState};
 use crate::theme::ThemeColors;
@@ -220,6 +220,101 @@ const PRESET_RAUL: PresetData = PresetData {
     name_masc: "Raul",
 };
 
+const CUSTOM_STARTING_TRAIT_IDS: &[&str] = &[
+    "SHY",
+    "CUTE",
+    "POSH",
+    "SULTRY",
+    "DOWN_TO_EARTH",
+    "BITCHY",
+    "REFINED",
+    "ROMANTIC",
+    "FLIRTY",
+    "AMBITIOUS",
+    "OUTGOING",
+    "OVERACTIVE_IMAGINATION",
+    "ANALYTICAL",
+    "CONFIDENT",
+    "SEXIST",
+    "HOMOPHOBIC",
+    "OBJECTIFYING",
+    "BLOCK_ROUGH",
+    "LIKES_ROUGH",
+];
+
+#[derive(Clone, Debug, PartialEq)]
+struct FemFormDefaults {
+    name_fem: String,
+    name_androg: String,
+    age: Age,
+    figure: PlayerFigure,
+    breasts: BreastSize,
+    race: String,
+}
+
+pub fn validate_registry_contract(registry: &PackRegistry) -> Vec<String> {
+    let mut errors = Vec::new();
+
+    for trait_id in CUSTOM_STARTING_TRAIT_IDS
+        .iter()
+        .copied()
+        .chain(PRESET_ROBIN.trait_ids.iter().copied())
+        .chain(PRESET_RAUL.trait_ids.iter().copied())
+    {
+        if registry.resolve_trait(trait_id).is_err() {
+            errors.push(format!(
+                "character creation requires trait '{trait_id}', but it is not registered"
+            ));
+        }
+    }
+
+    errors.sort();
+    errors.dedup();
+    errors
+}
+
+fn preset_by_idx(idx: Option<u8>) -> Option<&'static PresetData> {
+    match idx {
+        Some(0) => Some(&PRESET_ROBIN),
+        Some(1) => Some(&PRESET_RAUL),
+        _ => None,
+    }
+}
+
+fn fem_form_defaults(
+    partial: Option<&PartialCharState>,
+    fallback_race: Option<&str>,
+) -> FemFormDefaults {
+    if let Some(preset) = partial.and_then(|partial| preset_by_idx(partial.preset_idx)) {
+        return FemFormDefaults {
+            name_fem: preset.name_fem.to_string(),
+            name_androg: preset.name_androg.to_string(),
+            age: preset.age,
+            figure: preset.figure,
+            breasts: preset.breasts,
+            race: preset.race.to_string(),
+        };
+    }
+
+    let default_race = partial
+        .map(|state| state.before_race.as_str())
+        .filter(|race| !race.is_empty())
+        .or(fallback_race)
+        .unwrap_or("White");
+    let default_age = partial
+        .map(|state| state.before_age)
+        .unwrap_or(Age::EarlyTwenties);
+
+    FemFormDefaults {
+        name_fem: "Eva".to_string(),
+        name_androg: "Ev".to_string(),
+        age: default_age,
+        figure: PlayerFigure::Slim,
+        breasts: BreastSize::Full,
+        race: default_race.to_string(),
+    }
+}
+
 // ── PC origin helpers ─────────────────────────────────────────────────────────
 
 fn origin_from_idx(idx: u8) -> PcOrigin {
@@ -333,14 +428,14 @@ struct FemFormSignals {
 }
 
 impl FemFormSignals {
-    fn new() -> Self {
+    fn from_defaults(defaults: &FemFormDefaults) -> Self {
         Self {
-            name_fem: RwSignal::new("Eva".to_string()),
-            name_androg: RwSignal::new("Ev".to_string()),
-            age: RwSignal::new(Age::EarlyTwenties),
-            figure: RwSignal::new(PlayerFigure::Slim),
-            breasts: RwSignal::new(BreastSize::Full),
-            race: RwSignal::new(String::new()),
+            name_fem: RwSignal::new(defaults.name_fem.clone()),
+            name_androg: RwSignal::new(defaults.name_androg.clone()),
+            age: RwSignal::new(defaults.age),
+            figure: RwSignal::new(defaults.figure),
+            breasts: RwSignal::new(defaults.breasts),
+            race: RwSignal::new(defaults.race.clone()),
         }
     }
 }
@@ -421,28 +516,27 @@ pub fn fem_creation_view(
     game_state: Rc<RefCell<Option<GameState>>>,
     partial_char: RwSignal<Option<PartialCharState>>,
 ) -> impl View {
-    let form = FemFormSignals::new();
+    let races_list = read_races(&pre_state);
+    let partial = partial_char.get_untracked();
+    let preset_ref = partial
+        .as_ref()
+        .and_then(|partial| preset_by_idx(partial.preset_idx));
+    let defaults = fem_form_defaults(
+        partial.as_ref(),
+        races_list.first().map(|race| race.as_str()),
+    );
+    let form = FemFormSignals::from_defaults(&defaults);
 
-    // Determine if AlwaysFemale (so we show the Age field).
-    let is_always_female = partial_char
-        .get_untracked()
+    let is_always_female = partial
+        .as_ref()
         .map(|p| p.origin == PcOrigin::AlwaysFemale)
         .unwrap_or(false);
 
-    // Default race to first available; override with before_race if the player set one.
-    let races_list = read_races(&pre_state);
-    if let Some(first) = races_list.first() {
-        form.race.set(first.clone());
-    }
-    if let Some(ref partial) = partial_char.get_untracked() {
-        if !partial.before_race.is_empty() {
-            form.race.set(partial.before_race.clone());
-        }
-    }
-
     let begin_btn = build_begin_button(signals, form, pre_state, game_state, partial_char);
 
-    let age_row: Box<dyn View> = if is_always_female {
+    let age_row: Box<dyn View> = if let Some(preset) = preset_ref {
+        Box::new(read_only_row("Age", preset.age.to_string(), signals))
+    } else if is_always_female {
         Box::new(form_row(
             "Age",
             signals,
@@ -467,77 +561,119 @@ pub fn fem_creation_view(
         Box::new(empty())
     };
 
+    let names_section: Box<dyn View> = if let Some(preset) = preset_ref {
+        Box::new(
+            v_stack((
+                section_title("Your Name", signals),
+                read_only_row("Feminine name", preset.name_fem.to_string(), signals),
+                read_only_row("Androgynous name", preset.name_androg.to_string(), signals),
+            ))
+            .style(section_style()),
+        )
+    } else {
+        Box::new(
+            v_stack((
+                section_title("Your Name", signals),
+                form_row(
+                    "Feminine name",
+                    signals,
+                    text_input(form.name_fem)
+                        .placeholder("e.g. Eva")
+                        .style(field_style(signals)),
+                ),
+                form_row(
+                    "Androgynous name",
+                    signals,
+                    text_input(form.name_androg)
+                        .placeholder("e.g. Ev")
+                        .style(field_style(signals)),
+                ),
+            ))
+            .style(section_style()),
+        )
+    };
+
+    let body_section: Box<dyn View> = if let Some(preset) = preset_ref {
+        Box::new(
+            v_stack((
+                section_title("Your Body", signals),
+                read_only_row("Figure", preset.figure.to_string(), signals),
+                read_only_row("Breasts", preset.breasts.to_string(), signals),
+            ))
+            .style(section_style()),
+        )
+    } else {
+        Box::new(
+            v_stack((
+                section_title("Your Body", signals),
+                form_row(
+                    "Figure",
+                    signals,
+                    Dropdown::new_rw(
+                        form.figure,
+                        vec![
+                            PlayerFigure::Petite,
+                            PlayerFigure::Slim,
+                            PlayerFigure::Athletic,
+                            PlayerFigure::Hourglass,
+                            PlayerFigure::Curvy,
+                            PlayerFigure::Thick,
+                            PlayerFigure::Plus,
+                        ],
+                    )
+                    .main_view(themed_trigger::<PlayerFigure>(signals))
+                    .list_item_view(themed_item::<PlayerFigure>(signals))
+                    .style(field_style(signals)),
+                ),
+                form_row(
+                    "Breasts",
+                    signals,
+                    Dropdown::new_rw(
+                        form.breasts,
+                        vec![
+                            BreastSize::Flat,
+                            BreastSize::Perky,
+                            BreastSize::Handful,
+                            BreastSize::Average,
+                            BreastSize::Full,
+                            BreastSize::Big,
+                            BreastSize::Huge,
+                        ],
+                    )
+                    .main_view(themed_trigger::<BreastSize>(signals))
+                    .list_item_view(themed_item::<BreastSize>(signals))
+                    .style(field_style(signals)),
+                ),
+            ))
+            .style(section_style()),
+        )
+    };
+
+    let background_section: Box<dyn View> = if let Some(preset) = preset_ref {
+        Box::new(
+            v_stack((
+                section_title("Background", signals),
+                read_only_row("Race", preset.race.to_string(), signals),
+                age_row,
+            ))
+            .style(section_style()),
+        )
+    } else {
+        Box::new(
+            v_stack((
+                section_title("Background", signals),
+                form_row("Race", signals, race_picker(form.race, races_list, signals)),
+                age_row,
+            ))
+            .style(section_style()),
+        )
+    };
+
     let content = v_stack((
         heading("Who Are You Now?", signals),
-        // Names section
-        v_stack((
-            section_title("Your Name", signals),
-            form_row(
-                "Feminine name",
-                signals,
-                text_input(form.name_fem)
-                    .placeholder("e.g. Eva")
-                    .style(field_style(signals)),
-            ),
-            form_row(
-                "Androgynous name",
-                signals,
-                text_input(form.name_androg)
-                    .placeholder("e.g. Ev")
-                    .style(field_style(signals)),
-            ),
-        ))
-        .style(section_style()),
-        // Body section
-        v_stack((
-            section_title("Your Body", signals),
-            form_row(
-                "Figure",
-                signals,
-                Dropdown::new_rw(
-                    form.figure,
-                    vec![
-                        PlayerFigure::Petite,
-                        PlayerFigure::Slim,
-                        PlayerFigure::Athletic,
-                        PlayerFigure::Hourglass,
-                        PlayerFigure::Curvy,
-                        PlayerFigure::Thick,
-                        PlayerFigure::Plus,
-                    ],
-                )
-                .main_view(themed_trigger::<PlayerFigure>(signals))
-                .list_item_view(themed_item::<PlayerFigure>(signals))
-                .style(field_style(signals)),
-            ),
-            form_row(
-                "Breasts",
-                signals,
-                Dropdown::new_rw(
-                    form.breasts,
-                    vec![
-                        BreastSize::Flat,
-                        BreastSize::Perky,
-                        BreastSize::Handful,
-                        BreastSize::Average,
-                        BreastSize::Full,
-                        BreastSize::Big,
-                        BreastSize::Huge,
-                    ],
-                )
-                .main_view(themed_trigger::<BreastSize>(signals))
-                .list_item_view(themed_item::<BreastSize>(signals))
-                .style(field_style(signals)),
-            ),
-        ))
-        .style(section_style()),
-        // Background section
-        v_stack((
-            section_title("Background", signals),
-            form_row("Race", signals, race_picker(form.race, races_list, signals)),
-            age_row,
-        ))
-        .style(section_style()),
+        names_section,
+        body_section,
+        background_section,
         begin_btn,
         empty().style(|s| s.height(40.0)),
     ))
@@ -1045,7 +1181,13 @@ fn build_next_button(
                 if let Some(ref pre) = *pre_borrow {
                     trait_names
                         .iter()
-                        .filter_map(|name| pre.registry.resolve_trait(name).ok())
+                        .map(|name| {
+                            pre.registry.resolve_trait(name).unwrap_or_else(|_| {
+                                panic!(
+                                    "character creation trait '{name}' must be validated during init"
+                                )
+                            })
+                        })
                         .collect()
                 } else {
                     vec![]
@@ -1264,11 +1406,7 @@ fn build_begin_button(
             let origin = partial.origin;
 
             // Resolve preset reference (if any) so we can pull physical attributes
-            let preset_ref: Option<&'static PresetData> = match partial.preset_idx {
-                Some(0) => Some(&PRESET_ROBIN),
-                Some(1) => Some(&PRESET_RAUL),
-                _ => None,
-            };
+            let preset_ref = preset_by_idx(partial.preset_idx);
 
             let config = if let Some(p) = preset_ref {
                 // Preset mode: all physical/sexual attributes come from PresetData
@@ -1629,5 +1767,64 @@ fn field_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::st
             .border_color(colors.seam)
             .border_radius(4.0)
             .font_family("system-ui, -apple-system, sans-serif".to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_registry_contract_reports_missing_traits() {
+        let registry = PackRegistry::new();
+        let errors = validate_registry_contract(&registry);
+        assert!(
+            errors.iter().any(|error| error.contains("BLOCK_ROUGH")),
+            "expected missing trait error, got: {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn fem_form_defaults_use_preset_values_when_present() {
+        let partial = PartialCharState {
+            origin: PcOrigin::CisMaleTransformed,
+            before_name: "Robin".into(),
+            before_age: Age::Thirties,
+            before_race: "White".into(),
+            before_sexuality: BeforeSexuality::AttractedToWomen,
+            starting_traits: vec![],
+            arc_flag: Some("ROUTE_WORKPLACE".into()),
+            preset_idx: Some(0),
+            appearance: Appearance::Average,
+        };
+
+        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        assert_eq!(defaults.name_fem, "Robin");
+        assert_eq!(defaults.name_androg, "Robin");
+        assert_eq!(defaults.figure, PRESET_ROBIN.figure);
+        assert_eq!(defaults.breasts, PRESET_ROBIN.breasts);
+        assert_eq!(defaults.race, PRESET_ROBIN.race);
+    }
+
+    #[test]
+    fn fem_form_defaults_fall_back_to_before_race_for_custom_mode() {
+        let partial = PartialCharState {
+            origin: PcOrigin::CisMaleTransformed,
+            before_name: "Evan".into(),
+            before_age: Age::EarlyTwenties,
+            before_race: "Latina".into(),
+            before_sexuality: BeforeSexuality::AttractedToWomen,
+            starting_traits: vec![],
+            arc_flag: None,
+            preset_idx: None,
+            appearance: Appearance::Average,
+        };
+
+        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        assert_eq!(defaults.name_fem, "Eva");
+        assert_eq!(defaults.name_androg, "Ev");
+        assert_eq!(defaults.race, "Latina");
+        assert_eq!(defaults.age, Age::EarlyTwenties);
     }
 }

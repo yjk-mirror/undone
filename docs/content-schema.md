@@ -31,7 +31,6 @@ requires = []                        # other pack IDs this pack depends on
 
 opening_scene        = "base::rain_shelter"           # first scene for new games
 transformation_scene = "base::transformation_intro"   # char creation intro scene
-default_slot         = "free_time"                    # scheduler fallback slot
 
 [content]
 traits          = "data/traits.toml"
@@ -83,8 +82,10 @@ Groups (13 total, 126 traits in the base pack):
 | `menstruation` | menstruation-related traits |
 | `arousal_response` | arousal response traits |
 
-Hidden traits are auto-injected by the engine based on PC origin (ALWAYS_FEMALE, NOT_TRANSFORMED,
-BLOCK_ROUGH, LIKES_ROUGH). Do not inject hidden traits manually in UI or scene code.
+Origin traits such as `ALWAYS_FEMALE` and `NOT_TRANSFORMED` are injected by `new_game()`.
+Character-creation preference traits such as `BLOCK_ROUGH` and `LIKES_ROUGH` are selected in the
+UI flow and validated at startup. Scene code should treat them as existing trait IDs, not invent
+new copies of the logic.
 
 ### Skills (`data/skills.toml`)
 
@@ -93,7 +94,7 @@ BLOCK_ROUGH, LIKES_ROUGH). Do not inject hidden traits manually in UI or scene c
 id  = "FEMININITY"
 name = "Femininity"
 description = "Adaptation to female identity."
-min = -100
+min = 0
 max = 100
 ```
 
@@ -120,7 +121,6 @@ tracking lifetime event counts (TIMES_KISSED, etc.). Currently unused in scene c
 [[arc]]
 id            = "base::robin_opening"
 states        = ["arrived", "week_one", "working", "settled"]
-initial_state = "arrived"
 ```
 
 Arcs are state machines. The `advance_arc` effect in scene actions transitions between states.
@@ -465,8 +465,10 @@ Operators: `&&`, `||`, `!`, `==`, `!=`, `<`, `>`, `<=`, `>=`. String literals us
 | Arc IDs + states in effects | Scene load time |
 | `goto` targets | Post-load cross-reference pass |
 | Condition expression syntax | Scene load time |
-| Schedule event → scene ID | Runtime only |
-| Stat IDs in effects | Runtime only (not validated) |
+| Schedule conditions / triggers | Schedule load time |
+| Schedule event → scene ID | Startup + `validate-pack` |
+| Manifest `opening_scene` / `transformation_scene` | Startup + `validate-pack` |
+| Stat IDs in effects | Scene load time |
 
 ---
 

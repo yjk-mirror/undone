@@ -10,7 +10,7 @@ use undone_packs::{
 };
 use undone_scene::engine::SceneEngine;
 use undone_scene::loader::load_scenes;
-use undone_scene::scheduler::{load_schedule, Scheduler};
+use undone_scene::scheduler::{load_schedule, validate_entry_scene_references, Scheduler};
 use undone_scene::types::SceneDefinition;
 use undone_world::World;
 
@@ -115,12 +115,40 @@ pub fn init_game() -> PreGameState {
         return failed_pre(registry, scenes, format!("Scene validation error: {e}"));
     }
 
-    let scheduler = match load_schedule(&metas) {
+    let scheduler = match load_schedule(&metas, &registry) {
         Ok(s) => s,
         Err(e) => {
             return failed_pre(registry, scenes, format!("Schedule load error: {e}"));
         }
     };
+
+    if let Err(e) = scheduler.validate_scene_references(&scenes) {
+        return failed_pre(registry, scenes, format!("Schedule validation error: {e}"));
+    }
+
+    if let Err(e) = validate_entry_scene_references(
+        &scenes,
+        registry.opening_scene(),
+        registry.transformation_scene(),
+    ) {
+        return failed_pre(
+            registry,
+            scenes,
+            format!("Entry scene validation error: {e}"),
+        );
+    }
+
+    let char_creation_errors = crate::char_creation::validate_registry_contract(&registry);
+    if !char_creation_errors.is_empty() {
+        return failed_pre(
+            registry,
+            scenes,
+            format!(
+                "Character creation contract error(s):\n{}",
+                char_creation_errors.join("\n")
+            ),
+        );
+    }
 
     PreGameState {
         registry,

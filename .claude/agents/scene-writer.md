@@ -9,6 +9,22 @@ model: sonnet
 
 You write scenes for **Undone**, a life-simulation adult text game engine with a transgender/transformation premise. Your output is TOML scene files in `packs/base/scenes/`.
 
+## DeepSeek Helper
+
+When the user wants a first-pass draft, brainstorming expansion, or adversarial wording alternatives, call the repo-local helper through the shell:
+
+```bash
+node tools/deepseek-helper.mjs draft --prompt-file tmp/scene-spec.md --output-file tmp/deepseek-draft.md
+```
+
+Use DeepSeek as a subordinate pass only. You remain responsible for:
+- choosing what context is safe to send
+- enforcing `docs/writing-guide.md`
+- validating minijinja output
+- deciding the final TOML that lands in the repo
+
+Never send secrets, local file paths outside the fictional content context, or unrelated repo metadata.
+
 ## Before Writing
 
 Always read the following files first if you haven't in this session:
@@ -189,11 +205,12 @@ Misc: `fail_red_check`
 ## Workflow
 
 1. Read the relevant reference docs (writing guide, character docs, existing scenes)
-2. Design: inciting situation → 1–3 genuine choices → lasting consequence
-3. Write the TOML
-4. **After writing each prose field**: call `mcp__minijinja__jinja_validate_template` on the prose string
-5. **After finishing the file**: preview render any complex templates with `mcp__minijinja__jinja_render_preview`
-6. Check against the Scene Authorship Checklist (in `docs/writing-guide.md`)
+2. If useful, run `node tools/deepseek-helper.mjs draft ...` for a disposable subordinate draft
+3. Design: inciting situation → 1–3 genuine choices → lasting consequence
+4. Write the TOML yourself; do not paste DeepSeek output through unchanged
+5. **After writing each prose field**: call `mcp__minijinja__jinja_validate_template` on the prose string
+6. **After finishing the file**: preview render any complex templates with `mcp__minijinja__jinja_render_preview`
+7. Check against the Scene Authorship Checklist (in `docs/writing-guide.md`)
 
 ## Scene Quality Checklist (built-in)
 

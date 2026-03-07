@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use undone_packs::load_packs;
 use undone_scene::{
     loader::{load_scenes, validate_cross_references},
+    scheduler::validate_entry_scene_references,
     types::EffectDef,
 };
 
@@ -59,6 +60,27 @@ fn main() {
         }
     }
 
+    match undone_scene::load_schedule(&pack_metas, &registry) {
+        Ok(scheduler) => {
+            if let Err(e) = scheduler.validate_scene_references(&all_scenes) {
+                eprintln!("ERROR schedule validation: {e}");
+                error_count += 1;
+            }
+            if let Err(e) = validate_entry_scene_references(
+                &all_scenes,
+                registry.opening_scene(),
+                registry.transformation_scene(),
+            ) {
+                eprintln!("ERROR entry scene validation: {e}");
+                error_count += 1;
+            }
+        }
+        Err(e) => {
+            eprintln!("ERROR loading schedule: {e}");
+            error_count += 1;
+        }
+    }
+
     // Trait conflict validation
     let conflict_errors = registry.validate_trait_conflicts();
     if !conflict_errors.is_empty() {
@@ -71,6 +93,12 @@ fn main() {
     // Cross-reference check: all goto targets must exist
     if let Err(e) = validate_cross_references(&all_scenes) {
         eprintln!("ERROR cross-reference: {e}");
+        error_count += 1;
+    }
+
+    let char_creation_errors = undone_ui::char_creation::validate_registry_contract(&registry);
+    for error in char_creation_errors {
+        eprintln!("ERROR char creation contract: {error}");
         error_count += 1;
     }
 

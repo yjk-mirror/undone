@@ -8,7 +8,9 @@ pub mod types;
 pub use effects::{apply_effect, EffectError};
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
 pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
-pub use scheduler::{load_schedule, PickResult, Scheduler, SchedulerError};
+pub use scheduler::{
+    load_schedule, validate_entry_scene_references, PickResult, Scheduler, SchedulerError,
+};
 pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
 
 #[cfg(test)]
@@ -209,7 +211,7 @@ mod integration_tests {
 
         // Load packs + schedule + scenes
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
         let scenes = load_scenes(&scenes_dir, &registry).unwrap();
 
@@ -325,7 +327,7 @@ mod integration_tests {
         use rand::SeedableRng;
 
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
         let scenes = load_scenes(&scenes_dir, &registry).unwrap();
 
@@ -416,7 +418,7 @@ mod integration_tests {
         use rand::SeedableRng;
 
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
 
         let mut world = make_world_with_shy(&registry);
         // Set arc to settled state (post-arc)

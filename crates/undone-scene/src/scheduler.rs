@@ -1,14 +1,17 @@
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use rand::Rng;
 use serde::Deserialize;
 use thiserror::Error;
-use undone_expr::{eval, parse, Expr, SceneCtx};
+use undone_expr::{eval, Expr, SceneCtx};
 use undone_packs::{LoadedPackMeta, PackRegistry};
 use undone_world::World;
+
+use crate::{loader::parse_condition_checked, types::SceneDefinition};
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -24,8 +27,8 @@ pub enum SchedulerError {
     },
     #[error("toml parse error in {path}: {message}")]
     Toml { path: PathBuf, message: String },
-    #[error("expression parse error in condition '{condition}': {message}")]
-    ExprParse { condition: String, message: String },
+    #[error("schedule validation error in {context}: {message}")]
+    Validation { context: String, message: String },
 }
 
 // ---------------------------------------------------------------------------
@@ -312,6 +315,46 @@ impl Scheduler {
                 once_only: e.once_only,
             })
     }
+
+    pub fn validate_scene_references(
+        &self,
+        scenes: &HashMap<String, Arc<SceneDefinition>>,
+    ) -> Result<(), SchedulerError> {
+        for (slot_name, events) in &self.slots {
+            for event in events {
+                if !scenes.contains_key(&event.scene) {
+                    return Err(SchedulerError::Validation {
+                        context: format!("slot '{slot_name}'"),
+                        message: format!("event scene '{}' is not loaded", event.scene),
+                    });
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+pub fn validate_entry_scene_references(
+    scenes: &HashMap<String, Arc<SceneDefinition>>,
+    opening_scene: Option<&str>,
+    transformation_scene: Option<&str>,
+) -> Result<(), SchedulerError> {
+    for (label, scene_id) in [
+        ("opening_scene", opening_scene),
+        ("transformation_scene", transformation_scene),
+    ] {
+        if let Some(scene_id) = scene_id {
+            if !scenes.contains_key(scene_id) {
+                return Err(SchedulerError::Validation {
+                    context: label.to_string(),
+                    message: format!("scene '{scene_id}' is not loaded"),
+                });
+            }
+        }
+    }
+
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -320,7 +363,10 @@ impl Scheduler {
 
 /// Build a `Scheduler` from all packs that define a `schedule_file`.
 /// Multiple packs may contribute events to the same slot names.
-pub fn load_schedule(pack_metas: &[LoadedPackMeta]) -> Result<Scheduler, SchedulerError> {
+pub fn load_schedule(
+    pack_metas: &[LoadedPackMeta],
+    registry: &PackRegistry,
+) -> Result<Scheduler, SchedulerError> {
     let mut slots: HashMap<String, Vec<ScheduleEvent>> = HashMap::new();
 
     for meta in pack_metas {
@@ -340,20 +386,30 @@ pub fn load_schedule(pack_metas: &[LoadedPackMeta]) -> Result<Scheduler, Schedul
         })?;
 
         for slot_toml in file.slot {
-            let entry = slots.entry(slot_toml.name).or_default();
+            let slot_name = slot_toml.name;
+            let entry = slots.entry(slot_name.clone()).or_default();
             for ev in slot_toml.events {
+                let context = format!("slot '{slot_name}' scene '{}'", ev.scene);
                 let condition = match ev.condition {
-                    Some(ref src) => Some(parse(src).map_err(|e| SchedulerError::ExprParse {
-                        condition: src.clone(),
-                        message: e.to_string(),
-                    })?),
+                    Some(ref src) => Some(
+                        parse_condition_checked(src, registry, &context).map_err(|e| {
+                            SchedulerError::Validation {
+                                context: context.clone(),
+                                message: e.to_string(),
+                            }
+                        })?,
+                    ),
                     None => None,
                 };
                 let trigger = match ev.trigger {
-                    Some(ref src) => Some(parse(src).map_err(|e| SchedulerError::ExprParse {
-                        condition: src.clone(),
-                        message: e.to_string(),
-                    })?),
+                    Some(ref src) => Some(
+                        parse_condition_checked(src, registry, &context).map_err(|e| {
+                            SchedulerError::Validation {
+                                context: context.clone(),
+                                message: e.to_string(),
+                            }
+                        })?,
+                    ),
                     None => None,
                 };
                 entry.push(ScheduleEvent {
@@ -386,6 +442,7 @@ fn read_file(path: &Path) -> Result<String, SchedulerError> {
 mod tests {
     use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     use rand::rngs::SmallRng;
     use rand::SeedableRng;
@@ -394,6 +451,7 @@ mod tests {
     use undone_world::{GameData, World};
 
     use super::*;
+    use undone_packs::{PackContent, PackManifest, PackMeta};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -402,6 +460,16 @@ mod tests {
             .parent()
             .unwrap()
             .join("packs")
+    }
+
+    fn temp_test_dir(prefix: &str) -> PathBuf {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!("undone_{prefix}_{unique}"));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
     }
 
     fn make_world() -> World {
@@ -471,8 +539,8 @@ mod tests {
 
     #[test]
     fn loads_base_pack_schedule() {
-        let (_, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let slot_names: Vec<&str> = scheduler.slot_names().collect();
         assert!(
             slot_names.contains(&"free_time"),
@@ -481,9 +549,62 @@ mod tests {
     }
 
     #[test]
+    fn load_schedule_rejects_invalid_condition_ids() {
+        let pack_dir = temp_test_dir("scheduler_invalid_condition");
+        let schedule_path = pack_dir.join("schedule.toml");
+        std::fs::write(
+            &schedule_path,
+            r#"
+                [[slot]]
+                name = "free_time"
+
+                [[slot.events]]
+                scene = "test::scene"
+                condition = "w.hasTrait('MISSING_TRAIT')"
+            "#,
+        )
+        .unwrap();
+
+        let meta = LoadedPackMeta {
+            manifest: PackManifest {
+                pack: PackMeta {
+                    id: "test".into(),
+                    name: "Test Pack".into(),
+                    version: "0.1.0".into(),
+                    author: "test".into(),
+                    requires: vec![],
+                    opening_scene: None,
+                    transformation_scene: None,
+                },
+                content: PackContent {
+                    traits: "data/traits.toml".into(),
+                    npc_traits: "data/npc_traits.toml".into(),
+                    skills: "data/skills.toml".into(),
+                    scenes_dir: "scenes".into(),
+                    schedule_file: Some("schedule.toml".into()),
+                    names_file: None,
+                    stats_file: None,
+                    races_file: None,
+                    categories_file: None,
+                    arcs_file: None,
+                },
+            },
+            pack_dir: pack_dir.clone(),
+        };
+
+        let result = load_schedule(&[meta], &PackRegistry::new());
+        assert!(
+            matches!(result, Err(SchedulerError::Validation { .. })),
+            "expected validation error from invalid schedule condition"
+        );
+
+        std::fs::remove_dir_all(pack_dir).unwrap();
+    }
+
+    #[test]
     fn pick_returns_scene_from_eligible_events() {
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let world = make_world(); // week = 0
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -498,7 +619,7 @@ mod tests {
     #[test]
     fn pick_returns_scene_at_week_1() {
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let mut world = make_world();
         world.game_data.week = 1; // now week() > 0 passes
         let mut rng = SmallRng::seed_from_u64(42);
@@ -513,7 +634,7 @@ mod tests {
     #[test]
     fn pick_returns_none_for_unknown_slot() {
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let world = make_world();
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -726,6 +847,44 @@ mod tests {
         );
     }
 
+    #[test]
+    fn validate_scene_references_rejects_unknown_scene_ids() {
+        let event = ScheduleEvent {
+            scene: "test::missing".into(),
+            condition: None,
+            weight: 1,
+            once_only: false,
+            trigger: None,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("free_time".into(), vec![event]);
+        let scheduler = Scheduler { slots };
+        let scenes = HashMap::new();
+
+        let result = scheduler.validate_scene_references(&scenes);
+        assert!(
+            matches!(result, Err(SchedulerError::Validation { .. })),
+            "expected validation error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn validate_entry_scene_references_rejects_missing_manifest_scene() {
+        let scenes = HashMap::new();
+        let result = validate_entry_scene_references(
+            &scenes,
+            Some("base::opening"),
+            Some("base::transformation"),
+        );
+
+        assert!(
+            matches!(result, Err(SchedulerError::Validation { .. })),
+            "expected validation error, got: {:?}",
+            result
+        );
+    }
+
     // ── pick_next tests ──────────────────────────────────────────────────────
 
     #[test]
@@ -801,7 +960,7 @@ mod tests {
         // After fix: workplace_first_clothes must trigger on week_one (not workplace_first_day).
         // workplace_first_day's trigger is moved to require clothes_done.
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let mut world = make_world();
         world.game_data.set_flag("ROUTE_WORKPLACE");
         world
@@ -873,7 +1032,7 @@ mod tests {
     #[test]
     fn pick_next_free_time_appears_after_arc_settles_with_advance_time() {
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
-        let scheduler = load_schedule(&metas).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
         let mut world = make_world();
 
         // Simulate post-arc state: ROUTE_WORKPLACE, arc settled, all once_only flags set

@@ -25,6 +25,8 @@ pub enum PackLoadError {
         kind: &'static str,
         id: &'static str,
     },
+    #[error("required pack data is missing: {kind}")]
+    MissingRequiredData { kind: &'static str },
 }
 
 pub struct LoadedPackMeta {
@@ -104,6 +106,20 @@ fn validate_required_ids(registry: &PackRegistry) -> Result<(), PackLoadError> {
             kind: "trait",
             id: "SMOOTH_LEGS",
         })?;
+
+    if registry.male_names().is_empty() {
+        return Err(PackLoadError::MissingRequiredData {
+            kind: "male NPC names",
+        });
+    }
+    if registry.female_names().is_empty() {
+        return Err(PackLoadError::MissingRequiredData {
+            kind: "female NPC names",
+        });
+    }
+    if registry.races().is_empty() {
+        return Err(PackLoadError::MissingRequiredData { kind: "races" });
+    }
 
     Ok(())
 }
@@ -330,6 +346,67 @@ mod tests {
         assert!(
             matches!(result, Err(PackLoadError::MissingRequiredId { .. })),
             "expected missing required id error, got: {:?}",
+            result
+        );
+    }
+
+    #[test]
+    fn required_data_validation_fails_when_names_and_races_missing() {
+        let mut registry = PackRegistry::new();
+        registry.register_skills(vec![crate::data::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "".into(),
+            min: 0,
+            max: 100,
+        }]);
+        registry.register_traits(vec![
+            crate::data::TraitDef {
+                id: "TRANS_WOMAN".into(),
+                name: "".into(),
+                description: "".into(),
+                hidden: true,
+                group: None,
+                conflicts: vec![],
+            },
+            crate::data::TraitDef {
+                id: "ALWAYS_FEMALE".into(),
+                name: "".into(),
+                description: "".into(),
+                hidden: true,
+                group: None,
+                conflicts: vec![],
+            },
+            crate::data::TraitDef {
+                id: "NOT_TRANSFORMED".into(),
+                name: "".into(),
+                description: "".into(),
+                hidden: true,
+                group: None,
+                conflicts: vec![],
+            },
+            crate::data::TraitDef {
+                id: "NATURALLY_SMOOTH".into(),
+                name: "".into(),
+                description: "".into(),
+                hidden: true,
+                group: None,
+                conflicts: vec![],
+            },
+            crate::data::TraitDef {
+                id: "SMOOTH_LEGS".into(),
+                name: "".into(),
+                description: "".into(),
+                hidden: true,
+                group: None,
+                conflicts: vec![],
+            },
+        ]);
+
+        let result = validate_required_ids(&registry);
+        assert!(
+            matches!(result, Err(PackLoadError::MissingRequiredData { .. })),
+            "expected missing required data error, got: {:?}",
             result
         );
     }

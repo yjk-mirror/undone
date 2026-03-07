@@ -304,6 +304,8 @@ name     = "Base Game"
 version  = "0.1.0"
 author   = "Undone"
 requires = []
+opening_scene        = "base::rain_shelter"
+transformation_scene = "base::transformation_intro"
 
 [content]
 traits          = "data/traits.toml"
@@ -317,6 +319,9 @@ races_file      = "data/races.toml"
 categories_file = "data/categories.toml"
 arcs_file       = "data/arcs.toml"
 ```
+
+Startup contract: packs must provide non-empty male names, female names, and races.
+Manifest entry scenes and scheduler scene references are validated before the UI starts.
 
 ### Trait Definition File
 
