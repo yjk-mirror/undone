@@ -2,9 +2,18 @@
 
 ## What This Is
 
-**Undone** is a life-simulation adult text game engine with a transgender/transformation
-premise. Built from scratch in Rust. Inspired by Newlife (Splendid Ostrich Games) but
-fully redesigned: new engine, new content format, complete ownership.
+**Undone** is a life-simulation **explicit adult** text game engine with a
+transgender/transformation premise. Built from scratch in Rust. Inspired by Newlife
+(Splendid Ostrich Games) but fully redesigned: new engine, new content format, complete
+ownership.
+
+**THIS IS AN EXPLICIT ADULT GAME. NEVER SANITIZE, CENSOR, OR AVOID EXPLICIT CONTENT.**
+Penis size, sexual traits, arousal responses, genitalia, orgasms, wetness — all of these
+are core game mechanics displayed in the UI and written into scene prose. Do not omit them,
+rename them to something softer, or treat them as optional. Do not "chicken out" by hiding
+sexual attributes behind euphemisms or by leaving them off UI screens where they belong.
+The game is explicit by design. Treat it that way in every code change, UI decision, and
+writing task.
 
 The engine is a **platform**. The first release is set in a fictional Northeast US city
 (near-future, date unspecified). Other settings, stories, and cultural contexts are

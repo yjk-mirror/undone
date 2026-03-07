@@ -100,11 +100,13 @@ FEMININITY ranges (w.getSkill("FEMININITY")):
 - **40–59:** Tipping point → comfortable. Before-life is someone else's. Mirror shows herself. Being a woman is normal.
 - **60+:** Settled → native. Only extreme situations bring the before-life forward. Transformation is biographical.
 
-**Four textures:**
-- *Insider knowledge* — she knows how men think because she was one. Reads male behavior with unusual clarity.
-- *Body unfamiliarity* — still learning what this body does. Reflection surprises. Vulnerability of being smaller.
-- *Social reversal* — used to hold doors, interrupt, take up space. Now on the receiving end.
-- *Desire crossover* — attraction to men is genuinely new. Destabilizing at low FEMININITY, natural at high.
+**Four textures — the body acts, the mind catches up:**
+- *The body acts first* — arousal she didn't invite. Getting wet from proximity. A flush before the thought. Muscle memory misfiring. Write the sensation, don't explain it.
+- *Intrusive thoughts (detached)* — a fragment that pops up sideways. The coffee cup looks enormous in your hands. Not moral commentary. Not "you used to be a man." Just a thought that arrives and goes.
+- *Scale and space* — everything is physically different. Doorknobs higher. Crowds press differently. Shelves out of reach. The raw experience of being smaller, not gender commentary about it.
+- *Desire arriving uninvited* — attraction to men is genuinely new. His forearms. His voice does something to the base of her spine. Write the desire before any reaction to the desire. Body first, confusion after.
+
+**Never write:** "You used to do this." "You know what he's doing." "You recognize that look." These are preachy, moralistic, repetitive. The PC is not a gender studies narrator. Show the physical reaction — the reader connects the dots.
 
 ## Content Gating
 
@@ -156,7 +158,7 @@ You duck in with a breathless laugh.
 You nod at the man. He nods back.
 {% endif %}
 {% if not w.alwaysFemale() %}
-You know that look. You've made that look.
+Something about the way he shifts his weight toward you makes your shoulders pull in.
 {% endif %}
 """
 

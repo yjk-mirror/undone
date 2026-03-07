@@ -82,8 +82,9 @@ The game renders markdown in all prose fields. Use it deliberately and sparingly
 **When italics earn their place:**
 
 ```
-He's still talking. You stopped listening a while ago.
-*You used to do this too*, you think. Not listen. Assume the other person would catch up.
+His hand closes over yours and for a second your brain just — blanks. Like a word you know
+but can't find.
+*Huh*, you think. And then you're back.
 ```
 
 **When they don't:**
@@ -438,10 +439,11 @@ content pass requiring its own quality bar.
 #### The Cis-Male-Start Register
 
 The primary transformation experience. She is adjusting to a body and a social position she
-did not choose. Male attention lands strangely. The mirror is a fact that needs restating.
-Every gendered social interaction is a lesson she didn't ask for. The transformation is
-something that happened *to* her. Writing cue: alienation, recalibration, wry observation
-of what she used to be on the other side of.
+did not choose. The body does things the mind hasn't caught up to — arousal, sensitivity,
+physical reactions she has no reference for. Male attention lands in the body before the
+brain processes it. The transformation is something that happened *to* her. Writing cue:
+the gap between expectation and experience, involuntary physical response, detached
+intrusive thoughts that arrive sideways.
 
 ---
 
@@ -506,7 +508,7 @@ set at character creation and remain stable unless explicitly changed by a scene
 | BreastSize | `w.getBreasts()` | 7 variants |
 | Appearance | `w.getAppearance()` | Plain → Devastating (6 tiers) |
 | NaturalPubicHair | `w.getNaturalPubicHair()` | Bare → Heavy (5 tiers) |
-| ActiveName | `w.getName()` | Selects masc/androg/fem name by FEMININITY |
+| ActiveName | `w.getName()` | Selects masc/fem name by FEMININITY |
 | SmoothLegs | `w.hasSmoothLegs()` | true if NATURALLY_SMOOTH or SMOOTH_LEGS |
 | PenisSize | `w.beforePenisSize()` | On BeforeIdentity only |
 
@@ -539,50 +541,59 @@ set at character creation and remain stable unless explicitly changed by a scene
 
 ### Four Transformation Textures
 
-**1. Insider knowledge**
+**1. The body acts first**
 
-She knows how men think because she was one. This gives her unusual clarity about male
-behaviour — she can read what a man wants, what he's performing, what he actually means.
-It can be erotic (she knows exactly how much trouble she's in), uncomfortable (she sees
-the gap between what he's saying and what he's doing), or simply wry (she's watched this
-play out before, from the other side).
+The body has reactions the mind hasn't authorized. Arousal she didn't invite. Getting wet
+from proximity to a man and not understanding why yet. A flush that arrives before the
+thought. Reaching for something and the reach is different — shorter, weaker, angled wrong.
+Muscle memory misfiring. The body is doing its thing and she's a half-beat behind it.
 
-```jinja
-{% if not w.alwaysFemale() %}
-She knows that look. She used to wear it.
-{% endif %}
-```
-
-**2. Body unfamiliarity**
-
-She's still, at some level, learning what this body does. Not constant commentary — but in
-specific moments where something about being in this body is genuinely new. Her own
-reflection. The specific vulnerability of being smaller. Having to learn her own anatomy
-the way someone learns a foreign language.
+Write the sensation. Don't explain it. Don't moralize about it. The reader understands.
 
 ```jinja
 {% if not w.alwaysFemale() %}
-There's still the occasional moment where her own reflection takes her slightly by surprise.
-This is one of them.
+His hand closes over yours on the railing. Your stomach does something you don't have
+a word for yet.
 {% endif %}
 ```
 
-**3. Social reversal**
+**2. Intrusive thoughts (detached, not narrated)**
 
-She used to be on the side that holds doors, pays, interrupts, takes up space. Now she's
-on the other side of all of it. This can be:
+A thought arrives sideways, uninvited. Not a moral observation about gender. Not
+"you used to be a man and now you notice X." A genuinely detached fragment — the kind
+of thing that pops into your head and is gone before you can frame it.
 
-- Dissonance (being talked over when she used to do the interrupting)
-- Revelation (being physically protected when she used to be the one offering protection)
-- Irony (experiencing exactly what she used to dish out)
-- Charged eroticism (being the object of male desire when she used to be the one desiring)
+```jinja
+{% if not w.alwaysFemale() %}
+The coffee cup looks enormous in your hands. It didn't used to.
+{% endif %}
+```
 
-**4. Desire crossover**
+The thought doesn't editorialize. It doesn't connect dots for the reader. It just *is*.
+The reader connects the dots themselves — and that's what makes it land.
+
+**3. Scale and space**
+
+Everything is physically different. Doorknobs are higher. A crowd presses differently.
+Being in an elevator with a man registers differently in the body — not as a moral
+observation, but as a fact of mass. The seatbelt crosses your chest differently. Shelves
+are too high. Your own footsteps sound different on tile.
+
+This is not "social reversal" — not about who holds doors and who interrupts. It's about
+the raw physical experience of being smaller, lighter, shaped differently, in a world built
+for someone bigger. Show the physical fact; skip the gender commentary.
+
+**4. Desire arriving uninvited**
 
 Male-start PCs were heterosexual before transformation. Attraction to men is genuinely new.
-At low FEMININITY this can be destabilising — finding herself responding to a man physically
-and not knowing what to do with that. At high FEMININITY it's simply desire, unqualified.
-Calibrate by FEMININITY level.
+At low FEMININITY this is destabilizing — the body responding to a man's voice, his hands,
+his proximity, and the brain scrambling to catch up. At high FEMININITY it's simply desire,
+unqualified. Calibrate by FEMININITY level.
+
+The desire must be concrete and physical, not abstract. Not "she felt attracted to him" —
+*what* specifically. His forearms. The way his shirt pulls across his back. A low voice
+that does something to the base of her spine. Write the desire before any reaction to the
+desire. The body first, the confusion after.
 
 ---
 
@@ -590,12 +601,14 @@ Calibrate by FEMININITY level.
 
 | Don't write | Why |
 |---|---|
-| Transformation reference in every scene | Becomes noise. Reserve it for scenes where it changes something. |
-| "As a former man, you..." | Clunky. Show the transformation through experience, not announcement. |
+| "You used to do this" / "You know what he's doing" / "You were on the other side" | **The #1 failure mode.** Preachy, moralistic, repetitive. The PC is not a gender studies narrator. Show the physical reaction, not the intellectual commentary. |
+| Narrating the transformation explicitly: "as a former man", "you remember being a man" | The reader knows. The PC knows. Spelling it out kills the subtlety. Let the moment speak. |
+| The same beat in every scene (the male gaze, "you recognize this") | Each scene must find its OWN angle — a different physical sensation, a different intrusive thought, a different moment of the body acting before the mind catches up. No two scenes should use the same device. |
+| Abstract meta-framing: "there's something about being in a body you didn't choose" | Name the specific thing or don't write the line. Abstract frames tell the reader what to feel instead of making them feel it. |
 | The same transformation branch at all FEMININITY levels | A FEMININITY 10 PC and a FEMININITY 60 PC are different people. |
 | Always-female players left with a blank or gap | They must always get a complete, valid path. |
 | Transformation as comedy | It's not a gag. Wry is fine; slapstick is not. |
-| Ignoring it when it would genuinely change the scene | The biggest failure mode — treating her as if she has no history. |
+| Ignoring it when it would genuinely change the scene | A failure mode — but the fix is a physical/emotional moment, not a narrated observation. |
 
 ---
 
@@ -606,14 +619,15 @@ who always was one?**
 
 If yes: write the branch.
 
-**Scenes that almost always earn it:** male attention; body-awareness moments; being treated
-as a woman in a way she'd have been invisible to before; desire for a man; first-time sexual
-experiences; social dynamics where gender is active (being talked over, being protected,
-being excluded).
+**Scenes that almost always earn it:** male attention that registers in the body; physical
+sensation she has no reference for; desire arriving uninvited; the body being a different
+size/shape/weight than expected; being touched and the touch landing differently; arousal
+that surprises her.
 
 **Scenes that often don't need it:** choosing a film, dealing with a broken appliance,
-navigating a work task with no gendered dimension. Include it if it's genuinely earned,
-not as a quota.
+navigating a work task with no gendered dimension. Include it if it's genuinely earned
+through a physical or emotional moment — not as an intellectual observation about gender
+dynamics.
 
 ---
 
@@ -828,7 +842,7 @@ If the answer is "a woman goes to a park / bar / grocery store and notices it's 
 
 2. **At least one beat of unresolved tension or desire** — not everything resolves to "and that was fine." A glance that registered. A conversation that went longer than intended. A decision she made that surprised her. Something slightly open when the scene ends.
 
-3. **The transformation lens used, not merely referenced** — "You're on this side of it now" is a reference. Showing her recognize the exact calculation a man is running because she used to run it herself is using the lens. The difference between announcing the irony and demonstrating it.
+3. **The transformation lens used, not merely referenced** — "You're on this side of it now" is a reference. Her hand shaking when a man's voice drops and she doesn't know why is using the lens. The difference is: the body reacts, the mind catches up. Never announce the irony — let the physical moment carry it.
 
 **The "fine" test:** If you can summarize an action as "she did the thing and it was fine," the action needs work. Even mundane scenes need one moment where something actually happens — desire is registered, tension doesn't resolve cleanly, the world surprises her.
 

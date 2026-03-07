@@ -264,7 +264,7 @@ fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
             _ => "Old",
         };
 
-        // Use name_masc for the before identity name, falling back to name_androg.
+        // Use name_masc for the before identity name.
         let before_name = player
             .get("name_masc")
             .and_then(|v| v.as_str())
@@ -562,7 +562,6 @@ mod tests {
         World {
             player: Player {
                 name_fem: "Eva".into(),
-                name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),

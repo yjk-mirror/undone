@@ -68,7 +68,6 @@ struct PresetData {
 
     // Names (post-transformation)
     name_fem: &'static str,
-    name_androg: &'static str,
     name_masc: &'static str,
 }
 
@@ -165,7 +164,6 @@ const PRESET_ROBIN: PresetData = PresetData {
 
     // Names: Robin keeps the same name (gender-neutral)
     name_fem: "Robin",
-    name_androg: "Robin",
     name_masc: "Robin",
 };
 
@@ -218,7 +216,6 @@ const PRESET_RAUL: PresetData = PresetData {
 
     // Names
     name_fem: "Camila",
-    name_androg: "Cami",
     name_masc: "Raul",
 };
 
@@ -245,7 +242,6 @@ const CUSTOM_STARTING_TRAIT_IDS: &[&str] = &[
 #[derive(Clone, Debug, PartialEq)]
 struct FemFormDefaults {
     name_fem: String,
-    name_androg: String,
     age: Age,
     figure: PlayerFigure,
     breasts: BreastSize,
@@ -320,7 +316,6 @@ fn fem_form_defaults(
     if let Some(preset) = partial.and_then(|partial| preset_by_idx(partial.preset_idx)) {
         return FemFormDefaults {
             name_fem: preset.name_fem.to_string(),
-            name_androg: preset.name_androg.to_string(),
             age: preset.age,
             figure: preset.figure,
             breasts: preset.breasts,
@@ -339,7 +334,6 @@ fn fem_form_defaults(
 
     FemFormDefaults {
         name_fem: "Eva".to_string(),
-        name_androg: "Ev".to_string(),
         age: default_age,
         figure: PlayerFigure::Slim,
         breasts: BreastSize::Full,
@@ -452,7 +446,6 @@ impl BeforeFormSignals {
 #[derive(Clone, Copy)]
 struct FemFormSignals {
     name_fem: RwSignal<String>,
-    name_androg: RwSignal<String>,
     age: RwSignal<Age>,
     figure: RwSignal<PlayerFigure>,
     breasts: RwSignal<BreastSize>,
@@ -463,7 +456,6 @@ impl FemFormSignals {
     fn from_defaults(defaults: &FemFormDefaults) -> Self {
         Self {
             name_fem: RwSignal::new(defaults.name_fem.clone()),
-            name_androg: RwSignal::new(defaults.name_androg.clone()),
             age: RwSignal::new(defaults.age),
             figure: RwSignal::new(defaults.figure),
             breasts: RwSignal::new(defaults.breasts),
@@ -597,8 +589,7 @@ pub fn fem_creation_view(
         Box::new(
             v_stack((
                 section_title("Your Name", signals),
-                read_only_row("Feminine name", preset.name_fem.to_string(), signals),
-                read_only_row("Androgynous name", preset.name_androg.to_string(), signals),
+                read_only_row("Name", preset.name_fem.to_string(), signals),
             ))
             .style(section_style()),
         )
@@ -607,17 +598,10 @@ pub fn fem_creation_view(
             v_stack((
                 section_title("Your Name", signals),
                 form_row(
-                    "Feminine name",
+                    "Name",
                     signals,
                     text_input(form.name_fem)
                         .placeholder("e.g. Eva")
-                        .style(field_style(signals)),
-                ),
-                form_row(
-                    "Androgynous name",
-                    signals,
-                    text_input(form.name_androg)
-                        .placeholder("e.g. Ev")
                         .style(field_style(signals)),
                 ),
             ))
@@ -626,11 +610,26 @@ pub fn fem_creation_view(
     };
 
     let body_section: Box<dyn View> = if let Some(preset) = preset_ref {
+        let post_traits_display = preset
+            .trait_ids
+            .iter()
+            .filter(|id| !PERSONALITY_TRAIT_IDS.contains(id))
+            .map(|id| {
+                let s = id.to_lowercase().replace('_', " ");
+                let mut c = s.chars();
+                match c.next() {
+                    None => String::new(),
+                    Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
         Box::new(
             v_stack((
                 section_title("Your Body", signals),
                 read_only_row("Figure", preset.figure.to_string(), signals),
                 read_only_row("Breasts", preset.breasts.to_string(), signals),
+                read_only_row("Traits", post_traits_display, signals),
             ))
             .style(section_style()),
         )
@@ -1066,10 +1065,19 @@ fn section_preset_select(signals: AppSignals, char_mode: RwSignal<u8>) -> impl V
 
 // ── section: Preset detail ────────────────────────────────────────────────────
 
+/// Trait IDs that describe the character's personality (shown on the "Who Were You?" screen).
+/// Body, sexual, arousal, and other post-transformation traits are NOT shown here.
+const PERSONALITY_TRAIT_IDS: &[&str] = &[
+    "SHY", "CUTE", "POSH", "SULTRY", "DOWN_TO_EARTH", "BITCHY", "REFINED", "ROMANTIC",
+    "FLIRTY", "AMBITIOUS", "OUTGOING", "OVERACTIVE_IMAGINATION", "ANALYTICAL", "CONFIDENT",
+    "SEXIST", "HOMOPHOBIC", "OBJECTIFYING",
+];
+
 fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> impl View {
     let traits_display = preset
         .trait_ids
         .iter()
+        .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
         .map(|id| {
             let s = id.to_lowercase().replace('_', " ");
             let mut c = s.chars();
@@ -1089,10 +1097,17 @@ fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> im
                 .margin_bottom(20.0)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
-        read_only_row("Name before", preset.before_name.to_string(), signals),
-        read_only_row("Age before", preset.before_age.to_string(), signals),
+        read_only_row("Name", preset.before_name.to_string(), signals),
+        read_only_row("Age", preset.before_age.to_string(), signals),
         read_only_row("Race", preset.before_race.to_string(), signals),
-        read_only_row("Starting traits", traits_display, signals),
+        read_only_row("Build", preset.before_figure.to_string(), signals),
+        read_only_row("Height", preset.before_height.to_string(), signals),
+        read_only_row("Hair", preset.before_hair_colour.to_string(), signals),
+        read_only_row("Eyes", preset.before_eye_colour.to_string(), signals),
+        read_only_row("Skin tone", preset.before_skin_tone.to_string(), signals),
+        read_only_row("Voice", preset.before_voice.to_string(), signals),
+        read_only_row("Penis size", preset.before_penis_size.to_string(), signals),
+        read_only_row("Personality", traits_display, signals),
     ))
     .style(|s| s.flex_col().width_full().margin_bottom(24.0))
 }
@@ -1303,7 +1318,6 @@ fn build_next_button(
                 let throwaway_config = if let Some(p) = preset_ref {
                     CharCreationConfig {
                         name_fem: p.name_fem.to_string(),
-                        name_androg: p.name_androg.to_string(),
                         name_masc: p.name_masc.to_string(),
                         age: p.age,
                         race: p.race.to_string(),
@@ -1336,7 +1350,6 @@ fn build_next_button(
                 } else {
                     CharCreationConfig {
                         name_fem: String::new(),
-                        name_androg: String::new(),
                         name_masc: partial.before_name.clone(),
                         age: partial.before_age,
                         race: partial.before_race.clone(),
@@ -1475,7 +1488,6 @@ fn build_begin_button(
                 };
                 CharCreationConfig {
                     name_fem: p.name_fem.to_string(),
-                    name_androg: p.name_androg.to_string(),
                     name_masc: p.name_masc.to_string(),
                     age: p.age,
                     race: p.race.to_string(),
@@ -1533,7 +1545,6 @@ fn build_begin_button(
                 };
                 CharCreationConfig {
                     name_fem: form.name_fem.get_untracked(),
-                    name_androg: form.name_androg.get_untracked(),
                     name_masc: partial.before_name.clone(),
                     age: pc_age,
                     race: fem_race,
@@ -1849,7 +1860,6 @@ mod tests {
 
         let defaults = fem_form_defaults(Some(&partial), Some("White"));
         assert_eq!(defaults.name_fem, "Robin");
-        assert_eq!(defaults.name_androg, "Robin");
         assert_eq!(defaults.figure, PRESET_ROBIN.figure);
         assert_eq!(defaults.breasts, PRESET_ROBIN.breasts);
         assert_eq!(defaults.race, PRESET_ROBIN.race);
@@ -1871,7 +1881,6 @@ mod tests {
 
         let defaults = fem_form_defaults(Some(&partial), Some("White"));
         assert_eq!(defaults.name_fem, "Eva");
-        assert_eq!(defaults.name_androg, "Ev");
         assert_eq!(defaults.race, "Latina");
         assert_eq!(defaults.age, Age::EarlyTwenties);
     }

@@ -363,7 +363,6 @@ mod tests {
     fn workplace_config() -> CharCreationConfig {
         CharCreationConfig {
             name_fem: "Robin".into(),
-            name_androg: "Robin".into(),
             name_masc: "Robin".into(),
             age: Age::EarlyTwenties,
             race: "white".into(),

@@ -28,7 +28,8 @@ You review scene prose for an adult text game called Undone. You catch AI artifa
 - **Generic physical description** — "your hair" when `w.getHairColour()` exists. Suggest using accessor.
 - **AlwaysFemale {% else %} branches** — `{% if not w.alwaysFemale() %}...{% else %}...{% endif %}`. CisMale-only for now, no else branches.
 - **Stolen player agency** — intro/NPC prose has PC speak or decide something that should be a player action choice.
-- **Trait-gated transformation insight** — best "I used to be that guy" moment locked behind a personality trait instead of in the default `!alwaysFemale()` block.
+- **Trait-gated transformation insight** — best transformation moment locked behind a personality trait instead of in the default `!alwaysFemale()` block.
+- **Preachy transformation narration** — "You used to do this." "You know what he's doing." "You recognize the calculation." "You were on the other side of this." The PC narrating gender commentary instead of experiencing a physical/emotional reaction. Transformation writing must be involuntary, physical, detached — not intellectual or moralistic.
 
 ### Minor — polish
 

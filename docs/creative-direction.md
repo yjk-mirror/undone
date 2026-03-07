@@ -13,8 +13,9 @@ Rust. Inspired by Newlife (Splendid Ostrich Games) but fully redesigned.
 
 **The premise:** A player character navigates adult life — relationships, work, social
 dynamics. She may have started life as a man. The transformation is not backstory; it is
-a lens that changes how every socially-gendered experience lands. She knows how men think
-because she was one.
+a lens that changes how every experience lands in the body. The body reacts before the
+mind catches up — arousal, scale, sensation, desire. The transformation is felt, not
+narrated.
 
 **The core erotic logic:** Loss of control. The world happens to her. She responds.
 Unpredictability, the world exceeding her choices, situations she didn't invite — this is
@@ -73,7 +74,7 @@ montage. The next thing the player sees is the FemCreation screen.
 The player wakes up transformed. The gap between falling asleep and this screen is the
 transformation — implicit, not shown.
 
-- Feminine name, androgynous name
+- Feminine name
 - Figure, breasts, race (may differ from before)
 - Physical attributes
 - "Begin Your Story" button assembles the full character and starts the game
@@ -347,17 +348,21 @@ The biggest macro-level failure: the narrator TELLS the reader what to feel or u
 instead of SHOWING the moment and trusting the reader to get it.
 
 - ❌ "You know what he's thinking because you used to think it too."
-- ✅ Show what he's doing. The reader connects it. She doesn't need to announce the
-  connection — the scene already made it.
+- ❌ "You used to do this yourself without thinking."
+- ❌ "You recognize the calculation he's running."
+- ✅ Show the body reacting. His voice drops and something tightens below your
+  navel. That's transformation writing. The reader connects it — she doesn't need
+  to announce "I used to be a man and now I notice male behavior."
 
 - ❌ "There's something about being in a body you didn't choose that makes every
   ordinary moment slightly surreal."
-- ✅ Show the ordinary moment. Show what's surreal about it concretely. The reader
-  feels the surrealism without the narrator framing it as surreal.
+- ✅ The coffee cup looks enormous in your hands. The shelf is out of reach and it
+  wasn't before. A man's hand closes over yours and your brain just blanks.
+  Concrete, physical, involuntary. No meta-framing.
 
-The rule: if the narrator is naming the emotional category, the scene hasn't earned the
-emotion yet. Go back and earn it with a concrete moment. Then delete the narrator's
-label. The reader will supply it themselves, and it will land harder.
+The rule: if the narrator is explaining the transformation, the scene hasn't *shown*
+the transformation yet. Go back and find the physical moment. Write that. Delete the
+explanation. The reader will supply the meaning, and it will land ten times harder.
 
 ---
 
@@ -377,15 +382,19 @@ label. The reader will supply it themselves, and it will land harder.
    is not a scene — it's a placeholder. Ask for creative direction for the specific
    moment.
 
-4. **Never substitute telling for showing the transformation.** "You know what men think
-   because you were one" is telling. Showing her recognize the exact calculation a man is
-   running because she used to run it — that's showing. The insight should be demonstrated
-   through what the PC notices, not announced by the narrator.
+4. **Never narrate the transformation — let the body show it.** "You know what men think
+   because you were one" is telling. "You used to do this" is telling. "You recognize the
+   calculation he's running" is telling. All of these are the PC moralizing about gender
+   instead of living through a physical experience. The transformation lives in involuntary
+   reactions: the body flushing, arousal arriving uninvited, a hand that's suddenly too
+   small, a thought that pops up detached and vanishes. Write the sensation. Trust the reader.
 
-5. **Never hammer the same transformation beat explicitly.** Multiple scenes saying "you
-   used to be a man so you understand" is repetitive. Each scene should find a NEW
-   concrete observation that demonstrates the insider knowledge. The reader should think
-   "oh — she knows" without the narrator saying "she knows."
+5. **Every scene must find its own transformation angle.** No two scenes should use the same
+   device. One scene is about how the seatbelt sits. Another is about getting wet from a
+   voice. Another is about the coffee cup being enormous in her hands. Another is about
+   muscle memory misfiring when she reaches for something. The transformation has infinite
+   angles — physical, sensory, spatial, sexual. Repeating the same one ("the male gaze",
+   "being looked at") is a failure of imagination.
 
 ---
 

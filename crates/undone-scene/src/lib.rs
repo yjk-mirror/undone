@@ -40,7 +40,6 @@ mod integration_tests {
         World {
             player: Player {
                 name_fem: "Eva".into(),
-                name_androg: "Ev".into(),
                 name_masc: "Evan".into(),
                 before: Some(BeforeIdentity {
                     name: "Evan".into(),

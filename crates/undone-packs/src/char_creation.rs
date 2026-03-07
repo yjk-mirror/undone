@@ -14,11 +14,9 @@ use crate::{
 };
 
 pub struct CharCreationConfig {
-    /// Feminine display name (femininity 70+)
+    /// Feminine display name (femininity 50+)
     pub name_fem: String,
-    /// Androgynous display name (femininity 31–69)
-    pub name_androg: String,
-    /// Masculine display name (femininity 0–30)
+    /// Masculine display name (femininity 0–49)
     pub name_masc: String,
     pub age: Age,
     pub race: String,
@@ -75,7 +73,6 @@ pub fn new_game<R: Rng>(
 
     let mut player = Player {
         name_fem: config.name_fem,
-        name_androg: config.name_androg,
         name_masc: config.name_masc,
         age: config.age,
         race: config.race,
@@ -203,7 +200,6 @@ mod tests {
     fn base_config() -> CharCreationConfig {
         CharCreationConfig {
             name_fem: "Eva".into(),
-            name_androg: "Ev".into(),
             name_masc: "Evan".into(),
             age: Age::EarlyTwenties,
             race: "white".into(),

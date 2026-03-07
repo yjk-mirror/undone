@@ -60,9 +60,8 @@ pub struct PregnancyState {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
-    // Identity — three-name system (Lilith's Throne pattern)
+    // Identity — two-name system (feminine + masculine/before)
     pub name_fem: String,
-    pub name_androg: String,
     pub name_masc: String,
     pub age: Age,
     pub race: String,
@@ -127,14 +126,12 @@ pub struct Player {
 
 impl Player {
     /// Returns the currently active display name based on femininity score.
-    /// 0–30 → masculine name, 31–69 → androgynous name, 70+ → feminine name.
+    /// 0–49 → masculine name, 50+ → feminine name.
     /// Pass the resolved FEMININITY skill id so the value is read from the skills map.
     pub fn active_name(&self, femininity_skill: SkillId) -> &str {
         let femininity = self.skill(femininity_skill);
-        if femininity >= 70 {
+        if femininity >= 50 {
             &self.name_fem
-        } else if femininity >= 31 {
-            &self.name_androg
         } else {
             &self.name_masc
         }
@@ -169,7 +166,6 @@ mod tests {
     fn make_player() -> Player {
         Player {
             name_fem: "Eva".into(),
-            name_androg: "Ev".into(),
             name_masc: "Evan".into(),
             before: Some(BeforeIdentity {
                 name: "Evan".into(),
@@ -233,7 +229,6 @@ mod tests {
 
         let mut p = make_player();
         p.name_masc = "Evan".into();
-        p.name_androg = "Ev".into();
         p.name_fem = "Eva".into();
 
         let set_fem = |p: &mut Player, v: i32| {
@@ -249,16 +244,10 @@ mod tests {
         set_fem(&mut p, 0);
         assert_eq!(p.active_name(fem_id), "Evan");
 
-        set_fem(&mut p, 30);
+        set_fem(&mut p, 49);
         assert_eq!(p.active_name(fem_id), "Evan");
 
-        set_fem(&mut p, 31);
-        assert_eq!(p.active_name(fem_id), "Ev");
-
-        set_fem(&mut p, 69);
-        assert_eq!(p.active_name(fem_id), "Ev");
-
-        set_fem(&mut p, 70);
+        set_fem(&mut p, 50);
         assert_eq!(p.active_name(fem_id), "Eva");
 
         set_fem(&mut p, 100);
@@ -271,7 +260,6 @@ mod tests {
         let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
         let mut p = make_player();
         p.name_masc = "Evan".into();
-        p.name_androg = "Ev".into();
         p.name_fem = "Eva".into();
 
         // No entry in map → skill() returns 0 → masculine name

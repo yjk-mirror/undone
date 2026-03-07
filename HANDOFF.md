@@ -3,7 +3,7 @@
 ## Current State
 
 **Branch:** `master`
-**Tests:** 257 passing, 0 failures.
+**Tests:** 262 passing, 0 failures.
 **Scenes:** 33 total (19 pre-sprint + 14 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -21,7 +21,7 @@
 
 ## ⚡ Next Action
 
-**Engine readiness sprint is complete. Current authoring validation warnings are aligned with persistent runtime state, and the character-creation route/trait contract is tighter. Next focus is the remaining hardcoded content-ID surface in static preset definitions and any other runtime/UI assumptions that are still more base-pack-specific than the engine contract should allow, with writing-agent/tooling cleanup still documented but deferred.**
+**Writing overhaul planned.** Transformation writing direction overhauled: "you used to do this" pattern banned, replaced with involuntary physical/emotional reactions. Androgynous name removed (two-name system: fem + masc). Char creation preset display fixed: before-life physical attributes on "Who Were You?", post-transformation traits on FemCreation. All writing docs updated (writing-guide, creative-direction, writer-core, review-core). Next: autonomous DeepSeek writing session to rewrite all 33 scenes.
 
 Trust these docs first:
 
