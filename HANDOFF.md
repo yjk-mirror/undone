@@ -17,13 +17,23 @@
 
 ## ⚡ Next Action
 
-**Plane intro and Sidebar Phase 1 shipped. Next focus is char-creation polish + Sidebar Phase 2.**
+**Engine readiness sprint is complete. Next focus is ironclad engine hardening before content writing resumes.**
 
-### Priority order (agreed with user):
-1. **FemCreation preset name bug** (#6) — `FemFormSignals::new()` hardcodes "Eva"/"Ev" instead of reading preset's `name_fem`/`name_androg`. Quick fix once names are confirmed.
-2. **Char creation UI completion** (#5, #7) — Plan exists at `docs/plans/2026-02-25-char-creation-ui-attributes.md`.
-3. **NPC sidebar redesign Phase 2** (#13) — Phase 1 shipped (single known NPC card). Next: multi-NPC chips + selection model per `docs/plans/2026-03-03-npc-sidebar-redesign-ux.md`.
-4. **Writing quality sprint** (#14-15) — DeepSeek API key added to `.env`. Writing agent design not yet built. Do not start writing work without setting up the DeepSeek integration first.
+Trust these docs first:
+
+- `docs/engine-contract.md`
+- `docs/audits/2026-03-07-engine-readiness-matrix.md`
+- `docs/plans/2026-03-07-ironclad-engine-hardening.md`
+- `docs/prompts/2026-03-07-ironclad-engine-next-session-prompt.md`
+
+Immediate priorities:
+
+1. **Save / resume hardening** — add end-to-end coverage for runtime reset and post-load behavior.
+2. **Runtime diagnostics hardening** — make authoring/runtime failures easier to detect during QA.
+3. **Authoring validation hardening** — keep pushing failures into startup and `validate-pack`.
+4. **NPC context contract decision** — either ratify the current one-active-`m`/`f` model for the next writing phase or replace it before writing depends on it.
+
+Do not restart content writing until the ironclad-engine hardening plan is reviewed against current code and the remaining risks are explicitly accepted.
 
 ### Remaining open items (post-Sprint 3)
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
