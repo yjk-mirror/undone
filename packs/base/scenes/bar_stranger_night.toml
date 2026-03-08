@@ -110,7 +110,7 @@ You lean back and let him. When his mouth finds you, you let out a slow breath a
 {% elif w.hasTrait("FLIRTY") %}
 You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them. You come against his face with your thighs clamped around his ears.
 {% elif w.hasTrait("ANALYTICAL") %}
-*Living room floor. Your chair.* The observation lands and then his tongue finds a rhythm and the clarity burns off. No more observations. Just the wet pressure of his mouth and something coiling low, tightening, until you cry out and grip the arms of the chair.
+*Living room floor. Your chair.* The observation lands and then his tongue finds a rhythm and the clarity burns off. No more observations. Just the wet pressure of his mouth and the tension building low, tightening, until you cry out and grip the arms of the chair.
 {% elif w.hasTrait("SHY") %}
 His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one. You come quietly, your legs shaking, and then he's standing up.
 {% else %}
@@ -166,7 +166,7 @@ You walk him to the door. The hallway is narrow. He turns to face you.
 "Thanks for the walk home."
 A nod. He leaves. You lock the door and pour a glass of water and drink it standing at the sink. The apartment is exactly the same size it was before he came in.
 {% elif w.hasTrait("FLIRTY") %}
-He leans in and kisses your cheek. His stubble crosses your skin and then he's pulling back, stepping into the hallway. You lock the door. You don't touch your cheek. You think about maybe touching it.
+He leans in and kisses your cheek. His stubble crosses your skin and then he's pulling back, stepping into the hallway. You lock the door. You don't touch your cheek. Your hand stays in your pocket for the two flights up to your apartment.
 {% elif w.hasTrait("ANALYTICAL") %}
 "Good night," he says.
 "Good night."

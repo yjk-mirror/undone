@@ -17,7 +17,7 @@ The landlord is in your bathroom. Flannel shirt, reading glasses pushed up, a to
 {% if w.getSkill("FEMININITY") < 25 %}
 You're standing in the hallway between the bathroom and the kitchen and you're aware of every dimension of the space. The apartment is small. It felt small when it was just you. With a man crouched under your sink, the square footage contracts further. You can smell the metal of his toolbox and something that might be aftershave, and the apartment that is your space is temporarily his workspace.
 
-You used to fix your own faucets. The wrench would have fit differently in your hands, but the procedure was the same. You're standing in the hallway watching a man do it instead.
+The smell of the toolbox — metal, WD-40, something oily and specific. Your hands are the wrong size for that wrench and you know it without checking. The apartment that is your space is temporarily someone else's project.
 {% elif w.getSkill("FEMININITY") < 45 %}
 You're in the kitchen, close enough to hear the wrench and the muttering and the occasional clang that means the pipe joint is being difficult. The apartment feels occupied in a way it usually isn't. A man's toolbox on your bathroom floor. A man's voice from under your sink.
 {% else %}
@@ -119,7 +119,7 @@ You sit at the kitchen table. The coffee cools. Your phone is out but you're not
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-A man in your bathroom. Fixing your faucet. You're in the kitchen with two cups of coffee. The domesticity of this arrangement has a shape you recognize from a different angle — you've been the one under the sink. Now you're the one in the kitchen. The coffee is getting cold and the observation is the kind you don't do anything with.
+A man in your bathroom. Fixing your faucet. You're in the kitchen with two cups of coffee. The wrench sounds through the thin wall. The coffee is getting cold. You sit there and listen.
 {% endif %}
 
 He comes out ten minutes later. "Done," he says. You hand him the coffee. He takes it without comment, which is its own kind of thank you.
@@ -178,7 +178,7 @@ You hold it. He works. The silence between you is the silence of two people focu
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-His surprise, when it came, was in his eyebrows. The quick lift. The recalculation. Whatever he expected when he came to fix the young woman's faucet on a Saturday afternoon, competent plumbing diagnosis was not on the list. The recalculation is the thing. You've been recalculated a lot lately. It lands differently each time.
+His eyebrows lifted. The quick rise, the pause. The wrench stopped mid-turn. Then the nod — slow, reassessing. He went back to work.
 {% endif %}
 
 The repair takes five minutes with two people. He packs the toolbox. Runs the tap. Silent.

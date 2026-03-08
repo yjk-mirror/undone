@@ -15,9 +15,9 @@ People filter in at 10:02. Two from your immediate team, one you haven't met. A 
 Marcus looks at you. Looks at your slides. Looks at you again. His eyes do the thing — the quick trip down and back up that takes less than a second and that he probably doesn't know he's doing. Your neck gets warm.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-Carter will ask about timelines. The platform engineer — Devin — will push back on the interface contract. Marcus will be quiet for the first half and then ask one sharp question. You've been in enough of these rooms.
+Two weeks of standups. You know who defers and who interrupts. Carter writes everything down. The platform engineer — Devin — already has his laptop open to the interface spec.
 
-What you can't account for is how they're reading you. Two weeks of standups. You're still new data.
+Marcus settles into the chair directly across from yours. Laptop closed. Reading the room before the deck is up.
 
 {% else %}
 Two weeks of standups. You know who interrupts and who defers. Marcus settles into the chair directly across from you and opens his laptop without looking up.
@@ -72,7 +72,7 @@ The hallway outside the meeting room runs between the elevator bank and the open
 
 Marcus comes out behind you. He stops two feet away, because the water station is next to the hall and there's no particular way to avoid it.
 
-"Good presentation," he says. He means it, you think. He's not performing it.
+"Good presentation," he says. Flat. No inflection. He's already looking at his phone.
 
 "Thanks."
 
@@ -87,7 +87,7 @@ This is, you recognize, a real question. Not a social question. He wants to know
 {% if w.hasTrait("OBJECTIFYING") %}
 You stand at the water station for a moment longer than you need to. Kevin's explanation was ninety seconds. The meeting was forty-five minutes. The work held. That should be enough.
 
-Your reflection in the glass wall is a woman in professional clothes with a laptop under her arm. She looks competent. She looks young.
+Your reflection in the glass wall — professional clothes, laptop under your arm, the hallway light doing something to your jaw that you haven't gotten used to yet.
 
 {% elif w.hasTrait("ANALYTICAL") %}
 Two follow-up tasks: send Marcus the load test data, reply to whatever Carter is about to email. The content held. The room adjusted. You'll have better data in another two weeks.
@@ -146,7 +146,7 @@ He finishes. The room does the thing rooms do when someone has explained somethi
 
 The rest of the deck runs clean. Marcus waits until slide thirty-four to ask about operational latency. You have the benchmarks ready.
 
-In the hallway afterward, Marcus stops at the water station. "Good presentation," he says. Not performing it.
+In the hallway afterward, Marcus stops at the water station. "Good presentation," he says. Same flat delivery.
 
 "Thanks."
 
@@ -222,7 +222,7 @@ In the hallway: Marcus.
 "He was." Marcus fills his water bottle. "Send me the load test data when you get a chance."
 
 {% if w.getSkill("FEMININITY") < 30 %}
-You walk back to your desk. Your pulse is elevated — not from the content, which you know cold, but from the interruption itself. The room heard your voice cut through Kevin's and recalibrated in real time. You're not sure which version of you is processing that.
+You walk back to your desk. Your hands are warm. The room recalibrated when you cut through Kevin's explanation. That's still sitting in your chest.
 {% endif %}
 """
 

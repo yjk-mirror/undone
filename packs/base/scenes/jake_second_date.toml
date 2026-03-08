@@ -24,7 +24,7 @@ Every touch lands louder than it should. The brush of his sleeve, the half-secon
 {% if w.getSkill("FEMININITY") < 30 %}
 He guides you through a tighter part of the crowd with his hand at the small of your back — flat, warm, three full seconds. Your brain stops. Just stops. A blank, clean pause. Then you're back and you're leaning slightly into him and his arm has come around and you didn't make that happen, it just happened.
 {% elif w.getSkill("FEMININITY") >= 30 and w.getSkill("FEMININITY") < 50 %}
-His hand finds the small of your back in the crowd. The warmth of it settles there and stays. Something in your chest shifts — a low, waiting tightness that has a direction.
+His hand finds the small of your back in the crowd. The warmth of it settles there and stays. Your breath catches. A low, waiting tightness below your ribs.
 {% endif %}
 
 At the fruit stall, he picks up a peach and hands it to you. "Try this."
@@ -152,7 +152,7 @@ He's still close. The city keeps going around you like it doesn't know.
 [[actions]]
 id     = "not_yet"
 label  = "Not yet"
-detail = "Close. Almost. But she's not done with the anticipation."
+detail = "Close. Almost. But you're not done with the anticipation."
 prose  = """
 You take a small, deliberate step back. His thumb falls from your chin.
 
@@ -160,7 +160,7 @@ You take another bite of the peach instead. Chew it. Look out at the market, the
 
 "It's a really good peach," you say.
 
-He watches you for a second. Something shifts in his face — not disappointment exactly. More like a recalibration.
+He watches you for a second. His mouth closes. His eyes hold yours for a beat, then his jaw relaxes. He nods, once.
 
 "Yeah," he says. "It is."
 

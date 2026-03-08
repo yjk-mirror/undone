@@ -59,7 +59,7 @@ He doesn't step back.
 {% if w.getSkill("FEMININITY") < 30 %}
 His hand is still at your jaw. Something in your professional self — the person who ran a sprint review this morning, who owns opinions about dependency graphs — just left. You're aware of his thumb against your cheekbone and not much else.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You know what comes next. You came in today knowing it might. Your body is several steps ahead of whatever you were going to decide.
+You know what comes next. You came in today knowing it might.
 {% endif %}
 
 His hands go to your hips, walk you back until the table edge is behind you. He lifts you onto it without asking — the table is wide, solid, the right height — and steps between your knees. The conference room chair is behind him. The city light is through the blinds. The rest of the floor is empty and dark.
@@ -67,7 +67,7 @@ His hands go to your hips, walk you back until the table edge is behind you. He 
 He works your skirt up methodically — attentive, no wasted motion. When his fingers find the inside of your thigh you make a sound that wasn't a decision. He pauses there for a second, watching your face.
 
 {% if w.hasTrait("AMBITIOUS") %}
-The part of your brain that's been keeping a ledger is still running the numbers. Monday. The open floor plan. The four people who sit between your desks. You stop listening to it.
+Monday. The open floor plan. The four people who sit between your desks.
 {% elif w.hasTrait("ANALYTICAL") %}
 There was a version of tonight where you stayed on the train and went home. You can still see it from here. You stop looking at it.
 {% endif %}
@@ -132,7 +132,7 @@ He reaches back and closes the door without looking at it. The hallway light goe
 {% if w.getSkill("FEMININITY") < 30 %}
 The professional self is right there, with its opinions about what this costs. It doesn't seem like the most important thing in the room.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You knew this was possible since the bar. You came to work today knowing it was possible.
+His hand on your hip. The hallway light gone. The building dark around you both.
 {% endif %}
 
 You don't say no.
@@ -145,7 +145,7 @@ He finds your breast and his hand is warm and certain, no hesitation, and the so
 The risk calculus is still available if you want it. It's just not load-bearing right now.
 {% endif %}
 
-He takes his time with you in a way that feels like data collection — watching what works, adjusting, watching your face. His breathing changes when you pull at his belt. When he's inside you, he stills for a moment with his forehead pressed to yours, the way he pauses before answering a question he wants to get right.
+He takes his time with you — watching what works, adjusting, watching your face. His breathing changes when you pull at his belt. When he's inside you, he stills for a moment with his forehead pressed to yours, the way he pauses before answering a question he wants to get right.
 
 The conference room chair is still behind him. The floor outside is still empty. The table is solid and the light through the blinds is the same light it was ten minutes ago.
 
@@ -154,7 +154,7 @@ What happens between then and when he finally steps back is fast and close and n
 After, he tucks his shirt in. You straighten your skirt. The folder is still on the table.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The person who ran a standup this morning is still in here somewhere. She'll be back. Right now the room just has the two of you and the sound of the building doing its thing.
+The person who ran a standup this morning is still in here somewhere. Right now the room just has the two of you and the sound of the building doing its thing.
 {% endif %}
 """
 
@@ -201,7 +201,7 @@ You've seen the full trajectory: this room, then the Monday morning, then the we
 He doesn't argue. He watches you cross the room with his hands in his pockets — not hurt, not pushing — just watching.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-Your body has an opinion about this that differs from your professional self. The professional self wins by one vote.
+Your hips are warm. Your throat is tight. You keep walking.
 {% elif w.getSkill("FEMININITY") < 50 %}
 You knew this was possible since the bar. You just decided something about it.
 {% endif %}

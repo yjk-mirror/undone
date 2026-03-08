@@ -15,11 +15,11 @@ You wake up and it takes a second.
 The pillow is different. Or the light is different. Or the weight across your waist is different — warm, heavy, the particular gravity of another person's arm. Jake is behind you, breathing slow, asleep or close to it.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-Your body is a report. Sore in places that are new and specific. Your hips. Something in your inner thighs. The space between your legs feels different than it did yesterday — used, warm, the ghost of sensation. His arm is heavy across your waist and his hand rests against your stomach and the heat of him along your back is a wall of warmth that your body has decided is good before your brain has finished booting up.
+Your body is a report. Sore in places that are new. Your hips. Something in your inner thighs. The space between your legs feels different than it did yesterday — used, warm, the ghost of sensation. His arm is heavy across your waist and his hand rests against your stomach and the heat of him along your back is a wall of warmth and you press back into it without thinking.
 
 You're naked. He's naked. These are facts. The sheets are tangled. The room smells like sleep and him and something else underneath.
 {% elif w.getSkill("FEMININITY") < 50 %}
-Your body remembers before your brain does. Sore, warm, the specific weight of last night still in your limbs. His arm across your waist. His breathing against the back of your neck, slow, still asleep. The sheets smell like both of you.
+Your body remembers before your brain does. Sore, warm, the weight of last night still in your limbs. His arm across your waist. His breathing against the back of your neck, slow, still asleep. The sheets smell like both of you.
 
 You're aware of the places that are tender without cataloging them. You know what happened. Your body knows it better.
 {% else %}
@@ -44,7 +44,7 @@ Your body is soft and sore and warm. The places where he was — his mouth, his 
 *Oh.* Just — oh.
 {% endif %}
 
-The room smells like sleep and coffee that someone made yesterday and didn't finish. His apartment. The ceiling has a crack in it. The crack is shaped like a question mark, which you decide is significant.
+The room smells like sleep and coffee that someone made yesterday and didn't finish. His apartment. The ceiling has a crack in it. The crack is shaped like a question mark.
 """
 
 [[thoughts]]
@@ -73,7 +73,7 @@ He doesn't move to get up. Neither do you. The silence has a different texture t
 Eventually he says "coffee" like it's a philosophical statement, and gets up, and you watch him cross the room and you're watching him and he knows you're watching and neither of you says anything about it.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-He wakes up. You know the exact moment — the breathing shifts, the arm adjusts, a small sound behind your ear. You've been awake for twenty minutes already, cataloging. The ceiling crack. The weight of his arm. The specific soreness in your hip flexor.
+He wakes up. You know the exact moment — the breathing shifts, the arm adjusts, a small sound behind your ear. You've been awake for twenty minutes already, cataloging. The ceiling crack. The weight of his arm. The soreness in your hip flexor.
 
 "Hey," he says.
 
@@ -107,7 +107,7 @@ The morning finds its shape. You drink coffee in his bed and the conversation do
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-His shirt on the chair. Your clothes on the floor — you can see your bra draped over his desk chair. The sight of it there, in his room, is a small specific fact that lands somewhere in your chest.
+His shirt on the chair. Your clothes on the floor — you can see your bra draped over his desk chair. The sight of it there, in his room, is a fact that tightens your throat.
 
 He comes back with coffee and sits close and your bare shoulder touches his arm and the contact is different now. Everything is different now. Not bad different. Just — the same things, after.
 {% endif %}
@@ -156,7 +156,7 @@ You dress. You look at him one more time — asleep, the sheet at his waist, one
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The street is cold and bright and your body is a museum of last night — sore, warm, the specific memory of his hands in places that still feel touched. You walk. The city doesn't know. Nobody on this sidewalk knows what happened in that apartment. You're just a woman walking home on a Saturday morning.
+The street is cold and bright and your body is a museum of last night — sore, warm, the memory of his hands in places that still feel touched. You walk. The city doesn't know. Nobody on this sidewalk knows what happened in that apartment. You're just a woman walking home on a Saturday morning.
 
 The thought lands and keeps going.
 {% elif w.getSkill("FEMININITY") < 50 %}
@@ -240,7 +240,7 @@ The conversation doesn't need to go anywhere. You lie there and the morning fill
 {% if w.getSkill("FEMININITY") < 30 %}
 His chest against yours. The weight difference. His heartbeat under your ear, slow and steady, and yours faster, and you're aware of both.
 
-Last night happened and this morning is happening and the two are connected by the body you're in and the man you're next to and neither of those things is going away.
+His heartbeat under your ear. Yours faster. Both present.
 {% endif %}
 """
 

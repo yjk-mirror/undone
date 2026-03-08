@@ -71,7 +71,7 @@ You go to the kitchen because the kitchen is the information room. People in kit
 
 A man refilling his cup asks if you came with anyone. You say you know the host through work. He knows her from college. The map of the room fills in as you talk: whose apartment this is, who's on whose side of the breakup that happened last month, which guy by the window is going to make a scene later.
 
-By the end of the conversation you know more about these strangers than they know about each other. It's a skill. It still works.
+By the end of the conversation you know more about these strangers than they know about each other.
 
 {% else %}
 You get a drink and find a spot near the window where the noise drops to almost manageable. A man standing nearby has been there a while — you can tell from the condensation rings his cup has made on the windowsill.
@@ -136,7 +136,7 @@ A man near the edge works his way toward the center, which is toward you. He has
 {% if w.getSkill("FEMININITY") < 25 %}
 Hips that you haven't fully mapped yet, shoulders that carry differently than you expect. You catch yourself mid-movement and there's nothing wrong with the movement. You keep going.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You're dancing. That's a sentence you couldn't have easily said at week one. The metric keeps moving.
+You're dancing. The bass is in your ribs and your hips are doing something and nobody is looking twice.
 {% endif %}
 """
 

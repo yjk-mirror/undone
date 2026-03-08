@@ -60,7 +60,7 @@ The timer dings. Your clothes are done. You fold them at the table — methodica
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The awareness is the thing. Not interest — just the body's constant monitoring of another body in a shared space. The distance between your chair and his. His hands folding laundry. The size of his hands relative to the shirt.
+The distance between your chair and his. His hands folding laundry. The size of his hands relative to the shirt.
 
 You pack your bag. He says "have a good night" without looking up. You say "you too" and the exchange is exactly right and the walk home is two blocks with the laundry bag warm against your hip.
 {% elif w.getSkill("FEMININITY") < 50 %}
@@ -117,7 +117,7 @@ The dryer dings. You fold your clothes. He folds his. The conversation continues
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-Talking to a stranger in a laundromat at 10 PM. It's ordinary. People do this. But the awareness doesn't leave — his height, the way he leans against the machine with his arms crossed, the sound of his voice in the small space. All of it registers at a frequency that's still new.
+Talking to a stranger in a laundromat at 10 PM. It's ordinary. People do this. But the awareness doesn't leave — his height, the way he leans against the machine with his arms crossed, the sound of his voice in the small space. The small space holds all of it.
 {% endif %}
 
 "Good night," he says outside. "Good night," you say. He goes left. You go right. The laundry bag is warm against your hip. The cold is cold. The evening was something.
@@ -180,7 +180,7 @@ His dryer dings. He gets up to unload it. The six inches become three feet. You 
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 50 %}
-The fluorescent light is unforgiving and you're sitting close to a stranger and your laundry is between you and none of this is anything and also the warmth off his arm is a fact your body has opinions about.
+The fluorescent light is unforgiving and you're sitting close to a stranger and your laundry is between you and the warmth off his arm is real.
 {% endif %}
 
 Outside, the cold is immediate. "See you around," he says. "Maybe," you say. The walk home is short and the laundry bag is warm and the evening sits in your chest like a small, warm fact.

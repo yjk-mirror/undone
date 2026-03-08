@@ -54,17 +54,15 @@ You wash your face. The mirror is just the mirror. What catches you is the light
 {% if w.hasTrait("ANALYTICAL") %}
 The switch is on the right. Your hand went left. You dry your face on the towel and stand there for a moment longer than necessary.
 {% elif w.hasTrait("AMBITIOUS") %}
-Two hours of work left and you're standing in your bathroom thinking about a light switch. The day had been productive. You'd been useful. You'd made things move. None of that is present in this room right now.
+Two hours of work left and you're standing in your bathroom thinking about a light switch.
 
-You grip the edge of the sink for a moment, then turn off the light and go back to the kitchen.
+You grip the edge of the sink. The porcelain is cold. You turn off the light and go back to the kitchen.
 {% else %}
 The kettle starts to rumble in the other room. You go back out to deal with it.
 {% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}
 You make tea — the box of green tea you bought on Sunday because it was the familiar brand and you weren't prepared to make any additional decisions — and sit at the kitchen table with your laptop. Not working. You open a notes file and write: *light switch L→R. bathroom mirror. adaptation lag normal, cached motor patterns. no action required.*
-
-You read it back. Close the note. Open the PR you'd been meaning to review.
 
 You read it back. Close the note. Open the PR you'd been meaning to review. The cursor blinks. The apartment is quiet.
 {% elif w.hasTrait("AMBITIOUS") %}
@@ -129,13 +127,13 @@ The mirror is fogged before you get in, which is fine. The body in the periphera
 {% elif w.getSkill("FEMININITY") < 50 %}
 The mirror fogs. You step in. The water takes you in stages — calves, thighs, hips, the sharp intake at your stomach — and then you're in and the warmth has you and the apartment is very, very quiet.
 
-Your shoulders drop. Something in your chest unclenches that you didn't know was clenched.
+Your shoulders drop. Your jaw loosens. The day lets go.
 {% else %}
 You step in. The water closes over you. Your hair floats. The ceiling has a crack you've memorized. The warmth settles into your muscles and the day releases its grip one joint at a time.
 {% endif %}
 
 {% if w.hasTrait("ROMANTIC") %}
-You lie there for twenty minutes. The water cools slowly. You add more hot. The window above the tub is frosted glass and the streetlight comes through it orange and diffused and the bathroom is warm and the city is outside and you're in here and the moment has a quality to it that you don't try to name.
+You lie there for twenty minutes. The water cools slowly. You add more hot. The window above the tub is frosted glass and the streetlight comes through it orange and diffused and the bathroom is warm and the city is outside and you're in here and you're not thinking about anything and that's the whole thing.
 {% elif w.hasTrait("ANALYTICAL") %}
 You time yourself. Fifteen minutes. The water temperature drops about a degree every three minutes at this volume. You add hot at the ten-minute mark. The efficiency of this as a stress-reduction protocol is unclear, but the data point is: your hands have stopped being fists.
 {% else %}
@@ -190,7 +188,7 @@ You put the phone down. Open the delivery app instead. Thai food. The pad see ew
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The phone is dark on the counter. The contacts are all still there. The voice they'd hear is not the voice they expect. At some point you'll have to solve that. Tonight is not the point where you solve it.
+The phone is dark on the counter. The contacts are all still there.
 {% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}

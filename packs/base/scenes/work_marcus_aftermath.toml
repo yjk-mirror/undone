@@ -46,7 +46,7 @@ The ledger is running. It's been running since you walked in. Points for: nobody
 You close the ledger. The PR review needs another pass. You give it one. By ten o'clock you've cleared seventeen messages and your calendar is blocked through lunch and the mask is holding and the mask is expensive.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-You are performing normalcy to a degree that would be invisible to anyone who isn't you. The typing speed is correct. The Slack responses are the right length. You made the correct amount of eye contact with Dan on the way in and the correct amount of small talk about the weekend.
+The typing speed is correct. The Slack responses are the right length. You made the correct amount of eye contact with Dan on the way in and the correct amount of small talk about the weekend.
 
 At 10:15 Marcus walks past your desk to the kitchen. He doesn't stop. He doesn't look. You don't look. The not-looking is its own communication, and you're both fluent in it.
 
@@ -126,7 +126,7 @@ He reads it correctly. "We're fine." Meaning: nobody knows. Meaning: I'm not goi
 The exchange takes twelve seconds. You take your coffee back. The ambiguity is narrower now, which is what you needed. The rest — what happened, what it means, whether it happens again — that can wait.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-"I'm running the variables," you say, which is not what most people say in a kitchen the Monday after sleeping with a coworker. He stares at you for a second.
+"I'm running the variables," you say. He stares at you for a second.
 
 "And?"
 
@@ -153,7 +153,7 @@ You stand there for three seconds too long and then you take your coffee and go.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-In the kitchen, three feet away, he smells the same. The particular combination of soap and the building's coffee and him. Your body responds to the proximity the same way it did Friday and managing that response in a brightly lit kitchen at 10:30 on a Monday is a skill you're developing in real time.
+In the kitchen, three feet away, he smells the same. The particular combination of soap and the building's coffee and him. Your body responds to the proximity the same way it did Friday.
 {% endif %}
 """
 
@@ -203,13 +203,11 @@ Avoidance is a strategy, not a retreat. You're buying time. Monday is for gettin
 He sends a Slack at 2 PM: the Chen numbers. You respond in three minutes with a question about the projections. Professional. The typed words don't shake.
 
 {% else %}
-You just — avoid. Coffee at the wrong time. Lunch at your desk. The bathroom on the other floor. It's not a plan, exactly. More like your body making decisions your brain hasn't approved.
-
-At 3 PM he walks past your desk and you're looking at your screen and his shadow moves across the far edge of your monitor and your hands stop typing for one second and then they start again.
+You just — avoid. Coffee at the wrong time. Lunch at your desk. The bathroom on the other floor. At 3 PM he walks past your desk and you're looking at your screen and his shadow moves across the far edge of your monitor and your hands stop typing for one second and then they start again.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The body doesn't cooperate with avoidance. It remembers. Every time you pass the conference room. Every time his voice carries from across the floor. The professional distance you're maintaining is a wall built over something that isn't professional at all.
+Every time you pass the conference room. Every time his voice carries from across the floor.
 
 You get through Monday. That's the achievement. You got through Monday.
 {% endif %}

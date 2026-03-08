@@ -91,13 +91,13 @@ The shower takes thirty seconds to warm up. You stand just outside the spray and
 {% if w.getSkill("FEMININITY") < 25 %}
 The water hits your shoulders and runs down your back and your skin is — alive. That's the only word for it. Every drop registers. The heat opens something in your chest and your breath comes out in a sound you weren't planning on. Your hands move through your hair — longer than you expect, every time, heavier when it's wet — and the shampoo smells like the one you picked last week and the water is hot and for a minute you are just a body in hot water and nothing else is required of you.
 
-Your hands. On your own skin. Soap and water and the particular geography of a body you're mapping one shower at a time. Ribs. Hip. The curve of your waist that your hand follows without thinking about it.
+Your hands. On your own skin. Soap and water. Ribs. Hip. The curve of your waist that your hand follows without thinking about it.
 
-*Oh.* Just the water. Just the warmth. Just the quiet of being alone with yourself.
+*Oh.* The water. The warmth. Nobody asking anything.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The water is hot and you turn it hotter. The shampoo — the good one, the Saturday one — lathers in hair that's getting long enough to need a decision. You wash your hair and the process takes five minutes and you don't mind. The conditioner needs two minutes. You stand there and let the water hit your shoulders while you wait.
 
-Your hand moves along your side — soap, ribs, hip. The route is becoming familiar. The body under your hands is becoming yours, in the specific sense of a thing you'd choose again if asked.
+Your hand moves along your side — soap, ribs, hip. The route is becoming familiar. The body under your hands is becoming yours.
 {% else %}
 The shower is long and hot and you don't rush it. The shampoo, the conditioner, the body wash. You know the routine. You know the body. Saturday mornings are for taking your time with both.
 {% endif %}
@@ -137,7 +137,7 @@ The coffee shop on the corner — not the good one on Union, just the close one 
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The city on a Saturday morning treats you differently than the city on a Monday. Slower. Less purpose in the foot traffic. A man holds a door for you and you say thank you and he says "of course" and the exchange is over before your brain catches up to the fact that you were the person the door was held for.
+The city on a Saturday morning treats you differently than the city on a Monday. Slower. Less purpose in the foot traffic. A man holds a door for you. You say thank you. He says "of course." You're already through before you register that you were the person the door was held for.
 {% endif %}
 
 {% if w.hasTrait("OUTGOING") %}

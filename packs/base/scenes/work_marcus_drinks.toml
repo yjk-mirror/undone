@@ -12,9 +12,9 @@ You're in a booth. Two glasses on the table. His is half empty. Yours is close t
 He's leaned back, arm along the top of the booth, watching the room without watching it — the posture of someone who's done this kind of thing before and isn't nervous about it. You're not sure when the conversation stopped being about the Hendricks integration and started being about other things. Somewhere between the first drink and the second.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The second drink hit faster than the first. Not drunk — aware. Everything is slightly clearer at the edges, which is not what you expected alcohol to do, and his forearm is resting on the back of the booth and you've looked at it twice.
+The second drink hit faster than the first. Not drunk — aware. Everything is slightly clearer at the edges, and his forearm is resting on the back of the booth and you've looked at it twice.
 {% elif w.getSkill("FEMININITY") < 50 %}
-Two drinks and the professional armor has developed gaps. You know what the gaps feel like now — the warmth that starts in your chest, the way his voice carries differently when it's just two people in a booth. You came anyway.
+Two drinks and the professional armor has developed gaps. The warmth in your chest. The way his voice carries differently when it's just two people in a booth. You came anyway.
 {% endif %}
 
 His glass comes up. He looks at you over the rim.
@@ -37,7 +37,7 @@ prose  = """
 He flags the server without checking if you're sure. Like it was already decided and you just needed to say it out loud.
 
 {% if w.hasTrait("AMBITIOUS") %}
-You hear it — the part of your brain that's been keeping a ledger all evening. Monday. The open floor plan. The three people who sit between your desks. You're running the numbers even now and the numbers don't come out clean. You order anyway.
+You hear it — the part of your brain that's been keeping a ledger all evening. Monday. The open floor plan. The three people who sit between your desks. You order anyway.
 {% elif w.hasTrait("ANALYTICAL") %}
 You've been tracking his signals all evening: the leaning back (comfortable), the eye contact that goes a beat past professional (present), the way he asked the last question — not *so what are you working on* but *what's the thing you actually care about right now*. You have a read on where this is going. You order another drink because the read interests you.
 {% elif w.hasTrait("CONFIDENT") %}
@@ -130,7 +130,7 @@ id     = "tell_him_something_real"
 label  = "Tell him something true"
 detail = "Not about work. Something that wouldn't come out sober."
 prose  = """
-You don't plan it. The conversation is already somewhere else and then you're just — saying it. Not a confession. Just a thing that's true.
+You don't plan it. The conversation is already somewhere else and then you're just — saying it.
 
 {% if w.hasTrait("AMBITIOUS") %}
 You tell him about the job before this one. The one you left. The thing you built there that you don't get credit for in your current resume because the company folded and the work disappeared with it. You've never said this to a colleague before. The professional calculus would call this a liability. Two drinks in and you say it anyway.
@@ -189,7 +189,7 @@ You don't take it back. You've put signals out before — social signals, profes
 
 He doesn't move his hand.
 {% elif w.hasTrait("ANALYTICAL") %}
-You catalogued this possibility hours ago. The trajectory from the break room to this booth, the probability distribution of what happens next. You saw it all. You did it anyway and now his hand is warm under yours and the analysis stops being useful. He looks at you and the look has no professional component left in it.
+You catalogued this possibility hours ago. The trajectory from the break room to this booth, the probability distribution of what happens next. You saw it all. You did it anyway and now his hand is warm under yours. He looks at you and the look has no professional component left in it.
 {% elif w.hasTrait("CONFIDENT") %}
 He looks at your hand on his. Then at you. He reads it right — you weren't unsure, you weren't testing, you know what you're doing. He turns his hand over and closes it around yours.
 

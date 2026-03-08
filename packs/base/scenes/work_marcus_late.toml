@@ -48,14 +48,14 @@ Marcus. Jacket still on. Coffee from the hall machine. He was about to leave and
 {% if w.getSkill("FEMININITY") < 30 %}
 His voice carries differently with no one else on the floor. You catch yourself noticing it and get back to the monitor.
 {% elif w.getSkill("FEMININITY") < 50 %}
-During the day this floor has eleven people and their noise and their ambient presence. Right now it has two. Your professional self is aware this is not a problem. Something under that is just aware.
+During the day this floor has eleven people and their noise and their ambient presence. Right now it has two. Two.
 {% endif %}
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*His voice is different here. Or you're just — closer.*"
+prose = "*His voice. Or just — closer.*"
 
 # ── Actions ────────────────────────────────────────────────────────────────────
 
@@ -83,7 +83,7 @@ Twenty minutes pass. Maybe thirty. The tests finish running. Green. You sit back
 He's still typing. You can see the reflection of his screen in the window — not the content, just the light.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-You've worked late alone plenty of times in the last few months. Right now you're aware of exactly where he's sitting and you weren't tracking that kind of information before this body.
+You've worked late alone plenty of times in the last few months. Right now you're aware of exactly where he's sitting and the awareness sits in your shoulders.
 {% endif %}
 
 You pack up without making it a production. He looks up. "Night," he says. Back to his screen.
@@ -143,7 +143,7 @@ It's a real question. You think about it for three seconds. "Yes. Different lock
 
 He nods. "Okay."
 
-That's it. No follow-up. He just wanted to know if the fix was solid, and now he knows. You're aware that he asked because it mattered to him, professionally, as a thing he might have to depend on. That's not personal. And then his elbow shifts against the wall and something in your sternum does a thing you didn't authorize.
+That's it. No follow-up. He just wanted to know if the fix was solid, and now he knows. You're aware that he asked because it mattered to him, professionally, as a thing he might have to depend on. That's not personal. And then his elbow shifts against the wall and your sternum does something.
 
 {% else %}
 You tell him what you've been fixing. He asks a question that goes somewhere the question didn't have to go — into the actual architecture, the tradeoff you chose, what you'd have done with more time. The conversation turns technical before either of you decided to let it.

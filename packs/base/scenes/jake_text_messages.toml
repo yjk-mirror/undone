@@ -14,7 +14,7 @@ prose = """
 Your apartment. Evening. The phone buzzes on the nightstand and the screen says his name.
 
 {% if w.hasTrait("ROMANTIC") %}
-You pick it up. The glow in the dark room. His name. Something warm settles behind your ribs before you've read the message.
+You pick it up. The glow in the dark room. His name. You're already smiling before you've read the message.
 {% elif w.hasTrait("ANALYTICAL") %}
 You pick it up. The notification preview shows the first few words and your brain is already running the response before you've opened it.
 {% elif w.hasTrait("SHY") %}
@@ -25,9 +25,7 @@ You pick it up.
 
 **Jake:** *Hey. How was your day?*
 
-Three words and a question mark. The simplest possible text. He's not performing via text either.
-
-{% if w.getSkill("FEMININITY") < 30 %}
+Three words and a question mark. The simplest possible text. {% if w.getSkill("FEMININITY") < 30 %}
 You type a response. Delete it. Type another one. The phone is small in your hands and the keyboard is the same keyboard and the words should be the same words but they're not, exactly. What you'd say as you is filtered through something now. How you want to sound. How you want him to hear you.
 {% elif w.getSkill("FEMININITY") < 50 %}
 You type back. The response comes easy — easier than it would have a month ago. The words have a shape to them that feels like you. Specifically you.
@@ -102,7 +100,7 @@ You send it before you can edit it. The three dots appear.
 
 **Jake:** *Tell me one.*
 
-You do. Not the big one — a small one. The way he handed you the coffee at the market, both hands, the lid already on. The specificity of remembering that. He responds with his own — something you said at dinner that he's been thinking about. The exchange is quiet and honest and you fall asleep with the phone on the pillow and his last message on the screen.
+You do. Not the big one — a small one. The way he handed you the coffee at the market, both hands, the lid already on. The fact of remembering that. He responds with his own — something you said at dinner that he's been thinking about. The exchange is quiet and honest and you fall asleep with the phone on the pillow and his last message on the screen.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
@@ -171,7 +169,7 @@ You laugh in the dark room. The conversation stays here — easy, playful, the k
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-Light is easier. The phone doesn't need to know about the processing happening under the surface — the way your chest warms when his name appears, the speed with which you respond, the fact that you're smiling at a screen in a dark room.
+Light is easier. You're smiling at a screen in a dark room. The speed with which you respond. His name on the notification.
 {% endif %}
 """
 
@@ -200,7 +198,7 @@ The cursor blinks. You know what you want to say — something simple, something
 
 You put the phone face-down on the nightstand. The glow dies. The room is dark again.
 
-It's not that you don't want to talk to him. It's that talking to him requires being a version of yourself and right now you're lying in the dark being all the versions at once and that's too many for a text conversation.
+Tomorrow.
 
 {% elif w.hasTrait("ANALYTICAL") %}
 The response tree is branching in too many directions. "Good" is insufficient. "I miss you" is too much for a Tuesday. "Hey" mirrors his opener without advancing the conversation. You run six permutations and reject all of them.

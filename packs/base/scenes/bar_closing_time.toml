@@ -47,7 +47,7 @@ You set a pace. Not fast. Not slow.
 His footsteps are there behind you — the rhythm of them, the weight, the way they hit the pavement differently than yours. You don't adjust. You don't turn around.
 
 {% if w.hasTrait("SHY") %}
-Your shoulders are tight the whole first block. You're listening for whether the gap between his steps and yours is closing. At the corner of Fifth, his footsteps turn north. You keep walking east. Your breath comes out slow. Your stride loosens. The quiet is yours again and that's what you needed, which is the whole thing.
+Your shoulders are tight the whole first block. You're listening for whether the gap between his steps and yours is closing. At the corner of Fifth, his footsteps turn north. You keep walking east. Your breath comes out slow. Your stride loosens. The quiet is yours again.
 {% elif w.hasTrait("CONFIDENT") %}
 You walk. He walks. At the corner of Fifth, he turns north. The sound drops off. You keep going. The night is cold and clear and the street belongs to you, which is fine.
 {% elif w.hasTrait("FLIRTY") %}
@@ -57,7 +57,7 @@ You walk. At the corner of Fifth, he turns north. His footsteps go quiet. You're
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You've walked this two-block stretch a hundred times. Your legs feel shorter on it now. You listen for the gap between his steps and yours without deciding to, tracking the distance like it's something that needs tracking. When he turns off, you stop listening. The pavement is just pavement again.
+You've walked this two-block stretch a hundred times. Your legs feel shorter on it now. You listen for the gap between his steps and yours. Track the distance until he turns off. When he turns off, you stop listening. The pavement is just pavement again.
 {% endif %}
 """
 
@@ -182,7 +182,7 @@ He says it back softly. Doesn't move to leave right away — just stands there a
 {% if w.getSkill("FEMININITY") < 25 %}
 Inside, you stand at the window. The street is empty. His footsteps have been gone for thirty seconds and you can still place where they were. That's new.
 {% elif w.getSkill("FEMININITY") < 50 %}
-Inside, the apartment is quiet. You pour a glass of water. Something from the walk is still with you — not regret, just the shape of it, the texture of two blocks that went somewhere.
+Inside, the apartment is quiet. You pour a glass of water. His voice dropping when he laughed. The stride that was longer than yours. The cold on your face when he turned the corner.
 {% endif %}
 """
 

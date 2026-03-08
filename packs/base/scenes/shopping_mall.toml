@@ -9,7 +9,7 @@ description = "A shopping trip. Not the emergency kind — the kind where you're
 
 [intro]
 prose = """
-The mall on Chambers is the kind of place that smells like cinnamon pretzels and new shoes and the particular exhaustion of people who've been here since it opened. Two floors, a food court, an anchor store that's hanging on. You're here because you need — want — something. Not the emergency shopping you did that first week, grabbing whatever fit without looking at yourself too long. This is different.
+The mall on Chambers is the kind of place that smells like cinnamon pretzels and new shoes and the low-grade exhaustion of people who've been here since it opened. Two floors, a food court, an anchor store that's hanging on. You're here because you need — want — something. Not the emergency shopping you did that first week, grabbing whatever fit without looking at yourself too long. This is different.
 
 {% if w.hasTrait("POSH") %}
 You bypass the anchor store entirely and head for the row of smaller shops along the east corridor. Names you recognize. Price points you don't look at. You already know what you're looking for — the question is whether they have it in your size, which is a question you've recently learned to ask without hesitating.
@@ -47,9 +47,7 @@ There's a dress on the rack that caught your eye. Not flashy — dark green, sim
 The fitting room is a box with a mirror and a hook and a curtain that doesn't quite close. You undress. The fluorescent light is unforgiving, which is what fluorescent light does.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You pull the dress over your head and it settles onto your body and you look at the mirror and the mirror shows you a woman in a dark green dress. Not "a woman you're looking at" — you, in a dress. The distinction lands in your stomach before your brain processes it.
-
-The fabric sits on your hips. The neckline falls where necklines fall on bodies shaped like this. Your collarbones are visible and they look right, which is a thought you've never had about collarbones before.
+You pull the dress over your head and it settles onto your body and you look at the mirror and the mirror shows you a woman in a dark green dress. Not "a woman you're looking at" — you, in a dress. The fabric sits on your hips. The neckline falls where necklines fall on bodies shaped like this. Your collarbones are visible and they look right, which is a thought you've never had about collarbones before.
 
 You turn. Side view. The dress does something to your waist that jeans don't, and the woman in the mirror turns with you, and she looks — good? She looks good.
 
@@ -63,7 +61,7 @@ You try it on. It fits. You know it fits before you check the mirror — the fab
 {% endif %}
 
 {% if w.hasTrait("BEAUTIFUL") %}
-The dress fits the way clothes fit in magazine editorials — effortlessly, like it was made for you. Your reflection is not a surprise anymore. But it still catches you, the way a compliment you believe catches you — warm, quick, gone before you can hold it.
+The dress fits the way clothes fit in magazine editorials — effortlessly, like it was made for you. Your reflection is not a surprise anymore. But it still catches you — brief, warm, gone before you can hold it.
 {% elif w.hasTrait("PLAIN") %}
 It fits. The woman in the mirror looks fine. Not striking. Not terrible. The dress is doing what it can and the dress is not the problem. You stand there for a second longer than you planned, looking for something the mirror doesn't offer.
 {% endif %}
@@ -103,7 +101,7 @@ The fitting room. Try. Mirror. Yes or no. Next. You develop a rhythm. Two pairs 
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The jeans fit differently than men's jeans. You knew this — you've been wearing them for weeks — but the fitting room makes it explicit. The rise is different. The way they sit on your hips is different. Your reflection is a woman in jeans and a white shirt and she looks practical and put-together and she's you.
+The jeans fit differently. The rise. The way they sit on your hips is different. Your reflection is a woman in jeans and a white shirt and she looks practical and put-together and she's you.
 {% endif %}
 
 You pay. The bag is heavier than you expected. You head out.
@@ -153,7 +151,7 @@ The fitting room. Her voice through the curtain: "How's the length?" You tell he
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The vulnerability of this — standing in a fitting room while a stranger decides what looks good on a body you're still figuring out — is more than you expected. She's professional. She's helping. But every "try this with a belt" is a reminder that this is a skill set you're starting from scratch.
+She's professional. She's helping. Every "try this with a belt" lands somewhere between guidance and exposure. You stand in the fitting room and let her be right about you.
 {% endif %}
 
 You leave with a bag and the saleswoman's card and the particular feeling of having been helped by someone good at their job.

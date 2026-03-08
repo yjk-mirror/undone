@@ -14,7 +14,7 @@ He's sitting on the edge of the bed, looking at you. The way he's looking at you
 {% if w.getSkill("FEMININITY") < 25 %}
 You are at the far edge of what you understand about your own body. The part you don't know is the part where this body is involved — what arousal does from the inside now, what his hands will find when they get there. You've run the theory. The theory is going out the window.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You've thought about this. The wanting has been there for a while. Getting from the wanting to the here is a thing you've managed, and now the here is actual and your body is doing something low and warm that doesn't need your permission.
+You've thought about this. The wanting has been there for a while. Getting from the wanting to the here is a thing you've managed, and now the here is actual and something low and warm has settled in your hips.
 {% else %}
 You know what you want. You know what this body does when it gets close to what it wants. What you don't know is him, yet — his hands, his particular attention — and that's what the evening is about.
 {% endif %}
@@ -65,7 +65,7 @@ He moves you toward the bed without any of it feeling like being moved — just 
 {% if w.getSkill("FEMININITY") < 25 %}
 His mouth goes to your neck. Your brain whites out.
 
-Not fear — it's a complete silence, a drop in everything, replaced by something warm and rising. You make a sound. You've never made that sound before. The pitch of it surprises you. He stills for a moment, hearing it, and then does it again.
+A complete silence. A drop in everything. Then warmth, rising. You make a sound. You've never made that sound before. The pitch of it surprises you. He stills for a moment, hearing it, and then does it again.
 
 The arousal isn't what you knew. It doesn't arrive and peak — it builds. Every touch adds to it, layers onto it. His hands on your breasts and the warmth is different there than anywhere else, a focused heat that gathers. His fingers below and you arch up without meaning to, and the motion your hips make isn't anything you chose.
 
@@ -73,11 +73,11 @@ He watches you. He's watching what he's doing to you, paying attention in a way 
 
 When he finally pushes inside you, you gasp. The fullness is something you have no prior reference for. It's not what you expected. It's more than you expected. He goes slow, watching your face, and you close your eyes because keeping them open is too much.
 
-He moves. You move with him. The pleasure geography of this body is completely different from anything you knew, and you're learning it in real time, his hands finding places that send the signal somewhere new, and the rising wave just keeps rising until it crests and breaks and you make another sound you've never made.
+He moves. You move with him. His hands finding places that send the signal somewhere new, and the rising wave just keeps rising until it crests and breaks and you make another sound you've never made.
 
 He holds you through it. His chest warm against your back. The room is very quiet.
 {% elif w.getSkill("FEMININITY") < 50 %}
-The wanting got you here but the wanting had a theory about what here would feel like, and the theory and the reality are two different things. His hands on your hips, the weight of him over you, and what your body does under that weight — it responds faster than you expected. More directly. A touch in the right place and there's no committee meeting about it, the response is just there.
+His hands on your hips, the weight of him over you, and what your body does under that weight — it responds faster than you expected. More directly. A touch in the right place and there's no committee meeting about it, the response is just there.
 
 He finds a place low on your belly that makes your breath catch. Then he finds another one. He's paying attention. When he moves his fingers and you gasp, he keeps doing exactly that, and the fact that he keeps doing it means he heard you.
 
@@ -258,9 +258,7 @@ When you come back, his cheek is against your hair. The lamp is still on.
 {% else %}
 The clothes go. The bed meets you both. His hands know where to go and so do yours and the evening becomes the evening, which is what it was always going to become.
 
-He pays attention in the particular way that's his — the pause when something lands, the return to it, the quiet focus of a man who's actually here and not somewhere else. That's what you came for. Not the mechanics. That.
-
-You give him back the same attention.
+He pays attention in the particular way that's his — the pause when something lands, the return to it, the quiet focus of a man who's actually here and not somewhere else. You give him back the same attention.
 
 When it's over you lie with your leg thrown over his and the room is dim and warm.
 {% endif %}
