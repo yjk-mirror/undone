@@ -21,41 +21,38 @@
 
 ## ⚡ Next Action
 
-**Register calibrated. Robin opening scenes rewritten (2026-03-08).**
-Writing register calibrated through 7 iterative attempts with user feedback. DM narrator
-style — on the player's shoulder, describing the world, handing control to the player.
-All 7 writing docs updated to enforce the register deterministically. Calibration design doc
-at `docs/plans/2026-03-08-writing-register-calibration.md`. Session prompt at
-`docs/prompts/2026-03-08-robin-opening-writing-session.md`.
+**UI fixes + 10 scenes calibrated to DM narrator register (2026-03-08).**
 
-**4 scenes rewritten to calibrated register:**
-- `transformation_intro.toml` — plane scene, fresh rewrite. Before-body accessors guarded.
-- `workplace_arrival.toml` — 2-round choices (ID checkpoint + transport). Deep trait branching.
-- `workplace_first_day.toml` — 2-round choices (Dan response + lunch). 5 actions, rich branching.
-- `neighborhood_bar.toml` — 3-round flow (order → nurse/NPC → accept/decline). Matches Sample 0.
+### Critical UI fixes landed:
+- **Scheduler bypass fixed**: `pick_next()` now runs before `opening_scene` fallback — arc triggers fire correctly (workplace_arrival instead of rain_shelter)
+- **Scene transitions**: story signal cleared between scenes — no more monolithic scroll
+- **Choice echo**: thematic break separator + bold label between intro and action prose
+- **Markdown renderer**: ThematicBreak (---) and BlockQuote support added
+- **Detail strip**: hovered_detail resets when actions change (no stale text from previous scene)
+- **Button layout**: flex_shrink(0.0) on choices_bar/detail_strip — can't be squeezed off-screen
 
-All 33 scenes pass validate-pack. All Jinja templates valid.
+### 10 scenes calibrated (of 33 total):
+- `transformation_intro.toml` — plane scene (earlier session)
+- `workplace_arrival.toml` — airport ID checkpoint (earlier session)
+- `workplace_first_day.toml` — Dan + lunch (earlier session)
+- `neighborhood_bar.toml` — 3-round bar scene (earlier session)
+- `rain_shelter.toml` — rewritten this session
+- `workplace_landlord.toml` — rewritten this session: removed "you know exactly" + "you used to" patterns
+- `workplace_first_night.toml` — targeted fixes: FEMININITY guards, fragment thoughts
+- `workplace_first_clothes.toml` — removed "you know exactly what he's doing" NPC pattern
+- `workplace_work_meeting.toml` — removed OBJECTIFYING "you used to" moralizing
+- `workplace_evening.toml` — replaced !w.alwaysFemale() guards, trimmed narrator analysis
 
-**User should play through the opening sequence and recalibrate if needed.**
+### New tooling:
+- `.claude/agents/playtester.md` — unbiased player agent with screenshot + game-input MCP tools
+- `docs/player-experience-map.md` — screen-by-screen player flow reference
 
-Trust these docs first:
-
-- `docs/engine-contract.md`
-- `docs/audits/2026-03-07-engine-readiness-matrix.md`
-- `docs/plans/2026-03-07-ironclad-engine-hardening.md`
-- `docs/prompts/2026-03-07-ironclad-engine-next-session-prompt.md`
-- `docs/audits/2026-03-07-writing-agent-tooling-audit.md`
-- `docs/research/2026-03-07-writing-context-lorebooks-and-caching.md`
-- `docs/prompts/2026-03-07-engineering-fresh-session-prompt.md`
-
-Immediate priorities:
-
-1. **Reconcile current code vs docs before coding** — do not trust stale assumptions; confirm what still needs engineering work.
-2. **Hardcoded content-ID audit** — continue reducing runtime assumptions baked into engine/UI code paths.
-3. **Writer-facing contract cleanup** — at least one documented mismatch exists in writing-agent docs around `m` / `f` prose-template assumptions; fix when doing the writing-agent/tooling pass.
-4. **Remaining engine backlog selection** — if no correctness blocker remains, choose the highest-value non-content engineering task that reduces false assumptions for future writers/tool builders.
-
-Do not restart content writing until the documented writing-agent/tooling contract gaps are reviewed and the remaining risks are explicitly accepted.
+### Remaining priorities:
+1. **23 scenes still uncalibrated** — free_time (6), work slot (7), campus arc (7), others (3)
+2. **FemCreation "Who Are You Now" is too brief** — needs 4-5 interactive discovery beats (creative direction required)
+3. **Zero adult content** — game can't prove its premise without explicit scenes
+4. **Traits display overflow** — floem labels don't wrap; needs rich_text approach
+5. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action (fake choice)
 
 ### Remaining open items (post-Sprint 3)
 - **Writing-agent/tooling cleanup** — ✅ MOSTLY RESOLVED. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation added. Remaining: repo-neutral dispatch doc (Priority 3 in audit), retry/backoff in deepseek-helper (Priority 4). See annotated `docs/audits/2026-03-07-writing-agent-tooling-audit.md`.
