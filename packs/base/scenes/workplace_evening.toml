@@ -28,7 +28,7 @@ You stand in the kitchen for a moment without particular purpose. Not hungry yet
 
 [[actions]]
 id     = "moment"
-label  = "Continue"
+label  = "Wash your face"
 detail = "Something small. Not the meeting. Something smaller."
 prose = """
 You go to the bathroom to wash your face.
@@ -104,6 +104,114 @@ You get up and figure out dinner.
   [[actions.effects]]
   type   = "change_stress"
   amount = -3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "bath"
+label  = "Run a bath"
+detail = "The tub is deep. The apartment is quiet."
+prose  = """
+The bathroom is small and the tub is deep — the old cast-iron kind that takes ten minutes to fill and holds heat like it was built for a different century's pace. You turn the tap. The water pressure is decent. The pipes groan once and settle.
+
+You undress while it fills.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The mirror is fogged before you get in, which is fine. The body in the peripheral vision is one you're still learning the edges of — hip width, how your arm hangs, the weight distribution when you step over the lip of the tub. Your foot finds the bottom. The water rises over your shins and the warmth is immediate and complete and your breath goes out in a way you didn't expect.
+
+*Oh.* Just that. The water and the warmth and the small sound you made.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The mirror fogs. You step in. The water takes you in stages — calves, thighs, hips, the sharp intake at your stomach — and then you're in and the warmth has you and the apartment is very, very quiet.
+
+Your shoulders drop. Something in your chest unclenches that you didn't know was clenched.
+{% else %}
+You step in. The water closes over you. Your hair floats. The ceiling has a crack you've memorized. The warmth settles into your muscles and the day releases its grip one joint at a time.
+{% endif %}
+
+{% if w.hasTrait("ROMANTIC") %}
+You lie there for twenty minutes. The water cools slowly. You add more hot. The window above the tub is frosted glass and the streetlight comes through it orange and diffused and the bathroom is warm and the city is outside and you're in here and the moment has a quality to it that you don't try to name.
+{% elif w.hasTrait("ANALYTICAL") %}
+You time yourself. Fifteen minutes. The water temperature drops about a degree every three minutes at this volume. You add hot at the ten-minute mark. The efficiency of this as a stress-reduction protocol is unclear, but the data point is: your hands have stopped being fists.
+{% else %}
+Twenty minutes. Maybe more. The water cools and you add more hot and the pipes groan and the building settles and at some point you realize you haven't thought about the meeting or the week or the light switch for a while.
+{% endif %}
+
+You get out when the water is lukewarm. Towel. The fogged mirror clears in streaks. You go to the kitchen and order from the Thai place.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "settled"
+
+  [[actions.effects]]
+  type  = "advance_time"
+  slots = 28
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "call"
+label  = "Pick up the phone"
+detail = "There's someone from before. The question is what you'd say."
+prose  = """
+Your phone is on the kitchen counter. You pick it up. Scroll past the work notifications — Carter's email, a Slack thread you'll deal with tomorrow — and open contacts.
+
+{% if w.hasTrait("SHY") %}
+The list has names in it that belong to someone else's life. College friends. The guy from the climbing gym. Your sister, who texts every Sunday and whom you've been answering with emojis and excuses for two weeks. You scroll past all of them and put the phone down.
+
+Not tonight. The excuse you'd give — traveling, busy, new job — is true enough. The thing you can't say sits behind the things you can, and the gap is wider than a phone call can bridge.
+{% elif w.hasTrait("CONFIDENT") %}
+You call your sister.
+
+She picks up on the third ring. "Hey, stranger." Not annoyed. Just noting the gap. You tell her about the apartment. The neighborhood. The job. She asks if you're eating. You say yes. She asks if you're okay. You say yes. Both answers are close enough to true.
+
+"Come visit," she says. You say you will. You both know the timeline is vague. The call lasts eight minutes. When you hang up, the apartment is quieter than it was before you picked up the phone.
+{% else %}
+You hover over a name. Then another. The contacts list is a museum of a life you're still technically living — same number, same name in most of them, same relationships on paper. The gap is in the details. The details are everything.
+
+You put the phone down. Open the delivery app instead. Thai food. The pad see ew from the place on 43rd.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The phone is dark on the counter. The contacts are all still there. The voice they'd hear is not the voice they expect. At some point you'll have to solve that. Tonight is not the point where you solve it.
+{% endif %}
+
+{% if w.hasTrait("ANALYTICAL") %}
+You eat at the kitchen table with your laptop open. Not working — reading. The food is good. The apartment is becoming, incrementally, a place where you live rather than a place where you're staying.
+{% else %}
+The food arrives. You eat on the couch with the TV on something you're not watching. The apartment settles into its evening noises — radiator, street, the neighbor's music through the wall. It's not comfortable yet. But it's closer than last week.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "settled"
+
+  [[actions.effects]]
+  type  = "advance_time"
+  slots = 28
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
 
   [[actions.effects]]
   type   = "skill_increase"

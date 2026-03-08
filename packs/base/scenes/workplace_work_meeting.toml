@@ -40,8 +40,8 @@ prose = """
 
 [[actions]]
 id     = "present"
-label  = "Present the design."
-detail = "Get through the deck. Answer questions. Absorb what happens when someone explains your own work to you."
+label  = "Present the design"
+detail = "Get through the deck. Handle whatever comes."
 prose  = """
 You get through the first fifteen slides without interruption, which is better than you expected. The architecture is clean and you know it — the kind of clean that comes from having done something similar three times before and finally having enough scar tissue to know what to leave out. Carter writes things down. The platform engineer nods at the interface diagram without objecting. Marcus is quiet.
 
@@ -115,6 +115,139 @@ Carter says "great work" on the way out. Back at your desk, you open Slack. He's
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "let_kevin_talk"
+label  = "Let Kevin finish"
+detail = "He's explaining your diagram. Let him. Watch the room instead."
+prose  = """
+You get through the first fifteen slides clean. The architecture is yours and the room knows it — Carter writes things down, the platform engineer nods at the interface contract, Marcus is quiet in the way that means he's reading, not waiting.
+
+Slide nineteen. Kevin leans forward. "So this is the token exchange," he says, and starts explaining it. Your diagram. Your design. To you.
+
+You let him go.
+
+Not because you don't have the correction ready — you do, the token lifespan is asymmetric and he's treating it as symmetric, and the edge case on slide twenty-two will make that clear — but because the room is more interesting than the interruption right now.
+
+Carter's pen pauses. The platform engineer — Devin — shifts in his chair. Marcus is watching Kevin with an expression you can't read from this angle. And Kevin is explaining, with the confidence of someone who learned the concept yesterday and assumes that's sufficient for the room.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You catalog who notices. Devin catches the lifespan error at second 30 and doesn't say anything. Marcus catches it at second 15 — his jaw tightens once, the smallest possible tell. Carter doesn't catch it at all, which is fine; that's not his job. Kevin finishes. The room is quiet.
+
+"The lifespan is asymmetric," you say, after a beat. "Slide twenty-two has the detail." You advance the deck. The correction lands softly, which is how you intended it. Kevin writes something down.
+{% else %}
+He finishes. The room does the thing rooms do when someone has explained something incorrectly — a small redistribution of attention, everyone deciding simultaneously whether to address it.
+
+"The lifespan is asymmetric," you say. "Next slide." You advance the deck. Kevin nods. The room recalibrates. You move on.
+{% endif %}
+
+The rest of the deck runs clean. Marcus waits until slide thirty-four to ask about operational latency. You have the benchmarks ready.
+
+In the hallway afterward, Marcus stops at the water station. "Good presentation," he says. Not performing it.
+
+"Thanks."
+
+"Kevin was wrong about the token exchange." He says it like he's noting the weather.
+
+"I know."
+
+"You let him finish."
+
+"I did."
+
+He looks at you for a second longer than the exchange requires. Then he goes.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You fill your water bottle. Your reflection in the glass wall is a woman holding a laptop who just ran a forty-five minute design review. Your hands are steady. Something about the hallway exchange sits differently than the meeting itself.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_MEETING_DONE"
+
+  [[actions.effects]]
+  type = "set_npc_role"
+  npc  = "m"
+  role = "ROLE_MARCUS"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "correct_him"
+label     = "Cut him off"
+detail    = "He's wrong. You designed this. Say so."
+condition = "w.hasTrait('CONFIDENT') || w.hasTrait('ANALYTICAL')"
+prose     = """
+You get through the first fifteen slides clean. Carter writes things down. The platform engineer nods. Marcus reads.
+
+Slide nineteen. Kevin leans forward. "So this is the token exchange," he says, and gets four words into explaining your own diagram to you before you interrupt.
+
+"The lifespan is asymmetric." You point at the diagram — your diagram — and walk through it. Not hostile. Just precise. The token refresh window, the edge case, the reason the architecture looks the way it does. You designed it. You don't need to explain that you designed it; the specificity does it for you.
+
+Kevin stops. The room is very quiet.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Section 4.2," you say. "The spec has the detail." You advance the slide. The next one has the edge case Kevin was about to get wrong. You walk through it cleanly and move on.
+
+The room doesn't need to be told what happened. Everyone in it is an engineer. They read the exchange and filed it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You watch the room process it. Devin's expression: neutral, unsurprised. Carter: writing something down that isn't about the content. Marcus: still. Watching you. Kevin: recalibrating.
+
+You move to the next slide. The correction was four sentences. The meeting continues.
+{% endif %}
+
+The rest of the deck runs without interruption. Marcus asks about operational latency at slide thirty-four. You have the benchmarks. The answer lands.
+
+In the hallway: Marcus.
+
+"That was direct," he says.
+
+"He was wrong."
+
+"He was." Marcus fills his water bottle. "Send me the load test data when you get a chance."
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You walk back to your desk. Your pulse is elevated — not from the content, which you know cold, but from the interruption itself. The room heard your voice cut through Kevin's and recalibrated in real time. You're not sure which version of you is processing that.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_MEETING_DONE"
+
+  [[actions.effects]]
+  type = "set_npc_role"
+  npc  = "m"
+  role = "ROLE_MARCUS"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 1
 
   [[actions.next]]
   finish = true
