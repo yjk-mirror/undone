@@ -14,21 +14,32 @@ the writing. The writing exists to make the world feel real.
 
 ## Voice and Register
 
-The narrator is second-person, present tense, slightly detached — dry, observational,
-with occasional dark humour. It is **not**:
+**The narrator is a dungeon master.** Second-person, present tense, sitting on the player's
+shoulder. It points things out, describes what's happening, and then asks "what do you do?"
+It has personality — dry, occasionally wry — but it serves the player's experience. It never
+performs, never shows off, never tries to be literature.
 
+**Reference voice: the BG3 narrator.** Amelia Tyler described it as "chin on the player's
+shoulder, whispering 'look at that,' tilting their chin but never manipulating them." That's
+the register. Present. Specific. Grounded. A guide, not an author.
+
+The narrator is **not**:
+
+- A novelist crafting prose (no artful sentences, no atmospheric filler)
+- Omniscient (it doesn't know what people are thinking, or the bartender's life story)
+- A therapist analyzing the player's experience ("none of this was conscious")
 - Literary or self-consciously artistic
 - Pornographic in euphemism ("his throbbing need")
 - Clinical or mechanical
-- Chipper and upbeat ("What a fun adventure!")
 
-It sits somewhere between a wry novel and someone telling you exactly what happened to them.
-The narrator notices things. It has opinions but doesn't editorialize directly. Casual-to-
-conversational without being sloppy.
+**This is a game, not a novel.** The player will read thousands of these passages over hours
+of play. The prose needs to be readable, engaging, and fast. The engagement comes from the
+situations and choices — from what's happening and what you get to do about it — not from
+beautiful sentences. Write well, but write to be played, not to be admired.
 
-**Reference voice: the BG3 narrator.** Dry. Present-tense. Second-person. Wry. Matter-of-fact.
-Trusts the scene. Doesn't signal significance before the moment earns it. Plain English. Nothing
-artistic. Nothing performative. Just what happened, with occasional dry observation.
+**Practical test:** Read the prose aloud as if you were a DM narrating to a player at a table.
+If it sounds like you're reading from a novel, rewrite it. If it sounds like you're telling
+someone what's happening right now and then asking what they do, it's right.
 
 ---
 
@@ -422,28 +433,38 @@ a string). The primary origins for current content are:
 | `TransWomanTransformed` | Relief/recognition register. 4th or 5th driving origin. Requires dedicated writing effort. |
 | `CisFemaleTransformed` | Female-start with transformation element. Future. |
 
-**The current pattern for all scenes — CisMale only:**
+**Transformation prose IS the prose. No guards needed.**
 
-```jinja
-{% if not w.alwaysFemale() %}
-    {# Cis-male-start — disorientation and alienation register. This is still new. #}
-{% endif %}
-```
+Since we are only writing CisMale→Woman content, transformation texture is woven directly
+into the prose. Do NOT wrap it in `{% if not w.alwaysFemale() %}` blocks. That pattern
+cluttered the code and broke the flow of the writing. Just write it.
 
-Write transformation content inside `{% if not w.alwaysFemale() %}` blocks. If the moment
-doesn't feel different for a woman who used to be a man, don't add a transformation block.
-AlwaysFemale players will see the default (non-branched) prose, which should read naturally
-for anyone. Do not add `{% else %}` AlwaysFemale-specific branches yet — that is a future
-content pass requiring its own quality bar.
+Use `{% if not w.alwaysFemale() %}` ONLY for content that would be genuinely wrong or
+nonsensical for an AlwaysFemale player (e.g., before-body comparisons using `w.beforeName()`).
+For the vast majority of transformation texture — physical sensations, body awareness, the
+world treating you differently — write it directly. It reads naturally for any player.
 
-#### The Cis-Male-Start Register
+AlwaysFemale-specific content is a future pass requiring its own dedicated quality bar.
+Do not write `{% else %}` branches.
 
-The primary transformation experience. She is adjusting to a body and a social position she
-did not choose. The body does things the mind hasn't caught up to — arousal, sensitivity,
-physical reactions she has no reference for. Male attention lands in the body before the
-brain processes it. The transformation is something that happened *to* her. Writing cue:
-the gap between expectation and experience, involuntary physical response, detached
-intrusive thoughts that arrive sideways.
+#### How transformation works in the calibrated register
+
+Transformation is physical and immediate. The narrator doesn't analyze it, doesn't explain
+it, doesn't name it. It just describes what the player experiences.
+
+**Good:** "The stool takes a small hop to get onto. The bar top comes up higher than you
+expect and your hands look small against the wood."
+
+**Bad:** "You notice you're doing the thing. The shoulders angled forward, the posture that
+reads as *occupied*. You didn't learn this from a manual. The armor went up without you
+deciding to put it on."
+
+The first example is a physical fact the player notices. The second is the narrator
+analyzing the player's body language and explaining where it came from. The narrator
+doesn't know where it came from. The player connects those dots.
+
+**The rule:** If the narrator is explaining the transformation, the scene hasn't shown it
+yet. Find the physical moment. Write that. Delete the explanation.
 
 ---
 
@@ -541,59 +562,62 @@ set at character creation and remain stable unless explicitly changed by a scene
 
 ### Four Transformation Textures
 
+All transformation writing follows one rule: **describe the physical experience. Don't
+explain it.** The narrator reports what happens in the body. The player connects the dots.
+No meta-commentary, no "none of this was conscious," no analyzing what the body is doing.
+
+Write these directly in prose — no `{% if not w.alwaysFemale() %}` guards needed.
+
 **1. The body acts first**
 
-The body has reactions the mind hasn't authorized. Arousal she didn't invite. Getting wet
-from proximity to a man and not understanding why yet. A flush that arrives before the
-thought. Reaching for something and the reach is different — shorter, weaker, angled wrong.
-Muscle memory misfiring. The body is doing its thing and she's a half-beat behind it.
+Physical reactions the player didn't choose. Write the sensation, not the analysis.
 
-Write the sensation. Don't explain it. Don't moralize about it. The reader understands.
+Good: "His hand closes over yours on the railing. Your stomach drops."
+Good: "Something loosens between your hips when his hand lets go. Faint, warm."
+Bad: "Your body responding to the proximity of a man who leaned in close and smells like
+something your brain is filing under *want* before your brain gets to review the filing."
 
-```jinja
-{% if not w.alwaysFemale() %}
-His hand closes over yours on the railing. Your stomach does something you don't have
-a word for yet.
-{% endif %}
-```
+The bad example is the narrator analyzing the body's reaction in real time. The good
+examples just report what happened. The reader does the analysis.
 
-**2. Intrusive thoughts (detached, not narrated)**
+**2. Scale and space**
 
-A thought arrives sideways, uninvited. Not a moral observation about gender. Not
-"you used to be a man and now you notice X." A genuinely detached fragment — the kind
-of thing that pops into your head and is gone before you can frame it.
+The world is physically different when you're smaller. Write the fact, not the commentary.
 
-```jinja
-{% if not w.alwaysFemale() %}
-The coffee cup looks enormous in your hands. It didn't used to.
-{% endif %}
-```
+Good: "The stool takes a small hop to get onto. The bar top comes up higher than you expect."
+Good: "The coffee cup looks enormous in your hands."
+Bad: "You're learning the positioning math — where to sit, how to sit, the specific body
+language that reads as 'occupied' vs 'available.'"
 
-The thought doesn't editorialize. It doesn't connect dots for the reader. It just *is*.
-The reader connects the dots themselves — and that's what makes it land.
+The bad example is the narrator explaining a social system. The good examples are just
+physical facts the player notices.
 
-**3. Scale and space**
+**3. Desire arriving uninvited**
 
-Everything is physically different. Doorknobs are higher. A crowd presses differently.
-Being in an elevator with a man registers differently in the body — not as a moral
-observation, but as a fact of mass. The seatbelt crosses your chest differently. Shelves
-are too high. Your own footsteps sound different on tile.
+Attraction to men is new. Write the desire concretely — what specifically, what it does
+to the body — before any reaction to the desire.
 
-This is not "social reversal" — not about who holds doors and who interrupts. It's about
-the raw physical experience of being smaller, lighter, shaped differently, in a world built
-for someone bigger. Show the physical fact; skip the gender commentary.
+Good: "He smells like beer and something warmer underneath. Cologne, maybe, or just the
+way men smell up close. You're close enough to notice this, which means he's closer than
+you realized."
+Bad: "You have an opinion about the particular frequency of his voice and how it sits in
+your body and the opinion is *more of that, please*."
 
-**4. Desire arriving uninvited**
+The bad example is the narrator putting a fully articulated desire-thought in the player's
+head. The good example describes proximity and smell — the player supplies the desire.
 
-Male-start PCs were heterosexual before transformation. Attraction to men is genuinely new.
-At low FEMININITY this is destabilizing — the body responding to a man's voice, his hands,
-his proximity, and the brain scrambling to catch up. At high FEMININITY it's simply desire,
-unqualified. Calibrate by FEMININITY level.
+**4. Intrusive fragments**
 
-The desire must be concrete and physical, not abstract. Not "she felt attracted to him" —
-*what* specifically. His forearms. The way his shirt pulls across his back. A low voice
-that does something to the base of her spine. Write the desire before any reaction to the
-desire. The body first, the confusion after.
+A thought that pops up and goes. Half-formed, not a thesis.
+
+Good: "*Huh.*"
+Good: "The mirror behind the bottles catches you and for a second you look at the woman
+in it before you realize she's looking back."
+Bad: "You never made these calculations before. You never had to. Your body is making them.
+You're just watching it work."
+
+The bad example is a three-sentence essay about body autonomy. The good examples are
+moments that happen and pass.
 
 ---
 
@@ -601,14 +625,15 @@ desire. The body first, the confusion after.
 
 | Don't write | Why |
 |---|---|
-| "You used to do this" / "You know what he's doing" / "You were on the other side" | **The #1 failure mode.** Preachy, moralistic, repetitive. The PC is not a gender studies narrator. Show the physical reaction, not the intellectual commentary. |
-| Narrating the transformation explicitly: "as a former man", "you remember being a man" | The reader knows. The PC knows. Spelling it out kills the subtlety. Let the moment speak. |
-| The same beat in every scene (the male gaze, "you recognize this") | Each scene must find its OWN angle — a different physical sensation, a different intrusive thought, a different moment of the body acting before the mind catches up. No two scenes should use the same device. |
-| Abstract meta-framing: "there's something about being in a body you didn't choose" | Name the specific thing or don't write the line. Abstract frames tell the reader what to feel instead of making them feel it. |
+| "You used to do this" / "You know what he's doing" / "You were on the other side" | **The #1 failure mode.** Preachy, moralistic, repetitive. Show the physical reaction, not intellectual commentary. |
+| "None of this was conscious" / "Your body is making calculations" / "The armor went up without you deciding" | **The #2 failure mode.** The narrator analyzing what the body is doing instead of just describing it. Write the physical fact. Delete the analysis. |
+| "the opinion is *more of that, please*" / "*I'm here and I'm fine*" / any full thought in italics | **The #3 failure mode.** Putting fully articulated thoughts in the player's head. Inner voice should be fragments (*Huh.* / *Okay.* / *Right.*), not sentences. |
+| Narrating the transformation explicitly: "as a former man", "you remember being a man" | The reader knows. The PC knows. Spelling it out kills it. |
+| The same beat in every scene (the male gaze, "you recognize this") | Each scene must find its OWN angle. No two scenes should use the same device. |
+| Abstract meta-framing: "there's something about being in a body you didn't choose" | Name the specific thing or don't write the line. |
 | The same transformation branch at all FEMININITY levels | A FEMININITY 10 PC and a FEMININITY 60 PC are different people. |
 | Always-female players left with a blank or gap | They must always get a complete, valid path. |
-| Transformation as comedy | It's not a gag. Wry is fine; slapstick is not. |
-| Ignoring it when it would genuinely change the scene | A failure mode — but the fix is a physical/emotional moment, not a narrated observation. |
+| Transformation as comedy | Wry is fine; slapstick is not. |
 
 ---
 
@@ -746,33 +771,55 @@ something the player does?**
 We want the first. The world interrupts. Events have consequences the player didn't choose.
 NPCs have their own agendas. The player is a person in a city that has its own life.
 
-### Player agency
+### Player agency — the intro/action split
 
-**Actions are choices the player makes.** Every `[[actions]]` entry is a button the player
-clicks. It represents *her* decision — what she does, says, or chooses next.
+This is the most important structural rule in the game. Get it wrong and the player stops
+feeling like they're playing.
 
-Never write action prose that decides what the player says or does without the player
-having chosen it. The intro and NPC actions can describe the world acting on her — men
-approach, situations develop, the city does its thing. But when the player clicks an action,
-that action is *her* agency. She chose it.
+**The intro describes the world. Actions are what the player decides to do.**
 
-**What this means in practice:**
+The intro puts the player in a situation: where she is, what's around her, what's happening
+to her, who's there. It can describe men looking at her, rain starting, a coworker saying
+something that changes the room. The world acts freely. But the intro never decides what
+the player does — not what she orders, not how she sits, not what she says, not what she
+thinks.
 
-- **Action labels and prose are the player's voice.** If an action says "Say something,"
-  the prose can show her speaking. But the intro should not have her speak unprompted —
-  that is a choice the player hasn't made yet.
-- **The world acts on her freely.** Intro prose, NPC actions, and environmental description
-  can put her in any situation. A man can approach. The rain can start. A coworker can say
-  something that changes the dynamic. The world does not ask permission.
-- **The player responds through actions.** Her responses — what she says, whether she
-  engages, how she handles the situation — are the action buttons. Don't pre-decide them
-  in intro prose.
-- **Dialogue in action prose is fine.** When the player picks "Say something," writing
-  the specific line she says is expected — the player chose to speak, and the writer
-  decides what that sounds like for this character. The distinction is between the player
-  *choosing to act* (her agency) and the writer *deciding she acts* (stolen agency).
+Actions are the player's choices. Every `[[actions]]` entry is a button. When the player
+clicks it, that's her decision. The action prose describes what happens as a result of her
+choice, including dialogue, consequences, and how the world responds.
 
-This is roleplay. She is an agent of the world. Every action is "what would you do?"
+**What the intro CAN do:**
+- Describe the room, the people, the atmosphere
+- Show men reacting to her presence (BEAUTIFUL branch)
+- Show her body experiencing the space (stool too tall, bar top at chest height)
+- Set up tension (someone is watching, the bartender is waiting, a situation is developing)
+- End with something that invites a decision
+
+**What the intro CANNOT do:**
+- Order her a drink
+- Decide how she sits or positions herself consciously
+- Put full thoughts in her head ("*I'm here and I'm fine and I haven't decided yet*")
+- Have her speak to anyone
+- Analyze what her body is doing ("none of this was conscious," "you're doing the thing")
+- Explain her motivations ("which is what you came here for")
+
+**What actions MUST do:**
+- Lead somewhere meaningful. Every action should produce real consequences, open new paths,
+  or change the situation. "Check your phone" is not an action — it's filler. If an action
+  can be summarized as "you do the thing and nothing changes," cut it.
+- Branch deeply on traits. A SHY character accepting a drink from a stranger is a completely
+  different scene from a FLIRTY character doing it. The trait should change what happens,
+  who says what, and what it leads to.
+- Create decision chains when appropriate. "Order a drink" can lead to "what kind?" which
+  leads to a conversation with the bartender. Break decisions into beats — each one a moment
+  of player agency.
+
+**Dialogue in action prose is fine.** When the player picks "Accept the drink," writing what
+she says is expected — she chose to engage, and the prose shows what that looks like for this
+character. The line is between the player *choosing to act* (agency) and the writer *deciding
+she acts* (stolen agency).
+
+This is a game. Every moment is "what do you do?"
 
 ### Anatomy of a good scene
 
@@ -832,19 +879,47 @@ A scene with three of these five qualities is a good scene:
 
 ### The scene must earn its place
 
-Ask of every scene and every action: **what is the one thing that happens here that couldn't happen anywhere else?**
+Ask of every scene and every action: **what is the one thing that happens here that
+couldn't happen anywhere else?**
 
-If the answer is "a woman goes to a park / bar / grocery store and notices it's different now" — that's a description, not a scene. Every location-based scene can produce that description. It's not enough.
+If the answer is "a woman goes to a park / bar / grocery store and notices it's different
+now" — that's not a scene. That's a description. Every location can produce that.
+
+**Scenes must be intentional, deep, and richly branched.** If a scene doesn't go somewhere
+meaningful — if it doesn't change the world, develop a relationship, create a decision with
+real consequences — it doesn't exist. Half-assed scenes are worse than no scenes. They
+train the player to stop caring about what happens.
 
 **Positive requirements:**
 
-1. **One irreplaceable detail** — a specific person, event, or exchange that is pinned to this time and place. Not "a man glances at her" — a man with a specific posture doing a specific thing, in a way that produces a specific internal response. The kind of detail that would be cut if it weren't true.
+1. **One irreplaceable detail** — a specific person, event, or exchange pinned to this
+   time and place. The kind of detail that only exists in THIS scene.
 
-2. **At least one beat of unresolved tension or desire** — not everything resolves to "and that was fine." A glance that registered. A conversation that went longer than intended. A decision she made that surprised her. Something slightly open when the scene ends.
+2. **At least one beat of unresolved tension or desire** — not everything resolves to
+   "and that was fine." Something slightly open when the scene ends.
 
-3. **The transformation lens used, not merely referenced** — "You're on this side of it now" is a reference. Her hand shaking when a man's voice drops and she doesn't know why is using the lens. The difference is: the body reacts, the mind catches up. Never announce the irony — let the physical moment carry it.
+3. **Transformation as physical experience** — not referenced, not announced. The body
+   reacts. The player connects the dots.
 
-**The "fine" test:** If you can summarize an action as "she did the thing and it was fine," the action needs work. Even mundane scenes need one moment where something actually happens — desire is registered, tension doesn't resolve cleanly, the world surprises her.
+**The "fine" test:** If you can summarize an action as "she did the thing and it was fine,"
+the action needs work.
+
+### No filler actions
+
+Every action must lead somewhere. If an action doesn't produce real consequences, open
+new paths, or change the situation, cut it. Examples of filler:
+
+- "Check your phone" — nothing happens. Not an action.
+- "Look around the room" — this is description, not a choice. Put it in the intro.
+- "Wait" — unless waiting causes something to happen (NPC approaches, situation develops).
+  A "wait" that just produces ambient description is filler.
+
+Good actions create decision chains: "Order a drink" leads to a conversation with the
+bartender. "Accept the drink from him" leads to him sitting down, which leads to how you
+handle his proximity. Each beat is a moment of player agency that matters.
+
+**The depth test:** Can you trace a path from this action through at least one more
+decision point? If the action is a dead end with no consequences, it's filler.
 
 ---
 
@@ -854,28 +929,38 @@ Before submitting any scene, verify:
 
 **Design:**
 - [ ] Does something happen in the intro before the player makes any choice?
+- [ ] Does the intro ONLY describe the world? (No deciding player actions, ordering drinks, choosing how to sit)
+- [ ] Does the intro end by handing control to the player? (Bartender waiting, someone approaching, situation set up)
 - [ ] Are there 1–3 choices where different paths produce genuinely different outcomes?
 - [ ] Does at least one path set a lasting game flag or NPC/PC stat?
 - [ ] Is the inciting situation something that happens TO her, not something she chose?
-- [ ] Does the world behave as if it has its own life, independent of her?
-- [ ] Are actions the player's choices? (Intro/NPC prose doesn't pre-decide her dialogue or responses)
+- [ ] Is every action intentional? (No filler — every action leads somewhere meaningful)
+- [ ] Do actions create decision chains where appropriate? (Order → what kind → conversation)
 
-**Prose:**
-- [ ] All trait branches are structurally different (not adjective swaps)
+**Register:**
+- [ ] Does the prose read like a DM narrating, not a novelist crafting?
+- [ ] No narrator meta-commentary ("none of this was conscious," "you're doing the thing")
+- [ ] No full articulated thoughts put in the player's head
+- [ ] No narrator explaining player motivations ("which is what you came here for")
+- [ ] No omniscient details the player couldn't know
 - [ ] American English throughout — no British spellings or references
 - [ ] Second-person present tense throughout
 - [ ] Sentence structure varies (not every line starting with "You")
+
+**Prose quality:**
+- [ ] All trait branches are structurally different (not adjective swaps)
+- [ ] Trait branches go deep — different scenes unfold, not different adjectives
 - [ ] No emotion announcements, no heart/pulse clichés, no generic NPC dialogue
-- [ ] NPC dialogue reflects that NPC's personality and current goal, not a generic type
-- [ ] At least one action has a beat of unresolved tension or desire — not everything resolves to "fine"
+- [ ] NPC dialogue reflects that NPC's personality and current goal
+- [ ] At least one beat of unresolved tension or desire
 - [ ] At least one specific detail that is irreplaceable — pinned to this place, person, moment
 
 **Transformation:**
-- [ ] Does this scene earn a transformation branch? If yes, is it written for CisMale→Woman?
-- [ ] Transformation content inside `{% if not w.alwaysFemale() %}` blocks only
-- [ ] No `{% else %}` AlwaysFemale-specific branches (deprioritized — future content pass)
-- [ ] Transformation content calibrated to appropriate FEMININITY range (not one-size)?
-- [ ] No `TRANS_WOMAN` inner branches (deprioritized — future content pass)
+- [ ] Transformation texture written directly in prose (no `{% if not w.alwaysFemale() %}` guards unless using before-body accessors)
+- [ ] Transformation is physical and immediate, not analyzed or explained
+- [ ] No `{% else %}` AlwaysFemale-specific branches
+- [ ] Calibrated to appropriate FEMININITY range (not one-size)
+- [ ] No `TRANS_WOMAN` inner branches
 
 **Content gating:**
 - [ ] Is the content level tagged (VANILLA / SEXUAL / ROUGH / DUBCON / NONCON)?

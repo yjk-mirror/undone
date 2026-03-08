@@ -185,20 +185,43 @@ See `docs/presets/camila.md` for full profile.
 TransWomanTransformed, CisFemaleTransformed) are deprioritized. Do not write branches
 for them.
 
-Pattern: `{% if not w.alwaysFemale() %}` blocks only. No `{% else %}` AlwaysFemale
-branches. No `TRANS_WOMAN` branches.
+**Transformation prose IS the prose.** Write it directly — no `{% if not w.alwaysFemale() %}`
+guards. Since all current content targets CisMale→Woman, the transformation texture is simply
+part of how scenes are written. The guards cluttered the code and broke prose flow.
 
-AlwaysFemale players see the default (non-branched) prose, which should read naturally
-for anyone. Dedicated AlwaysFemale content is a future pass requiring its own quality bar.
+Use `{% if not w.alwaysFemale() %}` ONLY when using before-body accessors like
+`w.beforeName()` or `w.beforePenisSize()` that would be invalid for AlwaysFemale players.
+For everything else — physical sensations, scale, desire, body awareness — write it directly.
+
+AlwaysFemale players see all prose. It should read naturally for anyone. Dedicated
+AlwaysFemale content is a future pass requiring its own quality bar. No `{% else %}` branches.
+No `TRANS_WOMAN` branches.
 
 ---
 
 ## Voice
 
-**Reference: the BG3 narrator.** Dry. Present-tense. Second-person. Wry. Matter-of-fact.
-Trusts the scene. Plain English. Nothing artistic. Nothing performative.
+**The narrator is a dungeon master**, not a novelist. Sitting on the player's shoulder,
+pointing things out, then asking "what do you do?" It has personality — dry, occasionally
+wry — but it serves the player's experience. It never performs, never shows off, never
+tries to be literature.
+
+**Reference: the BG3 narrator.** "Chin on the player's shoulder, whispering 'look at that,'
+tilting their chin but never manipulating them." Present. Specific. Grounded. A guide, not
+an author.
 
 **Always second-person present tense.** "You go..." Never "she."
+
+**This is a game, not a novel.** The player reads thousands of passages over hours of play.
+Engagement comes from situations and choices, not from crafted sentences. Write well, but
+write to be played, not admired.
+
+The narrator does NOT:
+- Decide what the player does (ordering drinks, choosing how to sit, speaking for her)
+- Analyze what the player's body is doing ("none of this was conscious")
+- Put full thoughts in the player's head ("*more of that, please*")
+- Know things the player can't know (the bartender's life story, men's motivations)
+- Explain the significance of experiences ("which is what you came here for")
 
 See `docs/writing-guide.md` for full voice rules, anti-patterns, and the complete
 authoring checklist. See `docs/writing-samples.md` for calibration prose.
@@ -279,6 +302,18 @@ These are covered in depth in `docs/writing-guide.md`. The essentials:
 The writing guide (`docs/writing-guide.md`) has the full rules and checklist. These are
 the principles that agents consistently fail to follow. They are surfaced here because
 they are the difference between prose that works and prose that doesn't.
+
+### 0. Every scene must be intentional, deep, and richly branched
+
+This is the highest-level requirement. A scene that exists because "we needed a bar scene"
+is not a scene. It's filler. Filler trains the player to stop caring.
+
+Every scene must go somewhere. Every action must lead to a real consequence, a further
+decision, or a meaningful change in the world. Traits don't change flavor text — they
+open and close entire paths. A SHY character and a CONFIDENT character in the same bar
+should have completely different evenings unfold.
+
+If a scene can't sustain this depth, it doesn't exist. Cut it and write one that can.
 
 ### 1. Commit to specific trait axes and let them define the scene
 
@@ -379,22 +414,31 @@ explanation. The reader will supply the meaning, and it will land ten times hard
 
 3. **Never write scenes that only exist to demonstrate a system.** Every scene must earn
    its place (see writing guide). A scene that exists because "we needed a free_time scene"
-   is not a scene — it's a placeholder. Ask for creative direction for the specific
-   moment.
+   is not a scene — it's a placeholder.
 
-4. **Never narrate the transformation — let the body show it.** "You know what men think
-   because you were one" is telling. "You used to do this" is telling. "You recognize the
-   calculation he's running" is telling. All of these are the PC moralizing about gender
-   instead of living through a physical experience. The transformation lives in involuntary
-   reactions: the body flushing, arousal arriving uninvited, a hand that's suddenly too
-   small, a thought that pops up detached and vanishes. Write the sensation. Trust the reader.
+4. **Never decide for the player in intro prose.** The intro describes the world. It never
+   orders a drink, chooses where to sit, initiates a conversation, or puts full thoughts
+   in the player's head. The player decides what to do through actions. This is the most
+   common structural failure and it kills the feeling of playing a game.
 
-5. **Every scene must find its own transformation angle.** No two scenes should use the same
-   device. One scene is about how the seatbelt sits. Another is about getting wet from a
-   voice. Another is about the coffee cup being enormous in her hands. Another is about
-   muscle memory misfiring when she reaches for something. The transformation has infinite
-   angles — physical, sensory, spatial, sexual. Repeating the same one ("the male gaze",
-   "being looked at") is a failure of imagination.
+5. **Never analyze the transformation — just show it.** The narrator does not know why the
+   player's body is doing things. It just reports what happens. "The stool takes a small hop
+   to get onto. Your hands look small against the wood." Not: "None of this was conscious.
+   Your body is making calculations. The armor went up without you deciding to put it on."
+   Write the physical fact. Delete the analysis.
+
+6. **Never put articulated thoughts in the player's head.** Inner voice should be fragments
+   (*Huh.* / *Okay.* / *Right.*), not sentences. The narrator observes. It doesn't think
+   FOR the player. Even italicized inner voice must be fragments, not full articulated
+   thoughts like "*more of that, please*" or "*I'm here and I'm fine.*"
+
+7. **Every scene must find its own transformation angle.** No two scenes should use the same
+   device. The transformation has infinite angles — physical, sensory, spatial, sexual.
+   Repeating the same one is a failure of imagination.
+
+8. **Never write filler actions.** "Check your phone," "look around," "wait" (with nothing
+   happening) — these are not choices. Every action must lead somewhere meaningful. If it
+   can't, cut it.
 
 ---
 

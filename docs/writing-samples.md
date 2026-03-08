@@ -3,10 +3,92 @@
 > Read this before touching any scene. These are approved prose excerpts that define
 > the target register. Every new scene should match or exceed the quality demonstrated here.
 >
-> **All prose is second-person, present tense.** No exceptions. If a sample uses "she"
-> instead of "you", it is wrong and should be reported.
+> **The register is DM narrator, not novelist.** The narrator sits on the player's shoulder,
+> describes what's happening, and hands control to the player. It never decides for the
+> player, never analyzes what the body is doing, never puts full thoughts in the player's
+> head. It's casual, specific, and present. Like a good D&D dungeon master.
+>
+> **All prose is second-person, present tense.** No exceptions.
 >
 > See also: `docs/writing-guide.md` for the full checklist and rules.
+
+---
+
+## Sample 0: Bar intro — the calibrated register (2026-03-08)
+
+**Demonstrates:** The target register. DM narrator style. Intro that describes the world
+without deciding player actions. Transformation as physical fact, not meta-commentary.
+BEAUTIFUL branch changes what happens TO you. Ends by handing control to the player.
+
+*(The primary calibration sample — this defines what all scenes should sound like.)*
+
+---
+
+> Donovan's is half-empty on a Tuesday, which is probably why you picked it.
+>
+> Warm lighting, fryer oil and hops. A couple sharing nachos in the corner booth, leaned
+> in close enough that whatever they're saying is just for them. Three guys at the far end
+> of the bar with a pitcher and a game on TV. A woman sitting alone near the taps with a
+> glass of white wine, reading something on her phone with the posture of someone who came
+> here specifically to be left alone.
+>
+> The door shuts and the cold drops off you. It's warm in here, warm enough that your jacket
+> is already too much. The bartender looks up when you come in. She's already put a coaster
+> down by the time you reach the bar.
+>
+> *[BEAUTIFUL branch]:*
+> One of the guys at the end has stopped watching the game. You can feel it on the side of
+> your face before you look over. His friend follows his eyes to you. Now there are two.
+>
+> *[FEMININITY < 25 branch]:*
+> The stool takes a small hop to get onto. The bar top comes up higher than you expect and
+> your hands look small against the wood.
+>
+> The coaster is waiting. The bartender is waiting.
+
+---
+
+**Annotation:** This is what the register sounds like. Note what it does NOT do:
+- Does not order a drink for the player (the bartender is waiting — that's the player's choice)
+- Does not analyze the body ("none of this was conscious," "you're doing the thing women do")
+- Does not put thoughts in the player's head
+- Does not explain what the men are thinking or what the bartender's life story is
+- Does not use staccato closers, em-dashes, or atmospheric filler ("A bus passes outside")
+
+The BEAUTIFUL branch changes what's happening TO the player (men watching). The FEMININITY
+branch is a physical fact (stool too tall, hands small). Both describe things the player
+experiences without the narrator explaining their significance.
+
+---
+
+## Sample 0b: Bar action — deep trait branching
+
+**Demonstrates:** An action that goes somewhere, with traits producing genuinely different
+scenes. The player chose "Accept the drink" — the prose shows what happens next.
+
+---
+
+> *[SHY]:*
+> "Oh — thanks." You take the glass and immediately look at it instead of at him because
+> looking at him requires something you haven't assembled yet. The drink is cold. That's
+> something to hold. You hold it.
+>
+> *[FLIRTY]:*
+> "My hero." You say it with exactly enough irony to signal that you know what the drink
+> means and you're choosing to let it mean that. He grins. You grin back. The evening just
+> acquired a direction.
+>
+> *[ANALYTICAL]:*
+> You tell him your name. You're aware that a transaction has started and you're cataloguing
+> the moving parts — the bought drink, the proximity, the way he turned his body to wall off
+> the rest of the bar. You can see every piece of this. What you didn't expect is how his
+> forearm looks resting on the bar. The tendons. Something about it pulls at you low and warm.
+
+---
+
+**Annotation:** Three completely different scenes from the same action. SHY can barely
+engage. FLIRTY takes control of the dynamic. ANALYTICAL sees the pattern but is surprised
+by desire. The trait doesn't change an adjective — it changes what happens.
 
 ---
 

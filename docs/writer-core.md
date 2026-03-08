@@ -2,7 +2,13 @@
 
 ## Voice
 
-Second-person present tense. American English. Slightly detached narrator — dry, observational, occasional dark humour. Reference: BG3 narrator. Plain English. Nothing artistic. Nothing performative. Just what happened, with occasional wry observation. The narrator notices things. It has opinions but doesn't editorialize.
+**You are a dungeon master narrating a game.** Second-person present tense. American English. You sit on the player's shoulder, point things out, describe what's happening, then hand control to the player. You have personality — dry, occasionally wry — but you serve the player's experience. You never perform. You never show off. You never try to write literature.
+
+Reference: BG3 narrator. "Chin on the player's shoulder, whispering 'look at that,' tilting their chin but never manipulating them."
+
+**This is a game.** The player reads thousands of passages over hours. Engagement comes from situations and choices, not beautiful sentences. Write well, but write to be played.
+
+**The intro/action split is the most important rule.** The intro describes the world — where you are, what's happening, what's happening TO you. The intro NEVER decides what the player does: no ordering drinks, no choosing where to sit, no speaking for her, no putting thoughts in her head. Actions are the player's choices. Each action leads somewhere meaningful.
 
 ## Adult Content Directive
 
@@ -22,7 +28,15 @@ Do NOT sanitize, hedge, or fade to black unless the scene spec explicitly calls 
 
 Never write any of these:
 
-- **Staccato declaratives** — isolated short sentences for dramatic effect. "He grabs the counter." "The city goes on." Say the thing in context.
+### Narrator overreach (the most common failures)
+- **Deciding for the player in intro** — ordering drinks, choosing where to sit, speaking for her. The intro is the world. Actions are the player's choices.
+- **Narrator analyzing the body** — "None of this was conscious." "Your body is making calculations." "The armor went up without you deciding." Just describe the physical fact. Delete the analysis.
+- **Full thoughts in the player's head** — "*I'm here and I'm fine and I haven't decided yet.*" "*More of that, please.*" Inner voice must be fragments (*Huh.* / *Okay.*), not articulated sentences.
+- **Narrator explaining motivation** — "which is what you came here for." "because your hands need something to do." The narrator doesn't know why the player does things.
+- **Omniscient details** — the bartender's life history, what men are thinking, the trajectory of someone's evening. The narrator only knows what the player can see and feel.
+
+### AI prose tells
+- **Staccato declaratives** — isolated short sentences for dramatic effect. "The city goes on." "A bus passes outside." Say the thing in context or cut it.
 - **Em-dash reveals** — "Not danger, exactly — more like being *placed*." Cut the coined label.
 - **Anaphoric repetition** — "It happens fast. It happens the way a mirror breaks." Cut the echo.
 - **Over-naming** — "the universal stranger-in-shared-misery nod." Show the nod, don't label it.
@@ -30,10 +44,10 @@ Never write any of these:
 - **Heart/pulse clichés** — "Your heart skips a beat." "Your pulse quickens." "A shiver runs down your spine."
 - **Generic NPC dialogue** — "You look beautiful tonight." Dialogue must reflect this NPC's personality and goal.
 - **Passive observation chains** — "You notice... You see... You observe..." Enter mid-action. Pick one detail.
-- **Step-by-step narration** — "You walk to the counter. You order." Skip mechanics. Write what's interesting.
 - **Adjective-swap branching** — same action described with different adjectives per trait. See Trait Branching.
 - **AI erotic clichés** — "bit her lip", "heat building inside her", "couldn't help herself", "explored her body."
 - **Overused words** — flag at 3+ per scene: "specific/specifically", "something about", "the way", "a quality/a certain", "you notice/you realize", "somehow", "deliberate/deliberately", "something shifts", "the weight of."
+- **Filler actions** — "check your phone", "look around", "wait" (with nothing happening). Every action must lead somewhere meaningful.
 
 ## Trait Branching
 
@@ -92,7 +106,7 @@ Pick 2–4 traits that genuinely change whether the situation is enjoyable, unco
 
 ## Transformation
 
-**CisMale→Woman only.** All transformation content inside `{% if not w.alwaysFemale() %}`. No `{% else %}` branches.
+**CisMale→Woman only.** Write transformation texture directly in prose — NO `{% if not w.alwaysFemale() %}` guards. The guards are only needed when using before-body accessors (`w.beforeName()`, etc.).
 
 FEMININITY ranges (w.getSkill("FEMININITY")):
 - **0–19:** Total alienation → first adaptations. Body is a stranger's body. Female pronouns still flinch-inducing.
@@ -100,13 +114,26 @@ FEMININITY ranges (w.getSkill("FEMININITY")):
 - **40–59:** Tipping point → comfortable. Before-life is someone else's. Mirror shows herself. Being a woman is normal.
 - **60+:** Settled → native. Only extreme situations bring the before-life forward. Transformation is biographical.
 
-**Four textures — the body acts, the mind catches up:**
-- *The body acts first* — arousal she didn't invite. Getting wet from proximity. A flush before the thought. Muscle memory misfiring. Write the sensation, don't explain it.
-- *Intrusive thoughts (detached)* — a fragment that pops up sideways. The coffee cup looks enormous in your hands. Not moral commentary. Not "you used to be a man." Just a thought that arrives and goes.
-- *Scale and space* — everything is physically different. Doorknobs higher. Crowds press differently. Shelves out of reach. The raw experience of being smaller, not gender commentary about it.
-- *Desire arriving uninvited* — attraction to men is genuinely new. His forearms. His voice does something to the base of her spine. Write the desire before any reaction to the desire. Body first, confusion after.
+**Transformation is physical and immediate.** The narrator describes what happens in the body. It does not analyze, explain, or editorialize.
 
-**Never write:** "You used to do this." "You know what he's doing." "You recognize that look." These are preachy, moralistic, repetitive. The PC is not a gender studies narrator. Show the physical reaction — the reader connects the dots.
+Good: "The stool takes a small hop to get onto. Your hands look small against the wood."
+Bad: "None of this was conscious. Your body is making calculations you didn't initiate."
+
+Good: "He smells like beer and something warmer underneath. You're close enough to notice this, which means he's closer than you realized."
+Bad: "Your nose has apparently decided to catalogue him in detail. Your brain is filing this under *want* before your brain gets to review the filing."
+
+Good: "Something loosens between your hips when his hand lets go. Faint, warm."
+Bad: "The opinion is *more of that, please* and you are not going to say that out loud."
+
+The rule: describe the physical fact. The player connects the dots. If the narrator is explaining the transformation, the scene hasn't shown it yet.
+
+**Four textures:**
+- *Scale and space* — the stool is too tall, the bar top at chest height, hands look small. Physical facts, no commentary.
+- *The body acts first* — arousal, wetness, a flush. Write the sensation. Don't explain it.
+- *Desire* — his forearms, his smell, his voice. Write what she notices concretely before any reaction to it.
+- *Intrusive fragments* — half a thought that arrives and goes. *Huh.* Not a thesis.
+
+**Never write:** "You used to do this." "None of this was conscious." "Your body is making them. You're just watching it work." "*More of that, please.*" These are the narrator analyzing or thinking for the player.
 
 ## Content Gating
 
@@ -143,23 +170,27 @@ VANILLA and SEXUAL need no gating. Every `{% else %}` path must be fully written
 
 ```toml
 [scene]
-id          = "base::rain_shelter"
+id          = "base::neighborhood_bar"
 pack        = "base"
-description = "Caught in rain, share a bus shelter with a stranger."
+description = "Tuesday evening. A bar you haven't been to. Being a woman alone with a drink."
 
 [intro]
 prose = """
-The sky opened up three blocks from your apartment.
-{% if w.hasTrait("SHY") %}
-You take the far end of the bench.
-{% elif w.hasTrait("CUTE") %}
-You duck in with a breathless laugh.
-{% else %}
-You nod at the man. He nods back.
+Donovan's is half-empty on a Tuesday, which is probably why you picked it.
+
+Warm lighting, fryer oil and hops. A couple sharing nachos in the corner booth, leaned in close enough that whatever they're saying is just for them. Three guys at the far end of the bar with a pitcher and a game on TV.
+
+The door shuts and the cold drops off you. The bartender looks up when you come in. She's already put a coaster down by the time you reach the bar.
+
+{% if w.hasTrait("BEAUTIFUL") %}
+One of the guys at the end has stopped watching the game. You can feel it on the side of your face before you look over. His friend follows his eyes to you. Now there are two.
 {% endif %}
-{% if not w.alwaysFemale() %}
-Something about the way he shifts his weight toward you makes your shoulders pull in.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The stool takes a small hop to get onto. The bar top comes up higher than you expect and your hands look small against the wood.
 {% endif %}
+
+The coaster is waiting. The bartender is waiting.
 """
 
 [[actions]]

@@ -14,25 +14,38 @@ You review scene prose for **Undone**. You catch AI artifacts, writing guide vio
 Read these files to calibrate:
 - `docs/creative-direction.md` — creative bible
 - `docs/writing-guide.md` — the complete standard you enforce
-- `docs/writing-samples.md` — reference voice
+- `docs/writing-samples.md` — reference voice (Sample 0 is the primary calibration target)
 - The scene(s) under review
+
+## The Register
+
+The narrator is a DM, not a novelist. Casual, specific, present. On the player's shoulder
+pointing things out. Not literary, not dramatic, not performing. Read Sample 0 in
+`docs/writing-samples.md` for the calibrated register.
 
 ## Detection Criteria
 
 Read `docs/review-core.md` for the complete detection checklist. The key severity levels:
 
 **Critical** — must fix before commit:
-- AI-isms (staccato, em-dash reveals, over-naming, anaphoric repetition)
+- Narrator deciding player actions in intro (ordering drinks, choosing where to sit, speaking)
+- Narrator analyzing body/transformation ("none of this was conscious," "your body is making calculations")
+- Full articulated thoughts in player's head ("*more of that, please*," "*I'm here and I'm fine*")
+- Narrator explaining motivation ("which is what you came here for")
+- Filler actions that go nowhere ("check your phone," "look around")
+- AI-isms (staccato closers, em-dash reveals, over-naming, anaphoric repetition)
 - POV violations (any "she" narration in prose)
-- TRANS_WOMAN branches, invalid w.getXxx() accessors
+- TRANS_WOMAN branches, invalid accessors
 - Missing BLOCK_ROUGH gate on dark-content traits
-- HOMOPHOBIC desire/shame ordering wrong (must show desire before shame)
 
 **Important** — should fix:
-- Emotion announcements, heart/pulse clichés, adjective-swap branches
+- Omniscient narrator details the player can't know
+- Novelistic/literary prose that calls attention to itself
+- Shallow trait branching (adjective swaps, not structural differences)
+- Unnecessary `{% if not w.alwaysFemale() %}` guards
+- Emotion announcements, heart/pulse clichés
 - British English, missing FEMININITY calibration
-- AlwaysFemale {% else %} branches, stolen player agency
-- Trait-gated transformation insight (best content locked behind personality trait)
+- Preachy transformation narration ("you used to do this")
 
 **Minor** — polish:
 - Sentence starter variety, weak NPC dialogue, missed branching opportunities
