@@ -279,6 +279,11 @@ When a writing audit completes, always feed findings back into the writing tools
 
 ## Runtime Testing Notes
 
+- **Floem API work is version-sensitive here.** This repo is pinned to `floem 0.2.0`.
+  Prefer the local crate source and docs.rs `0.2.0` over GitHub `main` examples.
+  For version-safe syntax and project patterns, use
+  `.claude/skills/floem-layout/SKILL.md` and
+  `.claude/skills/floem-layout/reference/floem-0.2.0-syntax.md`.
 - **floem scroll requires `shrink_to_fit()`.** A `scroll()` widget inside a flex
   container (v_stack/h_stack) must use `.scroll_style(|s| s.shrink_to_fit())` and
   `.style(|s| s.flex_grow(1.0).flex_basis(0.0))` — otherwise taffy sizes the

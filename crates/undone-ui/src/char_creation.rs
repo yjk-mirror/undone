@@ -1068,9 +1068,23 @@ fn section_preset_select(signals: AppSignals, char_mode: RwSignal<u8>) -> impl V
 /// Trait IDs that describe the character's personality (shown on the "Who Were You?" screen).
 /// Body, sexual, arousal, and other post-transformation traits are NOT shown here.
 const PERSONALITY_TRAIT_IDS: &[&str] = &[
-    "SHY", "CUTE", "POSH", "SULTRY", "DOWN_TO_EARTH", "BITCHY", "REFINED", "ROMANTIC",
-    "FLIRTY", "AMBITIOUS", "OUTGOING", "OVERACTIVE_IMAGINATION", "ANALYTICAL", "CONFIDENT",
-    "SEXIST", "HOMOPHOBIC", "OBJECTIFYING",
+    "SHY",
+    "CUTE",
+    "POSH",
+    "SULTRY",
+    "DOWN_TO_EARTH",
+    "BITCHY",
+    "REFINED",
+    "ROMANTIC",
+    "FLIRTY",
+    "AMBITIOUS",
+    "OUTGOING",
+    "OVERACTIVE_IMAGINATION",
+    "ANALYTICAL",
+    "CONFIDENT",
+    "SEXIST",
+    "HOMOPHOBIC",
+    "OBJECTIFYING",
 ];
 
 fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> impl View {

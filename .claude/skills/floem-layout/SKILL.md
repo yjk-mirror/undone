@@ -1,250 +1,243 @@
-# Floem Layout Reference
+# Floem 0.2.0 Reference For Undone
 
-Floem is a native Rust UI library using taffy (CSS flexbox) for layout. This skill covers
-the layout model, common patterns, and pitfalls specific to this project.
+Use this for any Floem UI work in this repo.
 
-## Core Model
+## Source Of Truth
 
-Every floem view is a **flex item** inside a **flex container**. Default display is `Flex`,
-default direction is `Row`.
+This workspace is pinned to `floem = "0.2"` and currently resolves to `floem 0.2.0`.
 
-- `v_stack(children)` = flex container with `flex_direction: Column`
-- `h_stack(children)` = flex container with `flex_direction: Row`
-- `container(child)` = flex container with default direction (Row)
-- `scroll(child)` = scrollable viewport (special layout behavior, see below)
+Before trusting any snippet:
 
-### Axis Terminology
+1. Check [`Cargo.toml`](../../../Cargo.toml) and [`Cargo.lock`](../../../Cargo.lock)
+2. Prefer the local crate source in `C:\Users\YJK\.cargo\registry\src\...\floem-0.2.0\`
+3. Prefer docs.rs for `0.2.0`
+4. Treat GitHub `main` examples as suspicious until verified
 
-| Direction | Main Axis | Cross Axis |
-|---|---|---|
-| Row (h_stack, container) | Horizontal | Vertical |
-| Column (v_stack) | Vertical | Horizontal |
+Why this matters: upstream Floem moves quickly. Many current `main` branch examples use newer APIs and naming that do not map cleanly onto the `0.2.0` crate used here.
 
-- `justify_content` / `justify_center()` aligns on **main axis**
-- `align_items` / `items_center()` aligns on **cross axis**
+## Safe Syntax Patterns In This Repo
 
-So for a v_stack (column): `justify_center()` = vertical centering, `items_center()` = horizontal centering.
-For a container/h_stack (row): `justify_center()` = horizontal centering, `items_center()` = vertical centering.
-
-## Sizing
-
-| Method | CSS Equivalent | Notes |
-|---|---|---|
-| `width(px)` | `width: Npx` | Fixed pixel width |
-| `height(px)` | `height: Npx` | Fixed pixel height |
-| `width_full()` | `width: 100%` | 100% of parent content box |
-| `height_full()` | `height: 100%` | 100% of parent content box |
-| `size_full()` | `width: 100%; height: 100%` | Both axes |
-| `min_width(px)` | `min-width: Npx` | Minimum constraint |
-| `min_height_pct(100.0)` | `min-height: 100%` | At least parent height |
-| `min_height_full()` | `min-height: 100%` | Shortcut for above |
-| `max_width(px)` | `max-width: Npx` | Maximum constraint |
-| `flex_grow(1.0)` | `flex-grow: 1` | Grow to fill remaining space |
-| `flex_basis(0.0)` | `flex-basis: 0` | Start at 0 before growing |
-
-**Percentage units resolve to the parent's content box** (after padding, before border).
-
-## Scroll Container (Critical)
-
-`scroll(child)` creates a scrollable viewport. It has special layout behavior:
-
-1. **The scroll container itself** is a flex item that takes space from its parent.
-2. **The child inside scroll** is laid out with the scroll's width as constraint but
-   **unbounded height** -- the child can grow as tall as it needs.
-3. The scroll clips the child and provides scroll bars.
-
-### Why `size_full()` inside scroll doesn't work for centering
+### App bootstrap
 
 ```rust
-// WRONG: child gets unbounded height, so height: 100% has no reference
-scroll(
-    container(content).style(|s| s.size_full().items_center().justify_center())
+use floem::prelude::*;
+
+fn main() {
+    floem::launch(app_view);
+}
+
+fn app_view() -> impl View {
+    label(|| "Hello".to_string())
+}
+```
+
+For custom windows, use `Application::new().window(..., Some(WindowConfig::default()...)).run()`.
+
+### Signals and reactive closures
+
+```rust
+use floem::prelude::*;
+use floem::reactive::{create_effect, create_rw_signal, SignalGet, SignalUpdate};
+
+let count = create_rw_signal(0);
+
+let text = label(move || format!("Count: {}", count.get()));
+
+let inc = button("Increment").action(move || {
+    count.update(|value| *value += 1);
+});
+```
+
+Rules:
+
+- Use `move || signal.get()` or `move || format!(...)` for reactive labels
+- Use `.action(move || ...)` on buttons for no-argument click handlers
+- Use `SignalUpdate::update` or `set` for mutation
+- `RwSignal<T>` is `Copy`, so passing signals around is cheap
+
+### Conditional views
+
+```rust
+let body = dyn_container(
+    move || phase.get(),
+    move |phase| match phase {
+        Phase::Loading => label(|| "Loading".to_string()).into_any(),
+        Phase::Ready => main_view().into_any(),
+    },
 )
+.style(|s| s.size_full());
 ```
 
-The child's `height: 100%` resolves to... nothing useful, because the scroll doesn't
-constrain the child's height. The child collapses to content size.
+Rules:
 
-### `shrink_to_fit()` on scroll_style
+- `dyn_container(update_fn, child_fn)` is the main conditional view primitive in `0.2.0`
+- Return `.into_any()` from match arms when view types differ
+- If the dynamic container is a full-page wrapper, give it `.style(|s| s.size_full())`
+- Unsized `dyn_container` wrappers are a real source of broken centering in this repo
+
+The `dyn_view!` macro exists in `0.2.0`, but `dyn_container(...)` is usually easier to read in this codebase.
+
+### Dynamic lists
 
 ```rust
-scroll(child).scroll_style(|s| s.shrink_to_fit())
+let rows = dyn_stack(
+    move || items.get(),
+    |item| item.id.clone(),
+    move |item| label(move || item.name.clone()),
+);
 ```
 
-This sets `min_size(0, 0)` and `size_full()` on the scroll container itself.
-Effect: the scroll container fills available space in its parent flex layout while
-allowing shrinking. **Always use this when scroll is inside a flex layout.**
+Rules:
 
-### The correct scroll centering pattern
+- The key function must be stable and unique
+- `dyn_stack` preserves children when keys stay stable
+- Use `virtual_stack` or `virtual_list` only when the item count is large enough to justify virtualization
+
+### Inputs and rich text
 
 ```rust
-// Horizontal centering inside a scroll:
-let centered = container(content).style(|s| {
-    s.width_full().flex_row().justify_center()
-});
-scroll(centered)
+let name = create_rw_signal(String::new());
+
+let input = text_input(name);
+
+let prose = rich_text(move || build_layout(story.get()));
+```
+
+Rules:
+
+- `text_input(...)` takes an `RwSignal<String>`
+- `rich_text(...)` takes a closure returning `TextLayout`
+- For styled markdown-like text, build `TextLayout` directly with `Attrs`, `AttrsList`, and `TextLayout`
+
+## Layout Rules That Matter Here
+
+Floem uses Taffy flex layout. Most bugs in this repo come from flex sizing, scroll sizing, or dynamic wrappers with no explicit size.
+
+### Axis rules
+
+| Parent | Main axis | Cross axis |
+|---|---|---|
+| `h_stack`, default `container` | horizontal | vertical |
+| `v_stack` | vertical | horizontal |
+
+- `justify_*` works on the main axis
+- `items_*` works on the cross axis
+
+### Scroll rule
+
+Inside flex layouts, use:
+
+```rust
+scroll(child)
     .scroll_style(|s| s.shrink_to_fit())
-    .style(|s| s.size_full())
 ```
 
-The container fills the scroll's width (`width_full()`), is a row layout (`flex_row()`),
-and centers the content horizontally (`justify_center()`). The content's height determines
-the scroll content height.
+`shrink_to_fit()` matters because it applies `min_size(0, 0).size_full()` to the scroll view. Without it, the viewport often sizes to content instead of the available flex space.
 
-For vertical centering inside a scroll, use `min_height_pct(100.0)` on the centering
-container so it fills at least the viewport:
+### Scroll flex-shrink bug (floem 0.2.0)
 
+**Root cause:** `to_taffy_style()` in `floem-0.2.0/src/style.rs` ends with
+`..Default::default()`, which sets `overflow: Visible` on every node. Floem
+exposes no `overflow` style property — you cannot change this.
+
+**Why it matters:** When taffy sees `overflow: visible`, CSS automatic minimum
+size kicks in: `min-height: auto` resolves to the content height for flex items.
+This means `flex_grow(1.0) + flex_basis(0.0) + min_height(0.0)` still cannot
+shrink the scroll below its content height — taffy overrides the explicit
+`min_height(0)` with the content-based minimum.
+
+**What works:** `max_height` is reliably respected by taffy regardless of
+overflow mode. Use a reactive `max_height` computed from sibling sizes when
+the scroll must shrink to accommodate growing siblings.
+
+**Pattern (from left_panel.rs):**
 ```rust
-let centered = container(content).style(|s| {
-    s.width_full()
-        .min_height_pct(100.0)  // at least viewport height
-        .flex_row()
-        .justify_center()       // horizontal center
-        .items_center()         // vertical center (cross axis of row)
-});
-scroll(centered)
+scroll(child)
     .scroll_style(|s| s.shrink_to_fit())
-    .style(|s| s.size_full())
+    .style(move |s| {
+        // Compute available height from known sibling sizes
+        let sibling_height = compute_sibling_height();
+        let max_h = (available_height - sibling_height).max(min_reasonable);
+        s.max_height(max_h as f32)
+            .flex_grow(1.0)
+            .flex_basis(0.0)
+            .min_height(0.0)
+    })
 ```
 
-`min_height_pct(100.0)` works because scroll *does* pass its viewport height as the
-percentage reference, even though it doesn't constrain the child's max height.
+**What does NOT work** (all tested, all failed):
+- `min_height(0.0)` alone — overridden by content minimum
+- `flex_basis(0.0)` alone — same override
+- Wrapping scroll in `container()` with min_height(0) — container also affected
+- `Position::Absolute` on siblings — floem rendering doesn't match taffy expectations
+- `height(0.0)` — collapses the scroll entirely
 
-## Common Patterns in This Project
+### Centering rule
 
-### Pattern A: Horizontally centered scrollable content
-
-Used in char_creation.rs, left_panel.rs:
-
-```rust
-let centered = container(content).style(|s| {
-    s.width_full().flex_row().justify_center()
-});
-scroll(centered)
-    .scroll_style(|s| s.shrink_to_fit())
-    .style(|s| s.size_full())
-```
-
-### Pattern B: Full-viewport centering (both axes, no scroll)
-
-Used for empty states, placeholders:
+For full-page centering without scrolling:
 
 ```rust
-container(label("Empty")).style(|s| {
-    s.size_full().items_center().justify_center()
-})
-```
-
-This works because the container has a definite size from `size_full()` resolving
-against its parent, so flexbox can distribute free space.
-
-### Pattern C: Flex-grow scroll area in a column
-
-Used in left_panel.rs for story panel (scroll + fixed footer):
-
-```rust
-v_stack((
-    scroll(centered_prose)
-        .scroll_style(|s| s.shrink_to_fit())
-        .style(|s| s.flex_grow(1.0).flex_basis(0.0)),
-    footer.style(|s| s.height(40.0)),
-))
-.style(|s| s.flex_grow(1.0))
-```
-
-The scroll area grows to fill remaining space after the fixed footer.
-`flex_basis(0.0)` ensures it starts at 0 and grows, rather than starting at
-content size and potentially overflowing.
-
-### Pattern D: Full-viewport centered page (no scroll needed)
-
-For a page with minimal content that should be centered in the viewport:
-
-```rust
-let content = v_stack((...)).style(|s| s.width_full().max_width(720.0));
-
-container(content).style(move |s| {
-    s.size_full()
-        .flex_col()
-        .items_center()      // horizontal center (cross axis of column)
-        .justify_center()    // vertical center (main axis of column)
-        .padding_horiz(32.0)
-        .padding_vert(36.0)
-        .background(colors.ground)
-})
-```
-
-**Critical prerequisite:** The parent view must have a definite size. If the parent
-is a `dyn_container`, it MUST have `.style(|s| s.size_full())`. Otherwise
-`size_full()` resolves to content size, not viewport size, and centering fails.
-
-### Pattern E: Centered content that may need scrolling
-
-If the content might overflow the viewport, put the centering container OUTSIDE
-the scroll:
-
-```rust
-let content = v_stack((...)).style(|s| s.width_full().max_width(640.0));
-
-// Centering wrapper outside scroll — gets definite size from parent
-let page = container(
-    scroll(content)
-        .scroll_style(|s| s.shrink_to_fit())
-        .style(|s| s.size_full())
-).style(move |s| {
+container(content).style(|s| {
     s.size_full()
         .flex_col()
         .items_center()
-        .padding_horiz(32.0)
-        .background(colors.ground)
-});
+        .justify_center()
+})
 ```
 
-## Pitfalls
+For centered scrollable content:
 
-1. **`size_full()` inside scroll does NOT pin to viewport height.** Use
-   `min_height_pct(100.0)` instead for "at least viewport height".
+```rust
+let centered = container(content).style(|s| {
+    s.width_full().flex_row().justify_center()
+});
 
-2. **Percentage widths inside scroll children don't resolve to viewport.**
-   `width_full()`, `min_width_full()`, `width_pct(100.0)` all resolve to the
-   scroll's CONTENT width, not its viewport width. This is because the scroll
-   lays out its child with unbounded constraints. Use `min_height_pct(100.0)`
-   for vertical (works for height), but for horizontal you need either:
-   - Structure the centering container OUTSIDE the scroll
-   - Use explicit pixel widths
-   - Use `margin(PxPctAuto::Auto)` with a definite parent width
+scroll(centered)
+    .scroll_style(|s| s.shrink_to_fit())
+    .style(|s| s.size_full())
+```
 
-3. **Forgetting `shrink_to_fit()` on scroll.** Without it, the scroll container
-   may not size correctly inside flex layouts.
+Important:
 
-4. **`items_center()` on a v_stack centers horizontally** (cross axis), not
-   vertically. `justify_center()` on a v_stack centers vertically (main axis).
-   This is the opposite of what intuition suggests.
+- `size_full()` inside a scroll child does not mean "viewport height"
+- Scroll children effectively get unbounded height
+- For "at least viewport height" inside a scroll child, use `min_height_pct(100.0)` where it actually resolves correctly
+- In column layouts, scroll areas usually need `.flex_grow(1.0).flex_basis(0.0)`
 
-5. **`container` default direction is Row.** So `justify_center()` on a container
-   centers horizontally, `items_center()` centers vertically.
+## Common Failure Modes
 
-6. **Children stretch to fill cross-axis by default** (CSS `align-items: stretch`).
-   Setting `items_center()` or `items_start()` on the parent overrides this.
-   A child with `max_width` inside a container with default stretch will still
-   expand to fill width -- you need `items_center()` or `items_start()` on the
-   parent to make `max_width` visually meaningful.
+### Wrong Floem generation
 
-7. **Unsized `dyn_container` parents break child `size_full()`.**
-   `dyn_container(...)` with no `.style()` has `width: auto, height: auto`.
-   If a child view uses `size_full()`, it resolves to the content size, not
-   the viewport. Always add `.style(|s| s.size_full())` to `dyn_container`
-   wrappers in the view hierarchy, or they act as size-collapsing barriers.
-   This was the root cause of centering failures in this project's phase
-   containers (`lib.rs` line ~184).
+If a snippet uses names or patterns that do not appear in the local `floem-0.2.0` crate source, stop and verify before adapting it.
 
-## Quick Reference: "I want to center X"
+### Unsized dynamic wrapper
 
-| Goal | Pattern |
-|---|---|
-| Center horizontally in scroll | `container(x).style(\|s\| s.width_full().flex_row().justify_center())` then `scroll(...)` |
-| Center vertically in scroll | Add `.min_height_pct(100.0).items_center()` to the container |
-| Center both axes in scroll | Combine: `.width_full().min_height_pct(100.0).flex_row().justify_center().items_center()` |
-| Center both axes (no scroll) | `container(x).style(\|s\| s.size_full().items_center().justify_center())` |
-| Center text in a column | Wrap in `container().style(\|s\| s.width_full().flex_row().justify_center())` |
-| Fixed-width centered column | Set `max_width(N)` on content, wrap in centering container |
+If centering or `size_full()` is not working, inspect parent wrappers first. In this repo the usual offender is an outer `dyn_container(...)` missing `.style(|s| s.size_full())`.
+
+### Reactive closure missing
+
+`label(|| "text")` is static. `label(move || signal.get())` is reactive.
+
+### Bad list keys
+
+If list rows redraw strangely, selection jumps, or state resets, check the `dyn_stack` key function before changing layout code.
+
+### Wrong scroll mental model
+
+Do not treat `scroll(child)` like a normal container. It is a viewport plus a child with special sizing behavior.
+
+## Debugging Checklist
+
+1. Confirm the crate version is still `0.2.0`
+2. Confirm the API exists in local crate source before copying syntax
+3. Add `.debug_name("...")` to important wrappers when layout is confusing
+4. Check every full-page `dyn_container` for `.style(|s| s.size_full())`
+5. Check every flex-contained `scroll(...)` for `.scroll_style(|s| s.shrink_to_fit())`
+6. Check whether the problem is really axis confusion: `justify_*` vs `items_*`
+7. If scroll won't shrink for growing siblings, use reactive `max_height` (see "Scroll flex-shrink bug" above)
+
+## Supporting Reference
+
+For exact `0.2.0` syntax, constructor signatures, local source paths, and project examples, use:
+
+- [reference/floem-0.2.0-syntax.md](./reference/floem-0.2.0-syntax.md)
