@@ -129,6 +129,21 @@ fn markdown_to_text_layout(
                 text.push('\n');
                 span_start = Some((text.len(), false, false, None));
             }
+            MdEvent::Rule => {
+                // Thematic break (---): render as a visual separator line.
+                flush(text.len(), &mut span_start, &mut spans);
+                if !text.is_empty() {
+                    text.push('\n');
+                }
+                text.push_str("——————————");
+                text.push('\n');
+                span_start = Some((text.len(), false, false, None));
+            }
+            MdEvent::Start(Tag::BlockQuote(_)) => {
+                // Blockquote: just pass through; the inner paragraph
+                // handles newlines and the bold/italic inside renders.
+            }
+            MdEvent::End(TagEnd::BlockQuote(_)) => {}
             MdEvent::Text(t) | MdEvent::Code(t) => text.push_str(&t),
             MdEvent::SoftBreak => text.push(' '),
             MdEvent::HardBreak => text.push('\n'),
@@ -184,6 +199,15 @@ fn heading_font_size(level: u32, base: f32) -> f32 {
 /// Send a `ChooseAction` command, drain events, and if the scene finished,
 /// ask the scheduler to pick the next scene and start it.
 fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: AppSignals) {
+    // Choice echo: show what the player chose before rendering action prose.
+    {
+        let current_actions = signals.actions.get();
+        if let Some(chosen) = current_actions.iter().find(|a| a.id == action_id) {
+            let echo = format!("\n\n---\n\n> **{}**", chosen.label);
+            signals.story.update(|s| s.push_str(&echo));
+        }
+    }
+
     let mut gs = state.borrow_mut();
     let GameState {
         ref mut engine,
@@ -203,6 +227,8 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
             // (The throwaway world is discarded; FemCreation builds the real one.)
             signals.phase.set(crate::AppPhase::FemCreation);
         } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+            // Clean page turn: clear story for the new scene.
+            signals.story.set(String::new());
             if result.once_only {
                 world
                     .game_data
@@ -222,11 +248,13 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let hovered_detail = create_rw_signal(String::new());
     let highlighted_idx: RwSignal<Option<usize>> = RwSignal::new(None);
 
-    // Reset highlight whenever actions change (new scene step).
+    // Reset highlight and hovered detail whenever actions change (new scene step).
     let hi_reset = highlighted_idx;
+    let detail_reset = hovered_detail;
     create_effect(move |_| {
         let _ = actions.get(); // reactive dependency
         hi_reset.set(None);
+        detail_reset.set(String::new());
     });
 
     let keyboard_handler = move |e: &Event| -> bool {
@@ -384,6 +412,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.width_full()
             .flex_row()
+            .flex_shrink(0.0)
             .justify_center()
             .background(colors.page)
             .border_top(1.0)
@@ -520,6 +549,7 @@ fn choices_bar(
             .border_top(1.0)
             .border_color(colors.seam)
             .min_height(64.0)
+            .flex_shrink(0.0)
             .width_full()
             .flex_row()
             .justify_center()

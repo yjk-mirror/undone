@@ -295,11 +295,17 @@ pub fn app_view() -> impl View {
                                 ..
                             } = *gs;
 
+                            // Clear leftover prose from previous phases
+                            // (e.g. TransformationIntro text surviving into InGame).
+                            signals.story.set(String::new());
+
+                            // Scheduler takes priority: arc triggers (e.g.
+                            // workplace_arrival for ROUTE_WORKPLACE) must fire before
+                            // the generic opening_scene fallback from pack.toml.
                             let mut started_scene = false;
-                            if let Some(scene_id) = opening_scene.take() {
-                                start_scene(engine, world, registry, scene_id);
-                                started_scene = true;
-                            } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                            if let Some(result) = scheduler.pick_next(world, registry, rng) {
+                                // Scheduler found an eligible scene — discard opening_scene.
+                                let _ = opening_scene.take();
                                 if result.once_only {
                                     world
                                         .game_data
@@ -307,12 +313,19 @@ pub fn app_view() -> impl View {
                                 }
                                 start_scene(engine, world, registry, result.scene_id);
                                 started_scene = true;
+                            } else if let Some(scene_id) = opening_scene.take() {
+                                // No scheduled scene — use pack's opening_scene
+                                // (custom route with no arc flags).
+                                start_scene(engine, world, registry, scene_id);
+                                started_scene = true;
                             }
 
                             if started_scene {
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
+                                    // Clear story for the next scene — clean page turn.
+                                    signals.story.set(String::new());
                                     if let Some(result) = scheduler.pick_next(world, registry, rng)
                                     {
                                         if result.once_only {

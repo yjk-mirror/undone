@@ -1641,7 +1641,8 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
     h_stack((
         label(move || label_text.to_string()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.width(180.0)
+            s.min_width(180.0)
+                .width(180.0)
                 .font_size(14.0)
                 .color(colors.ink_dim)
                 .items_center()
@@ -1650,11 +1651,12 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
         label(move || value.clone()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
+                .flex_shrink(1.0)
                 .color(colors.ink)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
     ))
-    .style(|s| s.items_center().margin_bottom(12.0))
+    .style(|s| s.items_start().margin_bottom(12.0).max_width(600.0))
 }
 
 fn trait_checkbox(name: &'static str, sig: RwSignal<bool>, signals: AppSignals) -> impl View {

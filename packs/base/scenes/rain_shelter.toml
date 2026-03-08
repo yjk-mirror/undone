@@ -3,33 +3,24 @@ id          = "base::rain_shelter"
 pack        = "base"
 description = "Caught in rain, a stranger in a bus shelter. The city's first small test."
 
+# Content level: VANILLA — no explicit content.
+# 2-round flow using NPC actions:
+#   Round 1: Wait or run (!umbrella_offered)
+#   Round 2: Accept or decline his umbrella (umbrella_offered)
+
 [intro]
 prose = """
-The sky opened up three blocks from your apartment. Not a drizzle — the kind of rain that turns gutters into rivers and sends people running for awnings with their bags over their heads. A delivery driver on a moped blasts through a puddle that soaks your left side from the hip down.
+The sky opened up three blocks from your apartment. Not a drizzle — the kind of rain that turns gutters into rivers and puts everyone on the street into a fast walk.
 
-The bus shelter on Clement Ave is the nearest cover. Glass walls, metal bench, an ad for a personal injury lawyer peeling off the back panel. There's a man already in there — mid-twenties, decent jacket, one of those compact umbrellas people in this city carry because they've learned.
+The bus shelter on Clement Ave is the nearest cover. Glass walls, metal bench, an ad for a personal injury lawyer peeling off the back panel. A man is already in there — mid-twenties, decent jacket, one of those compact umbrellas people in this city carry.
 
-He looks up when you step in.
-
-{% if w.hasTrait("SHY") %}
-You take the far end of the bench without looking at him. Water drips from your jacket onto the concrete in a rhythm you didn't ask for. You can feel his gaze shift in your direction and then, mercifully, away.
-{% elif w.hasTrait("POSH") %}
-You step under the shelter and position yourself with the kind of precision that says *I chose this spot*. Your jacket is ruined — or at least the dry cleaning bill just doubled. The man gives you a quick once-over. You return it, and whatever he was about to say stays behind his teeth.
-{% elif w.hasTrait("CUTE") %}
-You duck in with a breathless laugh, shaking water from your hair. "Oh my God," you say to no one, and then realize you said it to him. He grins.
-{% elif w.hasTrait("BITCHY") %}
-You step under the overhang and shake the water off your sleeves. The man shifts slightly, as if making room is a favor. You don't acknowledge it.
+{% if w.hasTrait("BEAUTIFUL") %}
+He looks up when you step in. Holds the look a beat longer than he needs to.
 {% else %}
-You slip in and lean against the glass. The rain hammers the roof above you. The man looks up and nods. You nod back. That's all that needs to happen.
+He glances up when you step in. Quick read, back to his phone.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-The man glances at you — quick, automatic, the whole read done in under two seconds. You know that look. You've made that look, in spaces like this, more times than you've ever thought to count. You just never stood on the receiving end of it before.
-
-*You used to do this*, you think, *without knowing you were doing anything.*
-{% endif %}
-
-The rain isn't stopping. A bus goes by without pulling over — wrong route, or just indifferent. Across the street, a woman wrestles an inside-out umbrella and loses.
+The rain hammers the roof. A bus goes by without pulling over. Across the street, a woman wrestles an inside-out umbrella and loses.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -39,6 +30,19 @@ id                = "main"
 label             = "Wait it out"
 detail            = "Stay put. Let the rain handle itself."
 allow_npc_actions = true
+prose = """
+{% if w.hasTrait("SHY") %}
+You take the far end of the bench. Water drips from your jacket onto the concrete. He's on his phone. You're looking at the rain. The shelter is small enough that you're aware of the distance between you and precise about keeping it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You lean against the glass and track the rain patterns on the street — the drainage grade, the way the awnings direct water onto the sidewalk instead of the gutter. His umbrella is leaning against the bench. Compact, good brand.
+{% else %}
+You lean against the glass. The rain hammers on. He's got his phone out. The shelter does what shelters do.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Your jacket hangs lower on you than it should. The sleeves cover your hands. You fold your arms and the fabric bunches at your elbows.
+{% endif %}
+"""
 
 [[actions]]
 id        = "leave"
@@ -47,14 +51,14 @@ detail    = "Three blocks. You'll survive."
 condition = "!scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-You stand up before you've committed to the idea, and then you're already moving. Better soaked than stuck in silence with a stranger. The rain hits your face and you walk fast, shoulders up, not running but close.
+You're already moving before you've decided. Better soaked than stuck in silence. The rain hits your face and you walk fast, shoulders up.
 {% elif w.hasTrait("AMBITIOUS") %}
-Waiting is for people with nowhere to be. You step out and walk with purpose, rain be damned. Three blocks is three blocks.
+Three blocks is three blocks. You step out and walk with purpose.
 {% else %}
-You hunch your shoulders and step back into it. The rain is cold and immediate and doesn't care about your jacket. At least you're moving.
+You hunch your shoulders and step back into it. The rain is cold and immediate.
 {% endif %}
 
-By the time you reach your building, you're soaked through. Your shoes make sounds on the lobby floor that you'd rather not think about.
+By the time you reach your building, you're soaked through. Your shoes leave prints across the lobby floor.
 """
 
   [[actions.effects]]
@@ -67,26 +71,24 @@ By the time you reach your building, you're soaked through. Your shoes make soun
 [[actions]]
 id        = "accept_umbrella"
 label     = "Share his umbrella"
-detail    = "Step closer. He offered."
+detail    = "He offered. You're deciding."
 condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-"Thanks," you manage, and step under. The umbrella is small enough that your shoulders almost touch. You can smell whatever detergent he uses. You look at the rain. He looks at the rain. Neither of you has anything to say, and somehow that's worse than talking.
+"Thanks." You step under. The umbrella is small enough that your shoulders almost touch. He smells like whatever detergent he uses. You look at the rain. He looks at the rain.
 {% elif w.hasTrait("FLIRTY") %}
-"My hero." You step under the umbrella and stand close enough that he has to adjust his grip. He smells like coffee and some kind of soap that probably costs more than it should. You don't move away.
+"My hero." You step under the umbrella and stand close enough that he has to adjust his grip. He smells like coffee and something that probably costs more than it should.
 {% elif w.hasTrait("POSH") %}
-"That's kind of you." You step under, careful not to brush against him. The umbrella is barely adequate for two. He holds it slightly more toward your side, which you notice and don't acknowledge.
+"That's kind of you." You step under, careful not to brush against him. The umbrella is barely adequate for two. He holds it slightly more toward your side.
 {% else %}
-"Sure, thanks." You step under. It's not quite big enough for two — the rain still catches your far shoulder — but it's better than nothing. He tilts it toward you without being asked. Small courtesy. The kind of thing you notice in this city because it doesn't happen enough.
+"Sure, thanks." You step under. It's not quite big enough for two — the rain still catches your far shoulder — but it's better than nothing. He tilts it toward you without being asked.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-He's close enough that you can feel warmth coming off his arm. There's something about standing this close to a man who chose to move toward you. Not a threat. Just presence. Weight. The geometry of two bodies under insufficient shelter, and the fact that he's the bigger one.
-
-*This is what women do*, you think. *They stand next to men and calculate.*
+{% if w.getSkill("FEMININITY") < 30 %}
+He's close enough that you can feel warmth coming off his arm. The top of your head is level with his chin. The umbrella smells like nylon and rain. You're standing in the space someone else made for you, which is a sentence that didn't used to apply.
 {% endif %}
 
-"I'm David," he says. Not a question, not a pickup line. Just information.
+"I'm David," he says. Not a question. Just information.
 """
 
   [[actions.effects]]
@@ -108,12 +110,14 @@ detail    = "Generous, but no."
 condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-"I'm okay, thanks." You weren't expecting your voice to come out that quiet. He nods once, puts the umbrella back at his side, and the moment closes like a door.
+"I'm okay, thanks." Quieter than you intended. He nods once, puts the umbrella back at his side.
 {% elif w.hasTrait("BITCHY") %}
-"I'm fine." Something in the way you say it makes him take a half-step back. Good. Boundaries aren't a personality flaw.
+"I'm fine." Something in how you say it makes him take a half-step back.
 {% else %}
-"I'm good, but thanks." He shrugs — not offended, not invested. Just a guy who tried something small and moved on. The rain fills the silence instead.
+"I'm good, but thanks." He shrugs — not offended, not invested. Just a guy who tried something small and moved on.
 {% endif %}
+
+The rain fills the silence. Eventually it eases to something survivable and you walk the three blocks home with wet shoes and dry pride.
 """
 
   [[actions.effects]]
@@ -130,14 +134,14 @@ id        = "umbrella_offer"
 condition = "!scene.hasFlag('umbrella_offered')"
 weight    = 12
 prose     = """
-He looks at the rain. Then at you. Then at the umbrella leaning against the bench. He makes a decision about what kind of person he's going to be today.
+He looks at the rain. Then at you. Then at the umbrella leaning against the bench.
 
 "Rain's not letting up. I've got this, if you want."
 
 {% if w.hasTrait("BEAUTIFUL") %}
-He says it like the offer was obvious, which for him it was. You know this one. The umbrella is about the rain and also not about the rain.
+He says it like the offer was already decided before he opened his mouth.
 {% elif w.hasTrait("PLAIN") %}
-It takes him a beat to offer — the kind of beat you might not notice if you weren't paying attention. But you were. You always are.
+It takes him a beat to commit to the ask.
 {% endif %}
 """
 
@@ -150,15 +154,13 @@ id        = "small_talk"
 condition = "scene.hasFlag('umbrella_offered')"
 weight    = 5
 prose     = """
-"You live around here?" He says it the way people in this city ask — not interested, just filling air.
+"You live around here?" He says it the way people in this city ask — filling air, not expecting much.
 
 {% if w.hasTrait("POSH") %}
-"Nearby." You leave it at that. He doesn't push.
-{% elif w.hasTrait("CUTE") %}
-"Just a few blocks that way." You point, and he nods like that means something.
+"Nearby." You leave it at that.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-"Yeah, Clement and Fifth. You?" He says he's on Union, which is close enough to be relevant and far enough to not matter.
+"Yeah, Clement and Fifth." He says he's on Union. Close enough to be relevant.
 {% else %}
-"Close by," you say. He nods. That's the end of that.
+"Close by," you say. He nods. The rain keeps going.
 {% endif %}
 """

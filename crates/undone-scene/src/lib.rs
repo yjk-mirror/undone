@@ -164,7 +164,7 @@ mod integration_tests {
         );
         let events = engine.drain();
 
-        // 6. Assert intro prose contains shy branch
+        // 6. Assert intro prose renders (non-BEAUTIFUL default branch)
         let prose_events: Vec<&str> = events
             .iter()
             .filter_map(|e| {
@@ -178,8 +178,8 @@ mod integration_tests {
         assert!(!prose_events.is_empty(), "intro prose should be emitted");
         let all_prose = prose_events.join("\n");
         assert!(
-            all_prose.contains("far end"),
-            "SHY branch should appear in intro"
+            all_prose.contains("Quick read"),
+            "non-BEAUTIFUL branch should appear in intro"
         );
 
         // 7. Assert initial actions (main + leave, NOT accept_umbrella yet)
