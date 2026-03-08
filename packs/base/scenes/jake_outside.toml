@@ -11,17 +11,17 @@ He smiles. Not the careful smile of a man working out whether to approach, just 
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-Coffee shop Jake was at a table, approximately eye-level, at a remove. Street Jake is taller than you expected. You didn't used to have a frame for noticing that first. The grocery bag and the phone put him in a particular register — not polished, just a person running an errand — and you clock all of this in the time it takes him to smile.
+Coffee shop Jake was at a table, approximately eye-level, at a remove. Street Jake is taller than you expected. Taller and closer and the grocery bag puts his forearm at an angle that your eyes follow before your brain catches up. Something warm in your stomach, fast and involuntary.
 
 He sees you and the smile comes without delay. "Hey."
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 45"
+condition = "w.getSkill('FEMININITY') < 45"
 style     = "inner_voice"
-prose     = "*You've walked past this scene before — a man and a woman stopped on the sidewalk, talking. You barely clocked her side of it.*"
+prose     = "*A man and a woman stopped on the sidewalk, talking. You're the woman. The thought arrives and leaves.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 

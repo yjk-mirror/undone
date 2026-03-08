@@ -23,10 +23,8 @@ You catch his eye before he catches yours — or maybe it was simultaneous. Hard
 He nods. You nod back. The universal coffee-shop acknowledgment — *we are both here, we are both waiting, this is fine.*
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-You stand with your bag against your hip. Shoulders slightly in. The man ahead of you doesn't notice the three inches you've left between you, or the angle of your feet, or any of the small adjustments you've been making since you got in this line. He's just waiting for coffee.
-
-You used to be the one who didn't notice.
+{% if w.getSkill("FEMININITY") < 35 %}
+You stand with your bag against your hip. Shoulders slightly in. The adjustments happened before the line started moving — feet angled, space measured, bag positioned. None of it deliberate anymore. The man ahead of you is just waiting for coffee. You're waiting for coffee and managing geometry.
 {% endif %}
 """
 
@@ -136,10 +134,10 @@ You sit down. He slides a sugar packet toward you without asking, which is eithe
 
 "I'm Jake," he says. He holds out his hand, which feels weirdly formal for a coffee shop but somehow works.
 
-{% if not w.alwaysFemale() %}
-His hand is warm and bigger than yours, and the handshake lasts exactly the right amount of time, and for a second you're struck by the simple mechanical fact of a man reaching for you and you reaching back. It's not desire. It's not discomfort. It's just *new*.
+{% if w.getSkill("FEMININITY") < 35 %}
+His hand is warm and bigger than yours. The handshake lasts exactly the right amount of time, and your fingers disappear inside his grip for a second before he lets go. Something in your stomach does a small, involuntary thing.
 
-*You used to be the one who extended the hand*, you think. *You used to be the one who set the grip.*
+*His hand.* That's the whole thought. Just: his hand.
 {% endif %}
 """
 
@@ -196,7 +194,7 @@ He's sitting at a table by the window now, coffee in hand. He catches your eye a
 {% if w.hasTrait("PLAIN") %}
 He says it the way people say things to you — without the specific eagerness they reserve for other women. Just friendly. Just casual. You notice the absence of something you don't want to name.
 {% elif w.hasTrait("BEAUTIFUL") %}
-He says it with the careful casualness of a man who has decided to be brave. You recognize the calculation behind the ease. You've watched men do this math before.
+He says it with the careful casualness of a man who has decided to be brave. Something in your chest tightens — not unpleasant, just quick. His eyes stay on yours a beat longer than the question needs.
 {% endif %}
 """
 

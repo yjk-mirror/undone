@@ -11,9 +11,9 @@ You're heading for the water refill station, or back from a meeting, or somewher
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-The corridor between engineering and the kitchen is narrow enough that two people walking in opposite directions have to make a small decision about who yields. You still sometimes get it wrong — still sometimes hold your line the way you used to, expecting the other person to step around you, before you catch yourself and shift. Nobody notices when you correct it. That's maybe the strangest part. Two weeks of this and the corrections happen faster, but they still happen, which means you still notice them, which means the corridor is not just a corridor.
+The corridor between engineering and the kitchen is narrow enough that two people walking in opposite directions have to make a small decision about who yields. You hold your line for a half-step too long and then shift right. The guy from platform doesn't notice the correction. Your shoulder pulled in before your brain gave the order.
 
 You're heading for the water refill station. It's a sixty-second walk.
 """
@@ -29,8 +29,8 @@ Kevin Marsh is coming the other way, laptop bag over one shoulder, looking at hi
 
 That's it. The whole transaction takes maybe two seconds.
 
-{% if not w.alwaysFemale() %}
-Kevin filed you where he files everyone in this building — by team, by role, by whether he's had a substantive conversation with you yet. No prior version of you to compare against, no recalibration happening mid-stride. You're not sure when you started noticing when something lands correctly. You're noticing it now.
+{% if w.getSkill("FEMININITY") < 35 %}
+Kevin's gaze passed over you and kept going. Nothing in it. Nothing behind it. Just another colleague in a corridor, filed and forgotten before the next step. Your shoulders stayed where they were.
 {% endif %}
 """
 

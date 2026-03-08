@@ -7,21 +7,21 @@ description = "Friday 4pm. Someone wants drinks. The decision."
 prose = """
 The Slack message lands at 4:07 from someone in DevRel you've seen twice, maybe three times. Drinks at Corrigan's, 5pm, all welcome. Friday ritual. You read it once, then read it again, slower, working out what the question actually is underneath it — whether you're the kind of person who goes to these.
 
-You didn't use to have to think about it. You just went, or didn't, based on whether you felt like it, because there was never any variable other than whether you felt like it.
+The decision has more variables than it needs to. What to wear. Whether you'll be the only one who doesn't already have a group. Whether someone buys you a drink and whether that means something. The cursor blinks on the Slack channel.
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The Slack message lands at 4:07 from someone in DevRel you've seen twice, maybe three times. Drinks at Corrigan's, 5pm, all welcome. Friday ritual.
 
-You've been here a month. You don't know who goes to these, or whether the invitation extends to you in the same way it extends to the people it was written for. "All welcome" can mean a lot of different things depending on which version of you is reading it. You read it again, trying to work out which version the DevRel person had in mind when she typed it.
+You've been here a month. The invitation is simple. The calculation behind whether to accept it is not — what to wear, which group to attach to, whether the bar will be loud enough that your voice disappears or quiet enough that it carries. Your finger hovers over the reply box.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose = """*You went to things like this without thinking about it. The decision to go somewhere was never a calibration.*"""
+prose = """*Friday drinks. Variables: outfit, group, exit strategy. When did going somewhere need an exit strategy.*"""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -57,8 +57,8 @@ detail = "Message back. Another time."
 prose  = """
 You message back: another time, deadline. It lands fine. Someone sends a thumbs-up. Nobody is keeping score on this particular thing.
 
-{% if not w.alwaysFemale() %}
-*You used to be someone who didn't have to think about whether to go to a thing. The thinking is new.*
+{% if w.getSkill("FEMININITY") < 35 %}
+The office quiets. You close the Slack thread and the relief is immediate and specific — one fewer variable for the evening.
 {% endif %}
 
 The office quiets out over the next forty minutes as people leave. By 5:30 it's down to the people who are either on deadline or have nowhere to be. You finish what you're working on, pack up, and head out into the tail end of a Friday evening.

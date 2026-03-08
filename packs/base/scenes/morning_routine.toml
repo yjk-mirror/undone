@@ -9,12 +9,8 @@ The alarm didn't go off. Your phone says 7:48, which means you set it to PM agai
 
 The apartment is the same apartment. One bedroom off Clement Ave, third floor, the kitchen that's really a corner. Your landlord fixed the radiator in November and broke the hot water in doing so, and now you have both, which counts as a win in this city.
 
-{% if not w.alwaysFemale() %}
-The bathroom mirror is the first checkpoint of the day. It catches you before you're ready — hair still pressed flat on one side, face still soft with sleep. You look at yourself the way you look at someone you're not sure you recognize.
-
-*This is you now.* Not news. Just something that needs restating every morning, like a fact you keep checking because it still doesn't quite sit right.
-{% else %}
-The bathroom mirror catches you before you're ready — hair pressed flat on one side, pillow lines on your cheek. Monday.
+{% if w.getSkill("FEMININITY") < 30 %}
+The bathroom mirror catches you before you're ready — hair pressed flat on one side, face still soft with sleep. The face is yours. You know the face is yours. The quarter-second before that knowledge arrives is the part you're still getting used to.
 {% endif %}
 
 You get yourself together. Teeth, face, the usual negotiation with your hair.
@@ -31,8 +27,8 @@ The dress or the skirt. You hold both up. The dress says *try me*. The skirt say
 You get dressed without ceremony. Whatever's clean, whatever fits the weather. It'll do.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-Getting dressed is still a small negotiation. Not the mechanics — you've got those. But the decisions. Every piece of clothing is a declaration you didn't have to make before, and some mornings the weight of all those tiny choices adds up before you've even had coffee.
+{% if w.getSkill("FEMININITY") < 30 %}
+Getting dressed is still a small negotiation. Not the mechanics — you've got those. But the number of decisions. The bra clasp is automatic now. Which top goes with which jacket is not.
 {% endif %}
 
 Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
@@ -78,8 +74,8 @@ The Dunkin' on Fifth has a line, because the Dunkin' on Fifth always has a line.
 "Medium iced, cream, two sugars." She's already reaching for the cup before you finish. Some mornings the city just works.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-The guy behind you in line is standing close. Not inappropriately — just the way men stand, the way they fill space without negotiating for it. You used to stand like that. Now you hold your elbows in and your bag against your hip and you notice the three inches of air between your shoulder and his, and you know those three inches are yours to manage.
+{% if w.getSkill("FEMININITY") < 35 %}
+The guy behind you in line is standing close. Not inappropriately — just close. Your shoulders pull in before you've thought about it. Your bag shifts to the hip between you and him. Three inches of air that your body is already managing without being told to.
 {% endif %}
 
 Coffee in hand. The day starts now.

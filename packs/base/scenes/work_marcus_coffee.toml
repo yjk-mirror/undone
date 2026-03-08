@@ -15,7 +15,7 @@ Not *how did the presentation go*. Not *what feedback did you have*. He wants to
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 10:30, and the break room smells like burnt coffee from the first pot someone made at seven and forgot about. You're making your second cup — the machine grinds through its cycle, which you've timed to about forty seconds if you're not watching it.
 
@@ -23,13 +23,13 @@ Marcus comes in. He pours from the pot you just refreshed, doesn't thank the mac
 
 "What did you think of Kevin's deck?"
 
-You still clock the moment when someone asks your opinion as a first move — not the act of being asked, which is ordinary, but your own reaction to it. You've noticed Marcus does this. He asks the person in front of him things, and the person in front of him is currently you. You file the reaction away beside the others you're collecting, the ones you can't fully account for yet.
+He's looking at you directly. Your stomach does a small, unhelpful thing — not the question, the directness of it. The way he asked without preamble, like your opinion was already something he'd allocated time for. The coffee machine finishes its cycle behind you.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*Marcus asks you things like a person asks another person things. You know this is normal. You're still recalibrating to normal.*"
+prose = "*He asked. Direct. No preamble. Something about that lands harder than it should.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -73,8 +73,8 @@ prose  = """
 
 Marcus nods, gets his coffee, and goes. The kind of answer that produces no follow-up questions because it contains nothing worth following up on.
 
-{% if not w.alwaysFemale() %}
-On the walk back to your desk you think, not for the first time, that you used to have opinions faster than this — whether the hesitation is caution that makes sense in a new situation or something you've picked up that you didn't mean to, you can't say yet.
+{% if w.getSkill("FEMININITY") < 35 %}
+On the walk back to your desk, your hands are tight around the coffee cup. The measured answer sat where a direct one would have. You're not sure when the gap opened up between thinking something and saying it.
 {% endif %}
 """
 

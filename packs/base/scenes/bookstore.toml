@@ -15,11 +15,11 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you. That particular pleasure of browsing — no agenda, no transaction until you decide there is one.
 
-You're still sometimes performing browsing rather than just doing it. Calibrating what your hands do, where you look, how long you linger at a shelf. In a hardware store or a coffee shop there's a script; here the script is just *person looking at books*, and you're not sure you've got it right yet. The clerk doesn't look up, which helps.
+Your hands find the shelf at a different height than they expect. You linger at a spine and then move on, and the lingering felt calibrated rather than natural. The clerk doesn't look up, which helps.
 
 {% if gd.hasGameFlag("BOOKSTORE_VISITED") %}
 The clerk glances up when the door opens. "Back again," he says, then goes back to whatever he was reading. It's not unfriendly. It's a fact.
@@ -27,9 +27,9 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose     = """*The clerk said "miss" when you asked about the biography section. It's not the first time. Not bad, not good. Just: still landing.*"""
+prose     = """*Miss. The clerk said miss. Still lands like a coin flipping in midair.*"""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -46,8 +46,8 @@ You go straight for the wall of paperbacks in the back, where nothing is preciou
 You find a biography in the back corner — a figure you've been meaning to read — and bring it to the counter. The clerk wraps it in tissue paper without asking, out of habit or out of care for the books, you can't tell which. You overpay by two dollars in the calculation and don't correct it.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-The transaction was ordinary. The clerk said "have a good day" to the register as he made change, and you said it back, and then you were outside with a book in a bag. It went the way it was supposed to go, and you're holding onto that.
+{% if w.getSkill("FEMININITY") < 30 %}
+The clerk said "have a good day" without looking up from making change. You said it back. Outside with a book in a bag, and the whole thing went exactly the way it was supposed to go.
 {% endif %}
 """
 
@@ -123,8 +123,8 @@ You disagree on the conclusion. Not the diagnosis — the diagnosis seems right 
 The next ten minutes involve neither of you conceding the central point, both of you updating the supporting arguments, and a recommendation on both sides for things the other person should actually read before having this argument. He writes his down on a scrap of receipt paper. You remember yours.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-The conversation went without either of you navigating around anything. Two people in a bookstore with opinions, the way that used to be the whole transaction.
+{% if w.getSkill("FEMININITY") < 30 %}
+The conversation went without either of you navigating around anything. Two people in a bookstore with opinions. Your voice pitched differently than the one in your head, and neither of you noticed.
 {% endif %}
 """
 

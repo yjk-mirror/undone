@@ -9,17 +9,17 @@ Four o'clock and the park near your apartment is doing its afternoon thing. The 
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 Four o'clock and the park near your apartment is doing its afternoon thing. The dogs are making their rounds — a golden retriever pulling one direction, a pair of terriers pulling another, their owners attached like kites. A jogger goes by every few minutes on the outer path, steady as a clock.
 
-You're still recalibrating how you move in public space. The speed, the path choices — which side of the path you default to, when you make eye contact with approaching strangers and when you don't. You used to walk without thinking about it. You're still mapping it.
+Your stride is shorter than it expects to be. You catch yourself correcting path width — drifting center, pulling right, drifting center again. The jogger routes around you without looking and your shoulders dip inward on reflex.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*You walk like you're going somewhere. That hasn't changed. Something in the periphery has — the way the space around you reads, how much of it you take up and how, the way strangers route around or toward you. You're still mapping it.*"
+prose = "*Shorter stride. Narrower wake. The path feels wider than it is.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -30,8 +30,8 @@ detail = "An hour. A man jogs past, nods."
 prose = """
 You do the full loop around the park — the outer path, past the dog run, past the fountain that's been turned off for the season, back around to the entrance. A man in a running jacket jogs past and nods without breaking stride. You nod back. The exchange is nothing.
 
-{% if not w.alwaysFemale() %}
-You've given that nod before, from the other side of it. It's the same nod. What's different is how it arrives now — without the half-second sizing-up that used to happen below the surface. Just the nod, and then he's gone around the bend.
+{% if w.getSkill("FEMININITY") < 35 %}
+The nod arrives and goes. His eyes stayed on yours for exactly one beat — nothing in them, no calculation, just the reflex of passing someone on a path. Your neck is warm for a second afterward and you don't know why.
 {% endif %}
 """
 

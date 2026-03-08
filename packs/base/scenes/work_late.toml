@@ -9,17 +9,17 @@ prose = """
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles differently when it's only cooling the room rather than a roomful of people.
 
-The late office is one of the places where the world hasn't gotten around to having expectations about you. You're just someone staying late. That's all anyone knows, and it's all you've ever needed to be.
+The empty floor hums. Your reflection in the dark monitor across the aisle is a shape you're still learning — the proportions wrong in peripheral vision, correct when you look directly.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 style     = "inner_voice"
-prose = """*You always stayed late. It was a thing about you — not a boast, just a fact. The work ran longer than the day and you stayed with it. You wonder if the same thing still makes you stay, or if it's something else now.*"""
+prose = """*Empty floor. Good light. The quiet is the same quiet it always was.*"""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -58,8 +58,8 @@ detail = "Hit a natural stopping point and go."
 prose  = """
 You find a reasonable place to stop — not a perfect one, there's no such thing — and close the laptop at 6:28. File that task for tomorrow. Send that message in the morning. The work will still be there.
 
-{% if not w.alwaysFemale() %}
-You leave before the office empties completely, which means you leave alongside a handful of other people heading for the elevator. You notice you made this choice. You don't do anything with that information yet — you just carry it home with you, along with the laptop.
+{% if w.getSkill("FEMININITY") < 35 %}
+You leave alongside a handful of other people heading for the elevator. The parking garage is two floors down and well-lit. You noticed the lighting on day one. You notice you noticed.
 {% endif %}
 
 Outside it's colder than when you came in this morning. The responsible choice, as it turns out, also comes with better air.

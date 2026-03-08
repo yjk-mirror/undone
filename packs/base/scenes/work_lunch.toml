@@ -21,9 +21,9 @@ You don't know the lunch patterns yet. You watch which clusters form and which d
 # ── Thoughts ──────────────────────────────────────────────────────────
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 40"
+condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose = "*You used to pick up whatever was in the conference room or eat at your desk without thinking about it. The question of lunch never had social texture before.*"
+prose = "*Lunch. When did lunch become a decision with variables.*"
 
 # ── Player Actions ─────────────────────────────────────────────────────
 
@@ -55,8 +55,8 @@ detail = "A table to yourself. Nobody wants anything from you."
 prose  = """
 Two blocks from the office there's a sandwich place with a long counter facing the window. You get a table to yourself. You read your phone and eat your lunch and watch the sidewalk, which is doing what sidewalks do at this hour — people in motion, someone on a call, a bike courier cutting through the gap between a delivery truck and a cab.
 
-{% if not w.alwaysFemale() %}
-Being a woman alone at a lunch counter is a different read than being a man alone. The man eating alone in the middle of the day carries an assumption of something not quite working — nobody volunteers what, but it's there. The woman alone reads as a choice. You've been on the other side of that assumption, made it about other people without meaning to.
+{% if w.getSkill("FEMININITY") < 35 %}
+Nobody looks at you eating alone. The sandwich place doesn't care. The sidewalk doesn't care. You sit at a counter by yourself and nobody reads anything into it, and you notice the absence of something you can't quite name.
 {% endif %}
 
 You finish your sandwich and get back before 1:00.
@@ -115,8 +115,8 @@ He has opinions about the latency numbers — not complaints, opinions, which is
 
 By the time you're back in the elevator he's already drafting a message on his phone. "I want to try something," he says, which from him sounds less like small talk than it probably does from most people.
 
-{% if not w.alwaysFemale() %}
-You've had lunches like this before — the good kind, the kind where the work is what it is and nobody's performing at each other. You know how rare they are. The thing you're still working out is how it lands differently now, being taken seriously across a table, the specific way someone listens when they're actually interested.
+{% if w.getSkill("FEMININITY") < 35 %}
+The walk back to the elevator is quiet. He holds the door without thinking about it. Your hand on the counter left a warm spot. The lunch was about the work, and the work was good, and something underneath both of those things hums at a frequency you haven't named yet.
 {% endif %}
 """
 

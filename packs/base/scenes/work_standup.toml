@@ -27,7 +27,7 @@ Marcus nods. Kevin looks up briefly, then back at his phone.
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The standup circle forms at 9:05. Seven people. You're still calibrating where to stand in a circle of colleagues — not conspicuously, just the small adjustments that happen when the geometry is new. You end up two steps farther from the center than you need to be.
 
@@ -39,10 +39,10 @@ Marcus nods once. Kevin doesn't look up from his phone.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 style     = "inner_voice"
 prose = """
-*You hold yourself slightly smaller than you used to. You used to take up more space in these circles — both feet planted, elbows out, the body language of someone who doesn't think about body language. You notice the difference without deciding what it means.*
+*Elbows in. Two steps farther back than the geometry needs. When did the circle get this big.*
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -84,8 +84,8 @@ detail = "Minimum viable update. Let the circle move."
 prose  = """
 Thirty seconds. Deployed. Waiting on sign-off. The circle moves to Kevin before anyone has a chance to ask a follow-up.
 
-{% if not w.alwaysFemale() %}
-*You used to take longer, and not because you had more to say.*
+{% if w.getSkill("FEMININITY") < 35 %}
+*Thirty seconds. Done.* Your voice still surprises you in rooms this size — the pitch, the carry. Kevin didn't look up either way.
 {% endif %}
 
 Kevin's update runs four minutes. You listen to the first ninety seconds and then stop, which is the right amount of Kevin to absorb in a given standup. Marcus gives his infrastructure update in under a minute, with two concrete details and no padding, which is how you'd have done it too.

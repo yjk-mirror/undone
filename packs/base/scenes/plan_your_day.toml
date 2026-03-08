@@ -27,7 +27,7 @@ Somewhere down the block someone's running a restaurant kitchen at full noise. T
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 {% if gd.timeSlot() == "Morning" %}
 Coffee, window, list. The list is on your phone: dry-cleaning, the CVS run you've been putting off, a call you told yourself you'd make by end of week.
@@ -51,7 +51,7 @@ The apartment has gotten normal faster than expected. You can move through it in
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') >= 20 && w.getSkill('FEMININITY') < 50"
+condition = "w.getSkill('FEMININITY') >= 20 && w.getSkill('FEMININITY') < 50"
 prose = """
 {% if gd.timeSlot() == "Morning" %}
 The coffee routine runs itself now. Grind, brew, window. The same order every morning, and you stopped noticing you were doing it about a week ago.
@@ -75,7 +75,7 @@ The apartment is quiet. Not unsettlingly quiet — the ordinary quiet of a space
 # ── Thoughts ──────────────────────────────────────────────────────────
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 prose = "*You bought the same coffee two weeks running without looking at alternatives. At some point that became the brand you buy.*"
 style = "inner_voice"
 

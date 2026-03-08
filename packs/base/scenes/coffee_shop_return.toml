@@ -11,11 +11,11 @@ You've met this person, you know his name, there's no good reason to pretend oth
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up.
 
-You know what you'd have done before. Nodded once if you happened to make eye contact, gotten your coffee, gotten on with it. Clean and unremarkable. You're not sure if that's still the right call, or if "right" means something different in this body than it used to, or if you're overthinking a Tuesday morning in a coffee shop. Probably the third one. You get in line.
+Your pulse does a small, unnecessary thing. You get in line and look at the chalkboard menu you've already memorized and your hands find the strap of your bag and hold it.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -36,8 +36,8 @@ On your way out, he glances up. "Hey — you come here a lot?" Not a line. Just 
 
 "Good taste," he says, and goes back to his laptop.
 
-{% if not w.alwaysFemale() %}
-You've been in his position before — the one who acknowledges, who makes it easy, who does the small social maintenance and then returns to his own thing. You know the shape of it from the inside. It lands differently when you're on the other end of it. The coffee is still good.
+{% if w.getSkill("FEMININITY") < 35 %}
+"Good taste," he said. Your face is warm for the next half-block and you don't do anything about it. The coffee is still good.
 {% endif %}
 """
 
@@ -97,8 +97,8 @@ You order, pay, and take the table by the radiator at the back — the one nobod
 
 You don't look in his direction. You've decided what kind of morning this is going to be.
 
-{% if not w.alwaysFemale() %}
-He clocked you when you came in. You know that the way you know a lot of things now — from having been on the other side of it enough times that the mechanics are familiar. He's back on his laptop. Whatever he made of the non-acknowledgment, he's filed it and moved on. So have you.
+{% if w.getSkill("FEMININITY") < 35 %}
+He glanced up when you came in. You felt it — brief, automatic, filed and dismissed. He's back on his laptop now. You're at the back table with your coffee and the radiator and the specific relief of a choice that was yours to make.
 {% endif %}
 
 The coffee is fine. The table by the radiator is warmer than it needs to be, and you're fine with both.

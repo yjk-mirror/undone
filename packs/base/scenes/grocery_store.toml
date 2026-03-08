@@ -9,17 +9,17 @@ Thursday evening, the grocery store two blocks from your apartment. You have a l
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 Thursday evening, the grocery store two blocks from your apartment. You have a list.
 
-Two months of shopping here, and you're still making small adjustments. How you hold the basket. How you navigate around someone at the dairy case — the contact zone calibration that happens without being thought through, most of the time, but that you're still sometimes catching yourself on. You got here fine. You'll get out fine. It's the middle part that takes attention.
+The basket handle sits differently in your hand — smaller grip, different angle at the elbow. You navigate around a woman at the dairy case and your body does the geometry automatically: angle, yield, pass. It worked. You notice it worked, which means it's not fully automatic yet.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 35"
+condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*You used to shop fast. Get in, get the things, get out. You've slowed down without deciding to. You take the long way around the produce section sometimes. You don't know why exactly, but you suspect it's not random.*"
+prose = "*Produce section. The long way around. Didn't decide to.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -31,12 +31,10 @@ allow_npc_actions = false
 prose = """
 You move through the store efficiently — produce first, then the middle aisles, then dairy last to keep it cold. A man reaches across you at the pasta shelf with an "excuse me" that's more reflex than request. You shift slightly. He takes what he needed and moves on.
 
-{% if not w.alwaysFemale() %}
 {% if w.getSkill("FEMININITY") < 20 %}
-The contact zone calibration happened — you moved before he asked, read the angle of his reach, cleared the space. Still deliberate, not yet automatic.
-{% else %}
-The contact zone calibration happened automatically. You moved before he asked, read the angle of his reach, cleared the space. Two months of this and it's close to instinct.
-{% endif %}
+You moved before he asked. Read the angle of his reach, cleared the space. Still deliberate — your body waiting for your brain to sign off on each small adjustment.
+{% elif w.getSkill("FEMININITY") < 40 %}
+You moved before he asked. The angle of his reach, the space to clear — your body handled it without consulting you. Two months and counting.
 {% endif %}
 
 The list is done in twenty minutes. That's the correct number of minutes for this list.
@@ -85,8 +83,8 @@ You get the short lane — only two people ahead of you. The clerk has the pract
 
 "Have a good night," she says when you take your bags.
 
-{% if not w.alwaysFemale() %}
-It's a phrase she says to everyone. But you're on the receiving end of it, which is not where you used to stand in this kind of exchange. You used to be the one dispensing that particular casual warmth — a bartender, a checkout clerk, a guy holding a door. Now it's directed at you, and it lands the way it was meant to.
+{% if w.getSkill("FEMININITY") < 35 %}
+It's a phrase she says to everyone. Something in it lands anyway — the automatic warmth of a stranger being kind to you without thinking about it. You take your bags and the warmth stays for a few steps past the automatic doors.
 {% endif %}
 """
 
