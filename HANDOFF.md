@@ -21,7 +21,7 @@
 
 ## ⚡ Next Action
 
-**Prolific writing session complete — 16 new scenes, 3 explicit adult. (2026-03-08)**
+**Prolific writing session complete + writing-review audit done — 16 new scenes, 3 explicit adult. (2026-03-08)**
 
 ### Completed this session (writing session continuation):
 - **16 new scenes written** across 4 tracks (Jake romance, Marcus tension, stranger encounters, content deepening)
@@ -54,6 +54,14 @@
 | laundromat_night | Deepening | MEDIUM | Mundane tension — may need stronger hook |
 
 **Scenes requiring user creative review:** jake_apartment, bar_stranger_night, work_marcus_closet (all explicit, all MEDIUM confidence)
+
+### Writing-reviewer audit (2026-03-08, continuation session):
+- **18 scenes audited** by 4 parallel writing-reviewer agents (stranger+universal, marcus, jake, expanded)
+- **~65 Critical/Important findings** across all tracks — all fixed
+- **Recurring patterns killed:** narrator body-analysis, omniscient narrator, "specific" overuse, transformation-as-yardstick, full articulated thoughts, vague abstractions
+- **One copy-paste duplicate paragraph** found and fixed in workplace_evening.toml
+- **Estimated post-fix grades:** Stranger+Universal A-/A, Marcus B+/A-, Jake A-/A, Expanded B+
+- **work_marcus_closet** was lowest-rated (C+ pre-fix → B+ post-fix) — most narrator body-analysis violations
 
 ### Remaining priorities:
 1. ~~**Zero adult content**~~ — RESOLVED. 3 explicit scenes written (jake_apartment, bar_stranger_night, work_marcus_closet). Game can now prove its premise.
@@ -228,6 +236,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont.4 | Writing-reviewer audit + fix pass. 4 parallel writing-reviewer agents audited all 18 new/expanded scenes. ~65 Critical/Important findings fixed across all tracks: narrator body-analysis, omniscient narrator, "specific" overuse, transformation-as-yardstick, full articulated thoughts, vague abstractions. Fixed copy-paste duplicate paragraph in workplace_evening. Fixed 3rd-person POV slips. Post-fix grades: Stranger+Universal A-/A, Marcus B+/A-, Jake A-/A, Expanded B+. 49 scenes pass validate-pack. |
 | 2026-03-08 cont.3 | Prolific writing session. 16 new scenes across 4 tracks: Jake romance arc (jake_first_date, jake_second_date, jake_apartment [explicit], jake_morning_after, jake_text_messages), Marcus tension arc (work_marcus_late, work_marcus_drinks, work_marcus_closet [explicit], work_marcus_aftermath), stranger encounters (bar_closing_time, bar_stranger_night [explicit], party_invitation), content deepening (weekend_morning, shopping_mall, landlord_repair, laundromat_night). Expanded 2 existing single-action scenes (workplace_work_meeting +2 actions, workplace_evening +2 actions). Created character docs (docs/characters/jake.md, marcus.md). Full schedule.toml integration with flag progression chains: MET_JAKE→JAKE_FIRST_DATE→JAKE_SECOND_DATE→JAKE_INTIMATE→JAKE_MORNING_AFTER, FIRST_MEETING_DONE→MARCUS_LATE_NIGHT→MARCUS_DRINKS→MARCUS_INTIMATE→MARCUS_AFTERMATH, BAR_STRANGER_INVITED→BAR_STRANGER_SLEPT. 3 scene-writer agents dispatched per batch (parallel). 49 scenes total. 262 tests, 0 failures. validate-pack clean. |
 | 2026-03-08 cont.2 | UI bug fixes + playtester agent rewrite. Fixed traits text overflow in char creation (flex_basis(0) + flex_grow(1) + max_width(400) on read_only_row label). Rewrote `.claude/agents/playtester.md` per user direction — explicit horny player perspective, not polite QA. Attempted button overflow bug (3rd choice clips below window when buttons wrap to 2 rows) — 5 approaches failed: min_height(0) on scroll/parents, flex_grow+flex_basis on ancestors, height_full on story v_stack, moving buttons inside scroll (rejected: user says buttons shouldn't require scrolling), wrapping scroll in extra container. Root cause: floem scroll widget doesn't properly shrink in flex column. All experimental changes reverted. User directed: research floem docs/source next session, fix the bug, write findings to floem-layout skill. |
 | 2026-03-08 cont. | Scene calibration completion pass. Calibrated remaining 16 non-campus scenes (morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day). All `!w.alwaysFemale()` guards replaced with `w.getSkill('FEMININITY') < N` thresholds. All ~25 "you used to" / "from the other side" banned patterns replaced with involuntary physical reactions and body-first observations. All `{% else %}` AlwaysFemale branches removed. All inner voice thoughts converted to fragments. 26/33 scenes now calibrated (7 campus arc deprioritized). 262 tests, 0 failures. validate-pack passes. |
