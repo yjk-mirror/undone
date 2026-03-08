@@ -375,6 +375,13 @@ Project-specific agents invoked via `subagent_type` in the Task tool.
 |---|---|---|
 | scene-writer | `scene-writer` | Writing new scenes or expanding existing ones. Has Write/Edit, minijinja validation. |
 | writing-reviewer | `writing-reviewer` | Quality review of scene prose. Read-only. Returns Critical/Important/Minor findings. |
+| playtester | `playtester` | Plays through the game as an actual player — launches, clicks, reads, reports. Unbiased feedback on writing quality, choices, flow, UI. Has screenshot + game-input MCP tools. |
+
+**Mandatory playtesting:** After ANY session that changes UI code, scene prose, or game
+flow, launch the `playtester` agent to play through affected scenes BEFORE claiming done.
+The playtester catches issues that technical tests miss — bad writing, broken flow, stale
+detail text, choices that don't feel meaningful. Its report is player feedback, not a bug
+list. Treat it accordingly.
 
 **Prolific writing sessions:** Dispatch multiple `scene-writer` agents in parallel (one per
 scene), then run `writing-reviewer` on each result. Use `ops:dispatching-parallel-agents`
@@ -384,6 +391,7 @@ to coordinate.
 1. `scene-writer` reads character docs + arc docs + writing guide → writes TOML
 2. `writing-reviewer` audits the output → reports issues
 3. Lead agent applies Critical fixes, commits
+4. `playtester` plays through the scene and reports player experience
 
 ### Dispatching background agents
 
