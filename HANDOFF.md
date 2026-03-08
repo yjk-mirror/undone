@@ -4,7 +4,7 @@
 
 **Branch:** `master`
 **Tests:** 262 passing, 0 failures.
-**Scenes:** 33 total (19 pre-sprint + 14 new).
+**Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -21,29 +21,48 @@
 
 ## ⚡ Next Action
 
-**26/33 scenes calibrated to DM narrator register. Campus arc (7) deprioritized. (2026-03-08)**
+**Prolific writing session complete — 16 new scenes, 3 explicit adult. (2026-03-08)**
 
-### Completed this session:
-- **UI fixes** (prior conversation): scheduler bypass, scene transitions, choice echo, markdown renderer, detail strip reset, button layout
-- **10 scenes calibrated** (prior conversation): transformation_intro, workplace_arrival, workplace_first_day, neighborhood_bar, rain_shelter, workplace_landlord, workplace_first_night, workplace_first_clothes, workplace_work_meeting, workplace_evening
-- **16 more scenes calibrated** (this continuation): morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day
-- **Playtester agent** created (`.claude/agents/playtester.md`) — unbiased player with screenshot + game-input MCP tools
+### Completed this session (writing session continuation):
+- **16 new scenes written** across 4 tracks (Jake romance, Marcus tension, stranger encounters, content deepening)
+- **3 explicit adult scenes** — jake_apartment (first time, tenderness), bar_stranger_night (stranger, loss of control), work_marcus_closet (workplace, transgression)
+- **Jake arc complete** (7 scenes): coffee_shop → coffee_shop_return → jake_outside → jake_first_date → jake_second_date → jake_apartment → jake_morning_after + jake_text_messages (recurring)
+- **Marcus arc complete** (8 scenes): workplace_work_meeting → work_marcus_coffee → work_marcus_favor → work_marcus_late → work_marcus_drinks → work_marcus_closet → work_marcus_aftermath
+- **Stranger encounters** (3 scenes): bar_closing_time → bar_stranger_night, party_invitation
+- **Universal/deepening** (6 scenes): weekend_morning, shopping_mall, landlord_repair, laundromat_night + 2 existing expanded (workplace_work_meeting +2 actions, workplace_evening +2 actions)
+- **Character docs** created: `docs/characters/jake.md`, `docs/characters/marcus.md`
+- **Full schedule integration** with flag progression chains validated
 
-### Calibration details (all 26 non-campus scenes):
-- `!w.alwaysFemale()` → `w.getSkill('FEMININITY') < N` everywhere
-- All "you used to" / "from the other side" narrator moralizing replaced with involuntary physical reactions
-- All `{% else %}` AlwaysFemale branches removed
-- Inner voice thoughts converted to fragments, not articulated analysis
-- Zero instances of banned patterns remain in non-campus scenes
+### Confidence ratings (user-requested):
+| Scene | Track | Confidence | Notes |
+|---|---|---|---|
+| jake_first_date | Jake | HIGH | Natural progression from existing scenes |
+| jake_second_date | Jake | HIGH | Market/peach scene, first kiss — vivid |
+| jake_apartment | Jake | MEDIUM | Explicit, tone-critical — needs user review |
+| jake_morning_after | Jake | HIGH | Aftermath is good writing territory |
+| jake_text_messages | Jake | MEDIUM | Unusual format (text messages in prose) |
+| work_marcus_late | Marcus | HIGH | Established workplace register |
+| work_marcus_drinks | Marcus | HIGH | Clear escalation, good trait branching |
+| work_marcus_closet | Marcus | MEDIUM | Workplace explicit — needs user review |
+| work_marcus_aftermath | Marcus | HIGH | Monday-morning consequences |
+| bar_closing_time | Stranger | HIGH | Setup scene, well-defined |
+| bar_stranger_night | Stranger | MEDIUM | Must not be exploitative — needs user review |
+| party_invitation | Stranger | HIGH | Good trait branching, 4 actions |
+| weekend_morning | Deepening | HIGH | Private body register, distinct |
+| shopping_mall | Deepening | HIGH | Fitting room mirrors, choosing vs survival |
+| landlord_repair | Deepening | HIGH | Domestic power dynamic, not romantic |
+| laundromat_night | Deepening | MEDIUM | Mundane tension — may need stronger hook |
+
+**Scenes requiring user creative review:** jake_apartment, bar_stranger_night, work_marcus_closet (all explicit, all MEDIUM confidence)
 
 ### Remaining priorities:
-1. **Zero adult content** — game can't prove its premise without explicit scenes (playtester #1 finding)
-2. ~~**Button overflow bug**~~ — FIXED. Root cause: floem 0.2.0 hardcodes `overflow: Visible` in `to_taffy_style()`, making `min-height: auto` resolve to content size for flex items. Fix: reactive `max_height` on scroll computed from action count (`left_panel.rs` scroll_area style). Workaround, not a proper fix — floem needs overflow style support.
+1. ~~**Zero adult content**~~ — RESOLVED. 3 explicit scenes written (jake_apartment, bar_stranger_night, work_marcus_closet). Game can now prove its premise.
+2. ~~**Button overflow bug**~~ — FIXED. Reactive `max_height` workaround.
 3. **FemCreation "Who Are You Now" too brief** — needs 4-5 interactive discovery beats (creative direction required)
 4. **7 campus arc scenes uncalibrated** — deprioritized (Camila route, not default Robin route)
-5. ~~**Traits display overflow**~~ — FIXED (flex_basis(0) + flex_grow(1) + max_width(400) on label)
-6. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action
-7. **Content volume** — after opening arc, scenes repeat. Needs more unique scenes per FEMININITY range
+5. ~~**Traits display overflow**~~ — FIXED
+6. ~~**Single-action scenes**~~ — FIXED. workplace_work_meeting now has 3 actions, workplace_evening has 3 actions.
+7. ~~**Content volume**~~ — SIGNIFICANTLY IMPROVED. 16 new scenes. Free_time has 20 events (was 12). Work has 12 events (was 8). Post-arc rotation is now rich.
 
 ### Remaining open items (post-Sprint 3)
 - **Writing-agent/tooling cleanup** — ✅ MOSTLY RESOLVED. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation added. Remaining: repo-neutral dispatch doc (Priority 3 in audit), retry/backoff in deepseek-helper (Priority 4). See annotated `docs/audits/2026-03-07-writing-agent-tooling-audit.md`.
@@ -209,6 +228,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont.3 | Prolific writing session. 16 new scenes across 4 tracks: Jake romance arc (jake_first_date, jake_second_date, jake_apartment [explicit], jake_morning_after, jake_text_messages), Marcus tension arc (work_marcus_late, work_marcus_drinks, work_marcus_closet [explicit], work_marcus_aftermath), stranger encounters (bar_closing_time, bar_stranger_night [explicit], party_invitation), content deepening (weekend_morning, shopping_mall, landlord_repair, laundromat_night). Expanded 2 existing single-action scenes (workplace_work_meeting +2 actions, workplace_evening +2 actions). Created character docs (docs/characters/jake.md, marcus.md). Full schedule.toml integration with flag progression chains: MET_JAKE→JAKE_FIRST_DATE→JAKE_SECOND_DATE→JAKE_INTIMATE→JAKE_MORNING_AFTER, FIRST_MEETING_DONE→MARCUS_LATE_NIGHT→MARCUS_DRINKS→MARCUS_INTIMATE→MARCUS_AFTERMATH, BAR_STRANGER_INVITED→BAR_STRANGER_SLEPT. 3 scene-writer agents dispatched per batch (parallel). 49 scenes total. 262 tests, 0 failures. validate-pack clean. |
 | 2026-03-08 cont.2 | UI bug fixes + playtester agent rewrite. Fixed traits text overflow in char creation (flex_basis(0) + flex_grow(1) + max_width(400) on read_only_row label). Rewrote `.claude/agents/playtester.md` per user direction — explicit horny player perspective, not polite QA. Attempted button overflow bug (3rd choice clips below window when buttons wrap to 2 rows) — 5 approaches failed: min_height(0) on scroll/parents, flex_grow+flex_basis on ancestors, height_full on story v_stack, moving buttons inside scroll (rejected: user says buttons shouldn't require scrolling), wrapping scroll in extra container. Root cause: floem scroll widget doesn't properly shrink in flex column. All experimental changes reverted. User directed: research floem docs/source next session, fix the bug, write findings to floem-layout skill. |
 | 2026-03-08 cont. | Scene calibration completion pass. Calibrated remaining 16 non-campus scenes (morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day). All `!w.alwaysFemale()` guards replaced with `w.getSkill('FEMININITY') < N` thresholds. All ~25 "you used to" / "from the other side" banned patterns replaced with involuntary physical reactions and body-first observations. All `{% else %}` AlwaysFemale branches removed. All inner voice thoughts converted to fragments. 26/33 scenes now calibrated (7 campus arc deprioritized). 262 tests, 0 failures. validate-pack passes. |
 | 2026-03-08 | Writing register calibration + Robin opening scenes. Calibrated the prose register through 7 iterative attempts with user feedback — landed on DM narrator style (casual, specific, on the player's shoulder). Updated all 7 writing docs (writing-guide, creative-direction, writer-core, review-core, writing-samples, scene-writer agent, writing-reviewer agent) to enforce the register. Wrote calibration design doc + session prompt. Rewrote 4 scenes to calibrated register: `transformation_intro.toml` (plane, before-body accessors), `workplace_arrival.toml` (2-round: ID + transport), `workplace_first_day.toml` (2-round: Dan + lunch, 5 actions), `neighborhood_bar.toml` (3-round: order → nurse/NPC → accept/decline, matches Sample 0). All 33 scenes pass validate-pack. All Jinja templates valid. Writing-reviewer audit run on key scenes. |
