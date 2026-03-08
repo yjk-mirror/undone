@@ -1,0 +1,197 @@
+[scene]
+id          = "base::jake_second_date"
+pack        = "base"
+description = "Second date with Jake. A walk through his neighborhood, a farmers market. Physical contact arrives. The first kiss (if she allows it)."
+
+[intro]
+prose = """
+Jake's neighborhood is older, quieter. Trees that have been there longer than the sidewalks under them, houses with front porches, a few dogs on leashes. He meets you on the corner with his hands in his pockets.
+
+"Figured we could walk," he says. "There's a market a few blocks up. Less pressure than staring at each other across a table."
+
+You fall into step beside him. The sidewalk is wide enough for two. It's not a date in the way the restaurant was a date — there's no formality to it, no distance built in. He's just here, easy to walk next to, the city doing what it does around you.
+
+The market is a stretch of tents and wooden tables along the block. Tomatoes, honey, a baker, someone selling plants. He points out the stall he usually hits, and when he turns to show you something, his hand brushes your arm — warm, quick, gone.
+
+{% if w.hasTrait("ROMANTIC") %}
+Walking somewhere beside someone is different from sitting across from them. The city moves past on both sides, his shoulder occasionally near yours. The walk already has a shape to it.
+{% elif w.hasTrait("ANALYTICAL") %}
+Three contacts so far. The arm brush. His hand on your back steering you around a slower couple. And then at the honey stall, his forearm next to yours on the table edge, close enough that you can see the tendons under his skin shift when he reaches for the jar. You track it like data. The data is building toward something.
+{% elif w.hasTrait("SHY") %}
+Every touch lands louder than it should. The brush of his sleeve, the half-second his shoulder is against yours. You're aware of the inches between you with a precision that has nothing to do with choosing to be aware of it.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+He guides you through a tighter part of the crowd with his hand at the small of your back — flat, warm, three full seconds. Your brain stops. Just stops. A blank, clean pause. Then you're back and you're leaning slightly into him and his arm has come around and you didn't make that happen, it just happened.
+{% elif w.getSkill("FEMININITY") >= 30 and w.getSkill("FEMININITY") < 50 %}
+His hand finds the small of your back in the crowd. The warmth of it settles there and stays. Something in your chest shifts — a low, waiting tightness that has a direction.
+{% endif %}
+
+At the fruit stall, he picks up a peach and hands it to you. "Try this."
+
+The skin is fuzzy. The flesh gives. Juice runs down your thumb.
+
+He watches you take the bite, his eyes on your mouth. He doesn't look away.
+
+"Good?" he asks.
+
+He reaches over and wipes the drop of juice from your chin with his thumb. His thumb stays there, resting against your skin. He doesn't pull back.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = "*Invited. You did that.*"
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "kiss_him"
+label  = "Kiss him"
+detail = "Close the distance yourself. The first deliberate one."
+prose  = """
+You lean in.
+
+{% if w.hasTrait("ROMANTIC") %}
+It's not a question — it's the next line. Your mouth finds his, soft and slow. He goes still for half a second, then his hand comes up to the side of your face, and the kiss deepens just enough before you pull back. He's looking at you with an expression that's trying not to be too much. It doesn't entirely succeed.
+
+"Hey," he says, quiet, which is not what you expected him to say. It's just right.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've been cataloging your way here all afternoon. At some point the catalog runs out. Your lips meet his. He's warm, unhurried. There's a texture to his lower lip, the very slight drag of stubble at the corner. You note these things and then the noting stops, replaced by something blunter, which surprises you more than the kiss itself.
+
+He pulls back a little. His eyes are open, looking at yours.
+{% elif w.hasTrait("SHY") %}
+You have to look down first. At the sidewalk, at the peach in your hand. Then you look up, and the distance between you is very small, and you go up onto your toes and press your lips to his. Quick. It's over almost before it starts.
+
+He blinks. Then the slow spread of a smile.
+
+"Okay," he says. Like he's been waiting and decided not to push and now here it is. Just: okay.
+{% else %}
+He was going to do it. You got there first. His lips are softer than you expected, and he makes a small sound — surprised — and then his hand comes up to your jaw and it's not small anymore.
+
+You break it before he does. The afternoon is still there around you, the market noise, the light.
+
+"Hi," he says, which is a stupid thing to say, and he knows it, and the smile is already on his face.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_SECOND_DATE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_KISSED"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "let_him_kiss_you"
+label  = "Let him kiss you"
+detail = "Stay still. Let him read the moment."
+prose  = """
+You don't move. You don't lean back from his thumb on your chin. You just hold still and let him see it.
+
+He reads it. His eyes drop to your mouth, then back up. He leans in slowly, giving you time to change your mind.
+
+You don't.
+
+The kiss is careful. Patient. His other hand comes to your waist, light, steadying. He doesn't rush. When he pulls back, he doesn't go far — his forehead tips toward yours, close without closing.
+
+"Okay?" he says.
+
+{% if w.hasTrait("SHY") %}
+Your throat is too tight for more than a nod. He accepts that without comment and his thumb moves once against your side, then stills.
+{% elif w.hasTrait("ROMANTIC") %}
+"Yeah," you say. And then, because it's true and you can't not: "Yeah."
+
+He smiles, slow. The afternoon is still there. It has more of itself now.
+{% elif w.hasTrait("ANALYTICAL") %}
+You ran the scenario. He went through with it. You logged how it felt — the careful pressure, the patience in it, the hand at your waist. What you didn't log was how long you'd stand here before saying anything. A long time, it turns out.
+
+"Yeah," you manage.
+{% else %}
+"Yeah," you say. Your voice comes out steadier than the rest of you.
+
+He's still close. The city keeps going around you like it doesn't know.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_SECOND_DATE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_KISSED"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "not_yet"
+label  = "Not yet"
+detail = "Close. Almost. But she's not done with the anticipation."
+prose  = """
+You take a small, deliberate step back. His thumb falls from your chin.
+
+You take another bite of the peach instead. Chew it. Look out at the market, the tents, the late-afternoon light on the awnings.
+
+"It's a really good peach," you say.
+
+He watches you for a second. Something shifts in his face — not disappointment exactly. More like a recalibration.
+
+"Yeah," he says. "It is."
+
+He puts his hands back in his pockets. The walk back to the subway is quieter, but it's not a bad quiet. He doesn't make anything out of it. He says goodbye on the corner the same way he says everything — easy, no performance — and you walk your separate ways.
+
+{% if w.hasTrait("ROMANTIC") %}
+The afternoon has a shape you can still feel when you get home. Something unfinished. You're not sure if that's good or bad. You sit with it anyway.
+{% elif w.hasTrait("ANALYTICAL") %}
+You replay it on the train. His thumb on your chin. The two feet of charged air between you. The variables are all still in play. You put your headphones in and let the question sit.
+{% elif w.hasTrait("SHY") %}
+You're relieved and you're not, in equal amounts. The tension is still there. You just took it home with you instead of resolving it, and you're not entirely sure that was wrong.
+{% else %}
+You're almost to your building before you figure out what the feeling is. Not regret. Just — left open. A sentence that didn't finish.
+
+Maybe next time.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_SECOND_DATE"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true

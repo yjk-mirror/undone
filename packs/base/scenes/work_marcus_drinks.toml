@@ -1,0 +1,233 @@
+[scene]
+id          = "base::work_marcus_drinks"
+pack        = "base"
+description = "A bar near the office. After work. He suggested it as they were leaving. Two drinks in."
+
+[intro]
+prose = """
+The bar is three blocks from the office and smells like old wood and the fryer in the back. Half the tables empty. A couple at the bar end talking over each other, a group of four near the window with pints and work lanyards still on. The after-work crowd, the residue of it.
+
+You're in a booth. Two glasses on the table. His is half empty. Yours is close to that.
+
+He's leaned back, arm along the top of the booth, watching the room without watching it — the posture of someone who's done this kind of thing before and isn't nervous about it. You're not sure when the conversation stopped being about the Hendricks integration and started being about other things. Somewhere between the first drink and the second.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The second drink hit faster than the first. Not drunk — aware. Everything is slightly clearer at the edges, which is not what you expected alcohol to do, and his forearm is resting on the back of the booth and you've looked at it twice.
+{% elif w.getSkill("FEMININITY") < 50 %}
+Two drinks and the professional armor has developed gaps. You know what the gaps feel like now — the warmth that starts in your chest, the way his voice carries differently when it's just two people in a booth. You came anyway.
+{% endif %}
+
+His glass comes up. He looks at you over the rim.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*Two drinks. His forearm. Okay.*"
+
+# ── Actions ──────────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "another_round"
+label  = "Have another round"
+detail = "The evening's not done. His knee is against yours under the table."
+prose  = """
+"One more?" you say.
+
+He flags the server without checking if you're sure. Like it was already decided and you just needed to say it out loud.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You hear it — the part of your brain that's been keeping a ledger all evening. Monday. The open floor plan. The three people who sit between your desks. You're running the numbers even now and the numbers don't come out clean. You order anyway.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've been tracking his signals all evening: the leaning back (comfortable), the eye contact that goes a beat past professional (present), the way he asked the last question — not *so what are you working on* but *what's the thing you actually care about right now*. You have a read on where this is going. You order another drink because the read interests you.
+{% elif w.hasTrait("CONFIDENT") %}
+You meet his eyes when the server comes. You order what you want. He watches you do it and something in his expression moves — not surprise, closer to acknowledgment.
+{% else %}
+The server comes. You order. The booth has gotten smaller over the last hour — not literally, just the distance between you and the far end of it has stopped registering.
+{% endif %}
+
+The drinks arrive. His knee doesn't move. The conversation finds a different frequency — not work, not quite personal, the register that lives between them. He asks you something real. You answer it.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His voice is lower in here than it is in a meeting room. You've noticed this. You're still noticing it.
+{% endif %}
+
+When you finally check your phone it's past nine. The bar has thinned out. The couple is gone. It's mostly the four with the lanyards and two of you in a booth.
+
+He walks you to the subway. The cold is a fact after the warmth of the bar. At the entrance he says, "Next week." Not a question. You go down the steps.
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_DRINKS"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "split_the_check"
+label  = "Split the check"
+detail = "Professional boundary reasserted. The math stays clean."
+prose  = """
+"We should probably—" you start, and he's already putting his card on the table, and you put yours next to it. The server takes both without comment.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Good. Clean. The ledger closes at two drinks and a tab split evenly down the middle. You can walk into Monday without a variable you can't control.
+{% elif w.hasTrait("ANALYTICAL") %}
+The check arrives. Two cards. The math is unambiguous. You register that you made a choice just now — not the split itself, but the moment you decided to make it. The trajectory you didn't take stays visible for a second and then the server's back and the moment is gone.
+{% else %}
+The check arrives. You both pay. Efficient. Clear.
+{% endif %}
+
+Outside, the cold comes in fast. You walk to the subway together — same direction for four blocks, one of those city coincidences that isn't really a coincidence. The conversation stays easy. What the team's building next quarter. A movie he mentioned earlier that you've been meaning to see.
+
+At the corner where you split off he says, "Good talk." He means it professionally. Probably.
+
+You go your way. He goes his.
+
+{% if w.getSkill("FEMININITY") < 50 %}
+On the train, the warmth from the bar sits in your chest and the evening doesn't fully close. It just ends.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_DRINKS"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "tell_him_something_real"
+label  = "Tell him something true"
+detail = "Not about work. Something that wouldn't come out sober."
+prose  = """
+You don't plan it. The conversation is already somewhere else and then you're just — saying it. Not a confession. Just a thing that's true.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You tell him about the job before this one. The one you left. The thing you built there that you don't get credit for in your current resume because the company folded and the work disappeared with it. You've never said this to a colleague before. The professional calculus would call this a liability. Two drinks in and you say it anyway.
+{% elif w.hasTrait("ANALYTICAL") %}
+You tell him you knew the Hendricks integration was going to break six weeks before it did. You could see it from the dependency graph. You didn't say anything because it wasn't your call and you were still learning who listened and who didn't. He's quiet for a moment. Then: "I knew too." A beat. "I thought I was the only one."
+{% elif w.hasTrait("CONFIDENT") %}
+You tell him what you actually think about the direction the team is heading — not the hedged version you'd give in a meeting, the real one. He listens. He doesn't agree with all of it. He tells you where his read diverges and he gives you a reason. It's the best conversation you've had at this company.
+{% else %}
+Something comes out. Not a secret — just a true thing you wouldn't say in a meeting. He receives it straight, without managing it back at you. No "thanks for sharing that." No recalibrating his posture. He just takes it in and gives you something back in the same register. The transaction is real.
+{% endif %}
+
+He looks at you differently after. Not warmer exactly — more like he's recalibrating. Like something he thought he had a read on just got more complex and he finds that interesting.
+
+"That tracks," he says. Like that covers it. Maybe it does.
+
+The bar closes around you. At some point you both notice it's late. Outside he says, "We should do this again." He means the conversation. He might mean the rest of it too.
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_DRINKS"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "touch_his_hand"
+label     = "Touch his hand"
+detail    = "On the table. A signal. See what he does with it."
+condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 35"
+prose     = """
+Your hand moves before the decision fully forms. On the table, over his — not grabbing, just there. A fact.
+
+He goes still. Not pulling away — stilling. He looks down at your hand and then up at you and something in his face that's usually managed isn't, just for a second.
+
+{% if w.hasTrait("FLIRTY") %}
+You don't take it back. You've put signals out before — social signals, professional ones — but this is a different frequency and you both know it. He turns his hand over under yours.
+
+"This is a bad idea," he says.
+
+"Probably," you say.
+
+He doesn't move his hand.
+{% elif w.hasTrait("ANALYTICAL") %}
+You catalogued this possibility hours ago. The trajectory from the break room to this booth, the probability distribution of what happens next. You saw it all. You did it anyway and now his hand is warm under yours and the analysis stops being useful. He looks at you and the look has no professional component left in it.
+{% elif w.hasTrait("CONFIDENT") %}
+He looks at your hand on his. Then at you. He reads it right — you weren't unsure, you weren't testing, you know what you're doing. He turns his hand over and closes it around yours.
+
+"We're not doing this at work," he says.
+
+"I know," you say.
+{% else %}
+His hand turns over. He doesn't say anything. The bar noise fills the space where something was just decided.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 50 %}
+His thumb moves once across the back of your hand. A small thing. Your chest goes tight in a way that has nothing to do with the alcohol.
+{% endif %}
+
+You leave separately. You take the stairs down to the subway and stand on the platform in the warmth underground and look at your hand like it belongs to someone else for a moment, and then the train comes.
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_DRINKS"
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_TOUCHED"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true

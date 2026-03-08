@@ -1,0 +1,277 @@
+[scene]
+id          = "base::party_invitation"
+pack        = "base"
+description = "A coworker's party. An apartment full of strangers, alcohol, and the particular energy of being new."
+
+# Content level: VANILLA — charged attention, party dynamics, no explicit content.
+# This is the gateway scene. PARTY_STRANGER_OUTSIDE enables a follow-up scene.
+# Trait axes: SHY/OUTGOING shape the whole evening. BEAUTIFUL changes the attention density.
+# OBJECTIFYING means she reads approaches before they arrive.
+# FEMININITY < 25: body navigating crowded space. 25-50: learning the social physics.
+
+[intro]
+prose = """
+The apartment is on the fourth floor of a walkup and you can hear the party before you reach the landing.
+
+Inside: forty people in a space meant for twelve. Music from a speaker in the corner that's doing its best. The kitchen is the most crowded room, the way kitchens always are. Someone has pushed the living room furniture against the walls and a few people are dancing in the gap. The windows are fogged from the inside. There's a card table with bottles on it and a cooler underneath and a line of solo cups.
+
+Your coworker who invited you has already vanished into the middle of it.
+
+{% if w.hasTrait("BEAUTIFUL") %}
+The nearest cluster of people shifts when you step in. Not dramatically — the way a room adjusts when something changes, the way eyes move before heads do. A man near the kitchen doorway clocks you and then says something to the person beside him without looking away.
+{% endif %}
+
+{% if w.hasTrait("OUTGOING") or w.hasTrait("CONFIDENT") %}
+The noise settles around you. Somewhere in here there's a conversation worth having.
+{% elif w.hasTrait("SHY") %}
+It's loud. You're pressed on three sides before you've made it past the entryway. The kitchen is visible through a gap in the crowd, which means there's a wall to stand against.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Someone coming through the door behind you puts a hand on your waist to move past — automatic, thoughtless — and you go still for a full second. Not fear. Processing. Then the moment's already gone and the person is already gone and the party is still going around you.
+{% elif w.getSkill("FEMININITY") < 50 %}
+A man coming through the door catches himself holding it for you. He didn't decide to — you can see him catch up to the gesture after he's already done it.
+{% endif %}
+
+A man near the back has pulled the balcony door open and stepped out. The noise drops a notch behind the glass. He's got a drink and he's not looking at his phone.
+
+The card table is right there. So is the kitchen. So is the dancing.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*Okay.* Forty people."
+
+# ── Actions ─────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "find_quiet_corner"
+label  = "Find the quietest corner"
+detail = "One person. A real conversation. Not the loudest thing in the room."
+prose = """
+The kitchen is actually quieter — fewer people fighting to be heard, just a few standing with their drinks pressed against the counter. You get in there.
+
+{% if w.hasTrait("SHY") %}
+The counter gives you something to do with your back. A woman in a yellow jacket is explaining something to her friend with great emphasis and neither of them needs anything from you, which is ideal. You pour yourself a drink and take up exactly as much space as you require.
+
+After a few minutes, the person next to you — you'll clock them as the host's roommate later — turns and asks if you know anyone here. "Not really," you say. It's enough to start. They ask what you do. You tell them. Turns out they have questions. Real ones, not small-talk ones.
+
+You're in the kitchen for an hour. The party does its thing six feet away and you don't need to touch it.
+
+{% elif w.hasTrait("OUTGOING") or w.hasTrait("CONFIDENT") %}
+You're at the card table long enough to pour a drink, then you're moving. The kitchen is where the useful people are. In here they're actually talking, not performing talking.
+
+The one leaning against the fridge with a beer and the expression of someone who showed up for exactly one person and that person isn't here yet — you ask her who she knows. She says your coworker's name. So do you. She relaxes immediately.
+
+Her name is Priya. She works in research. By the third drink you've covered two neighborhoods, a restaurant that closed in September, and a mutual dislike for a type of person you're both too polite to name. You leave her your number before the night ends.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+You go to the kitchen because the kitchen is the information room. People in kitchens have been there longer, know more people, drink slower. You get a drink and position yourself near the counter and let the room come to you.
+
+A man refilling his cup asks if you came with anyone. You say you know the host through work. He knows her from college. The map of the room fills in as you talk: whose apartment this is, who's on whose side of the breakup that happened last month, which guy by the window is going to make a scene later.
+
+By the end of the conversation you know more about these strangers than they know about each other. It's a skill. It still works.
+
+{% else %}
+You get a drink and find a spot near the window where the noise drops to almost manageable. A man standing nearby has been there a while — you can tell from the condensation rings his cup has made on the windowsill.
+
+He asks if you're new. You say new to the group. He says he's been going to these parties for three years and knows fewer people every time. It's funnier than it sounds. You stand there for forty minutes and talk about the city, a documentary you both saw, whether the thing on the card table counts as a cocktail. When he goes to refill his drink he asks if you want anything. You say you're good.
+
+The party is still going when you leave. He's still at the window.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The kitchen counter is the right height to rest your arms on. The living room has three conversations you can map from here without moving. The noise is still a lot, but in here you can see all the exits.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_ATTENDED"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "dance"
+label     = "Dance"
+detail    = "The living room has turned into a floor. The music is loud enough that it doesn't require conversation."
+condition = "w.hasTrait('OUTGOING') || w.hasTrait('CONFIDENT') || w.getSkill('FEMININITY') > 30"
+prose = """
+The living room gap isn't big, but it's enough. Three or four people already in it with drinks held loosely.
+
+{% if w.hasTrait("OUTGOING") %}
+You get in there. The song changes to something with a better tempo and you're already moving to it before you've decided to move to it. The woman next to you grins. You grin back. The room gets easier and then easy.
+
+A man you've never seen before dances near you, not at you — the polite version of attention in a crowded room. You let the attention sit without returning it directly, which is a different thing than ignoring it. The evening keeps going.
+
+{% elif w.hasTrait("CONFIDENT") %}
+You step in and find your footing. The song is fine. You're not here to perform — you're here because you wanted to move and the room offered an excuse.
+
+Someone's boyfriend tries to catch your eye from the kitchen doorway. You don't give him the catch. The woman he came with hasn't noticed yet. You stay on your side of the room.
+
+{% elif w.hasTrait("SHY") %}
+You're in the gap before you've decided — the song was just right and your feet made the call. It's awkward for about thirty seconds, which you get through by looking at the middle distance and letting the rhythm handle the rest.
+
+Then it isn't awkward. That happens sometimes.
+
+A woman next to you has the same look of mild surprise you probably have. You both stop pretending you're somewhere else and start dancing in the same room together, which is different and better.
+
+{% else %}
+You step in and move. The song has a good beat and the floor is loose and nobody is watching too hard.
+
+A man near the edge works his way toward the center, which is toward you. He has a drink and a reasonable amount of confidence. You hold your space without committing one way or the other.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Hips that you haven't fully mapped yet, shoulders that carry differently than you expect. You catch yourself mid-movement and there's nothing wrong with the movement. You keep going.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You're dancing. That's a sentence you couldn't have easily said at week one. The metric keeps moving.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_ATTENDED"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_DANCED"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "follow_outside"
+label  = "Follow him outside"
+detail = "There's a door to a balcony. He's heading for it. The party noise would be muffled out there."
+prose = """
+The balcony is barely a balcony — iron railing, two feet of concrete, the city going sideways below. He gets out there first and holds the door. The party noise drops by half when it closes.
+
+Cold air. The sound of traffic. He leans on the railing with his drink.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+You can read the whole setup from here: the door held, the space left beside the railing, the way he's not quite looking at you yet. You ran this play before. Not from this side, but you know the shape of it from the inside out.
+
+You stand at the railing anyway. The city looks good from up here and you aren't going anywhere yet.
+
+He asks your name. You give it. He gives his. A beat of city noise fills the gap after that and neither of you rushes to cover it.
+
+{% elif w.hasTrait("SHY") %}
+You're out here mostly because the alternative was another twenty minutes of noise. He was a reasonable excuse.
+
+"Cold," he says. Not a complaint — just noting it. You agree. It is cold.
+
+He's easier to talk to out here than he would have been inside. No performance needed, no reading the room for audience. Just two people on a balcony with drinks and a city that's indifferent to both of you.
+
+You ask what he does. He tells you. He asks you back. You tell him. The conversation finds its level.
+
+{% elif w.hasTrait("FLIRTY") %}
+You lean on the railing next to him, close enough to be a deliberate proximity.
+
+"Needed air," you say.
+
+"Me too," he says, though he'd been inside fine two minutes ago.
+
+The city spreads out below. He says something about the neighborhood. You say something back. At some point you're facing each other instead of the street. He has a good face up close — the kind that gets better in low light — and he knows it, and he's choosing not to use it too hard, which you notice.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+You clock him noticing you before he approaches the door. You follow, which is a choice.
+
+Out here he's more comfortable than he was inside — less crowd noise to navigate, just the two of you and the city. He asks where you're from. You say here now. He picks it up as an invitation to ask about the before and you let him ask.
+
+You learn more than he intended to tell in the first fifteen minutes. He's an open book dressed like a closed one. The particular warmth in your sternum when he laughs is information you file separately.
+
+{% else %}
+He turns when you come through the door and looks mildly pleased, the way people do when a thing they were thinking about happens.
+
+"Better out here," he says.
+
+"Yeah."
+
+The city makes its city sounds. He tells you his name. You give him yours. The conversation starts the way these start, with the surface questions, and then it doesn't stay there. He's been somewhere interesting recently and has the kind of detail that means he actually paid attention. You have opinions. You give them.
+
+At some point your shoulders drop.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The cold is on your bare arms. He's standing close enough that you're aware of how much warmer he runs. When he turns to say something his voice drops naturally and you have to lean slightly to catch it. Your stomach tightens. You lean.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The party is muffled behind the glass. Out here you can think. His attention is a fixed point and you leave it there for now.
+{% endif %}
+
+You stay until the cold wins.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_ATTENDED"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_STRANGER_OUTSIDE"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "change_alcohol"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "leave_early"
+label  = "Leave early"
+detail = "You've been here long enough. The cold air outside will feel earned."
+prose = """
+You find your coworker in the living room and say you're heading out. She says come to the next one, and you say you will, and probably you will.
+
+The stairwell is quiet. Four flights down and you're on the street.
+
+{% if w.hasTrait("SHY") %}
+The cold hits and something in your shoulders comes down. The noise is gone. A cab goes by, not for you. The block is quiet enough that you can hear your own footsteps, which is the exact amount of quiet you needed.
+
+{% elif w.hasTrait("OUTGOING") %}
+You're still carrying some of the party's energy — it doesn't drop immediately. You pull out your phone and text someone. You've been somewhere tonight and that went fine. Good, even.
+
+{% else %}
+The air is cold and clean. The party goes on four floors up without you and that's fine. You put your hands in your pockets and walk.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The city at night looks the same. The footsteps behind you on the block belong to a woman with a dog who turns off at the corner. You walk the rest of the way with your hands in your pockets and your collar up and the evening settling into something that was more than you expected.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The walk home is fifteen minutes. You don't fill it with anything. You let it be the walk home.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true

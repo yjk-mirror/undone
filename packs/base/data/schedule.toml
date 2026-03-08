@@ -70,6 +70,12 @@ name = "free_time"
   trigger   = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && gd.npcLiking('ROLE_JAKE') == 'Like'"
   once_only = true
 
+  [[slot.events]]
+  scene     = "base::jake_second_date"
+  weight    = 0
+  trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
+  once_only = true
+
   # New universal scenes
   [[slot.events]]
   scene     = "base::weekend_morning"
@@ -92,6 +98,12 @@ name = "free_time"
   scene     = "base::bar_closing_time"
   weight    = 6
   condition = "gd.week() >= 3 && !gd.hasGameFlag('BAR_STRANGER_INVITED')"
+
+  [[slot.events]]
+  scene     = "base::party_invitation"
+  weight    = 5
+  condition = "gd.week() >= 4"
+  once_only = true
 
 # ── Workplace opening arc ────────────────────────────────────────────────
 
@@ -193,6 +205,12 @@ name = "work"
   scene     = "base::work_marcus_late"
   weight    = 8
   condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
+
+  [[slot.events]]
+  scene     = "base::work_marcus_drinks"
+  weight    = 0
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_LATE_NIGHT') && !gd.hasGameFlag('MARCUS_DRINKS') && gd.npcLiking('ROLE_MARCUS') == 'Like'"
+  once_only = true
 
 # ── Campus opening arc ────────────────────────────────────────────────
 
