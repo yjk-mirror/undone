@@ -11,7 +11,7 @@ You knew the boxes weren't here yet — the shipping company said Monday, which 
 
 The apartment is fine. The apartment is actually fine: pre-war floors, good light from the windows, a kitchen with actual counter space. There is a radiator in the bedroom. It's not on yet. It will take a few minutes.
 
-You set your carry-on down and do a circuit of the rooms. Bedroom, kitchen, bathroom, living room. You note the things you need: furniture (Monday), bedding (you forgot this), towels (you forgot this), food (obviously). You mentally add items to the list and then realize you don't have anything to write them on, which means your phone, which means you open a note and start typing.
+You set your carry-on down and do a circuit. Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. You open a note on your phone and start typing.
 
 {% if w.hasTrait("AMBITIOUS") %}
 The list is organized in twenty minutes. Priority-ranked. You text the shipping company to confirm the Monday window before you remember it's 11 PM. You send it anyway.
@@ -23,13 +23,13 @@ The list gets long. You look at it for a moment. Add *bra* and then look at that
 
 Right. The bra problem.
 
-You'd managed all day on sheer forward momentum — airport, subway, landlord, deposit — without thinking about the fact that what you're wearing under your shirt is not — you've been in this body for forty-eight hours and you'd been so focused on getting to the city that you hadn't —
+You'd managed all day on sheer forward momentum — airport, subway, landlord, deposit — without stopping to think about the fact that what you're wearing under your shirt is a sports bra you grabbed at the airport gift shop, and it is not doing the job.
 
-*Okay*, you think. *New problem. Same protocol.*
+*Right. Okay.*
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
+condition = "w.getSkill('FEMININITY') < 15"
 prose = """
 Unit 4B is empty.
 
@@ -43,18 +43,16 @@ Right. You don't — the list said *clothes*, generally, meaning Monday, meaning
 
 You add *bra* to the list. The word looks wrong in the note. You stare at it.
 
-*Okay*, you think. *It's on the list. Lists get solved in order.*
+*On the list. Lists get solved.*
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-You sit on the floor — no furniture yet, the floor is clean enough — and look at the city through the window. The building across the street has lit windows. Someone in 3C is watching something with the sound up. A siren moves through the neighborhood at a speed that suggests this isn't an emergency, just the city moving.
+You sit on the floor — no furniture, floor is clean enough — and look at the city through the window. The building across the street has lit windows. Someone in 3C is watching something with the sound up. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
 
-*He* would have ordered food and gone to sleep.
-
-You're going to order food and go to sleep. That part is the same. The rest you'll figure out tomorrow.
+Your reflection in the dark glass is someone you're still learning to recognize. The shape is wrong. The proportions. The hair. You tilt your head and the reflection tilts back and it's still not you, not yet, not quite.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -106,7 +104,7 @@ Forty minutes later you have learned: bra sizing is a system that was apparently
 You put your phone down.
 
 {% if w.hasTrait("DOWN_TO_EARTH") %}
-*Okay*, you think. *Tomorrow I go to the department store, I tell them my situation in factual terms, and I get what I need.* You add *department store, early* to your list and go to sleep.
+You add *department store, early* to your list. You'll tell them what you need in factual terms and get what works. Sleep first.
 {% else %}
 The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups and specialty stores and the number of times in your life you walked past a lingerie department without thinking anything at all.
 

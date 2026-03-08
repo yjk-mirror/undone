@@ -12,35 +12,27 @@ Your laptop is open. The slides are up. You've reviewed the deck four times sinc
 People filter in at 10:02. Two from your immediate team, one you haven't met. A product manager named Carter who writes things down even when the thing isn't worth writing down. A senior engineer from the platform side who is going to have opinions about the API layer regardless of what the slides say. And Marcus from adjacent infrastructure, who you know by reputation and who settles into the chair directly across from you.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-Marcus looks at you. He looks at your slides. He looks at you again, and you can read the specific sequence of adjustments happening in his expression — the involuntary first take, followed by the recalibration to professional context, followed by the second take that doesn't fully commit to the recalibration. You know this because you used to do it. Not with malice. Not with awareness. Just as a default setting you never examined.
-
-You open the deck to slide three and say, "Okay. Thanks for coming — let's get started."
+Marcus looks at you. Looks at your slides. Looks at you again. His eyes do the thing — the quick trip down and back up that takes less than a second and that he probably doesn't know he's doing. Your neck gets warm.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-You categorize the room before anyone speaks. Carter will ask about timelines. The platform engineer — Devin, you think — will push back on the interface contract. Marcus will be quiet for the first half and then ask one question that reframes everything, which you've seen people mistake for insight and which you've privately concluded is just a thing he does. You've been in enough of these rooms to know the shape of the meeting before it starts.
+Carter will ask about timelines. The platform engineer — Devin — will push back on the interface contract. Marcus will be quiet for the first half and then ask one sharp question. You've been in enough of these rooms.
 
-What you can't fully account for yet is how the room is categorizing you. You're aware of it the way weather is a condition — something you're operating in, not a thing you've chosen to have feelings about. You've run through most of the variables. You'll know in about ten minutes how the room adjusts.
-
-You open the deck and say, "Let's get started. I'll move fast and leave room for questions at the end."
+What you can't account for is how they're reading you. Two weeks of standups. You're still new data.
 
 {% else %}
-You know these faces reasonably well by now — two weeks of standups will do that. You know who interrupts and who defers and who writes things down that don't need to be written down. You've been read as younger than you are in every meeting you've sat in, and you've made your peace with it, or something approximating peace, which is that you've decided to treat it as information about the room rather than information about yourself.
-
-You open the deck to slide three. "Thanks for coming. I'll go through the architecture and then we'll have time for questions."
+Two weeks of standups. You know who interrupts and who defers. Marcus settles into the chair directly across from you and opens his laptop without looking up.
 
 {% endif %}
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "w.getSkill('FEMININITY') < 30"
 style     = "inner_voice"
 prose = """
-You've given this presentation before. Not this version — the system is new — but the shape of it. The logic tree, the tradeoffs, the section where you explain what you decided not to do and why. You know how this goes.
-
 {% if w.hasTrait("ANALYTICAL") %}
-What you don't have good data on yet is how you're going to be heard. That's the variable you can't control for. You've been running the experiment for two weeks now and the results are still coming in.
+*Same logic tree. Same tradeoffs. Different voice delivering them.* Your voice is higher than the slides expect. The room will adjust or it won't.
 {% else %}
-What you can't work out yet is how you're going to be heard. You know the content. You know how to run this kind of room. You don't know this version of yourself in it — not with two weeks of data.
+*Forty slides. You designed this system.* Your hands are smaller on the keyboard. The ring you used to wear doesn't fit anymore. You took it off three days ago.
 {% endif %}
 """
 
@@ -56,11 +48,9 @@ You get through the first fifteen slides without interruption, which is better t
 You're on slide nineteen — the authentication flow — when Kevin Marsh, the platform-side engineer you hadn't met before today, leans forward. "So this is the token exchange," he says, gesturing at your slide, and then begins explaining it. Not asking about it. Explaining it. To you. The person who drew the diagram.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You let him finish the sentence. The room goes still — Carter's pen stops, the platform engineer glances between you and the slide — and Kevin keeps going, unaware of the gap between what he's explaining and who he's explaining it to. You've been on the wrong side of that gap before. Not in meetings like this, but in a life spent being someone who didn't examine things he should have examined.
+You let him finish. The room goes still — Carter's pen stops, the platform engineer glances between you and the slide. Kevin keeps going, confident, explaining the diagram you drew to the person who drew it.
 
-Kevin's explanation is technically correct. You're going to let him have that.
-
-"Yes," you say. "That's the design. The implementation note on the next slide covers the edge case you're probably about to ask about." You advance the deck. He is, in fact, about to ask about it. You answer the question before he finishes asking it, with enough specificity that the room recalibrates — not perfectly, but enough to move on.
+"Yes," you say when he stops. "That's the design. The implementation note on the next slide covers the edge case you're probably about to ask about." You advance the deck. He is, in fact, about to ask about it. You answer it before he finishes phrasing it.
 
 {% elif w.hasTrait("ANALYTICAL") %}
 You observe it happening in real time. Kevin is explaining your diagram to you, with the confident incorrectness of someone who hasn't read the spec but has enough context to sound like he has. He is wrong about one thing — a nuance in the token lifespan that matters for the edge case you spent two days on — and you give him about forty seconds before you interrupt.
@@ -95,24 +85,20 @@ This is, you recognize, a real question. Not a social question. He wants to know
 "Yeah," he says, "send it over." And then he goes.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You stand at the water station for a moment longer than you need to. The meeting was forty-five minutes. Kevin's explanation was maybe ninety seconds of it. You know exactly why it happened — you've run that calculation yourself, without knowing you were running it — and knowing why doesn't change that it happened. You put the cap back on your bottle and go back to your desk.
+You stand at the water station for a moment longer than you need to. Kevin's explanation was ninety seconds. The meeting was forty-five minutes. The work held. That should be enough.
+
+Your reflection in the glass wall is a woman in professional clothes with a laptop under her arm. She looks competent. She looks young.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-The meeting cost you forty-five minutes and produced two follow-up tasks: send Marcus the load test data, reply to the question Carter wrote down that he'll definitely send by the end of the day. Ninety seconds of Kevin explaining your diagram. A clean technical record that you are now in the building's memory as someone with opinions that hold up under questioning. This is how it works. The work is its own argument, and eventually the room knows it. You've run this process before.
-
-The version of this you ran before took about three months. You're curious how long this version takes. You have data from the first two weeks and it's not enough to generalize from yet.
+Two follow-up tasks: send Marcus the load test data, reply to whatever Carter is about to email. The content held. The room adjusted. You'll have better data in another two weeks.
 
 {% else %}
-The hallway is quiet. You drink the water. Down the hall someone is on a call, talking fast and too loud for an inside space, something about a deadline, something about capacity.
-
-The meeting was good. The technical content held. Kevin did what Kevin did and the room moved past it, which is all that could have happened and probably all that should have happened. You're not going to sit with it long. You have things to get back to.
+The hallway is quiet. You drink the water. The meeting was good. The content held. Kevin did his thing and the room moved past it.
 
 {% endif %}
 
-{% if not w.alwaysFemale() %}
-You close the laptop. Carter says "great work" on the way out and you say thanks. Back at your desk, you know the work was good because you know what good work looks like — you've been producing it for over a decade. The thing you're less certain about is whether the room knows it in the way you need it to. You think that's a longer project than a single forty-five minute meeting.
-
-You open Slack. Carter has already messaged you. You weren't wrong about that part.
+{% if w.getSkill("FEMININITY") < 30 %}
+Carter says "great work" on the way out. Back at your desk, you open Slack. He's already messaged you. Your hands on the keyboard are smaller than the ones that wrote the spec. The code doesn't care. The code is the same.
 {% endif %}
 """
 

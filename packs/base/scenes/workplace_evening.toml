@@ -35,7 +35,7 @@ You go to the bathroom to wash your face.
 
 The light switch is on the right side of the door. You reach left on instinct — muscle memory from wherever, the old apartment, some room you haven't been in for weeks — and your hand finds nothing for a quarter-second before you correct. You flip the switch.
 
-{% if not w.alwaysFemale() %}
+{% if w.getSkill("FEMININITY") < 40 %}
 {% if w.getSkill("FEMININITY") < 25 %}
 The face in the mirror takes a second. Not because you don't know it — you know it; you've been looking at it for a week and a half — but the bathroom light is different in the evening and for one split second your brain ran the wrong comparison and came up empty.
 
@@ -52,9 +52,7 @@ You wash your face. The mirror is just the mirror. What catches you is the light
 {% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}
-You run through the incident the way you'd run through a bug report: the switch is on the right, the instinct goes left, the instinct is a cached value from an input that no longer applies. The cache will clear eventually. No intervention required.
-
-You dry your face on the towel and find this mildly insufficient as a resolution.
+The switch is on the right. Your hand went left. You dry your face on the towel and stand there for a moment longer than necessary.
 {% elif w.hasTrait("AMBITIOUS") %}
 Two hours of work left and you're standing in your bathroom thinking about a light switch. The day had been productive. You'd been useful. You'd made things move. None of that is present in this room right now.
 
@@ -68,7 +66,7 @@ You make tea — the box of green tea you bought on Sunday because it was the fa
 
 You read it back. Close the note. Open the PR you'd been meaning to review.
 
-You are not okay. But you are categorically operational, and the categories matter, and you've always found it easier to move through the world when you can name which category you're in.
+You read it back. Close the note. Open the PR you'd been meaning to review. The cursor blinks. The apartment is quiet.
 {% elif w.hasTrait("AMBITIOUS") %}
 You go back to the laptop. You send the follow-up you'd meant to send. It takes four minutes. The three carried-over items go into tomorrow's list in priority order.
 
@@ -81,13 +79,11 @@ You make tea and sit with it by the window. The bus stop below has two people wa
 You drink the tea. The apartment is quiet in a way that's becoming, if not comfortable, at least familiar.
 {% endif %}
 
-{% if not w.alwaysFemale() %}
+{% if w.getSkill("FEMININITY") < 40 %}
 {% if w.getSkill("FEMININITY") < 25 %}
-You would have ordered food and worked until midnight and not thought twice. Would have been fine.
+The thing in the bathroom was thirty seconds. The light switch. The mirror. Both already fading.
 
-You're fine. Categorically fine. You have a job and an apartment and a list and the list is getting shorter. The thing in the bathroom was thirty seconds of nothing and it's over.
-
-You get up and start figuring out dinner. The city is outside. You are in here. Both of these are facts, and facts are manageable.
+You get up and start figuring out dinner.
 {% else %}
 The switch thing was nothing. You know it was nothing. In a month you'll stop reaching left entirely, and at some point after that you won't remember that you ever did.
 

@@ -20,7 +20,7 @@ The lingerie department is in the back, which you've learned is always where it 
 "Okay. I can do that. Two minutes."
 
 {% if w.hasTrait("SHY") %}
-You stand very still for the measurement. The associate is brisk and efficient and treats the whole thing with the detachment of someone who has done it several thousand times. You are still slightly mortified. You file this under *things that will be normal eventually.*
+You stand very still for the measurement. The associate is brisk and efficient and treats the whole thing with the detachment of someone who has done it several thousand times. You are still slightly mortified.
 {% elif w.hasTrait("POSH") %}
 You submit to the measurement with the awareness that you are in a department store rather than somewhere with a fitting room that has natural light. You don't say this. It's not relevant.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
@@ -31,39 +31,33 @@ Two minutes is approximately right. The associate writes something and says "oka
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 You find the department store. Nine AM. You are the first customer in the lingerie section.
 
 The associate who helps you has done this for approximately ever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads you to a rack of options with the specific efficiency of a professional who has been told a size and knows where sizes live.
 
-You follow. You keep your face neutral. Inside, you are taking notes.
-
-*This is how this works.* You are learning how this works. It's information. You write it down.
+You follow. Your face is neutral. Your hands are in your pockets because you don't know what else to do with them.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 style     = "inner_voice"
 prose = """
-You stand in the dressing room with the door closed and look at the options the associate selected and think: *he would have bought the first one that fit and left.*
+Dressing room. Door closed. Four options on the hook.
 
-You are going to buy — you look at the options — several, actually, because you have to, and you're going to think about which ones work for different things, and you're going to learn what those things are, and this is all fine.
+You put on the first one. The clasp is in the back. Your fingers find it on the second try. Something tightens and settles and you look down and — *oh.* That's what it does.
 
-This is all fine. You put on the first one.
-
-It fits. This is, you realize, information you have never had before. What *fits* means, practically, in this context. You make a note.
+The second one is different. Different shape, different support. You didn't know there were different shapes. You are learning that there are different shapes.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-The dressing room mirror is unavoidable.
+The dressing room mirror is well-lit and at an angle you haven't seen yet. The fluorescent overhead, the three-panel setup.
 
-You've been in this body for — you count — two days. The shock from the first morning is different now. Less acute, more specific. You know what you're looking at. You've been looking at it for two days. What you didn't have then was a well-lit mirror at this angle.
-
-You note the things that are true. You don't editorialize. You have work on Monday.
+Your collarbones. Your waist. The way the fabric sits across your chest. Two days ago you were on a plane and this body was still a series of logistics. Now it's in a department store dressing room and the light is very, very honest.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -74,7 +68,7 @@ label = "Get what you need, efficiently"
 detail = "Bras, underwear, basics. In and out. You have a list."
 allow_npc_actions = true
 prose = """
-You spend forty minutes and come out with: three bras, a week of underwear, a pair of dress pants that needed minimal alteration, two work blouses, a sweater. You pay. The total is more than you expected — you'd been calibrating to men's clothing prices, apparently — and you file this as a new calibration point.
+You spend forty minutes and come out with: three bras, a week of underwear, a pair of dress pants that needed minimal alteration, two work blouses, a sweater. You pay. The total is more than you expected.
 
 Outside the store, you check the list on your phone. The most urgent items are crossed off. You get coffee from the Dunkin' across the street — you were going to get the independent café but it's Sunday and there's a line — and drink it on the walk back.
 
@@ -109,16 +103,16 @@ detail = "The mirror. You've been avoiding this. You don't have to, particularly
 prose = """
 You stay in the dressing room longer than you need to.
 
-The mirror is what the mirror is. You spent thirty-two years walking past mirrors with one set of expectations and now the expectations are different and the mirror is different. This is a fact. You're looking at it.
+The mirror is what the mirror is. Full length, well lit. The dress pants sit on your hips differently than any pants have sat before. The blouse buttons the wrong way. You fasten them anyway.
 
 {% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
 You think about Monday. You, in the office, in the dress pants and the work blouse. The manager's face when you say *I know, I wrote that spec.* You've practiced this face in your head so many times that you almost know what it looks like. You think you look competent. You hope you look competent. You decide to look competent regardless.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
 You note what's true. You don't spend time on it that you don't have. You get dressed and take the practical items to the register.
 {% else %}
-The person looking back from the mirror is a stranger who shares your memories. You find this less upsetting than you expected to. Possibly because you're too tired to find it upsetting. Or possibly because you've been managing the logistics of this situation for forty-eight hours and logistics don't have room for upsetting.
+The person in the mirror looks like someone you might pass on the street without a second thought. Average height. Brown hair. Professional clothes that fit correctly. She looks ready for Monday. That's enough.
 
-You get dressed. You take what you need to the register.
+You take what you need to the register.
 {% endif %}
 """
 
@@ -153,13 +147,13 @@ condition = "!scene.hasFlag('noticed')"
 prose = """
 You're comparing two options — same brand, different cut — when you become aware of the man at the edge of your peripheral vision.
 
-He's shopping, technically. He has a bag. He's looking at you in the way that happens now, the two-second inventory, the held look that's slightly too long. You know exactly what he's doing. You knew exactly what he was doing the first time you saw him, which was before you were ready for it.
+He's shopping, technically. He has a bag. He's looking at you. The two-second look, the held gaze that's slightly too long.
 
-{% if not w.alwaysFemale() %}
-The thing you didn't expect: something in your body registered it before your brain did. Some calibration you don't control yet. You're working on not having an opinion about that until you understand what the opinion should be.
+{% if w.getSkill("FEMININITY") < 25 %}
+Something warm moves through your stomach before you've decided what to think about it. Your skin prickles. You don't turn toward him and you don't turn away and you stand very still until it passes.
 {% endif %}
 
-You turn back to the options. He moves on. The store continues at its Sunday pace.
+He moves on. The store continues at its Sunday pace. You pick the one on the left.
 """
 
   [[npc_actions.effects]]
