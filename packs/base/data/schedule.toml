@@ -18,7 +18,7 @@ name = "free_time"
   [[slot.events]]
   scene     = "base::coffee_shop"
   condition = "gd.week() >= 1"
-  weight    = 10
+  weight    = 7
   once_only = false
 
   [[slot.events]]
@@ -67,7 +67,7 @@ name = "free_time"
   [[slot.events]]
   scene     = "base::jake_first_date"
   weight    = 0
-  trigger   = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && gd.npcLiking('ROLE_JAKE') == 'Like'"
+  trigger   = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && (gd.npcLiking('ROLE_JAKE') == 'Like' || gd.npcLiking('ROLE_JAKE') == 'Close')"
   once_only = true
 
   [[slot.events]]

@@ -137,13 +137,13 @@ pub fn apply_effect(
 ) -> Result<(), EffectError> {
     match effect {
         EffectDef::ChangeStress { amount } => {
-            world.player.stress += amount;
+            world.player.stress = (world.player.stress + amount).max(0);
         }
         EffectDef::ChangeMoney { amount } => {
             world.player.money += amount;
         }
         EffectDef::ChangeAnxiety { amount } => {
-            world.player.anxiety += amount;
+            world.player.anxiety = (world.player.anxiety + amount).max(0);
         }
         EffectDef::AddArousal { delta } => {
             world.player.arousal = step_arousal(world.player.arousal, *delta);
