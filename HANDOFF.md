@@ -38,11 +38,12 @@
 
 ### Remaining priorities:
 1. **Zero adult content** — game can't prove its premise without explicit scenes (playtester #1 finding)
-2. **FemCreation "Who Are You Now" too brief** — needs 4-5 interactive discovery beats (creative direction required)
-3. **7 campus arc scenes uncalibrated** — deprioritized (Camila route, not default Robin route)
-4. **Traits display overflow** — floem labels don't wrap; needs rich_text approach
-5. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action
-6. **Content volume** — after opening arc, scenes repeat. Needs more unique scenes per FEMININITY range
+2. **Button overflow bug** — 3rd choice button clips below window when buttons wrap to 2 rows. Root cause: scroll widget in flex column doesn't shrink to accommodate growing siblings. Needs floem source/doc research to fix properly. Five approaches tried and failed (see session log 2026-03-08 cont.2). **Next session must start here**: read floem docs/source, fix the bug, write findings to `.claude/skills/floem-layout/`.
+3. **FemCreation "Who Are You Now" too brief** — needs 4-5 interactive discovery beats (creative direction required)
+4. **7 campus arc scenes uncalibrated** — deprioritized (Camila route, not default Robin route)
+5. ~~**Traits display overflow**~~ — FIXED (flex_basis(0) + flex_grow(1) + max_width(400) on label)
+6. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action
+7. **Content volume** — after opening arc, scenes repeat. Needs more unique scenes per FEMININITY range
 
 ### Remaining open items (post-Sprint 3)
 - **Writing-agent/tooling cleanup** — ✅ MOSTLY RESOLVED. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation added. Remaining: repo-neutral dispatch doc (Priority 3 in audit), retry/backoff in deepseek-helper (Priority 4). See annotated `docs/audits/2026-03-07-writing-agent-tooling-audit.md`.
@@ -86,7 +87,7 @@
 17. ✅ **Remaining scenes register rewrite** — All 26 non-campus scenes calibrated. !w.alwaysFemale() → FEMININITY thresholds, "you used to" eradicated, thoughts → fragments. Campus arc (7) deprioritized.
 
 ### Char creation bugs (previous session)
-- **Trait list runoff** — "Starting traits" row overflows off-screen. No wrapping, no colon/space between label and values. Runs off the right edge.
+- ~~**Trait list runoff**~~ — FIXED: flex_basis(0) + flex_grow(1) + max_width(400) on read_only_row value label. Visually confirmed.
 - **Post-transformation attributes in before-phase** — preset detail shows post-transformation physical traits (Straight hair, Sweet voice, Almond eyes, Wide hips, Narrow waist, Small hands) in the "Who Were You?" phase. Before-phase should only show before-life attributes (name, age, race).
 - **Attribute formatting** — trait/attribute display is a raw comma list with no structure. Needs proper layout (grouped, wrapped, styled).
 - **Needs test coverage** — these visual/layout bugs should be caught by integration tests or a structured playtest checklist, not manual user testing.
@@ -208,6 +209,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont.2 | UI bug fixes + playtester agent rewrite. Fixed traits text overflow in char creation (flex_basis(0) + flex_grow(1) + max_width(400) on read_only_row label). Rewrote `.claude/agents/playtester.md` per user direction — explicit horny player perspective, not polite QA. Attempted button overflow bug (3rd choice clips below window when buttons wrap to 2 rows) — 5 approaches failed: min_height(0) on scroll/parents, flex_grow+flex_basis on ancestors, height_full on story v_stack, moving buttons inside scroll (rejected: user says buttons shouldn't require scrolling), wrapping scroll in extra container. Root cause: floem scroll widget doesn't properly shrink in flex column. All experimental changes reverted. User directed: research floem docs/source next session, fix the bug, write findings to floem-layout skill. |
 | 2026-03-08 cont. | Scene calibration completion pass. Calibrated remaining 16 non-campus scenes (morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day). All `!w.alwaysFemale()` guards replaced with `w.getSkill('FEMININITY') < N` thresholds. All ~25 "you used to" / "from the other side" banned patterns replaced with involuntary physical reactions and body-first observations. All `{% else %}` AlwaysFemale branches removed. All inner voice thoughts converted to fragments. 26/33 scenes now calibrated (7 campus arc deprioritized). 262 tests, 0 failures. validate-pack passes. |
 | 2026-03-08 | Writing register calibration + Robin opening scenes. Calibrated the prose register through 7 iterative attempts with user feedback — landed on DM narrator style (casual, specific, on the player's shoulder). Updated all 7 writing docs (writing-guide, creative-direction, writer-core, review-core, writing-samples, scene-writer agent, writing-reviewer agent) to enforce the register. Wrote calibration design doc + session prompt. Rewrote 4 scenes to calibrated register: `transformation_intro.toml` (plane, before-body accessors), `workplace_arrival.toml` (2-round: ID + transport), `workplace_first_day.toml` (2-round: Dan + lunch, 5 actions), `neighborhood_bar.toml` (3-round: order → nurse/NPC → accept/decline, matches Sample 0). All 33 scenes pass validate-pack. All Jinja templates valid. Writing-reviewer audit run on key scenes. |
 | 2026-03-07 | Hardcoded content-ID audit session. Reconciled current code against docs first, then tightened the character-creation runtime contract instead of leaving preset route flags and rough-content traits as ambient UI strings. `PartialCharState.arc_flag` became explicit `starting_flags`; startup and `validate-pack` now validate that built-in preset starting flags are actually referenced by the scheduler; rough-content preference traits (`BLOCK_ROUGH` / `LIKES_ROUGH`) and structural smooth-legs trait lookups are centralized through `PackRegistry`; runtime/template code now reuses those helpers instead of scattering structural trait strings. Added targeted tests in `undone-scene`, `undone-packs`, and `undone-ui`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
