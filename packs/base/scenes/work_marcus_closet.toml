@@ -1,0 +1,236 @@
+[scene]
+id          = "base::work_marcus_closet"
+pack        = "base"
+description = "The office. An empty conference room. After drinks. The line that's been drawing closer since the break room finally arrives."
+
+[intro]
+prose = """
+The conference room is a fishbowl. Long table, twelve chairs, a manila folder on the end nearest the door. The overhead panel is off — the light comes in from the hallway, a cold stripe across the carpet. Marcus is by the door. Not leaning. Just standing. The posture of a man who's already made up his mind about something.
+
+The rest of the floor is dark. It's past seven and the building has that particular quality of being mostly empty — ducts ticking somewhere above the ceiling, the elevator doing its thing two floors up. No voices. No keyboards.
+
+He's looking at you. Not at his phone. Not at anything else.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The conference room is smaller than it should be. You know that isn't true — it's the same room it was at eleven this morning when you were in a standing review with seven other people. But the room that had seven people in it was a different room.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You knew this was possible. Not this room specifically, but — the direction. Since the bar, maybe. Since the break room if you're being honest. You came to work today carrying that possibility around like a thing you haven't decided whether to put down.
+{% else %}
+The wanting is simple. The setting is the complication.
+{% endif %}
+
+The hallway light cuts across the floor between you.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*Two of you. Empty building. Okay.*"
+
+# ── Actions ──────────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "close_the_door"
+label  = "Close the door"
+detail = "She moves first. No ambiguity."
+prose  = """
+You go to the door. Your hand finds the frame, the cold metal of the handle. You push it shut. The latch clicks.
+
+The hallway light goes.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You hear the calculus running — the open floor plan Monday morning, the three people who sit between your desks, the reference list you've been building for four years. You're not stopping. You just know exactly what you're paying.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've been tracking this trajectory since the break room: his questions, the drinks, the way he held his weight at the door just now. You see where every branch leads. The analysis stops being useful about the time the latch clicks.
+{% elif w.hasTrait("CONFIDENT") %}
+You turn back to the room. He's watching you. You cross the distance in four steps because you already know and so does he.
+{% else %}
+You turn back. The room is darker now — just the ambient glow through the blinds, the city two floors down. He's still by the table. Waiting.
+{% endif %}
+
+When you reach him he doesn't say anything. His hand comes to your jaw, tilts your face up, and then his mouth is on yours.
+
+It's not a long kiss. It's fast and direct, like his questions, like everything with him. When he pulls back, his forehead drops to yours. His breathing is even. Yours isn't.
+
+"This is a problem," he says. Close enough that you feel it more than hear it.
+
+He doesn't step back.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His hand is still at your jaw. Something in your professional self — the person who ran a sprint review this morning, who owns opinions about dependency graphs — just left. You're aware of his thumb against your cheekbone and not much else.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You know what comes next. You came in today knowing it might. Your body is several steps ahead of whatever you were going to decide.
+{% endif %}
+
+His hands go to your hips, walk you back until the table edge is behind you. He lifts you onto it without asking — the table is wide, solid, the right height — and steps between your knees. The conference room chair is behind him. The city light is through the blinds. The rest of the floor is empty and dark.
+
+He works your skirt up methodically — attentive, no wasted motion. When his fingers find the inside of your thigh you make a sound that wasn't a decision. He pauses there for a second, watching your face.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The part of your brain that's been keeping a ledger is still running the numbers. Monday. The open floor plan. The four people who sit between your desks. You stop listening to it.
+{% elif w.hasTrait("ANALYTICAL") %}
+There was a version of tonight where you stayed on the train and went home. You can still see it from here. You stop looking at it.
+{% endif %}
+
+"Tell me if—" he starts.
+
+"Don't stop," you say.
+
+His thumb moves. Your hand finds his shoulder, holds on. The table is cold through your skirt. He's warm everywhere else.
+
+What follows is fast and necessary and absolutely not gentle. He keeps his jacket on. The blinds let in enough light to see his face when he looks at you — and he looks at you. Not at the ceiling, not past you. His eyes stay on yours.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The professional self does not come back for a while.
+{% endif %}
+
+After, you're both still in the conference room and the floor is still empty and the chair is still behind him. He fixes his tie. You get your skirt back to where it belongs. Neither of you says anything about Monday yet.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_INTIMATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "let_him"
+label  = "Let him"
+detail = "He moves first. She doesn't stop him."
+prose  = """
+You stay where you are. The table edge is at the back of your thighs. He's still by the door. The hallway light frames him.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The Monday-morning ledger is open in the back of your head. You don't close it. You just stop adding to it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You saw the approach. The shift in his weight, the deliberate step off the doorframe. You've been watching his signals since the break room — this one is unambiguous.
+{% elif w.hasTrait("CONFIDENT") %}
+You meet his eyes. You don't look away first.
+{% else %}
+He pushes off the doorframe. His footsteps are quiet on the carpet.
+{% endif %}
+
+He reaches back and closes the door without looking at it. The hallway light goes. He crosses the room without urgency. When he gets to you, he doesn't lean in immediately — he stops, a foot away, and looks at your face for a second like he's deciding something. Then his hand comes to your hip. Just holds you there.
+
+"I'm going to need you to tell me no," he says.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The professional self is right there, with its opinions about what this costs. It doesn't seem like the most important thing in the room.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You knew this was possible since the bar. You came to work today knowing it was possible.
+{% endif %}
+
+You don't say no.
+
+He tilts your face up and kisses you, and the hand on your hip walks you back to the table. He lifts you onto it — the conference table is the right height, it turns out, for a thing that was not on any agenda today. He steps between your knees and his jacket is rough under your hands and his mouth is on your neck and his fingers are working your blouse open with a patience that does not feel professional.
+
+He finds your breast and his hand is warm and certain, no hesitation, and the sound you make is not quiet and the room is not soundproofed and the blinds are open and none of that has stopped either of you.
+
+{% if w.hasTrait("ANALYTICAL") %}
+The risk calculus is still available if you want it. It's just not load-bearing right now.
+{% endif %}
+
+He takes his time with you in a way that feels like data collection — watching what works, adjusting, watching your face. His breathing changes when you pull at his belt. When he's inside you, he stills for a moment with his forehead pressed to yours, the way he pauses before answering a question he wants to get right.
+
+The conference room chair is still behind him. The floor outside is still empty. The table is solid and the light through the blinds is the same light it was ten minutes ago.
+
+What happens between then and when he finally steps back is fast and close and nothing like a business meeting. He looks at you the whole time. His voice when he finally makes a sound is the lowest you've heard it.
+
+After, he tucks his shirt in. You straighten your skirt. The folder is still on the table.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The person who ran a standup this morning is still in here somewhere. She'll be back. Right now the room just has the two of you and the sound of the building doing its thing.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_INTIMATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "walk_away"
+label  = "Walk away"
+detail = "The professional self wins. This time."
+prose  = """
+You pick up the folder.
+
+The manila is cool in your hands. It weighs nothing. It doesn't need to be retrieved tonight — you both know that.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Monday is real. The open floor plan is real. You built a reputation in this building from the bottom and it is not something you're going to hand over in a conference room. You tuck the folder under your arm.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've seen the full trajectory: this room, then the Monday morning, then the week after that. You can see it clearly enough to choose the one where you go home.
+{% elif w.hasTrait("CONFIDENT") %}
+"Not tonight," you say. You don't make it a question.
+{% else %}
+"I should go," you say.
+{% endif %}
+
+He doesn't argue. He watches you cross the room with his hands in his pockets — not hurt, not pushing — just watching.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Your body has an opinion about this that differs from your professional self. The professional self wins by one vote.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You knew this was possible since the bar. You just decided something about it.
+{% endif %}
+
+At the door, you pause. He's still standing by the table. The city light through the blinds is the same as it was when you came in.
+
+"Night," you say.
+
+"Night," he says.
+
+The hallway is bright. You blink against it. Behind you, the conference room goes back to being a conference room.
+
+{% if w.hasTrait("AMBITIOUS") %}
+On the train home you run the calculation again. It still comes out the same way. *Good*, you think, but the word is quieter than you expected.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_ALMOST"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true

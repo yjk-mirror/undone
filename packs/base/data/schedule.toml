@@ -76,6 +76,23 @@ name = "free_time"
   trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
   once_only = true
 
+  [[slot.events]]
+  scene     = "base::jake_apartment"
+  weight    = 0
+  trigger   = "gd.week() >= 5 && gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::jake_morning_after"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('JAKE_INTIMATE') && !gd.hasGameFlag('JAKE_MORNING_AFTER')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::jake_text_messages"
+  weight    = 5
+  condition = "gd.hasGameFlag('JAKE_INTIMATE')"
+
   # New universal scenes
   [[slot.events]]
   scene     = "base::weekend_morning"
@@ -104,6 +121,17 @@ name = "free_time"
   weight    = 5
   condition = "gd.week() >= 4"
   once_only = true
+
+  [[slot.events]]
+  scene     = "base::bar_stranger_night"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('BAR_STRANGER_INVITED') && !gd.hasGameFlag('BAR_STRANGER_SLEPT')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::laundromat_night"
+  weight    = 6
+  condition = "gd.week() >= 3"
 
 # ── Workplace opening arc ────────────────────────────────────────────────
 
@@ -210,6 +238,18 @@ name = "work"
   scene     = "base::work_marcus_drinks"
   weight    = 0
   trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_LATE_NIGHT') && !gd.hasGameFlag('MARCUS_DRINKS') && gd.npcLiking('ROLE_MARCUS') == 'Like'"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::work_marcus_closet"
+  weight    = 0
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_DRINKS') && !gd.hasGameFlag('MARCUS_INTIMATE')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::work_marcus_aftermath"
+  weight    = 0
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_INTIMATE') && !gd.hasGameFlag('MARCUS_AFTERMATH')"
   once_only = true
 
 # ── Campus opening arc ────────────────────────────────────────────────

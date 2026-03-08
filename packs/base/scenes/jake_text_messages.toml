@@ -1,0 +1,229 @@
+[scene]
+id          = "base::jake_text_messages"
+pack        = "base"
+description = "Evening. Phone buzzing. Jake. The intimacy of a phone screen at night."
+
+# Post-intimacy interlude. Short scene, different texture.
+# The phone is the one space where the body doesn't matter — except
+# it does. She's choosing words as a woman texting a man she's
+# sleeping with. The patterns are new.
+# NOT explicit. Tender. The gap between thinking and sending.
+
+[intro]
+prose = """
+Your apartment. Evening. The phone buzzes on the nightstand and the screen says his name.
+
+{% if w.hasTrait("ROMANTIC") %}
+You pick it up. The glow in the dark room. His name. Something warm settles behind your ribs before you've read the message.
+{% elif w.hasTrait("ANALYTICAL") %}
+You pick it up. The notification preview shows the first few words and your brain is already running the response before you've opened it.
+{% elif w.hasTrait("SHY") %}
+You look at it for five seconds before picking it up. His name on the screen. The warmth and the small tightening in your stomach arrive together.
+{% else %}
+You pick it up.
+{% endif %}
+
+**Jake:** *Hey. How was your day?*
+
+Three words and a question mark. The simplest possible text. He's not performing via text either.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You type a response. Delete it. Type another one. The phone is small in your hands and the keyboard is the same keyboard and the words should be the same words but they're not, exactly. What you'd say as you is filtered through something now. How you want to sound. How you want him to hear you.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You type back. The response comes easy — easier than it would have a month ago. The words have a shape to them that feels like you. Specifically you.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*Hey.* That's the whole thing."
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "honest_text"
+label  = "Send the honest text"
+detail = "Say what you're thinking. Let him see it."
+prose  = """
+You type it. The real thing. Not the filtered version.
+
+{% if w.hasTrait("ROMANTIC") %}
+**You:** *Good. Better now.*
+
+Three dots. He's typing.
+
+**Jake:** *Yeah?*
+
+**You:** *Yeah. I keep thinking about Saturday.*
+
+A pause. Longer than his usual response time. Then:
+
+**Jake:** *Me too.*
+
+**You:** *The market or after?*
+
+**Jake:** *Both. The peach. Definitely the peach.*
+
+You smile at the phone in the dark. The conversation continues in small exchanges — what he had for dinner, the thing he's working on, a question about your weekend plans that's really a question about whether he's in them. You answer honestly. He reads it honestly. The phone glows and the room is dark and the conversation is warm and direct and you put the phone down forty minutes later and the pillow smells like shampoo and the evening is different than it was before he texted.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+**You:** *Long. Productive. Thinking about you between pull requests.*
+
+Send. The honesty of it sits on the screen. You watch the three dots.
+
+**Jake:** *Pull requests and me. High company.*
+
+**You:** *Don't let it go to your head.*
+
+**Jake:** *Too late.*
+
+The exchange is fast. Efficient. You're texting the way you work — direct, no wasted keystrokes. He matches it. Fifteen minutes of short exchanges that cover more ground than an hour of phone conversation would. When you put the phone down, you've said something real and he received it and nothing broke.
+
+{% elif w.hasTrait("CONFIDENT") %}
+**You:** *I had a good day. Now I'm lying in bed and you texted and it got better. That's the whole report.*
+
+**Jake:** *Comprehensive.*
+
+**You:** *I'm thorough.*
+
+**Jake:** *I noticed.*
+
+The text has a weight to it that coffee-shop conversation doesn't. No face to read, no body language to interpret. Just words, chosen. He's good at this — funny without trying, warm without performing it. You text back and forth for half an hour. When you stop, it's because you're both tired, not because it ran out.
+
+{% else %}
+**You:** *Good. Quiet. I was thinking about you.*
+
+You send it before you can edit it. The three dots appear.
+
+**Jake:** *Good thoughts?*
+
+**You:** *Yeah.*
+
+**Jake:** *Tell me one.*
+
+You do. Not the big one — a small one. The way he handed you the coffee at the market, both hands, the lid already on. The specificity of remembering that. He responds with his own — something you said at dinner that he's been thinking about. The exchange is quiet and honest and you fall asleep with the phone on the pillow and his last message on the screen.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Texting him is different from talking to him. No body in the equation — just your words and his words and the gap between them. Except the body is in the equation. You're lying in bed and your skin remembers his hands and the text conversation has a physical texture that has nothing to do with the phone.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "keep_light"
+label  = "Keep it light"
+detail = "Flirty. Casual. Don't let him see the processing."
+prose  = """
+{% if w.hasTrait("FLIRTY") %}
+**You:** *Survived another one. You?*
+
+**Jake:** *Same. Thought about going to the market again this weekend.*
+
+**You:** *The peach vendor?*
+
+**Jake:** *Among other things.*
+
+**You:** *Smooth.*
+
+**Jake:** *I try.*
+
+The volley is easy. You know this register — the light, charged back-and-forth that means more than it says. You're good at this. The phone lets you be good at this without your face doing something you didn't authorize.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+**You:** *Long day. Tell me something interesting.*
+
+**Jake:** *The coffee shop changed their beans. Noticed it immediately.*
+
+**You:** *Tragic.*
+
+**Jake:** *I'm devastated. May never recover.*
+
+You keep the tone at this altitude — above the real thing, skimming. The real thing is there and you both know it and the keeping-it-light is a mutual agreement to leave it for in-person, where his face can do the work his texts can't.
+
+{% else %}
+**You:** *Day was fine. What's new?*
+
+**Jake:** *Not much. Tried to cook the thing. The thing won.*
+
+**You:** *Casualties?*
+
+**Jake:** *One pan. My dignity.*
+
+You laugh in the dark room. The conversation stays here — easy, playful, the kind of texting that doesn't require excavation. You trade small things for twenty minutes. When you say goodnight, the emoji he sends back is simple and right.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Light is easier. The phone doesn't need to know about the processing happening under the surface — the way your chest warms when his name appears, the speed with which you respond, the fact that you're smiling at a screen in a dark room.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "dont_reply"
+label  = "Don't reply tonight"
+detail = "The phone on the nightstand. The glow. Tomorrow."
+prose  = """
+You read it. You start to type. You delete it.
+
+{% if w.hasTrait("SHY") %}
+The cursor blinks. You know what you want to say — something simple, something that matches his "hey" with your own "hey" — but the gap between wanting to say it and the send button is wider tonight.
+
+You put the phone face-down on the nightstand. The glow dies. The room is dark again.
+
+It's not that you don't want to talk to him. It's that talking to him requires being a version of yourself and right now you're lying in the dark being all the versions at once and that's too many for a text conversation.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+The response tree is branching in too many directions. "Good" is insufficient. "I miss you" is too much for a Tuesday. "Hey" mirrors his opener without advancing the conversation. You run six permutations and reject all of them.
+
+Phone on the nightstand. Tomorrow the tree will prune itself.
+
+{% else %}
+Not tonight. The text is there. He's there. But the day was long and the processing isn't done and whatever you'd send right now would be a rough draft and he deserves a final.
+
+You put the phone down. The screen dims. The room is quiet.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You lie there and the phone glows once more — he sent a follow-up. You don't read it. The wanting to read it is its own information. You'll reply tomorrow and by then you'll know what voice to use.
+{% endif %}
+
+In the morning there's a second message: *No rush.* He doesn't push. That's the thing about Jake.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true

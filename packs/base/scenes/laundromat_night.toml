@@ -1,0 +1,199 @@
+[scene]
+id          = "base::laundromat_night"
+pack        = "base"
+description = "The laundromat at 10 PM. Fluorescent light, warm machines, the hum. She's alone — then she's not."
+
+# NOT explicit. Tension only. The domestic mundane as charged space.
+# A stranger encounter that doesn't go anywhere — the body's awareness
+# of proximity in an empty room at night. Distinct from bar_closing_time
+# (alcohol, intentional nightlife) — this is accidental, domestic.
+
+[intro]
+prose = """
+The laundromat on Clement is open until midnight and at 10 PM it's almost empty. Two rows of machines, the big ones in back, a folding table, a row of plastic chairs. Fluorescent light that makes everything look like evidence. The detergent dispenser hums.
+
+You're here because the hamper was full and tomorrow is a workday and the machines in your building are broken again. Two loads. An hour. You brought a book.
+
+The dryer is running. The sound is a constant warm vibration that you can feel through the chair. The book is open on your lap and you're reading the same paragraph for the third time.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The laundromat at night feels different in this body. Not dangerous — the attendant is in the back, the street is visible through the window. Just aware. The door opens and you look up and the looking-up is automatic now, the quick inventory of who's coming in.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The door opens. You look up. A man, thirties, a bag of laundry and the expression of someone who's also here because the alternative was worse.
+{% else %}
+The door opens. A man with a laundry bag.
+{% endif %}
+
+He takes a machine two rows over. Sorts his clothes. Quarters in. The machine starts and he sits down in the plastic chairs across from you.
+
+The laundromat hums. You go back to your book.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*Laundry. 10 PM. Fluorescent light and a stranger.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "ignore_him"
+label  = "Earbuds in. Book open."
+detail = "The dryer has twelve minutes left. He's not your business."
+prose  = """
+You put your earbuds in. Nothing playing — the laundromat's hum is enough, but the earbuds are a signal. The book is open. The twelve minutes tick down.
+
+{% if w.hasTrait("SHY") %}
+You read. Or you look at the page and the words are there and somewhere behind the words you're tracking his movements in the peripheral. He folds a shirt. He checks his phone. He shifts in the plastic chair and the chair makes a sound against the floor.
+
+Twelve minutes. You don't look up once and you know exactly where he is.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+The dryer has eleven minutes left. His machine has — you calculate from the cycle start — twenty-three. You will leave first. The logistics are clean.
+
+He folds a shirt. Good fold. Hospital corners on a t-shirt, which is either military or someone's mother. You add this to a file that doesn't need to exist and go back to your book.
+
+{% else %}
+You read. The dryer hums. He's there, across the row, in the peripheral. The laundromat at 10 PM is a small world with two citizens and neither of them is making anything of it.
+
+The timer dings. Your clothes are done. You fold them at the table — methodical, fast, the routine you've built in three weeks of doing this — and put them in the bag and you're out.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The awareness is the thing. Not interest — just the body's constant monitoring of another body in a shared space. The distance between your chair and his. His hands folding laundry. The size of his hands relative to the shirt.
+
+You pack your bag. He says "have a good night" without looking up. You say "you too" and the exchange is exactly right and the walk home is two blocks with the laundry bag warm against your hip.
+{% elif w.getSkill("FEMININITY") < 50 %}
+He nods when you leave. You nod back. The fluorescent light and the hum and the warm bag of clean laundry and the walk home.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "talk"
+label  = "Talk to him"
+detail = "Laundromat small talk. It's 10 PM and neither of you planned this."
+prose  = """
+"Broken machines in your building too?" you ask, because the silence has been there long enough that it needs a shape.
+
+He looks up. Small smile. "Third time this month. I'm on first-name terms with the super and it hasn't helped."
+
+{% if w.hasTrait("DOWN_TO_EARTH") %}
+The conversation finds its level fast. His building, your building. The super. The rent. The particular absurdity of paying what you both pay and still sitting in a laundromat at 10 PM on a weeknight. He's easy to talk to in the way that people who don't need anything from the conversation are easy to talk to.
+
+By the time your dryer dings you've covered the neighborhood, a restaurant that closed, and whether the bodega on Fifth is actually cheaper than the one on Third. It's not, but the cat is worth the markup.
+
+{% elif w.hasTrait("OUTGOING") %}
+You talk. He talks. The laundromat opens up — the fluorescent light stops feeling like an interrogation and starts feeling like a stage for a small, comfortable conversation between two people waiting for the same thing.
+
+His name is — it doesn't matter. You won't remember it. What you'll remember is that he laughed at the thing you said about the detergent dispenser and that the laugh was surprised, which is the best kind.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+You learn: his building is the one on Ashford with the green awning. He works in logistics. He's been in the neighborhood two years. He has opinions about the laundromat's dryer settings that suggest he's thought about this more than most people.
+
+"The large dryers run fifteen degrees hotter than the label says," he tells you. "I tested it."
+
+"You brought a thermometer to the laundromat?"
+
+"...Yes." A pause. "Is that weird?"
+
+"No," you say. And mean it.
+
+{% else %}
+The conversation is small and easy. The neighborhood. The weather. Whether the pizza place on Union is better than the one on Clement. He thinks Union. You think Clement. Neither of you has strong evidence.
+
+The dryer dings. You fold your clothes. He folds his. The conversation continues over the folding table and then you're both done and both leaving and the street is cold after the laundromat's warmth.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Talking to a stranger in a laundromat at 10 PM. It's ordinary. People do this. But the awareness doesn't leave — his height, the way he leans against the machine with his arms crossed, the sound of his voice in the small space. All of it registers at a frequency that's still new.
+{% endif %}
+
+"Good night," he says outside. "Good night," you say. He goes left. You go right. The laundry bag is warm against your hip. The cold is cold. The evening was something.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "sit_closer"
+label     = "Sit closer"
+detail    = "The bench has room. You choose proximity."
+condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 35"
+prose     = """
+Your dryer finishes. His is still running. Instead of the folding table, you take the chair one over from his.
+
+{% if w.hasTrait("FLIRTY") %}
+He registers the proximity without commenting on it. You fold a shirt. He watches — not your hands, exactly. Just you. The awareness between you has a temperature.
+
+"That's a complicated fold," he says.
+
+"It's a fitted sheet."
+
+"Nobody can fold those."
+
+"I can." You demonstrate. He watches. The laundromat hum fills the silence and the silence is comfortable and slightly charged and you're enjoying it.
+
+"Impressive," he says.
+
+"I know."
+
+He laughs. You keep folding. The conversation continues in the register between friendly and something else. When you leave, his eyes follow you to the door and you let them.
+
+{% elif w.hasTrait("CONFIDENT") %}
+You sit. You fold. He's there, close enough that your elbows could touch if either of you leaned. Neither of you does.
+
+"Come here often?" he asks, deadpan.
+
+"That's the line you're going with?"
+
+He grins. "Seemed appropriate. We're literally doing laundry."
+
+The conversation is easy and a little charged and you fold your clothes and he waits for his dryer and by the time you're done the evening has a texture it didn't have when you walked in with a bag of dirty jeans.
+
+{% else %}
+The chair is cold plastic. His dryer has eight minutes. You fold your clothes in the chair next to him and the proximity is deliberate and he knows it's deliberate and neither of you says anything about it.
+
+Small talk. The neighborhood. How long he's lived here. Your knee is six inches from his and the six inches have a presence.
+
+His dryer dings. He gets up to unload it. The six inches become three feet. You finish packing your bag.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 50 %}
+The fluorescent light is unforgiving and you're sitting close to a stranger and your laundry is between you and none of this is anything and also the warmth off his arm is a fact your body has opinions about.
+{% endif %}
+
+Outside, the cold is immediate. "See you around," he says. "Maybe," you say. The walk home is short and the laundry bag is warm and the evening sits in your chest like a small, warm fact.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true

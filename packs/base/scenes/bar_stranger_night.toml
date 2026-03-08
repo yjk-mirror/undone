@@ -1,0 +1,199 @@
+[scene]
+id          = "base::bar_stranger_night"
+pack        = "base"
+description = "Her apartment. The stranger from the bar is on her couch. One drink is done. The night is not."
+
+# Content level: SEXUAL — explicit consensual content in two of three actions.
+# No rough-content gating needed for this scene.
+
+[intro]
+prose = """
+Your living room is different with him in it. The couch cushions sit lower under his weight. The lamp throws his shadow up the wall — long, angled, a shape that wasn't there an hour ago.
+
+Two empty glasses on the coffee table. Conversation stopped a few minutes ago. He hasn't moved toward the door. He's looking at you, not at anything else.
+
+His jacket is still on the arm of the couch.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The three feet between your chair and the couch has its own texture. You can see the grain of the floor in it.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You can feel the weight of his attention on your face, your neck. The room is warm. The silence is his too.
+{% else %}
+The room is yours, but he's in it now. He's waiting.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.hasTrait('ANALYTICAL')"
+style     = "inner_voice"
+prose     = "*He's waiting. You're waiting.*"
+
+[[thoughts]]
+condition = "w.hasTrait('SHY') && w.getSkill('FEMININITY') > 30"
+style     = "inner_voice"
+prose     = "*Three feet.*"
+
+# ── Actions ─────────────────────────────────────────────────────────────
+
+[[actions]]
+id        = "pull_him_close"
+label     = "Pull him close."
+detail    = "Your hand on his shirt. Your mouth on his."
+condition = "!w.hasTrait('SHY') || w.getSkill('FEMININITY') > 30"
+prose = """
+You stand up. The floorboards creak once. He watches you cross the three feet.
+
+Your hand goes to his chest, heat through the fabric. You lean down and kiss him. His mouth is warm. His hands come up to your waist, and he pulls you onto his lap.
+
+{% if w.hasTrait("CONFIDENT") %}
+You straddle him. Your skirt rides up your thighs. His hands slide under your shirt. You break the kiss long enough to nod toward the hall. "Bedroom." He stands, lifting you with him, your legs locked around his waist. Your back hits the wall in the hallway. You're directing, steering, a hand on his collar.
+{% elif w.hasTrait("FLIRTY") %}
+You roll your hips against him, feel the hard ridge of his cock through his jeans. He laughs low and his hands go under your skirt. He stands with you around him and walks you backward into the hall while you work the buttons of his shirt.
+{% elif w.hasTrait("ANALYTICAL") %}
+You're noting: stubble, the heat through his shirt, the way your hips settle against his — and then his tongue is in your mouth and *okay* and the inventory closes. He stands with you around him and carries you down the hall. The wall against your back. His mouth on your neck. The noting is done.
+{% elif w.hasTrait("SHY") %}
+You kiss him. His hands on your waist feel huge. He pulls you onto his lap and you go still for a moment, then don't. He does all the moving from there — standing, carrying you, setting you down on your bed. You watch him from the pillows while he strips his shirt off.
+{% else %}
+He takes over once you're in his lap. Hands under your thighs, standing, walking you down the hall. He sets you on the bed. The comforter is cold against your back. He's above you, pulling his shirt off.
+{% endif %}
+
+He undresses you without ceremony. Shirt over your head, bra gone, skirt down to the floor. His jeans follow. His cock is hard, curved slightly to the left, a dark thatch at the base. He kneels between your legs.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His fingers touch you and your hips arch before you've made any decision at all. You're wet — already, unexpectedly — and he can feel it, and that registers somewhere on your face. He pushes into you. The fullness hits your spine. Your hands fly to his shoulders. He's inside you and the room has narrowed to the place where that's happening.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You're wet. He slides two fingers in and you moan. When he lines up his cock and pushes, the stretch is a different stretch than a known person's — less careful, less anticipated. His weight, his smell, the particular rhythm he finds — all of it new. You wrap your legs around him. He fucks you deep, each thrust landing exactly where it lands.
+{% else %}
+You're wet. He enters you in one stroke. Your body takes him and you move with him, angling your hips, finding the rhythm. He's sweating, his chest against yours, the headboard knocking against the wall. You come before he does, a sound you don't suppress.
+{% endif %}
+
+He comes with a grunt, his hips stuttering. He stays there for a few seconds, breathing. Then he rolls off.
+
+The space beside you is warm. He dresses in the dark — not quickly, not apologetically, just doing it. Kisses your forehead. The front door clicks shut. You lie in the quiet.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Your legs are still parted. The sheets are damp. You stare at the ceiling. His cologne is still in the air.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The room is quiet. The sheets smell different now. You lie there until your breathing slows.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAR_STRANGER_SLEPT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "wait_let_him_move"
+label  = "Wait. See what he does."
+detail = "Stay in your chair. The silence has pressure."
+prose = """
+You stay where you are. Hands in your lap. You look at him.
+
+He watches you for a long moment. Then he stands and comes over. He kneels in front of your chair. His hands settle on your knees and push them apart. Not rough — just decided.
+
+His fingers slide up your thighs, under your skirt. He hooks your underwear to the side.
+
+{% if w.hasTrait("CONFIDENT") %}
+You lean back and let him. When his mouth finds you, you let out a slow breath and put your hand in his hair. You guide the pace. He follows.
+{% elif w.hasTrait("FLIRTY") %}
+You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them. You come against his face with your thighs clamped around his ears.
+{% elif w.hasTrait("ANALYTICAL") %}
+*Living room floor. Your chair.* The observation lands and then his tongue finds a rhythm and the clarity burns off. No more observations. Just the wet pressure of his mouth and something coiling low, tightening, until you cry out and grip the arms of the chair.
+{% elif w.hasTrait("SHY") %}
+His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one. You come quietly, your legs shaking, and then he's standing up.
+{% else %}
+His mouth is on you. Your head falls back. You moan into the empty apartment. When you come, his name isn't there — just the fact of it, sharp and immediate.
+{% endif %}
+
+He stands, jeans already open. He turns you around in the chair and you let him, bracing on the arm of it while he finds the angle.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+He pushes into you from behind. Each thrust rocks you forward, your hands sliding on the upholstery. The position is exposed. You grip the chair and take it. When he comes, he bites down on your shoulder — not hard, but enough to leave the memory.
+{% elif w.getSkill("FEMININITY") < 50 %}
+He enters you and sets a hard, fast pace. The chair creaks. You push back against him, matching it. His hips stutter when he comes and you feel the heat of it.
+{% else %}
+He fucks you over the chair arm. Raw, direct, no ceremony about it. He comes with a short groan. You feel it.
+{% endif %}
+
+He pulls out. His hand rests on your back for a second — not tender, just present. Then it's gone, and you hear him zipping up.
+
+The front door opens and closes. You straighten. Your underwear is on the floor. Your legs are unsteady. You stand there, in the middle of your living room, and let them steady.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAR_STRANGER_SLEPT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "change_mind"
+label  = "\"Actually — I think it's getting late.\""
+detail = "Thank him. Close the door. Alone."
+prose = """
+"I think it's getting late," you say.
+
+He doesn't argue. A beat of a pause, then he nods and picks up his jacket from the arm of the couch.
+
+"Sure."
+
+You walk him to the door. The hallway is narrow. He turns to face you.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Thanks for the drink," he says.
+"Thanks for the walk home."
+A nod. He leaves. You lock the door and pour a glass of water and drink it standing at the sink. The apartment is exactly the same size it was before he came in.
+{% elif w.hasTrait("FLIRTY") %}
+He leans in and kisses your cheek. His stubble crosses your skin and then he's pulling back, stepping into the hallway. You lock the door. You don't touch your cheek. You think about maybe touching it.
+{% elif w.hasTrait("ANALYTICAL") %}
+"Good night," he says.
+"Good night."
+He goes. You lock the door and stand in your living room. Two glasses. A dent in the cushion. The scent of his jacket still in the air. The evening got this far and then you stopped it. You stand in that fact for a moment.
+{% elif w.hasTrait("SHY") %}
+He says good night and steps out. The door clicks shut. You stand with your hand on the lock for a long time. You're not sure what you're listening for. The hallway goes quiet.
+{% else %}
+"Night," he says.
+"Night."
+He goes. You lock the door. You straighten the cushion on the couch. You rinse the glasses and set them on the rack. The night is over.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You sit on the couch where he was. The cushion is still warm. You stay there a minute before you get up and turn off the lamp.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The lamp is still on. You turn it off. In the dark, the apartment is just an apartment again. You brush your teeth. You go to bed.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true

@@ -1,0 +1,288 @@
+[scene]
+id          = "base::jake_apartment"
+pack        = "base"
+description = "Her apartment or his. Evening. After enough dates that this was coming. The question isn't whether — it's how."
+
+[intro]
+prose = """
+His apartment, or yours. The address doesn't matter. What matters is the door is closed and the city is on the other side of it, and neither of you is pretending there's somewhere else you need to be.
+
+The floor lamp puts a circle of yellow light on the wall. His jacket is over the chair. Yours is on the floor by the door, which is how you know where the last hour went.
+
+He's sitting on the edge of the bed, looking at you. The way he's looking at you is quiet. Patient. He's not pushing. He's not hurrying himself.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You are at the far edge of what you understand about your own body. The part you don't know is the part where this body is involved — what arousal does from the inside now, what his hands will find when they get there. You've run the theory. The theory is going out the window.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You've thought about this. The wanting has been there for a while. Getting from the wanting to the here is a thing you've managed, and now the here is actual and your body is doing something low and warm that doesn't need your permission.
+{% else %}
+You know what you want. You know what this body does when it gets close to what it wants. What you don't know is him, yet — his hands, his particular attention — and that's what the evening is about.
+{% endif %}
+
+He doesn't say anything. The room is warm.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 30"
+style     = "inner_voice"
+prose     = "*Okay.*"
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "let_him_lead"
+label  = "Let him set the pace"
+detail = "He's patient. He'll find you."
+prose  = """
+He stands and crosses to you. He cups your face in both hands first — just holds it, his thumbs along your jaw, looking at you. His eyes are dark.
+
+Then he kisses you, and the kiss is slow in a way that dismantles the last of whatever you were bracing against.
+
+{% if w.hasTrait("SHY") %}
+He moves at the pace of someone who isn't trying to get anywhere, which helps. His hands find your shoulders. He draws you down onto the bed and takes his time. Every place he touches is a question that doesn't require words. When he finds the hem of your shirt, he looks at you first.
+
+You don't stop him.
+
+The shirt comes off. He runs one hand from your shoulder down your side and settles it at your hip. Not moving yet. Just present. He looks at you again, and the looking isn't hunger, it's something more careful than that, and your eyes go down because you can't hold the weight of being looked at like that.
+
+"Hey," he says, quietly, and waits until you look up.
+{% elif w.hasTrait("ANALYTICAL") %}
+You're cataloguing. The weight of his hands on your shoulders. The height differential when you're both standing close. His mouth on your throat and what that does — your brain is trying to file it somewhere useful while your body is filing it in an entirely different place.
+
+He gets your shirt off. He takes stock of you in the lamplight, and the cataloguing reverses direction. You're aware of being looked at and the awareness goes all the way down.
+
+The analysis runs for about another forty seconds. Then his hand moves and the analysis stops.
+
+*Oh.* And then nothing, because there's no room for it.
+{% elif w.hasTrait("FLIRTY") %}
+You've been building here. A coffee shop, a market, a restaurant, two hours of hands and proximity. This is what the building was for.
+
+He moves like he already knows what he's doing. His hands are warm and his attention is total and when you pull him down onto the bed by his collar he laughs, low, and lets himself be pulled.
+{% else %}
+He moves you toward the bed without any of it feeling like being moved — just the direction of things, where they were going anyway. His hands know what they're doing. You let yourself be taken.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His mouth goes to your neck. Your brain whites out.
+
+Not fear — it's a complete silence, a drop in everything, replaced by something warm and rising. You make a sound. You've never made that sound before. The pitch of it surprises you. He stills for a moment, hearing it, and then does it again.
+
+The arousal isn't what you knew. It doesn't arrive and peak — it builds. Every touch adds to it, layers onto it. His hands on your breasts and the warmth is different there than anywhere else, a focused heat that gathers. His fingers below and you arch up without meaning to, and the motion your hips make isn't anything you chose.
+
+He watches you. He's watching what he's doing to you, paying attention in a way that makes the whole thing worse in the best direction.
+
+When he finally pushes inside you, you gasp. The fullness is something you have no prior reference for. It's not what you expected. It's more than you expected. He goes slow, watching your face, and you close your eyes because keeping them open is too much.
+
+He moves. You move with him. The pleasure geography of this body is completely different from anything you knew, and you're learning it in real time, his hands finding places that send the signal somewhere new, and the rising wave just keeps rising until it crests and breaks and you make another sound you've never made.
+
+He holds you through it. His chest warm against your back. The room is very quiet.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The wanting got you here but the wanting had a theory about what here would feel like, and the theory and the reality are two different things. His hands on your hips, the weight of him over you, and what your body does under that weight — it responds faster than you expected. More directly. A touch in the right place and there's no committee meeting about it, the response is just there.
+
+He finds a place low on your belly that makes your breath catch. Then he finds another one. He's paying attention. When he moves his fingers and you gasp, he keeps doing exactly that, and the fact that he keeps doing it means he heard you.
+
+The orgasm rolls through you from somewhere below the waist upward, and it's different from anything you've had before — wider somehow, less localized. You clutch his shoulders through it. He doesn't stop until you tell him to.
+
+Afterward, the room comes back. His arm around you.
+{% else %}
+You know this body. You know the particular way arousal sits in your hips, the place on your throat where his mouth is going to undo you, the threshold between you want more and you need more.
+
+What you don't know is him.
+
+His hands are different from any hands that have been here. His weight has its own distribution. The way he pays attention — the pause when he finds something that works, the return to it — is his, not a template. The pleasure is familiar in texture and his in shape, and the combination of both is what does it.
+
+He takes his time. So do you.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_INTIMATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "show_him"
+label     = "Show him what you want"
+detail    = "Guide his hands. Even if the map is still being drawn."
+condition = "w.hasTrait('CONFIDENT') || w.getSkill('FEMININITY') > 30"
+prose     = """
+You take his hand.
+
+Move it. Not roughly — just with intent. This is where. That's the direction. He gets it immediately, which you knew he would, and the slight shift in his expression is something between pleased and focused.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Here," you say, and he goes. "Slower." He slows. "There." He stays. The word there isn't even out of your mouth before your eyes close.
+
+You know what you want in general. What you're learning is the specific route in this body. The map isn't complete but you're adding to it in real time, and having his full attention while you do it means every discovery gets confirmed twice — once by your nerves and once by his hands returning to the same place, the fact of them saying: noted.
+
+When you come, it's with his face against your shoulder and your hand still directing, because that's who you are, and the orgasm is a complete white-out of the machinery that makes you that person for about twenty seconds.
+{% elif w.getSkill("FEMININITY") > 50 %}
+You know what you want. Getting him there takes about two redirects. He's a quick study. His hands move with purpose and you arch up and the ceiling is close.
+
+He checks your face the way he checks everything — quietly, paying attention. When he finds the thing that makes you tighten, his eyes stay on yours, which is almost too much. You look away first.
+
+The orgasm is long. You come back to the room slowly.
+{% else %}
+You don't have complete information — you're going on instinct and on what the body does when you get close to the right place. His thumb traces the inside of your thigh and there's a signal from somewhere south of your navel. Down, you think, and pull his hand, and then his fingers find the right spot and the thought ends there.
+
+He can tell. His rhythm steadies. You don't tell him to stop and then you absolutely have to tell him to stop and even after, your hips are still moving.
+
+You lie with your forehead against his chest. His breathing slows back down. So does yours.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_INTIMATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "stop_not_tonight"
+label  = "Stop. Not tonight."
+detail = "The wanting is real. She's choosing to wait."
+prose  = """
+"Not yet." It comes out quiet. "I can't. Not tonight."
+
+He stops. Doesn't try to re-close the distance or coax you or figure out what 'yet' means. He sits back on the bed beside you. Not wounded. Not performing patience — just actually patient.
+
+"Okay," he says. Just that.
+
+{% if w.hasTrait("SHY") %}
+The relief is bigger than you expected. Not relief that he stopped — you're sure about the wanting. Relief that the stopping was this easy, that there's no negotiation, no explanation required. The wanting is still there and the room is warm and he's right there, and none of it got complicated.
+
+He passes you your shirt from the floor. You pull it over your head.
+
+After a while you put the lamp off and lie next to him in the dark, your shoulder against his. He doesn't try anything. The ceiling is there.
+{% elif w.hasTrait("ROMANTIC") %}
+The apartment is warm and still. He's close and his breathing has steadied. Some part of you made this evening into something — the buildup, the particular quality of his patience — and the not-tonight has its own meaning in the sequence of it.
+
+You sit with the wanting. It has a shape now. It'll still have a shape next time.
+{% elif w.hasTrait("ANALYTICAL") %}
+The variables are still in play. The evening didn't end, just this particular thread. You do a quick inventory: still want him. Still trust him. The body still has an opinion, low and warm and persistent. The decision was yours, which is the relevant fact.
+
+He sits beside you. After a while he says, "I've got beer, if you want."
+
+You do.
+{% else %}
+The room settles. He stretches out beside you, not crowding, and looks at the ceiling the same way you're looking at it.
+
+"Okay," you say, after a while. Which is not a continuation of anything. Just confirmation that the okay goes in both directions.
+
+"Yeah," he says.
+
+The lamp puts yellow light on the wall. The city is still out there. Neither of you is in a hurry to go back to it.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "kiss_and_see"
+label  = "Kiss him and see what happens"
+detail = "No plan. Just this moment."
+prose  = """
+You lean in. No strategy. Just the fact of him being close and the evening having arrived here.
+
+He meets you. The kiss starts slow and then your hand goes to the back of his neck and the slow drops off.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You end up on the bed without a clear narrative of how. He's over you and your hands are in his hair and the kissing has gone somewhere past kissing. He gets your shirt off and his mouth goes to your collarbone and a sound comes out of you that belongs to a body you're still getting acquainted with.
+
+High, soft, involuntary. The room catches it.
+
+He stills. Looks at you. His expression is something very focused, paying attention.
+
+He does it again. The same place. Same pressure.
+
+The sound comes again.
+
+*Oh*, you think, which is not a thought so much as a complete account of the situation.
+
+His hands find their way. The arousal doesn't peak and resolve — it layers, it deepens, it pulls you down somewhere warm. Every touch adds to it. His fingers inside you and the whole thing tips sideways in the best possible way and you're clutching the dark blue comforter and he is absolutely paying attention to everything you do.
+
+The orgasm takes a while to come and it comes from everywhere at once.
+
+Afterward the city is still there and neither of you moves right away.
+{% elif w.getSkill("FEMININITY") < 50 %}
+His shirt ends up on the floor. Yours too. The kissing became hands and the hands have a direction and you're following both.
+
+His mouth moves down your throat. You tilt your head without thinking. The wanting goes ahead of everything and the body knows where it's going even when the mind is a half-step behind.
+
+He moves between your legs and the fullness of him is new in the exact way this body makes things new — a sensation you have no reference for except the one you're building right now. You pull him closer.
+
+The orgasm rolls up from below your navel and takes you completely.
+
+When you come back, his cheek is against your hair. The lamp is still on.
+{% else %}
+The clothes go. The bed meets you both. His hands know where to go and so do yours and the evening becomes the evening, which is what it was always going to become.
+
+He pays attention in the particular way that's his — the pause when something lands, the return to it, the quiet focus of a man who's actually here and not somewhere else. That's what you came for. Not the mechanics. That.
+
+You give him back the same attention.
+
+When it's over you lie with your leg thrown over his and the room is dim and warm.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_INTIMATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true

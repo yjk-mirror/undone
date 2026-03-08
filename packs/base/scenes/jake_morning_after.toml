@@ -1,0 +1,266 @@
+[scene]
+id          = "base::jake_morning_after"
+pack        = "base"
+description = "Morning. His place or hers. Waking up next to someone for the first time in this body."
+
+# Aftermath of jake_apartment. The physical evidence of last night.
+# His arm across her. The question isn't "did I enjoy it" — the body
+# answered that. The question is what this means for who she is now.
+# NOT explicit. The morning-after register: tender, quiet, real.
+
+[intro]
+prose = """
+You wake up and it takes a second.
+
+The pillow is different. Or the light is different. Or the weight across your waist is different — warm, heavy, the particular gravity of another person's arm. Jake is behind you, breathing slow, asleep or close to it.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Your body is a report. Sore in places that are new and specific. Your hips. Something in your inner thighs. The space between your legs feels different than it did yesterday — used, warm, the ghost of sensation. His arm is heavy across your waist and his hand rests against your stomach and the heat of him along your back is a wall of warmth that your body has decided is good before your brain has finished booting up.
+
+You're naked. He's naked. These are facts. The sheets are tangled. The room smells like sleep and him and something else underneath.
+{% elif w.getSkill("FEMININITY") < 50 %}
+Your body remembers before your brain does. Sore, warm, the specific weight of last night still in your limbs. His arm across your waist. His breathing against the back of your neck, slow, still asleep. The sheets smell like both of you.
+
+You're aware of the places that are tender without cataloging them. You know what happened. Your body knows it better.
+{% else %}
+His arm across your waist. His breathing on the back of your neck. The morning light doing what it does to the sheets tangled around you both.
+
+You know where you are and how you got here and the memory is warm.
+{% endif %}
+
+The ceiling has a crack in it. His apartment, then. You don't recognize the ceiling.
+"""
+
+[[intro_variants]]
+condition = "w.hasTrait('ROMANTIC')"
+prose = """
+You wake up slowly.
+
+The light is golden — his bedroom faces east and the curtains are thin and the morning comes through them like it has opinions about how you should start the day. Jake is behind you, one arm across your waist, his breathing slow and even against the back of your neck.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Your body is soft and sore and warm. The places where he was — his mouth, his hands, the weight of him — are still registering, quiet echoes that haven't finished. His hand rests against your stomach and you can feel his heartbeat through his chest against your back.
+
+*Oh.* Just — oh.
+{% endif %}
+
+The room smells like sleep and coffee that someone made yesterday and didn't finish. His apartment. The ceiling has a crack in it. The crack is shaped like a question mark, which you decide is significant.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = "*Morning. Him. Okay.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stay"
+label  = "Stay"
+detail = "The morning with him. Coffee. Whatever comes next."
+prose  = """
+You don't move. His arm stays. The morning happens around you — light shifting, the radiator clicking, the sound of the city starting its Saturday through the window.
+
+{% if w.hasTrait("ROMANTIC") %}
+He wakes up slowly. You feel it — the breathing changes, the arm tightens slightly, a sound that's not quite a word. Then his mouth on the back of your neck, brief, warm, still half-asleep.
+
+"Morning," he says. His voice is rough. Lower than usual.
+
+"Morning."
+
+He doesn't move to get up. Neither do you. The silence has a different texture than it did at the coffee shop — heavier, warmer, with all of last night in it. You let it sit. He lets it sit.
+
+Eventually he says "coffee" like it's a philosophical statement, and gets up, and you watch him cross the room and you're watching him and he knows you're watching and neither of you says anything about it.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+He wakes up. You know the exact moment — the breathing shifts, the arm adjusts, a small sound behind your ear. You've been awake for twenty minutes already, cataloging. The ceiling crack. The weight of his arm. The specific soreness in your hip flexor.
+
+"Hey," he says.
+
+"Hey."
+
+"How long have you been awake?"
+
+"A while." You don't explain what you were doing. He makes coffee. The apartment is small and you can see the kitchen from the bed and you watch him measure grounds with the particular precision of a man who has opinions about ratios.
+
+{% elif w.hasTrait("SHY") %}
+He wakes up. You feel it happen. Your first instinct is to pretend you're still asleep, which is ridiculous, and you override it.
+
+"Hey," he says. Quiet. His hand moves once across your stomach — slow, warm, checking.
+
+"Hey."
+
+The silence is enormous. Not bad. Just full. You pull the sheet up slightly. He doesn't comment on it.
+
+He gets up after a few minutes and the bed gets colder and bigger and he comes back with two cups and sits on the edge near your hip and hands you one and says nothing while you drink it.
+
+{% else %}
+He wakes up. His arm tightens once and then he's shifting, blinking, the transition from sleep to present. He sees you and something in his face settles.
+
+"Hey."
+
+"Hey."
+
+He gets up and makes coffee and brings you a cup without asking how you take it and gets it right, which shouldn't be charming but is.
+
+The morning finds its shape. You drink coffee in his bed and the conversation doesn't try to be anything — just two people who slept together and are now drinking coffee and the city is doing its thing outside.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His shirt on the chair. Your clothes on the floor — you can see your bra draped over his desk chair. The sight of it there, in his room, is a small specific fact that lands somewhere in your chest.
+
+He comes back with coffee and sits close and your bare shoulder touches his arm and the contact is different now. Everything is different now. Not bad different. Just — the same things, after.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_MORNING_AFTER"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "get_up_quietly"
+label  = "Get up quietly"
+detail = "She needs to process alone."
+prose  = """
+You slide out from under his arm. Slow. He shifts but doesn't wake — a murmured sound, then the breathing evens out.
+
+Your clothes are on the floor. You find them in the order they came off, which is the reverse order of last night's narrative and you're not thinking about that. Underwear. Jeans. The shirt that smells like the bar and like him.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You dress in the bathroom. The mirror shows you a woman who had sex last night — flushed, hair tangled, a mark on her collarbone that she touches once and then buttons her shirt over. You splash water on your face. The analysis will come later. Right now you're operating on autopilot and autopilot says: leave, walk, process.
+{% elif w.hasTrait("SHY") %}
+You dress fast, in the hallway, listening for his breathing to change. It doesn't. The apartment is quiet. His keys are on the counter and his coffee maker is there and his whole life is here in this small apartment and you were in it last night and now you're leaving it.
+
+The door is tricky — a deadbolt that needs a quarter-turn — and the click when it opens is loud in the quiet.
+{% elif w.hasTrait("AMBITIOUS") %}
+You're up, dressed, and at the door in four minutes. Not running — efficient. There's a morning you need to have with yourself before you have one with him. Last night was good. Last night changed something. You need to figure out what before you look at him over coffee and the question is in his face.
+{% else %}
+You dress. You look at him one more time — asleep, the sheet at his waist, one arm where you were. The room smells like both of you. You let yourself out.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The street is cold and bright and your body is a museum of last night — sore, warm, the specific memory of his hands in places that still feel touched. You walk. The city doesn't know. Nobody on this sidewalk knows what happened in that apartment. You're just a woman walking home on a Saturday morning.
+
+The thought lands and keeps going.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The walk home is twenty minutes. You put your headphones in and don't play anything. The city goes by. Your body carries last night like a secret that isn't a secret — just a thing that happened that belongs to you.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_MORNING_AFTER"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "wake_him"
+label  = "Wake him up"
+detail = "The morning is its own thing. She's not done."
+prose  = """
+You turn over. His face is close — eyes closed, mouth slightly open, the particular slack of a man deeply asleep. His jaw in the morning light. You touch it.
+
+His eyes open. Not startled — just there, immediately, like he was waiting.
+
+"Hey," he says. The word is rough with sleep.
+
+"Hey."
+
+{% if w.hasTrait("FLIRTY") %}
+You don't say anything else. You lean in and kiss him and his hand comes up to the back of your head, threading into your hair, and the kiss is slow and warm and tastes like sleep and you're smiling into it.
+
+"Good morning," you say against his mouth.
+
+"It is now." The worst line. The worst delivery. You laugh and he laughs and then you're kissing again and the morning gets simpler.
+
+{% elif w.hasTrait("CONFIDENT") %}
+"Coffee?" he asks.
+
+"Later."
+
+He reads it. His hand moves from the pillow to your hip and stays there, warm, waiting. You move closer. The morning light is doing something to the sheets and to his skin and to the particular geometry of two bodies that already know each other from last night.
+
+"Yeah?" he says.
+
+"Yeah."
+
+{% elif w.hasTrait("ROMANTIC") %}
+You trace his jaw. The stubble is rougher than last night. His eyes track you with the soft focus of someone who's only been awake for ten seconds and is already fully present.
+
+"You're staring," he says.
+
+"I'm looking."
+
+He smiles. His arm comes around you and pulls you against him and the warmth of his chest against yours is the morning's first complete sentence.
+
+{% else %}
+"Morning," you say.
+
+His hand finds your waist under the sheet. The touch is different than last night — lighter, simpler, a hello. He pulls you slightly closer. You let him.
+
+"Sleep okay?" he asks.
+
+"Yeah."
+
+The conversation doesn't need to go anywhere. You lie there and the morning fills with small exchanges — his hand on your hip, your head on his chest, the radiator clicking — and none of it requires analysis.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His chest against yours. The weight difference. His heartbeat under your ear, slow and steady, and yours faster, and you're aware of both.
+
+Last night happened and this morning is happening and the two are connected by the body you're in and the man you're next to and neither of those things is going away.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_MORNING_AFTER"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -4
+
+  [[actions.next]]
+  finish = true

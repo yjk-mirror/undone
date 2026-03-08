@@ -1,0 +1,232 @@
+[scene]
+id          = "base::work_marcus_aftermath"
+pack        = "base"
+description = "Monday morning. The office. After what happened with Marcus. The normality of the building and the abnormality of what happened in it."
+
+# Post-marcus_closet. The professional mask and what's behind it.
+# The other people don't know. The question: can the mask hold?
+# NOT explicit. Tension, consequences, the weight of a shared secret.
+
+[intro]
+prose = """
+Monday.
+
+The elevator is the same elevator. The lobby is the same lobby. Your badge beeps the same beep it has every morning since the first week. The open floor plan stretches out in front of you — desks, monitors, the low hum of people arriving, coffee already going in the kitchen.
+
+Marcus is at his desk. You can see the back of his head from here. He's typing. The exact same posture as every other Monday. The exact same shoulders, the same angle.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Your body remembers before your brain does. His hands. The conference room door. The thing that happened between the lock clicking and the door opening again. Your stomach tightens and you keep walking toward your desk and nobody in this room knows and the normality of it is absurd.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You walk to your desk. The walk is the same walk. Your heels on the carpet, your bag on your shoulder, the same nod to the same receptionist. Everything is the same except the thing that isn't, which is that you slept with the man sitting thirty feet from your monitor.
+{% else %}
+You walk to your desk. Everything is normal. You are normal. Monday is normal. The conference room door down the hall is closed and it's just a door.
+{% endif %}
+
+Dan is at his desk already. He says good morning. You say it back. The screen comes on. Slack has forty unread messages. The week starts.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = "*Monday.* Just Monday."
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "act_normal"
+label  = "Act normal"
+detail = "Professionalism. The mask holds."
+prose  = """
+You work. You answer Slack messages. You review the PR that Kevin submitted over the weekend — it's fine, mostly, two comments that need addressing. You drink coffee at your desk. Normal.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The ledger is running. It's been running since you walked in. Points for: nobody suspects. He's behaving normally. The work is the same work. Points against: the conference room. His hand on the small of your back. The sound he made.
+
+You close the ledger. The PR review needs another pass. You give it one. By ten o'clock you've cleared seventeen messages and your calendar is blocked through lunch and the mask is holding and the mask is expensive.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+You are performing normalcy to a degree that would be invisible to anyone who isn't you. The typing speed is correct. The Slack responses are the right length. You made the correct amount of eye contact with Dan on the way in and the correct amount of small talk about the weekend.
+
+At 10:15 Marcus walks past your desk to the kitchen. He doesn't stop. He doesn't look. You don't look. The not-looking is its own communication, and you're both fluent in it.
+
+At 10:23 a Slack message: **Marcus**: *Reviewed the Chen proposal. Your numbers are better than mine. Sending updated deck.* Professional. Completely professional. The attachment icon. The deck. You open it and it's real work and that's — fine. That's what this is now.
+
+{% elif w.hasTrait("CONFIDENT") %}
+Normalcy isn't a performance for you — it's a decision. You decided this morning, in the shower, before coffee: Monday is Monday. What happened happened. The work hasn't changed. You haven't changed. The only variable is whether the two of you can look at each other across an open floor plan without the room noticing.
+
+He walks past at 10:15 and you look up and your eyes meet for exactly one second and his face says nothing and your face says nothing and the second passes and that's it. Clean.
+
+{% else %}
+You work. The morning moves. Marcus walks past your desk to get coffee and you don't look up and then he's past and the moment is over and nobody noticed because there was nothing to notice.
+
+At some point he sends a Slack message about the Chen proposal. Business. You respond with business. The exchange takes four messages and accomplishes what it needs to and nothing underneath it shows.
+
+The mask holds. It's heavy, but it holds.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+At 11:00 you go to the bathroom and stand in the stall for thirty seconds longer than necessary. Not crying. Not panicking. Just — standing in a space where nobody can see your face for thirty seconds.
+
+His hand. The lock. The sound of his breath. Your body's response to all of it, which was real and is still real and is sitting under your skin like a charge that the office's fluorescent normalcy can't discharge.
+
+You flush. You wash your hands. You go back to your desk.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_AFTERMATH"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "find_him"
+label  = "Find him"
+detail = "She needs to know where they stand. Not feelings. Logistics."
+prose  = """
+You wait until 10:30. The standup is done. The first round of coffee is cleared. You get up, walk to the kitchen, and he's there — refilling his mug, back to the door.
+
+"Hey," you say.
+
+He turns. His face does something very fast and then it does nothing. "Hey."
+
+{% if w.hasTrait("CONFIDENT") %}
+"We should talk about Friday," you say. Direct. No hedging.
+
+He sets the mug down. Looks at the kitchen doorway — checking the sightline — then back at you. "Yeah."
+
+"Not here."
+
+"Lunch?"
+
+"The place on Third."
+
+"Noon."
+
+You nod. You take your coffee. You go back to your desk. Sixteen words. The minimum viable conversation. He'll be at the place on Third at noon and you'll say what needs saying and you'll both know where this goes.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+"Are we okay?" you ask. Meaning: are we going to be okay at work. Meaning: does this affect Monday.
+
+He reads it correctly. "We're fine." Meaning: nobody knows. Meaning: I'm not going to make this a problem.
+
+"Good."
+
+The exchange takes twelve seconds. You take your coffee back. The ambiguity is narrower now, which is what you needed. The rest — what happened, what it means, whether it happens again — that can wait.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+"I'm running the variables," you say, which is not what most people say in a kitchen the Monday after sleeping with a coworker. He stares at you for a second.
+
+"And?"
+
+"The primary risk is behavioral. If we change how we interact on the floor, people notice." You're holding your mug with both hands. "So we don't change."
+
+He considers this. "Agreed."
+
+"The secondary risk is repetition."
+
+A beat. His eyes. "Is that a risk?"
+
+You don't answer that. You take your coffee and go.
+
+{% else %}
+"Are we —" You don't finish. He looks at you and waits. The kitchen is empty but someone could walk in and you both know it.
+
+"We're good," he says. Quiet. Certain. "The work doesn't change."
+
+"Okay."
+
+"Okay."
+
+You stand there for three seconds too long and then you take your coffee and go. On the walk back to your desk the three seconds replay and the shape of what just happened is: real. Contained. Professional. The thing under it is real too, but you don't need to name it right now.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+In the kitchen, three feet away, he smells the same. The particular combination of soap and the building's coffee and him. Your body responds to the proximity the same way it did Friday and managing that response in a brightly lit kitchen at 10:30 on a Monday is a skill you're developing in real time.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_AFTERMATH"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "avoid_him"
+label  = "Avoid him"
+detail = "Not ready. Reroute through the day. Minimize contact."
+prose  = """
+You take the long way to the kitchen — around the back of the floor, past the server room, the route that doesn't pass his desk. You time your coffee for when he's in standup. You eat lunch at your desk.
+
+{% if w.hasTrait("SHY") %}
+The avoidance has a precision to it that would be impressive if anyone could see it, which is the point — no one can. You've mapped his schedule. Kitchen at 9:15, standup at 10, lunch at 12:30 at the Thai place or 1:00 at his desk. You build your day around the negative space.
+
+By 3 PM you've successfully not been in the same room as him since 9 AM and the effort of it is exhausting and the distance doesn't help. He's still there. Thirty feet away. The conference room door is still a door.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+The optimization problem is clear: minimize unplanned proximity while maintaining normal work patterns. The constraints include his schedule, the kitchen, the bathroom route, and three meetings you're both in.
+
+The first meeting at 11 is unavoidable. He's across the table. You sit in your usual spot and pull up the slides and the meeting goes normally because meetings are structured and structure is what you need.
+
+He asks a question about the timeline. You answer it. His voice is the same voice. His face is the same face. The meeting ends. You survived it.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+Avoidance is a strategy, not a retreat. You're buying time. Monday is for getting your read back. By Tuesday you'll know how to walk past his desk without the conference room replaying in your chest.
+
+He sends a Slack at 2 PM: the Chen numbers. You respond in three minutes with a question about the projections. Professional. The typed words don't shake.
+
+{% else %}
+You just — avoid. Coffee at the wrong time. Lunch at your desk. The bathroom on the other floor. It's not a plan, exactly. More like your body making decisions your brain hasn't approved.
+
+At 3 PM he walks past your desk and you're looking at your screen and his shadow moves across the far edge of your monitor and your hands stop typing for one second and then they start again.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The body doesn't cooperate with avoidance. It remembers. Every time you pass the conference room. Every time his voice carries from across the floor. The professional distance you're maintaining is a wall built over something that isn't professional at all.
+
+You get through Monday. That's the achievement. You got through Monday.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_AFTERMATH"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
