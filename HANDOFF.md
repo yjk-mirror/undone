@@ -21,38 +21,28 @@
 
 ## ⚡ Next Action
 
-**UI fixes + 10 scenes calibrated to DM narrator register (2026-03-08).**
+**26/33 scenes calibrated to DM narrator register. Campus arc (7) deprioritized. (2026-03-08)**
 
-### Critical UI fixes landed:
-- **Scheduler bypass fixed**: `pick_next()` now runs before `opening_scene` fallback — arc triggers fire correctly (workplace_arrival instead of rain_shelter)
-- **Scene transitions**: story signal cleared between scenes — no more monolithic scroll
-- **Choice echo**: thematic break separator + bold label between intro and action prose
-- **Markdown renderer**: ThematicBreak (---) and BlockQuote support added
-- **Detail strip**: hovered_detail resets when actions change (no stale text from previous scene)
-- **Button layout**: flex_shrink(0.0) on choices_bar/detail_strip — can't be squeezed off-screen
+### Completed this session:
+- **UI fixes** (prior conversation): scheduler bypass, scene transitions, choice echo, markdown renderer, detail strip reset, button layout
+- **10 scenes calibrated** (prior conversation): transformation_intro, workplace_arrival, workplace_first_day, neighborhood_bar, rain_shelter, workplace_landlord, workplace_first_night, workplace_first_clothes, workplace_work_meeting, workplace_evening
+- **16 more scenes calibrated** (this continuation): morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day
+- **Playtester agent** created (`.claude/agents/playtester.md`) — unbiased player with screenshot + game-input MCP tools
 
-### 10 scenes calibrated (of 33 total):
-- `transformation_intro.toml` — plane scene (earlier session)
-- `workplace_arrival.toml` — airport ID checkpoint (earlier session)
-- `workplace_first_day.toml` — Dan + lunch (earlier session)
-- `neighborhood_bar.toml` — 3-round bar scene (earlier session)
-- `rain_shelter.toml` — rewritten this session
-- `workplace_landlord.toml` — rewritten this session: removed "you know exactly" + "you used to" patterns
-- `workplace_first_night.toml` — targeted fixes: FEMININITY guards, fragment thoughts
-- `workplace_first_clothes.toml` — removed "you know exactly what he's doing" NPC pattern
-- `workplace_work_meeting.toml` — removed OBJECTIFYING "you used to" moralizing
-- `workplace_evening.toml` — replaced !w.alwaysFemale() guards, trimmed narrator analysis
-
-### New tooling:
-- `.claude/agents/playtester.md` — unbiased player agent with screenshot + game-input MCP tools
-- `docs/player-experience-map.md` — screen-by-screen player flow reference
+### Calibration details (all 26 non-campus scenes):
+- `!w.alwaysFemale()` → `w.getSkill('FEMININITY') < N` everywhere
+- All "you used to" / "from the other side" narrator moralizing replaced with involuntary physical reactions
+- All `{% else %}` AlwaysFemale branches removed
+- Inner voice thoughts converted to fragments, not articulated analysis
+- Zero instances of banned patterns remain in non-campus scenes
 
 ### Remaining priorities:
-1. **23 scenes still uncalibrated** — free_time (6), work slot (7), campus arc (7), others (3)
-2. **FemCreation "Who Are You Now" is too brief** — needs 4-5 interactive discovery beats (creative direction required)
-3. **Zero adult content** — game can't prove its premise without explicit scenes
+1. **Zero adult content** — game can't prove its premise without explicit scenes (playtester #1 finding)
+2. **FemCreation "Who Are You Now" too brief** — needs 4-5 interactive discovery beats (creative direction required)
+3. **7 campus arc scenes uncalibrated** — deprioritized (Camila route, not default Robin route)
 4. **Traits display overflow** — floem labels don't wrap; needs rich_text approach
-5. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action (fake choice)
+5. **Single-action scenes** — workplace_work_meeting and workplace_evening have only 1 action
+6. **Content volume** — after opening arc, scenes repeat. Needs more unique scenes per FEMININITY range
 
 ### Remaining open items (post-Sprint 3)
 - **Writing-agent/tooling cleanup** — ✅ MOSTLY RESOLVED. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation added. Remaining: repo-neutral dispatch doc (Priority 3 in audit), retry/backoff in deepseek-helper (Priority 4). See annotated `docs/audits/2026-03-07-writing-agent-tooling-audit.md`.
@@ -93,7 +83,7 @@
 14. ✅ **Rain scene writing bad** — Fixed: register calibrated (2026-03-08). DM narrator, no thought-insertion.
 15. ✅ **Repetitive transformation narration** — Fixed: "you used to" pattern banned. Transformation shown through physical facts only.
 16. ✅ **DeepSeek API for writing agents** — Infrastructure built (2026-03-07). Full pipeline tested.
-17. **Remaining scenes need register rewrite** — 4 opening scenes rewritten to calibrated register. Other workplace arc scenes (landlord, first_night, first_clothes, work_meeting, evening) still in old register. Free-time scenes (rain_shelter, coffee_shop, etc.) also need audit.
+17. ✅ **Remaining scenes register rewrite** — All 26 non-campus scenes calibrated. !w.alwaysFemale() → FEMININITY thresholds, "you used to" eradicated, thoughts → fragments. Campus arc (7) deprioritized.
 
 ### Char creation bugs (previous session)
 - **Trait list runoff** — "Starting traits" row overflows off-screen. No wrapping, no colon/space between label and values. Runs off the right edge.
@@ -218,6 +208,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont. | Scene calibration completion pass. Calibrated remaining 16 non-campus scenes (morning_routine, coffee_shop, bookstore, park_walk, grocery_store, evening_home, work_standup, work_lunch, work_corridor, work_late, work_friday, work_marcus_coffee, work_marcus_favor, jake_outside, coffee_shop_return, plan_your_day). All `!w.alwaysFemale()` guards replaced with `w.getSkill('FEMININITY') < N` thresholds. All ~25 "you used to" / "from the other side" banned patterns replaced with involuntary physical reactions and body-first observations. All `{% else %}` AlwaysFemale branches removed. All inner voice thoughts converted to fragments. 26/33 scenes now calibrated (7 campus arc deprioritized). 262 tests, 0 failures. validate-pack passes. |
 | 2026-03-08 | Writing register calibration + Robin opening scenes. Calibrated the prose register through 7 iterative attempts with user feedback — landed on DM narrator style (casual, specific, on the player's shoulder). Updated all 7 writing docs (writing-guide, creative-direction, writer-core, review-core, writing-samples, scene-writer agent, writing-reviewer agent) to enforce the register. Wrote calibration design doc + session prompt. Rewrote 4 scenes to calibrated register: `transformation_intro.toml` (plane, before-body accessors), `workplace_arrival.toml` (2-round: ID + transport), `workplace_first_day.toml` (2-round: Dan + lunch, 5 actions), `neighborhood_bar.toml` (3-round: order → nurse/NPC → accept/decline, matches Sample 0). All 33 scenes pass validate-pack. All Jinja templates valid. Writing-reviewer audit run on key scenes. |
 | 2026-03-07 | Hardcoded content-ID audit session. Reconciled current code against docs first, then tightened the character-creation runtime contract instead of leaving preset route flags and rough-content traits as ambient UI strings. `PartialCharState.arc_flag` became explicit `starting_flags`; startup and `validate-pack` now validate that built-in preset starting flags are actually referenced by the scheduler; rough-content preference traits (`BLOCK_ROUGH` / `LIKES_ROUGH`) and structural smooth-legs trait lookups are centralized through `PackRegistry`; runtime/template code now reuses those helpers instead of scattering structural trait strings. Added targeted tests in `undone-scene`, `undone-packs`, and `undone-ui`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
 | 2026-03-07 | Authoring validation policy refinement session. Reconciled current code/docs first, then tightened `validate-pack`'s "no lasting effects" heuristic to match actual persistent world mutations instead of only `set_game_flag` / `add_npc_liking` / `advance_arc`. Added reusable `EffectDef::mutates_persistent_world()` and `SceneDefinition::has_persistent_world_mutation()` helpers with unit coverage, including NPC-action coverage. `validate-pack` now warns only when a scene truly lacks persistent world mutation; scene-local flags and pure navigation no longer create false positives. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. Current warning inventory: `base::campus_library` still warns because it only mutates scene-local state. |
