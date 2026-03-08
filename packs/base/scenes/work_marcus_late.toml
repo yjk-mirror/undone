@@ -1,0 +1,223 @@
+[scene]
+id          = "base::work_marcus_late"
+pack        = "base"
+description = "Office at 8 PM. Most people gone. Marcus is still here too."
+
+[intro]
+prose = """
+8 PM, and the floor is mostly dark.
+
+Half the overhead panels switched off on their timers an hour ago. The remaining ones hum at a pitch you stop hearing until it stops. Three desks still lit, all of them yours — the monitor, the task lamp, a sticky note about a deploy window that you've been ignoring since five o'clock.
+
+The building settles in a way it doesn't during the day. A duct pops somewhere above the drop ceiling. The elevator makes a sound two floors up. None of it is alarming. It's just the building doing what buildings do when the people have mostly gone home.
+
+You're finishing something. You were going to finish it by seven, then by seven-thirty, and now it's eight and you're still here and the code is almost right.
+
+Footsteps down the hall.
+
+Not the security guard — wrong gait, wrong shoes. They stop at your row. You don't look up before you hear him.
+
+"Thought I was the only one."
+
+Marcus. His jacket is still on, which means he was about to leave. He's got a coffee cup that looks like it came from the machine down the hall, which means he wasn't.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His voice carries differently in here with no one else to absorb it. Closer than it sounds in a meeting room. Your eyes stay on the monitor for a second longer than necessary.
+{% elif w.getSkill("FEMININITY") < 50 %}
+During the day there are eleven other people on this floor. Right now there are two. That's a number you're now aware of in a way you weren't aware of it at nine this morning.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "w.hasTrait('AMBITIOUS')"
+prose = """
+8 PM, and the floor is mostly dark.
+
+Half the overhead panels switched off an hour ago. Your station is an island: monitor, task lamp, four browser tabs, the deploy window you've been putting off until it became tonight's problem. The plan was to leave by seven. The plan changed at six when you found the race condition in the integration layer, and now it's eight and you've fixed the race condition and you're not leaving until the tests pass clean.
+
+The building settles. A duct somewhere above the ceiling. The elevator two floors up.
+
+Footsteps.
+
+Not the guard. They stop at the end of your row.
+
+"Thought I was the only one still here."
+
+Marcus. Jacket still on. Coffee from the hall machine. He was about to leave and then didn't.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His voice carries differently with no one else on the floor. You catch yourself noticing it and get back to the monitor.
+{% elif w.getSkill("FEMININITY") < 50 %}
+During the day this floor has eleven people and their noise and their ambient presence. Right now it has two. Your professional self is aware this is not a problem. Something under that is just aware.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*His voice is different here. Or you're just — closer.*"
+
+# ── Actions ────────────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "keep_working"
+label  = "Keep working"
+detail = "You're almost done. He can find somewhere to be."
+prose  = """
+"Almost done," you say, and that's all the invitation you're offering.
+
+He doesn't take it as an invitation to leave. He takes a chair from the nearest empty desk and pulls it over, not to your station — a few feet away, his own laptop already open. A man who knows how to work near someone without intruding on them.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Which is fine. Better than fine — it's someone else pulling a late night, which means the thing you're finishing is important enough to have company. You close the conversation and open the terminal.
+{% elif w.hasTrait("ANALYTICAL") %}
+You clock the distance he chose. Far enough to be professional. Close enough that you'll hear him when he types. He knows what he's doing with that distance or he doesn't, and either way it lands the same.
+{% elif w.hasTrait("SHY") %}
+You look at your monitor. The code is right there. You were almost done. You are going to finish this and it is going to be fine.
+{% else %}
+You go back to your code. He goes to his. The floor is quiet enough that you can hear his keyboard — a different cadence than yours, steadier.
+{% endif %}
+
+Twenty minutes pass. Maybe thirty. The tests finish running. Green. You sit back.
+
+He's still typing. You can see the reflection of his screen in the window — not the content, just the light.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You've worked late alone plenty of times in the last few months. Right now you're aware of exactly where he's sitting and you weren't tracking that kind of information before this body.
+{% endif %}
+
+You pack up without making it a production. He looks up. "Night," he says. Back to his screen.
+
+You get in the elevator. The lobby is empty. The cold outside is a fact.
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_LATE_NIGHT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "take_a_break"
+label  = "Take a break. You've earned it."
+detail = "The vending machines are down the hall. He's already heading that way."
+prose  = """
+"Good timing," you say. "I need to step away from this for ten minutes."
+
+{% if w.hasTrait("AMBITIOUS") %}
+Which is true — the tests are running anyway. You're not procrastinating, you're waiting.
+{% endif %}
+
+The vending hall is two floors up. The elevator ride is short enough to not require conversation. He holds the door. You don't flag it.
+
+The machines are those frosted-front models with the little rotating shelves. The floor is carpeted up here, which feels wrong on a weeknight — too quiet, too formal, the wrong kind of empty. He gets something from the top row without looking at the labels. You pick what you actually want.
+
+He leans against the wall the way he does in the break room — settled, unhurried, the cup in one hand. But the break room has eleven people's worth of ambient noise. Right now it's just the hum of the refrigerated display and the building doing its thing.
+
+"What are you finishing?" he asks.
+
+{% if w.hasTrait("ANALYTICAL") %}
+It's a real question. Not conversation — acquisition. You give him the actual answer: the integration issue, the race condition, the reason it took three more hours than it should have. He listens without adding to it, the way he does in meetings when someone is actually saying something useful.
+
+When you're done he says, "That's a better fix than the workaround Priya put in last quarter." He pauses. "She knows it too."
+
+You didn't know that. He just gave you something useful.
+
+{% elif w.hasTrait("SHY") %}
+You tell him. More than you meant to — the context comes out before the summary, and then you're explaining the workaround you didn't take and why. He doesn't look bored. He asks one question that cuts to the actual problem and then nods.
+
+"Yeah," he says. Not a compliment. Just: *yeah, that's the problem, and you found it.*
+
+The silence after that is not comfortable. But it's not bad, either.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+You give him the shape of it — the deploy window, the race condition, the fix. He listens, then: "Is that going to hold under concurrent writes?"
+
+It's a real question. You think about it for three seconds. "Yes. Different lock scope."
+
+He nods. "Okay."
+
+That's it. No follow-up. He just wanted to know if the fix was solid, and now he knows. You're aware that he asked because it mattered to him, professionally, as a thing he might have to depend on. That's not personal. And then his elbow shifts against the wall and something in your sternum does a thing you didn't authorize.
+
+{% else %}
+You tell him what you've been fixing. He asks a question that goes somewhere the question didn't have to go — into the actual architecture, the tradeoff you chose, what you'd have done with more time. The conversation turns technical before either of you decided to let it.
+
+Eleven minutes. By the end you have a cleaner read on a dependency you hadn't fully mapped, and he has whatever he came down here for.
+
+{% endif %}
+
+On the elevator back down, the floor numbers tick up and neither of you is filling the silence. It doesn't need to be filled.
+
+{% if w.getSkill("FEMININITY") < 50 %}
+His shoulder is close enough that you could close the gap with half a step. You don't. The elevator opens. You both go back to your desks.
+{% endif %}
+
+You finish the tests in another twenty minutes. He's still there when you pack up. He looks up. You say good night. He says good night.
+
+The lobby is empty. The air outside is cold and you walk to the subway and get on the train and sit with your bag on your lap and look at nothing.
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_LATE_NIGHT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "call_it_a_night"
+label  = "Call it a night"
+detail = "The code can wait until tomorrow. You're done."
+prose  = """
+"I was just wrapping up," you say. And you were. Near enough.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You look at the terminal once more. The tests aren't done. You save the state and close the lid anyway. Tomorrow is early.
+{% endif %}
+
+You pack up with the practiced efficiency of someone who's been doing this long enough to have a system: laptop, charger, badge clipped to the bag. He steps back to let you through — not crowding you, just out of the way.
+
+"Night," you say.
+
+"Night."
+
+{% if w.hasTrait("SHY") %}
+You don't look back. The hall is long. The elevator takes too long to arrive and you stand with your back to the floor and wait and listen to him settle back into his chair.
+{% else %}
+The elevator is empty. The lobby is empty. You push through the door and the cold comes in fast.
+
+The walk to the subway is four blocks. You don't think about much. The trains are running on the late schedule, one every twelve minutes. You get there just as one is leaving and wait for the next one on the platform with two other people.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 50 %}
+The building is two blocks behind you. His light was still on on the fourth floor. You caught it through the window on the way out.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type  = "set_game_flag"
+  flag  = "MARCUS_LATE_NIGHT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true

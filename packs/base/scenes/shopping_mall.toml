@@ -1,0 +1,176 @@
+[scene]
+id          = "base::shopping_mall"
+pack        = "base"
+description = "A shopping trip. Not the emergency kind — the kind where you're choosing."
+
+# Distinct from workplace_first_clothes (survival shopping, buying things that fit).
+# This scene is about preference. About choosing things for a body you're starting
+# to own. The fitting room mirror is the transformation device.
+
+[intro]
+prose = """
+The mall on Chambers is the kind of place that smells like cinnamon pretzels and new shoes and the particular exhaustion of people who've been here since it opened. Two floors, a food court, an anchor store that's hanging on. You're here because you need — want — something. Not the emergency shopping you did that first week, grabbing whatever fit without looking at yourself too long. This is different.
+
+{% if w.hasTrait("POSH") %}
+You bypass the anchor store entirely and head for the row of smaller shops along the east corridor. Names you recognize. Price points you don't look at. You already know what you're looking for — the question is whether they have it in your size, which is a question you've recently learned to ask without hesitating.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+You head for the anchor store because it has everything in one place and you don't want to be here longer than you need to be. Jeans. Maybe a jacket. Get in, get out.
+{% elif w.hasTrait("CUTE") %}
+You gravitate toward a window display with a yellow cardigan and a pair of boots that would look good with the skirt you bought last week, and you're already inside before you've finished the thought.
+{% else %}
+You drift through the first floor without a specific destination. Past the accessories kiosk. Past the shoe store. Past a woman your age carrying four bags with the focused expression of someone on a mission. You're not on a mission. You're browsing, which is a thing you're learning to do.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The saleswoman at the first store you enter says "Can I help you find something?" and you say "just looking" in the way that means *I have no idea what I'm looking for and the number of options in this store is making my vision swim*. She nods and backs off. Professional distance.
+{% elif w.getSkill("FEMININITY") < 45 %}
+A saleswoman greets you. You say "just looking" but you mean it this time — you have opinions now. Vague ones, but they're there. Something about a neckline. Something about a color. The opinions arrived without an announcement.
+{% endif %}
+
+The fitting rooms are at the back. Fluorescent overhead. Three items over the limit. The mirror is waiting.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*Three hangers. A mirror. Same body, different question than last time.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "try_dress"
+label  = "Try the dress"
+detail = "Something you wouldn't have considered a month ago."
+prose  = """
+There's a dress on the rack that caught your eye. Not flashy — dark green, simple cut, the kind of thing that hangs well on the hanger and might hang well on you and there's only one way to find out.
+
+The fitting room is a box with a mirror and a hook and a curtain that doesn't quite close. You undress. The fluorescent light is unforgiving, which is what fluorescent light does.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You pull the dress over your head and it settles onto your body and you look at the mirror and the mirror shows you a woman in a dark green dress. Not "a woman you're looking at" — you, in a dress. The distinction lands in your stomach before your brain processes it.
+
+The fabric sits on your hips. The neckline falls where necklines fall on bodies shaped like this. Your collarbones are visible and they look right, which is a thought you've never had about collarbones before.
+
+You turn. Side view. The dress does something to your waist that jeans don't, and the woman in the mirror turns with you, and she looks — good? She looks good.
+
+{% elif w.getSkill("FEMININITY") < 50 %}
+You pull it on. The fabric settles. You adjust the straps — an automatic gesture now, fingers finding the right position without thinking — and look at the mirror.
+
+Good. The green works with your skin tone, which you didn't know you knew. The cut sits where it should. Your reflection looks like a woman who chose a dress because she wanted to, not because she needed to cover a body.
+
+{% else %}
+You try it on. It fits. You know it fits before you check the mirror — the fabric drapes right, the cut is clean, the color works. The mirror confirms what your body already told you.
+{% endif %}
+
+{% if w.hasTrait("BEAUTIFUL") %}
+The dress fits the way clothes fit in magazine editorials — effortlessly, like it was made for you. Your reflection is not a surprise anymore. But it still catches you, the way a compliment you believe catches you — warm, quick, gone before you can hold it.
+{% elif w.hasTrait("PLAIN") %}
+It fits. The woman in the mirror looks fine. Not striking. Not terrible. The dress is doing what it can and the dress is not the problem. You stand there for a second longer than you planned, looking for something the mirror doesn't offer.
+{% endif %}
+
+You take it off. Put your clothes back on. Pick up the hanger.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -40
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "stick_to_basics"
+label  = "Stick to basics"
+detail = "Jeans. Shirts. Things that don't ask questions."
+prose  = """
+Jeans. Two pairs — one darker, one lighter. A few tops. You move through the racks with the efficiency of someone who has decided what this trip is and what it isn't.
+
+{% if w.hasTrait("DOWN_TO_EARTH") %}
+The first pair fits. You check the mirror — looks fine, sits fine, moves fine. Done. You grab the second pair in the same size without trying them on because life is too short. Three shirts that go with both. Cart total under a hundred.
+{% elif w.hasTrait("ANALYTICAL") %}
+You check the fabric content on the tags. Cotton blend, not polyester. Proper rivets on the jeans, not decorative. The sizing system is still a negotiation — you're between two sizes in most brands and you've started remembering which brands run small. This is, you realize, expertise. You are developing expertise in women's jeans.
+{% else %}
+The fitting room. Try. Mirror. Yes or no. Next. You develop a rhythm. Two pairs of jeans, three tops, a jacket that you didn't come for but that fits the way jackets are supposed to fit.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The jeans fit differently than men's jeans. You knew this — you've been wearing them for weeks — but the fitting room makes it explicit. The rise is different. The way they sit on your hips is different. Your reflection is a woman in jeans and a white shirt and she looks practical and put-together and she's you.
+{% endif %}
+
+You pay. The bag is heavier than you expected. You head out.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -60
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "ask_help"
+label  = "Ask the saleswoman"
+detail = "She does this for a living. You're learning."
+prose  = """
+The saleswoman is mid-forties, patient, with the specific competence of someone who has been dressing other women's bodies for years. You approach her because the alternative is standing in front of a rack of forty options with no criteria, which is what you've been doing for three minutes.
+
+"I'm looking for —" You pause. What are you looking for? "Something for work. And maybe something for — not work."
+
+{% if w.hasTrait("SHY") %}
+Your face is warm. The request sounded more helpless out loud than it did in your head. She doesn't blink.
+
+"What's your office like?" she asks. Practical. Not judging. You describe it — the tech company, the meeting rooms, the dress code that's technically casual but isn't — and she nods and disappears into the racks and comes back with four things.
+
+"Try these."
+
+You try them. She's right about three of them. The fourth she holds up, tilts her head, and puts back. "Not with your coloring," she says, like she's reading a weather report.
+{% elif w.hasTrait("CONFIDENT") %}
+"Work. And a dinner." Specific enough. She looks at you — quick, professional, assessing — and pulls four things from three different racks in under a minute.
+
+"Start with the navy," she says. You do. She's right. You end up buying two things she picked and one thing you found yourself.
+{% else %}
+She listens. She doesn't patronize. She asks your size — and you know it now, which wasn't true a month ago — and comes back with options.
+
+The fitting room. Her voice through the curtain: "How's the length?" You tell her. She makes a sound that means she already knew. She brings an alternative.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The vulnerability of this — standing in a fitting room while a stranger decides what looks good on a body you're still figuring out — is more than you expected. She's professional. She's helping. But every "try this with a belt" is a reminder that this is a skill set you're starting from scratch.
+{% endif %}
+
+You leave with a bag and the saleswoman's card and the particular feeling of having been helped by someone good at their job.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -80
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true

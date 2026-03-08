@@ -1,0 +1,205 @@
+[scene]
+id          = "base::landlord_repair"
+pack        = "base"
+description = "The landlord is here to fix something. Your apartment. His building. The power dynamic is spatial."
+
+# Not a romantic scene. Not explicit. The content is the power dynamic:
+# a man in her private space with the authority of ownership.
+# Distinct from workplace_landlord (first meeting, ID check, building entrance).
+# This is domestic: he's inside the apartment, fixing something she can't fix.
+
+[intro]
+prose = """
+He called yesterday. The faucet — you'd mentioned it in the hallway last week, the drip that gets louder at night when the building is quiet — and he said he'd come by Saturday around two. He's here at 1:47, which you know because you checked when the buzzer went.
+
+The landlord is in your bathroom. Flannel shirt, reading glasses pushed up, a toolbox that looks older than the building. He's crouched under the sink with a wrench, and the sounds coming from behind the vanity are the sounds of a man who's done this enough times to have opinions about the plumbing.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You're standing in the hallway between the bathroom and the kitchen and you're aware of every dimension of the space. The apartment is small. It felt small when it was just you. With a man crouched under your sink, the square footage contracts further. You can smell the metal of his toolbox and something that might be aftershave, and the apartment that is your space is temporarily his workspace.
+
+You used to fix your own faucets. The wrench would have fit differently in your hands, but the procedure was the same. You're standing in the hallway watching a man do it instead.
+{% elif w.getSkill("FEMININITY") < 45 %}
+You're in the kitchen, close enough to hear the wrench and the muttering and the occasional clang that means the pipe joint is being difficult. The apartment feels occupied in a way it usually isn't. A man's toolbox on your bathroom floor. A man's voice from under your sink.
+{% else %}
+You're in the kitchen making coffee because making coffee is something to do while a man fixes your faucet. The wrench sounds come through the thin wall. He mutters at the pipe joint. You pour two cups because offering coffee is what you do when someone is fixing something in your apartment.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = "w.hasTrait('ANALYTICAL')"
+prose = """
+He called yesterday. The faucet — you'd mentioned it, he said Saturday around two. He's here at 1:47.
+
+The landlord is under your bathroom sink with a wrench and reading glasses and the specific posture of a man who has been fixing this building's plumbing for longer than you've been alive. The sounds are diagnostic: tap, pause, wrench adjustment, grunt. He's assessing the valve seat. You could tell him it's the washer — you diagnosed the drip pattern three days ago — but he's already in there and the social contract of landlord-tenant repair visits is that you let him determine the problem.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You're standing in the hallway cataloging the spatial dynamics. A man in your bathroom. The door open because it would be stranger to close it. The toolbox blocking the path. You're pressed against the hallway wall, and the distance between your hip and the door frame is about four inches, and the awareness of those four inches is entirely new.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 30"
+style     = "inner_voice"
+prose     = "*His building. Your faucet. Four inches of hallway.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "watch"
+label  = "Stay. Watch him work."
+detail = "Your apartment. Your faucet. May as well know what he's doing."
+prose  = """
+You lean against the bathroom doorframe. He's got the faucet handle off and the valve stem out and he's holding it up to the light with the expression of a man examining a small artifact.
+
+"Washer's shot," he says. "Got a spare in the kit." He doesn't look at you when he says it. His attention is on the valve.
+
+{% if w.hasTrait("ANALYTICAL") %}
+"The drip pattern was consistent with a worn washer," you say. "Every 4.2 seconds. Temperature-independent."
+
+He pauses. Looks up. The reading glasses slide down his nose. He pushes them back. "You timed the drip?"
+
+"It was keeping me up."
+
+He stares at you for a second. Then he laughs — short, surprised, the kind of laugh that means something was genuinely funny. "All right then." He goes back to the valve. "Four-point-two. Jesus."
+
+{% elif w.hasTrait("CONFIDENT") %}
+"While you're in there," you say, "the hot water takes about ninety seconds to come through. That normal?"
+
+He makes a face that translates to *this building*. "I'll check the heating element. Might be the dip tube." He says it like you asked a reasonable question, which you did.
+
+{% elif w.hasTrait("SHY") %}
+You watch his hands. Large, competent, moving through the repair with the ease of repetition. The wrench turns. The washer comes out. The replacement goes in. You don't say anything. The silence between you is comfortable in the way that silence between a tenant and a landlord is comfortable — functional, not personal.
+
+{% else %}
+You watch. The repair takes ten minutes. He replaces the washer, tests the valve, runs the tap. No drip. He packs the toolbox.
+{% endif %}
+
+"That should do it," he says, standing up. His knees pop. He runs the faucet — solid stream, no drip, no stutter. "Give it a week. If it comes back, it's the seat and I'll need to bring the grinder."
+
+"Thanks."
+
+He picks up the toolbox. Pauses in the hallway. "Apartment's in good shape," he says. Not a compliment, exactly. More like an inventory note. "The last tenant — " He stops. Whatever the last tenant did, he decides you don't need to know.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+He fills the doorway on his way out. For a second — toolbox in one hand, reading glasses on his forehead — he's just a large man in the frame of a door that's yours. The space he takes up. The space you make for him to pass. The automatic half-step back, the angling of your shoulder. He doesn't notice. Why would he. He's done this a thousand times.
+
+The door closes. The apartment is yours again. The faucet is silent. You stand in the hallway for a moment where he stood and the space feels larger and smaller at the same time.
+{% else %}
+He lets himself out. The door clicks. The apartment settles. The faucet, when you test it, is silent.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_REPAIR"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "leave_him"
+label  = "Go to the other room"
+detail = "He knows what he's doing. You don't need to supervise."
+prose  = """
+"I'll be in the kitchen," you say, and you go. The bathroom sounds follow you — wrench, mutter, pipe groan, the particular soundtrack of a man fixing something that was keeping you awake.
+
+You make coffee. Two cups, because that's what you do. You set one on the counter for him.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You open your laptop at the kitchen table and try to work. The wrench sounds punctuate the code review you're doing, and you stop reading the same function signature for the third time and close the laptop and just sit there with the coffee and the sounds of a man in your bathroom.
+{% elif w.hasTrait("ROMANTIC") %}
+You sit at the kitchen table with your hands around the coffee mug and listen to the sounds from the bathroom and the sounds from outside — the Saturday street, a kid on a scooter, the building's elevator — and the apartment is full of sounds that aren't yours and the effect is not unpleasant.
+{% else %}
+You sit at the kitchen table. The coffee cools. Your phone is out but you're not looking at it. You're listening to the sounds from the bathroom — diagnostic clangs, a muttered assessment, the squeak of a valve being tested — and the sounds from outside, and the apartment is occupied in a way it usually isn't.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+A man in your bathroom. Fixing your faucet. You're in the kitchen with two cups of coffee. The domesticity of this arrangement has a shape you recognize from a different angle — you've been the one under the sink. Now you're the one in the kitchen. The coffee is getting cold and the observation is the kind you don't do anything with.
+{% endif %}
+
+He comes out ten minutes later. "Done," he says. You hand him the coffee. He takes it without comment, which is its own kind of thank you.
+
+"The washer was shot. Should be good now." He drinks the coffee standing up, in the kitchen doorway. One cup. Two minutes. Then the toolbox and the door and he's gone.
+
+The faucet, when you check, is silent.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_REPAIR"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "help"
+label     = "Help him"
+detail    = "You know plumbing. The wrench is the same regardless."
+condition = "w.hasTrait('CONFIDENT') || w.hasTrait('ANALYTICAL') || w.hasTrait('DOWN_TO_EARTH')"
+prose     = """
+"It's the washer," you say from the doorway.
+
+He pauses. The wrench stops mid-turn. He looks up at you over his reading glasses with the expression of a man who's been surprised and is working out whether it's the good kind.
+
+"The drip is consistent and temperature-independent," you say. "That's the washer, not the seat."
+
+{% if w.hasTrait("ANALYTICAL") %}
+"I timed it," you add. "Every 4.2 seconds. A seat issue would vary with pressure."
+
+He stares at you. Then he nods, slow. "Huh." He pulls the valve stem and holds the washer up. Cracked ring. Exactly where you said.
+
+"You want a job?" he asks. He's not joking, exactly.
+{% elif w.hasTrait("CONFIDENT") %}
+"Hand me the basin wrench?" you say. He looks at the toolbox. He looks at you. He hands you the basin wrench.
+
+You get under the sink. The pipe joint is the same pipe joint regardless of whose hands are on the wrench. The clearance is tight and your hands are smaller than the last hands that did this, which turns out to be an advantage in the space behind the vanity.
+
+"You've done this before," he says. It's not a question.
+
+"Different apartment." True enough.
+{% else %}
+He considers this for a moment. Then he nods and hands you the flashlight. "Hold that steady on the valve."
+
+You hold it. He works. The silence between you is the silence of two people focused on the same problem, which is a register of silence you understand perfectly.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His surprise, when it came, was in his eyebrows. The quick lift. The recalculation. Whatever he expected when he came to fix the young woman's faucet on a Saturday afternoon, competent plumbing diagnosis was not on the list. The recalculation is the thing. You've been recalculated a lot lately. It lands differently each time.
+{% endif %}
+
+The repair takes five minutes with two people. He packs the toolbox. Runs the tap. Silent.
+
+"Well," he says. "That was efficient." He sounds almost disappointed — like he'd been looking forward to the full diagnostic. He lets himself out.
+
+The faucet is fixed. You did the thing you know how to do. It felt like something.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_REPAIR"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true

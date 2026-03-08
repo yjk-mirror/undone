@@ -1,0 +1,166 @@
+[scene]
+id          = "base::weekend_morning"
+pack        = "base"
+description = "Saturday morning. No alarm. The apartment in weekend light. The first morning that's entirely yours."
+
+[intro]
+prose = """
+Saturday. You know before you open your eyes — the light is different, warmer, coming through the curtains at an angle that means it's past nine. No alarm. No PM/AM mistake. You just woke up because your body was done sleeping.
+
+The sheets are warm. The apartment is quiet in a way it never is on a weekday — no muffled commute sounds, no neighbor's alarm through the wall. Just the radiator ticking and the distant hum of the city doing Saturday at its own pace.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You stretch. The stretch does something unexpected — your back arches off the mattress and a sound comes out of your mouth that you didn't plan, a small hum that lives in the upper register of a voice you're still calibrating. The sheets slide against skin that's warmer and smoother than the skin you remember waking up in, and for a second you're just — there. In the warmth. In the body. Not managing it. Just in it.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You stretch. The full kind, arms above your head, back arched, the kind of stretch that used to take up less of the bed. The sheets are warm against your legs. The pillow smells like the shampoo you bought last week — the one you picked because it smelled good, not because it was on sale, which felt like a decision at the time.
+{% else %}
+You stretch. The morning takes its time arriving and you let it.
+{% endif %}
+
+No meeting. No commute. No one expects you anywhere. The ceiling has a water stain shaped like nothing. You've been looking at it.
+"""
+
+[[intro_variants]]
+condition = "w.hasTrait('ROMANTIC')"
+prose = """
+Saturday. The light through the curtains is golden and warm and unhurried, and you lie there in it for a minute without opening your eyes. No alarm. The city is doing something quiet outside. The sheets are warm. The pillow is exactly right.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You stretch and the sound you make is soft and unfamiliar and you don't correct it. The sheets against your skin. The warmth pooled in the small of your back. The morning has a texture to it that weekdays burn off before you can notice.
+{% endif %}
+
+No one expects you anywhere. The water stain on the ceiling is shaped like a comma. You've decided this is meaningful.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*Saturday.* The thought is enough. You lie there with it."
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stay_in_bed"
+label  = "Stay in bed"
+detail = "Nowhere to be. This is allowed."
+prose  = """
+You stay.
+
+Not forever — maybe another twenty minutes, maybe forty. Time moves differently on a Saturday morning with no alarm and no agenda. You roll onto your side. The pillow adjusts. The city does its thing outside the window.
+
+{% if w.hasTrait("ROMANTIC") %}
+You pull the blanket up to your chin and lie there and the morning is a small, warm country with a population of one. Your phone is on the nightstand and it can wait. Everything can wait. This is the first morning that's felt like a morning instead of a problem to solve, and you're not going to solve it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You make a list in your head. Groceries. Laundry. The thing with the shower curtain rings. The list takes shape and you let it sit there without acting on it, which is a specific kind of luxury you haven't practiced.
+
+The list is still there ten minutes later. You haven't moved. This is data.
+{% else %}
+You check your phone — no work emergencies, two texts from numbers you don't recognize that are probably spam, a weather notification you dismiss without reading. You put it back down.
+
+The radiator clicks. The upstairs neighbor runs water. The morning accumulates around you and you let it.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Your hand rests on your stomach. The flat plane of it, the softness of the skin above your hip. Your hand is smaller than the hands you remember. You leave it there. The warmth of your own palm against your own body, unhurried, unmeasured.
+{% endif %}
+
+Eventually the bladder wins and you get up.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "shower"
+label  = "Take a long shower"
+detail = "The water pressure is decent on weekends."
+prose  = """
+You get up and go straight to the bathroom. The tiles are cold under your feet — the one detail the radiator can't reach.
+
+The shower takes thirty seconds to warm up. You stand just outside the spray and wait, arms crossed, and then step in.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The water hits your shoulders and runs down your back and your skin is — alive. That's the only word for it. Every drop registers. The heat opens something in your chest and your breath comes out in a sound you weren't planning on. Your hands move through your hair — longer than you expect, every time, heavier when it's wet — and the shampoo smells like the one you picked last week and the water is hot and for a minute you are just a body in hot water and nothing else is required of you.
+
+Your hands. On your own skin. Soap and water and the particular geography of a body you're mapping one shower at a time. Ribs. Hip. The curve of your waist that your hand follows without thinking about it.
+
+*Oh.* Just the water. Just the warmth. Just the quiet of being alone with yourself.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The water is hot and you turn it hotter. The shampoo — the good one, the Saturday one — lathers in hair that's getting long enough to need a decision. You wash your hair and the process takes five minutes and you don't mind. The conditioner needs two minutes. You stand there and let the water hit your shoulders while you wait.
+
+Your hand moves along your side — soap, ribs, hip. The route is becoming familiar. The body under your hands is becoming yours, in the specific sense of a thing you'd choose again if asked.
+{% else %}
+The shower is long and hot and you don't rush it. The shampoo, the conditioner, the body wash. You know the routine. You know the body. Saturday mornings are for taking your time with both.
+{% endif %}
+
+You stay in until the water starts to cool. The mirror is fogged when you step out. Towel. The fog clears in streaks and you stand there for a second, dripping, and the woman in the mirror stands there too.
+
+{% if w.hasTrait("BEAUTIFUL") %}
+The mirror clears and she's there. Wet hair, flushed skin, the particular look of someone who just had a very good shower. You hold your own gaze for a moment. The woman looking back is not performing. She's just looking.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -4
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "go_out"
+label  = "Get dressed and go out"
+detail = "The apartment is too quiet. The city is awake."
+prose  = """
+The apartment is too quiet. You're up, you're dressed — something casual, Saturday clothes, the kind of outfit that doesn't need to prove anything — and you're out the door before ten.
+
+{% if w.hasTrait("POSH") %}
+You pick the place three blocks east — the one with the marble counter and the pastries under glass and the espresso that costs what espresso costs when the barista has opinions about extraction time. You sit at the counter with a cortado and a croissant and watch the street through the window. The morning is yours.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+Dunkin'. The line is shorter on Saturdays. The iced coffee is the same regardless of the day. You take it outside and walk.
+{% else %}
+The coffee shop on the corner — not the good one on Union, just the close one — is half empty. You get a latte and a seat by the window. The newspaper someone left behind is three days old. You read it anyway.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The city on a Saturday morning treats you differently than the city on a Monday. Slower. Less purpose in the foot traffic. A man holds a door for you and you say thank you and he says "of course" and the exchange is over before your brain catches up to the fact that you were the person the door was held for.
+{% endif %}
+
+{% if w.hasTrait("OUTGOING") %}
+You end up walking for an hour. The farmers market on Grand. A bookstore you've been meaning to check. The park where someone is playing guitar badly but with conviction. The morning fills itself up and by noon you've spoken to four strangers and remembered why you moved to a city.
+{% elif w.hasTrait("SHY") %}
+You walk for a while. The blocks unspool. No destination, just movement. The headphones are in but nothing is playing — the street noise is enough. By the time you loop back to your block, the morning feels used in a good way.
+{% else %}
+You walk until the coffee is gone and then you walk some more. The neighborhood is doing its Saturday thing — laundromats, farmers market set up on Grand, a couple arguing about brunch with the energy of people who've been having this argument for years. You watch all of it. None of it requires anything from you.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -8
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true

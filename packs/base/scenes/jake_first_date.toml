@@ -1,0 +1,211 @@
+[scene]
+id          = "base::jake_first_date"
+pack        = "base"
+description = "First real date with Jake. A restaurant, evening. He asked. She said yes."
+
+[intro]
+prose = """
+Antico is the kind of place where the lighting is low enough that everyone looks slightly better than they are and nobody minds. Red-checked tablecloths, a candle in a wine bottle, the smell of garlic bread and someone's pasta arriving at the table behind you. Not fancy enough to be intimidating, nice enough to signal that this was a deliberate choice.
+
+He's already here. Standing near the host stand, jacket on, phone in his pocket for once. He spots you when you come through the door. The smile comes without any calculation in it.
+
+"Hey." He holds out his hand, a gesture that's half handshake and half something else, and then it becomes the thing where he guides you through the room with a hand briefly at the small of your back and you feel the heat of it through your jacket and then it's gone.
+
+The table is small. His shoulders fill his side of it in a way they didn't at the coffee shop counter, and the candle sits between you, and the room narrows down to this.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+He's been across from you before, at the coffee shop, at the table with the knees almost touching. This is different. This is on purpose. The wine list is in front of you and you haven't looked at it, and somewhere behind the ribs something is doing something you haven't approved.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The menu is in your hands and you're reading it and you're also aware of the candle, and his forearms on the table, and the way he's looking at you when he thinks you're looking at the menu. You're not entirely looking at the menu.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 40"
+style     = "inner_voice"
+prose     = "*On a date. Right.*"
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "let_him_lead"
+label  = "Let him lead the conversation"
+detail = "He talks. The evening unfolds at his pace."
+prose  = """
+He orders the wine with the ease of someone who made the decision before you arrived, which should be presumptuous and somehow isn't. A glass appears in front of you. He asks about your week — a real question, not a polite one, and he waits for the actual answer.
+
+{% if w.hasTrait("SHY") %}
+The silence between his questions isn't awkward with Jake. It's just space. You find yourself using it — a beat, a breath, the time to say the actual thing instead of the first thing. He waits. Nobody does that.
+
+By the second glass you've told him about the project, the thing that went sideways, the fix that took three days and went nowhere because the problem turned out to be a person problem. He listens. He doesn't offer solutions. By the time the food arrives you've said more than you meant to, and it doesn't feel like a problem.
+{% elif w.hasTrait("ANALYTICAL") %}
+He's reading the menu and asking about your work and doing three things at once in the way of someone comfortable with their own attention. You're cataloguing: the angle of his jaw in the candlelight, how he holds his glass, the specific way he laughs — short, real, surprised by it. You can see all of this clearly. What you didn't expect is to start caring about the answer to the question he just asked.
+
+You answer it honestly. He asks a follow-up that's actually about the thing, and you're two courses in before you notice you stopped counting.
+{% elif w.hasTrait("ROMANTIC") %}
+The evening gathers itself into something. He tells a story about a trip, something that went wrong and then right, and he tells it like someone who knows how stories work — not performing it, just remembering it in the right order. You're watching his hands while he talks, the way they move when something was the wrong kind of funny.
+
+*Origin story*, some part of you thinks, and then you put that away.
+{% else %}
+He does most of the talking at first — not dominating, just comfortable with it, finding the shape of an evening. He asks about your week, your neighborhood, how you ended up in this part of the city. Good questions, but not interrogation. By the time the food arrives you've both talked roughly equally and you're not sure when the ratio changed.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_FIRST_DATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "ask_something_real"
+label  = "Ask him something real"
+detail = "Not the weather. Not the neighborhood. Something he hasn't been asked tonight."
+prose  = """
+He's in the middle of asking you about the city when you cut across it — not rudely, just taking the wheel. "What are you actually working on?" You've seen the laptop, the hours, the specific posture of someone doing something that matters to them.
+
+He pauses. Sets his glass down. Something in his face shifts into a different register — less the-guy-at-the-coffee-shop, more the actual person.
+
+"Software." A beat. "Tool for independent musicians — distribution, rights tracking. Mostly I do the back end." He says it plain, no pitch in it, which means he's done pitching it to strangers and you're not a stranger.
+
+"What was the hard part?" you ask.
+
+"Still is," he says. "Getting people to trust a thing they can't hold." He looks at you a second. "You get that."
+
+{% if w.hasTrait("CONFIDENT") %}
+"Better than most," you say, and you mean it, and he can tell. The conversation finds a depth that neither of you negotiated for. An hour in you've covered three subjects that weren't on any first-date agenda, and he's looking at you with the expression of someone whose evening went better than expected.
+{% elif w.hasTrait("AMBITIOUS") %}
+You ask the follow-up question. And the one after that. He answers both — real answers, not the polished summary — and somewhere in it the dynamic tips: you're not being interviewed, you're interviewing, and he's enjoying it. "You're like this with everyone?" he asks at some point. "Only with things that are interesting," you say.
+{% else %}
+The question opens something. He talks about it the way people talk about the thing they actually care about — not carefully, just directly. By the time the pasta arrives you've covered more ground than two months at the coffee shop, and the candle is burning lower.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 35 %}
+At some point he leans in to explain a thing, elbows on the table, and his face is close enough that you can hear him over the restaurant noise. You stay still. Your hand, on the table, is about four inches from his.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_FIRST_DATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "touch_his_hand"
+label     = "Put your hand on his"
+detail    = "Across the table. Deliberate."
+condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 30"
+prose     = """
+He's saying something — a story, mid-sentence — and you put your hand on his.
+
+Not grabbing it. Just setting it there, palm-down, on top of his hand on the table.
+
+He stops mid-word.
+
+The candle does nothing. The restaurant keeps going around you. He looks down at your hand on his and then up at you, and his expression is the specific one of someone deciding what this means and deciding it means exactly what it looks like.
+
+{% if w.hasTrait("FLIRTY") %}
+You let the silence run. That's the move. He knows it's the move. You both know it and neither of you says anything about it, which is how it becomes something.
+
+"Okay," he says, quiet enough that the table behind you doesn't hear it. His hand turns slightly under yours, not pulling away. Just acknowledging.
+
+You smile. You don't explain the smile.
+{% elif w.hasTrait("ANALYTICAL") %}
+You did it before you decided to. The analysis comes half a second after. His hand is warm under yours and the tendons along the back of it shift slightly and his face does the thing where the conversation he was having becomes completely secondary to the conversation happening right now.
+
+You don't move your hand. The data is interesting.
+{% else %}
+His hand turns over, slowly, under yours. Fingers along the edge of your palm without making a thing of it. He meets your eyes and doesn't say anything, which is better than whatever he might have said.
+
+The dinner continues. It's a different dinner now.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 35 %}
+Your heartbeat is audible to no one but you, and you're aware of it anyway.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_FIRST_DATE"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "make_excuse_leave"
+label  = "Make an excuse. Call it a night."
+detail = "Not tonight. That's all. Just not tonight."
+prose  = """
+{% if w.hasTrait("SHY") %}
+The menu, the candle, the small table — it's all fine, except you've been here forty minutes and something keeps tightening between your shoulder blades. Not fear. Nothing that dramatic. Just the feeling of being looked at in a way that requires a response you don't have sorted out.
+
+You get your phone out. You glance at it in the way that means something came up. "I'm sorry — I have to — work thing." You can hear how thin it is. He can hear it too.
+
+He doesn't make you explain it. That's worse than if he had.
+
+"No worries," he says. Like it already doesn't matter. Like he's fine. You believe him, and that makes it harder.
+
+You leave a twenty on the table because you had the wine, and you get your jacket, and the door opens out into the cold, and the street takes you back.
+{% else %}
+The evening is fine. He's fine. None of this is bad. But there's a gear in it somewhere that won't catch, and you've been trying to find it for forty minutes and it hasn't given.
+
+You tell him something came up — close enough to true that you don't feel terrible about it. He takes it clean: "Of course. Rain check." Not wounded. Not pointed. Just easy.
+
+You split the check and you get your coat and he holds the door and you step out into the cold and something in your chest unclenches and also, immediately, regrets it.
+
+The block is quiet. You could go back. You don't.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
