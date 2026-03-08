@@ -1,87 +1,133 @@
 [scene]
 id          = "base::workplace_arrival"
 pack        = "base"
-description = "Robin arrives in the city. Airport, exit screening, the subway. First hours in the new body in a new place."
+description = "First hours in the city. Airport exit, the ID that doesn't match, the ride to your new apartment."
+
+# Content level: VANILLA — no sexual content.
+# Two rounds of choices: (1) ID checkpoint, (2) transport.
+# AlwaysFemale players skip the ID round and go straight to transport.
 
 [intro]
 prose = """
-The seat belt sign clicks off before you're ready.
+The seat belt sign clicks off.
 
-You've been awake since — you do the math — thirty-one hours. The man in 14C reclined into your space somewhere over Ohio and you didn't say anything. You would have, before. The thought arrives without context.
+Around you, people are already standing, pulling bags from overheads. A flight attendant in the aisle ahead is crouched at someone's row. The plane smells like recycled air and bad sleep.
 
-The flight attendant crouches at the row ahead, smiling at something the woman there said. The aisle is narrow and people are already standing before they're supposed to, pulling bags from overheads with the focused expression of people who have not slept enough and have somewhere to be.
+You stand up. The overhead bin is higher than you remember overhead bins being. You reach for your carry-on and a man behind you gets to it first, lifts it down one-handed.
 
-You stand.
+"Here you go."
 
-The first thing you notice is the weight — you keep forgetting and remembering the weight, a rhythm you've been doing since Saturday morning and apparently haven't stopped doing. Forget. Stand up. Remember. The carry-on is in the overhead. You reach for it and a man behind you reaches past and takes it down.
+{% if w.hasTrait("ANALYTICAL") %}
+"Thanks." You take the bag. That's twice in the last minute someone has reached something for you without being asked. You file the pattern.
+{% elif w.hasTrait("SHY") %}
+"Thanks." It comes out quiet. He was being helpful. You take the bag and go.
+{% else %}
+"Thanks." You take the bag and keep moving.
+{% endif %}
 
-"Got it," he says, and hands it to you.
+Jet bridge. Terminal. Big, bright, the kind of institutional lighting that doesn't care what time zone you're in. Signs for Ground Transportation, Baggage Claim, Rental Cars.
 
-He means it kindly. You know this. You say thank you and mean it, and file the interaction somewhere, and keep moving.
+{% if not w.alwaysFemale() %}
+At the exit checkpoint, the agent takes your ID. Looks at the photo. Looks at you.
 
-Through the jetbridge. Into the terminal. The airport is large and bright and indifferent in the specific way airports are: it has been processing people since before you got here and will continue after. The signs for Ground Transportation are adequate.
-
-At the exit checkpoint, the agent looks at your ID. Then at you. The ID is correct. The face in the photo is a white man in his early thirties.
-
-"I know," you say, before he can figure out the sentence. "I just look young."
-
-The line behind you is long. He waves you through.
-"""
-
-[[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
-prose = """
-The seat belt sign clicks off before you're ready.
-
-Thirty-one hours. You do the math like it's a ticket number and wait.
-
-The aisle fills with people who have places to be. You have a place to be. You have a place to be and a job starting Monday and an apartment you've never seen and a body that keeps — you reach for the carry-on and a man behind you takes it down first.
-
-"Got it," he says.
-
-*Okay*, you think. You say thank you. You keep moving.
-
-The terminal is large. The signs for Ground Transportation say what they say. You follow them.
-
-At the exit checkpoint, the agent looks at your ID. The ID is correct. The face in the photo is not your face.
-
-"I know," you say. "I just look young."
-
-He waves you through. You walk into the city and start making a list of problems to solve and their order.
+**{{ w.beforeName() }}**, says the card. The face in the photo is not the face standing here. His hand pauses.
+{% endif %}
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
 style     = "inner_voice"
-prose = """
-*Okay* — *okay*. There is a problem. Several problems. They are going to be solved in order.
+prose = "*Okay.* Problems, in order. You keep reaching for things at the wrong height. Your voice is at a pitch you haven't mapped. Your hands are cold — they didn't get cold like this before. The city is tomorrow's problem. Tonight: keys, door, sleep."
 
-The first problem is: you're in a city you don't know. The second is: the subway map looked fine on your phone but you need to know which platform. The third is: you've been awake for thirty-one hours and this body handles fatigue differently than you expected. Your hands are cold. They didn't used to get cold.
-
-You find the platform. The train is three minutes out.
-
-*Okay.*
-"""
-
-# ── Player Actions ────────────────────────────────────────────────────
+# ── Round 1: The ID check ────────────────────────────────────────────
 
 [[actions]]
-id                = "take_subway"
-label             = "Take the subway"
-detail            = "Platform B. Change at Central. The map said twenty-two minutes."
-allow_npc_actions = true
+id        = "id_preempt"
+label     = "\"I know. I just look young.\""
+detail    = "Get ahead of it."
+condition = "!scene.hasFlag('id_done') && !w.alwaysFemale()"
 prose = """
-The train arrives with a rush of displaced air and a screech that the city has apparently decided is normal. You board. The car is about half full — evening commuters, a man with a bike, two women talking about something that made one of them laugh hard enough to grab the pole.
+You say it before he can figure out the question.
 
-You find a seat near the door.
-
-{% if not w.alwaysFemale() %}
-A man across the aisle notices you. Not aggressively — just the quick inventory, the two-second read, the look that slides away when you meet it. You know exactly what he's doing. You used to do it yourself without thinking. The thing you didn't know then is how specific it feels from this side. *Catalogued*, you think. *Filed.*
-
-You look out the window. The city moves past in strips of light.
+{% if w.hasTrait("ANALYTICAL") %}
+The sentence was prepared. You rehearsed it on the plane without realizing you were rehearsing. It worked. You'll use it again.
+{% elif w.hasTrait("SHY") %}
+You said it too fast — the words came out in a rush, but the tone was even. He blinks, looks at the ID again, looks at the line behind you.
+{% elif w.hasTrait("CONFIDENT") %}
+You say it the way you'd say something in a standup — clear, informational, moving on. He doesn't have a follow-up.
+{% else %}
+He looks at the card. Looks at you. The line behind you is getting longer.
 {% endif %}
 
-Twenty-two minutes. You count the stops.
+He waves you through.
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "id_done"
+
+[[actions]]
+id        = "id_wait"
+label     = "Wait for him to work it out"
+detail    = "It's your ID. He'll get there."
+condition = "!scene.hasFlag('id_done') && !w.alwaysFemale()"
+prose = """
+He turns the card over. Looks at the photo again. You can see the math happening — the name, the face, the age that doesn't add up.
+
+{% if w.hasTrait("CONFIDENT") %}
+You wait. It's your ID. The answer is yes, and he'll arrive at it.
+{% elif w.hasTrait("SHY") %}
+The line behind you is growing. Someone shifts their weight. The guard opens his mouth.
+
+"It's me," you say. "I just look young."
+{% else %}
+"I just look young," you say, when the silence has gone on long enough.
+{% endif %}
+
+He studies the card one more time. Waves you through.
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "id_done"
+
+# ── Round 2: Transport ────────────────────────────────────────────────
+
+[[actions]]
+id        = "take_subway"
+label     = "Take the subway"
+detail    = "Platform B. Transfer at Central. The app says twenty-two minutes."
+condition = "scene.hasFlag('id_done') || w.alwaysFemale()"
+prose = """
+The platform is underground and ten degrees cooler than the terminal. A transit map on the wall confirms what your phone already says: Platform B, transfer at Central, eleven stops.
+
+The train arrives with a screech and a rush of displaced air. You board. The car is half full — evening commuters, a man with a bicycle wedged against the door, a woman reading a paperback with headphones in.
+
+You find a seat near the door. Your bag goes on your lap because the overhead rack is a reach you'd rather not attempt in public.
+
+{% if w.hasTrait("BEAUTIFUL") %}
+A man across the aisle looks up when you sit down. The look lasts about two seconds — the automatic scan, the quick read — and then he's back on his phone. You're past it and into the next thought before the train starts moving.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+You know that look. The two-second read, the inventory. You've done it yourself, from the same kind of seat. You just didn't know it had a texture from this side.
+{% endif %}
+
+{% if w.hasTrait("SHY") %}
+You keep your eyes on your phone. The train fills and empties at each stop. Nobody talks to you. Nobody expects anything. The city scrolls past the windows in strips of light, then goes underground, then comes back.
+{% elif w.hasTrait("ANALYTICAL") %}
+Eleven stops. You count them. The neighborhoods change through the windows — commercial, residential, a stretch of construction, then trees. Your station is the one after the park. The transit system makes sense.
+{% endif %}
+
+Twenty-two minutes. Your stop.
+
+The building is a five-minute walk from the station. Four stories, brick, a bodega on the corner. The lockbox on the front door has your keys.
+
+{% if w.hasTrait("AMBITIOUS") %}
+*Okay.* Apartment. Unpack. Sleep. Monday.
+{% else %}
+You stand outside for a second with your bag and your keys and the cold air of a city you don't know yet.
+{% endif %}
 """
 
   [[actions.effects]]
@@ -102,19 +148,32 @@ Twenty-two minutes. You count the stops.
   finish = true
 
 [[actions]]
-id    = "call_a_cab"
-label = "Call a cab"
-detail = "Skip the subway. Get there faster. Costs money."
+id        = "call_a_cab"
+label     = "Call a cab"
+detail    = "Skip the subway. Forty dollars."
+condition = "scene.hasFlag('id_done') || w.alwaysFemale()"
 prose = """
-You open your phone and request a ride. Forty dollars. You approve it without hesitation — you have a job starting Monday, you have money, and you have been awake for thirty-one hours and cannot read a transit map right now.
+You open your phone and request a ride. Forty dollars. You've been awake for thirty-one hours and you're not navigating a transit map right now.
 
-The driver is a middle-aged man who asks where you're headed and then doesn't talk for the rest of the trip, which is exactly what you needed. The city scrolls past the window. Brick buildings, a park, a stretch of fast food, then suddenly residential — trees, actual trees — and then the neighborhood the listing called "up-and-coming" and which looks like someone's about halfway through the up-and-coming.
+The driver is a middle-aged man who asks where you're headed and then stops talking, which is exactly what you needed. The city scrolls past the window — downtown glass, a park, a stretch of fast food joints, then residential. Trees. Actual trees. Then the neighborhood the listing described as "up-and-coming," which looks about halfway through the process.
 
-The car stops in front of your building.
+{% if w.hasTrait("ANALYTICAL") %}
+You watch the neighborhoods change and build a mental map as they pass. The commercial strip near the station. The cross street with a bodega. Residential blocks with front stoops and small yards. There's a logic to this city. You'll learn it.
+{% elif w.hasTrait("SHY") %}
+The back seat of a cab is its own kind of quiet. Nobody looks at you. Nobody expects conversation. You watch the city go by and let your shoulders drop for the first time since the plane landed.
+{% endif %}
 
-"Here you go," the driver says.
+The car stops in front of your building. Four stories, brick, a bodega on the corner.
 
-You get out into the early spring cold and look at your building and think: *okay*.
+"This is it," the driver says.
+
+You get out into the early spring cold. The lockbox on the front door has your keys. The street is quiet. A cat watches you from a fire escape across the road.
+
+{% if w.hasTrait("AMBITIOUS") %}
+*Okay.* Keys. Address. Monday is three days away and you're going to be ready.
+{% else %}
+You stand there for a second with your bag and your keys and the fact of being here.
+{% endif %}
 """
 
   [[actions.effects]]

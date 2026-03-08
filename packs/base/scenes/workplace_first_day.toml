@@ -1,188 +1,240 @@
 [scene]
 id          = "base::workplace_first_day"
 pack        = "base"
-description = "First day at the tech company. The lobby, the manager, the coworker who explains something you invented."
+description = "First day at the tech company. The lobby, the manager, the coworker who explains something you invented. Two rounds of choices."
+
+# Content level: VANILLA — no sexual content.
+# Round 1: How you handle Dan's explanation (!dan_done)
+# Round 2: Lunch (dan_done)
 
 [intro]
 prose = """
-The subway runs on time, which is a good sign or a coincidence.
+The financial district is twenty minutes from your apartment by train. You tested the route yesterday on a dry run and you're confirming it now with your actual body on an actual Monday morning.
 
-The financial district is twenty minutes from Clement by train, which you tested yesterday with the transit app and are now confirming with your actual body on an actual train. Business casual feels different than you remembered — the pants sit differently, the blouse has a collar that does something you're still calibrating.
+The blouse has a collar that sits differently than you expected. Your laptop bag pulls at a shoulder that's narrower than it was a week ago.
 
-{% if not w.alwaysFemale() %}
-You had someone else dress you in your forties and this is the first time you've had to figure out what *professional* means from the other side.
-{% endif %}
+You get off at the right stop. The building is glass and steel — ground-floor lobby, security desk, badge readers.
 
-You arrive at the building at 8:47. The lobby is glass and steel and the security desk has two guards and a badge reader.
+The guard looks at your badge request. "First day?"
 
-The guard looks at your ID. He looks at the badge reader. He looks at you.
+"Yes. Robin. Software engineering."
 
-"First day?" he says.
+He types. The system takes a moment. "Visitor badge until your card comes through. Someone will meet you."
 
-"Yes," you say. "Robin. Software engineering."
+You take the badge and find a seat in the lobby. The morning rush moves through the turnstiles — people who know exactly where they're going.
 
-He types something. The system takes a moment. "Okay," he says. "Visitor badge until your card is issued. Someone will meet you."
-
-You take the badge and find a seat in the lobby to wait. Around you, the morning rush moves through with the focus of people who know exactly where they're going and don't have time to notice anyone who doesn't.
-
-At 9:02 your new manager comes through the turnstile looking for you.
+At 9:02, your new manager comes through looking for you.
 
 {% if w.hasTrait("SHY") %}
-You stand up too quickly and almost drop your bag.
+You stand up too fast and grab your bag before it can slide off the chair.
 {% else %}
-You stand. He finds you by the process of elimination.
+You stand. He finds you by elimination — you're the only one sitting here who doesn't look like they belong yet.
 {% endif %}
 
-His face does the thing you expected it to do.
+He sees you and his step hitches. Just a fraction — the recalibration. Whatever he was expecting from your resume, you don't match it.
 
-You give him a professional smile and say your name before he can work out how to ask if you're the person he's looking for.
-"""
+You say your name before he can work out what to say. He shakes your hand. His grip adjusts mid-shake — lighter than it started.
 
-[[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 15"
-prose = """
-The financial district. Twenty minutes. The transit app was right.
+{% if w.hasTrait("ANALYTICAL") %}
+You clock the adjustment. You're going to see this today. Probably tomorrow too.
+{% endif %}
 
-You get off the train and walk to the building and show your ID at the desk and wait for the manager. You've been at this company for approximately ninety minutes in total, counting the onboarding calls. You've read the architecture docs. You know the codebase language. You've prepared for everything except how you're going to be read.
+Fourth floor. Open plan. Whiteboards with diagrams you could redraw from memory. Your desk is temporary — pending permanent assignment — and the laptop is still in the box.
 
-The manager comes through the turnstile.
+You get set up. At ten, the team gathers for standup. Someone introduces you: "Robin, she's joining us from the Seattle office." You shake seven hands and remember four names.
 
-His face does the thing.
+{% if w.hasTrait("OBJECTIFYING") %}
+One of them holds the handshake a beat too long. You can feel him cataloging — face, body, age estimate. The read is fast and automatic and you recognize every part of it.
+{% endif %}
 
-You say your name before he can figure out what to say. Professional. Clear. He extends his hand and you shake it.
+At 11:15, a coworker named Dan from the backend team finds your desk. He starts walking you through the authentication architecture with the helpful energy of someone onboarding a new hire who might be lost.
 
-*Okay*, you think. *We're doing this.*
+You wrote the original spec for this system. Your name is in the commit history.
+
+He finishes the explanation and looks at you.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
 style     = "inner_voice"
-prose = """
-You have institutional knowledge. You know the vocabulary, the stack, the architecture patterns. You've been doing this for ten years.
+prose = "You have ten years of experience, institutional knowledge, and a mass-produced visitor badge. Your manager decided you might be an intern. You watched him make this decision in real time. *Okay.* Work the problem."
 
-Your manager has decided you might be an intern. You watched him make this decision in real time. You're going to spend today correcting it by means of doing the work.
-
-This is, you think, exactly how you would have managed this as a senior engineer before. Work the problem. Let the results speak. You just didn't expect to have to start over.
-"""
-
-# ── Player Actions ────────────────────────────────────────────────────
+# ── Round 1: How to handle Dan ────────────────────────────────────────
 
 [[actions]]
-id    = "meet_the_team"
-label = "Meet the team. Get oriented."
-detail = "The standup is at ten. You know what standups are."
-allow_npc_actions = true
+id        = "assert_expertise"
+label     = "\"I wrote that spec.\""
+detail    = "Set the record straight. Once."
+condition = "!scene.hasFlag('dan_done') && (w.hasTrait('AMBITIOUS') || w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY'))"
 prose = """
-The open plan office has the organized chaos of a team that's grown faster than its process. You find your desk — a temporary one, pending a permanent assignment — and set up your laptop with the efficiency of someone who's done this in new codebases many times.
-
-{% if w.hasTrait("AMBITIOUS") %}
-You're in the codebase before 9:30. You've found three things you'd do differently and have said nothing about two of them.
-{% elif w.hasTrait("DOWN_TO_EARTH") %}
-You get the machine configured and then ask your neighbor who to talk to about a monitor. The neighbor is helpful. This is fine.
-{% else %}
-You get the machine configured and open the README. It's out of date. You take notes.
-{% endif %}
-
-At ten the team gathers for standup. Someone introduces you as "Robin from the Seattle office, she's transferring in." You shake hands with seven people and remember four of their names.
-
-The day moves forward at the speed of days.
-"""
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "working"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STARTED_JOB"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.next]]
-  finish = true
-
-[[actions]]
-id    = "prove_it_now"
-label = "Establish your position early"
-detail = "The first day is the day it's easiest to set a baseline. Don't wait."
-condition = "w.hasTrait('AMBITIOUS') || w.hasTrait('BITCHY')"
-prose = """
-The coworker — Dan, you've already forgotten his last name — starts explaining the authentication system to you at 11:15 like it's a concept you might not know.
-
-You wait until he finishes the sentence.
-
 {% if w.hasTrait("BITCHY") %}
-"The spec for that," you say, "is in the repo. The one I wrote during the design phase. I can send you the link if you want a refresher." You say it without inflection. You're smiling. He stops.
+"The spec for that is in the repo," you say. "The one I wrote." You say it without inflection. You're smiling. He stops.
+{% elif w.hasTrait("AMBITIOUS") %}
+"I know — I wrote the original requirements doc. The one in the repo, not the presentation deck." You say it like a fact, because it is one. He processes this. Nods. Finds something else to do.
 {% else %}
-"I know," you say, without edge. "I was in the design review. I wrote the original requirements doc — the one in the repo, not the deck." You say it matter-of-factly, like you're noting a fact. "But thank you."
+"I was on the design review for that, actually. I wrote the initial spec." Even. Professional. He nods once and moves on.
 {% endif %}
 
-He processes this. Then he nods, slowly, and finds something else to do.
+The rest of the morning shifts after that. Not dramatically — just the small adjustments that happen when a room recalibrates. Someone asks you a real question about the auth module. You answer it.
 
-You turn back to your screen. This is established now. You don't have to do it again.
-"""
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "working"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STARTED_JOB"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.next]]
-  finish = true
-
-# ── NPC Actions ────────────────────────────────────────────────────
-
-[[npc_actions]]
-id        = "dan_explains"
-label     = "Coworker explains something she knows"
-weight    = 10
-condition = "!scene.hasFlag('dan_done')"
-prose = """
-The coworker — Dan, from the backend team — finds you at your temporary desk around eleven and starts explaining the authentication architecture with the helpful energy of someone orienting a new hire who might be lost.
-
-You listen. He knows what he's talking about. He's just telling it to the wrong person.
-
-{% if w.hasTrait("AMBITIOUS") %}
-You wait until he reaches the end of his explanation and then say, "I actually designed the initial spec for this — I'm in the commit history if you want to check. But I appreciate the walkthrough." You say it without edge. He pauses, recalibrates, and moves on.
-{% elif w.hasTrait("SHY") %}
-You let him finish. "Got it, thanks," you say. You write it down, even though you already know it, because writing it down is what you do when you've decided not to correct someone. You spend the rest of the morning wondering if you made the right call.
-{% else %}
-You let him finish. "Thanks," you say, and turn back to your screen. You've had the codebase open. You've been in this specific module since 9:30.
-
-The gap between what you know and what he thinks you know is going to close eventually. You can wait.
+{% if w.hasTrait("OBJECTIFYING") %}
+The coworker from standup — Matt, you've learned — glances your direction four times in the next hour. Not at your screen. The inventory is quick each time. You recognize the efficiency of it.
 {% endif %}
 """
 
-  [[npc_actions.effects]]
+  [[actions.effects]]
   type = "set_scene_flag"
   flag = "dan_done"
 
-  [[npc_actions.effects]]
+[[actions]]
+id        = "let_it_go"
+label     = "\"Thanks. I'll dig into it.\""
+detail    = "Let your work do the talking."
+condition = "!scene.hasFlag('dan_done')"
+prose = """
+"Thanks, I'll take a look," you say, and he walks away satisfied.
+
+You turn back to the codebase you've had open since 9:30. You wrote half of what you're looking at and he doesn't know that, and for now that's fine.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You know exactly what's wrong with his explanation. You didn't say it. The gap between what you know and what he thinks you know will close on its own — you just need to ship something.
+{% elif w.hasTrait("AMBITIOUS") %}
+By lunch you'll have found three things you'd do differently. You've said nothing about any of them. Not yet.
+{% elif w.hasTrait("SHY") %}
+At your desk, you look at the notes you took during his explanation. You know every word of it already. The afternoon stretches ahead, long and quiet, and you fill it with work.
+{% else %}
+The morning moves on. You work. People leave you alone, which is fine.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+The coworker from standup — Matt — glances your direction when he thinks you're not looking. Quick. Automatic. You don't look back. You're at work.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "dan_done"
+
+# ── Round 2: Lunch ────────────────────────────────────────────────────
+
+[[actions]]
+id        = "lunch_at_desk"
+label     = "Eat at your desk"
+detail    = "You've got momentum. Keep it."
+condition = "scene.hasFlag('dan_done')"
+prose = """
+The team starts filtering out for lunch around noon. Someone asks if you want to join.
+
+"I'm good — I want to get through this." You gesture at your screen. They go.
+
+You eat the protein bar from your bag and keep working. The office is quiet with most people gone. The code makes sense — you should know, you designed half of it. By 1 PM you've pushed your first commit and the tests pass.
+
+{% if w.hasTrait("AMBITIOUS") %}
+When the team comes back, someone notices the commit in Slack. "Already?" he says. "Yeah," you say. That one syllable does more than Dan's walkthrough ever could.
+{% elif w.hasTrait("ANALYTICAL") %}
+First commit. Tests green. Forty-seven minutes ahead of your internal schedule. You open the next ticket.
+{% else %}
+The team comes back. The afternoon starts. You're ahead of where you expected to be, which counts for something.
+{% endif %}
+
+By five you've pushed two more commits. Nobody has asked how old you are since this morning. The day, on balance, worked.
+"""
+
+  [[actions.effects]]
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "working"
 
-  [[npc_actions.effects]]
+  [[actions.effects]]
   type = "set_game_flag"
   flag = "STARTED_JOB"
 
-  [[npc_actions.effects]]
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 3
 
-  [[npc_actions.next]]
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "lunch_with_group"
+label     = "Join the group for lunch"
+detail    = "Six people. A sandwich place two blocks away."
+condition = "scene.hasFlag('dan_done') && !w.hasTrait('SHY')"
+prose = """
+Six of you walk to a place two blocks away that someone describes as "fine, it's fine." It is fine. Sandwiches. Bright lighting. The kind of restaurant that exists to feed office workers and doesn't pretend otherwise.
+
+The conversation is first-day stuff — where are you from, where were you before, what team. Then someone asks how old you are.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Thirty-two," you say, and let the number do its work. A beat. Someone does the math. "You look..." they start. "I know," you say. That's the end of it.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+"Old enough to have opinions about the auth system," you say. It gets a laugh. The conversation moves on. You eat your sandwich.
+{% else %}
+"Thirty-two." The table recalibrates. You can see it happen — the assumptions reshuffling. Not hostile. Just surprise. You eat your sandwich and let the number sit.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Matt sits across from you and directs most of his conversation your way. The positioning is familiar — close, attentive, angled to exclude the rest of the table.
+{% endif %}
+
+Walking back to the office, someone holds the door for you. Quick, automatic, not a thing.
+
+The afternoon is code. By five you've pushed your first commit and the tests pass and the day worked.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "lunch_alone"
+label     = "Slip out on your own"
+detail    = "The group is still deciding where to go. You already know."
+condition = "scene.hasFlag('dan_done')"
+prose = """
+You leave while the group is still debating restaurants. The neighborhood around the office is financial district standard — sandwich shops, a Starbucks, a park with benches and pigeons and people eating lunches out of paper bags.
+
+You find a bench. The sandwich is adequate. The sun is out.
+
+{% if w.hasTrait("SHY") %}
+This is better. The office was a lot of people reading you at once — your face, your age, your body, the gap between your badge and what they were expecting. Out here, nobody knows any of that. You're just someone on a bench eating a sandwich. The simplicity of it is a relief.
+{% elif w.hasTrait("ANALYTICAL") %}
+You map the neighborhood while you eat. Coffee shop on the corner — potential morning stop. The park has a path that looks like it connects to the waterfront. Grocery store across from the station. You're building infrastructure, the same way you'd build a dev environment. One dependency at a time.
+{% else %}
+You eat. You watch the city. A man walks by with a dog and the dog looks at you with the open curiosity that dogs have and people don't. You finish the sandwich and go back.
+{% endif %}
+
+The afternoon is code. By five you've pushed your first commit and the tests are green and nobody has asked how old you are since this morning.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
   finish = true

@@ -21,20 +21,22 @@
 
 ## ⚡ Next Action
 
-**Writing overhaul — calibrating prose direction with user.**
-Transformation writing direction overhauled: "you used to do this" pattern banned, replaced
-with involuntary physical/emotional reactions. Androgynous name removed (two-name system:
-fem + masc). Scene roster designed (33→25, 8 scrapped). Three example scenes drafted
-(transformation_intro, workplace_arrival, neighborhood_bar) — stashed, not at quality bar.
-User feedback: (a) drop `{% if not w.alwaysFemale() %}` guards — write transformation
-content directly; (b) still too much telling — narrator puts thoughts in player's head;
-show body/events, let player interpret; (c) calibrate before going autonomous.
+**Register calibrated. Robin opening scenes rewritten (2026-03-08).**
+Writing register calibrated through 7 iterative attempts with user feedback. DM narrator
+style — on the player's shoulder, describing the world, handing control to the player.
+All 7 writing docs updated to enforce the register deterministically. Calibration design doc
+at `docs/plans/2026-03-08-writing-register-calibration.md`. Session prompt at
+`docs/prompts/2026-03-08-robin-opening-writing-session.md`.
 
-**After calibration — update ALL writing docs before autonomous work:**
-writing-guide.md, creative-direction.md, writer-core.md, review-core.md, writing-samples.md,
-scene-writer agent, writing-reviewer agent. These docs still allow patterns the user has
-rejected (too much interiority, narrator thinking for the player). Must be fixed BEFORE any
-autonomous writing session or agents will reproduce the same problems.
+**4 scenes rewritten to calibrated register:**
+- `transformation_intro.toml` — plane scene, fresh rewrite. Before-body accessors guarded.
+- `workplace_arrival.toml` — 2-round choices (ID checkpoint + transport). Deep trait branching.
+- `workplace_first_day.toml` — 2-round choices (Dan response + lunch). 5 actions, rich branching.
+- `neighborhood_bar.toml` — 3-round flow (order → nurse/NPC → accept/decline). Matches Sample 0.
+
+All 33 scenes pass validate-pack. All Jinja templates valid.
+
+**User should play through the opening sequence and recalibrate if needed.**
 
 Trust these docs first:
 
@@ -91,9 +93,10 @@ Do not restart content writing until the documented writing-agent/tooling contra
 13. ⚠️ **Multiple NPC display unclear** — Phase 2 pending (multi-NPC chips/selection).
 
 **Writing quality:**
-14. **Rain scene writing bad** — Too much telling-not-showing. Narrator puts thoughts directly into PC's brain ("you know what they think because you've been him"). Violates the show-don't-tell principle. The "you know what men think because you were one" angle is too explicit and repetitive — it should be shown through specific moments, not stated as narration.
-15. **Repetitive transformation narration** — Multiple scenes hammer the same "you used to be a man so you understand" beat explicitly instead of letting it emerge from concrete observations. Needs subtlety — the insight should be demonstrated through what the PC notices, not announced by the narrator.
-16. **User considering DeepSeek API for writing agents** — Wants to discuss using DeepSeek alongside Claude for scene writing before next writing sprint. Do not act on this yet.
+14. ✅ **Rain scene writing bad** — Fixed: register calibrated (2026-03-08). DM narrator, no thought-insertion.
+15. ✅ **Repetitive transformation narration** — Fixed: "you used to" pattern banned. Transformation shown through physical facts only.
+16. ✅ **DeepSeek API for writing agents** — Infrastructure built (2026-03-07). Full pipeline tested.
+17. **Remaining scenes need register rewrite** — 4 opening scenes rewritten to calibrated register. Other workplace arc scenes (landlord, first_night, first_clothes, work_meeting, evening) still in old register. Free-time scenes (rain_shelter, coffee_shop, etc.) also need audit.
 
 ### Char creation bugs (previous session)
 - **Trait list runoff** — "Starting traits" row overflows off-screen. No wrapping, no colon/space between label and values. Runs off the right edge.
@@ -218,6 +221,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 | Writing register calibration + Robin opening scenes. Calibrated the prose register through 7 iterative attempts with user feedback — landed on DM narrator style (casual, specific, on the player's shoulder). Updated all 7 writing docs (writing-guide, creative-direction, writer-core, review-core, writing-samples, scene-writer agent, writing-reviewer agent) to enforce the register. Wrote calibration design doc + session prompt. Rewrote 4 scenes to calibrated register: `transformation_intro.toml` (plane, before-body accessors), `workplace_arrival.toml` (2-round: ID + transport), `workplace_first_day.toml` (2-round: Dan + lunch, 5 actions), `neighborhood_bar.toml` (3-round: order → nurse/NPC → accept/decline, matches Sample 0). All 33 scenes pass validate-pack. All Jinja templates valid. Writing-reviewer audit run on key scenes. |
 | 2026-03-07 | Hardcoded content-ID audit session. Reconciled current code against docs first, then tightened the character-creation runtime contract instead of leaving preset route flags and rough-content traits as ambient UI strings. `PartialCharState.arc_flag` became explicit `starting_flags`; startup and `validate-pack` now validate that built-in preset starting flags are actually referenced by the scheduler; rough-content preference traits (`BLOCK_ROUGH` / `LIKES_ROUGH`) and structural smooth-legs trait lookups are centralized through `PackRegistry`; runtime/template code now reuses those helpers instead of scattering structural trait strings. Added targeted tests in `undone-scene`, `undone-packs`, and `undone-ui`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. |
 | 2026-03-07 | Authoring validation policy refinement session. Reconciled current code/docs first, then tightened `validate-pack`'s "no lasting effects" heuristic to match actual persistent world mutations instead of only `set_game_flag` / `add_npc_liking` / `advance_arc`. Added reusable `EffectDef::mutates_persistent_world()` and `SceneDefinition::has_persistent_world_mutation()` helpers with unit coverage, including NPC-action coverage. `validate-pack` now warns only when a scene truly lacks persistent world mutation; scene-local flags and pure navigation no longer create false positives. Synced `docs/engine-contract.md` and `docs/audits/2026-03-07-engine-readiness-matrix.md`. Final verification passed: `cargo fmt --all`, `cargo check --workspace`, `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo run --bin validate-pack`, `node tools/deepseek-helper.mjs --help`. Current warning inventory: `base::campus_library` still warns because it only mutates scene-local state. |
 | 2026-03-07 | DeepSeek writing infrastructure session. Built the full prompt-packing and reference doc pipeline: `docs/writer-core.md` (compact 12KB DeepSeek prompt prefix with voice, anti-patterns, trait tables, TOML format, adult content directive), `docs/review-core.md` (compact 4KB review criteria), `tools/pack-prompt.mjs` (assembles prompts from JSON scene specs with route-specific context). Fixed `docs/writing-guide.md` m/f availability statement (action/NPC-action only, not intro). Thinned `scene-writer.md` from 301→40 lines and `writing-reviewer.md` from 288→40 lines to orchestrator shape referencing the core docs. Tested full pipeline: rain_shelter reproduction (v1 had over-naming, short output; v2 after iteration had proper trait branches in actions, correct NPC branching within single action, 81% cache hit rate). New scene test (workplace_lunch_break) confirmed cache efficiency and structural quality. Annotated resolved findings in `docs/audits/2026-03-07-writing-agent-tooling-audit.md`. Updated `docs/deepseek-writing-tool.md` with prompt packer workflow. |
