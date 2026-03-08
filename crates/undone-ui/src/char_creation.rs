@@ -1651,7 +1651,10 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
         label(move || value.clone()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
+                .flex_basis(0.0)
+                .flex_grow(1.0)
                 .flex_shrink(1.0)
+                .max_width(400.0)
                 .color(colors.ink)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
