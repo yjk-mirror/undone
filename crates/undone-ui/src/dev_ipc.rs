@@ -22,6 +22,7 @@ pub enum DevCommand {
     RemoveFlag { flag: String },
     AdvanceTime { weeks: u32 },
     SetNpcLiking { npc_name: String, level: String },
+    SetAllNpcLiking { level: String },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -112,6 +113,7 @@ pub fn execute_command(
         DevCommand::RemoveFlag { flag } => remove_flag(gs, signals, &flag),
         DevCommand::AdvanceTime { weeks } => advance_time(gs, weeks),
         DevCommand::SetNpcLiking { npc_name, level } => set_npc_liking(gs, &npc_name, &level),
+        DevCommand::SetAllNpcLiking { level } => set_all_npc_liking(gs, &level),
     };
 
     if response.success {
@@ -301,6 +303,39 @@ fn advance_time(gs: &mut GameState, weeks: u32) -> DevCommandResponse {
     DevCommandResponse {
         success: true,
         message: format!("Advanced {weeks} week(s)"),
+        data: None,
+    }
+}
+
+fn set_all_npc_liking(gs: &mut GameState, level: &str) -> DevCommandResponse {
+    use undone_domain::LikingLevel;
+
+    let liking = match level {
+        "Neutral" => LikingLevel::Neutral,
+        "Ok" => LikingLevel::Ok,
+        "Like" => LikingLevel::Like,
+        "Close" => LikingLevel::Close,
+        other => {
+            return DevCommandResponse {
+                success: false,
+                message: format!(
+                    "Unknown liking level '{other}'. Supported: Neutral, Ok, Like, Close"
+                ),
+                data: None,
+            };
+        }
+    };
+
+    for (_, npc) in gs.world.male_npcs.iter_mut() {
+        npc.core.npc_liking = liking;
+    }
+    for (_, npc) in gs.world.female_npcs.iter_mut() {
+        npc.core.npc_liking = liking;
+    }
+
+    DevCommandResponse {
+        success: true,
+        message: format!("Set all NPC liking to {level}"),
         data: None,
     }
 }

@@ -646,7 +646,7 @@ floem (Lapce reactive UI). Two-panel layout at 1200×800:
 - `undone -- --dev` enables development-only UI and file-polled IPC.
 - `undone -- --dev --quick` skips character creation and boots directly into Robin's route.
 - The running game polls `%TEMP%/undone-dev-cmd.json` and writes responses to `%TEMP%/undone-dev-result.json`.
-- Supported commands: `jump_to_scene`, `get_state`, `set_stat`, `set_flag`, `remove_flag`.
+- Supported commands: `jump_to_scene`, `get_state`, `set_stat`, `set_flag`, `remove_flag`, `advance_time`, `set_npc_liking`, `set_all_npc_liking`.
 - `tools/game-input-mcp` now supports both window-input tools and the dev IPC helpers.
 
 ## Validation / Analysis

@@ -10,18 +10,57 @@ use crate::game_state::GameState;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
-pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
-    let filter = RwSignal::new(String::new());
-    let status = RwSignal::new(String::new());
+/// Bundles the shared state that every dev panel widget needs.
+#[derive(Clone)]
+struct DevContext {
+    gs: Rc<RefCell<GameState>>,
+    signals: AppSignals,
+    status: RwSignal<String>,
+    money: RwSignal<String>,
+    stress: RwSignal<String>,
+    anxiety: RwSignal<String>,
+    femininity: RwSignal<String>,
+}
 
+impl DevContext {
+    fn run(&self, command: DevCommand) {
+        let response = {
+            let mut gs_ref = self.gs.borrow_mut();
+            execute_command(&mut gs_ref, self.signals, command)
+        };
+        self.status.set(response.message);
+        self.sync_inputs();
+    }
+
+    fn sync_inputs(&self) {
+        let snapshot = {
+            let gs_ref = self.gs.borrow();
+            game_state_snapshot(&gs_ref)
+        };
+        self.money.set(snapshot.money.to_string());
+        self.stress.set(snapshot.stress.to_string());
+        self.anxiety.set(snapshot.anxiety.to_string());
+        self.femininity.set(snapshot.femininity.to_string());
+    }
+}
+
+pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
     let snapshot = {
         let gs_ref = gs.borrow();
         game_state_snapshot(&gs_ref)
     };
-    let money_input = RwSignal::new(snapshot.money.to_string());
-    let stress_input = RwSignal::new(snapshot.stress.to_string());
-    let anxiety_input = RwSignal::new(snapshot.anxiety.to_string());
-    let femininity_input = RwSignal::new(snapshot.femininity.to_string());
+
+    let ctx = DevContext {
+        gs,
+        signals,
+        status: RwSignal::new(String::new()),
+        money: RwSignal::new(snapshot.money.to_string()),
+        stress: RwSignal::new(snapshot.stress.to_string()),
+        anxiety: RwSignal::new(snapshot.anxiety.to_string()),
+        femininity: RwSignal::new(snapshot.femininity.to_string()),
+    };
+
+    let filter = RwSignal::new(String::new());
     let flag_input = RwSignal::new(String::new());
 
     let scene_section = section_card(
@@ -33,11 +72,11 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
             scroll(
                 dyn_stack(
                     {
-                        let gs = Rc::clone(&gs);
+                        let ctx = ctx.clone();
                         move || {
-                            let _ = signals.dev_tick.get();
+                            let _ = ctx.signals.dev_tick.get();
                             let ids = {
-                                let gs_ref = gs.borrow();
+                                let gs_ref = ctx.gs.borrow();
                                 gs_ref.engine.scene_ids()
                             };
                             filter_scene_ids(ids, &filter.get())
@@ -45,25 +84,16 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                     },
                     |scene_id: &String| scene_id.clone(),
                     {
-                        let gs = Rc::clone(&gs);
+                        let ctx = ctx.clone();
                         move |scene_id: String| {
                             let click_scene = scene_id.clone();
                             label(move || scene_id.clone())
                                 .on_click_stop({
-                                    let gs = Rc::clone(&gs);
+                                    let ctx = ctx.clone();
                                     move |_| {
-                                        run_command(
-                                            &gs,
-                                            signals,
-                                            status,
-                                            money_input,
-                                            stress_input,
-                                            anxiety_input,
-                                            femininity_input,
-                                            DevCommand::JumpToScene {
-                                                scene_id: click_scene.clone(),
-                                            },
-                                        );
+                                        ctx.run(DevCommand::JumpToScene {
+                                            scene_id: click_scene.clone(),
+                                        });
                                     }
                                 })
                                 .style(move |s| {
@@ -93,54 +123,10 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
     let stats_section = section_card(
         "Stat Editors",
         v_stack((
-            stat_editor_row(
-                "Money",
-                money_input,
-                "money",
-                Rc::clone(&gs),
-                signals,
-                status,
-                money_input,
-                stress_input,
-                anxiety_input,
-                femininity_input,
-            ),
-            stat_editor_row(
-                "Stress",
-                stress_input,
-                "stress",
-                Rc::clone(&gs),
-                signals,
-                status,
-                money_input,
-                stress_input,
-                anxiety_input,
-                femininity_input,
-            ),
-            stat_editor_row(
-                "Anxiety",
-                anxiety_input,
-                "anxiety",
-                Rc::clone(&gs),
-                signals,
-                status,
-                money_input,
-                stress_input,
-                anxiety_input,
-                femininity_input,
-            ),
-            stat_editor_row(
-                "Femininity",
-                femininity_input,
-                "femininity",
-                Rc::clone(&gs),
-                signals,
-                status,
-                money_input,
-                stress_input,
-                anxiety_input,
-                femininity_input,
-            ),
+            stat_editor_row("Money", ctx.money, "money", ctx.clone()),
+            stat_editor_row("Stress", ctx.stress, "stress", ctx.clone()),
+            stat_editor_row("Anxiety", ctx.anxiety, "anxiety", ctx.clone()),
+            stat_editor_row("Femininity", ctx.femininity, "femininity", ctx.clone()),
         )),
         signals,
     );
@@ -153,47 +139,29 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                     .placeholder("GAME_FLAG")
                     .style(input_style(signals)),
                 action_button("Set", signals, {
-                    let gs = Rc::clone(&gs);
+                    let ctx = ctx.clone();
                     move || {
-                        run_command(
-                            &gs,
-                            signals,
-                            status,
-                            money_input,
-                            stress_input,
-                            anxiety_input,
-                            femininity_input,
-                            DevCommand::SetFlag {
-                                flag: flag_input.get_untracked(),
-                            },
-                        );
+                        ctx.run(DevCommand::SetFlag {
+                            flag: flag_input.get_untracked(),
+                        });
                     }
                 }),
                 action_button("Remove", signals, {
-                    let gs = Rc::clone(&gs);
+                    let ctx = ctx.clone();
                     move || {
-                        run_command(
-                            &gs,
-                            signals,
-                            status,
-                            money_input,
-                            stress_input,
-                            anxiety_input,
-                            femininity_input,
-                            DevCommand::RemoveFlag {
-                                flag: flag_input.get_untracked(),
-                            },
-                        );
+                        ctx.run(DevCommand::RemoveFlag {
+                            flag: flag_input.get_untracked(),
+                        });
                     }
                 }),
             ))
             .style(|s| s.gap(8.0).items_center()),
             dyn_stack(
                 {
-                    let gs = Rc::clone(&gs);
+                    let ctx = ctx.clone();
                     move || {
-                        let _ = signals.dev_tick.get();
-                        let gs_ref = gs.borrow();
+                        let _ = ctx.signals.dev_tick.get();
+                        let gs_ref = ctx.gs.borrow();
                         game_state_snapshot(&gs_ref).game_flags
                     }
                 },
@@ -223,35 +191,17 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         "Quick Actions",
         h_stack((
             action_button("Advance 1 Week", signals, {
-                let gs = Rc::clone(&gs);
+                let ctx = ctx.clone();
                 move || {
-                    run_command(
-                        &gs,
-                        signals,
-                        status,
-                        money_input,
-                        stress_input,
-                        anxiety_input,
-                        femininity_input,
-                        DevCommand::AdvanceTime { weeks: 1 },
-                    );
+                    ctx.run(DevCommand::AdvanceTime { weeks: 1 });
                 }
             }),
             action_button("All NPC → Close", signals, {
-                let gs = Rc::clone(&gs);
+                let ctx = ctx.clone();
                 move || {
-                    use undone_domain::LikingLevel;
-                    {
-                        let mut gs_ref = gs.borrow_mut();
-                        for (_, npc) in gs_ref.world.male_npcs.iter_mut() {
-                            npc.core.npc_liking = LikingLevel::Close;
-                        }
-                        for (_, npc) in gs_ref.world.female_npcs.iter_mut() {
-                            npc.core.npc_liking = LikingLevel::Close;
-                        }
-                    }
-                    status.set("Set all NPC liking to Close".to_string());
-                    signals.dev_tick.update(|tick| *tick += 1);
+                    ctx.run(DevCommand::SetAllNpcLiking {
+                        level: "Close".to_string(),
+                    });
                 }
             }),
         ))
@@ -263,11 +213,11 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         "State Inspector",
         scroll(
             label({
-                let gs = Rc::clone(&gs);
+                let ctx = ctx.clone();
                 move || {
-                    let _ = signals.dev_tick.get();
+                    let _ = ctx.signals.dev_tick.get();
                     let snapshot = {
-                        let gs_ref = gs.borrow();
+                        let gs_ref = ctx.gs.borrow();
                         game_state_snapshot(&gs_ref)
                     };
                     serde_json::to_string_pretty(&snapshot)
@@ -287,6 +237,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         signals,
     );
 
+    let status = ctx.status;
     scroll(v_stack((
         heading("Dev Tools", signals),
         label(move || status.get()).style(move |s| {
@@ -324,59 +275,13 @@ fn filter_scene_ids(scene_ids: Vec<String>, filter_text: &str) -> Vec<String> {
         .collect()
 }
 
-fn run_command(
-    gs: &Rc<RefCell<GameState>>,
-    signals: AppSignals,
-    status: RwSignal<String>,
-    money_input: RwSignal<String>,
-    stress_input: RwSignal<String>,
-    anxiety_input: RwSignal<String>,
-    femininity_input: RwSignal<String>,
-    command: DevCommand,
-) {
-    let response = {
-        let mut gs_ref = gs.borrow_mut();
-        execute_command(&mut gs_ref, signals, command)
-    };
-    status.set(response.message);
-    sync_inputs(
-        gs,
-        money_input,
-        stress_input,
-        anxiety_input,
-        femininity_input,
-    );
-}
-
-fn sync_inputs(
-    gs: &Rc<RefCell<GameState>>,
-    money_input: RwSignal<String>,
-    stress_input: RwSignal<String>,
-    anxiety_input: RwSignal<String>,
-    femininity_input: RwSignal<String>,
-) {
-    let snapshot = {
-        let gs_ref = gs.borrow();
-        game_state_snapshot(&gs_ref)
-    };
-    money_input.set(snapshot.money.to_string());
-    stress_input.set(snapshot.stress.to_string());
-    anxiety_input.set(snapshot.anxiety.to_string());
-    femininity_input.set(snapshot.femininity.to_string());
-}
-
 fn stat_editor_row(
     label_text: &'static str,
     input: RwSignal<String>,
     stat_key: &'static str,
-    gs: Rc<RefCell<GameState>>,
-    signals: AppSignals,
-    status: RwSignal<String>,
-    money_input: RwSignal<String>,
-    stress_input: RwSignal<String>,
-    anxiety_input: RwSignal<String>,
-    femininity_input: RwSignal<String>,
+    ctx: DevContext,
 ) -> impl View {
+    let signals = ctx.signals;
     h_stack((
         label(move || label_text.to_string()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -386,22 +291,12 @@ fn stat_editor_row(
         }),
         text_input(input).style(input_style(signals)),
         action_button("Apply", signals, move || {
-            let parsed = input.get_untracked().trim().parse::<i32>();
-            match parsed {
-                Ok(value) => run_command(
-                    &gs,
-                    signals,
-                    status,
-                    money_input,
-                    stress_input,
-                    anxiety_input,
-                    femininity_input,
-                    DevCommand::SetStat {
-                        stat: stat_key.to_string(),
-                        value,
-                    },
-                ),
-                Err(err) => status.set(format!("Invalid {label_text} value: {err}")),
+            match input.get_untracked().trim().parse::<i32>() {
+                Ok(value) => ctx.run(DevCommand::SetStat {
+                    stat: stat_key.to_string(),
+                    value,
+                }),
+                Err(err) => ctx.status.set(format!("Invalid {label_text} value: {err}")),
             }
         }),
     ))

@@ -86,17 +86,17 @@ pub fn simulate(
     for _ in 0..config.runs {
         let mut world = base_world.clone();
         for _ in 0..config.weeks {
-            if let Some(result) = scheduler.pick_next(&world, registry, &mut rng) {
-                *scene_counts.entry(result.scene_id.clone()).or_insert(0) += 1;
-                total_picks += 1;
-                if result.once_only {
-                    world
-                        .game_data
-                        .set_flag(format!("ONCE_{}", result.scene_id));
-                }
-            }
-
             for _ in 0..28 {
+                // 4 slots/day × 7 days/week — pick once per slot, matching real gameplay
+                if let Some(result) = scheduler.pick_next(&world, registry, &mut rng) {
+                    *scene_counts.entry(result.scene_id.clone()).or_insert(0) += 1;
+                    total_picks += 1;
+                    if result.once_only {
+                        world
+                            .game_data
+                            .set_flag(format!("ONCE_{}", result.scene_id));
+                    }
+                }
                 world.game_data.advance_time_slot();
             }
         }
