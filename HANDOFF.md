@@ -2,7 +2,9 @@
 
 ## Current State
 
-**Branch:** `master`
+**Latest session (2026-03-09):** Dev tooling suite implemented on `codex/dev-tooling-plan` worktree. Added `BoundedStat` for stress/anxiety, `--dev` / `--quick` CLI flags, Robin quick-start path, Dev tab + scene jumper/stat+flag/state tools, file-polled dev IPC, MCP dev-command wrappers, schedule reachability warnings, and `validate-pack --simulate`.
+
+**Branch:** `codex/dev-tooling-plan`
 **Tests:** 262 passing, 0 failures.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
@@ -146,7 +148,8 @@ For pure writing (authoring `.toml` scene files), no Rust compilation is needed.
 **Input tools:** `press_key(title, key)`, `click(title, x, y)`, `scroll(title, x, y, delta)`, `hover(title, x, y)`.
 Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 Scroll: sends WM_MOUSEMOVE before WM_MOUSEWHEEL (floem routes wheel events via cached cursor_position). Positive delta = up, negative = down (one tick = one wheel notch).
-**Lifecycle tools:** `start_game(working_dir)`, `stop_game(exe_name)`, `is_game_running(exe_name)`.
+**Lifecycle tools:** `start_game(working_dir, dev_mode)`, `stop_game(exe_name)`, `is_game_running(exe_name)`.
+**Dev IPC tools:** `dev_command(command_json, timeout_ms)`, `get_game_state()`, `jump_to_scene(scene_id)`, `set_game_stat(stat, value)`, `set_game_flag(flag)`, `remove_game_flag(flag)`.
 Process management uses Toolhelp32 snapshot API.
 
 ---

@@ -31,6 +31,7 @@ pub struct GameState {
     pub engine: SceneEngine,
     pub scheduler: Scheduler,
     pub rng: SmallRng,
+    pub dev_mode: bool,
     /// Set when pack loading fails; checked by app_view to surface the error.
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
@@ -180,7 +181,7 @@ pub fn init_game() -> PreGameState {
 }
 
 /// Create a world from character creation config and build the full `GameState`.
-pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
+pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool) -> GameState {
     let PreGameState {
         mut registry,
         scenes,
@@ -200,6 +201,7 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig) -> GameState {
         engine,
         scheduler,
         rng,
+        dev_mode,
         init_error,
         opening_scene,
         femininity_id,
@@ -227,7 +229,7 @@ fn extend_scenes_checked(
 ///
 /// `opening_scene` is intentionally `None` so resuming from save does not replay
 /// the new-game opening scene.
-pub fn start_loaded_game(pre: PreGameState, world: World) -> GameState {
+pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> GameState {
     let PreGameState {
         registry,
         scenes,
@@ -245,6 +247,7 @@ pub fn start_loaded_game(pre: PreGameState, world: World) -> GameState {
         engine,
         scheduler,
         rng,
+        dev_mode,
         init_error,
         opening_scene: None,
         femininity_id,
@@ -252,10 +255,14 @@ pub fn start_loaded_game(pre: PreGameState, world: World) -> GameState {
 }
 
 /// Validate and load a save file into a full `GameState`.
-pub fn load_game_state_from_save(pre: PreGameState, save_path: &Path) -> Result<GameState, String> {
+pub fn load_game_state_from_save(
+    pre: PreGameState,
+    save_path: &Path,
+    dev_mode: bool,
+) -> Result<GameState, String> {
     let loaded_world = undone_save::load_game(save_path, &pre.registry)
         .map_err(|e| format!("Load failed: {e}"))?;
-    Ok(start_loaded_game(pre, loaded_world))
+    Ok(start_loaded_game(pre, loaded_world, dev_mode))
 }
 
 /// Reset transient runtime state, then resume from the current persisted world.
@@ -457,7 +464,7 @@ mod tests {
     #[test]
     fn reload_current_game_from_save_resets_runtime_and_resumes_from_persisted_world() {
         let pre = test_pre_state();
-        let mut gs = start_game(pre, workplace_config());
+        let mut gs = start_game(pre, workplace_config(), false);
 
         assert_eq!(
             gs.opening_scene.as_deref(),

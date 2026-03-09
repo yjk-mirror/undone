@@ -1,7 +1,9 @@
+pub mod bounded_stat;
 pub mod enums;
 pub mod ids;
 pub mod npc;
 pub mod player;
+pub use bounded_stat::BoundedStat;
 pub use enums::*;
 pub use ids::*;
 pub use npc::{FemaleClothing, FemaleNpc, MaleClothing, MaleNpc, NpcCore};

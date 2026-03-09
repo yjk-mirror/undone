@@ -1,6 +1,6 @@
 use crate::{
-    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeSexuality, BeforeVoice, BreastSize,
-    ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height,
+    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeSexuality, BeforeVoice, BoundedStat,
+    BreastSize, ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height,
     InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize,
     PlayerFigure, PubicHairStyle, SkillId, SkinTone, StuffId, TraitId, WaistSize, WetnessBaseline,
 };
@@ -94,8 +94,8 @@ pub struct Player {
 
     // Economy & wellbeing
     pub money: i32,
-    pub stress: i32,
-    pub anxiety: i32,
+    pub stress: BoundedStat,
+    pub anxiety: BoundedStat,
     pub arousal: ArousalLevel,
     pub alcohol: AlcoholLevel,
 
@@ -204,8 +204,8 @@ mod tests {
             traits: HashSet::new(),
             skills: HashMap::new(),
             money: 500,
-            stress: 0,
-            anxiety: 0,
+            stress: BoundedStat::new(0),
+            anxiety: BoundedStat::new(0),
             arousal: ArousalLevel::Comfort,
             alcohol: AlcoholLevel::Sober,
             partner: None,

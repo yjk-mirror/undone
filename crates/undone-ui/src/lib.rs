@@ -1,4 +1,6 @@
 pub mod char_creation;
+pub mod dev_ipc;
+pub mod dev_panel;
 pub mod game_state;
 pub mod landing_page;
 pub mod left_panel;
@@ -20,6 +22,7 @@ use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
 use undone_world::World;
 
 use crate::char_creation::{char_creation_view, fem_creation_view};
+use crate::dev_panel::dev_panel;
 use crate::game_state::{init_game, GameState, PreGameState};
 use crate::landing_page::landing_view;
 use crate::left_panel::story_panel;
@@ -34,6 +37,7 @@ pub enum AppTab {
     Game,
     Saves,
     Settings,
+    Dev,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -75,6 +79,7 @@ pub struct AppSignals {
     pub tab: RwSignal<AppTab>,
     pub phase: RwSignal<AppPhase>,
     pub scroll_gen: RwSignal<u64>,
+    pub dev_tick: RwSignal<u64>,
 }
 
 impl Default for AppSignals {
@@ -94,6 +99,7 @@ impl AppSignals {
             tab: RwSignal::new(AppTab::Game),
             phase: RwSignal::new(AppPhase::Landing),
             scroll_gen: RwSignal::new(0),
+            dev_tick: RwSignal::new(0),
         }
     }
 }
@@ -117,8 +123,8 @@ impl PlayerSnapshot {
             name: p.active_name(femininity_id).to_owned(),
             femininity: p.skill(femininity_id),
             money: p.money,
-            stress: p.stress,
-            anxiety: p.anxiety,
+            stress: p.stress.get(),
+            anxiety: p.anxiety.get(),
             arousal: format!("{}", p.arousal),
             alcohol: format!("{}", p.alcohol),
         }
@@ -150,7 +156,7 @@ impl NpcSnapshot {
     }
 }
 
-pub fn app_view() -> impl View {
+pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
     let signals = AppSignals::new();
 
     // Load packs (no world yet — waits for char creation)
@@ -166,6 +172,18 @@ pub fn app_view() -> impl View {
         if let Some(ref pre) = *ps {
             if let Some(ref err) = pre.init_error {
                 signals.story.set(err.clone());
+            }
+        }
+    }
+
+    if quick_start {
+        if let Some(pre) = pre_state.borrow_mut().take() {
+            if pre.init_error.is_none() {
+                let config = crate::char_creation::robin_quick_config(&pre.registry);
+                *game_state.borrow_mut() = Some(crate::game_state::start_game(pre, config, true));
+                signals.phase.set(AppPhase::InGame);
+            } else {
+                *pre_state.borrow_mut() = Some(pre);
             }
         }
     }
@@ -186,10 +204,13 @@ pub fn app_view() -> impl View {
                 let game_state_lp = Rc::clone(&game_state_lp);
                 move |tab| match tab {
                     AppTab::Settings => settings_view(signals).into_any(),
-                    AppTab::Game | AppTab::Saves => {
-                        landing_view(signals, Rc::clone(&pre_state_lp), Rc::clone(&game_state_lp))
-                            .into_any()
-                    }
+                    AppTab::Game | AppTab::Saves | AppTab::Dev => landing_view(
+                        signals,
+                        Rc::clone(&pre_state_lp),
+                        Rc::clone(&game_state_lp),
+                        dev_mode,
+                    )
+                    .into_any(),
                 }
             })
             .style(|s| s.size_full())
@@ -199,7 +220,7 @@ pub fn app_view() -> impl View {
                 let game_state_cc = Rc::clone(&game_state_cc);
                 move |tab| match tab {
                     AppTab::Settings => settings_view(signals).into_any(),
-                    _ => char_creation_view(
+                    AppTab::Game | AppTab::Saves | AppTab::Dev => char_creation_view(
                         signals,
                         Rc::clone(&pre_state_cc),
                         Rc::clone(&game_state_cc),
@@ -249,7 +270,7 @@ pub fn app_view() -> impl View {
                     let gs_cell = Rc::clone(&gs_cell);
                     move |tab| match tab {
                         AppTab::Settings => settings_view(signals).into_any(),
-                        _ => h_stack((
+                        AppTab::Game | AppTab::Saves | AppTab::Dev => h_stack((
                             sidebar_panel(signals),
                             story_panel(signals, Rc::clone(&gs_cell)),
                         ))
@@ -265,11 +286,12 @@ pub fn app_view() -> impl View {
                 let game_state_cc = Rc::clone(&game_state_cc);
                 move |tab| match tab {
                     AppTab::Settings => settings_view(signals).into_any(),
-                    _ => fem_creation_view(
+                    AppTab::Game | AppTab::Saves | AppTab::Dev => fem_creation_view(
                         signals,
                         Rc::clone(&pre_state_cc),
                         Rc::clone(&game_state_cc),
                         partial_char,
+                        dev_mode,
                     )
                     .into_any(),
                 }
@@ -360,12 +382,14 @@ pub fn app_view() -> impl View {
                     }
                 };
                 let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
+                crate::dev_ipc::start_polling(signals, Rc::clone(&gs_cell));
 
                 dyn_container(move || signals.tab.get(), {
                     let gs_cell = Rc::clone(&gs_cell);
                     move |tab| match tab {
                         AppTab::Settings => settings_view(signals).into_any(),
                         AppTab::Saves => saves_panel(signals, Rc::clone(&gs_cell)).into_any(),
+                        AppTab::Dev => dev_panel(signals, Rc::clone(&gs_cell)).into_any(),
                         AppTab::Game => h_stack((
                             sidebar_panel(signals),
                             story_panel(signals, Rc::clone(&gs_cell)),
@@ -382,7 +406,7 @@ pub fn app_view() -> impl View {
     .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 
     // Title bar is always visible (both CharCreation and InGame phases).
-    let body = v_stack((title_bar(signals), content)).style(move |s| {
+    let body = v_stack((title_bar(signals, dev_mode), content)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     });
@@ -673,8 +697,8 @@ mod tests {
             traits: HashSet::new(),
             skills: HashMap::new(),
             money: 200,
-            stress: 5,
-            anxiety: 2,
+            stress: undone_domain::BoundedStat::new(5),
+            anxiety: undone_domain::BoundedStat::new(2),
             arousal: ArousalLevel::Comfort,
             alcohol: AlcoholLevel::Sober,
             partner: None,

@@ -117,10 +117,11 @@ pub struct World {
 ### Player
 
 ```rust
+pub struct BoundedStat(i32); // clamped to 0..=100 on construction and deserialize
+
 pub struct Player {
-    // Identity — three-name system
+    // Identity — two-name system
     pub name_fem: String,
-    pub name_androg: String,
     pub name_masc: String,
     pub age: Age,
     pub race: String,
@@ -153,8 +154,8 @@ pub struct Player {
 
     // Economy & wellbeing
     pub money: i32,
-    pub stress: i32,
-    pub anxiety: i32,
+    pub stress: BoundedStat,
+    pub anxiety: BoundedStat,
     pub arousal: ArousalLevel,
     pub alcohol: AlcoholLevel,
 
@@ -198,7 +199,7 @@ pub struct BeforeIdentity {
 ```
 
 The active display name is selected by FEMININITY level:
-0–30 → `name_masc`, 31–69 → `name_androg`, 70+ → `name_fem`.
+0–49 → `name_masc`, 50+ → `name_fem`.
 
 ### NPC Core (shared via composition)
 
@@ -634,10 +635,25 @@ floem (Lapce reactive UI). Two-panel layout at 1200×800:
 ```
 
 - Title bar: UNDONE branding, Game/Saves/Settings tabs, window controls
+- Dev mode adds a Dev tab with scene jumping, stat editing, flag editing, and a state inspector
 - Stats sidebar left (280px): player stats, NPC info when active
 - Story panel right: scrollable prose, choices bar at bottom, detail strip on hover
 - Three themes: Warm Paper (default), Sepia, Night
 - Theme and fonts loaded from `packs/base/ui/` — packs can reskin
+
+### Dev Mode / IPC
+
+- `undone -- --dev` enables development-only UI and file-polled IPC.
+- `undone -- --dev --quick` skips character creation and boots directly into Robin's route.
+- The running game polls `%TEMP%/undone-dev-cmd.json` and writes responses to `%TEMP%/undone-dev-result.json`.
+- Supported commands: `jump_to_scene`, `get_state`, `set_stat`, `set_flag`, `remove_flag`.
+- `tools/game-input-mcp` now supports both window-input tools and the dev IPC helpers.
+
+## Validation / Analysis
+
+- `validate-pack` still performs pack, scene, and scheduler validation.
+- It now also runs schedule reachability analysis and reports non-fatal warnings for unreachable flags / arc states and risky exact NPC-liking equality checks.
+- `validate-pack --simulate --weeks N --runs M` runs a Monte Carlo-style schedule distribution pass using the Robin quick-start world and reports dominant / rare / never-fire scenes.
 
 ---
 

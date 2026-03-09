@@ -9,7 +9,7 @@ use undone_domain::{
     Age, Appearance, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, ButtSize,
     ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize,
     LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize, PlayerFigure,
-    PubicHairStyle, SkinTone, WaistSize, WetnessBaseline,
+    PubicHairStyle, SkinTone, TraitId, WaistSize, WetnessBaseline,
 };
 use undone_packs::{char_creation::CharCreationConfig, PackRegistry};
 use undone_scene::scheduler::Scheduler;
@@ -341,6 +341,65 @@ fn fem_form_defaults(
     }
 }
 
+/// Build a complete CharCreationConfig for the Robin preset.
+/// Used by `--quick` start and later dev tooling entry points.
+pub fn robin_quick_config(registry: &PackRegistry) -> CharCreationConfig {
+    let starting_traits: Vec<TraitId> = PRESET_ROBIN
+        .trait_ids
+        .iter()
+        .filter_map(|trait_id| registry.resolve_trait(trait_id).ok())
+        .collect();
+
+    CharCreationConfig {
+        name_fem: PRESET_ROBIN.name_fem.to_string(),
+        name_masc: PRESET_ROBIN.name_masc.to_string(),
+        age: PRESET_ROBIN.age,
+        race: PRESET_ROBIN.race.to_string(),
+        figure: PRESET_ROBIN.figure,
+        breasts: PRESET_ROBIN.breasts,
+        origin: PRESET_ROBIN.origin,
+        before: Some(BeforeIdentity {
+            name: PRESET_ROBIN.before_name.to_string(),
+            age: PRESET_ROBIN.before_age,
+            race: PRESET_ROBIN.before_race.to_string(),
+            sexuality: PRESET_ROBIN.before_sexuality,
+            figure: PRESET_ROBIN.before_figure,
+            height: PRESET_ROBIN.before_height,
+            hair_colour: PRESET_ROBIN.before_hair_colour,
+            eye_colour: PRESET_ROBIN.before_eye_colour,
+            skin_tone: PRESET_ROBIN.before_skin_tone,
+            penis_size: PRESET_ROBIN.before_penis_size,
+            voice: PRESET_ROBIN.before_voice,
+            traits: std::collections::HashSet::new(),
+        }),
+        starting_traits,
+        male_count: 6,
+        female_count: 3,
+        starting_flags: PRESET_ROBIN
+            .starting_flags
+            .iter()
+            .map(|flag| (*flag).to_string())
+            .collect(),
+        starting_arc_states: std::collections::HashMap::new(),
+        height: PRESET_ROBIN.height,
+        butt: PRESET_ROBIN.butt,
+        waist: PRESET_ROBIN.waist,
+        lips: PRESET_ROBIN.lips,
+        hair_colour: PRESET_ROBIN.hair_colour,
+        hair_length: PRESET_ROBIN.hair_length,
+        eye_colour: PRESET_ROBIN.eye_colour,
+        skin_tone: PRESET_ROBIN.skin_tone,
+        complexion: PRESET_ROBIN.complexion,
+        appearance: PRESET_ROBIN.appearance,
+        pubic_hair: PRESET_ROBIN.pubic_hair,
+        natural_pubic_hair: PRESET_ROBIN.natural_pubic_hair,
+        nipple_sensitivity: PRESET_ROBIN.nipple_sensitivity,
+        clit_sensitivity: PRESET_ROBIN.clit_sensitivity,
+        inner_labia: PRESET_ROBIN.inner_labia,
+        wetness_baseline: PRESET_ROBIN.wetness_baseline,
+    }
+}
+
 // ── PC origin helpers ─────────────────────────────────────────────────────────
 
 fn origin_from_idx(idx: u8) -> PcOrigin {
@@ -539,6 +598,7 @@ pub fn fem_creation_view(
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
     partial_char: RwSignal<Option<PartialCharState>>,
+    dev_mode: bool,
 ) -> impl View {
     let races_list = read_races(&pre_state);
     let partial = partial_char.get_untracked();
@@ -556,7 +616,8 @@ pub fn fem_creation_view(
         .map(|p| p.origin == PcOrigin::AlwaysFemale)
         .unwrap_or(false);
 
-    let begin_btn = build_begin_button(signals, form, pre_state, game_state, partial_char);
+    let begin_btn =
+        build_begin_button(signals, form, pre_state, game_state, partial_char, dev_mode);
 
     let age_row: Box<dyn View> = if let Some(preset) = preset_ref {
         Box::new(read_only_row("Age", preset.age.to_string(), signals))
@@ -1414,6 +1475,7 @@ fn build_next_button(
                             engine,
                             scheduler: pre.scheduler.clone(),
                             rng: rand::rngs::SmallRng::from_entropy(),
+                            dev_mode: false,
                             init_error: None,
                             opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
                             femininity_id,
@@ -1451,6 +1513,7 @@ fn build_begin_button(
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
     partial_char: RwSignal<Option<PartialCharState>>,
+    dev_mode: bool,
 ) -> impl View {
     label(|| "Begin Your Story".to_string())
         .keyboard_navigable()
@@ -1590,7 +1653,7 @@ fn build_begin_button(
                 }
             };
 
-            let gs = start_game(pre, config);
+            let gs = start_game(pre, config, dev_mode);
             *game_state.borrow_mut() = Some(gs);
             signals.tab.set(crate::AppTab::Game);
             signals.phase.set(AppPhase::InGame);
@@ -1925,5 +1988,20 @@ mod tests {
             "expected no runtime contract errors, got: {:?}",
             errors
         );
+    }
+
+    #[test]
+    fn robin_quick_config_builds_workplace_preset() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+
+        let config = robin_quick_config(&registry);
+
+        assert_eq!(config.name_fem, PRESET_ROBIN.name_fem);
+        assert_eq!(config.name_masc, PRESET_ROBIN.name_masc);
+        assert!(config.starting_flags.contains("ROUTE_WORKPLACE"));
+        assert_eq!(config.male_count, 6);
+        assert_eq!(config.female_count, 3);
+        assert_eq!(config.appearance, PRESET_ROBIN.appearance);
+        assert_eq!(config.starting_traits.len(), PRESET_ROBIN.trait_ids.len());
     }
 }

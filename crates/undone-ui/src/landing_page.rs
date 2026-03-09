@@ -15,6 +15,7 @@ fn try_load_entry(
     signals: AppSignals,
     pre_state: &Rc<RefCell<Option<PreGameState>>>,
     game_state: &Rc<RefCell<Option<GameState>>>,
+    dev_mode: bool,
     status_msg: RwSignal<String>,
 ) {
     let pre = match pre_state.borrow_mut().take() {
@@ -25,7 +26,7 @@ fn try_load_entry(
         }
     };
 
-    match load_game_state_from_save(pre, &entry.path) {
+    match load_game_state_from_save(pre, &entry.path, dev_mode) {
         Ok(loaded_game) => {
             *game_state.borrow_mut() = Some(loaded_game);
             signals.story.set(String::new());
@@ -45,6 +46,7 @@ pub fn landing_view(
     signals: AppSignals,
     pre_state: Rc<RefCell<Option<PreGameState>>>,
     game_state: Rc<RefCell<Option<GameState>>>,
+    dev_mode: bool,
 ) -> impl View {
     let status_msg: RwSignal<String> = RwSignal::new(String::new());
     let show_load_list: RwSignal<bool> = RwSignal::new(false);
@@ -69,7 +71,14 @@ pub fn landing_view(
                     status_msg.set("No saves found. Start a new game.".to_string());
                     return;
                 };
-                try_load_entry(entry, signals, &pre_state, &game_state, status_msg);
+                try_load_entry(
+                    entry,
+                    signals,
+                    &pre_state,
+                    &game_state,
+                    dev_mode,
+                    status_msg,
+                );
             }
         })
         .style(move |s| primary_btn_style(s, signals));
@@ -134,6 +143,7 @@ pub fn landing_view(
                                         signals,
                                         &pre_state,
                                         &game_state,
+                                        dev_mode,
                                         status_msg,
                                     );
                                 }

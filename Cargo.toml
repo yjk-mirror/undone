@@ -63,4 +63,5 @@ undone-scene  = { path = "crates/undone-scene" }
 undone-ui     = { path = "crates/undone-ui" }
 floem         = { workspace = true }
 tracing-subscriber = { workspace = true }
+rand          = { workspace = true }
 fs4           = "0.13"

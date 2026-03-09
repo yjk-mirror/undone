@@ -157,6 +157,20 @@ impl SceneEngine {
         self.events.drain(..).collect()
     }
 
+    pub fn scene_ids(&self) -> Vec<String> {
+        let mut ids: Vec<String> = self.scenes.keys().cloned().collect();
+        ids.sort();
+        ids
+    }
+
+    pub fn has_scene(&self, scene_id: &str) -> bool {
+        self.scenes.contains_key(scene_id)
+    }
+
+    pub fn current_scene_id(&self) -> Option<String> {
+        self.stack.last().map(|frame| frame.def.id.clone())
+    }
+
     /// Convenience: send a ChooseAction command and immediately drain events.
     /// Use this from the UI instead of calling send() + drain() separately.
     pub fn advance_with_action(
@@ -699,8 +713,8 @@ mod tests {
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 100,
-                stress: 10,
-                anxiety: 5,
+                stress: undone_domain::BoundedStat::new(10),
+                anxiety: undone_domain::BoundedStat::new(5),
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
                 partner: None,
@@ -843,8 +857,8 @@ mod tests {
         );
 
         assert_eq!(
-            world.player.stress,
-            stress_before - 1,
+            world.player.stress.get(),
+            stress_before.get() - 1,
             "stress should have decreased by 1"
         );
     }

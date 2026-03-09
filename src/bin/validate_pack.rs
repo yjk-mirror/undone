@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use rand::{rngs::SmallRng, SeedableRng};
 use undone_packs::load_packs;
 use undone_scene::{
     loader::{load_scenes, validate_cross_references},
@@ -30,6 +31,21 @@ fn extend_scenes_checked(
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let simulate = args.iter().any(|arg| arg == "--simulate");
+    let weeks: u32 = args
+        .iter()
+        .position(|arg| arg == "--weeks")
+        .and_then(|index| args.get(index + 1))
+        .and_then(|value| value.parse().ok())
+        .unwrap_or(52);
+    let runs: u32 = args
+        .iter()
+        .position(|arg| arg == "--runs")
+        .and_then(|index| args.get(index + 1))
+        .and_then(|value| value.parse().ok())
+        .unwrap_or(1000);
+
     let packs_dir = PathBuf::from("packs");
     println!("Loading packs from {:?}", packs_dir);
 
@@ -119,6 +135,17 @@ fn main() {
     }
 
     if let Some(ref scheduler) = scheduler {
+        let warnings = undone_scene::reachability::check_reachability(
+            &scheduler.all_conditions(),
+            &all_scenes,
+        );
+        for warning in warnings {
+            eprintln!(
+                "WARN  [reachability] {}: {}",
+                warning.context, warning.message
+            );
+        }
+
         let char_creation_errors =
             undone_ui::char_creation::validate_runtime_contract(&registry, scheduler);
         for error in char_creation_errors {
@@ -132,5 +159,43 @@ fn main() {
         std::process::exit(1);
     } else {
         println!("\nAll checks passed. {} total scene(s).", all_scenes.len());
+    }
+
+    if simulate {
+        let Some(ref scheduler) = scheduler else {
+            eprintln!("Simulation skipped: scheduler not available.");
+            std::process::exit(1);
+        };
+
+        println!("\nRunning distribution simulation ({weeks} weeks x {runs} runs)...\n");
+
+        let mut sim_registry = registry.clone();
+        let config = undone_ui::char_creation::robin_quick_config(&sim_registry);
+        let mut sim_rng = SmallRng::seed_from_u64(42);
+        let world = undone_packs::char_creation::new_game(config, &mut sim_registry, &mut sim_rng);
+
+        let result = undone_scene::simulator::simulate(
+            scheduler,
+            &registry,
+            &world,
+            undone_scene::simulator::SimulationConfig {
+                weeks,
+                runs,
+                seed: 42,
+            },
+        );
+
+        println!("Scene Distribution ({weeks} weeks x {runs} runs):");
+        for stat in result.stats() {
+            let warning = stat
+                .warning
+                .as_ref()
+                .map(|value| format!("  ! {value}"))
+                .unwrap_or_default();
+            println!(
+                "  {:<40} - {:>5.1}% (avg {:.1}/run){}",
+                stat.scene_id, stat.percentage, stat.avg_per_run, warning
+            );
+        }
     }
 }

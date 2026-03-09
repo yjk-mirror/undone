@@ -137,13 +137,13 @@ pub fn apply_effect(
 ) -> Result<(), EffectError> {
     match effect {
         EffectDef::ChangeStress { amount } => {
-            world.player.stress = (world.player.stress + amount).max(0);
+            world.player.stress.apply_delta(*amount);
         }
         EffectDef::ChangeMoney { amount } => {
             world.player.money += amount;
         }
         EffectDef::ChangeAnxiety { amount } => {
-            world.player.anxiety = (world.player.anxiety + amount).max(0);
+            world.player.anxiety.apply_delta(*amount);
         }
         EffectDef::AddArousal { delta } => {
             world.player.arousal = step_arousal(world.player.arousal, *delta);
@@ -513,8 +513,8 @@ mod tests {
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 100,
-                stress: 10,
-                anxiety: 5,
+                stress: BoundedStat::new(10),
+                anxiety: BoundedStat::new(5),
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
                 partner: None,
@@ -582,7 +582,7 @@ mod tests {
             &reg,
         )
         .unwrap();
-        assert_eq!(world.player.stress, 15);
+        assert_eq!(world.player.stress.get(), 15);
     }
 
     #[test]

@@ -449,8 +449,8 @@ pub fn eval_call_int(
     match call.receiver {
         Receiver::Player => match call.method.as_str() {
             "getMoney" => Ok(world.player.money as i64),
-            "getStress" => Ok(world.player.stress as i64),
-            "getAnxiety" => Ok(world.player.anxiety as i64),
+            "getStress" => Ok(world.player.stress.get() as i64),
+            "getAnxiety" => Ok(world.player.anxiety.get() as i64),
             "getSkill" => {
                 let id = str_arg(0)?;
                 let skill_id = registry
@@ -733,8 +733,8 @@ mod tests {
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 500,
-                stress: 10,
-                anxiety: 0,
+                stress: undone_domain::BoundedStat::new(10),
+                anxiety: undone_domain::BoundedStat::new(0),
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
                 partner: None,

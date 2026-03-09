@@ -1,7 +1,9 @@
 pub mod effects;
 pub mod engine;
 pub mod loader;
+pub mod reachability;
 pub mod scheduler;
+pub mod simulator;
 pub mod template_ctx;
 pub mod types;
 
@@ -82,8 +84,8 @@ mod integration_tests {
                 },
                 skills: HashMap::new(),
                 money: 100,
-                stress: 0,
-                anxiety: 0,
+                stress: BoundedStat::new(0),
+                anxiety: BoundedStat::new(0),
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
                 partner: None,

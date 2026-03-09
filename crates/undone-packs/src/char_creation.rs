@@ -1,7 +1,7 @@
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BreastSize, ButtSize,
+    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BoundedStat, BreastSize, ButtSize,
     ClitSensitivity, Complexion, EyeColour, HairColour, HairLength, Height, InnerLabiaSize,
     LipShape, NaturalPubicHair, NippleSensitivity, PcOrigin, Player, PlayerFigure, PubicHairStyle,
     SkillValue, SkinTone, TraitId, WaistSize, WetnessBaseline,
@@ -97,8 +97,8 @@ pub fn new_game<R: Rng>(
         traits,
         skills: HashMap::new(),
         money: 500,
-        stress: 0,
-        anxiety: 0,
+        stress: BoundedStat::new(0),
+        anxiety: BoundedStat::new(0),
         arousal: ArousalLevel::Comfort,
         alcohol: AlcoholLevel::Sober,
         partner: None,

@@ -70,12 +70,12 @@ fn default_weight() -> u32 {
 // ---------------------------------------------------------------------------
 
 #[derive(Clone)]
-struct ScheduleEvent {
-    scene: String,
-    condition: Option<Expr>,
-    weight: u32,
-    once_only: bool,
-    trigger: Option<Expr>,
+pub(crate) struct ScheduleEvent {
+    pub(crate) scene: String,
+    pub(crate) condition: Option<Expr>,
+    pub(crate) weight: u32,
+    pub(crate) once_only: bool,
+    pub(crate) trigger: Option<Expr>,
 }
 
 // ---------------------------------------------------------------------------
@@ -128,6 +128,38 @@ impl Scheduler {
                     .as_ref()
                     .is_some_and(|expr| expr_references_game_flag(expr, flag))
         })
+    }
+
+    pub fn all_conditions(&self) -> Vec<(String, Expr)> {
+        let mut result = Vec::new();
+        for (slot_name, events) in &self.slots {
+            for event in events {
+                let ctx = format!("slot '{slot_name}', scene '{}'", event.scene);
+                if let Some(expr) = &event.condition {
+                    result.push((ctx.clone(), expr.clone()));
+                }
+                if let Some(expr) = &event.trigger {
+                    result.push((format!("{ctx} (trigger)"), expr.clone()));
+                }
+            }
+        }
+        result
+    }
+
+    pub fn all_scene_ids(&self) -> Vec<String> {
+        let mut ids: Vec<String> = self
+            .slots
+            .values()
+            .flat_map(|events| events.iter().map(|event| event.scene.clone()))
+            .collect();
+        ids.sort();
+        ids.dedup();
+        ids
+    }
+
+    #[cfg(test)]
+    pub(crate) fn from_slots_for_tests(slots: HashMap<String, Vec<ScheduleEvent>>) -> Self {
+        Self { slots }
     }
 
     /// Pick a scene for the given slot. Evaluates conditions against the current
@@ -551,8 +583,8 @@ mod tests {
                 traits: HashSet::new(),
                 skills: HashMap::new(),
                 money: 100,
-                stress: 0,
-                anxiety: 0,
+                stress: undone_domain::BoundedStat::new(0),
+                anxiety: undone_domain::BoundedStat::new(0),
                 arousal: ArousalLevel::Comfort,
                 alcohol: AlcoholLevel::Sober,
                 partner: None,
