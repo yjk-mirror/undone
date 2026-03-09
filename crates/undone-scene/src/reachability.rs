@@ -27,7 +27,7 @@ pub fn check_reachability(
     let mut seen = HashSet::new();
 
     for (context, expr) in schedule_conditions {
-        inspect_expr(expr, context, &facts, &mut warnings, &mut seen);
+        inspect_expr(expr, context, &facts, &mut warnings, &mut seen, false);
     }
 
     warnings
@@ -76,10 +76,13 @@ fn inspect_expr(
     facts: &EffectFacts,
     warnings: &mut Vec<ReachabilityWarning>,
     seen: &mut HashSet<(String, String)>,
+    negated: bool,
 ) {
     match expr {
-        Expr::Call(call) => inspect_call(call, context, facts, warnings, seen),
-        Expr::Not(inner) => inspect_expr(inner, context, facts, warnings, seen),
+        // When negated, a hasGameFlag check means "absence is intended" — skip the warning.
+        Expr::Call(call) if !negated => inspect_call(call, context, facts, warnings, seen),
+        Expr::Call(_) => {}
+        Expr::Not(inner) => inspect_expr(inner, context, facts, warnings, seen, !negated),
         Expr::And(left, right)
         | Expr::Or(left, right)
         | Expr::Ne(left, right)
@@ -87,12 +90,12 @@ fn inspect_expr(
         | Expr::Gt(left, right)
         | Expr::Le(left, right)
         | Expr::Ge(left, right) => {
-            inspect_expr(left, context, facts, warnings, seen);
-            inspect_expr(right, context, facts, warnings, seen);
+            inspect_expr(left, context, facts, warnings, seen, negated);
+            inspect_expr(right, context, facts, warnings, seen, negated);
         }
         Expr::Eq(left, right) => {
-            inspect_expr(left, context, facts, warnings, seen);
-            inspect_expr(right, context, facts, warnings, seen);
+            inspect_expr(left, context, facts, warnings, seen, negated);
+            inspect_expr(right, context, facts, warnings, seen, negated);
             inspect_arc_state_eq(left, right, context, facts, warnings, seen);
             inspect_npc_liking_eq(left, right, context, facts, warnings, seen);
         }
@@ -289,6 +292,24 @@ mod tests {
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].message.contains("JAKE_MET"));
+    }
+
+    #[test]
+    fn negated_flag_check_does_not_warn_when_flag_never_set() {
+        // !gd.hasGameFlag('X') means "fire when flag is absent" — absence is the default state.
+        // No warning should be emitted even though no scene sets the flag.
+        let warnings = check_reachability(
+            &[(
+                "slot 'free_time', scene 'base::jake_first_date'".to_string(),
+                undone_expr::parse("!gd.hasGameFlag('JAKE_REJECTED')").unwrap(),
+            )],
+            &HashMap::new(),
+        );
+
+        assert!(
+            warnings.is_empty(),
+            "negated flag check should not warn: {warnings:?}"
+        );
     }
 
     #[test]

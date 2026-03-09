@@ -287,8 +287,10 @@ impl GameInputServer {
         let tmp_path = command_path.with_extension("tmp");
         std::fs::write(&tmp_path, &params.0.command_json)
             .map_err(|e| McpError::internal_error(format!("write command failed: {e}"), None))?;
-        std::fs::rename(&tmp_path, &command_path)
-            .map_err(|e| McpError::internal_error(format!("rename command failed: {e}"), None))?;
+        std::fs::rename(&tmp_path, &command_path).map_err(|e| {
+            let _ = std::fs::remove_file(&tmp_path);
+            McpError::internal_error(format!("rename command failed: {e}"), None)
+        })?;
 
         let deadline = std::time::Instant::now() + std::time::Duration::from_millis(timeout_ms);
         loop {
