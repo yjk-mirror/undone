@@ -2,10 +2,10 @@
 
 ## Current State
 
-**Latest session (2026-03-09):** Dev tooling suite implemented on `codex/dev-tooling-plan` worktree. Added `BoundedStat` for stress/anxiety, `--dev` / `--quick` CLI flags, Robin quick-start path, Dev tab + scene jumper/stat+flag/state tools, file-polled dev IPC, MCP dev-command wrappers, schedule reachability warnings, and `validate-pack --simulate`.
+**Latest session (2026-03-08):** Dev tooling cleanup merged to master. Fixed dyn_view in title bar, IPC polling (50ms→100ms), atomic writes (tmp+rename), added AdvanceTime + SetNpcLiking IPC commands + MCP tools, quick-action buttons in dev panel. Also fixed reachability false-positives for negated flag checks. Total: 287 tests passing.
 
-**Branch:** `codex/dev-tooling-plan`
-**Tests:** 262 passing, 0 failures.
+**Branch:** `master`
+**Tests:** 287 passing, 0 failures.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -239,6 +239,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont.5 | Dev tooling cleanup. Merged `codex/dev-tooling-plan` to master after cleanup pass: removed `dyn_view` from title bar, fixed IPC polling 50ms→100ms, atomic tmp+rename for command+result files, added AdvanceTime + SetNpcLiking IPC commands + matching MCP tools, quick-action buttons in dev panel (Advance 1 Week, All NPC→Close). Audit found + fixed: negated hasGameFlag reachability false-positives (suppress warning when inside Not), tmp file leak on rename failure. 287 tests, 0 failures. |
 | 2026-03-08 cont.4 | Writing-reviewer audit + fix pass. 4 parallel writing-reviewer agents audited all 18 new/expanded scenes. ~65 Critical/Important findings fixed across all tracks: narrator body-analysis, omniscient narrator, "specific" overuse, transformation-as-yardstick, full articulated thoughts, vague abstractions. Fixed copy-paste duplicate paragraph in workplace_evening. Fixed 3rd-person POV slips. Post-fix grades: Stranger+Universal A-/A, Marcus B+/A-, Jake A-/A, Expanded B+. 49 scenes pass validate-pack. |
 | 2026-03-08 cont.3 | Prolific writing session. 16 new scenes across 4 tracks: Jake romance arc (jake_first_date, jake_second_date, jake_apartment [explicit], jake_morning_after, jake_text_messages), Marcus tension arc (work_marcus_late, work_marcus_drinks, work_marcus_closet [explicit], work_marcus_aftermath), stranger encounters (bar_closing_time, bar_stranger_night [explicit], party_invitation), content deepening (weekend_morning, shopping_mall, landlord_repair, laundromat_night). Expanded 2 existing single-action scenes (workplace_work_meeting +2 actions, workplace_evening +2 actions). Created character docs (docs/characters/jake.md, marcus.md). Full schedule.toml integration with flag progression chains: MET_JAKE→JAKE_FIRST_DATE→JAKE_SECOND_DATE→JAKE_INTIMATE→JAKE_MORNING_AFTER, FIRST_MEETING_DONE→MARCUS_LATE_NIGHT→MARCUS_DRINKS→MARCUS_INTIMATE→MARCUS_AFTERMATH, BAR_STRANGER_INVITED→BAR_STRANGER_SLEPT. 3 scene-writer agents dispatched per batch (parallel). 49 scenes total. 262 tests, 0 failures. validate-pack clean. |
 | 2026-03-08 cont.2 | UI bug fixes + playtester agent rewrite. Fixed traits text overflow in char creation (flex_basis(0) + flex_grow(1) + max_width(400) on read_only_row label). Rewrote `.claude/agents/playtester.md` per user direction — explicit horny player perspective, not polite QA. Attempted button overflow bug (3rd choice clips below window when buttons wrap to 2 rows) — 5 approaches failed: min_height(0) on scroll/parents, flex_grow+flex_basis on ancestors, height_full on story v_stack, moving buttons inside scroll (rejected: user says buttons shouldn't require scrolling), wrapping scroll in extra container. Root cause: floem scroll widget doesn't properly shrink in flex column. All experimental changes reverted. User directed: research floem docs/source next session, fix the bug, write findings to floem-layout skill. |
