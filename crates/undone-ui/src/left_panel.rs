@@ -258,6 +258,11 @@ fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
         crate::start_scene(engine, world, registry, result.scene_id);
         let events = engine.drain();
         crate::process_events(events, signals, world, femininity_id);
+    } else {
+        signals
+            .story
+            .set("[No eligible scene is currently available.]".into());
+        signals.actions.set(vec![]);
     }
 }
 
@@ -284,12 +289,12 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             let key = &key_event.key.logical_key;
 
             // When awaiting continue, Enter/Space advances to next scene.
+            // All other keys are consumed to prevent stale action navigation.
             if signals.awaiting_continue.get_untracked() {
                 if key == &Key::Named(NamedKey::Enter) || key == &Key::Named(NamedKey::Space) {
                     continue_to_next_scene(&state_for_continue, signals);
-                    return true;
                 }
-                return false;
+                return true;
             }
 
             // Arrow navigation (always active regardless of mode).
