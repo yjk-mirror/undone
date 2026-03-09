@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use ops:executing-plans to implement this plan task-by-task.
 
-**Goal:** Fix the 4 bugs preventing the game from being playable: action prose invisible on scene transitions, scheduler burying key NPC introductions, AROUSAL stat never moving, FemCreation screen having zero prose.
+**Goal:** Fix the 4 bugs preventing the game from being playable: action prose invisible on scene transitions, scheduler burying key NPC introductions, AROUSAL stat never moving, FemCreation screen having zero prose. Plus: elaborate the transformation_intro (plane scene) to better ground who the player was before everything changes.
 
-**Architecture:** Three content fixes (scheduler weights, arousal effects, FemCreation prose), one UI fix (scene transition flow). The UI fix adds a "Continue" state between scenes so action prose is visible. The scheduler fix converts coffee_shop from weighted-random to a guaranteed trigger. AROUSAL gets effects in the scenes that should move it. FemCreation gets inline prose blocks between form sections.
+**Architecture:** One UI fix (scene transition "Continue" state), two data fixes (scheduler triggers, arousal effects), and two content passes (FemCreation brief framing prose, transformation_intro elaboration). The discovery of the new body is NOT on the FemCreation screen — it pans out chaotically across the opening arc (workplace_arrival → landlord → first_night → first_clothes). FemCreation just needs a brief bridge. The plane scene needs more character grounding.
 
 **Tech Stack:** Rust (floem UI), TOML scene files, minijinja templates.
 
@@ -388,58 +388,35 @@ during gameplay."
 
 ---
 
-## Task 4: Add Prose to FemCreation Screen
+## Task 4: Add Brief Framing Prose to FemCreation Screen
 
-**Problem:** "Who Are You Now?" is a pure data form — name, figure, breasts, race, age dropdowns with zero narrative text. This is the moment the player first inhabits the transformed body. It should have discovery prose framing each form section.
+**Problem:** "Who Are You Now?" is a pure data form with zero narrative text. It doesn't need the full body discovery (that's the opening arc's job — arrival, landlord, first night, first clothes). It just needs a brief bridge: you fell asleep as one person, here's who you are now.
 
-**Creative direction from user:** The prose should be hot. Discovery of the new body — weight, scale, skin, sensitivity. The body responding before the mind catches up. Not a scene redesign — just prose blocks inserted between the existing form sections.
+**The discovery pans out across the opening arc scenes:**
+- `workplace_arrival` — overhead bin height, ID mismatch, cold hands
+- `workplace_landlord` — the photo that doesn't match, the key in your hand
+- `workplace_first_night` — empty apartment, the bra problem, reflection in dark glass
+- `workplace_first_clothes` — fitting room, the mirror, "something tightens and settles and — *oh*"
 
-**Approach:** Add prose as `&str` constants in `char_creation.rs`, rendered as `label()` widgets between sections. Prose is short (2-4 sentences per block), atmospheric, second-person present tense. For presets (Robin), the prose references specific attributes (petite frame, huge breasts, East Asian). For custom characters, the prose is more generic but still physical.
+Those scenes already deliver the chaotic physical discovery. FemCreation is a calm moment between "eyes close over Ohio" and "seat belt sign clicks off." A brief framing — not a sensory inventory.
 
 **Files:**
 - Modify: `crates/undone-ui/src/char_creation.rs:596-789` (fem_creation_view)
 
-### Step 1: Add prose constants
-
-At the top of `fem_creation_view` or in a nearby module, define prose blocks:
+### Step 1: Add a brief opening prose constant and helper
 
 ```rust
-// Discovery prose for FemCreation — inserted between form sections.
-// For presets, these reference specific physical attributes.
-// For custom, they're general enough for any configuration.
+const FEM_FRAMING_PROSE: &str = "\
+Somewhere between Ohio and here, everything changed. You don't remember it. \
+You just woke up and the body was different — the weight, the proportions, \
+the face in the airplane bathroom mirror. You're still you. The rest is new.";
 
-const FEM_OPENING_PROSE: &str = "\
-You open your eyes. Hotel room. The ceiling is closer than it should be — or you're \
-further from it. Something is wrong with the weight on your chest. Not pain. Pressure. \
-Soft, heavy, shifting when you breathe. Your hand goes there before your brain catches \
-up. What it finds is warm and real and far too large for the frame it's attached to.";
-
-const FEM_BODY_PROSE: &str = "\
-You stand. Lower center of gravity. Everything sways. In the bathroom mirror: a face \
-that's stunning and not yours. The body below it is — you look. You can't not look. \
-Narrow waist curving into hips that weren't there yesterday. Breasts that are going to \
-make people stare.";
-
-const FEM_BACKGROUND_PROSE: &str = "\
-The shower helps. Warm water, something to do with your hands. Except the water is \
-information now — every drop registers on skin that's an instrument, not a wrapper. \
-Something tightens low in your abdomen. You haven't touched anything. Just water. Your \
-breath is faster than you authorized.";
-
-const FEM_NAME_PROSE: &str = "\
-You wipe the mirror. She stares back. Beautiful in a way that would have made you look, \
-before. That thought lands somewhere complicated. You need a name for this face.";
-```
-
-### Step 2: Create a prose_block helper
-
-```rust
 fn prose_block(text: &'static str, signals: AppSignals) -> impl View {
     label(move || text.to_string()).style(move |s| {
         let prefs = signals.prefs.get();
         let colors = ThemeColors::from_mode(prefs.mode);
         s.width_full()
-            .padding_vert(12.0)
+            .padding_vert(16.0)
             .padding_horiz(4.0)
             .color(colors.muted)
             .font_size(prefs.font_size as f32 * 0.95)
@@ -449,91 +426,112 @@ fn prose_block(text: &'static str, signals: AppSignals) -> impl View {
 }
 ```
 
-### Step 3: Insert prose blocks into fem_creation_view
+### Step 2: Insert prose into fem_creation_view
 
-In `fem_creation_view`, modify the final `v_stack` assembly (lines 764-771):
+In `fem_creation_view`, add the prose block between the heading and the first form section (lines 764-771):
 
 ```rust
     let content = v_stack((
         heading("Who Are You Now?", signals),
-        prose_block(FEM_OPENING_PROSE, signals),
+        prose_block(FEM_FRAMING_PROSE, signals),
         names_section,
-        prose_block(FEM_BODY_PROSE, signals),
         body_section,
-        prose_block(FEM_BACKGROUND_PROSE, signals),
         background_section,
         begin_btn,
         empty().style(|s| s.height(40.0)),
     ))
 ```
 
-Wait — that's 9 children and floem's v_stack tuple impl may have a max arity. If the tuple doesn't support 9, split into a nested structure:
+The tuple arity may not support 8 children. If it doesn't compile, nest into two v_stacks (upper/lower) and combine them.
 
-```rust
-    let upper = v_stack((
-        heading("Who Are You Now?", signals),
-        prose_block(FEM_OPENING_PROSE, signals),
-        names_section,
-        prose_block(FEM_BODY_PROSE, signals),
-        body_section,
-    ));
-
-    let lower = v_stack((
-        prose_block(FEM_BACKGROUND_PROSE, signals),
-        background_section,
-        begin_btn,
-        empty().style(|s| s.height(40.0)),
-    ));
-
-    let content = v_stack((upper, lower))
-        .style(move |s| {
-            // ... existing style ...
-        });
-```
-
-### Step 4: Adjust prose for preset vs custom
-
-The prose constants above work for both preset and custom paths — they describe sensations, not specific attributes. If you want preset-specific prose (referencing "petite frame" or "East Asian face"), wrap in a conditional:
-
-```rust
-let opening_prose = if preset_ref.is_some() {
-    FEM_OPENING_PROSE_PRESET // More specific
-} else {
-    FEM_OPENING_PROSE // More generic
-};
-```
-
-Start with generic prose for both paths. Preset-specific variants can be a follow-up.
-
-### Step 5: Run `cargo fmt` and `cargo check -p undone-ui`
+### Step 3: Run `cargo fmt` and `cargo check -p undone-ui`
 
 Run: `cargo fmt && cargo check -p undone-ui`
 Expected: compiles clean.
 
-### Step 6: Commit
+### Step 4: Commit
 
 ```bash
 git add crates/undone-ui/src/char_creation.rs
-git commit -m "feat: add discovery prose to FemCreation screen
+git commit -m "feat: add brief framing prose to FemCreation screen
 
-Insert narrative prose blocks between form sections on the
-'Who Are You Now?' screen. The transformation landing moment
-is no longer a bare data form — it has physical discovery beats
-framing each section."
+'Who Are You Now?' now has a short narrative bridge between the
+plane scene and the form fields. The real body discovery plays out
+across the opening arc scenes — this just sets the frame."
 ```
 
 ---
 
-## Task 5: Runtime Verification
+## Task 5: Elaborate Transformation Intro (Plane Scene)
+
+**Problem:** The plane scene grounds the player in logistics (job, apartment, boxes) but not enough in who this person IS. The creative direction says it should "reflect your background — who you are, why you're going to this city, what you're leaving behind." Right now it's mostly practical. It needs more character.
+
+**What exists:** `packs/base/scenes/transformation_intro.toml` — Gate C31, route-specific logistics, trait-specific gate behavior, jet bridge, safety demo, eyes close over Ohio. Two prose blocks (intro + action).
+
+**What it needs:** More of the person before the transformation. Not more logistics — more character. What are they leaving behind? What do they expect? What's the last thing they think about as a man? The creative direction says this is the last moment of the old identity. It should feel like one.
+
+**Files:**
+- Modify: `packs/base/scenes/transformation_intro.toml`
+
+### Step 1: Expand the intro prose
+
+The current intro has route-specific logistics and a few trait branches. Expand with more character grounding. Add after the route-specific block and before the trait-specific block:
+
+For ROUTE_WORKPLACE, add a beat about the career identity being left behind — ten years of experience, the reputation, the name that meant something. The man on the boarding pass had a career. He had a voice people recognized in meetings. He had a life that made sense.
+
+For ROUTE_CAMPUS, add a beat about the identity being stepped into — the acceptance letter, the person who got in, the eighteen-year-old certainty that the world would make room.
+
+Add a universal beat (not route-gated) about the gate area — the last moments as this person. People around you doing normal airport things. You're doing a normal airport thing. Everything is still normal.
+
+### Step 2: Expand the action prose (boarding + falling asleep)
+
+The current action has the jet bridge, safety demo, and eyes closing. Add between the safety demo and falling asleep:
+
+A beat of the old self settling in. The last conscious thoughts as this person. The in-flight magazine. The phone switching to airplane mode. The ordinary machinery of being who you are, one last time.
+
+Trait-specific dozing beats:
+- ANALYTICAL: running through the week's logistics, the numbers making sense, the familiar architecture of a mind that works in systems
+- AMBITIOUS: already rehearsing Monday, the handshake, the name introduction
+- SHY: the relief of the window seat, nobody expecting anything
+- OUTGOING: the seatmate conversation that fizzles into comfortable silence
+
+The last line stays: "Somewhere over Ohio, your eyes close." That's the pivot. Everything before it is who you were.
+
+### Step 3: Validate template
+
+Run: Use `mcp__minijinja__jinja_validate_template` on the modified file.
+Expected: valid template, no syntax errors.
+
+### Step 4: Run validate-pack
+
+Run: `cargo run --bin validate-pack 2>&1`
+Expected: no errors.
+
+### Step 5: Commit
+
+```bash
+git add packs/base/scenes/transformation_intro.toml
+git commit -m "feat: elaborate plane scene with more character grounding
+
+The transformation intro now has more of who the player was before
+everything changes — career identity, what they're leaving behind,
+the last ordinary thoughts. The logistics are still there but the
+person is more present."
+```
+
+---
+
+## Task 6: Runtime Verification
 
 **Acceptance criteria — every one must be verified by launching the game and playing:**
 
 1. **Action prose visible:** Click any action that ends a scene (e.g. "Walk faster" in bar_closing_time). The action's response prose should be visible with a "Continue" button. Clicking Continue loads the next scene.
-2. **Transformation intro → FemCreation:** Complete character creation as Robin. The plane scene should still transition to FemCreation correctly (no Continue button — this is a phase change, not a scene transition).
-3. **FemCreation prose:** The "Who Are You Now?" screen should show discovery prose between the form sections. Prose should be readable, atmospheric, not clipped or overflowing.
-4. **Scheduler pacing:** Start a new Robin game. By week 2, coffee_shop should have triggered (Jake introduction). Verify by checking if the MET_JAKE flag is set (visible in dev panel with `--dev`).
-5. **AROUSAL moves:** Play through to jake_apartment or bar_stranger_night. After the explicit scene, AROUSAL should show something other than "Comfort" in the stats sidebar.
-6. **No regressions:** Mid-scene actions (that don't finish the scene) should still work normally — no Continue button between actions within the same scene.
+2. **Transformation intro → FemCreation:** Complete character creation as Robin. The plane scene should still transition to FemCreation correctly (no Continue button — this is a phase change, not a scene transition). The plane scene should feel more grounded in who Robin was.
+3. **FemCreation prose:** The "Who Are You Now?" screen should show a brief framing paragraph above the form. Readable, not overwrought.
+4. **Opening arc flow:** After FemCreation, the arc should flow: arrival (overhead bin, ID check) → landlord (photo mismatch) → first night (bra problem, reflection) → first clothes (fitting room). Each scene should deliver a distinct discovery beat. Verify the action prose is visible at each transition.
+5. **Scheduler pacing:** Start a new Robin game. By week 2, coffee_shop should have triggered (Jake introduction). Verify by checking if the MET_JAKE flag is set (visible in dev panel with `--dev`).
+6. **AROUSAL moves:** Play through to jake_apartment or bar_stranger_night. After the explicit scene, AROUSAL should show something other than "Comfort" in the stats sidebar.
+7. **No regressions:** Mid-scene actions (that don't finish the scene) should still work normally — no Continue button between actions within the same scene.
 
 ### Step 1: Build release
 
@@ -544,7 +542,8 @@ Expected: compiles.
 
 Use the `playtester` agent or manual play. Go through:
 - Landing → New Game → Robin preset → Plane scene → FemCreation → Workplace arrival
-- Play through at least 2 in-game weeks
+- Verify the opening arc discovery flow (arrival → landlord → first night → first clothes → first day)
+- Play through at least 2 in-game weeks into the settled state
 - Verify each acceptance criterion above
 - Screenshot key moments
 
