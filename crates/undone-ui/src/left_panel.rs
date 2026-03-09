@@ -366,11 +366,16 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let centered_prose = container(prose_label)
         .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
+    // Track actual window height via WindowResized events. Initialized to
+    // the default window height (800) minus the custom title bar (40).
+    let panel_height = create_rw_signal(760.0f64);
+
     // Reactive max_height for the scroll area. Floem's taffy integration
-    // hardcodes overflow:visible, which prevents flex_grow+flex_basis(0) from
+    // hardcodes overflow:visible on every node (to_taffy_style uses
+    // ..Default::default()), which prevents flex_grow+flex_basis(0) from
     // shrinking the scroll below its content height. max_height is the one
-    // constraint that taffy reliably respects. We compute it from the number
-    // of action buttons so the scroll shrinks when buttons wrap to extra rows.
+    // constraint that taffy reliably respects. We compute it from the
+    // actual panel height and the number of action buttons.
     let scroll_area = scroll(centered_prose)
         .scroll_to(move || {
             let gen = scroll_gen.get();
@@ -384,15 +389,15 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             // Estimate the bottom bar height from the action count.
-            // Each button is ~56px (48 min-height + 8 margin). Two fit per row
-            // in the 680px max-width container. Detail strip is ~41px.
+            // Each button is ~56px (48 min-height + 8 margin). Use worst case
+            // (1 button per row) — long labels can prevent wrapping 2-per-row.
+            // Detail strip is ~41px.
             let n = actions.get().len().max(1) as f64;
-            let button_rows = (n / 2.0).ceil();
-            let choices_height = button_rows * 56.0 + 25.0; // padding_vert(12)*2 + border(1)
+            let choices_height = n * 56.0 + 25.0; // padding_vert(12)*2 + border(1)
             let detail_height = 41.0;
             let bottom_height = choices_height + detail_height;
-            // 760 = window(800) - title_bar(40). 8px breathing room.
-            let max_h = (760.0 - bottom_height - 8.0).max(200.0);
+            let available = panel_height.get();
+            let max_h = (available - bottom_height - 8.0).max(200.0);
             s.max_height(max_h as f32)
                 .flex_grow(1.0)
                 .flex_basis(0.0)
@@ -446,6 +451,12 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     .keyboard_navigable()
     .on_event_stop(EventListener::KeyDown, move |e| {
         keyboard_handler(e);
+    })
+    .on_event_cont(EventListener::WindowResized, move |e| {
+        if let Event::WindowResized(size) = e {
+            // Window height minus title bar (40px).
+            panel_height.set(size.height - 40.0);
+        }
     })
     .style(|s| s.flex_grow(1.0).min_height(0.0).height_full())
 }
