@@ -20,6 +20,8 @@ pub enum DevCommand {
     SetStat { stat: String, value: i32 },
     SetFlag { flag: String },
     RemoveFlag { flag: String },
+    AdvanceTime { weeks: u32 },
+    SetNpcLiking { npc_name: String, level: String },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -108,6 +110,8 @@ pub fn execute_command(
         DevCommand::SetStat { stat, value } => set_stat(gs, signals, &stat, value),
         DevCommand::SetFlag { flag } => set_flag(gs, signals, &flag),
         DevCommand::RemoveFlag { flag } => remove_flag(gs, signals, &flag),
+        DevCommand::AdvanceTime { weeks } => advance_time(gs, weeks),
+        DevCommand::SetNpcLiking { npc_name, level } => set_npc_liking(gs, &npc_name, &level),
     };
 
     if response.success {
@@ -289,6 +293,72 @@ fn remove_flag(gs: &mut GameState, _signals: AppSignals, flag: &str) -> DevComma
     }
 }
 
+fn advance_time(gs: &mut GameState, weeks: u32) -> DevCommandResponse {
+    let slots = weeks * 28; // 4 slots/day × 7 days/week
+    for _ in 0..slots {
+        gs.world.game_data.advance_time_slot();
+    }
+    DevCommandResponse {
+        success: true,
+        message: format!("Advanced {weeks} week(s)"),
+        data: None,
+    }
+}
+
+fn set_npc_liking(gs: &mut GameState, npc_name: &str, level: &str) -> DevCommandResponse {
+    use undone_domain::LikingLevel;
+
+    let liking = match level {
+        "Neutral" => LikingLevel::Neutral,
+        "Ok" => LikingLevel::Ok,
+        "Like" => LikingLevel::Like,
+        "Close" => LikingLevel::Close,
+        other => {
+            return DevCommandResponse {
+                success: false,
+                message: format!(
+                    "Unknown liking level '{other}'. Supported: Neutral, Ok, Like, Close"
+                ),
+                data: None,
+            };
+        }
+    };
+
+    let name_lower = npc_name.trim().to_lowercase();
+    let mut found = false;
+
+    for (_, npc) in gs.world.male_npcs.iter_mut() {
+        if npc.core.name.to_lowercase() == name_lower {
+            npc.core.npc_liking = liking;
+            found = true;
+            break;
+        }
+    }
+    if !found {
+        for (_, npc) in gs.world.female_npcs.iter_mut() {
+            if npc.core.name.to_lowercase() == name_lower {
+                npc.core.npc_liking = liking;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    if found {
+        DevCommandResponse {
+            success: true,
+            message: format!("Set {npc_name} liking to {level}"),
+            data: None,
+        }
+    } else {
+        DevCommandResponse {
+            success: false,
+            message: format!("NPC '{npc_name}' not found"),
+            data: None,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -399,5 +469,35 @@ mod tests {
         assert!(data.get("money").is_some());
         assert!(data.get("stress").is_some());
         assert!(data.get("game_flags").is_some());
+    }
+
+    #[test]
+    fn execute_advance_time_increments_week() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        let week_before = gs.world.game_data.week;
+
+        let response = execute_command(&mut gs, signals, DevCommand::AdvanceTime { weeks: 2 });
+
+        assert!(response.success);
+        assert_eq!(gs.world.game_data.week, week_before + 2);
+    }
+
+    #[test]
+    fn execute_set_npc_liking_unknown_level_returns_error() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::SetNpcLiking {
+                npc_name: "Jake".to_string(),
+                level: "BestFriend".to_string(),
+            },
+        );
+
+        assert!(!response.success);
+        assert!(response.message.contains("Unknown liking level"));
     }
 }
