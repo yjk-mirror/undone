@@ -210,6 +210,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                             signals.story.set(String::new());
                             signals.actions.set(vec![]);
                             signals.active_npc.set(None);
+                            signals.awaiting_continue.set(false);
                             status_msg.set(
                                 entry_path_load
                                     .file_stem()
