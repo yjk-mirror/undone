@@ -80,6 +80,9 @@ pub struct AppSignals {
     pub phase: RwSignal<AppPhase>,
     pub scroll_gen: RwSignal<u64>,
     pub dev_tick: RwSignal<u64>,
+    /// When true, the player has finished a scene and should see a "Continue"
+    /// button instead of action choices. Clicking Continue loads the next scene.
+    pub awaiting_continue: RwSignal<bool>,
 }
 
 impl Default for AppSignals {
@@ -100,6 +103,7 @@ impl AppSignals {
             phase: RwSignal::new(AppPhase::Landing),
             scroll_gen: RwSignal::new(0),
             dev_tick: RwSignal::new(0),
+            awaiting_continue: RwSignal::new(false),
         }
     }
 }
@@ -346,19 +350,8 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                                 let events = engine.drain();
                                 let finished = process_events(events, signals, world, fem_id);
                                 if finished {
-                                    // Clear story for the next scene — clean page turn.
-                                    signals.story.set(String::new());
-                                    if let Some(result) = scheduler.pick_next(world, registry, rng)
-                                    {
-                                        if result.once_only {
-                                            world
-                                                .game_data
-                                                .set_flag(format!("ONCE_{}", result.scene_id));
-                                        }
-                                        start_scene(engine, world, registry, result.scene_id);
-                                        let events = engine.drain();
-                                        process_events(events, signals, world, fem_id);
-                                    }
+                                    // Let the player read the intro prose before advancing.
+                                    signals.awaiting_continue.set(true);
                                 }
                             } else {
                                 signals

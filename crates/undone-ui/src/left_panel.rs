@@ -213,8 +213,6 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
         ref mut engine,
         ref mut world,
         ref registry,
-        ref scheduler,
-        ref mut rng,
         femininity_id,
         ..
     } = *gs;
@@ -226,18 +224,40 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
             // Transformation intro complete — move to female customisation.
             // (The throwaway world is discarded; FemCreation builds the real one.)
             signals.phase.set(crate::AppPhase::FemCreation);
-        } else if let Some(result) = scheduler.pick_next(world, registry, rng) {
-            // Clean page turn: clear story for the new scene.
-            signals.story.set(String::new());
-            if result.once_only {
-                world
-                    .game_data
-                    .set_flag(format!("ONCE_{}", result.scene_id));
-            }
-            crate::start_scene(engine, world, registry, result.scene_id);
-            let events = engine.drain();
-            crate::process_events(events, signals, world, femininity_id);
+        } else {
+            // Don't auto-advance. Let the player read the action prose.
+            // The action bar will show a "Continue" button.
+            signals.awaiting_continue.set(true);
         }
+    }
+}
+
+/// Called when the player clicks "Continue" after reading action prose.
+/// Picks the next scene from the scheduler and starts it.
+fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
+    signals.awaiting_continue.set(false);
+
+    let mut gs = state.borrow_mut();
+    let GameState {
+        ref mut engine,
+        ref mut world,
+        ref registry,
+        ref scheduler,
+        ref mut rng,
+        femininity_id,
+        ..
+    } = *gs;
+
+    if let Some(result) = scheduler.pick_next(world, registry, rng) {
+        signals.story.set(String::new());
+        if result.once_only {
+            world
+                .game_data
+                .set_flag(format!("ONCE_{}", result.scene_id));
+        }
+        crate::start_scene(engine, world, registry, result.scene_id);
+        let events = engine.drain();
+        crate::process_events(events, signals, world, femininity_id);
     }
 }
 
@@ -257,10 +277,20 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         detail_reset.set(String::new());
     });
 
+    let state_for_continue = Rc::clone(&state);
     let keyboard_handler = move |e: &Event| -> bool {
         if let Event::KeyDown(key_event) = e {
             let mode = signals.prefs.get().number_key_mode;
             let key = &key_event.key.logical_key;
+
+            // When awaiting continue, Enter/Space advances to next scene.
+            if signals.awaiting_continue.get_untracked() {
+                if key == &Key::Named(NamedKey::Enter) || key == &Key::Named(NamedKey::Space) {
+                    continue_to_next_scene(&state_for_continue, signals);
+                    return true;
+                }
+                return false;
+            }
 
             // Arrow navigation (always active regardless of mode).
             if key == &Key::Named(NamedKey::ArrowDown) {
@@ -443,22 +473,71 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             .border_color(colors.seam)
     });
 
-    v_stack((
-        scroll_area,
-        detail_strip,
-        choices_bar(signals, state, hovered_detail, highlighted_idx),
-    ))
-    .keyboard_navigable()
-    .on_event_stop(EventListener::KeyDown, move |e| {
-        keyboard_handler(e);
-    })
-    .on_event_cont(EventListener::WindowResized, move |e| {
-        if let Event::WindowResized(size) = e {
-            // Window height minus title bar (40px).
-            panel_height.set(size.height - 40.0);
-        }
-    })
-    .style(|s| s.flex_grow(1.0).min_height(0.0).height_full())
+    let state_for_bar = Rc::clone(&state);
+    let state_for_cont = Rc::clone(&state);
+    let awaiting = signals.awaiting_continue;
+    let action_bar = dyn_container(
+        move || awaiting.get(),
+        move |is_waiting| {
+            if is_waiting {
+                continue_button(signals, Rc::clone(&state_for_cont)).into_any()
+            } else {
+                choices_bar(
+                    signals,
+                    Rc::clone(&state_for_bar),
+                    hovered_detail,
+                    highlighted_idx,
+                )
+                .into_any()
+            }
+        },
+    );
+
+    v_stack((scroll_area, detail_strip, action_bar))
+        .keyboard_navigable()
+        .on_event_stop(EventListener::KeyDown, move |e| {
+            keyboard_handler(e);
+        })
+        .on_event_cont(EventListener::WindowResized, move |e| {
+            if let Event::WindowResized(size) = e {
+                // Window height minus title bar (40px).
+                panel_height.set(size.height - 40.0);
+            }
+        })
+        .style(|s| s.flex_grow(1.0).min_height(0.0).height_full())
+}
+
+fn continue_button(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
+    let btn = label(move || "Continue".to_string()).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.padding_vert(12.0)
+            .padding_horiz(24.0)
+            .border_radius(4.0)
+            .border(1.0)
+            .border_color(colors.seam)
+            .color(colors.ink)
+            .font_size(15.0)
+            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .cursor(floem::style::CursorStyle::Pointer)
+            .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
+    });
+
+    container(btn)
+        .on_click_stop(move |_| {
+            continue_to_next_scene(&state, signals);
+        })
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.width_full()
+                .flex_row()
+                .justify_center()
+                .padding_vert(12.0)
+                .min_height(64.0)
+                .flex_shrink(0.0)
+                .border_top(1.0)
+                .border_color(colors.seam)
+                .background(colors.page)
+        })
 }
 
 fn choices_bar(
