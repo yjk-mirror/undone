@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Latest session (2026-03-08):** Dev tooling cleanup merged to master. Fixed dyn_view in title bar, IPC polling (50ms→100ms), atomic writes (tmp+rename), added AdvanceTime + SetNpcLiking IPC commands + MCP tools, quick-action buttons in dev panel. Also fixed reachability false-positives for negated flag checks. Total: 287 tests passing.
+**Latest session (2026-03-08):** Opus audit of Sonnet's dev tooling work. All code production-quality. Four fixes applied: simulator now picks per time slot (was per week — missed weekend_morning entirely), dev panel refactored with DevContext struct (eliminated 7-param pollution), "All NPC → Close" button routed through new SetAllNpcLiking IPC command (was direct mutation), engine design doc updated with all 8 IPC commands.
 
 **Branch:** `master`
 **Tests:** 287 passing, 0 failures.
@@ -23,7 +23,15 @@
 
 ## ⚡ Next Action
 
-**Prolific writing session complete + writing-review audit done — 16 new scenes, 3 explicit adult. (2026-03-08)**
+**Dev tooling audit complete. Next: runtime-test dev panel, add missing test + MCP wrapper. (2026-03-08)**
+
+### Gaps from audit (next session):
+1. **Runtime-test dev panel** — Launch with `--dev`, click through all sections (scene jumper, stat editors, flags, quick actions, inspector). Verify DevContext refactor didn't break UI.
+2. **Add test for SetAllNpcLiking** — No unit test for the new command. Pattern is tested via set_npc_liking, but a dedicated test is proper.
+3. **Add MCP convenience wrapper** for `set_all_npc_liking` in game-input-mcp (currently only reachable via raw `dev_command` JSON).
+4. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
+
+### Previous: Prolific writing session + writing-review audit (2026-03-08)
 
 ### Completed this session (writing session continuation):
 - **16 new scenes written** across 4 tracks (Jake romance, Marcus tension, stranger encounters, content deepening)
@@ -239,6 +247,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-08 cont.6 | Opus audit of Sonnet's dev tooling work. Deep audit via 5 parallel agents (IPC, reachability/simulator, BoundedStat, MCP server, main/UI integration). All code production-quality. Four fixes: (1) simulator picks per time slot not per week — `weekend_morning` now correctly appears, avg/run 28× more accurate; (2) dev panel `DevContext` struct eliminates 7-param pollution across 10+ call sites (net -70 lines); (3) "All NPC → Close" button routed through new `SetAllNpcLiking` IPC command instead of direct mutation; (4) engine design doc lists all 8 IPC commands (was 5). 287 tests, 0 failures, 0 warnings. |
 | 2026-03-08 cont.5 | Dev tooling cleanup. Merged `codex/dev-tooling-plan` to master after cleanup pass: removed `dyn_view` from title bar, fixed IPC polling 50ms→100ms, atomic tmp+rename for command+result files, added AdvanceTime + SetNpcLiking IPC commands + matching MCP tools, quick-action buttons in dev panel (Advance 1 Week, All NPC→Close). Audit found + fixed: negated hasGameFlag reachability false-positives (suppress warning when inside Not), tmp file leak on rename failure. 287 tests, 0 failures. |
 | 2026-03-08 cont.4 | Writing-reviewer audit + fix pass. 4 parallel writing-reviewer agents audited all 18 new/expanded scenes. ~65 Critical/Important findings fixed across all tracks: narrator body-analysis, omniscient narrator, "specific" overuse, transformation-as-yardstick, full articulated thoughts, vague abstractions. Fixed copy-paste duplicate paragraph in workplace_evening. Fixed 3rd-person POV slips. Post-fix grades: Stranger+Universal A-/A, Marcus B+/A-, Jake A-/A, Expanded B+. 49 scenes pass validate-pack. |
 | 2026-03-08 cont.3 | Prolific writing session. 16 new scenes across 4 tracks: Jake romance arc (jake_first_date, jake_second_date, jake_apartment [explicit], jake_morning_after, jake_text_messages), Marcus tension arc (work_marcus_late, work_marcus_drinks, work_marcus_closet [explicit], work_marcus_aftermath), stranger encounters (bar_closing_time, bar_stranger_night [explicit], party_invitation), content deepening (weekend_morning, shopping_mall, landlord_repair, laundromat_night). Expanded 2 existing single-action scenes (workplace_work_meeting +2 actions, workplace_evening +2 actions). Created character docs (docs/characters/jake.md, marcus.md). Full schedule.toml integration with flag progression chains: MET_JAKE→JAKE_FIRST_DATE→JAKE_SECOND_DATE→JAKE_INTIMATE→JAKE_MORNING_AFTER, FIRST_MEETING_DONE→MARCUS_LATE_NIGHT→MARCUS_DRINKS→MARCUS_INTIMATE→MARCUS_AFTERMATH, BAR_STRANGER_INVITED→BAR_STRANGER_SLEPT. 3 scene-writer agents dispatched per batch (parallel). 49 scenes total. 262 tests, 0 failures. validate-pack clean. |
