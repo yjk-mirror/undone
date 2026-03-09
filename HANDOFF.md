@@ -2,10 +2,10 @@
 
 ## Current State
 
-**Latest session (2026-03-08):** Opus audit of Sonnet's dev tooling work. All code production-quality. Four fixes applied: simulator now picks per time slot (was per week — missed weekend_morning entirely), dev panel refactored with DevContext struct (eliminated 7-param pollution), "All NPC → Close" button routed through new SetAllNpcLiking IPC command (was direct mutation), engine design doc updated with all 8 IPC commands.
+**Latest session (2026-03-09):** Playable-game fixes. Four bugs preventing smooth play resolved: (1) action prose now visible via `awaiting_continue` pause before scene transitions, (2) key NPC introductions (coffee_shop, neighborhood_bar) guaranteed via scheduler triggers, (3) AROUSAL wired into 8 charged/explicit scenes, (4) FemCreation has framing prose. Plane scene elaborated with career identity + normality beats. Runtime playtested.
 
 **Branch:** `master`
-**Tests:** 287 passing, 0 failures.
+**Tests:** 289 passing, 0 failures.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -23,13 +23,17 @@
 
 ## ⚡ Next Action
 
-**Dev tooling audit complete. Next: runtime-test dev panel, add missing test + MCP wrapper. (2026-03-08)**
+**Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
-### Gaps from audit (next session):
+### Remaining from previous audit (2026-03-08):
 1. **Runtime-test dev panel** — Launch with `--dev`, click through all sections (scene jumper, stat editors, flags, quick actions, inspector). Verify DevContext refactor didn't break UI.
 2. **Add test for SetAllNpcLiking** — No unit test for the new command. Pattern is tested via set_npc_liking, but a dedicated test is proper.
 3. **Add MCP convenience wrapper** for `set_all_npc_liking` in game-input-mcp (currently only reachable via raw `dev_command` JSON).
 4. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
+
+### From this session:
+5. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
+6. **FemCreation still hardcodes "Eva"/"Ev"** — preset names not carried through.
 
 ### Previous: Prolific writing session + writing-review audit (2026-03-08)
 
@@ -247,6 +251,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-03-09 | Playable-game fixes. Implemented plan `docs/plans/2026-03-09-playable-game-fixes.md` (6 tasks). (1) Action prose invisible on scene transitions — added `awaiting_continue` signal + Continue button; player now sees action prose before next scene loads. (2) Scheduler burying NPC intros — converted `coffee_shop` and `neighborhood_bar` from random-weighted to deterministic triggers at weeks 2/3; `morning_routine` weight 15→10. (3) AROUSAL never moving — wired `add_arousal` effects into 8 charged/explicit scenes (jake_apartment, work_marcus_closet, bar_stranger_night, jake_second_date, work_marcus_drinks, bar_closing_time, jake_first_date, weekend_morning). (4) FemCreation zero prose — added brief framing paragraph. (5) Plane scene thin — elaborated with career identity beats, gate normality, and "last version of you" close. (6) Runtime playtested all changes. Code-reviewed, acceptance-tested. 289 tests, 0 failures. Merged `playable-game-fixes` worktree to master. |
 | 2026-03-08 cont.6 | Opus audit of Sonnet's dev tooling work. Deep audit via 5 parallel agents (IPC, reachability/simulator, BoundedStat, MCP server, main/UI integration). All code production-quality. Four fixes: (1) simulator picks per time slot not per week — `weekend_morning` now correctly appears, avg/run 28× more accurate; (2) dev panel `DevContext` struct eliminates 7-param pollution across 10+ call sites (net -70 lines); (3) "All NPC → Close" button routed through new `SetAllNpcLiking` IPC command instead of direct mutation; (4) engine design doc lists all 8 IPC commands (was 5). 287 tests, 0 failures, 0 warnings. |
 | 2026-03-08 cont.5 | Dev tooling cleanup. Merged `codex/dev-tooling-plan` to master after cleanup pass: removed `dyn_view` from title bar, fixed IPC polling 50ms→100ms, atomic tmp+rename for command+result files, added AdvanceTime + SetNpcLiking IPC commands + matching MCP tools, quick-action buttons in dev panel (Advance 1 Week, All NPC→Close). Audit found + fixed: negated hasGameFlag reachability false-positives (suppress warning when inside Not), tmp file leak on rename failure. 287 tests, 0 failures. |
 | 2026-03-08 cont.4 | Writing-reviewer audit + fix pass. 4 parallel writing-reviewer agents audited all 18 new/expanded scenes. ~65 Critical/Important findings fixed across all tracks: narrator body-analysis, omniscient narrator, "specific" overuse, transformation-as-yardstick, full articulated thoughts, vague abstractions. Fixed copy-paste duplicate paragraph in workplace_evening. Fixed 3rd-person POV slips. Post-fix grades: Stranger+Universal A-/A, Marcus B+/A-, Jake A-/A, Expanded B+. 49 scenes pass validate-pack. |
