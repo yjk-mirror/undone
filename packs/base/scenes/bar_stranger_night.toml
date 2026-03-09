@@ -91,6 +91,10 @@ The room is quiet. The sheets smell different now. You lie there until your brea
   type   = "change_stress"
   amount = -3
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
   [[actions.next]]
   finish = true
 
@@ -145,6 +149,10 @@ The front door opens and closes. You straighten. Your underwear is on the floor.
   type   = "change_stress"
   amount = -3
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
   [[actions.next]]
   finish = true
 
@@ -194,6 +202,10 @@ The lamp is still on. You turn it off. In the dark, the apartment is just an apa
   [[actions.effects]]
   type   = "change_stress"
   amount = -1
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true

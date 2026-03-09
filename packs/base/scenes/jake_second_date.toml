@@ -93,6 +93,10 @@ You break it before he does. The afternoon is still there around you, the market
   npc   = "m"
   delta = 2
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
   [[actions.next]]
   finish = true
 
@@ -145,6 +149,10 @@ He's still close. The city keeps going around you like it doesn't know.
   type  = "add_npc_liking"
   npc   = "m"
   delta = 2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true

@@ -75,6 +75,10 @@ He walks you to the subway. The cold is a fact after the warmth of the bar. At t
   npc   = "m"
   delta = 2
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
   [[actions.next]]
   finish = true
 
@@ -228,6 +232,10 @@ You leave separately. You take the stairs down to the subway and stand on the pl
   type  = "add_npc_liking"
   npc   = "m"
   delta = 2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true

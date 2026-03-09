@@ -116,6 +116,10 @@ Walking beside him, the difference in your strides is immediate. His is longer. 
   type = "set_game_flag"
   flag = "BAR_STRANGER_WALKED"
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
   [[actions.next]]
   finish = true
 
@@ -156,6 +160,10 @@ Your hand is steady on the bottle. His jacket is on your couch. The apartment fe
   [[actions.effects]]
   type = "set_game_flag"
   flag = "BAR_STRANGER_INVITED"
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true

@@ -69,6 +69,10 @@ He does most of the talking at first — not dominating, just comfortable with i
   type   = "change_stress"
   amount = -2
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
   [[actions.next]]
   finish = true
 
@@ -117,6 +121,10 @@ At some point he leans in to explain a thing, elbows on the table, and his face 
   [[actions.effects]]
   type   = "change_stress"
   amount = -2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true
@@ -173,6 +181,10 @@ Your heartbeat is audible to no one but you, and you're aware of it anyway.
   [[actions.effects]]
   type   = "change_stress"
   amount = -2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true

@@ -113,6 +113,10 @@ He takes his time. So do you.
   type   = "change_stress"
   amount = -5
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
   [[actions.next]]
   finish = true
 
@@ -165,6 +169,10 @@ You lie with your forehead against his chest. His breathing slows back down. So 
   type   = "change_stress"
   amount = -5
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
   [[actions.next]]
   finish = true
 
@@ -214,6 +222,10 @@ The lamp puts yellow light on the wall. The city is still out there. Neither of 
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true
@@ -281,6 +293,10 @@ When it's over you lie with your leg thrown over his and the room is dim and war
   [[actions.effects]]
   type   = "change_stress"
   amount = -5
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
 
   [[actions.next]]
   finish = true

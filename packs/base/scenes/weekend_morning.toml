@@ -76,6 +76,10 @@ Eventually the bladder wins and you get up.
   type   = "change_stress"
   amount = -3
 
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
   [[actions.next]]
   finish = true
 
@@ -117,6 +121,10 @@ The mirror clears and she's there. Wet hair, flushed skin, the particular look o
   [[actions.effects]]
   type   = "change_stress"
   amount = -4
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
 
   [[actions.next]]
   finish = true
