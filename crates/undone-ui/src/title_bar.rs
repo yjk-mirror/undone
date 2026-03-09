@@ -7,7 +7,7 @@ use crate::theme::ThemeColors;
 use crate::AppSignals;
 use crate::AppTab;
 
-pub fn title_bar(signals: AppSignals) -> impl View {
+pub fn title_bar(signals: AppSignals, dev_mode: bool) -> impl View {
     let tab = signals.tab;
 
     // Left zone: drag region with app name
@@ -27,12 +27,23 @@ pub fn title_bar(signals: AppSignals) -> impl View {
             floem::action::drag_window();
         });
 
-    // Center zone: tab buttons
-    let tabs = h_stack((
-        tab_button("Game", AppTab::Game, tab, signals),
-        tab_button("Saves", AppTab::Saves, tab, signals),
-        tab_button("Settings", AppTab::Settings, tab, signals),
-    ));
+    // Center zone: tab buttons (dev_mode is static — no reactivity needed)
+    let tabs = if dev_mode {
+        h_stack((
+            tab_button("Game", AppTab::Game, tab, signals, dev_mode),
+            tab_button("Saves", AppTab::Saves, tab, signals, dev_mode),
+            tab_button("Settings", AppTab::Settings, tab, signals, dev_mode),
+            tab_button("Dev", AppTab::Dev, tab, signals, dev_mode),
+        ))
+        .into_any()
+    } else {
+        h_stack((
+            tab_button("Game", AppTab::Game, tab, signals, dev_mode),
+            tab_button("Saves", AppTab::Saves, tab, signals, dev_mode),
+            tab_button("Settings", AppTab::Settings, tab, signals, dev_mode),
+        ))
+        .into_any()
+    };
 
     // Right zone: window control buttons
     let minimize_btn = label(|| "\u{2500}".to_string())
@@ -101,6 +112,7 @@ fn tab_button(
     tab: AppTab,
     active: RwSignal<AppTab>,
     signals: AppSignals,
+    dev_mode: bool,
 ) -> impl View {
     label(move || name.to_string())
         .keyboard_navigable()
@@ -113,6 +125,7 @@ fn tab_button(
                 AppTab::Game | AppTab::Saves => {
                     phase == crate::AppPhase::Landing || phase == crate::AppPhase::InGame
                 }
+                AppTab::Dev => dev_mode && phase == crate::AppPhase::InGame,
             };
             let s = s
                 .padding_horiz(16.0)
@@ -141,6 +154,7 @@ fn tab_button(
                 AppTab::Game | AppTab::Saves => {
                     phase == crate::AppPhase::Landing || phase == crate::AppPhase::InGame
                 }
+                AppTab::Dev => dev_mode && phase == crate::AppPhase::InGame,
             };
             if tab_enabled {
                 active.set(tab);
