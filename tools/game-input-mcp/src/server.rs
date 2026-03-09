@@ -100,6 +100,20 @@ pub struct SetGameFlagInput {
     pub flag: String,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct AdvanceTimeInput {
+    /// Number of weeks to advance.
+    pub weeks: u32,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetNpcLikingInput {
+    /// NPC name (case-insensitive), e.g. "Jake".
+    pub npc_name: String,
+    /// Liking level: Neutral, Ok, Like, or Close.
+    pub level: String,
+}
+
 #[derive(Clone)]
 pub struct GameInputServer {
     tool_router: ToolRouter<Self>,
@@ -374,6 +388,39 @@ impl GameInputServer {
         .await
     }
 
+    #[tool(description = "Advance the game clock by N weeks in a running Undone game in dev mode.")]
+    async fn advance_time(
+        &self,
+        params: Parameters<AdvanceTimeInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "advance_time",
+                "weeks": params.0.weeks,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Set an NPC's liking level in a running Undone game in dev mode.")]
+    async fn set_npc_liking(
+        &self,
+        params: Parameters<SetNpcLikingInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "set_npc_liking",
+                "npc_name": params.0.npc_name,
+                "level": params.0.level,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
     #[tool(
         description = "Stop the game process by killing it. Finds the process by exe name and terminates it."
     )]
@@ -424,7 +471,8 @@ impl ServerHandler for GameInputServer {
                  stop_game(exe_name) to kill the process, is_game_running(exe_name) to check \
                  if it's running and get the PID, and dev-mode IPC helpers such as \
                  get_game_state(), jump_to_scene(scene_id), set_game_stat(stat, value), \
-                 set_game_flag(flag), and remove_game_flag(flag)."
+                 set_game_flag(flag), remove_game_flag(flag), advance_time(weeks), \
+                 and set_npc_liking(npc_name, level)."
                     .into(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
