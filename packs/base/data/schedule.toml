@@ -13,13 +13,13 @@ name = "free_time"
   [[slot.events]]
   scene     = "base::morning_routine"
   condition = "gd.week() >= 1"
-  weight    = 15
+  weight    = 10
 
   [[slot.events]]
   scene     = "base::coffee_shop"
-  condition = "gd.week() >= 1"
-  weight    = 7
-  once_only = false
+  weight    = 0
+  trigger   = "gd.week() >= 2 && !gd.hasGameFlag('ONCE_base::coffee_shop')"
+  once_only = true
 
   [[slot.events]]
   scene     = "base::plan_your_day"
@@ -49,8 +49,9 @@ name = "free_time"
 
   [[slot.events]]
   scene     = "base::neighborhood_bar"
-  weight    = 7
-  condition = "gd.week() >= 2"
+  weight    = 0
+  trigger   = "gd.week() >= 3 && !gd.hasGameFlag('ONCE_base::neighborhood_bar')"
+  once_only = true
 
   # Jake follow-up scenes — gated by having met Jake at the coffee shop
   [[slot.events]]

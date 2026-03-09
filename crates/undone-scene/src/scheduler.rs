@@ -1156,6 +1156,93 @@ mod tests {
     }
 
     #[test]
+    fn coffee_shop_triggers_at_week_2() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+        let mut world = make_world();
+
+        // Simulate post-arc settled state (Robin preset)
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        world.game_data.set_flag("ONCE_base::workplace_arrival");
+        world.game_data.set_flag("ONCE_base::workplace_landlord");
+        world.game_data.set_flag("ONCE_base::workplace_first_night");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
+        world.game_data.set_flag("ONCE_base::workplace_first_day");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
+        world.game_data.set_flag("ONCE_base::workplace_evening");
+        world.game_data.set_flag("MET_LANDLORD");
+        world.game_data.set_flag("FIRST_MEETING_DONE");
+
+        // Advance to week 2
+        for _ in 0..56 {
+            world.game_data.advance_time_slot();
+        }
+        assert_eq!(world.game_data.week, 2);
+
+        // coffee_shop should trigger deterministically at week 2
+        let mut rng = SmallRng::seed_from_u64(42);
+        let result = scheduler.pick_next(&world, &registry, &mut rng);
+        assert!(result.is_some(), "expected a scene to be picked at week 2");
+        assert_eq!(
+            result.unwrap().scene_id,
+            "base::coffee_shop",
+            "coffee_shop should trigger at week 2"
+        );
+    }
+
+    #[test]
+    fn neighborhood_bar_triggers_at_week_3() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+        let mut world = make_world();
+
+        // Same settled state as above
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        world.game_data.set_flag("ONCE_base::workplace_arrival");
+        world.game_data.set_flag("ONCE_base::workplace_landlord");
+        world.game_data.set_flag("ONCE_base::workplace_first_night");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
+        world.game_data.set_flag("ONCE_base::workplace_first_day");
+        world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
+        world.game_data.set_flag("ONCE_base::workplace_evening");
+        world.game_data.set_flag("MET_LANDLORD");
+        world.game_data.set_flag("FIRST_MEETING_DONE");
+
+        // Earlier triggers already fired
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("ONCE_base::plan_your_day");
+
+        // Advance to week 3
+        for _ in 0..84 {
+            world.game_data.advance_time_slot();
+        }
+        assert_eq!(world.game_data.week, 3);
+
+        let mut rng = SmallRng::seed_from_u64(42);
+        let result = scheduler.pick_next(&world, &registry, &mut rng);
+        assert!(result.is_some(), "expected a scene to be picked at week 3");
+        assert_eq!(
+            result.unwrap().scene_id,
+            "base::neighborhood_bar",
+            "neighborhood_bar should trigger at week 3"
+        );
+    }
+
+    #[test]
     fn references_game_flag_detects_condition_reference() {
         let event = ScheduleEvent {
             scene: "test::scene".into(),
