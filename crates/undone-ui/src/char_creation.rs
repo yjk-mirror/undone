@@ -761,8 +761,26 @@ pub fn fem_creation_view(
         )
     };
 
+    let framing_prose = label(move || {
+        "Somewhere between Ohio and here, everything changed. You don't remember it. \
+         You just woke up and the body was different — the weight, the proportions, \
+         the face in the airplane bathroom mirror. You're still you. The rest is new."
+            .to_string()
+    })
+    .style(move |s| {
+        let prefs = signals.prefs.get();
+        let colors = ThemeColors::from_mode(prefs.mode);
+        s.width_full()
+            .padding_vert(16.0)
+            .padding_horiz(4.0)
+            .color(colors.ink_dim)
+            .font_size(prefs.font_size as f32 * 0.95)
+            .line_height(1.6)
+    });
+
     let content = v_stack((
         heading("Who Are You Now?", signals),
+        framing_prose,
         names_section,
         body_section,
         background_section,
