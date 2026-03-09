@@ -25,6 +25,14 @@ You got in. Now you have to show up and be the person who got in.
 You've been telling people you're starting fresh, which is true enough. The sublet starts tomorrow. The plan after that is loose.
 {% endif %}
 
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
+{% if not w.alwaysFemale() %}Ten years in the industry. A name people recognized in meetings. A reputation built one clean commit, one shipped feature, one mentored junior at a time. The man on the boarding pass had a career that made sense.{% endif %}
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
+{% if not w.alwaysFemale() %}The acceptance letter is still in your phone's screenshots. The person who applied had a transcript and a personal statement and an eighteen-year-old certainty that the world would make room.{% endif %}
+{% endif %}
+
+{% if not w.alwaysFemale() %}Around you, the gate area does normal airport things. A businessman laughs into his phone. A college kid hugs her backpack like a pillow. The Cinnabon line inches forward. You're doing a normal airport thing too — sitting, waiting, going somewhere. Everything is still normal.{% endif %}
+
 {% if w.hasTrait("AMBITIOUS") %}
 You've mapped the first week already. Airport to apartment, unpack, sleep. Monday is accounted for. The rest is contingency.
 {% elif w.hasTrait("ANALYTICAL") %}
@@ -74,6 +82,22 @@ The city grid rotates below. You catch yourself calculating altitude by the size
 {% endif %}
 
 The cabin lights go down. The engine noise settles into a hum.
+
+{% if not w.alwaysFemale() %}You flip your phone to airplane mode. The lock screen shows a picture you took last month — nothing important, just the view from your old apartment. You don't look at it long.
+
+The in-flight magazine has an article about the ten best airports for layovers. You read half a page before your eyes start drifting.{% endif %}
+
+{% if w.hasTrait("ANALYTICAL") %}
+Your mind runs the week one more time. Apartment, keys, unpack. Grocery run. The commute route you memorized from Google Maps. The numbers line up. They always line up. That's how your head works — systems, sequences, things that fit.
+{% elif w.hasTrait("AMBITIOUS") %}
+Monday. The handshake, the name introduction, the first meeting where they figure out what you're worth. You've done this before. Different city, same playbook.
+{% elif w.hasTrait("SHY") %}
+The window seat is good. No one in the middle. The aisle passenger fell asleep first, which means you don't have to figure out the armrest situation. Small mercies.
+{% elif w.hasTrait("OUTGOING") %}
+The seatmate tried to start a conversation during takeoff. You matched her energy for ten minutes — where are you headed, what do you do — and then it tapered into comfortable silence. Good people know when a conversation is done.
+{% endif %}
+
+{% if not w.alwaysFemale() %}This is the last version of you that makes sense. The man on the boarding pass, with the right name and the right body and a plan that fits the shape of his life. Everything from here works the way it always has.{% endif %}
 
 Somewhere over Ohio, your eyes close.
 """
