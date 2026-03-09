@@ -5,6 +5,7 @@ use rmcp::{
 };
 use schemars::JsonSchema;
 use serde::Deserialize;
+use serde_json::json;
 
 use crate::input;
 
@@ -12,6 +13,8 @@ use crate::input;
 pub struct StartGameInput {
     /// Working directory for `cargo run --release`. Typically the game workspace root.
     pub working_dir: String,
+    /// Launch with `--dev --quick` so the dev panel and IPC are immediately available.
+    pub dev_mode: bool,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -66,6 +69,35 @@ pub struct HoverInput {
     pub x: i32,
     /// Y coordinate relative to the window's client area.
     pub y: i32,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct DevCommandInput {
+    /// Raw JSON command payload written to the game's dev IPC command file.
+    pub command_json: String,
+    /// How long to wait for the game to respond before returning a timeout.
+    pub timeout_ms: Option<u64>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct GetGameStateInput {}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct JumpToSceneInput {
+    /// Scene ID to jump to, for example `base::coffee_shop`.
+    pub scene_id: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetGameStatInput {
+    /// Supported: money, stress, anxiety, femininity.
+    pub stat: String,
+    pub value: i32,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetGameFlagInput {
+    pub flag: String,
 }
 
 #[derive(Clone)]
@@ -196,16 +228,22 @@ impl GameInputServer {
     }
 
     #[tool(
-        description = "Start the game by running `cargo run --release` in the given working directory. Returns immediately after spawning — the game runs independently. Returns the PID of the cargo process."
+        description = "Start the game by running `cargo run --release` in the given working directory. When dev_mode is true it launches with `--dev --quick` so the dev panel and IPC are available immediately."
     )]
     async fn start_game(
         &self,
         params: Parameters<StartGameInput>,
     ) -> Result<CallToolResult, McpError> {
         let working_dir = params.0.working_dir.clone();
+        let dev_mode = params.0.dev_mode;
 
-        let child = std::process::Command::new("cargo")
-            .args(["run", "--release", "--bin", "undone"])
+        let mut command = std::process::Command::new("cargo");
+        command.args(["run", "--release", "--bin", "undone"]);
+        if dev_mode {
+            command.args(["--", "--dev", "--quick"]);
+        }
+
+        let child = command
             .current_dir(&working_dir)
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
@@ -218,6 +256,122 @@ impl GameInputServer {
             "Game building and launching (cargo PID {}). The game window will appear once compilation finishes. Use is_game_running to check.",
             pid
         ))]))
+    }
+
+    #[tool(
+        description = "Send a raw dev command JSON payload to a running Undone game launched with --dev. Returns the JSON response from the game."
+    )]
+    async fn dev_command(
+        &self,
+        params: Parameters<DevCommandInput>,
+    ) -> Result<CallToolResult, McpError> {
+        let timeout_ms = params.0.timeout_ms.unwrap_or(2000);
+        let command_path = std::env::temp_dir().join("undone-dev-cmd.json");
+        let result_path = std::env::temp_dir().join("undone-dev-result.json");
+
+        let _ = std::fs::remove_file(&result_path);
+        let tmp_path = command_path.with_extension("tmp");
+        std::fs::write(&tmp_path, &params.0.command_json)
+            .map_err(|e| McpError::internal_error(format!("write command failed: {e}"), None))?;
+        std::fs::rename(&tmp_path, &command_path)
+            .map_err(|e| McpError::internal_error(format!("rename command failed: {e}"), None))?;
+
+        let deadline = std::time::Instant::now() + std::time::Duration::from_millis(timeout_ms);
+        loop {
+            if result_path.exists() {
+                let result = std::fs::read_to_string(&result_path).map_err(|e| {
+                    McpError::internal_error(format!("read result failed: {e}"), None)
+                })?;
+                let _ = std::fs::remove_file(&result_path);
+                return Ok(CallToolResult::success(vec![Content::text(result)]));
+            }
+            if std::time::Instant::now() > deadline {
+                return Ok(CallToolResult::success(vec![Content::text(
+                    r#"{"success": false, "message": "Timeout waiting for game response. Is the game running with --dev?"}"#,
+                )]));
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+    }
+
+    #[tool(description = "Get the current game state from a running Undone game in dev mode.")]
+    async fn get_game_state(
+        &self,
+        _params: Parameters<GetGameStateInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "get_state"
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Jump to a specific scene in a running Undone game in dev mode.")]
+    async fn jump_to_scene(
+        &self,
+        params: Parameters<JumpToSceneInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "jump_to_scene",
+                "scene_id": params.0.scene_id,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Set a dev-editable stat in a running Undone game in dev mode.")]
+    async fn set_game_stat(
+        &self,
+        params: Parameters<SetGameStatInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "set_stat",
+                "stat": params.0.stat,
+                "value": params.0.value,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Set a game flag in a running Undone game in dev mode.")]
+    async fn set_game_flag(
+        &self,
+        params: Parameters<SetGameFlagInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "set_flag",
+                "flag": params.0.flag,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Remove a game flag in a running Undone game in dev mode.")]
+    async fn remove_game_flag(
+        &self,
+        params: Parameters<SetGameFlagInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "remove_flag",
+                "flag": params.0.flag,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
     }
 
     #[tool(
@@ -266,9 +420,11 @@ impl ServerHandler for GameInputServer {
                  Windows GUI apps without stealing focus. Use press_key(title, key) for keyboard \
                  input, click(title, x, y) for mouse clicks, scroll(title, x, y, delta) for \
                  mouse wheel, and hover(title, x, y) for mouse move/hover effects. Also provides \
-                 game lifecycle tools: start_game(working_dir) to build and launch, \
-                 stop_game(exe_name) to kill the process, and is_game_running(exe_name) to check \
-                 if it's running and get the PID."
+                 game lifecycle tools: start_game(working_dir, dev_mode) to build and launch, \
+                 stop_game(exe_name) to kill the process, is_game_running(exe_name) to check \
+                 if it's running and get the PID, and dev-mode IPC helpers such as \
+                 get_game_state(), jump_to_scene(scene_id), set_game_stat(stat, value), \
+                 set_game_flag(flag), and remove_game_flag(flag)."
                     .into(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
