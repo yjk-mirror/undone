@@ -535,4 +535,45 @@ mod tests {
         assert!(!response.success);
         assert!(response.message.contains("Unknown liking level"));
     }
+
+    #[test]
+    fn test_set_all_npc_liking() {
+        use undone_domain::LikingLevel;
+
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+
+        // Confirm precondition: 2+ NPCs spawned by robin_quick_config (6 male + 3 female).
+        let total_npcs = gs.world.male_npcs.len() + gs.world.female_npcs.len();
+        assert!(
+            total_npcs >= 2,
+            "expected 2+ NPCs from test_game_state, got {total_npcs}"
+        );
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::SetAllNpcLiking {
+                level: "Close".to_string(),
+            },
+        );
+
+        assert!(response.success);
+        for (_, npc) in gs.world.male_npcs.iter() {
+            assert_eq!(
+                npc.core.npc_liking,
+                LikingLevel::Close,
+                "male NPC '{}' liking not updated",
+                npc.core.name
+            );
+        }
+        for (_, npc) in gs.world.female_npcs.iter() {
+            assert_eq!(
+                npc.core.npc_liking,
+                LikingLevel::Close,
+                "female NPC '{}' liking not updated",
+                npc.core.name
+            );
+        }
+    }
 }

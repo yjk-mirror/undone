@@ -114,6 +114,12 @@ pub struct SetNpcLikingInput {
     pub level: String,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetAllNpcLikingInput {
+    /// Liking level to set for all NPCs: Neutral, Ok, Like, or Close.
+    pub level: String,
+}
+
 #[derive(Clone)]
 pub struct GameInputServer {
     tool_router: ToolRouter<Self>,
@@ -423,6 +429,22 @@ impl GameInputServer {
         .await
     }
 
+    #[tool(description = "Set all NPCs' liking level at once in a running Undone game in dev mode.")]
+    async fn set_all_npc_liking(
+        &self,
+        params: Parameters<SetAllNpcLikingInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "set_all_npc_liking",
+                "level": params.0.level,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
     #[tool(
         description = "Stop the game process by killing it. Finds the process by exe name and terminates it."
     )]
@@ -474,7 +496,7 @@ impl ServerHandler for GameInputServer {
                  if it's running and get the PID, and dev-mode IPC helpers such as \
                  get_game_state(), jump_to_scene(scene_id), set_game_stat(stat, value), \
                  set_game_flag(flag), remove_game_flag(flag), advance_time(weeks), \
-                 and set_npc_liking(npc_name, level)."
+                 set_npc_liking(npc_name, level), and set_all_npc_liking(level)."
                     .into(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
