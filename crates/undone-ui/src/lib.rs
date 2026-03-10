@@ -663,11 +663,18 @@ fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::dev_ipc::game_state_snapshot;
+    use crate::game_state::{start_game, PreGameState};
     use lasso::Key;
+    use rand::SeedableRng;
     use std::collections::{HashMap, HashSet};
+    use std::path::PathBuf;
     use std::sync::Arc;
     use undone_domain::*;
+    use undone_packs::load_packs;
     use undone_packs::PackRegistry;
+    use undone_scene::loader::load_scenes;
+    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
     use undone_scene::engine::{EngineCommand, SceneEngine};
     use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
     use undone_world::test_helpers::make_test_world as test_world;
@@ -704,6 +711,48 @@ mod tests {
             clothing: MaleClothing::default(),
             had_orgasm: false,
             has_baby_with_pc: false,
+        }
+    }
+
+    fn packs_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("packs")
+    }
+
+    fn test_pre_state() -> PreGameState {
+        let packs_dir = packs_dir();
+        let (registry, metas) = load_packs(&packs_dir).unwrap();
+
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        let mut scene_sources: HashMap<String, String> = HashMap::new();
+        for meta in &metas {
+            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
+            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
+                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
+                scenes.insert(scene_id, scene);
+            }
+        }
+        undone_scene::loader::validate_cross_references(&scenes).unwrap();
+
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+        scheduler.validate_scene_references(&scenes).unwrap();
+        validate_entry_scene_references(
+            &scenes,
+            registry.opening_scene(),
+            registry.transformation_scene(),
+        )
+        .unwrap();
+
+        PreGameState {
+            registry,
+            scenes,
+            scheduler,
+            rng: rand::rngs::SmallRng::seed_from_u64(7),
+            init_error: None,
         }
     }
 
@@ -889,6 +938,61 @@ mod tests {
                 .any(|event| matches!(event, EngineEvent::ErrorOccurred(_))),
             "fallback binding should make active-male effects safe after scene start: {:?}",
             events
+        );
+    }
+
+    #[test]
+    fn intro_time_npc_binding_is_available_during_scene_start() {
+        let scene = SceneDefinition {
+            id: "test::intro_time_npc".into(),
+            pack: "test".into(),
+            intro_prose: "{{ m.getLiking() }}".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![],
+            npc_actions: vec![],
+        };
+
+        let mut scenes = HashMap::new();
+        scenes.insert(scene.id.clone(), Arc::new(scene));
+
+        let mut engine = SceneEngine::new(scenes);
+        let mut world = test_world();
+        let mut registry = PackRegistry::new();
+        let personality = registry.intern_personality("ROMANTIC");
+        world.male_npcs.insert(test_male_npc(personality));
+
+        start_scene(
+            &mut engine,
+            &mut world,
+            &registry,
+            "test::intro_time_npc".into(),
+        );
+        let events = engine.drain();
+
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::ErrorOccurred(_))),
+            "intro-time NPC access must be valid during scene start: {:?}",
+            events
+        );
+    }
+
+    #[test]
+    fn runtime_snapshot_requires_visible_story_and_actions() {
+        let pre = test_pre_state();
+        let config = crate::char_creation::robin_quick_config(&pre.registry);
+        let gs = start_game(pre, config, true);
+        let snapshot = serde_json::to_value(game_state_snapshot(&gs)).unwrap();
+
+        assert!(
+            snapshot.get("story_paragraphs").is_some(),
+            "runtime snapshot must expose visible story paragraphs: {snapshot}"
+        );
+        assert!(
+            snapshot.get("visible_actions").is_some(),
+            "runtime snapshot must expose visible action choices: {snapshot}"
         );
     }
 }
