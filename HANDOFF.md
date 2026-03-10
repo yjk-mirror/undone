@@ -2,10 +2,10 @@
 
 ## Current State
 
-**Latest session (2026-03-09):** Playable-game fixes + audit. Four bugs preventing smooth play resolved: (1) action prose now visible via `awaiting_continue` pause before scene transitions, (2) key NPC introductions (coffee_shop, neighborhood_bar) guaranteed via scheduler triggers, (3) AROUSAL wired into 8 charged/explicit scenes, (4) FemCreation has framing prose. Plane scene elaborated with career identity + normality beats. Runtime playtested. Post-merge audit fixed: Continue-into-dead-end (scheduler exhaustion now shows message) and key consumption during await state.
+**Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
 **Branch:** `master`
-**Tests:** 289 passing, 0 failures.
+**Tests:** 293 passing, 0 failures.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -25,15 +25,20 @@
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
-### Remaining from previous audit (2026-03-08):
+### Remaining:
 1. **Runtime-test dev panel** — Launch with `--dev`, click through all sections (scene jumper, stat editors, flags, quick actions, inspector). Verify DevContext refactor didn't break UI.
-2. **Add test for SetAllNpcLiking** — No unit test for the new command. Pattern is tested via set_npc_liking, but a dedicated test is proper.
-3. **Add MCP convenience wrapper** for `set_all_npc_liking` in game-input-mcp (currently only reachable via raw `dev_command` JSON).
-4. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
+2. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
+3. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
 
-### From this session:
-5. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
-6. **FemCreation still hardcodes "Eva"/"Ev"** — preset names not carried through.
+### Resolved this session (conductor batch):
+- ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
+- ~~Add MCP wrapper for set_all_npc_liking~~ — Done (game-input-mcp)
+- ~~FemCreation hardcodes "Eva"/"Ev"~~ — Fixed (preset names flow through)
+- ~~Before-phase shows post-transformation attributes~~ — Fixed (filtered to personality only)
+- ~~Attribute formatting raw comma list~~ — Fixed (chip/tag layout with categories)
+- ~~Test fixture DRY~~ — 7 duplicates → shared make_test_world()
+- ~~Encapsulation leaks~~ — ID newtypes sealed, registry fields private, eval helpers pub(crate)
+- ~~Hardcoded content IDs~~ — Audited, one runtime fix, rest documented
 
 ### Previous: Prolific writing session + writing-review audit (2026-03-08)
 
@@ -93,8 +98,8 @@
 - **Free_time expansion** — more universal scenes needed. → Sprint 4.
 - **NPC character docs missing** — 13 named NPCs have no character docs (Marcus, David, Jake, Frank, etc.). → As needed.
 - **Presets as pack data** — built-in presets still live as static Rust structs in `crates/undone-ui/src/char_creation.rs`, even though their starting-flag contract is now explicit and validated. → Sprint 5.
-- **Test fixture DRY** — 8+ identical `make_world()` helpers across crates. → Sprint 5.
-- **Hardcoded content IDs in engine code** — reduced further; remaining production assumptions are mostly static preset definitions / trait lists in character creation plus any future UI helpers that still embed base-pack strings. Continue auditing for full Principle 2 compliance.
+- ~~**Test fixture DRY**~~ — RESOLVED. Shared `make_test_world()` in undone-world::test_helpers.
+- ~~**Hardcoded content IDs in engine code**~~ — RESOLVED. Audited all engine crates. One runtime fix (eval.rs FEMININITY error path). Remaining are test fixtures and closed enum mappings, documented with audit comments. Presets in char_creation.rs still embed base-pack strings but are UI/content, not engine.
 
 ### User playtest feedback (2026-02-27, second session)
 
