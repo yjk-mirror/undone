@@ -11,8 +11,8 @@ mod tests {
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
     use undone_domain::{
-        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing,
-        MaleFigure, MaleNpc, NpcCore, PersonalityId, RelationshipStatus,
+        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
+        NpcCore, PersonalityId, RelationshipStatus,
     };
     use undone_packs::load_packs;
     use undone_scene::loader::load_scenes;
@@ -256,7 +256,10 @@ mod tests {
         }
         let after = harness.snapshot();
 
-        assert_ne!(after.current_scene_id.as_deref(), Some(first_scene.as_str()));
+        assert_ne!(
+            after.current_scene_id.as_deref(),
+            Some(first_scene.as_str())
+        );
     }
 
     #[test]
@@ -272,11 +275,14 @@ mod tests {
         undone_save::save_game(&harness.gs.world, &harness.gs.registry, &save_path).unwrap();
 
         harness.signals.story.set("stale prose".into());
-        harness.signals.actions.set(vec![undone_scene::engine::ActionView {
-            id: "stale".into(),
-            label: "Stale".into(),
-            detail: "stale".into(),
-        }]);
+        harness
+            .signals
+            .actions
+            .set(vec![undone_scene::engine::ActionView {
+                id: "stale".into(),
+                label: "Stale".into(),
+                detail: "stale".into(),
+            }]);
         load_world_from_save(&mut harness.gs, &save_path).unwrap();
         {
             let mut controller = harness.controller();
@@ -292,7 +298,10 @@ mod tests {
             "resume should clear stale runtime story"
         );
         assert!(
-            resumed.visible_actions.iter().all(|action| action.id != "stale"),
+            resumed
+                .visible_actions
+                .iter()
+                .all(|action| action.id != "stale"),
             "resume should clear stale runtime actions"
         );
         assert_eq!(

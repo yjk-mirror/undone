@@ -213,10 +213,9 @@ fn jump_to_scene(gs: &mut GameState, signals: AppSignals, scene_id: &str) -> Dev
 fn choose_action(gs: &mut GameState, signals: AppSignals, action_id: &str) -> DevCommandResponse {
     let mut controller = RuntimeController::new(gs, signals);
     match controller.choose_action(action_id) {
-        Ok(_) => success_runtime_response(
-            format!("Chose action '{action_id}'"),
-            controller.snapshot(),
-        ),
+        Ok(_) => {
+            success_runtime_response(format!("Chose action '{action_id}'"), controller.snapshot())
+        }
         Err(message) => error_response(message),
     }
 }

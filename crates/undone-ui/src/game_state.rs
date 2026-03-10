@@ -256,11 +256,11 @@ pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> Gam
 
 /// Validate and load a save file into a full `GameState`.
 pub fn load_game_state_from_save(
-    pre: PreGameState,
+    mut pre: PreGameState,
     save_path: &Path,
     dev_mode: bool,
 ) -> Result<GameState, String> {
-    let loaded_world = undone_save::load_game(save_path, &pre.registry)
+    let loaded_world = undone_save::load_game(save_path, &mut pre.registry)
         .map_err(|e| format!("Load failed: {e}"))?;
     Ok(start_loaded_game(pre, loaded_world, dev_mode))
 }
@@ -292,8 +292,8 @@ pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
 }
 
 pub fn load_world_from_save(gs: &mut GameState, save_path: &Path) -> Result<(), String> {
-    let loaded_world =
-        undone_save::load_game(save_path, &gs.registry).map_err(|e| format!("Load failed: {e}"))?;
+    let loaded_world = undone_save::load_game(save_path, &mut gs.registry)
+        .map_err(|e| format!("Load failed: {e}"))?;
     gs.world = loaded_world;
     gs.opening_scene = None;
     Ok(())
@@ -593,7 +593,10 @@ mod tests {
             outcome.started_scene_id.as_deref(),
             Some("base::workplace_landlord")
         );
-        assert_eq!(snapshot.current_scene_id.as_deref(), Some("base::workplace_landlord"));
+        assert_eq!(
+            snapshot.current_scene_id.as_deref(),
+            Some("base::workplace_landlord")
+        );
 
         std::fs::remove_file(save_path).unwrap();
     }
@@ -612,12 +615,7 @@ mod tests {
                 .game_data
                 .set_flag(format!("ONCE_{}", first_pick.scene_id));
         }
-        crate::start_scene(
-            &mut gs.engine,
-            &gs.world,
-            &gs.registry,
-            first_pick.scene_id,
-        );
+        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, first_pick.scene_id);
         play_scene_to_finish(&mut gs);
 
         let save_path = temp_save_path("resume_snapshot_reset");
@@ -651,8 +649,14 @@ mod tests {
         let outcome = controller.resume_from_current_world().unwrap();
         let snapshot = snapshot_runtime(signals, &gs);
 
-        assert_eq!(outcome.started_scene_id.as_deref(), Some("base::workplace_landlord"));
-        assert_eq!(snapshot.current_scene_id.as_deref(), Some("base::workplace_landlord"));
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some("base::workplace_landlord")
+        );
+        assert_eq!(
+            snapshot.current_scene_id.as_deref(),
+            Some("base::workplace_landlord")
+        );
         assert!(
             snapshot
                 .story_paragraphs

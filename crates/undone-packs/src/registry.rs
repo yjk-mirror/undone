@@ -67,6 +67,12 @@ impl PackRegistry {
         self.rodeo.get_or_intern(s)
     }
 
+    /// Ensure a raw string exists in the interner without registering any new definitions.
+    /// Used when replaying runtime-only interned ids from save files.
+    pub fn ensure_interned_string(&mut self, id: &str) {
+        let _ = self.intern(id);
+    }
+
     /// Register player traits from a pack data file.
     pub fn register_traits(&mut self, defs: Vec<TraitDef>) {
         for def in defs {

@@ -115,7 +115,7 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
 /// Returns `SaveError::VersionMismatch` if the save version is unknown. Returns
 /// `SaveError::IdMismatch` or `SaveError::TooManyIds` if the pack content or load
 /// order has changed since the file was written.
-pub fn load_game(path: &Path, registry: &PackRegistry) -> Result<World, SaveError> {
+pub fn load_game(path: &Path, registry: &mut PackRegistry) -> Result<World, SaveError> {
     let json = std::fs::read_to_string(path).map_err(|e| SaveError::Io {
         path: path.to_path_buf(),
         source: e,
@@ -505,18 +505,12 @@ fn migrate_v4_to_v5(mut save_json: serde_json::Value) -> serde_json::Value {
 
 /// Verify that all IDs recorded in the save file still map to the same strings
 /// in the current registry.
-fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveError> {
+fn validate_ids(saved: &[String], registry: &mut PackRegistry) -> Result<(), SaveError> {
     let current = registry.all_interned_strings();
 
-    // If the save references IDs beyond the registry's range, a pack was removed.
-    if saved.len() > current.len() {
-        return Err(SaveError::TooManyIds {
-            saved_count: saved.len(),
-            registry_count: current.len(),
-        });
-    }
-
-    // Every ID in the save must match the same-index ID in the current registry.
+    // Every ID in the current pack-loaded registry must match the same-index ID in the save.
+    // If the current registry is a strict prefix of the saved ids, replay the saved tail:
+    // those extra ids come from runtime-only interning (for example spawned NPC personalities).
     for (i, (s, c)) in saved.iter().zip(current.iter()).enumerate() {
         if s != c {
             return Err(SaveError::IdMismatch {
@@ -524,6 +518,12 @@ fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveErr
                 saved: s.clone(),
                 current: c.clone(),
             });
+        }
+    }
+
+    if saved.len() > current.len() {
+        for id in &saved[current.len()..] {
+            registry.ensure_interned_string(id);
         }
     }
 
@@ -562,7 +562,7 @@ mod tests {
 
     #[test]
     fn round_trip_save_and_load() {
-        let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let (mut registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let world = make_world(&registry);
 
         let dir = tempfile_dir();
@@ -571,7 +571,7 @@ mod tests {
         save_game(&world, &registry, &path).expect("save should succeed");
         assert!(path.exists(), "save file should exist");
 
-        let loaded = load_game(&path, &registry).expect("load should succeed");
+        let loaded = load_game(&path, &mut registry).expect("load should succeed");
         assert_eq!(loaded.player.name_fem, world.player.name_fem);
         assert_eq!(loaded.player.stress, world.player.stress);
         assert_eq!(loaded.player.money, world.player.money);
@@ -598,7 +598,7 @@ mod tests {
 
     #[test]
     fn load_fails_on_version_mismatch() {
-        let (registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let (mut registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
         let world = make_world(&registry);
 
         let dir = tempfile_dir();
@@ -611,11 +611,30 @@ mod tests {
         parsed["version"] = serde_json::Value::Number((SAVE_VERSION + 1).into());
         std::fs::write(&path, serde_json::to_string_pretty(&parsed).unwrap()).unwrap();
 
-        let result = load_game(&path, &registry);
+        let result = load_game(&path, &mut registry);
         assert!(
             matches!(result, Err(SaveError::VersionMismatch { .. })),
             "should fail with VersionMismatch"
         );
+    }
+
+    #[test]
+    fn load_replays_runtime_only_interned_tail() {
+        let (mut save_registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let mut load_registry = save_registry.clone();
+        save_registry.intern_personality("RUNTIME_ONLY");
+        let world = make_world(&save_registry);
+
+        let dir = tempfile_dir();
+        let path = dir.join("runtime_tail.json");
+        save_game(&world, &save_registry, &path).unwrap();
+
+        let loaded = load_game(&path, &mut load_registry).expect("load should succeed");
+
+        assert_eq!(loaded.player.name_fem, world.player.name_fem);
+        assert!(load_registry
+            .all_interned_strings()
+            .contains(&"RUNTIME_ONLY".to_string()));
     }
 
     #[test]
@@ -632,7 +651,7 @@ mod tests {
 
         // "ALPHA" → index 0; save claims index 0 = "BETA"
         let saved = vec!["BETA".to_string()];
-        let result = validate_ids(&saved, &registry);
+        let result = validate_ids(&saved, &mut registry);
         assert!(
             matches!(result, Err(SaveError::IdMismatch { index: 0, .. })),
             "should detect ID mismatch at index 0"
@@ -640,14 +659,12 @@ mod tests {
     }
 
     #[test]
-    fn validate_ids_detects_too_many_saved_ids() {
-        let registry = PackRegistry::new(); // empty registry
+    fn validate_ids_replays_saved_tail_into_registry() {
+        let mut registry = PackRegistry::new();
         let saved = vec!["SOMETHING".to_string()]; // saved has 1 ID, registry has 0
-        let result = validate_ids(&saved, &registry);
-        assert!(
-            matches!(result, Err(SaveError::TooManyIds { .. })),
-            "should detect too many saved IDs"
-        );
+        let result = validate_ids(&saved, &mut registry);
+        assert!(result.is_ok(), "saved runtime-only tail should be replayed");
+        assert_eq!(registry.all_interned_strings(), saved);
     }
 
     #[test]
@@ -674,7 +691,7 @@ mod tests {
 
         // Saved only knew about "SHY" (first registered); registry also has POSH
         let saved = vec!["SHY".to_string()];
-        let result = validate_ids(&saved, &registry);
+        let result = validate_ids(&saved, &mut registry);
         assert!(result.is_ok(), "registry having more IDs than save is OK");
     }
 
@@ -727,7 +744,8 @@ mod tests {
         std::fs::write(&path, serde_json::to_string_pretty(&save_json).unwrap()).unwrap();
 
         // Load it — should migrate v1→v2→v3 transparently.
-        let loaded = load_game(&path, &registry).expect("v1 load should succeed");
+        let mut registry = registry;
+        let loaded = load_game(&path, &mut registry).expect("v1 load should succeed");
 
         assert_eq!(
             loaded.player.origin,
@@ -795,7 +813,8 @@ mod tests {
         std::fs::write(&path, serde_json::to_string_pretty(&save_json).unwrap()).unwrap();
 
         // Load — should migrate v2→v3 transparently.
-        let loaded = load_game(&path, &registry).expect("v2→v3 load should succeed");
+        let mut registry = registry;
+        let loaded = load_game(&path, &mut registry).expect("v2→v3 load should succeed");
 
         assert!(
             loaded.player.before.is_some(),
