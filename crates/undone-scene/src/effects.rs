@@ -424,15 +424,17 @@ fn resolve_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<NpcRef, EffectError> {
 // Tests
 // ---------------------------------------------------------------------------
 
+// Hardcoded content-ID audit: no runtime content ID literals in effects.rs.
+// All trait/skill/stat lookups in apply_effect resolve through PackRegistry.
+// Test code below uses IDs like "FEMININITY" as fixture data — acceptable.
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::{HashMap, HashSet};
 
     use lasso::Key;
-    use slotmap::SlotMap;
     use undone_domain::*;
-    use undone_world::{GameData, World};
+    use undone_world::test_helpers::make_test_world;
 
     fn make_female_npc() -> FemaleNpc {
         FemaleNpc {
@@ -442,7 +444,7 @@ mod tests {
                 race: "white".into(),
                 eye_colour: "green".into(),
                 hair_colour: "red".into(),
-                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                personality: PersonalityId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
                 traits: HashSet::new(),
                 relationship: RelationshipStatus::Stranger,
                 pc_liking: LikingLevel::Neutral,
@@ -462,7 +464,7 @@ mod tests {
                 alcohol: AlcoholLevel::Sober,
                 roles: HashSet::new(),
             },
-            char_type: CharTypeId(lasso::Spur::try_from_usize(0).unwrap()),
+            char_type: CharTypeId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
             figure: PlayerFigure::Slim,
             breasts: BreastSize::Average,
             clothing: FemaleClothing::default(),
@@ -472,67 +474,7 @@ mod tests {
     }
 
     fn make_world() -> World {
-        World {
-            player: Player {
-                name_fem: "Eva".into(),
-                name_masc: "Evan".into(),
-                before: Some(BeforeIdentity {
-                    name: "Evan".into(),
-                    age: Age::MidLateTwenties,
-                    race: "white".into(),
-                    sexuality: BeforeSexuality::AttractedToWomen,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: HashSet::new(),
-                }),
-                age: Age::LateTeen,
-                race: "east_asian".into(),
-                figure: PlayerFigure::Slim,
-                breasts: BreastSize::Big,
-                eye_colour: EyeColour::Brown,
-                hair_colour: HairColour::DarkBrown,
-                height: Height::Average,
-                hair_length: HairLength::Shoulder,
-                skin_tone: SkinTone::Medium,
-                complexion: Complexion::Normal,
-                appearance: Appearance::Average,
-                butt: ButtSize::Round,
-                waist: WaistSize::Average,
-                lips: LipShape::Average,
-                nipple_sensitivity: NippleSensitivity::Normal,
-                clit_sensitivity: ClitSensitivity::Normal,
-                pubic_hair: PubicHairStyle::Trimmed,
-                natural_pubic_hair: NaturalPubicHair::Full,
-                inner_labia: InnerLabiaSize::Average,
-                wetness_baseline: WetnessBaseline::Normal,
-                traits: HashSet::new(),
-                skills: HashMap::new(),
-                money: 100,
-                stress: BoundedStat::new(10),
-                anxiety: BoundedStat::new(5),
-                arousal: ArousalLevel::Comfort,
-                alcohol: AlcoholLevel::Sober,
-                partner: None,
-                friends: vec![],
-                virgin: true,
-                anal_virgin: true,
-                lesbian_virgin: true,
-                on_pill: false,
-                pregnancy: None,
-                stuff: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                origin: PcOrigin::CisMaleTransformed,
-            },
-            male_npcs: SlotMap::with_key(),
-            female_npcs: SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
+        make_test_world()
     }
 
     fn make_male_npc() -> MaleNpc {
@@ -543,7 +485,7 @@ mod tests {
                 race: "white".into(),
                 eye_colour: "blue".into(),
                 hair_colour: "brown".into(),
-                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                personality: PersonalityId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
                 traits: HashSet::new(),
                 relationship: RelationshipStatus::Stranger,
                 pc_liking: LikingLevel::Neutral,
@@ -588,6 +530,7 @@ mod tests {
     #[test]
     fn change_money_subtracts() {
         let mut world = make_world();
+        world.player.money = 100;
         let mut ctx = SceneCtx::new();
         let reg = PackRegistry::new();
         apply_effect(

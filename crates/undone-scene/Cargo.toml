@@ -16,5 +16,6 @@ thiserror     = { workspace = true }
 rand          = { workspace = true }
 
 [dev-dependencies]
+undone-world = { path = "../undone-world", features = ["test-helpers"] }
 slotmap = { workspace = true }
 lasso   = { workspace = true }

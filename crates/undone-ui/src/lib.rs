@@ -640,82 +640,13 @@ fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
 mod tests {
     use super::*;
     use lasso::Key;
-    use slotmap::SlotMap;
     use std::collections::{HashMap, HashSet};
     use std::sync::Arc;
     use undone_domain::*;
     use undone_packs::PackRegistry;
     use undone_scene::engine::{EngineCommand, SceneEngine};
     use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
-    use undone_world::{GameData, World};
-
-    fn test_player() -> Player {
-        Player {
-            name_fem: "Eva".into(),
-            name_masc: "Evan".into(),
-            before: Some(BeforeIdentity {
-                name: "Evan".into(),
-                age: Age::MidLateTwenties,
-                race: "white".into(),
-                sexuality: BeforeSexuality::AttractedToWomen,
-                figure: MaleFigure::Average,
-                height: Height::Average,
-                hair_colour: HairColour::DarkBrown,
-                eye_colour: EyeColour::Brown,
-                skin_tone: SkinTone::Medium,
-                penis_size: PenisSize::Average,
-                voice: BeforeVoice::Average,
-                traits: HashSet::new(),
-            }),
-            age: Age::LateTeen,
-            race: "white".into(),
-            figure: PlayerFigure::Slim,
-            breasts: BreastSize::Full,
-            eye_colour: EyeColour::Blue,
-            hair_colour: HairColour::Blonde,
-            height: Height::Average,
-            hair_length: HairLength::Shoulder,
-            skin_tone: SkinTone::Medium,
-            complexion: Complexion::Normal,
-            appearance: Appearance::Average,
-            butt: ButtSize::Round,
-            waist: WaistSize::Average,
-            lips: LipShape::Average,
-            nipple_sensitivity: NippleSensitivity::Normal,
-            clit_sensitivity: ClitSensitivity::Normal,
-            pubic_hair: PubicHairStyle::Trimmed,
-            natural_pubic_hair: NaturalPubicHair::Full,
-            inner_labia: InnerLabiaSize::Average,
-            wetness_baseline: WetnessBaseline::Normal,
-            traits: HashSet::new(),
-            skills: HashMap::new(),
-            money: 200,
-            stress: undone_domain::BoundedStat::new(5),
-            anxiety: undone_domain::BoundedStat::new(2),
-            arousal: ArousalLevel::Comfort,
-            alcohol: AlcoholLevel::Sober,
-            partner: None,
-            friends: vec![],
-            virgin: true,
-            anal_virgin: true,
-            lesbian_virgin: true,
-            on_pill: false,
-            pregnancy: None,
-            stuff: HashSet::new(),
-            custom_flags: HashMap::new(),
-            custom_ints: HashMap::new(),
-            origin: PcOrigin::CisMaleTransformed,
-        }
-    }
-
-    fn test_world() -> World {
-        World {
-            player: test_player(),
-            male_npcs: SlotMap::with_key(),
-            female_npcs: SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
-    }
+    use undone_world::test_helpers::make_test_world as test_world;
 
     fn test_male_npc(personality: PersonalityId) -> MaleNpc {
         MaleNpc {
@@ -755,25 +686,25 @@ mod tests {
     #[test]
     fn player_snapshot_name_uses_active_name() {
         // femininity=25 → masculine name; set via skills map
-        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
-        let mut p = test_player();
-        p.skills.insert(
+        let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
+        let mut world = test_world();
+        world.player.skills.insert(
             fem_id,
             undone_domain::SkillValue {
                 value: 25,
                 modifier: 0,
             },
         );
-        let snap = PlayerSnapshot::from_player(&p, fem_id);
+        let snap = PlayerSnapshot::from_player(&world.player, fem_id);
         assert_eq!(snap.name, "Evan"); // femininity=25 → masc
     }
 
     #[test]
     fn player_snapshot_captures_money() {
-        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
-        let p = test_player();
-        let snap = PlayerSnapshot::from_player(&p, fem_id);
-        assert_eq!(snap.money, 200);
+        let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
+        let world = test_world();
+        let snap = PlayerSnapshot::from_player(&world.player, fem_id);
+        assert_eq!(snap.money, 500);
     }
 
     #[test]
@@ -826,7 +757,7 @@ mod tests {
     #[test]
     fn process_events_appends_error_occurred_to_story_output() {
         let signals = AppSignals::new();
-        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
         let world = test_world();
 
         let finished = process_events(

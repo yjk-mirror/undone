@@ -186,7 +186,7 @@ enum EvalValue {
 }
 
 /// Evaluate a method call that returns bool.
-pub fn eval_call_bool(
+pub(crate) fn eval_call_bool(
     call: &Call,
     world: &World,
     ctx: &SceneCtx,
@@ -433,7 +433,7 @@ fn map_registry_unknown_trait(err: RegistryError) -> EvalError {
 }
 
 /// Evaluate a method call that returns an integer (e.g. getSkill, getStat, week).
-pub fn eval_call_int(
+pub(crate) fn eval_call_int(
     call: &Call,
     world: &World,
     _ctx: &SceneCtx,
@@ -486,7 +486,7 @@ pub fn eval_call_int(
 }
 
 /// Evaluate a method call that returns a string (e.g. pcOrigin).
-pub fn eval_call_string(
+pub(crate) fn eval_call_string(
     call: &Call,
     world: &World,
     ctx: &SceneCtx,
@@ -536,7 +536,7 @@ pub fn eval_call_string(
             "getName" => {
                 let fem_id = registry
                     .femininity_skill()
-                    .map_err(|_| EvalError::UnknownSkill("FEMININITY".into()))?;
+                    .map_err(map_registry_unknown_trait)?;
                 Ok(world.player.active_name(fem_id).to_string())
             }
             "getRace" => Ok(world.player.race.clone()),
@@ -679,81 +679,18 @@ pub fn eval_call_string(
     }
 }
 
+// Hardcoded content-ID audit: all runtime uses of content IDs in this file
+// resolve through PackRegistry methods (femininity_skill(), resolve_trait(), etc.)
+// rather than hardcoding string literals. The test module below uses IDs like
+// "SHY" and "FEMININITY" as fixture data — these are test-only and acceptable.
 #[cfg(test)]
 #[allow(non_snake_case)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
-
-    use slotmap::SlotMap;
     use undone_domain::*;
-    use undone_world::{GameData, World};
 
     use super::*;
     use crate::parser::parse;
-
-    fn make_world() -> World {
-        World {
-            player: Player {
-                name_fem: "Eva".into(),
-                name_masc: "Evan".into(),
-                before: Some(BeforeIdentity {
-                    name: "Evan".into(),
-                    age: Age::MidLateTwenties,
-                    race: "white".into(),
-                    sexuality: BeforeSexuality::AttractedToWomen,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: HashSet::new(),
-                }),
-                age: Age::LateTeen,
-                race: "east_asian".into(),
-                figure: PlayerFigure::Slim,
-                breasts: BreastSize::Full,
-                eye_colour: EyeColour::Brown,
-                hair_colour: HairColour::DarkBrown,
-                height: Height::Average,
-                hair_length: HairLength::Shoulder,
-                skin_tone: SkinTone::Medium,
-                complexion: Complexion::Normal,
-                appearance: Appearance::Average,
-                butt: ButtSize::Round,
-                waist: WaistSize::Average,
-                lips: LipShape::Average,
-                nipple_sensitivity: NippleSensitivity::Normal,
-                clit_sensitivity: ClitSensitivity::Normal,
-                pubic_hair: PubicHairStyle::Trimmed,
-                natural_pubic_hair: NaturalPubicHair::Full,
-                inner_labia: InnerLabiaSize::Average,
-                wetness_baseline: WetnessBaseline::Normal,
-                traits: HashSet::new(),
-                skills: HashMap::new(),
-                money: 500,
-                stress: undone_domain::BoundedStat::new(10),
-                anxiety: undone_domain::BoundedStat::new(0),
-                arousal: ArousalLevel::Comfort,
-                alcohol: AlcoholLevel::Sober,
-                partner: None,
-                friends: vec![],
-                virgin: true,
-                anal_virgin: true,
-                lesbian_virgin: true,
-                on_pill: false,
-                pregnancy: None,
-                stuff: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                origin: PcOrigin::CisMaleTransformed,
-            },
-            male_npcs: SlotMap::with_key(),
-            female_npcs: SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
-    }
+    use undone_world::test_helpers::make_test_world as make_world;
 
     #[test]
     fn eval_bool_literal_true() {

@@ -12,4 +12,5 @@ serde_json    = { workspace = true }
 thiserror     = { workspace = true }
 
 [dev-dependencies]
+undone-world = { path = "../undone-world", features = ["test-helpers"] }
 slotmap = { workspace = true }

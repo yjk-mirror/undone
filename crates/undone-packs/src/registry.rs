@@ -22,9 +22,9 @@ pub enum RegistryError {
 #[derive(Clone)]
 pub struct PackRegistry {
     rodeo: Rodeo,
-    pub trait_defs: HashMap<TraitId, TraitDef>,
-    pub npc_trait_defs: HashMap<NpcTraitId, NpcTraitDef>,
-    pub skill_defs: HashMap<SkillId, SkillDef>,
+    trait_defs: HashMap<TraitId, TraitDef>,
+    npc_trait_defs: HashMap<NpcTraitId, NpcTraitDef>,
+    skill_defs: HashMap<SkillId, SkillDef>,
     male_names: Vec<String>,
     female_names: Vec<String>,
     races: Vec<String>,
@@ -71,7 +71,7 @@ impl PackRegistry {
     pub fn register_traits(&mut self, defs: Vec<TraitDef>) {
         for def in defs {
             let spur = self.intern(&def.id);
-            self.trait_defs.insert(TraitId(spur), def);
+            self.trait_defs.insert(TraitId::from_spur(spur), def);
         }
     }
 
@@ -79,7 +79,7 @@ impl PackRegistry {
     pub fn register_npc_traits(&mut self, defs: Vec<NpcTraitDef>) {
         for def in defs {
             let spur = self.intern(&def.id);
-            self.npc_trait_defs.insert(NpcTraitId(spur), def);
+            self.npc_trait_defs.insert(NpcTraitId::from_spur(spur), def);
         }
     }
 
@@ -87,7 +87,7 @@ impl PackRegistry {
     pub fn register_skills(&mut self, defs: Vec<SkillDef>) {
         for def in defs {
             let spur = self.intern(&def.id);
-            self.skill_defs.insert(SkillId(spur), def);
+            self.skill_defs.insert(SkillId::from_spur(spur), def);
         }
     }
 
@@ -104,7 +104,7 @@ impl PackRegistry {
     pub fn is_registered_stat(&self, id: &str) -> bool {
         self.rodeo
             .get(id)
-            .map(|s| self.registered_stats.contains(&StatId(s)))
+            .map(|s| self.registered_stats.contains(&StatId::from_spur(s)))
             .unwrap_or(false)
     }
 
@@ -114,7 +114,7 @@ impl PackRegistry {
         self.rodeo
             .get(id)
             .and_then(|s| {
-                let tid = TraitId(s);
+                let tid = TraitId::from_spur(s);
                 self.trait_defs.contains_key(&tid).then_some(tid)
             })
             .ok_or_else(|| RegistryError::UnknownTrait(id.to_string()))
@@ -125,10 +125,15 @@ impl PackRegistry {
         self.rodeo
             .get(id)
             .and_then(|s| {
-                let tid = NpcTraitId(s);
+                let tid = NpcTraitId::from_spur(s);
                 self.npc_trait_defs.contains_key(&tid).then_some(tid)
             })
             .ok_or_else(|| RegistryError::UnknownNpcTrait(id.to_string()))
+    }
+
+    /// Return all registered NPC trait IDs.
+    pub fn npc_trait_ids(&self) -> Vec<NpcTraitId> {
+        self.npc_trait_defs.keys().copied().collect()
     }
 
     /// Look up a SkillDef by SkillId.
@@ -141,7 +146,7 @@ impl PackRegistry {
         self.rodeo
             .get(id)
             .and_then(|s| {
-                let sid = SkillId(s);
+                let sid = SkillId::from_spur(s);
                 self.skill_defs.contains_key(&sid).then_some(sid)
             })
             .ok_or_else(|| RegistryError::UnknownSkill(id.to_string()))
@@ -186,7 +191,7 @@ impl PackRegistry {
 
     /// Intern a stat name (stat names don't need definitions, just interning).
     pub fn intern_stat(&mut self, id: &str) -> StatId {
-        StatId(self.intern(id))
+        StatId::from_spur(self.intern(id))
     }
 
     /// Look up an already-interned stat name. Returns `None` if the string has never been
@@ -194,17 +199,17 @@ impl PackRegistry {
     /// never declared as a `StatDef`. Use `is_registered_stat` to distinguish declared stats
     /// from strings merely interned as a side effect of another operation.
     pub fn get_stat(&self, id: &str) -> Option<StatId> {
-        self.rodeo.get(id).map(StatId)
+        self.rodeo.get(id).map(StatId::from_spur)
     }
 
     /// Resolve a TraitId back to its string ID (spur → str). Used for template rendering.
     pub fn trait_id_to_str(&self, id: TraitId) -> &str {
-        self.rodeo.resolve(&id.0)
+        self.rodeo.resolve(&id.inner())
     }
 
     /// Resolve a SkillId back to its string ID (spur → str). Used for template rendering.
     pub fn skill_id_to_str(&self, id: SkillId) -> &str {
-        self.rodeo.resolve(&id.0)
+        self.rodeo.resolve(&id.inner())
     }
 
     /// Resolve any Spur back to its string. Used by the save system to build the id_strings
@@ -215,30 +220,30 @@ impl PackRegistry {
 
     /// Intern a stuff/item name, returning a StuffId.
     pub fn intern_stuff(&mut self, id: &str) -> StuffId {
-        StuffId(self.intern(id))
+        StuffId::from_spur(self.intern(id))
     }
 
     /// Look up an already-interned stuff name. Returns None if never interned.
     pub fn resolve_stuff(&self, id: &str) -> Option<StuffId> {
-        self.rodeo.get(id).map(StuffId)
+        self.rodeo.get(id).map(StuffId::from_spur)
     }
 
     /// Intern a personality name, returning a PersonalityId.
     /// Personalities don't require registered definitions — any string is valid.
     pub fn intern_personality(&mut self, id: &str) -> PersonalityId {
-        PersonalityId(self.intern(id))
+        PersonalityId::from_spur(self.intern(id))
     }
 
     /// Resolve a PersonalityId back to its string name.
     pub fn personality_name(&self, id: PersonalityId) -> &str {
-        self.rodeo.resolve(&id.0)
+        self.rodeo.resolve(&id.inner())
     }
 
     /// Resolve a PersonalityId to the engine Personality enum.
     /// Returns None for custom/unknown personalities.
     pub fn core_personality(&self, id: PersonalityId) -> Option<undone_domain::Personality> {
         use undone_domain::Personality;
-        match self.rodeo.resolve(&id.0) {
+        match self.rodeo.resolve(&id.inner()) {
             "ROMANTIC" => Some(Personality::Romantic),
             "JERK" => Some(Personality::Jerk),
             "FRIEND" => Some(Personality::Friend),
@@ -346,7 +351,7 @@ impl PackRegistry {
     pub fn validate_trait_conflicts(&self) -> Vec<String> {
         let mut errors = Vec::new();
         for (tid, def) in &self.trait_defs {
-            let owner = self.rodeo.resolve(&tid.0);
+            let owner = self.rodeo.resolve(&tid.inner());
             for conflict_id in &def.conflicts {
                 if self.resolve_trait(conflict_id).is_err() {
                     errors.push(format!(
@@ -376,7 +381,7 @@ impl PackRegistry {
         new_trait: TraitId,
     ) -> Option<String> {
         let conflicts = self.trait_conflicts(new_trait);
-        let new_name = self.rodeo.resolve(&new_trait.0);
+        let new_name = self.rodeo.resolve(&new_trait.inner());
         for conflict_id in conflicts {
             if let Ok(conflict_tid) = self.resolve_trait(conflict_id) {
                 if existing.contains(&conflict_tid) {
@@ -397,6 +402,11 @@ impl Default for PackRegistry {
     }
 }
 
+// Hardcoded content-ID audit: registry.rs is the canonical home for content ID
+// constants (SKILL_FEMININITY, TRAIT_* etc at lines 39-46). The core_personality()
+// match uses string literals for the closed personality→enum mapping — this is
+// correct since the registry owns that mapping. Test code below uses IDs like
+// "SHY" and "ROMANTIC" as fixture data — acceptable.
 #[cfg(test)]
 mod tests {
     use super::*;

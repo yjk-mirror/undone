@@ -112,77 +112,12 @@ pub fn simulate(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
+    use std::collections::HashMap;
 
     use crate::scheduler::ScheduleEvent;
-    use undone_domain::*;
-    use undone_world::{GameData, World};
 
     use super::*;
-
-    fn make_world() -> World {
-        World {
-            player: Player {
-                name_fem: "Eva".into(),
-                name_masc: "Evan".into(),
-                before: Some(BeforeIdentity {
-                    name: "Evan".into(),
-                    age: Age::MidLateTwenties,
-                    race: "white".into(),
-                    sexuality: BeforeSexuality::AttractedToWomen,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: HashSet::new(),
-                }),
-                age: Age::LateTeen,
-                race: "east_asian".into(),
-                figure: PlayerFigure::Slim,
-                breasts: BreastSize::Big,
-                eye_colour: EyeColour::Brown,
-                hair_colour: HairColour::DarkBrown,
-                height: Height::Average,
-                hair_length: HairLength::Shoulder,
-                skin_tone: SkinTone::Medium,
-                complexion: Complexion::Normal,
-                appearance: Appearance::Average,
-                butt: ButtSize::Round,
-                waist: WaistSize::Average,
-                lips: LipShape::Average,
-                nipple_sensitivity: NippleSensitivity::Normal,
-                clit_sensitivity: ClitSensitivity::Normal,
-                pubic_hair: PubicHairStyle::Trimmed,
-                natural_pubic_hair: NaturalPubicHair::Full,
-                inner_labia: InnerLabiaSize::Average,
-                wetness_baseline: WetnessBaseline::Normal,
-                traits: HashSet::new(),
-                skills: HashMap::new(),
-                money: 100,
-                stress: BoundedStat::new(0),
-                anxiety: BoundedStat::new(0),
-                arousal: ArousalLevel::Comfort,
-                alcohol: AlcoholLevel::Sober,
-                partner: None,
-                friends: vec![],
-                virgin: true,
-                anal_virgin: true,
-                lesbian_virgin: true,
-                on_pill: false,
-                pregnancy: None,
-                stuff: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                origin: PcOrigin::CisMaleTransformed,
-            },
-            male_npcs: slotmap::SlotMap::with_key(),
-            female_npcs: slotmap::SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
-    }
+    use undone_world::test_helpers::make_test_world as make_world;
 
     #[test]
     fn simulation_counts_scene_frequencies() {

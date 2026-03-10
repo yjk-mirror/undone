@@ -233,6 +233,10 @@ fn read_file(path: &Path) -> Result<String, PackLoadError> {
     })
 }
 
+// Hardcoded content-ID audit: validate_required_ids() uses string literals in
+// MissingRequiredId error messages — these are diagnostic strings for the
+// validation function, not runtime lookups. Test code below uses IDs like
+// "SHY" and "FEMININITY" as fixture data — acceptable.
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -536,14 +536,13 @@ fn validate_ids(saved: &[String], registry: &PackRegistry) -> Result<(), SaveErr
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
 
-    use slotmap::SlotMap;
-    use undone_domain::{BeforeIdentity, BeforeSexuality, MaleFigure, PcOrigin, *};
-    use undone_world::{GameData, World};
+    use undone_domain::{BeforeSexuality, PcOrigin};
+    use undone_world::World;
 
     use super::*;
+    use undone_world::test_helpers::make_test_world;
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -556,70 +555,9 @@ mod tests {
 
     fn make_world(registry: &PackRegistry) -> World {
         let shy_id = registry.resolve_trait("SHY").unwrap();
-        let mut traits = HashSet::new();
-        traits.insert(shy_id);
-
-        World {
-            player: Player {
-                name_fem: "Eva".into(),
-                name_masc: "Evan".into(),
-                before: Some(BeforeIdentity {
-                    name: "Evan".into(),
-                    age: Age::MidLateTwenties,
-                    race: "white".into(),
-                    sexuality: BeforeSexuality::AttractedToWomen,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: HashSet::new(),
-                }),
-                age: Age::LateTeen,
-                race: "east_asian".into(),
-                figure: PlayerFigure::Slim,
-                breasts: BreastSize::Full,
-                eye_colour: EyeColour::Brown,
-                hair_colour: HairColour::DarkBrown,
-                height: Height::Average,
-                hair_length: HairLength::Shoulder,
-                skin_tone: SkinTone::Medium,
-                complexion: Complexion::Normal,
-                appearance: Appearance::Average,
-                butt: ButtSize::Round,
-                waist: WaistSize::Average,
-                lips: LipShape::Average,
-                nipple_sensitivity: NippleSensitivity::Normal,
-                clit_sensitivity: ClitSensitivity::Normal,
-                pubic_hair: PubicHairStyle::Trimmed,
-                natural_pubic_hair: NaturalPubicHair::Full,
-                inner_labia: InnerLabiaSize::Average,
-                wetness_baseline: WetnessBaseline::Normal,
-                traits,
-                skills: HashMap::new(),
-                money: 500,
-                stress: undone_domain::BoundedStat::new(10),
-                anxiety: undone_domain::BoundedStat::new(3),
-                arousal: ArousalLevel::Comfort,
-                alcohol: AlcoholLevel::Sober,
-                partner: None,
-                friends: vec![],
-                virgin: true,
-                anal_virgin: true,
-                lesbian_virgin: true,
-                on_pill: false,
-                pregnancy: None,
-                stuff: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                origin: PcOrigin::CisMaleTransformed,
-            },
-            male_npcs: SlotMap::with_key(),
-            female_npcs: SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
+        let mut world = make_test_world();
+        world.player.traits.insert(shy_id);
+        world
     }
 
     #[test]

@@ -89,7 +89,7 @@ pub fn spawn_npcs<R: Rng>(
     personality_ids.shuffle(rng);
 
     // Collect NPC trait IDs from registry (snapshot, not borrowed later)
-    let npc_trait_ids: Vec<NpcTraitId> = registry.npc_trait_defs.keys().copied().collect();
+    let npc_trait_ids: Vec<NpcTraitId> = registry.npc_trait_ids();
 
     // Snapshot name lists before mutable registry calls in the loop
     let male_names = registry.male_names().to_vec();
@@ -97,7 +97,7 @@ pub fn spawn_npcs<R: Rng>(
 
     // All female NPCs get char_type FRIEND for now. CharTypeId wraps the same
     // Spur type as PersonalityId — intern via personality gives us the right key.
-    let char_type_id = CharTypeId(registry.intern_personality("FRIEND").0);
+    let char_type_id = CharTypeId::from_spur(registry.intern_personality("FRIEND").inner());
 
     for (i, &personality) in personality_ids.iter().enumerate() {
         let name = male_names

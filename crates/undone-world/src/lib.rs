@@ -5,6 +5,9 @@ use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;
 use undone_domain::{FemaleNpc, FemaleNpcKey, MaleNpc, MaleNpcKey, Player};
 
+#[cfg(any(test, feature = "test-helpers"))]
+pub mod test_helpers;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct World {
     pub player: Player,

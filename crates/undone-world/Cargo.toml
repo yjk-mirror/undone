@@ -3,6 +3,9 @@ name    = "undone-world"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+test-helpers = []
+
 [dependencies]
 undone-domain = { path = "../undone-domain" }
 serde         = { workspace = true }

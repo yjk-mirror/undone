@@ -225,7 +225,7 @@ mod tests {
     #[test]
     fn active_name_picks_correct_variant() {
         // Use a fake SkillId (spur 0) — the test sets the skill value directly in the map.
-        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
 
         let mut p = make_player();
         p.name_masc = "Evan".into();
@@ -257,7 +257,7 @@ mod tests {
     #[test]
     fn active_name_reads_from_skills_map() {
         // Verify that active_name reads from the skills map, not a standalone field.
-        let fem_id = SkillId(lasso::Spur::try_from_usize(0).unwrap());
+        let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
         let mut p = make_player();
         p.name_masc = "Evan".into();
         p.name_fem = "Eva".into();

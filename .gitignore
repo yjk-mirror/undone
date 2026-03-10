@@ -5,6 +5,7 @@ Cargo.lock
 Thumbs.db
 .claude/settings.local.json
 .env
+opencode.json
 tmp/
 
 # Override global gitignore — track docs and dot folders in this repo

@@ -21,12 +21,12 @@ mod integration_tests {
     use std::path::PathBuf;
 
     use lasso::Key;
-    use slotmap::SlotMap;
     use undone_domain::*;
-    use undone_world::{GameData, World};
+    use undone_world::World;
 
     use crate::engine::{EngineCommand, EngineEvent, SceneEngine};
     use crate::loader::load_scenes;
+    use undone_world::test_helpers::make_test_world;
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -39,71 +39,9 @@ mod integration_tests {
 
     fn make_world_with_shy(registry: &undone_packs::PackRegistry) -> World {
         let shy_id = registry.resolve_trait("SHY").unwrap();
-        World {
-            player: Player {
-                name_fem: "Eva".into(),
-                name_masc: "Evan".into(),
-                before: Some(BeforeIdentity {
-                    name: "Evan".into(),
-                    age: Age::MidLateTwenties,
-                    race: "white".into(),
-                    sexuality: BeforeSexuality::AttractedToWomen,
-                    figure: MaleFigure::Average,
-                    height: Height::Average,
-                    hair_colour: HairColour::DarkBrown,
-                    eye_colour: EyeColour::Brown,
-                    skin_tone: SkinTone::Medium,
-                    penis_size: PenisSize::Average,
-                    voice: BeforeVoice::Average,
-                    traits: HashSet::new(),
-                }),
-                age: Age::LateTeen,
-                race: "east_asian".into(),
-                figure: PlayerFigure::Slim,
-                breasts: BreastSize::Big,
-                eye_colour: EyeColour::Brown,
-                hair_colour: HairColour::DarkBrown,
-                height: Height::Average,
-                hair_length: HairLength::Shoulder,
-                skin_tone: SkinTone::Medium,
-                complexion: Complexion::Normal,
-                appearance: Appearance::Average,
-                butt: ButtSize::Round,
-                waist: WaistSize::Average,
-                lips: LipShape::Average,
-                nipple_sensitivity: NippleSensitivity::Normal,
-                clit_sensitivity: ClitSensitivity::Normal,
-                pubic_hair: PubicHairStyle::Trimmed,
-                natural_pubic_hair: NaturalPubicHair::Full,
-                inner_labia: InnerLabiaSize::Average,
-                wetness_baseline: WetnessBaseline::Normal,
-                traits: {
-                    let mut s = HashSet::new();
-                    s.insert(shy_id);
-                    s
-                },
-                skills: HashMap::new(),
-                money: 100,
-                stress: BoundedStat::new(0),
-                anxiety: BoundedStat::new(0),
-                arousal: ArousalLevel::Comfort,
-                alcohol: AlcoholLevel::Sober,
-                partner: None,
-                friends: vec![],
-                virgin: true,
-                anal_virgin: true,
-                lesbian_virgin: true,
-                on_pill: false,
-                pregnancy: None,
-                stuff: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                origin: PcOrigin::CisMaleTransformed,
-            },
-            male_npcs: SlotMap::with_key(),
-            female_npcs: SlotMap::with_key(),
-            game_data: GameData::default(),
-        }
+        let mut world = make_test_world();
+        world.player.traits.insert(shy_id);
+        world
     }
 
     fn make_male_npc() -> MaleNpc {
@@ -114,7 +52,7 @@ mod integration_tests {
                 race: "white".into(),
                 eye_colour: "grey".into(),
                 hair_colour: "brown".into(),
-                personality: PersonalityId(lasso::Spur::try_from_usize(0).unwrap()),
+                personality: PersonalityId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
                 traits: HashSet::new(),
                 relationship: RelationshipStatus::Stranger,
                 pc_liking: LikingLevel::Neutral,
