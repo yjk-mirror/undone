@@ -9,6 +9,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::game_state::{load_world_from_save, GameState};
 use crate::runtime_controller::RuntimeController;
+use crate::signal_utils::get_or_default;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
@@ -169,7 +170,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         });
 
     // --- Status message strip ---
-    let status_strip = label(move || status_msg.get()).style(move |s| {
+    let status_strip = label(move || get_or_default(status_msg)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(13.0)
             .font_family("system-ui, -apple-system, sans-serif".to_string())
@@ -181,7 +182,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     // --- Save entries list ---
     let list_state = Rc::clone(&state);
     let entries_list = dyn_stack(
-        move || save_list.get(),
+        move || get_or_default(save_list),
         |e: &SaveEntry| e.path.to_string_lossy().to_string(),
         {
             let list_state = Rc::clone(&list_state);
@@ -268,7 +269,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
 
     // --- Empty state label ---
     let empty_label = dyn_view(move || {
-        if save_list.get().is_empty() {
+        if get_or_default(save_list).is_empty() {
             label(|| "No saves yet.".to_string())
                 .style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);

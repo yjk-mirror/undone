@@ -10,6 +10,7 @@ pub mod runtime_snapshot;
 pub mod runtime_test_support;
 pub mod saves_panel;
 pub mod settings_panel;
+mod signal_utils;
 pub mod theme;
 pub mod title_bar;
 

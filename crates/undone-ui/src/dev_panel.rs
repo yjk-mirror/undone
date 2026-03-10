@@ -8,6 +8,7 @@ use floem::views::dyn_stack;
 use crate::dev_ipc::{execute_command, game_state_snapshot, runtime_state_snapshot, DevCommand};
 use crate::game_state::GameState;
 use crate::runtime_snapshot::RuntimeSnapshot;
+use crate::signal_utils::get_or_default;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
@@ -29,6 +30,9 @@ impl DevContext {
             let mut gs_ref = self.gs.borrow_mut();
             execute_command(&mut gs_ref, self.signals, command)
         };
+        if response.success {
+            self.signals.dev_tick.update(|tick| *tick += 1);
+        }
         self.status.set(response.message);
         self.sync_inputs();
     }
@@ -80,7 +84,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                                 let gs_ref = ctx.gs.borrow();
                                 gs_ref.engine.scene_ids()
                             };
-                            filter_scene_ids(ids, &filter.get())
+                            filter_scene_ids(ids, &get_or_default(filter))
                         }
                     },
                     |scene_id: &String| scene_id.clone(),
@@ -240,7 +244,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
     let status = ctx.status;
     scroll(v_stack((
         heading("Dev Tools", signals),
-        label(move || status.get()).style(move |s| {
+        label(move || get_or_default(status)).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.min_height(18.0)
                 .font_size(13.0)

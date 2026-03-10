@@ -1,5 +1,6 @@
 use crate::game_state::GameState;
 use crate::runtime_controller::RuntimeController;
+use crate::signal_utils::{get_or, get_or_default};
 use crate::theme::NumberKeyMode;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
@@ -278,7 +279,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
 
             // Enter: confirm highlighted choice.
             if key == &Key::Named(NamedKey::Enter) {
-                if let Some(idx) = highlighted_idx.get() {
+                if let Some(idx) = get_or_default(highlighted_idx) {
                     let current_actions = actions.get();
                     if idx < current_actions.len() {
                         let action_id = current_actions[idx].id.clone();
@@ -310,7 +311,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                     return true;
                                 }
                                 NumberKeyMode::Confirm => {
-                                    if highlighted_idx.get() == Some(idx) {
+                                    if get_or_default(highlighted_idx) == Some(idx) {
                                         // Already highlighted — confirm.
                                         let action_id = current_actions[idx].id.clone();
                                         drop(current_actions);
@@ -378,7 +379,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             let choices_height = n * 56.0 + 25.0; // padding_vert(12)*2 + border(1)
             let detail_height = 41.0;
             let bottom_height = choices_height + detail_height;
-            let available = panel_height.get();
+            let available = get_or(panel_height, 760.0);
             let max_h = (available - bottom_height - 8.0).max(200.0);
             s.max_height(max_h as f32)
                 .flex_grow(1.0)
@@ -390,13 +391,13 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let detail_strip = label(move || {
         // Show highlighted detail when a choice is keyboard-highlighted,
         // otherwise fall back to hovered detail.
-        if let Some(idx) = highlighted_idx.get() {
+        if let Some(idx) = get_or_default(highlighted_idx) {
             let acts = actions.get();
             if idx < acts.len() {
                 return acts[idx].detail.clone();
             }
         }
-        hovered_detail.get()
+        get_or_default(hovered_detail)
     })
     .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -523,12 +524,12 @@ fn choices_bar(
             let exec_action_click = exec_action.clone();
             let exec_action_key = exec_action;
             let hovered = create_rw_signal(false);
-            let is_highlighted = move || highlighted_idx.get() == Some(index);
+            let is_highlighted = move || get_or_default(highlighted_idx) == Some(index);
 
             h_stack((
                 label(move || format!("{}·", index + 1)).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                    let ink = if hovered.get() || is_highlighted() {
+                    let ink = if get_or_default(hovered) || is_highlighted() {
                         colors.ink_dim
                     } else {
                         colors.ink_ghost

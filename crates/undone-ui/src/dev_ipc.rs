@@ -108,7 +108,7 @@ pub fn execute_command(
     signals: AppSignals,
     command: DevCommand,
 ) -> DevCommandResponse {
-    let response = match command {
+    match command {
         DevCommand::JumpToScene { scene_id } => jump_to_scene(gs, signals, &scene_id),
         DevCommand::GetState => DevCommandResponse {
             success: true,
@@ -135,33 +135,30 @@ pub fn execute_command(
         DevCommand::AdvanceTime { weeks } => advance_time(gs, weeks),
         DevCommand::SetNpcLiking { npc_name, level } => set_npc_liking(gs, &npc_name, &level),
         DevCommand::SetAllNpcLiking { level } => set_all_npc_liking(gs, &level),
-    };
-
-    if response.success {
-        signals.dev_tick.update(|tick| *tick += 1);
     }
-
-    response
 }
 
 fn schedule_poll(signals: AppSignals, gs: Rc<RefCell<GameState>>) {
     exec_after(Duration::from_millis(100), move |_| {
-        {
+        let should_tick = {
             let mut gs = gs.borrow_mut();
             if gs.dev_mode {
-                poll_once(&mut gs, signals);
+                poll_once(&mut gs, signals)
             } else {
                 return;
             }
+        };
+        if should_tick {
+            signals.dev_tick.update(|tick| *tick += 1);
         }
         schedule_poll(signals, Rc::clone(&gs));
     });
 }
 
-fn poll_once(gs: &mut GameState, signals: AppSignals) {
+fn poll_once(gs: &mut GameState, signals: AppSignals) -> bool {
     let command_path = command_file_path();
     if !command_path.exists() {
-        return;
+        return false;
     }
 
     let result_path = result_file_path();
@@ -197,6 +194,8 @@ fn poll_once(gs: &mut GameState, signals: AppSignals) {
     if std::fs::write(&tmp_path, &payload).is_ok() {
         let _ = std::fs::rename(&tmp_path, &result_path);
     }
+
+    response.success
 }
 
 fn jump_to_scene(gs: &mut GameState, signals: AppSignals, scene_id: &str) -> DevCommandResponse {
