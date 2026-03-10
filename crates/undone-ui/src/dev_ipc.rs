@@ -10,6 +10,7 @@ use serde_json::json;
 use undone_domain::{BoundedStat, SkillValue};
 
 use crate::game_state::GameState;
+use crate::runtime_controller::RuntimeController;
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{AppSignals, AppTab, PlayerSnapshot};
 
@@ -18,6 +19,10 @@ use crate::{AppSignals, AppTab, PlayerSnapshot};
 pub enum DevCommand {
     JumpToScene { scene_id: String },
     GetState,
+    GetRuntimeState,
+    ChooseAction { action_id: String },
+    ContinueScene,
+    SetTab { tab: String },
     SetStat { stat: String, value: i32 },
     SetFlag { flag: String },
     RemoveFlag { flag: String },
@@ -113,6 +118,17 @@ pub fn execute_command(
                     .unwrap_or_else(|_| json!({"error": "failed to serialize state"})),
             ),
         },
+        DevCommand::GetRuntimeState => DevCommandResponse {
+            success: true,
+            message: "Runtime state captured".to_string(),
+            data: Some(
+                serde_json::to_value(runtime_state_snapshot(gs, signals))
+                    .unwrap_or_else(|_| json!({"error": "failed to serialize runtime state"})),
+            ),
+        },
+        DevCommand::ChooseAction { action_id } => choose_action(gs, signals, &action_id),
+        DevCommand::ContinueScene => continue_scene(gs, signals),
+        DevCommand::SetTab { tab } => set_tab(gs, signals, &tab),
         DevCommand::SetStat { stat, value } => set_stat(gs, signals, &stat, value),
         DevCommand::SetFlag { flag } => set_flag(gs, signals, &flag),
         DevCommand::RemoveFlag { flag } => remove_flag(gs, signals, &flag),
@@ -184,29 +200,74 @@ fn poll_once(gs: &mut GameState, signals: AppSignals) {
 }
 
 fn jump_to_scene(gs: &mut GameState, signals: AppSignals, scene_id: &str) -> DevCommandResponse {
-    if !gs.engine.has_scene(scene_id) {
-        return DevCommandResponse {
-            success: false,
-            message: format!("Unknown scene '{scene_id}'"),
-            data: None,
-        };
+    let mut controller = RuntimeController::new(gs, signals);
+    match controller.jump_to_scene(scene_id) {
+        Ok(_) => success_runtime_response(
+            format!("Jumped to scene '{scene_id}'"),
+            controller.snapshot(),
+        ),
+        Err(message) => error_response(message),
     }
+}
 
-    gs.engine.reset_runtime();
-    crate::reset_scene_ui_state(signals);
-    crate::start_scene(
-        &mut gs.engine,
-        &mut gs.world,
-        &gs.registry,
-        scene_id.to_string(),
-    );
-    let events = gs.engine.drain();
-    crate::process_events(events, signals, &gs.world, gs.femininity_id);
-    signals.tab.set(AppTab::Game);
+fn choose_action(gs: &mut GameState, signals: AppSignals, action_id: &str) -> DevCommandResponse {
+    let mut controller = RuntimeController::new(gs, signals);
+    match controller.choose_action(action_id) {
+        Ok(_) => success_runtime_response(
+            format!("Chose action '{action_id}'"),
+            controller.snapshot(),
+        ),
+        Err(message) => error_response(message),
+    }
+}
 
+fn continue_scene(gs: &mut GameState, signals: AppSignals) -> DevCommandResponse {
+    let mut controller = RuntimeController::new(gs, signals);
+    match controller.continue_flow() {
+        Ok(_) => success_runtime_response("Continued scene".to_string(), controller.snapshot()),
+        Err(message) => error_response(message),
+    }
+}
+
+fn set_tab(gs: &mut GameState, signals: AppSignals, tab: &str) -> DevCommandResponse {
+    let normalized = tab.trim().to_lowercase();
+    let target = match normalized.as_str() {
+        "game" => AppTab::Game,
+        "saves" => AppTab::Saves,
+        "settings" => AppTab::Settings,
+        "dev" if gs.dev_mode => AppTab::Dev,
+        "dev" => {
+            return error_response("Dev tab is unavailable when dev mode is disabled".to_string());
+        }
+        _ => {
+            return error_response(format!(
+                "Unknown tab '{tab}'. Supported: game, saves, settings, dev"
+            ));
+        }
+    };
+
+    signals.tab.set(target);
+    success_runtime_response(
+        format!("Switched to tab '{normalized}'"),
+        runtime_state_snapshot(gs, signals),
+    )
+}
+
+fn success_runtime_response(message: String, snapshot: RuntimeSnapshot) -> DevCommandResponse {
     DevCommandResponse {
         success: true,
-        message: format!("Jumped to scene '{scene_id}'"),
+        message,
+        data: Some(
+            serde_json::to_value(snapshot)
+                .unwrap_or_else(|_| json!({"error": "failed to serialize runtime state"})),
+        ),
+    }
+}
+
+fn error_response(message: String) -> DevCommandResponse {
+    DevCommandResponse {
+        success: false,
+        message,
         data: None,
     }
 }
@@ -402,6 +463,7 @@ mod tests {
     use super::*;
     use crate::char_creation::robin_quick_config;
     use crate::game_state::{start_game, PreGameState};
+    use crate::runtime_controller::RuntimeController;
     use floem::prelude::SignalGet;
     use rand::{rngs::SmallRng, SeedableRng};
     use std::collections::HashMap;
@@ -457,6 +519,11 @@ mod tests {
         let pre = test_pre_state();
         let config = robin_quick_config(&pre.registry);
         start_game(pre, config, true)
+    }
+
+    fn boot_runtime(gs: &mut GameState, signals: AppSignals) {
+        let mut controller = RuntimeController::new(gs, signals);
+        controller.continue_flow().unwrap();
     }
 
     #[test]
@@ -542,6 +609,22 @@ mod tests {
     }
 
     #[test]
+    fn execute_get_runtime_state_returns_visible_story_and_actions() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        boot_runtime(&mut gs, signals);
+
+        let response = execute_command(&mut gs, signals, DevCommand::GetRuntimeState);
+
+        assert!(response.success);
+        let data = response
+            .data
+            .expect("get_runtime_state should include snapshot data");
+        assert!(data.get("story_paragraphs").is_some());
+        assert!(data.get("visible_actions").is_some());
+    }
+
+    #[test]
     fn execute_advance_time_increments_week() {
         let mut gs = test_game_state();
         let signals = AppSignals::new();
@@ -569,6 +652,111 @@ mod tests {
 
         assert!(!response.success);
         assert!(response.message.contains("Unknown liking level"));
+    }
+
+    #[test]
+    fn execute_choose_action_returns_error_for_invalid_action_id() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        boot_runtime(&mut gs, signals);
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::ChooseAction {
+                action_id: "not-visible".to_string(),
+            },
+        );
+
+        assert!(!response.success);
+        assert!(response.message.contains("not currently visible"));
+    }
+
+    #[test]
+    fn execute_continue_scene_returns_error_when_not_awaiting_continue() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        boot_runtime(&mut gs, signals);
+
+        let response = execute_command(&mut gs, signals, DevCommand::ContinueScene);
+
+        assert!(!response.success);
+        assert!(response.message.contains("not awaiting continue"));
+    }
+
+    #[test]
+    fn execute_set_tab_rejects_unknown_tab_names() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::SetTab {
+                tab: "arcade".to_string(),
+            },
+        );
+
+        assert!(!response.success);
+        assert!(response.message.contains("Unknown tab"));
+    }
+
+    #[test]
+    fn acceptance_runtime_dev_commands_expose_runtime_state_and_progression() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        boot_runtime(&mut gs, signals);
+
+        let runtime = execute_command(&mut gs, signals, DevCommand::GetRuntimeState);
+        assert!(runtime.success);
+        let runtime_data = runtime.data.expect("runtime state should include data");
+        let first_action = runtime_data["visible_actions"][0]["id"]
+            .as_str()
+            .expect("visible action should expose stable id")
+            .to_string();
+
+        let choose = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::ChooseAction {
+                action_id: first_action,
+            },
+        );
+        assert!(choose.success);
+
+        let mut attempts = 0;
+        loop {
+            let runtime = execute_command(&mut gs, signals, DevCommand::GetRuntimeState);
+            let data = runtime.data.expect("runtime state should include data");
+            if data["awaiting_continue"].as_bool() == Some(true) {
+                break;
+            }
+
+            let next_action = data["visible_actions"][0]["id"]
+                .as_str()
+                .expect("visible action should expose stable id")
+                .to_string();
+            let choose = execute_command(
+                &mut gs,
+                signals,
+                DevCommand::ChooseAction {
+                    action_id: next_action,
+                },
+            );
+            assert!(choose.success);
+            attempts += 1;
+            assert!(attempts < 8, "expected runtime to reach a continue state");
+        }
+
+        let continue_response = execute_command(&mut gs, signals, DevCommand::ContinueScene);
+        assert!(continue_response.success);
+        let data = continue_response
+            .data
+            .expect("continue_scene should include updated runtime state");
+        assert!(
+            data["current_scene_id"].is_string() || data["current_scene_id"].is_null(),
+            "continue_scene should return a coherent runtime snapshot"
+        );
     }
 
     #[test]

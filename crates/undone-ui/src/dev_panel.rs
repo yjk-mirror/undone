@@ -5,8 +5,9 @@ use floem::prelude::*;
 use floem::reactive::RwSignal;
 use floem::views::dyn_stack;
 
-use crate::dev_ipc::{execute_command, game_state_snapshot, DevCommand};
+use crate::dev_ipc::{execute_command, game_state_snapshot, runtime_state_snapshot, DevCommand};
 use crate::game_state::GameState;
+use crate::runtime_snapshot::RuntimeSnapshot;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
@@ -218,10 +219,9 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                     let _ = ctx.signals.dev_tick.get();
                     let snapshot = {
                         let gs_ref = ctx.gs.borrow();
-                        game_state_snapshot(&gs_ref)
+                        runtime_state_snapshot(&gs_ref, ctx.signals)
                     };
-                    serde_json::to_string_pretty(&snapshot)
-                        .unwrap_or_else(|err| format!("{{\"error\":\"{err}\"}}"))
+                    format_runtime_snapshot_json(&snapshot)
                 }
             })
             .style(move |s| {
@@ -273,6 +273,10 @@ fn filter_scene_ids(scene_ids: Vec<String>, filter_text: &str) -> Vec<String> {
         .into_iter()
         .filter(|scene_id| scene_id.to_lowercase().contains(&needle))
         .collect()
+}
+
+fn format_runtime_snapshot_json(snapshot: &RuntimeSnapshot) -> String {
+    serde_json::to_string_pretty(snapshot).unwrap_or_else(|err| format!("{{\"error\":\"{err}\"}}"))
 }
 
 fn stat_editor_row(
@@ -377,7 +381,11 @@ fn action_button(
 
 #[cfg(test)]
 mod tests {
-    use super::filter_scene_ids;
+    use super::{filter_scene_ids, format_runtime_snapshot_json};
+    use crate::runtime_snapshot::{
+        ActiveNpcSnapshot, ArcStateSnapshot, PlayerSummarySnapshot, RuntimeSnapshot,
+        VisibleActionSnapshot, WorldSummarySnapshot,
+    };
 
     #[test]
     fn filter_scene_ids_matches_case_insensitively() {
@@ -390,5 +398,54 @@ mod tests {
         );
 
         assert_eq!(filtered, vec!["base::coffee_shop".to_string()]);
+    }
+
+    #[test]
+    fn format_runtime_snapshot_json_includes_runtime_fields() {
+        let formatted = format_runtime_snapshot_json(&RuntimeSnapshot {
+            phase: "in_game".into(),
+            tab: "dev".into(),
+            current_scene_id: Some("base::coffee_shop".into()),
+            awaiting_continue: false,
+            story_paragraphs: vec!["Hello".into()],
+            visible_actions: vec![VisibleActionSnapshot {
+                id: "wait".into(),
+                label: "Wait".into(),
+                detail: "Stay".into(),
+            }],
+            active_npc: Some(ActiveNpcSnapshot {
+                name: "Jake".into(),
+                age: "MidLateTwenties".into(),
+                personality: "Romantic".into(),
+                relationship: "Acquaintance".into(),
+                pc_liking: "Like".into(),
+                pc_attraction: "Attracted".into(),
+                known: true,
+            }),
+            player: PlayerSummarySnapshot {
+                name: "Robin".into(),
+                femininity: 10,
+                money: 500,
+                stress: 0,
+                anxiety: 0,
+                arousal: "Comfort".into(),
+                alcohol: "Sober".into(),
+            },
+            world: WorldSummarySnapshot {
+                week: 0,
+                day: 0,
+                time_slot: "Morning".into(),
+                game_flags: vec!["ROUTE_WORKPLACE".into()],
+                arc_states: vec![ArcStateSnapshot {
+                    id: "base::workplace_opening".into(),
+                    state: "arrived".into(),
+                }],
+            },
+            init_error: None,
+        });
+
+        assert!(formatted.contains("\"story_paragraphs\""));
+        assert!(formatted.contains("\"visible_actions\""));
+        assert!(formatted.contains("\"current_scene_id\""));
     }
 }

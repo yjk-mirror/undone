@@ -326,16 +326,18 @@ impl SceneEngine {
         self.stack.push(SceneFrame { def, ctx });
         if let Some(key) = active_male {
             if let Some(npc) = world.male_npc(key) {
-                self.events.push_back(EngineEvent::NpcActivated(Some(
-                    NpcActivatedData::from_npc(&npc.core, registry),
-                )));
+                self.events
+                    .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from_npc(
+                        &npc.core, registry,
+                    ))));
             }
         }
         if let Some(key) = active_female {
             if let Some(npc) = world.female_npc(key) {
-                self.events.push_back(EngineEvent::NpcActivated(Some(
-                    NpcActivatedData::from_npc(&npc.core, registry),
-                )));
+                self.events
+                    .push_back(EngineEvent::NpcActivated(Some(NpcActivatedData::from_npc(
+                        &npc.core, registry,
+                    ))));
             }
         }
 
