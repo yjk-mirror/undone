@@ -2,12 +2,12 @@
 
 ## Current State
 
-**Latest session (2026-03-10):** Player-correctness runtime design pass complete. Wrote `docs/plans/2026-03-10-player-correctness-design.md` and `docs/plans/2026-03-10-player-correctness-runtime-plan.md`. Direction: build a single runtime controller + structured runtime snapshot + code-driven acceptance harness, then expose the same contract through dev IPC and `game-input-mcp`. This is the next execution session's target.
+**Latest session (2026-03-10):** Player-correctness runtime implementation complete. `undone-ui` now has a shared `RuntimeController` and `RuntimeSnapshot`, acceptance-style runtime harness coverage, intro-time NPC fallback binding before scene render, richer dev IPC/runtime MCP wrappers, and a save-loader fix that replays runtime-only interned IDs on load. Live release smoke passed for `get_runtime_state`, `set_tab`, `choose_action`, and `continue_scene` against `undone -- --dev --quick`. Two live-only regressions found during smoke were fixed: disposed view-local signal reads during tab swaps, and a dev-panel `RefCell` borrow cycle caused by bumping `dev_tick` before releasing the mutable `GameState` borrow.
 
 **Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
-**Branch:** `master`
-**Tests:** 293 passing, 0 failures.
+**Branch:** `codex/player-correctness-runtime`
+**Verification (2026-03-10):** `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test -p game-input-mcp` (in `tools/`), `cargo build --release` (in `tools/`), and live release smoke against `undone -- --dev --quick` all passed.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -25,7 +25,7 @@
 
 ## ⚡ Next Action
 
-**Next recommended execution:** Implement `docs/plans/2026-03-10-player-correctness-runtime-plan.md` in a fresh session. Priority order: runtime controller extraction, `RuntimeSnapshot`, acceptance-flow harness, intro-time NPC binding fix, dev IPC expansion, MCP wrappers, then targeted live runtime verification.
+**Next recommended execution:** Finish branch wrap-up after the final verification pass. If additional manual QA time is available, click through the Dev tab UI once in a live build; the runtime/dev-tooling contract itself is already covered by tests plus release smoke.
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
@@ -170,7 +170,8 @@ For pure writing (authoring `.toml` scene files), no Rust compilation is needed.
 Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 Scroll: sends WM_MOUSEMOVE before WM_MOUSEWHEEL (floem routes wheel events via cached cursor_position). Positive delta = up, negative = down (one tick = one wheel notch).
 **Lifecycle tools:** `start_game(working_dir, dev_mode)`, `stop_game(exe_name)`, `is_game_running(exe_name)`.
-**Dev IPC tools:** `dev_command(command_json, timeout_ms)`, `get_game_state()`, `jump_to_scene(scene_id)`, `set_game_stat(stat, value)`, `set_game_flag(flag)`, `remove_game_flag(flag)`.
+**Dev IPC tools:** `dev_command(command_json, timeout_ms)`, `get_game_state()`, `get_runtime_state()`, `jump_to_scene(scene_id)`, `choose_action(action_id)`, `continue_scene()`, `set_tab(tab)`, `set_game_stat(stat, value)`, `set_game_flag(flag)`, `remove_game_flag(flag)`.
+Successful runtime commands now return the same structured runtime snapshot used by the dev panel inspector and acceptance tests.
 Process management uses Toolhelp32 snapshot API.
 
 ---

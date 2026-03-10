@@ -1,6 +1,6 @@
 # Current Engine Contract
 
-This document describes the engine behavior that is currently expected to be true in code as of 2026-03-07.
+This document describes the engine behavior that is currently expected to be true in code as of 2026-03-10.
 
 ## 1. Player Init
 
@@ -71,12 +71,14 @@ Scene content contracts:
 
 Scene start contract:
 
-1. Set `SceneCtx.scene_id`.
-2. Pick the first matching `intro_variant`, else use base intro.
-3. Render intro prose.
-4. Render intro thoughts whose conditions pass.
-5. Push the scene frame.
-6. Emit the visible action list.
+1. Resolve active NPC bindings before intro render. Callers may pass explicit bindings, and the UI runtime controller pre-binds first-male / first-female fallbacks when the scene has not already selected active NPCs.
+2. Set `SceneCtx.scene_id`.
+3. Pick the first matching `intro_variant`, else use base intro.
+4. Render intro prose.
+5. Render intro thoughts whose conditions pass.
+6. Push the scene frame.
+7. Emit `NpcActivated` for any bound active NPCs.
+8. Emit the visible action list.
 
 Action contract:
 
@@ -108,6 +110,16 @@ Scheduler contract:
 - weighted phase runs second across every eligible event from every slot
 - `once_only` filtering is based on persistent `ONCE_<scene_id>` game flags
 - the caller that actually starts the picked scene is responsible for setting the `ONCE_` flag
+
+UI runtime controller contract:
+
+- `RuntimeController` is the single owner of scene-start, choose-action, continue, jump, and resume semantics in `undone-ui`
+- new-game launch, save resume, UI button handlers, dev IPC, and dev panel actions all delegate to the controller instead of reimplementing runtime flow
+- `start_scene()` always clears transient scene UI state before entering a scene
+- `continue_flow()` first checks whether the current runtime is awaiting continue; if not, it may launch the opening scene on first boot or ask the scheduler for the next eligible scene
+- when `continue_flow()` starts a scheduler-picked `once_only` scene, it persists `ONCE_<scene_id>` before returning
+- `jump_to_scene()` reuses the same scene-start path as normal gameplay
+- `resume_from_current_world()` resets runtime-only scene state, does not replay `opening_scene`, and then uses the same continue path as normal runtime progression
 
 ## 4. Runtime Error Visibility
 
@@ -141,11 +153,11 @@ Load must fail if:
 
 - save version is newer than the loader understands
 - saved interner strings differ from the current registry at any matching index
-- the save references more interned IDs than the current registry has
 
 Load may succeed if:
 
 - the current registry has additional IDs appended after the saved prefix
+- the save references additional runtime-only interned IDs after the current registry prefix; load replays that saved tail back into the registry before deserializing the world
 
 Migration chain:
 
@@ -176,8 +188,9 @@ The engine does not pick semantic NPCs on its own. The caller supplies active NP
 
 Current UI helper behavior:
 
-- `start_scene()` starts the scene, then binds the first male NPC and first female NPC in the world as fallback active receivers
-- because the fallback binding happens after scene start, intro prose / intro thoughts / intro variants must not rely on fallback `m` / `f` bindings
+- `RuntimeController::start_scene()` uses `SceneEngine::start_scene_with_bindings(...)`
+- when the caller has not explicitly chosen active NPCs, the controller binds the first male NPC and first female NPC in the world before intro render
+- intro prose / intro thoughts / intro variants may rely on fallback `m` / `f` bindings when those NPCs exist in the world
 
 Persistent NPC mutations include:
 
@@ -202,3 +215,45 @@ Current limitation:
 
 - scene runtime supports one active male NPC and one active female NPC at a time
 - richer multi-NPC selection remains a UI/runtime-layer follow-up, not part of the current contract
+
+## 7. Runtime Snapshot Contract
+
+`RuntimeSnapshot` is the shared player-visible runtime contract used by tests, the dev panel inspector, dev IPC, and `game-input-mcp`.
+
+It currently includes:
+
+- `phase`
+- `tab`
+- `current_scene_id`
+- `awaiting_continue`
+- `init_error`
+- `story_paragraphs`
+- `visible_actions` with stable `id`, `label`, and `detail`
+- `active_npc`
+- player summary fields matching the sidebar
+- world summary fields: `week`, `day`, `time_slot`, sorted `game_flags`, sorted `arc_states`
+
+Snapshot invariants:
+
+- story is exposed as paragraph strings using the same paragraph-splitting model as the visible story panel
+- visible actions are only the actions currently available to the player
+- snapshot building must not reimplement runtime flow; it only reflects `AppSignals` plus `GameState`
+
+## 8. Dev IPC / MCP Runtime Tooling Contract
+
+Dev IPC runtime commands:
+
+- `get_runtime_state`
+- `jump_to_scene`
+- `choose_action`
+- `continue_scene`
+- `set_tab`
+
+Successful runtime commands return the updated `RuntimeSnapshot` in `DevCommandResponse.data`.
+
+Additional tooling invariants:
+
+- `choose_action` must fail if the action id is not currently visible
+- `continue_scene` must fail if runtime is not awaiting continue
+- `set_tab` validates `game`, `saves`, `settings`, and `dev`, and rejects `dev` when dev mode is disabled
+- `game-input-mcp` exposes typed wrappers for the runtime commands above so agents can inspect and drive a running game without screenshot parsing

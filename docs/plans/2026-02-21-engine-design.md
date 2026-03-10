@@ -645,9 +645,14 @@ floem (Lapce reactive UI). Two-panel layout at 1200×800:
 
 - `undone -- --dev` enables development-only UI and file-polled IPC.
 - `undone -- --dev --quick` skips character creation and boots directly into Robin's route.
+- `undone-ui::RuntimeController` is the single runtime-flow entry point for scene start, action choice, continue, jump, and save resume semantics.
+- `undone-ui::RuntimeSnapshot` is the shared player-visible contract used by acceptance tests, the dev inspector, dev IPC, and MCP.
 - The running game polls `%TEMP%/undone-dev-cmd.json` and writes responses to `%TEMP%/undone-dev-result.json`.
-- Supported commands: `jump_to_scene`, `get_state`, `set_stat`, `set_flag`, `remove_flag`, `advance_time`, `set_npc_liking`, `set_all_npc_liking`.
-- `tools/game-input-mcp` now supports both window-input tools and the dev IPC helpers.
+- Supported runtime commands: `get_runtime_state`, `jump_to_scene`, `choose_action`, `continue_scene`, `set_tab`.
+- Supported world-mutation commands: `get_state`, `set_stat`, `set_flag`, `remove_flag`, `advance_time`, `set_npc_liking`, `set_all_npc_liking`.
+- Successful runtime commands return the updated `RuntimeSnapshot` payload.
+- `tools/game-input-mcp` now supports both window-input tools and typed wrappers over the dev IPC runtime commands.
+- Live release smoke on 2026-03-10 validated `get_runtime_state -> set_tab(dev) -> choose_action -> continue_scene` against a running `--dev --quick` build.
 
 ## Validation / Analysis
 
