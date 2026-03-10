@@ -5,6 +5,7 @@ pub mod game_state;
 pub mod landing_page;
 pub mod left_panel;
 pub mod right_panel;
+pub mod runtime_controller;
 pub mod runtime_snapshot;
 pub mod saves_panel;
 pub mod settings_panel;
@@ -19,7 +20,7 @@ use floem::window::ResizeDirection;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::SkillId;
-use undone_scene::engine::{ActionView, EngineCommand, EngineEvent};
+use undone_scene::engine::{ActionView, EngineEvent};
 use undone_world::World;
 
 use crate::char_creation::{char_creation_view, fem_creation_view};
@@ -28,12 +29,13 @@ use crate::game_state::{init_game, GameState, PreGameState};
 use crate::landing_page::landing_view;
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
+use crate::runtime_controller::RuntimeController;
 use crate::saves_panel::saves_panel;
 use crate::settings_panel::settings_view;
 use crate::theme::{ThemeColors, UserPrefs};
 use crate::title_bar::title_bar;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum AppTab {
     Game,
     Saves,
@@ -41,7 +43,7 @@ pub enum AppTab {
     Dev,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum AppPhase {
     Landing,
     BeforeCreation,
@@ -245,20 +247,11 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                 {
                     let mut gs_opt = gs_ref.borrow_mut();
                     if let Some(ref mut gs) = *gs_opt {
-                        let fem_id = gs.femininity_id;
-                        let GameState {
-                            ref mut engine,
-                            ref mut world,
-                            ref registry,
-                            ..
-                        } = *gs;
-                        reset_scene_ui_state(signals);
-                        if let Some(scene_id) = registry.transformation_scene() {
-                            let scene_id = scene_id.to_owned();
-                            start_scene(engine, world, registry, scene_id);
+                        let transformation_scene = gs.registry.transformation_scene().map(str::to_owned);
+                        if let Some(scene_id) = transformation_scene {
+                            let mut controller = RuntimeController::new(gs, signals);
+                            let _ = controller.start_scene(scene_id);
                         }
-                        let events = engine.drain();
-                        process_events(events, signals, world, fem_id);
                     }
                 }
 
@@ -314,58 +307,8 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                     let mut gs_opt = gs_ref.borrow_mut();
                     if let Some(ref mut gs) = *gs_opt {
                         if gs.init_error.is_none() {
-                            let fem_id = gs.femininity_id;
-                            let GameState {
-                                ref mut engine,
-                                ref mut world,
-                                ref registry,
-                                ref scheduler,
-                                ref mut rng,
-                                ref mut opening_scene,
-                                ..
-                            } = *gs;
-
-                            // Clear leftover scene UI state from previous phases
-                            // (e.g. TransformationIntro text surviving into InGame).
-                            reset_scene_ui_state(signals);
-
-                            // Scheduler takes priority: arc triggers (e.g.
-                            // workplace_arrival for ROUTE_WORKPLACE) must fire before
-                            // the generic opening_scene fallback from pack.toml.
-                            let mut started_scene = false;
-                            if let Some(result) = scheduler.pick_next(world, registry, rng) {
-                                // Scheduler found an eligible scene — discard opening_scene.
-                                let _ = opening_scene.take();
-                                if result.once_only {
-                                    world
-                                        .game_data
-                                        .set_flag(format!("ONCE_{}", result.scene_id));
-                                }
-                                start_scene(engine, world, registry, result.scene_id);
-                                started_scene = true;
-                            } else if let Some(scene_id) = opening_scene.take() {
-                                // No scheduled scene — use pack's opening_scene
-                                // (custom route with no arc flags).
-                                start_scene(engine, world, registry, scene_id);
-                                started_scene = true;
-                            }
-
-                            if started_scene {
-                                let events = engine.drain();
-                                let finished = process_events(events, signals, world, fem_id);
-                                if finished {
-                                    // Let the player read the intro prose before advancing.
-                                    signals.awaiting_continue.set(true);
-                                }
-                            } else {
-                                signals
-                                    .story
-                                    .set("[No eligible scene is currently available.]".to_string());
-                                signals.actions.set(vec![]);
-                                signals
-                                    .player
-                                    .set(PlayerSnapshot::from_player(&world.player, fem_id));
-                            }
+                            let mut controller = RuntimeController::new(gs, signals);
+                            let _ = controller.continue_flow();
                         }
                     }
                 }
@@ -497,17 +440,13 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
 /// NPC in the world's slotmaps (the spawner guarantees at least one of each).
 pub fn start_scene(
     engine: &mut undone_scene::engine::SceneEngine,
-    world: &mut World,
+    world: &World,
     registry: &undone_packs::PackRegistry,
     scene_id: String,
 ) {
-    engine.send(EngineCommand::StartScene(scene_id), world, registry);
-    if let Some((key, _)) = world.male_npcs.iter().next() {
-        engine.send(EngineCommand::SetActiveMale(key), world, registry);
-    }
-    if let Some((key, _)) = world.female_npcs.iter().next() {
-        engine.send(EngineCommand::SetActiveFemale(key), world, registry);
-    }
+    let active_male = world.male_npcs.iter().next().map(|(key, _)| key);
+    let active_female = world.female_npcs.iter().next().map(|(key, _)| key);
+    engine.start_scene_with_bindings(scene_id, active_male, active_female, world, registry);
 }
 
 pub fn reset_scene_ui_state(signals: AppSignals) {

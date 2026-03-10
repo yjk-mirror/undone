@@ -263,6 +263,81 @@ impl Object for SceneCtxView {
     }
 }
 
+#[derive(Debug)]
+pub struct NpcCtx {
+    pub name: String,
+    pub relationship: undone_domain::RelationshipStatus,
+    pub pc_liking: undone_domain::LikingLevel,
+    pub pc_love: undone_domain::LoveLevel,
+    pub pc_attraction: undone_domain::AttractionLevel,
+    pub behaviour: undone_domain::Behaviour,
+    pub relationship_flags: HashSet<String>,
+    pub roles: HashSet<String>,
+    pub contactable: bool,
+    pub pregnant: bool,
+    pub virgin: bool,
+    pub had_orgasm: bool,
+}
+
+impl fmt::Display for NpcCtx {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "NpcCtx")
+    }
+}
+
+impl Object for NpcCtx {
+    fn repr(self: &Arc<Self>) -> ObjectRepr {
+        ObjectRepr::Plain
+    }
+
+    fn call_method(
+        self: &Arc<Self>,
+        _state: &State<'_, '_>,
+        method: &str,
+        args: &[Value],
+    ) -> Result<Value, Error> {
+        match method {
+            "getName" => Ok(Value::from(self.name.as_str())),
+            "getLiking" => Ok(Value::from(self.pc_liking.to_string())),
+            "getLove" => Ok(Value::from(format!("{:?}", self.pc_love))),
+            "getAttraction" => Ok(Value::from(self.pc_attraction.to_string())),
+            "getBehaviour" => Ok(Value::from(format!("{:?}", self.behaviour))),
+            "hasFlag" => {
+                let flag = string_arg(method, args, 0)?;
+                Ok(Value::from(self.relationship_flags.contains(flag.as_str())))
+            }
+            "hasRole" => {
+                let role = string_arg(method, args, 0)?;
+                Ok(Value::from(self.roles.contains(role.as_str())))
+            }
+            "isPartner" => Ok(Value::from(matches!(
+                self.relationship,
+                undone_domain::RelationshipStatus::Partner { .. }
+                    | undone_domain::RelationshipStatus::Married
+            ))),
+            "isFriend" => Ok(Value::from(matches!(
+                self.relationship,
+                undone_domain::RelationshipStatus::Friend
+                    | undone_domain::RelationshipStatus::Partner { .. }
+                    | undone_domain::RelationshipStatus::Married
+            ))),
+            "isCohabiting" => Ok(Value::from(matches!(
+                self.relationship,
+                undone_domain::RelationshipStatus::Partner { cohabiting: true }
+                    | undone_domain::RelationshipStatus::Married
+            ))),
+            "isContactable" => Ok(Value::from(self.contactable)),
+            "isPregnant" => Ok(Value::from(self.pregnant)),
+            "isVirgin" => Ok(Value::from(self.virgin)),
+            "hadOrgasm" => Ok(Value::from(self.had_orgasm)),
+            _ => Err(Error::new(
+                ErrorKind::UnknownMethod,
+                format!("undefined has no method named {method}"),
+            )),
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Helper
 // ---------------------------------------------------------------------------
@@ -413,6 +488,46 @@ pub fn render_prose(
     let scene_view = SceneCtxView {
         flags: ctx.scene_flags.clone(),
     };
+    let active_male = ctx
+        .active_male
+        .and_then(|key| world.male_npc(key))
+        .map(|npc| {
+            Value::from_object(NpcCtx {
+                name: npc.core.name.clone(),
+                relationship: npc.core.relationship.clone(),
+                pc_liking: npc.core.pc_liking,
+                pc_love: npc.core.pc_love,
+                pc_attraction: npc.core.pc_attraction,
+                behaviour: npc.core.behaviour,
+                relationship_flags: npc.core.relationship_flags.clone(),
+                roles: npc.core.roles.clone(),
+                contactable: npc.core.contactable,
+                pregnant: false,
+                virgin: false,
+                had_orgasm: npc.had_orgasm,
+            })
+        })
+        .unwrap_or(Value::UNDEFINED);
+    let active_female = ctx
+        .active_female
+        .and_then(|key| world.female_npc(key))
+        .map(|npc| {
+            Value::from_object(NpcCtx {
+                name: npc.core.name.clone(),
+                relationship: npc.core.relationship.clone(),
+                pc_liking: npc.core.pc_liking,
+                pc_love: npc.core.pc_love,
+                pc_attraction: npc.core.pc_attraction,
+                behaviour: npc.core.behaviour,
+                relationship_flags: npc.core.relationship_flags.clone(),
+                roles: npc.core.roles.clone(),
+                contactable: npc.core.contactable,
+                pregnant: npc.pregnancy.is_some(),
+                virgin: npc.virgin,
+                had_orgasm: false,
+            })
+        })
+        .unwrap_or(Value::UNDEFINED);
 
     let mut env = minijinja::Environment::new();
     env.add_template("prose", template_str)?;
@@ -422,6 +537,8 @@ pub fn render_prose(
         w => Value::from_object(player_ctx),
         gd => Value::from_object(game_data_ctx),
         scene => Value::from_object(scene_view),
+        m => active_male,
+        f => active_female,
     };
 
     tmpl.render(render_ctx)

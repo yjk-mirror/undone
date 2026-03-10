@@ -1,4 +1,5 @@
 use crate::game_state::GameState;
+use crate::runtime_controller::RuntimeController;
 use crate::theme::NumberKeyMode;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
@@ -199,70 +200,17 @@ fn heading_font_size(level: u32, base: f32) -> f32 {
 /// Send a `ChooseAction` command, drain events, and if the scene finished,
 /// ask the scheduler to pick the next scene and start it.
 fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: AppSignals) {
-    // Choice echo: show what the player chose before rendering action prose.
-    {
-        let current_actions = signals.actions.get();
-        if let Some(chosen) = current_actions.iter().find(|a| a.id == action_id) {
-            let echo = format!("\n\n---\n\n> **{}**", chosen.label);
-            signals.story.update(|s| s.push_str(&echo));
-        }
-    }
-
     let mut gs = state.borrow_mut();
-    let GameState {
-        ref mut engine,
-        ref mut world,
-        ref registry,
-        femininity_id,
-        ..
-    } = *gs;
-
-    let events = engine.advance_with_action(&action_id, world, registry);
-    let finished = crate::process_events(events, signals, world, femininity_id);
-    if finished {
-        if signals.phase.get_untracked() == crate::AppPhase::TransformationIntro {
-            // Transformation intro complete — move to female customisation.
-            // (The throwaway world is discarded; FemCreation builds the real one.)
-            signals.phase.set(crate::AppPhase::FemCreation);
-        } else {
-            // Don't auto-advance. Let the player read the action prose.
-            // The action bar will show a "Continue" button.
-            signals.awaiting_continue.set(true);
-        }
-    }
+    let mut controller = RuntimeController::new(&mut gs, signals);
+    let _ = controller.choose_action(&action_id);
 }
 
 /// Called when the player clicks "Continue" after reading action prose.
 /// Picks the next scene from the scheduler and starts it.
 fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
-    crate::reset_scene_ui_state(signals);
-
     let mut gs = state.borrow_mut();
-    let GameState {
-        ref mut engine,
-        ref mut world,
-        ref registry,
-        ref scheduler,
-        ref mut rng,
-        femininity_id,
-        ..
-    } = *gs;
-
-    if let Some(result) = scheduler.pick_next(world, registry, rng) {
-        if result.once_only {
-            world
-                .game_data
-                .set_flag(format!("ONCE_{}", result.scene_id));
-        }
-        crate::start_scene(engine, world, registry, result.scene_id);
-        let events = engine.drain();
-        crate::process_events(events, signals, world, femininity_id);
-    } else {
-        signals
-            .story
-            .set("[No eligible scene is currently available.]".into());
-        signals.actions.set(vec![]);
-    }
+    let mut controller = RuntimeController::new(&mut gs, signals);
+    let _ = controller.continue_flow();
 }
 
 pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {

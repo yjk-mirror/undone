@@ -124,7 +124,7 @@ impl SceneEngine {
         self.transition_count = 0;
         match cmd {
             EngineCommand::StartScene(id) => {
-                self.start_scene(id, world, registry);
+                self.start_scene(id, world, registry, None, None);
             }
             EngineCommand::ChooseAction(action_id) => {
                 self.choose_action(action_id, world, registry);
@@ -169,6 +169,18 @@ impl SceneEngine {
 
     pub fn current_scene_id(&self) -> Option<String> {
         self.stack.last().map(|frame| frame.def.id.clone())
+    }
+
+    pub fn start_scene_with_bindings(
+        &mut self,
+        scene_id: String,
+        active_male: Option<MaleNpcKey>,
+        active_female: Option<FemaleNpcKey>,
+        world: &World,
+        registry: &PackRegistry,
+    ) {
+        self.transition_count = 0;
+        self.start_scene(scene_id, world, registry, active_male, active_female);
     }
 
     /// Convenience: send a ChooseAction command and immediately drain events.
@@ -243,7 +255,14 @@ impl SceneEngine {
     // Private: scene lifecycle
     // -----------------------------------------------------------------------
 
-    fn start_scene(&mut self, id: String, world: &World, registry: &PackRegistry) {
+    fn start_scene(
+        &mut self,
+        id: String,
+        world: &World,
+        registry: &PackRegistry,
+        active_male: Option<MaleNpcKey>,
+        active_female: Option<FemaleNpcKey>,
+    ) {
         self.transition_count += 1;
         if self.transition_count > MAX_TRANSITIONS_PER_COMMAND {
             log::error!(
@@ -274,6 +293,8 @@ impl SceneEngine {
 
         let mut ctx = SceneCtx::new();
         ctx.scene_id = Some(def.id.clone());
+        ctx.active_male = active_male;
+        ctx.active_female = active_female;
 
         // Select intro prose: use first passing variant, fall back to base intro
         let intro_prose = Self::select_intro_prose(
@@ -303,6 +324,20 @@ impl SceneEngine {
         );
 
         self.stack.push(SceneFrame { def, ctx });
+        if let Some(key) = active_male {
+            if let Some(npc) = world.male_npc(key) {
+                self.events.push_back(EngineEvent::NpcActivated(Some(
+                    NpcActivatedData::from_npc(&npc.core, registry),
+                )));
+            }
+        }
+        if let Some(key) = active_female {
+            if let Some(npc) = world.female_npc(key) {
+                self.events.push_back(EngineEvent::NpcActivated(Some(
+                    NpcActivatedData::from_npc(&npc.core, registry),
+                )));
+            }
+        }
 
         self.emit_actions(world, registry);
     }
@@ -637,7 +672,7 @@ impl SceneEngine {
             if let Some(goto) = &branch.goto {
                 let target = goto.clone();
                 self.stack.pop();
-                self.start_scene(target, world, registry);
+                self.start_scene(target, world, registry, None, None);
                 return;
             }
 
