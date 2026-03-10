@@ -2,6 +2,8 @@
 
 ## Current State
 
+**Latest session (2026-03-10):** Player-correctness runtime design pass complete. Wrote `docs/plans/2026-03-10-player-correctness-design.md` and `docs/plans/2026-03-10-player-correctness-runtime-plan.md`. Direction: build a single runtime controller + structured runtime snapshot + code-driven acceptance harness, then expose the same contract through dev IPC and `game-input-mcp`. This is the next execution session's target.
+
 **Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
 **Branch:** `master`
@@ -22,6 +24,8 @@
 ---
 
 ## ⚡ Next Action
+
+**Next recommended execution:** Implement `docs/plans/2026-03-10-player-correctness-runtime-plan.md` in a fresh session. Priority order: runtime controller extraction, `RuntimeSnapshot`, acceptance-flow harness, intro-time NPC binding fix, dev IPC expansion, MCP wrappers, then targeted live runtime verification.
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
