@@ -83,6 +83,9 @@ pub struct DevCommandInput {
 pub struct GetGameStateInput {}
 
 #[derive(Debug, Deserialize, JsonSchema)]
+pub struct GetRuntimeStateInput {}
+
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct JumpToSceneInput {
     /// Scene ID to jump to, for example `base::coffee_shop`.
     pub scene_id: String,
@@ -120,9 +123,54 @@ pub struct SetAllNpcLikingInput {
     pub level: String,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ChooseActionInput {
+    /// Stable visible action id returned by get_runtime_state.
+    pub action_id: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ContinueSceneInput {}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetTabInput {
+    /// Supported tabs: game, saves, settings, dev.
+    pub tab: String,
+}
+
 #[derive(Clone)]
 pub struct GameInputServer {
     tool_router: ToolRouter<Self>,
+}
+
+fn runtime_state_payload() -> String {
+    json!({
+        "command": "get_runtime_state"
+    })
+    .to_string()
+}
+
+fn choose_action_payload(action_id: &str) -> String {
+    json!({
+        "command": "choose_action",
+        "action_id": action_id,
+    })
+    .to_string()
+}
+
+fn continue_scene_payload() -> String {
+    json!({
+        "command": "continue_scene"
+    })
+    .to_string()
+}
+
+fn set_tab_payload(tab: &str) -> String {
+    json!({
+        "command": "set_tab",
+        "tab": tab,
+    })
+    .to_string()
 }
 
 #[tool_router]
@@ -331,6 +379,20 @@ impl GameInputServer {
         .await
     }
 
+    #[tool(
+        description = "Get the current player-visible runtime state from a running Undone game in dev mode."
+    )]
+    async fn get_runtime_state(
+        &self,
+        _params: Parameters<GetRuntimeStateInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: runtime_state_payload(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
     #[tool(description = "Jump to a specific scene in a running Undone game in dev mode.")]
     async fn jump_to_scene(
         &self,
@@ -342,6 +404,42 @@ impl GameInputServer {
                 "scene_id": params.0.scene_id,
             })
             .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Choose a visible action by stable id in a running Undone game in dev mode.")]
+    async fn choose_action(
+        &self,
+        params: Parameters<ChooseActionInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: choose_action_payload(&params.0.action_id),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Continue the runtime after a scene finishes in a running Undone game in dev mode.")]
+    async fn continue_scene(
+        &self,
+        _params: Parameters<ContinueSceneInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: continue_scene_payload(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Switch the active app tab in a running Undone game in dev mode.")]
+    async fn set_tab(
+        &self,
+        params: Parameters<SetTabInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: set_tab_payload(&params.0.tab),
             timeout_ms: Some(2000),
         }))
         .await
@@ -496,7 +594,9 @@ impl ServerHandler for GameInputServer {
                  game lifecycle tools: start_game(working_dir, dev_mode) to build and launch, \
                  stop_game(exe_name) to kill the process, is_game_running(exe_name) to check \
                  if it's running and get the PID, and dev-mode IPC helpers such as \
-                 get_game_state(), jump_to_scene(scene_id), set_game_stat(stat, value), \
+                 get_game_state(), get_runtime_state(), jump_to_scene(scene_id), \
+                 choose_action(action_id), continue_scene(), set_tab(tab), \
+                 set_game_stat(stat, value), \
                  set_game_flag(flag), remove_game_flag(flag), advance_time(weeks), \
                  set_npc_liking(npc_name, level), and set_all_npc_liking(level)."
                     .into(),
@@ -504,5 +604,45 @@ impl ServerHandler for GameInputServer {
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        choose_action_payload, continue_scene_payload, runtime_state_payload, set_tab_payload,
+    };
+    use serde_json::json;
+
+    #[test]
+    fn runtime_state_payload_uses_runtime_command_name() {
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&runtime_state_payload()).unwrap(),
+            json!({ "command": "get_runtime_state" })
+        );
+    }
+
+    #[test]
+    fn choose_action_payload_includes_stable_action_id() {
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&choose_action_payload("wait")).unwrap(),
+            json!({ "command": "choose_action", "action_id": "wait" })
+        );
+    }
+
+    #[test]
+    fn continue_scene_payload_uses_continue_command_name() {
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&continue_scene_payload()).unwrap(),
+            json!({ "command": "continue_scene" })
+        );
+    }
+
+    #[test]
+    fn set_tab_payload_includes_requested_tab() {
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&set_tab_payload("dev")).unwrap(),
+            json!({ "command": "set_tab", "tab": "dev" })
+        );
     }
 }
