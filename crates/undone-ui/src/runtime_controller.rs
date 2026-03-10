@@ -1,8 +1,10 @@
 use floem::prelude::{SignalGet, SignalUpdate};
 
-use crate::game_state::{resume_current_world, GameState};
+use crate::game_state::GameState;
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
-use crate::{process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab, PlayerSnapshot};
+use crate::{
+    process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab, PlayerSnapshot,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeCommandOutcome {
@@ -67,36 +69,7 @@ impl<'a> RuntimeController<'a> {
             return Err("Runtime is not awaiting continue".to_string());
         }
 
-        if let Some(result) =
-            self.gs
-                .scheduler
-                .pick_next(&self.gs.world, &self.gs.registry, &mut self.gs.rng)
-        {
-            let _ = self.gs.opening_scene.take();
-            if result.once_only {
-                self.gs
-                    .world
-                    .game_data
-                    .set_flag(format!("ONCE_{}", result.scene_id));
-            }
-            return self.start_scene_internal(result.scene_id);
-        }
-
-        if let Some(scene_id) = self.gs.opening_scene.take() {
-            return self.start_scene_internal(scene_id);
-        }
-
-        reset_scene_ui_state(self.signals);
-        self.signals
-            .story
-            .set("[No eligible scene is currently available.]".to_string());
-        self.signals.actions.set(vec![]);
-        self.signals.player.set(PlayerSnapshot::from_player(
-            &self.gs.world.player,
-            self.gs.femininity_id,
-        ));
-
-        Ok(self.outcome(None, false))
+        self.start_next_scene(true)
     }
 
     pub fn jump_to_scene(&mut self, scene_id: &str) -> RuntimeCommandResult {
@@ -106,23 +79,9 @@ impl<'a> RuntimeController<'a> {
     }
 
     pub fn resume_from_current_world(&mut self) -> RuntimeCommandResult {
-        reset_scene_ui_state(self.signals);
-        let resume = resume_current_world(self.gs);
-        let scene_finished = process_events(
-            resume.events,
-            self.signals,
-            &self.gs.world,
-            self.gs.femininity_id,
-        );
-        if scene_finished {
-            self.signals.awaiting_continue.set(true);
-        }
-
-        Ok(RuntimeCommandOutcome {
-            started_scene_id: resume.started_scene_id,
-            current_scene_id: self.gs.engine.current_scene_id(),
-            scene_finished,
-        })
+        self.gs.engine.reset_runtime();
+        self.gs.opening_scene = None;
+        self.start_next_scene(false)
     }
 
     pub fn snapshot(&self) -> RuntimeSnapshot {
@@ -138,7 +97,8 @@ impl<'a> RuntimeController<'a> {
             scene_id.clone(),
         );
         let events = self.gs.engine.drain();
-        let scene_finished = process_events(events, self.signals, &self.gs.world, self.gs.femininity_id);
+        let scene_finished =
+            process_events(events, self.signals, &self.gs.world, self.gs.femininity_id);
         if scene_finished {
             self.signals.awaiting_continue.set(true);
         }
@@ -146,7 +106,46 @@ impl<'a> RuntimeController<'a> {
         Ok(self.outcome(Some(scene_id), scene_finished))
     }
 
-    fn outcome(&self, started_scene_id: Option<String>, scene_finished: bool) -> RuntimeCommandOutcome {
+    fn start_next_scene(&mut self, allow_opening_scene: bool) -> RuntimeCommandResult {
+        if let Some(result) =
+            self.gs
+                .scheduler
+                .pick_next(&self.gs.world, &self.gs.registry, &mut self.gs.rng)
+        {
+            let _ = self.gs.opening_scene.take();
+            if result.once_only {
+                self.gs
+                    .world
+                    .game_data
+                    .set_flag(format!("ONCE_{}", result.scene_id));
+            }
+            return self.start_scene_internal(result.scene_id);
+        }
+
+        if allow_opening_scene {
+            if let Some(scene_id) = self.gs.opening_scene.take() {
+                return self.start_scene_internal(scene_id);
+            }
+        }
+
+        reset_scene_ui_state(self.signals);
+        self.signals
+            .story
+            .set("[No eligible scene is currently available.]".to_string());
+        self.signals.actions.set(vec![]);
+        self.signals.player.set(PlayerSnapshot::from_player(
+            &self.gs.world.player,
+            self.gs.femininity_id,
+        ));
+
+        Ok(self.outcome(None, false))
+    }
+
+    fn outcome(
+        &self,
+        started_scene_id: Option<String>,
+        scene_finished: bool,
+    ) -> RuntimeCommandOutcome {
         RuntimeCommandOutcome {
             started_scene_id,
             current_scene_id: self.gs.engine.current_scene_id(),
@@ -335,7 +334,10 @@ mod tests {
         let mut controller = RuntimeController::new(&mut gs, signals);
         let outcome = controller.start_scene("test::clear_state").unwrap();
 
-        assert_eq!(outcome.started_scene_id.as_deref(), Some("test::clear_state"));
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some("test::clear_state")
+        );
         assert_eq!(signals.scroll_gen.get(), 0);
         assert!(!signals.awaiting_continue.get());
         assert!(signals.story.get().contains("Fresh intro."));
@@ -387,19 +389,20 @@ mod tests {
         let mut controller = RuntimeController::new(&mut gs, signals);
         let outcome = controller.continue_flow().unwrap();
 
-        assert_eq!(outcome.started_scene_id.as_deref(), Some(expected.scene_id.as_str()));
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some(expected.scene_id.as_str())
+        );
         assert_eq!(
             controller.gs.engine.current_scene_id().as_deref(),
             Some(expected.scene_id.as_str())
         );
         if expected.once_only {
-            assert!(
-                controller
-                    .gs
-                    .world
-                    .game_data
-                    .has_flag(&format!("ONCE_{}", expected.scene_id))
-            );
+            assert!(controller
+                .gs
+                .world
+                .game_data
+                .has_flag(&format!("ONCE_{}", expected.scene_id)));
         }
     }
 
@@ -424,7 +427,10 @@ mod tests {
         let outcome = controller.jump_to_scene("test::jump_target").unwrap();
         let snapshot = controller.snapshot();
 
-        assert_eq!(outcome.started_scene_id.as_deref(), Some("test::jump_target"));
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some("test::jump_target")
+        );
         assert_eq!(signals.tab.get(), AppTab::Game);
         assert!(
             !snapshot

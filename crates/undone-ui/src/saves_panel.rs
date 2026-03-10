@@ -7,7 +7,8 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::game_state::{reload_current_game_from_save, GameState};
+use crate::game_state::{load_world_from_save, GameState};
+use crate::runtime_controller::RuntimeController;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
@@ -195,43 +196,24 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 let load_btn = label(|| "Load".to_string())
                     .keyboard_navigable()
                     .on_click_stop(move |_| {
-                        let loaded = {
+                        {
                             let mut gs = load_state.borrow_mut();
-                            let resume =
-                                match reload_current_game_from_save(&mut gs, &entry_path_load) {
-                                    Err(e) => {
-                                        status_msg.set(e);
-                                        return;
-                                    }
-                                    Ok(resume) => resume,
-                                };
-
-                            crate::reset_scene_ui_state(signals);
+                            if let Err(e) = load_world_from_save(&mut gs, &entry_path_load) {
+                                status_msg.set(e);
+                                return;
+                            }
+                            let mut controller = RuntimeController::new(&mut gs, signals);
+                            if let Err(err) = controller.resume_from_current_world() {
+                                status_msg.set(err);
+                                return;
+                            }
                             status_msg.set(
                                 entry_path_load
                                     .file_stem()
                                     .map(|s| format!("Loaded: {}", s.to_string_lossy()))
                                     .unwrap_or_else(|| "Loaded.".into()),
                             );
-
-                            (
-                                resume.events,
-                                gs.femininity_id,
-                                resume.started_scene_id.is_some(),
-                            )
-                        }; // RefMut dropped here
-
-                        // Phase 2: process events with only a shared borrow
-                        let (events, fem_id, scene_started) = loaded;
-                        let gs = load_state.borrow();
-                        crate::process_events(events, signals, &gs.world, fem_id);
-                        if !scene_started {
-                            signals.story.set(
-                                "[Loaded save. No eligible scene is currently available.]".into(),
-                            );
-                            signals.actions.set(vec![]);
                         }
-
                         signals.tab.set(crate::AppTab::Game);
                     })
                     .style(move |s| small_action_btn_style(s, signals));

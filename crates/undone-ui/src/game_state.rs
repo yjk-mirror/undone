@@ -282,7 +282,7 @@ pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
                 .set_flag(format!("ONCE_{}", result.scene_id));
         }
         started_scene_id = Some(result.scene_id.clone());
-        crate::start_scene(&mut gs.engine, &mut gs.world, &gs.registry, result.scene_id);
+        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, result.scene_id);
     }
 
     ResumeGameResult {
@@ -291,20 +291,30 @@ pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
     }
 }
 
+pub fn load_world_from_save(gs: &mut GameState, save_path: &Path) -> Result<(), String> {
+    let loaded_world =
+        undone_save::load_game(save_path, &gs.registry).map_err(|e| format!("Load failed: {e}"))?;
+    gs.world = loaded_world;
+    gs.opening_scene = None;
+    Ok(())
+}
+
 /// Load a save into an existing `GameState`, then resume from the persisted world.
 pub fn reload_current_game_from_save(
     gs: &mut GameState,
     save_path: &Path,
 ) -> Result<ResumeGameResult, String> {
-    let loaded_world =
-        undone_save::load_game(save_path, &gs.registry).map_err(|e| format!("Load failed: {e}"))?;
-    gs.world = loaded_world;
+    load_world_from_save(gs, save_path)?;
     Ok(resume_current_world(gs))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::runtime_controller::RuntimeController;
+    use crate::runtime_snapshot::snapshot_runtime;
+    use crate::{AppSignals, NpcSnapshot};
+    use floem::prelude::SignalUpdate;
     use rand::SeedableRng;
     use std::collections::{HashMap, HashSet};
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -482,12 +492,7 @@ mod tests {
                 .game_data
                 .set_flag(format!("ONCE_{}", first_pick.scene_id));
         }
-        crate::start_scene(
-            &mut gs.engine,
-            &mut gs.world,
-            &gs.registry,
-            first_pick.scene_id,
-        );
+        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, first_pick.scene_id);
         play_scene_to_finish(&mut gs);
 
         assert_eq!(
@@ -546,6 +551,125 @@ mod tests {
             "stale opening-scene actions leaked through load: {:?}",
             resumed_actions
         );
+
+        std::fs::remove_file(save_path).unwrap();
+    }
+
+    #[test]
+    fn load_game_state_from_save_uses_shared_initial_controller_progression() {
+        let pre = test_pre_state();
+        let mut source = start_game(pre, workplace_config(), false);
+
+        let first_pick = source
+            .scheduler
+            .pick_next(&source.world, &source.registry, &mut source.rng)
+            .expect("workplace route should schedule arrival");
+        if first_pick.once_only {
+            source
+                .world
+                .game_data
+                .set_flag(format!("ONCE_{}", first_pick.scene_id));
+        }
+        crate::start_scene(
+            &mut source.engine,
+            &source.world,
+            &source.registry,
+            first_pick.scene_id,
+        );
+        play_scene_to_finish(&mut source);
+
+        let save_path = temp_save_path("load_state_through_controller");
+        undone_save::save_game(&source.world, &source.registry, &save_path).unwrap();
+
+        let pre = test_pre_state();
+        let mut loaded = load_game_state_from_save(pre, &save_path, false).unwrap();
+        let signals = AppSignals::new();
+        let mut controller = RuntimeController::new(&mut loaded, signals);
+        let outcome = controller.continue_flow().unwrap();
+        let snapshot = controller.snapshot();
+
+        assert_eq!(controller.gs.opening_scene, None);
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some("base::workplace_landlord")
+        );
+        assert_eq!(snapshot.current_scene_id.as_deref(), Some("base::workplace_landlord"));
+
+        std::fs::remove_file(save_path).unwrap();
+    }
+
+    #[test]
+    fn resume_current_world_clears_transient_ui_state_after_load_world_from_save() {
+        let pre = test_pre_state();
+        let mut gs = start_game(pre, workplace_config(), false);
+
+        let first_pick = gs
+            .scheduler
+            .pick_next(&gs.world, &gs.registry, &mut gs.rng)
+            .expect("workplace route should schedule arrival");
+        if first_pick.once_only {
+            gs.world
+                .game_data
+                .set_flag(format!("ONCE_{}", first_pick.scene_id));
+        }
+        crate::start_scene(
+            &mut gs.engine,
+            &gs.world,
+            &gs.registry,
+            first_pick.scene_id,
+        );
+        play_scene_to_finish(&mut gs);
+
+        let save_path = temp_save_path("resume_snapshot_reset");
+        undone_save::save_game(&gs.world, &gs.registry, &save_path).unwrap();
+
+        gs.engine.send(
+            EngineCommand::StartScene("base::rain_shelter".into()),
+            &mut gs.world,
+            &gs.registry,
+        );
+
+        let signals = AppSignals::new();
+        signals.story.set("stale prose".into());
+        signals.actions.set(vec![undone_scene::engine::ActionView {
+            id: "stale".into(),
+            label: "Stale".into(),
+            detail: "stale".into(),
+        }]);
+        signals.active_npc.set(Some(NpcSnapshot {
+            name: "Stale".into(),
+            age: "Old".into(),
+            personality: "Old".into(),
+            relationship: undone_domain::RelationshipStatus::Acquaintance,
+            pc_liking: undone_domain::LikingLevel::Like,
+            pc_attraction: undone_domain::AttractionLevel::Attracted,
+        }));
+        signals.awaiting_continue.set(true);
+
+        load_world_from_save(&mut gs, &save_path).unwrap();
+        let mut controller = RuntimeController::new(&mut gs, signals);
+        let outcome = controller.resume_from_current_world().unwrap();
+        let snapshot = snapshot_runtime(signals, &gs);
+
+        assert_eq!(outcome.started_scene_id.as_deref(), Some("base::workplace_landlord"));
+        assert_eq!(snapshot.current_scene_id.as_deref(), Some("base::workplace_landlord"));
+        assert!(
+            snapshot
+                .story_paragraphs
+                .iter()
+                .all(|paragraph| !paragraph.contains("stale prose")),
+            "resume snapshot should not keep stale UI story: {:?}",
+            snapshot.story_paragraphs
+        );
+        assert!(
+            snapshot
+                .visible_actions
+                .iter()
+                .all(|action| action.id != "stale"),
+            "resume snapshot should not keep stale actions: {:?}",
+            snapshot.visible_actions
+        );
+        assert!(!snapshot.awaiting_continue);
 
         std::fs::remove_file(save_path).unwrap();
     }
