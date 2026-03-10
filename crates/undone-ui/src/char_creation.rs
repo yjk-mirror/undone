@@ -2159,7 +2159,10 @@ mod tests {
             .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
             .collect();
 
-        assert!(!displayed.is_empty(), "Robin should have personality traits to display");
+        assert!(
+            !displayed.is_empty(),
+            "Robin should have personality traits to display"
+        );
 
         let non_personality = [
             "STRAIGHT_HAIR",

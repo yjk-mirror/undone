@@ -429,7 +429,9 @@ impl GameInputServer {
         .await
     }
 
-    #[tool(description = "Set all NPCs' liking level at once in a running Undone game in dev mode.")]
+    #[tool(
+        description = "Set all NPCs' liking level at once in a running Undone game in dev mode."
+    )]
     async fn set_all_npc_liking(
         &self,
         params: Parameters<SetAllNpcLikingInput>,

@@ -79,6 +79,7 @@ pub struct AppSignals {
     pub tab: RwSignal<AppTab>,
     pub phase: RwSignal<AppPhase>,
     pub scroll_gen: RwSignal<u64>,
+    pub scene_epoch: RwSignal<u64>,
     pub dev_tick: RwSignal<u64>,
     /// When true, the player has finished a scene and should see a "Continue"
     /// button instead of action choices. Clicking Continue loads the next scene.
@@ -102,6 +103,7 @@ impl AppSignals {
             tab: RwSignal::new(AppTab::Game),
             phase: RwSignal::new(AppPhase::Landing),
             scroll_gen: RwSignal::new(0),
+            scene_epoch: RwSignal::new(0),
             dev_tick: RwSignal::new(0),
             awaiting_continue: RwSignal::new(false),
         }
@@ -249,6 +251,7 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                             ref registry,
                             ..
                         } = *gs;
+                        reset_scene_ui_state(signals);
                         if let Some(scene_id) = registry.transformation_scene() {
                             let scene_id = scene_id.to_owned();
                             start_scene(engine, world, registry, scene_id);
@@ -321,9 +324,9 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                                 ..
                             } = *gs;
 
-                            // Clear leftover prose from previous phases
+                            // Clear leftover scene UI state from previous phases
                             // (e.g. TransformationIntro text surviving into InGame).
-                            signals.story.set(String::new());
+                            reset_scene_ui_state(signals);
 
                             // Scheduler takes priority: arc triggers (e.g.
                             // workplace_arrival for ROUTE_WORKPLACE) must fire before
@@ -506,6 +509,15 @@ pub fn start_scene(
     }
 }
 
+pub fn reset_scene_ui_state(signals: AppSignals) {
+    signals.story.set(String::new());
+    signals.actions.set(Vec::new());
+    signals.active_npc.set(None);
+    signals.awaiting_continue.set(false);
+    signals.scroll_gen.set(0);
+    signals.scene_epoch.update(|epoch| *epoch += 1);
+}
+
 const MAX_STORY_PARAGRAPHS: usize = 200;
 
 fn trim_story_paragraphs(story: &mut String) {
@@ -563,8 +575,12 @@ pub fn process_events(
                     // same layout pass. Deferring to the next frame via exec_after
                     // ensures layout has fully settled with the new content.
                     let sg = signals.scroll_gen;
+                    let scene_epoch = signals.scene_epoch;
+                    let expected_epoch = scene_epoch.get_untracked();
                     floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                        sg.update(|n| *n += 1);
+                        if scene_epoch.get_untracked() == expected_epoch {
+                            sg.update(|n| *n += 1);
+                        }
                     });
                 }
             }
@@ -603,8 +619,12 @@ pub fn process_events(
                     append_story_paragraph(s, &text);
                 });
                 let sg = signals.scroll_gen;
+                let scene_epoch = signals.scene_epoch;
+                let expected_epoch = scene_epoch.get_untracked();
                 floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                    sg.update(|n| *n += 1);
+                    if scene_epoch.get_untracked() == expected_epoch {
+                        sg.update(|n| *n += 1);
+                    }
                 });
             }
             EngineEvent::SlotRequested(_slot) => {
@@ -616,8 +636,12 @@ pub fn process_events(
                     append_story_paragraph(s, &format!("[Scene error: {}]", msg));
                 });
                 let sg = signals.scroll_gen;
+                let scene_epoch = signals.scene_epoch;
+                let expected_epoch = scene_epoch.get_untracked();
                 floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                    sg.update(|n| *n += 1);
+                    if scene_epoch.get_untracked() == expected_epoch {
+                        sg.update(|n| *n += 1);
+                    }
                 });
             }
         }
@@ -726,6 +750,36 @@ mod tests {
         append_story_paragraph(&mut story, "one");
         append_story_paragraph(&mut story, "two");
         assert_eq!(story, "one\n\ntwo");
+    }
+
+    #[test]
+    fn reset_scene_ui_state_clears_story_scroll_and_continue_state() {
+        let signals = AppSignals::new();
+        signals.story.set("stale".into());
+        signals.actions.set(vec![ActionView {
+            id: "stale".into(),
+            label: "Stale".into(),
+            detail: "old".into(),
+        }]);
+        signals.active_npc.set(Some(NpcSnapshot {
+            name: "Jake".into(),
+            age: "Twenty-four".into(),
+            personality: "Warm".into(),
+            relationship: RelationshipStatus::Acquaintance,
+            pc_liking: LikingLevel::Like,
+            pc_attraction: AttractionLevel::Attracted,
+        }));
+        signals.awaiting_continue.set(true);
+        signals.scroll_gen.set(9);
+
+        reset_scene_ui_state(signals);
+
+        assert!(signals.story.get().is_empty());
+        assert!(signals.actions.get().is_empty());
+        assert!(signals.active_npc.get().is_none());
+        assert!(!signals.awaiting_continue.get());
+        assert_eq!(signals.scroll_gen.get(), 0);
+        assert_eq!(signals.scene_epoch.get(), 1);
     }
 
     #[test]

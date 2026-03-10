@@ -3,9 +3,9 @@ use std::collections::{HashMap, HashSet};
 use undone_domain::{
     Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BeforeSexuality, BeforeVoice,
     BoundedStat, BreastSize, ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour,
-    HairLength, Height, InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair,
-    NippleSensitivity, PcOrigin, PenisSize, Player, PlayerFigure, PubicHairStyle, SkinTone,
-    WaistSize, WetnessBaseline,
+    HairLength, Height, InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity,
+    PcOrigin, PenisSize, Player, PlayerFigure, PubicHairStyle, SkinTone, WaistSize,
+    WetnessBaseline,
 };
 
 use crate::{GameData, World};

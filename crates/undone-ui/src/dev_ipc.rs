@@ -188,9 +188,7 @@ fn jump_to_scene(gs: &mut GameState, signals: AppSignals, scene_id: &str) -> Dev
     }
 
     gs.engine.reset_runtime();
-    signals.story.set(String::new());
-    signals.actions.set(Vec::new());
-    signals.active_npc.set(None);
+    crate::reset_scene_ui_state(signals);
     crate::start_scene(
         &mut gs.engine,
         &mut gs.world,
@@ -399,6 +397,7 @@ mod tests {
     use super::*;
     use crate::char_creation::robin_quick_config;
     use crate::game_state::{start_game, PreGameState};
+    use floem::prelude::SignalGet;
     use rand::{rngs::SmallRng, SeedableRng};
     use std::collections::HashMap;
     use std::path::PathBuf;
@@ -470,6 +469,37 @@ mod tests {
 
         assert!(!response.success);
         assert!(response.message.contains("Unknown scene"));
+    }
+
+    #[test]
+    fn execute_jump_to_scene_resets_transient_scene_ui_state() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        signals.story.set("old prose".into());
+        signals.actions.set(vec![undone_scene::engine::ActionView {
+            id: "stale".into(),
+            label: "Stale".into(),
+            detail: "stale detail".into(),
+        }]);
+        signals.awaiting_continue.set(true);
+        signals.scroll_gen.set(7);
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::JumpToScene {
+                scene_id: "base::coffee_shop".to_string(),
+            },
+        );
+
+        assert!(response.success);
+        assert!(!signals.awaiting_continue.get());
+        assert_eq!(signals.scroll_gen.get(), 0);
+        assert_ne!(signals.story.get(), "old prose");
+        assert!(
+            !signals.actions.get().is_empty(),
+            "jumped scene should expose its actions"
+        );
     }
 
     #[test]

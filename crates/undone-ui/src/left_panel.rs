@@ -235,7 +235,7 @@ fn dispatch_action(action_id: String, state: &Rc<RefCell<GameState>>, signals: A
 /// Called when the player clicks "Continue" after reading action prose.
 /// Picks the next scene from the scheduler and starts it.
 fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
-    signals.awaiting_continue.set(false);
+    crate::reset_scene_ui_state(signals);
 
     let mut gs = state.borrow_mut();
     let GameState {
@@ -249,7 +249,6 @@ fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
     } = *gs;
 
     if let Some(result) = scheduler.pick_next(world, registry, rng) {
-        signals.story.set(String::new());
         if result.once_only {
             world
                 .game_data

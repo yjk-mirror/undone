@@ -29,9 +29,7 @@ fn try_load_entry(
     match load_game_state_from_save(pre, &entry.path, dev_mode) {
         Ok(loaded_game) => {
             *game_state.borrow_mut() = Some(loaded_game);
-            signals.story.set(String::new());
-            signals.actions.set(vec![]);
-            signals.active_npc.set(None);
+            crate::reset_scene_ui_state(signals);
             signals.tab.set(AppTab::Game);
             signals.phase.set(AppPhase::InGame);
             status_msg.set(format!("Loaded: {}", entry.name));
@@ -55,6 +53,7 @@ pub fn landing_view(
     let new_game_btn = label(|| "New Game".to_string())
         .keyboard_navigable()
         .on_click_stop(move |_| {
+            crate::reset_scene_ui_state(signals);
             signals.tab.set(AppTab::Game);
             signals.phase.set(AppPhase::BeforeCreation);
         })

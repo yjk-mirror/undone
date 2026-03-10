@@ -16,6 +16,8 @@ use windows::Win32::{
     },
 };
 
+const MK_LBUTTON_FLAG: usize = 0x0001;
+
 // ── Window finding ──────────────────────────────────────────────────
 
 struct FindCtx {
@@ -105,6 +107,19 @@ fn make_keyup_lparam(vk: VIRTUAL_KEY) -> LPARAM {
     LPARAM((1 | ((scan & 0xFF) << 16) | (1 << 30) | (1 << 31)) as isize)
 }
 
+fn mouse_client_lparam(x: i32, y: i32) -> LPARAM {
+    LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF))
+}
+
+fn click_messages(x: i32, y: i32) -> [(u32, WPARAM, LPARAM); 3] {
+    let lparam = mouse_client_lparam(x, y);
+    [
+        (WM_MOUSEMOVE, WPARAM(0), lparam),
+        (WM_LBUTTONDOWN, WPARAM(MK_LBUTTON_FLAG), lparam),
+        (WM_LBUTTONUP, WPARAM(0), lparam),
+    ]
+}
+
 // ── Public actions ──────────────────────────────────────────────────
 
 /// Post a key press (down + up) to the target window. No focus steal.
@@ -125,14 +140,11 @@ pub fn press_key(hwnd: HWND, key: &str) -> anyhow::Result<()> {
 /// Post a mouse click (down + up) at client-relative (x, y) to the target window.
 /// No focus steal, no cursor movement.
 pub fn click(hwnd: HWND, x: i32, y: i32) -> anyhow::Result<()> {
-    // MAKELPARAM(x, y) = (y << 16) | (x & 0xFFFF)
-    let lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
-
     unsafe {
-        PostMessageW(hwnd, WM_LBUTTONDOWN, WPARAM(0), lparam)
-            .map_err(|e| anyhow::anyhow!("PostMessage WM_LBUTTONDOWN failed: {}", e))?;
-        PostMessageW(hwnd, WM_LBUTTONUP, WPARAM(0), lparam)
-            .map_err(|e| anyhow::anyhow!("PostMessage WM_LBUTTONUP failed: {}", e))?;
+        for (message, wparam, lparam) in click_messages(x, y) {
+            PostMessageW(hwnd, message, wparam, lparam)
+                .map_err(|e| anyhow::anyhow!("PostMessage {message:#X} failed: {}", e))?;
+        }
     }
 
     Ok(())
@@ -148,7 +160,7 @@ pub fn click(hwnd: HWND, x: i32, y: i32) -> anyhow::Result<()> {
 /// event targets whatever widget the real cursor was last over.
 pub fn scroll(hwnd: HWND, x: i32, y: i32, delta: i32) -> anyhow::Result<()> {
     // Step 1: Update floem's cursor_position so the wheel event hits the right widget.
-    let move_lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
+    let move_lparam = mouse_client_lparam(x, y);
     unsafe {
         PostMessageW(hwnd, WM_MOUSEMOVE, WPARAM(0), move_lparam)
             .map_err(|e| anyhow::anyhow!("PostMessage WM_MOUSEMOVE failed: {}", e))?;
@@ -158,7 +170,7 @@ pub fn scroll(hwnd: HWND, x: i32, y: i32, delta: i32) -> anyhow::Result<()> {
     // WM_MOUSEMOVE above will be processed first.
     let wheel_delta = delta * 120; // WHEEL_DELTA = 120
     let wparam = WPARAM((wheel_delta as u16 as usize) << 16);
-    let lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
+    let lparam = mouse_client_lparam(x, y);
     unsafe {
         PostMessageW(hwnd, WM_MOUSEWHEEL, wparam, lparam)
             .map_err(|e| anyhow::anyhow!("PostMessage WM_MOUSEWHEEL failed: {}", e))?;
@@ -169,7 +181,7 @@ pub fn scroll(hwnd: HWND, x: i32, y: i32, delta: i32) -> anyhow::Result<()> {
 
 /// Post a mouse move to client-relative (x, y). Triggers hover effects.
 pub fn hover(hwnd: HWND, x: i32, y: i32) -> anyhow::Result<()> {
-    let lparam = LPARAM(((y as isize) << 16) | (x as isize & 0xFFFF));
+    let lparam = mouse_client_lparam(x, y);
 
     unsafe {
         PostMessageW(hwnd, WM_MOUSEMOVE, WPARAM(0), lparam)
@@ -231,5 +243,25 @@ pub fn kill_process(pid: u32) -> anyhow::Result<()> {
 
         result.map_err(|e| anyhow::anyhow!("TerminateProcess({}) failed: {}", pid, e))?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::click_messages;
+    use windows::Win32::UI::WindowsAndMessaging::{WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE};
+
+    #[test]
+    fn click_messages_move_before_click_and_hold_button_during_down() {
+        let [move_msg, down_msg, up_msg] = click_messages(120, 340);
+
+        assert_eq!(move_msg.0, WM_MOUSEMOVE);
+        assert_eq!(down_msg.0, WM_LBUTTONDOWN);
+        assert_eq!(up_msg.0, WM_LBUTTONUP);
+        assert_eq!(move_msg.1 .0, 0);
+        assert_eq!(down_msg.1 .0, super::MK_LBUTTON_FLAG);
+        assert_eq!(up_msg.1 .0, 0);
+        assert_eq!(move_msg.2 .0, down_msg.2 .0);
+        assert_eq!(down_msg.2 .0, up_msg.2 .0);
     }
 }

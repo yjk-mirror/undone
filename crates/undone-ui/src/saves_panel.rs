@@ -206,11 +206,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                                     Ok(resume) => resume,
                                 };
 
-                            // Clear UI signals first
-                            signals.story.set(String::new());
-                            signals.actions.set(vec![]);
-                            signals.active_npc.set(None);
-                            signals.awaiting_continue.set(false);
+                            crate::reset_scene_ui_state(signals);
                             status_msg.set(
                                 entry_path_load
                                     .file_stem()
