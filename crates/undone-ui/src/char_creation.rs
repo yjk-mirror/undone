@@ -671,26 +671,39 @@ pub fn fem_creation_view(
     };
 
     let body_section: Box<dyn View> = if let Some(preset) = preset_ref {
-        let post_traits_display = preset
+        let physical_traits: Vec<String> = preset
             .trait_ids
             .iter()
-            .filter(|id| !PERSONALITY_TRAIT_IDS.contains(id))
-            .map(|id| {
-                let s = id.to_lowercase().replace('_', " ");
-                let mut c = s.chars();
-                match c.next() {
-                    None => String::new(),
-                    Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-                }
+            .filter(|id| {
+                !PERSONALITY_TRAIT_IDS.contains(id) && BODY_APPEARANCE_TRAIT_IDS.contains(id)
             })
-            .collect::<Vec<_>>()
-            .join(", ");
+            .map(|id| trait_id_to_display(id))
+            .collect();
+        let sexual_traits: Vec<String> = preset
+            .trait_ids
+            .iter()
+            .filter(|id| {
+                !PERSONALITY_TRAIT_IDS.contains(id) && !BODY_APPEARANCE_TRAIT_IDS.contains(id)
+            })
+            .map(|id| trait_id_to_display(id))
+            .collect();
+        let physical_row: Box<dyn View> = if physical_traits.is_empty() {
+            Box::new(empty())
+        } else {
+            Box::new(trait_chips("Physical", physical_traits, signals))
+        };
+        let sexual_row: Box<dyn View> = if sexual_traits.is_empty() {
+            Box::new(empty())
+        } else {
+            Box::new(trait_chips("Sexual", sexual_traits, signals))
+        };
         Box::new(
             v_stack((
                 section_title("Your Body", signals),
                 read_only_row("Figure", preset.figure.to_string(), signals),
                 read_only_row("Breasts", preset.breasts.to_string(), signals),
-                read_only_row("Traits", post_traits_display, signals),
+                physical_row,
+                sexual_row,
             ))
             .style(section_style()),
         )
@@ -1166,21 +1179,40 @@ const PERSONALITY_TRAIT_IDS: &[&str] = &[
     "OBJECTIFYING",
 ];
 
+/// Physical appearance trait IDs shown under "Physical" in the body section.
+/// Non-personality traits not in this list appear under "Sexual".
+const BODY_APPEARANCE_TRAIT_IDS: &[&str] = &[
+    "STRAIGHT_HAIR",
+    "WAVY_HAIR",
+    "CURLY_HAIR",
+    "SWEET_VOICE",
+    "SMOKY_VOICE",
+    "HUSKY_VOICE",
+    "ALMOND_EYES",
+    "WIDE_EYES",
+    "HOODED_EYES",
+    "WIDE_HIPS",
+    "NARROW_HIPS",
+    "NARROW_WAIST",
+    "SMALL_HANDS",
+    "LONG_LEGS",
+    "LONG_NECK",
+    "PRONOUNCED_COLLARBONES",
+    "THIGH_GAP",
+    "SOFT_SKIN",
+    "NATURALLY_SMOOTH",
+    "INTOXICATING_SCENT",
+    "REGULAR_PERIODS",
+    "IRREGULAR_PERIODS",
+];
+
 fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> impl View {
-    let traits_display = preset
+    let personality_traits: Vec<String> = preset
         .trait_ids
         .iter()
         .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
-        .map(|id| {
-            let s = id.to_lowercase().replace('_', " ");
-            let mut c = s.chars();
-            match c.next() {
-                None => String::new(),
-                Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-            }
-        })
-        .collect::<Vec<_>>()
-        .join(", ");
+        .map(|id| trait_id_to_display(id))
+        .collect();
 
     v_stack((
         label(move || preset.blurb.to_string()).style(move |s| {
@@ -1200,7 +1232,7 @@ fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> im
         read_only_row("Skin tone", preset.before_skin_tone.to_string(), signals),
         read_only_row("Voice", preset.before_voice.to_string(), signals),
         read_only_row("Penis size", preset.before_penis_size.to_string(), signals),
-        read_only_row("Personality", traits_display, signals),
+        trait_chips("Personality", personality_traits, signals),
     ))
     .style(|s| s.flex_col().width_full().margin_bottom(24.0))
 }
@@ -1757,6 +1789,56 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
     .style(|s| s.items_start().margin_bottom(12.0).max_width(600.0))
 }
 
+fn trait_id_to_display(id: &str) -> String {
+    let s = id.to_lowercase().replace('_', " ");
+    let mut c = s.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
+fn trait_chips(label_text: &'static str, traits: Vec<String>, signals: AppSignals) -> impl View {
+    let traits_sig = RwSignal::new(traits);
+    let chips = dyn_stack(
+        move || traits_sig.get(),
+        |t| t.clone(),
+        move |t| {
+            label(move || t.clone()).style(move |s| {
+                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                s.padding_horiz(8.0)
+                    .padding_vert(3.0)
+                    .margin_right(4.0)
+                    .margin_bottom(4.0)
+                    .border(1.0)
+                    .border_radius(4.0)
+                    .border_color(colors.seam)
+                    .color(colors.ink_ghost)
+                    .font_size(12.0)
+                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+            })
+        },
+    )
+    .style(|s| {
+        s.flex_row()
+            .flex_wrap(floem::style::FlexWrap::Wrap)
+            .flex_basis(0.0)
+            .flex_grow(1.0)
+    });
+    h_stack((
+        label(move || label_text.to_string()).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.min_width(180.0)
+                .width(180.0)
+                .font_size(14.0)
+                .color(colors.ink_dim)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+        }),
+        chips,
+    ))
+    .style(|s| s.items_start().margin_bottom(12.0).max_width(600.0))
+}
+
 fn trait_checkbox(name: &'static str, sig: RwSignal<bool>, signals: AppSignals) -> impl View {
     Checkbox::labeled_rw(sig, move || name.to_string()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -1966,6 +2048,28 @@ mod tests {
     }
 
     #[test]
+    fn fem_form_defaults_use_camila_name_for_raul_preset() {
+        // preset_idx=1 → PRESET_RAUL → name_fem should be "Camila", not "Eva"
+        let partial = PartialCharState {
+            origin: PcOrigin::CisMaleTransformed,
+            before_name: "Raul".into(),
+            before_age: Age::LateTeen,
+            before_race: "Latina".into(),
+            before_sexuality: BeforeSexuality::AttractedToWomen,
+            starting_traits: vec![],
+            starting_flags: vec!["ROUTE_CAMPUS".into()],
+            preset_idx: Some(1),
+            appearance: Appearance::Average,
+        };
+
+        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        assert_eq!(defaults.name_fem, "Camila");
+        assert_eq!(defaults.figure, PRESET_RAUL.figure);
+        assert_eq!(defaults.breasts, PRESET_RAUL.breasts);
+        assert_eq!(defaults.race, PRESET_RAUL.race);
+    }
+
+    #[test]
     fn fem_form_defaults_fall_back_to_before_race_for_custom_mode() {
         let partial = PartialCharState {
             origin: PcOrigin::CisMaleTransformed,
@@ -2021,5 +2125,60 @@ mod tests {
         assert_eq!(config.female_count, 3);
         assert_eq!(config.appearance, PRESET_ROBIN.appearance);
         assert_eq!(config.starting_traits.len(), PRESET_ROBIN.trait_ids.len());
+    }
+
+    /// Physical/body traits from PRESET_ROBIN must NOT appear in BeforeCreation's
+    /// personality display — they are post-transformation attributes.
+    #[test]
+    fn before_creation_personality_display_excludes_physical_traits() {
+        let physical_traits = [
+            "STRAIGHT_HAIR",
+            "SWEET_VOICE",
+            "ALMOND_EYES",
+            "WIDE_HIPS",
+            "NARROW_WAIST",
+            "SMALL_HANDS",
+        ];
+        for id in physical_traits {
+            assert!(
+                !PERSONALITY_TRAIT_IDS.contains(&id),
+                "Physical trait '{}' must not be in PERSONALITY_TRAIT_IDS",
+                id
+            );
+        }
+    }
+
+    /// Robin's personality display (BeforeCreation) must only contain personality traits —
+    /// filtering on PERSONALITY_TRAIT_IDS must exclude all physical/sexual traits.
+    #[test]
+    fn robin_preset_personality_display_excludes_body_and_sexual_traits() {
+        let displayed: Vec<&str> = PRESET_ROBIN
+            .trait_ids
+            .iter()
+            .copied()
+            .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
+            .collect();
+
+        assert!(!displayed.is_empty(), "Robin should have personality traits to display");
+
+        let non_personality = [
+            "STRAIGHT_HAIR",
+            "SWEET_VOICE",
+            "ALMOND_EYES",
+            "WIDE_HIPS",
+            "NARROW_WAIST",
+            "SMALL_HANDS",
+            "HAIR_TRIGGER",
+            "HEAVY_SQUIRTER",
+            "MULTI_ORGASMIC",
+            "REGULAR_PERIODS",
+        ];
+        for id in displayed {
+            assert!(
+                !non_personality.contains(&id),
+                "Non-personality trait '{}' incorrectly appears in BeforeCreation display",
+                id
+            );
+        }
     }
 }

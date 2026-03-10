@@ -18,3 +18,6 @@ slotmap          = { workspace = true }
 dirs             = { workspace = true }
 serde            = { workspace = true }
 serde_json       = { workspace = true }
+
+[dev-dependencies]
+undone-world = { path = "../undone-world", features = ["test-helpers"] }
