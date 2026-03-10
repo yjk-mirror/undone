@@ -65,6 +65,7 @@ pub fn load_packs(packs_dir: &Path) -> Result<(PackRegistry, Vec<LoadedPackMeta>
     }
 
     validate_required_ids(&registry)?;
+    registry.seal_pack_id_prefix();
 
     Ok((registry, metas))
 }

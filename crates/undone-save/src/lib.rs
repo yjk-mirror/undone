@@ -47,6 +47,14 @@ pub enum SaveError {
         saved_count: usize,
         registry_count: usize,
     },
+
+    #[error(
+        "save recorded pack_id_prefix_len {saved_pack_count} but only stored {saved_count} interned IDs"
+    )]
+    InvalidPackIdPrefix {
+        saved_pack_count: usize,
+        saved_count: usize,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -69,6 +77,9 @@ pub struct SaveFile {
     pub version: u32,
     /// All strings interned by the PackRegistry, in Spur-index order.
     pub id_strings: Vec<String>,
+    /// The count of pack-loaded IDs present when the save was written.
+    #[serde(default)]
+    pub pack_id_prefix_len: Option<usize>,
     pub world: World,
 }
 
@@ -85,6 +96,7 @@ pub fn save_game(world: &World, registry: &PackRegistry, path: &Path) -> Result<
     let file = SaveFile {
         version: SAVE_VERSION,
         id_strings,
+        pack_id_prefix_len: Some(registry.pack_id_prefix_len()),
         world: world.clone(),
     };
     let json = serde_json::to_string_pretty(&file)?;
@@ -154,7 +166,7 @@ pub fn load_game(path: &Path, registry: &mut PackRegistry) -> Result<World, Save
 
     let file: SaveFile = serde_json::from_value(raw)?;
 
-    validate_ids(&file.id_strings, registry)?;
+    validate_ids(&file.id_strings, file.pack_id_prefix_len, registry)?;
 
     Ok(file.world)
 }
@@ -505,13 +517,38 @@ fn migrate_v4_to_v5(mut save_json: serde_json::Value) -> serde_json::Value {
 
 /// Verify that all IDs recorded in the save file still map to the same strings
 /// in the current registry.
-fn validate_ids(saved: &[String], registry: &mut PackRegistry) -> Result<(), SaveError> {
+fn validate_ids(
+    saved: &[String],
+    saved_pack_id_prefix_len: Option<usize>,
+    registry: &mut PackRegistry,
+) -> Result<(), SaveError> {
     let current = registry.all_interned_strings();
+    let current_len = current.len();
 
-    // Every ID in the current pack-loaded registry must match the same-index ID in the save.
-    // If the current registry is a strict prefix of the saved ids, replay the saved tail:
-    // those extra ids come from runtime-only interning (for example spawned NPC personalities).
-    for (i, (s, c)) in saved.iter().zip(current.iter()).enumerate() {
+    if let Some(saved_pack_count) = saved_pack_id_prefix_len {
+        if saved_pack_count > saved.len() {
+            return Err(SaveError::InvalidPackIdPrefix {
+                saved_pack_count,
+                saved_count: saved.len(),
+            });
+        }
+
+        if current_len < saved_pack_count {
+            return Err(SaveError::TooManyIds {
+                saved_count: saved.len(),
+                registry_count: current_len,
+            });
+        }
+    }
+
+    let compare_len = saved.len().min(current_len);
+
+    for (i, (s, c)) in saved
+        .iter()
+        .take(compare_len)
+        .zip(current.iter().take(compare_len))
+        .enumerate()
+    {
         if s != c {
             return Err(SaveError::IdMismatch {
                 index: i,
@@ -521,10 +558,18 @@ fn validate_ids(saved: &[String], registry: &mut PackRegistry) -> Result<(), Sav
         }
     }
 
-    if saved.len() > current.len() {
-        for id in &saved[current.len()..] {
-            registry.ensure_interned_string(id);
+    let Some(_) = saved_pack_id_prefix_len else {
+        if saved.len() > current_len {
+            return Err(SaveError::TooManyIds {
+                saved_count: saved.len(),
+                registry_count: current_len,
+            });
         }
+        return Ok(());
+    };
+
+    for id in &saved[current_len..] {
+        registry.ensure_interned_string(id);
     }
 
     Ok(())
@@ -593,6 +638,10 @@ mod tests {
         let parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
         assert_eq!(parsed["version"], SAVE_VERSION);
         assert!(parsed["id_strings"].is_array());
+        assert_eq!(
+            parsed["pack_id_prefix_len"],
+            serde_json::Value::Number((registry.pack_id_prefix_len() as u64).into())
+        );
         assert!(parsed["world"].is_object());
     }
 
@@ -651,7 +700,7 @@ mod tests {
 
         // "ALPHA" → index 0; save claims index 0 = "BETA"
         let saved = vec!["BETA".to_string()];
-        let result = validate_ids(&saved, &mut registry);
+        let result = validate_ids(&saved, None, &mut registry);
         assert!(
             matches!(result, Err(SaveError::IdMismatch { index: 0, .. })),
             "should detect ID mismatch at index 0"
@@ -659,10 +708,10 @@ mod tests {
     }
 
     #[test]
-    fn validate_ids_replays_saved_tail_into_registry() {
+    fn validate_ids_replays_saved_tail_into_registry_when_prefix_is_recorded() {
         let mut registry = PackRegistry::new();
         let saved = vec!["SOMETHING".to_string()]; // saved has 1 ID, registry has 0
-        let result = validate_ids(&saved, &mut registry);
+        let result = validate_ids(&saved, Some(0), &mut registry);
         assert!(result.is_ok(), "saved runtime-only tail should be replayed");
         assert_eq!(registry.all_interned_strings(), saved);
     }
@@ -691,8 +740,93 @@ mod tests {
 
         // Saved only knew about "SHY" (first registered); registry also has POSH
         let saved = vec!["SHY".to_string()];
-        let result = validate_ids(&saved, &mut registry);
+        let result = validate_ids(&saved, None, &mut registry);
         assert!(result.is_ok(), "registry having more IDs than save is OK");
+    }
+
+    #[test]
+    fn validate_ids_rejects_runtime_tail_when_registry_prefix_shifts() {
+        let mut registry = PackRegistry::new();
+        registry.register_traits(vec![
+            undone_packs::TraitDef {
+                id: "PACK_A".into(),
+                name: "Pack A".into(),
+                description: "".into(),
+                hidden: false,
+                group: None,
+                conflicts: vec![],
+            },
+            undone_packs::TraitDef {
+                id: "PACK_B".into(),
+                name: "Pack B".into(),
+                description: "".into(),
+                hidden: false,
+                group: None,
+                conflicts: vec![],
+            },
+        ]);
+        let saved = vec!["PACK_A".to_string(), "RUNTIME_ONLY".to_string()];
+
+        let result = validate_ids(&saved, Some(1), &mut registry);
+        assert!(
+            matches!(
+                result,
+                Err(SaveError::IdMismatch { index: 1, .. })
+            ),
+            "runtime tails cannot be replayed after pack IDs shift"
+        );
+    }
+
+    #[test]
+    fn validate_ids_replays_missing_runtime_tail_after_matching_prefix() {
+        let mut registry = PackRegistry::new();
+        registry.register_traits(vec![undone_packs::TraitDef {
+            id: "PACK_A".into(),
+            name: "Pack A".into(),
+            description: "".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        registry.ensure_interned_string("RUNTIME_ONLY");
+        let saved = vec![
+            "PACK_A".to_string(),
+            "RUNTIME_ONLY".to_string(),
+            "RUNTIME_TAIL".to_string(),
+        ];
+
+        let result = validate_ids(&saved, Some(1), &mut registry);
+        assert!(result.is_ok(), "matching runtime prefix should be extendable");
+        assert_eq!(registry.all_interned_strings(), saved);
+    }
+
+    #[test]
+    fn load_fails_when_longer_id_table_has_no_runtime_tail_metadata() {
+        let (mut save_registry, _) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let mut load_registry = save_registry.clone();
+        save_registry.intern_personality("REMOVED_PACK_OR_RUNTIME_TAIL");
+        let world = make_world(&save_registry);
+
+        let dir = tempfile_dir();
+        let path = dir.join("missing_runtime_tail_metadata.json");
+        save_game(&world, &save_registry, &path).unwrap();
+
+        let mut parsed: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        parsed.as_object_mut().unwrap().remove("pack_id_prefix_len");
+        std::fs::write(&path, serde_json::to_string_pretty(&parsed).unwrap()).unwrap();
+
+        let result = load_game(&path, &mut load_registry);
+        assert!(
+            matches!(
+                result,
+                Err(SaveError::TooManyIds {
+                    saved_count,
+                    registry_count
+                }) if saved_count > registry_count
+            ),
+            "longer saved ID tables without runtime-tail metadata must fail"
+        );
     }
 
     /// Test that a v1-format save is correctly migrated through v2 and v3 on load.
@@ -715,6 +849,7 @@ mod tests {
         let mut save_json = serde_json::to_value(&SaveFile {
             version: 1, // lie about the version
             id_strings,
+            pack_id_prefix_len: None,
             world,
         })
         .unwrap();
@@ -778,6 +913,7 @@ mod tests {
         let mut save_json = serde_json::to_value(&SaveFile {
             version: 2,
             id_strings,
+            pack_id_prefix_len: None,
             world,
         })
         .unwrap();

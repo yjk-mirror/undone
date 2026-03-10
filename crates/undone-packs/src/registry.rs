@@ -22,6 +22,7 @@ pub enum RegistryError {
 #[derive(Clone)]
 pub struct PackRegistry {
     rodeo: Rodeo,
+    pack_id_prefix_len: Option<usize>,
     trait_defs: HashMap<TraitId, TraitDef>,
     npc_trait_defs: HashMap<NpcTraitId, NpcTraitDef>,
     skill_defs: HashMap<SkillId, SkillDef>,
@@ -48,6 +49,7 @@ impl PackRegistry {
     pub fn new() -> Self {
         Self {
             rodeo: Rodeo::new(),
+            pack_id_prefix_len: None,
             trait_defs: HashMap::new(),
             npc_trait_defs: HashMap::new(),
             skill_defs: HashMap::new(),
@@ -71,6 +73,18 @@ impl PackRegistry {
     /// Used when replaying runtime-only interned ids from save files.
     pub fn ensure_interned_string(&mut self, id: &str) {
         let _ = self.intern(id);
+    }
+
+    /// Record the current interner length as the boundary between pack-loaded IDs
+    /// and any runtime-only IDs added later.
+    pub fn seal_pack_id_prefix(&mut self) {
+        self.pack_id_prefix_len = Some(self.rodeo.len());
+    }
+
+    /// Return the count of pack-loaded interned IDs known to the registry.
+    /// Unsealed registries treat the full current interner length as pack-loaded.
+    pub fn pack_id_prefix_len(&self) -> usize {
+        self.pack_id_prefix_len.unwrap_or(self.rodeo.len())
     }
 
     /// Register player traits from a pack data file.

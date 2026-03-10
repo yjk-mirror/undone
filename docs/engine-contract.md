@@ -148,16 +148,19 @@ Save format:
 - current version is `5`
 - save files store the full `World`
 - save files also store `id_strings`, the pack interner contents in spur order
+- save files written by the current runtime also store `pack_id_prefix_len`, the count of pack-loaded IDs before any runtime-only interning
 
 Load must fail if:
 
 - save version is newer than the loader understands
 - saved interner strings differ from the current registry at any matching index
+- `pack_id_prefix_len` is malformed or the current registry is shorter than the saved pack-loaded prefix
+- an older save omits `pack_id_prefix_len` and has more interned IDs than the current registry
 
 Load may succeed if:
 
 - the current registry has additional IDs appended after the saved prefix
-- the save references additional runtime-only interned IDs after the current registry prefix; load replays that saved tail back into the registry before deserializing the world
+- the save references additional runtime-only interned IDs after the saved pack-loaded prefix and the current registry matches the saved ID table prefix; load replays only the missing saved tail back into the registry before deserializing the world
 
 Migration chain:
 
