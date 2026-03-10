@@ -7,6 +7,7 @@ pub mod left_panel;
 pub mod right_panel;
 pub mod runtime_controller;
 pub mod runtime_snapshot;
+pub mod runtime_test_support;
 pub mod saves_panel;
 pub mod settings_panel;
 pub mod theme;
@@ -247,7 +248,8 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
                 {
                     let mut gs_opt = gs_ref.borrow_mut();
                     if let Some(ref mut gs) = *gs_opt {
-                        let transformation_scene = gs.registry.transformation_scene().map(str::to_owned);
+                        let transformation_scene =
+                            gs.registry.transformation_scene().map(str::to_owned);
                         if let Some(scene_id) = transformation_scene {
                             let mut controller = RuntimeController::new(gs, signals);
                             let _ = controller.start_scene(scene_id);
@@ -613,9 +615,9 @@ mod tests {
     use undone_domain::*;
     use undone_packs::load_packs;
     use undone_packs::PackRegistry;
+    use undone_scene::engine::{EngineCommand, SceneEngine};
     use undone_scene::loader::load_scenes;
     use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
-    use undone_scene::engine::{EngineCommand, SceneEngine};
     use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
     use undone_world::test_helpers::make_test_world as test_world;
 
@@ -856,12 +858,7 @@ mod tests {
         let personality = registry.intern_personality("ROMANTIC");
         let male_key = world.male_npcs.insert(test_male_npc(personality));
 
-        start_scene(
-            &mut engine,
-            &mut world,
-            &registry,
-            "test::npc_binding".into(),
-        );
+        start_scene(&mut engine, &world, &registry, "test::npc_binding".into());
         engine.drain();
 
         engine.send(
@@ -904,7 +901,7 @@ mod tests {
 
         start_scene(
             &mut engine,
-            &mut world,
+            &world,
             &registry,
             "test::intro_time_npc".into(),
         );
@@ -924,7 +921,8 @@ mod tests {
         let pre = test_pre_state();
         let config = crate::char_creation::robin_quick_config(&pre.registry);
         let gs = start_game(pre, config, true);
-        let snapshot = serde_json::to_value(runtime_state_snapshot(&gs, AppSignals::new())).unwrap();
+        let snapshot =
+            serde_json::to_value(runtime_state_snapshot(&gs, AppSignals::new())).unwrap();
 
         assert!(
             snapshot.get("story_paragraphs").is_some(),

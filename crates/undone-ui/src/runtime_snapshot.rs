@@ -228,7 +228,9 @@ mod tests {
         signals.phase.set(AppPhase::InGame);
         signals.tab.set(AppTab::Dev);
         signals.awaiting_continue.set(true);
-        signals.story.set("First paragraph.\n\nSecond paragraph.".into());
+        signals
+            .story
+            .set("First paragraph.\n\nSecond paragraph.".into());
         signals.actions.set(vec![ActionView {
             id: "wait".into(),
             label: "Wait".into(),
@@ -264,7 +266,10 @@ mod tests {
         assert!(snapshot.awaiting_continue);
         assert_eq!(
             snapshot.story_paragraphs,
-            vec!["First paragraph.".to_string(), "Second paragraph.".to_string()]
+            vec![
+                "First paragraph.".to_string(),
+                "Second paragraph.".to_string()
+            ]
         );
         assert_eq!(
             snapshot.visible_actions,
@@ -287,13 +292,14 @@ mod tests {
             })
         );
         assert_eq!(snapshot.player.name, "Robin");
-        assert!(snapshot.world.game_flags.contains(&"FLAG_ALPHA".to_string()));
-        assert!(
-            snapshot
-                .world
-                .arc_states
-                .iter()
-                .any(|arc| arc.id == "base::workplace_opening" && arc.state == "arrived")
-        );
+        assert!(snapshot
+            .world
+            .game_flags
+            .contains(&"FLAG_ALPHA".to_string()));
+        assert!(snapshot
+            .world
+            .arc_states
+            .iter()
+            .any(|arc| arc.id == "base::workplace_opening" && arc.state == "arrived"));
     }
 }
