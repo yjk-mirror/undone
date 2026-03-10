@@ -5,6 +5,7 @@ pub mod game_state;
 pub mod landing_page;
 pub mod left_panel;
 pub mod right_panel;
+pub mod runtime_snapshot;
 pub mod saves_panel;
 pub mod settings_panel;
 pub mod theme;
@@ -663,7 +664,7 @@ fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dev_ipc::game_state_snapshot;
+    use crate::dev_ipc::runtime_state_snapshot;
     use crate::game_state::{start_game, PreGameState};
     use lasso::Key;
     use rand::SeedableRng;
@@ -984,7 +985,7 @@ mod tests {
         let pre = test_pre_state();
         let config = crate::char_creation::robin_quick_config(&pre.registry);
         let gs = start_game(pre, config, true);
-        let snapshot = serde_json::to_value(game_state_snapshot(&gs)).unwrap();
+        let snapshot = serde_json::to_value(runtime_state_snapshot(&gs, AppSignals::new())).unwrap();
 
         assert!(
             snapshot.get("story_paragraphs").is_some(),

@@ -10,6 +10,7 @@ use serde_json::json;
 use undone_domain::{BoundedStat, SkillValue};
 
 use crate::game_state::GameState;
+use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{AppSignals, AppTab, PlayerSnapshot};
 
 #[derive(Debug, Deserialize)]
@@ -91,6 +92,10 @@ pub fn game_state_snapshot(gs: &GameState) -> GameStateSnapshot {
         game_flags: flags,
         arc_states,
     }
+}
+
+pub fn runtime_state_snapshot(gs: &GameState, signals: AppSignals) -> RuntimeSnapshot {
+    snapshot_runtime(signals, gs)
 }
 
 pub fn execute_command(
