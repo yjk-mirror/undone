@@ -45,6 +45,8 @@ struct ScheduleFileToml {
 struct ScheduleSlotToml {
     name: String,
     #[serde(default)]
+    consumes_time: Option<bool>,
+    #[serde(default)]
     events: Vec<ScheduleEventToml>,
 }
 
@@ -78,6 +80,13 @@ pub(crate) struct ScheduleEvent {
     pub(crate) trigger: Option<Expr>,
 }
 
+#[derive(Clone)]
+pub(crate) struct ScheduleSlot {
+    pub(crate) name: String,
+    pub(crate) consumes_time: bool,
+    pub(crate) events: Vec<ScheduleEvent>,
+}
+
 // ---------------------------------------------------------------------------
 // Public result types
 // ---------------------------------------------------------------------------
@@ -87,6 +96,8 @@ pub(crate) struct ScheduleEvent {
 pub struct PickResult {
     pub scene_id: String,
     pub once_only: bool,
+    pub slot_name: String,
+    pub consumes_time: bool,
 }
 
 // ---------------------------------------------------------------------------
@@ -97,8 +108,8 @@ pub struct PickResult {
 /// Use `load_schedule` to build from pack metadata, then call `pick` each week.
 #[derive(Clone)]
 pub struct Scheduler {
-    /// slot_name → list of events
-    slots: HashMap<String, Vec<ScheduleEvent>>,
+    /// slot_name → slot definition + list of events
+    slots: HashMap<String, ScheduleSlot>,
 }
 
 impl Scheduler {
@@ -118,7 +129,7 @@ impl Scheduler {
     /// Return true when any schedule condition or trigger references the given
     /// game flag via `gd.hasGameFlag("...")`.
     pub fn references_game_flag(&self, flag: &str) -> bool {
-        self.slots.values().flatten().any(|event| {
+        self.slots.values().flat_map(|slot| slot.events.iter()).any(|event| {
             event
                 .condition
                 .as_ref()
@@ -132,9 +143,9 @@ impl Scheduler {
 
     pub fn all_conditions(&self) -> Vec<(String, Expr)> {
         let mut result = Vec::new();
-        for (slot_name, events) in &self.slots {
-            for event in events {
-                let ctx = format!("slot '{slot_name}', scene '{}'", event.scene);
+        for slot in self.slots.values() {
+            for event in &slot.events {
+                let ctx = format!("slot '{}', scene '{}'", slot.name, event.scene);
                 if let Some(expr) = &event.condition {
                     result.push((ctx.clone(), expr.clone()));
                 }
@@ -150,7 +161,7 @@ impl Scheduler {
         let mut ids: Vec<String> = self
             .slots
             .values()
-            .flat_map(|events| events.iter().map(|event| event.scene.clone()))
+            .flat_map(|slot| slot.events.iter().map(|event| event.scene.clone()))
             .collect();
         ids.sort();
         ids.dedup();
@@ -159,7 +170,21 @@ impl Scheduler {
 
     #[cfg(test)]
     pub(crate) fn from_slots_for_tests(slots: HashMap<String, Vec<ScheduleEvent>>) -> Self {
-        Self { slots }
+        Self {
+            slots: slots
+                .into_iter()
+                .map(|(name, events)| {
+                    (
+                        name.clone(),
+                        ScheduleSlot {
+                            name,
+                            consumes_time: false,
+                            events,
+                        },
+                    )
+                })
+                .collect(),
+        }
     }
 
     /// Pick a scene for the given slot. Evaluates conditions against the current
@@ -173,7 +198,8 @@ impl Scheduler {
         registry: &PackRegistry,
         rng: &mut impl Rng,
     ) -> Option<PickResult> {
-        let events = self.slots.get(slot_name)?;
+        let slot = self.slots.get(slot_name)?;
+        let events = &slot.events;
 
         // Empty SceneCtx — scheduler conditions have no scene-local state.
         let ctx = SceneCtx::new();
@@ -220,6 +246,8 @@ impl Scheduler {
             .map(|e| PickResult {
                 scene_id: e.scene.clone(),
                 once_only: e.once_only,
+                slot_name: slot.name.clone(),
+                consumes_time: slot.consumes_time,
             })
     }
 
@@ -232,7 +260,8 @@ impl Scheduler {
         world: &World,
         registry: &PackRegistry,
     ) -> Option<PickResult> {
-        let events = self.slots.get(slot_name)?;
+        let slot = self.slots.get(slot_name)?;
+        let events = &slot.events;
         let ctx = SceneCtx::new();
 
         events
@@ -258,6 +287,8 @@ impl Scheduler {
             .map(|e| PickResult {
                 scene_id: e.scene.clone(),
                 once_only: e.once_only,
+                slot_name: slot.name.clone(),
+                consumes_time: slot.consumes_time,
             })
     }
 
@@ -289,7 +320,8 @@ impl Scheduler {
 
         // 1. Triggers — first active trigger across all slots wins.
         for slot_name in &slot_names {
-            if let Some(events) = self.slots.get(*slot_name) {
+            if let Some(slot) = self.slots.get(*slot_name) {
+                let events = &slot.events;
                 if let Some(e) =
                     events.iter().find(|e| {
                         !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
@@ -311,17 +343,19 @@ impl Scheduler {
                     return Some(PickResult {
                         scene_id: e.scene.clone(),
                         once_only: e.once_only,
+                        slot_name: slot.name.clone(),
+                        consumes_time: slot.consumes_time,
                     });
                 }
             }
         }
 
         // 2. Weighted pick across all eligible events from all slots.
-        let eligible: Vec<&ScheduleEvent> = slot_names
+        let eligible: Vec<(&ScheduleSlot, &ScheduleEvent)> = slot_names
             .iter()
             .filter_map(|name| self.slots.get(*name))
-            .flat_map(|events| events.iter())
-            .filter(|e| {
+            .flat_map(|slot| slot.events.iter().map(move |event| (slot, event)))
+            .filter(|(_, e)| {
                 e.weight > 0
                     && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.condition {
@@ -345,11 +379,11 @@ impl Scheduler {
             return None;
         }
 
-        let total: u32 = eligible.iter().map(|e| e.weight).sum();
+        let total: u32 = eligible.iter().map(|(_, e)| e.weight).sum();
         let mut roll = rng.gen_range(0..total);
         eligible
             .iter()
-            .find(|e| {
+            .find(|(_, e)| {
                 if roll < e.weight {
                     true
                 } else {
@@ -357,9 +391,11 @@ impl Scheduler {
                     false
                 }
             })
-            .map(|e| PickResult {
+            .map(|(slot, e)| PickResult {
                 scene_id: e.scene.clone(),
                 once_only: e.once_only,
+                slot_name: slot.name.clone(),
+                consumes_time: slot.consumes_time,
             })
     }
 
@@ -367,8 +403,8 @@ impl Scheduler {
         &self,
         scenes: &HashMap<String, Arc<SceneDefinition>>,
     ) -> Result<(), SchedulerError> {
-        for (slot_name, events) in &self.slots {
-            for event in events {
+        for (slot_name, slot) in &self.slots {
+            for event in &slot.events {
                 if !scenes.contains_key(&event.scene) {
                     return Err(SchedulerError::Validation {
                         context: format!("slot '{slot_name}'"),
@@ -436,7 +472,7 @@ pub fn load_schedule(
     pack_metas: &[LoadedPackMeta],
     registry: &PackRegistry,
 ) -> Result<Scheduler, SchedulerError> {
-    let mut slots: HashMap<String, Vec<ScheduleEvent>> = HashMap::new();
+    let mut slots: HashMap<String, ScheduleSlot> = HashMap::new();
 
     for meta in pack_metas {
         let schedule_path = match &meta.manifest.content.schedule_file {
@@ -455,9 +491,20 @@ pub fn load_schedule(
         })?;
 
         for slot_toml in file.slot {
-            let slot_name = slot_toml.name;
-            let entry = slots.entry(slot_name.clone()).or_default();
-            for ev in slot_toml.events {
+            let ScheduleSlotToml {
+                name: slot_name,
+                consumes_time,
+                events,
+            } = slot_toml;
+            let slot = slots.entry(slot_name.clone()).or_insert_with(|| ScheduleSlot {
+                name: slot_name.clone(),
+                consumes_time: consumes_time.unwrap_or(false),
+                events: Vec::new(),
+            });
+            if let Some(consumes_time) = consumes_time {
+                slot.consumes_time = consumes_time;
+            }
+            for ev in events {
                 let context = format!("slot '{slot_name}' scene '{}'", ev.scene);
                 let condition = match ev.condition {
                     Some(ref src) => Some(
@@ -481,7 +528,7 @@ pub fn load_schedule(
                     ),
                     None => None,
                 };
-                entry.push(ScheduleEvent {
+                slot.events.push(ScheduleEvent {
                     scene: ev.scene,
                     condition,
                     weight: ev.weight,
@@ -519,6 +566,10 @@ mod tests {
     use undone_packs::{PackContent, PackManifest, PackMeta};
     use undone_world::test_helpers::make_test_world as make_world;
 
+    fn scheduler_for_test_slots(slots: HashMap<String, Vec<ScheduleEvent>>) -> Scheduler {
+        Scheduler::from_slots_for_tests(slots)
+    }
+
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
@@ -547,6 +598,90 @@ mod tests {
             slot_names.contains(&"free_time"),
             "base pack should define free_time slot"
         );
+    }
+
+    #[test]
+    fn load_schedule_reads_slot_time_consumption_metadata() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+
+        assert!(
+            scheduler
+                .slots
+                .get("free_time")
+                .is_some_and(|slot| slot.consumes_time),
+            "free_time should consume time"
+        );
+        assert!(
+            scheduler
+                .slots
+                .get("work")
+                .is_some_and(|slot| slot.consumes_time),
+            "work should consume time"
+        );
+        assert!(
+            scheduler
+                .slots
+                .get("workplace_opening")
+                .is_some_and(|slot| !slot.consumes_time),
+            "opening arc slots should default to non-consuming"
+        );
+        assert!(
+            scheduler
+                .slots
+                .get("campus_opening")
+                .is_some_and(|slot| !slot.consumes_time),
+            "slots without metadata should default to false"
+        );
+    }
+
+    #[test]
+    fn pick_next_returns_originating_slot_metadata() {
+        let registry = PackRegistry::new();
+        let free_event = ScheduleEvent {
+            scene: "test::free_scene".into(),
+            condition: None,
+            weight: 5,
+            once_only: false,
+            trigger: None,
+        };
+        let work_event = ScheduleEvent {
+            scene: "test::work_scene".into(),
+            condition: None,
+            weight: 100,
+            once_only: false,
+            trigger: None,
+        };
+        let scheduler = Scheduler {
+            slots: HashMap::from([
+                (
+                    "free_time".into(),
+                    ScheduleSlot {
+                        name: "free_time".into(),
+                        consumes_time: true,
+                        events: vec![free_event],
+                    },
+                ),
+                (
+                    "workplace_opening".into(),
+                    ScheduleSlot {
+                        name: "workplace_opening".into(),
+                        consumes_time: false,
+                        events: vec![work_event],
+                    },
+                ),
+            ]),
+        };
+        let world = make_world();
+        let mut rng = SmallRng::seed_from_u64(42);
+
+        let result = scheduler
+            .pick_next(&world, &registry, &mut rng)
+            .expect("pick_next should return the higher-weight work scene");
+
+        assert_eq!(result.scene_id, "test::work_scene");
+        assert_eq!(result.slot_name, "workplace_opening");
+        assert!(!result.consumes_time);
     }
 
     #[test]
@@ -655,7 +790,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -688,7 +823,7 @@ mod tests {
         ];
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), events);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
 
         // Same seed → same pick
@@ -723,7 +858,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
 
         // Before flag is set — should pick the scene
         let mut world = make_world();
@@ -758,7 +893,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -786,7 +921,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
 
         let result = scheduler.check_triggers("test_slot", &world, &registry);
@@ -811,7 +946,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
 
         let result = scheduler.check_triggers("test_slot", &world, &registry);
@@ -835,7 +970,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
 
         // Set the ONCE_ flag so the event is filtered out
         let mut world = make_world();
@@ -859,7 +994,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let scenes = HashMap::new();
 
         let result = scheduler.validate_scene_references(&scenes);
@@ -912,7 +1047,7 @@ mod tests {
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -943,7 +1078,7 @@ mod tests {
         // Put triggered in "a_slot" (sorts first alphabetically) and weighted in "b_slot"
         slots.insert("a_slot".into(), vec![triggered_event]);
         slots.insert("b_slot".into(), vec![weighted_event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
         let world = make_world();
         let mut rng = SmallRng::seed_from_u64(42);
 
@@ -1004,7 +1139,7 @@ mod tests {
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![free_event]);
         slots.insert("workplace_opening".into(), vec![arc_event]);
-        let scheduler = Scheduler { slots };
+        let scheduler = scheduler_for_test_slots(slots);
 
         // Without flag — only free_time eligible
         let world_no_flag = make_world();
@@ -1184,9 +1319,7 @@ mod tests {
             once_only: false,
             trigger: None,
         };
-        let scheduler = Scheduler {
-            slots: HashMap::from([("intro".into(), vec![event])]),
-        };
+        let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 
         assert!(scheduler.references_game_flag("ROUTE_WORKPLACE"));
         assert!(!scheduler.references_game_flag("ROUTE_CAMPUS"));
@@ -1201,9 +1334,7 @@ mod tests {
             once_only: false,
             trigger: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_CAMPUS')").unwrap()),
         };
-        let scheduler = Scheduler {
-            slots: HashMap::from([("intro".into(), vec![event])]),
-        };
+        let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 
         assert!(scheduler.references_game_flag("ROUTE_CAMPUS"));
         assert!(!scheduler.references_game_flag("ROUTE_WORKPLACE"));

@@ -4,6 +4,7 @@
 
 [[slot]]
 name = "free_time"
+consumes_time = true
 
   [[slot.events]]
   scene     = "base::rain_shelter"
@@ -192,6 +193,7 @@ name = "workplace_opening"
 
 [[slot]]
 name = "work"
+consumes_time = true
 
   [[slot.events]]
   scene     = "base::work_standup"
