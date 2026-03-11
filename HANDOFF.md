@@ -2,12 +2,14 @@
 
 ## Current State
 
+**Latest session (2026-03-11):** Window tooling follow-up complete. `game-input-mcp` now exposes a first-class `set_window_size(width, height)` tool over the existing dev-command path, `RuntimeSnapshot` now serializes live `window_width` / `window_height`, and the Dev tab now supports custom width/height inputs plus a `Default` reset wired to the shared layout defaults. Live acceptance passed on a fresh `undone --dev --quick` launch: `set_tab("dev")` → `set_window_size(1800, 1000)` → `get_runtime_state()` reported `1800x1000`, then `jump_to_scene("base::plan_your_day")` → `advance_time(1)` → `choose_action("go_out")` progressed to a different scene with a new action set while preserving the wide layout in screenshots. Responsive audit of `saves_panel`, `settings_panel`, `title_bar`, `landing_page`, and `char_creation` found no additional reproduced wide-window regressions. One live-only bug found during acceptance was fixed: the Dev tab resize inputs now resync from app-level window signals after external/tooling-triggered resizes.
+
 **Latest session (2026-03-10):** Player-correctness runtime implementation complete. `undone-ui` now has a shared `RuntimeController` and `RuntimeSnapshot`, acceptance-style runtime harness coverage, intro-time NPC fallback binding before scene render, richer dev IPC/runtime MCP wrappers, and a hardened save-loader contract that records the pack-loaded ID prefix and only replays runtime-only interned IDs when the saved/current prefixes still match. Live release smoke passed for `get_runtime_state`, `set_tab`, `choose_action`, and `continue_scene` against `undone -- --dev --quick`. Two live-only regressions found during smoke were fixed: disposed view-local signal reads during tab swaps, and a dev-panel `RefCell` borrow cycle caused by bumping `dev_tick` before releasing the mutable `GameState` borrow.
 
 **Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
-**Branch:** `codex/player-correctness-runtime`
-**Verification (2026-03-10):** `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test -p game-input-mcp` (in `tools/`), `cargo build --release` (in `tools/`), and live release smoke against `undone -- --dev --quick` all passed.
+**Branch:** `codex/window-tooling-followup`
+**Verification (2026-03-11):** `cargo build`, `cargo test -p undone-ui`, `cargo test -p game-input-mcp` (in `tools/`), and fresh live acceptance against `undone --dev --quick` all passed. Live acceptance covered `set_tab("dev")`, `set_window_size(1800, 1000)`, `get_runtime_state()`, `jump_to_scene("base::plan_your_day")`, `advance_time(1)`, `choose_action("go_out")`, and before/after screenshots at the resized window size.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
@@ -25,14 +27,13 @@
 
 ## ⚡ Next Action
 
-**Next recommended execution:** Finish branch wrap-up after the final verification pass. If additional manual QA time is available, click through the Dev tab UI once in a live build; the runtime/dev-tooling contract itself is already covered by tests plus release smoke.
+**Next recommended execution:** Finish branch wrap-up and merge `codex/window-tooling-followup`. The resize tooling, runtime snapshot metrics, Dev tab controls, live acceptance flow, and responsive audit are complete.
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
 ### Remaining:
-1. **Runtime-test dev panel** — Launch with `--dev`, click through all sections (scene jumper, stat editors, flags, quick actions, inspector). Verify DevContext refactor didn't break UI.
-2. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
-3. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
+1. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
+2. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
@@ -170,8 +171,8 @@ For pure writing (authoring `.toml` scene files), no Rust compilation is needed.
 Keys: `"1"`–`"9"`, `"enter"`, `"tab"`, `"escape"`, `"space"`.
 Scroll: sends WM_MOUSEMOVE before WM_MOUSEWHEEL (floem routes wheel events via cached cursor_position). Positive delta = up, negative = down (one tick = one wheel notch).
 **Lifecycle tools:** `start_game(working_dir, dev_mode)`, `stop_game(exe_name)`, `is_game_running(exe_name)`.
-**Dev IPC tools:** `dev_command(command_json, timeout_ms)`, `get_game_state()`, `get_runtime_state()`, `jump_to_scene(scene_id)`, `choose_action(action_id)`, `continue_scene()`, `set_tab(tab)`, `set_game_stat(stat, value)`, `set_game_flag(flag)`, `remove_game_flag(flag)`.
-Successful runtime commands now return the same structured runtime snapshot used by the dev panel inspector and acceptance tests.
+**Dev IPC tools:** `dev_command(command_json, timeout_ms)`, `get_game_state()`, `get_runtime_state()`, `jump_to_scene(scene_id)`, `choose_action(action_id)`, `continue_scene()`, `set_tab(tab)`, `set_window_size(width, height)`, `set_game_stat(stat, value)`, `set_game_flag(flag)`, `remove_game_flag(flag)`.
+Successful runtime commands now return the same structured runtime snapshot used by the dev panel inspector and acceptance tests, including live `window_width` and `window_height`.
 Process management uses Toolhelp32 snapshot API.
 
 ---
