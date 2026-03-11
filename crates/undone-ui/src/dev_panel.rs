@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use floem::prelude::*;
-use floem::reactive::RwSignal;
+use floem::reactive::{create_effect, RwSignal};
 use floem::views::dyn_stack;
 
 use crate::dev_ipc::{execute_command, game_state_snapshot, runtime_state_snapshot, DevCommand};
@@ -78,6 +78,22 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
 
     let filter = RwSignal::new(String::new());
     let flag_input = RwSignal::new(String::new());
+
+    create_effect({
+        let window_width = ctx.window_width;
+        let window_height = ctx.window_height;
+        move |_| {
+            let width_text = signals.window_width.get().to_string();
+            let height_text = signals.window_height.get().to_string();
+
+            if window_width.get_untracked() != width_text {
+                window_width.set(width_text);
+            }
+            if window_height.get_untracked() != height_text {
+                window_height.set(height_text);
+            }
+        }
+    });
 
     let scene_section = section_card(
         "Scene Jumper",

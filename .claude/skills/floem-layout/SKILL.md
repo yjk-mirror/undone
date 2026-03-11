@@ -255,6 +255,29 @@ Verified in the live app on 2026-03-11:
 - action buttons expanded across the available story region at `1800x1000`
 - the same responsive sizing survived a slot-driven scene change once runtime state was correctly advanced
 
+### Resize acceptance path
+
+For this repo, treat window resize verification as a tooling-first flow, not a drag-the-corner repro.
+
+Verified in the live app on 2026-03-11:
+
+1. Switch to the dev tab with `set_tab("dev")`
+2. Resize through dev tooling with `set_window_size(1800, 1000)`
+3. Call `get_runtime_state()` and verify `window_width == 1800` and `window_height == 1000`
+4. Capture a screenshot of the dev tab and confirm the UI reflects the same size, including any editable width/height controls
+5. Jump into a responsive scene flow with `jump_to_scene("base::plan_your_day")`, `advance_time(1)`, then `choose_action("go_out")`
+6. Call `get_runtime_state()` again and verify:
+   - `current_scene_id` changed away from `base::plan_your_day`
+   - the new `visible_actions` do not still show the stale `go_out` action set
+   - `window_width` and `window_height` still report the resized values
+7. Capture a second screenshot and confirm the wide layout still holds after the scene change
+
+Why this matters:
+
+- It verifies the shared `SetWindowSize` path instead of a manual OS drag
+- It distinguishes layout regressions from runtime/controller regressions
+- It catches local dev-panel state that can drift from app-level resize signals when external tooling triggers the resize
+
 ## Common Failure Modes
 
 ### Wrong Floem generation
