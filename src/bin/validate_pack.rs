@@ -167,7 +167,9 @@ fn main() {
             std::process::exit(1);
         };
 
-        println!("\nRunning distribution simulation ({weeks} weeks x {runs} runs)...\n");
+        println!(
+            "\nRunning runtime-driven distribution simulation ({weeks} weeks x {runs} runs)...\n"
+        );
 
         let mut sim_registry = registry.clone();
         let config = undone_ui::char_creation::robin_quick_config(&sim_registry);
@@ -176,6 +178,7 @@ fn main() {
 
         let result = undone_scene::simulator::simulate(
             scheduler,
+            &all_scenes,
             &registry,
             &world,
             undone_scene::simulator::SimulationConfig {
@@ -185,7 +188,7 @@ fn main() {
             },
         );
 
-        println!("Scene Distribution ({weeks} weeks x {runs} runs):");
+        println!("Runtime Scene Distribution ({weeks} weeks x {runs} runs):");
         for stat in result.stats() {
             let warning = stat
                 .warning
