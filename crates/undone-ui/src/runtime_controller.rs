@@ -1,6 +1,6 @@
 use floem::prelude::{SignalGet, SignalUpdate};
 
-use crate::game_state::GameState;
+use crate::game_state::{GameState, SceneTimeAnchor};
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{
     process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab,
@@ -33,7 +33,7 @@ impl<'a> RuntimeController<'a> {
             return Err(format!("Unknown scene '{scene_id}'"));
         }
 
-        self.start_scene_internal(scene_id)
+        self.start_scene_internal(scene_id, None)
     }
 
     pub fn choose_action(&mut self, action_id: &str) -> RuntimeCommandResult {
@@ -82,6 +82,10 @@ impl<'a> RuntimeController<'a> {
             return Err("Runtime is not awaiting continue".to_string());
         }
 
+        if self.signals.awaiting_continue.get_untracked() {
+            self.consume_pending_scene_time();
+        }
+
         self.start_next_scene(true)
     }
 
@@ -94,6 +98,7 @@ impl<'a> RuntimeController<'a> {
     pub fn resume_from_current_world(&mut self) -> RuntimeCommandResult {
         self.gs.engine.reset_runtime();
         self.gs.opening_scene = None;
+        self.gs.current_scene_time_anchor = None;
         self.start_next_scene(false)
     }
 
@@ -101,7 +106,12 @@ impl<'a> RuntimeController<'a> {
         snapshot_runtime(self.signals, self.gs)
     }
 
-    fn start_scene_internal(&mut self, scene_id: String) -> RuntimeCommandResult {
+    fn start_scene_internal(
+        &mut self,
+        scene_id: String,
+        scene_time_anchor: Option<SceneTimeAnchor>,
+    ) -> RuntimeCommandResult {
+        self.gs.current_scene_time_anchor = scene_time_anchor;
         reset_scene_ui_state(self.signals);
         start_scene(
             &mut self.gs.engine,
@@ -132,12 +142,15 @@ impl<'a> RuntimeController<'a> {
                     .game_data
                     .set_flag(format!("ONCE_{}", result.scene_id));
             }
-            return self.start_scene_internal(result.scene_id);
+            let scene_time_anchor = result
+                .consumes_time
+                .then(|| SceneTimeAnchor::capture(&self.gs.world));
+            return self.start_scene_internal(result.scene_id, scene_time_anchor);
         }
 
         if allow_opening_scene {
             if let Some(scene_id) = self.gs.opening_scene.take() {
-                return self.start_scene_internal(scene_id);
+                return self.start_scene_internal(scene_id, None);
             }
         }
 
@@ -156,8 +169,11 @@ impl<'a> RuntimeController<'a> {
                     .game_data
                     .set_flag(format!("ONCE_{}", result.scene_id));
             }
+            let scene_time_anchor = result
+                .consumes_time
+                .then(|| SceneTimeAnchor::capture(&self.gs.world));
             return self
-                .start_scene_internal(result.scene_id)
+                .start_scene_internal(result.scene_id, scene_time_anchor)
                 .expect("scheduler returned a known scene id");
         }
 
@@ -165,6 +181,7 @@ impl<'a> RuntimeController<'a> {
     }
 
     fn show_no_scene_available(&mut self) -> RuntimeCommandOutcome {
+        self.gs.current_scene_time_anchor = None;
         reset_scene_ui_state(self.signals);
         self.signals
             .story
@@ -187,6 +204,17 @@ impl<'a> RuntimeController<'a> {
             started_scene_id,
             current_scene_id: self.gs.engine.current_scene_id(),
             scene_finished,
+        }
+    }
+
+    fn consume_pending_scene_time(&mut self) {
+        let should_advance = self
+            .gs
+            .current_scene_time_anchor
+            .is_some_and(|anchor| anchor.matches_world(&self.gs.world));
+        self.gs.current_scene_time_anchor = None;
+        if should_advance {
+            self.gs.world.game_data.advance_time_slot();
         }
     }
 
@@ -327,7 +355,47 @@ mod tests {
             init_error: None,
             opening_scene: None,
             femininity_id: SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
+            current_scene_time_anchor: None,
         }
+    }
+
+    fn settle_workplace_route(gs: &mut GameState) {
+        gs.world.game_data.set_flag("ROUTE_WORKPLACE");
+        gs.world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        gs.world.game_data.set_flag("MET_LANDLORD");
+        gs.world.game_data.set_flag("FIRST_MEETING_DONE");
+        gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
+        gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
+        gs.world.game_data.set_flag("ONCE_base::workplace_evening");
+        for _ in 0..28 {
+            gs.world.game_data.advance_time_slot();
+        }
+    }
+
+    fn play_first_visible_action_until_pause(
+        controller: &mut RuntimeController<'_>,
+    ) -> RuntimeSnapshot {
+        for _ in 0..32 {
+            let snapshot = controller.snapshot();
+            if snapshot.awaiting_continue || snapshot.visible_actions.is_empty() {
+                return snapshot;
+            }
+
+            let action_id = snapshot.visible_actions[0].id.clone();
+            controller.choose_action(&action_id).unwrap();
+        }
+
+        controller.snapshot()
     }
 
     #[test]
@@ -538,6 +606,92 @@ mod tests {
                 .all(|paragraph| !paragraph.contains("Coffee, window, list.")),
             "slot-based scene transitions must replace stale hub prose: {:?}",
             after.story_paragraphs
+        );
+    }
+
+    #[test]
+    fn runtime_controller_continue_consumes_time_after_free_time_scene() {
+        let mut gs = test_game_state();
+        settle_workplace_route(&mut gs);
+        let signals = AppSignals::new();
+
+        let mut controller = RuntimeController::new(&mut gs, signals);
+        controller.start_scene("base::plan_your_day").unwrap();
+        controller.choose_action("go_out").unwrap();
+
+        assert!(
+            controller.gs.current_scene_time_anchor.is_some(),
+            "scheduled free_time scenes should remember their cadence anchor"
+        );
+
+        let mut expected = controller.gs.world.game_data.clone();
+        expected.advance_time_slot();
+
+        let paused = play_first_visible_action_until_pause(&mut controller);
+        assert!(
+            paused.awaiting_continue,
+            "free_time scene should finish into awaiting-continue state"
+        );
+
+        controller.continue_flow().unwrap();
+
+        assert_eq!(
+            (
+                controller.gs.world.game_data.week,
+                controller.gs.world.game_data.day,
+                format!("{:?}", controller.gs.world.game_data.time_slot),
+            ),
+            (expected.week, expected.day, format!("{:?}", expected.time_slot)),
+            "continue_flow should consume exactly one time slot after a settled free_time scene"
+        );
+    }
+
+    #[test]
+    fn runtime_controller_opening_arc_scene_does_not_double_advance_time() {
+        let mut gs = test_game_state();
+        gs.world.game_data.set_flag("ROUTE_WORKPLACE");
+        gs.world
+            .game_data
+            .advance_arc("base::workplace_opening", "working");
+        gs.world.game_data.set_flag("FIRST_MEETING_DONE");
+        gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
+        gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
+        let signals = AppSignals::new();
+        signals.awaiting_continue.set(true);
+
+        let mut controller = RuntimeController::new(&mut gs, signals);
+        let outcome = controller.continue_flow().unwrap();
+
+        assert_eq!(
+            outcome.started_scene_id.as_deref(),
+            Some("base::workplace_evening")
+        );
+        assert!(
+            controller.gs.current_scene_time_anchor.is_none(),
+            "opening-arc scenes should not be treated as cadence-consuming slot scenes"
+        );
+
+        let _ = play_first_visible_action_until_pause(&mut controller);
+        let after_scene = controller.gs.world.game_data.clone();
+
+        controller.continue_flow().unwrap();
+
+        assert_eq!(
+            (
+                controller.gs.world.game_data.week,
+                controller.gs.world.game_data.day,
+                controller.gs.world.game_data.time_slot,
+            ),
+            (after_scene.week, after_scene.day, after_scene.time_slot),
+            "continue_flow must not add an extra time step after explicit advance_time scenes"
         );
     }
 }

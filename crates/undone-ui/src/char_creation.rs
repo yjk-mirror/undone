@@ -1529,6 +1529,7 @@ fn build_next_button(
                             init_error: None,
                             opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
                             femininity_id,
+                            current_scene_time_anchor: None,
                         };
                         *game_state.borrow_mut() = Some(throwaway_gs);
                     }

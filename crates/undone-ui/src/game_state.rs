@@ -2,7 +2,7 @@ use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
-use undone_domain::SkillId;
+use undone_domain::{SkillId, TimeSlot};
 
 use undone_packs::{
     char_creation::{new_game, CharCreationConfig},
@@ -36,6 +36,30 @@ pub struct GameState {
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
     pub femininity_id: SkillId,
+    pub current_scene_time_anchor: Option<SceneTimeAnchor>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SceneTimeAnchor {
+    pub week: u32,
+    pub day: u8,
+    pub time_slot: TimeSlot,
+}
+
+impl SceneTimeAnchor {
+    pub fn capture(world: &World) -> Self {
+        Self {
+            week: world.game_data.week,
+            day: world.game_data.day,
+            time_slot: world.game_data.time_slot,
+        }
+    }
+
+    pub fn matches_world(&self, world: &World) -> bool {
+        self.week == world.game_data.week
+            && self.day == world.game_data.day
+            && self.time_slot == world.game_data.time_slot
+    }
 }
 
 pub struct ResumeGameResult {
@@ -205,6 +229,7 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool)
         init_error,
         opening_scene,
         femininity_id,
+        current_scene_time_anchor: None,
     }
 }
 
@@ -251,6 +276,7 @@ pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> Gam
         init_error,
         opening_scene: None,
         femininity_id,
+        current_scene_time_anchor: None,
     }
 }
 
@@ -273,6 +299,7 @@ pub fn load_game_state_from_save(
 pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
     gs.engine.reset_runtime();
     gs.opening_scene = None;
+    gs.current_scene_time_anchor = None;
 
     let mut started_scene_id = None;
     if let Some(result) = gs.scheduler.pick_next(&gs.world, &gs.registry, &mut gs.rng) {
@@ -282,6 +309,9 @@ pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
                 .set_flag(format!("ONCE_{}", result.scene_id));
         }
         started_scene_id = Some(result.scene_id.clone());
+        gs.current_scene_time_anchor = result
+            .consumes_time
+            .then(|| SceneTimeAnchor::capture(&gs.world));
         crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, result.scene_id);
     }
 
@@ -296,6 +326,7 @@ pub fn load_world_from_save(gs: &mut GameState, save_path: &Path) -> Result<(), 
         .map_err(|e| format!("Load failed: {e}"))?;
     gs.world = loaded_world;
     gs.opening_scene = None;
+    gs.current_scene_time_anchor = None;
     Ok(())
 }
 

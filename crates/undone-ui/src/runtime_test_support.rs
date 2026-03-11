@@ -148,13 +148,24 @@ mod tests {
     }
 
     fn play_until_continue(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
+        let mut tried_actions = HashSet::new();
         for _ in 0..32 {
             let current = harness.snapshot();
             if current.awaiting_continue || current.visible_actions.is_empty() {
                 return current;
             }
 
-            let action_id = current.visible_actions[0].id.clone();
+            let scene_id = current
+                .current_scene_id
+                .clone()
+                .unwrap_or_else(|| "<no-scene>".to_string());
+            let action_id = current
+                .visible_actions
+                .iter()
+                .find(|action| tried_actions.insert((scene_id.clone(), action.id.clone())))
+                .unwrap_or(&current.visible_actions[0])
+                .id
+                .clone();
             let mut controller = harness.controller();
             controller.choose_action(&action_id).unwrap();
         }
@@ -185,23 +196,16 @@ mod tests {
         }
     }
 
-    fn advance_first_action_runtime(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
-        let current = harness.snapshot();
-        if current.awaiting_continue || current.current_scene_id.is_none() {
-            let mut controller = harness.controller();
-            controller.continue_flow().unwrap();
-            return harness.snapshot();
-        }
-
-        let action_id = current
-            .visible_actions
-            .first()
-            .expect("runtime should expose a visible action before advancing")
-            .id
-            .clone();
-        let mut controller = harness.controller();
-        controller.choose_action(&action_id).unwrap();
-        harness.snapshot()
+    fn has_week_two_robin_content(snapshot: &RuntimeSnapshot) -> bool {
+        matches!(
+            snapshot.current_scene_id.as_deref(),
+            Some("base::coffee_shop") | Some("base::plan_your_day")
+        ) || snapshot.world.game_flags.iter().any(|flag| {
+            matches!(
+                flag.as_str(),
+                "MET_JAKE" | "ONCE_base::coffee_shop" | "ONCE_base::plan_your_day"
+            )
+        })
     }
 
     #[test]
@@ -384,6 +388,7 @@ mod tests {
             femininity_id: undone_domain::SkillId::from_spur(
                 lasso::Spur::try_from_usize(0).unwrap(),
             ),
+            current_scene_time_anchor: None,
         };
         let signals = make_test_signals();
 
@@ -407,19 +412,33 @@ mod tests {
     fn acceptance_runtime_robin_route_reaches_week_two_without_dev_time_travel() {
         let mut harness = make_harness();
         let mut saw_week_two_content = false;
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
         let mut last_snapshot = harness.snapshot();
 
-        for _ in 0..400 {
-            let snapshot = advance_first_action_runtime(&mut harness);
-            if matches!(
-                snapshot.current_scene_id.as_deref(),
-                Some("base::coffee_shop") | Some("base::plan_your_day")
-            ) || snapshot.world.game_flags.iter().any(|flag| {
-                matches!(
-                    flag.as_str(),
-                    "MET_JAKE" | "ONCE_base::coffee_shop" | "ONCE_base::plan_your_day"
-                )
-            }) {
+        for _ in 0..120 {
+            let paused = play_until_continue(&mut harness);
+            if has_week_two_robin_content(&paused) {
+                saw_week_two_content = true;
+            }
+            if paused.world.week >= 2 && saw_week_two_content {
+                last_snapshot = paused;
+                break;
+            }
+            assert!(
+                paused.awaiting_continue,
+                "runtime should finish each scene into continue state while advancing naturally, got {:?}",
+                paused
+            );
+
+            {
+                let mut controller = harness.controller();
+                controller.continue_flow().unwrap();
+            }
+            let snapshot = harness.snapshot();
+            if has_week_two_robin_content(&snapshot) {
                 saw_week_two_content = true;
             }
             if snapshot.world.week >= 2 && saw_week_two_content {
