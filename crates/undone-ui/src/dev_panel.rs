@@ -7,6 +7,7 @@ use floem::views::dyn_stack;
 
 use crate::dev_ipc::{execute_command, game_state_snapshot, runtime_state_snapshot, DevCommand};
 use crate::game_state::GameState;
+use crate::layout::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use crate::runtime_snapshot::RuntimeSnapshot;
 use crate::signal_utils::get_or_default;
 use crate::theme::ThemeColors;
@@ -24,6 +25,8 @@ struct DevContext {
     stress: RwSignal<String>,
     anxiety: RwSignal<String>,
     femininity: RwSignal<String>,
+    window_width: RwSignal<String>,
+    window_height: RwSignal<String>,
 }
 
 impl DevContext {
@@ -48,6 +51,10 @@ impl DevContext {
         self.stress.set(snapshot.stress.to_string());
         self.anxiety.set(snapshot.anxiety.to_string());
         self.femininity.set(snapshot.femininity.to_string());
+        self.window_width
+            .set(self.signals.window_width.get_untracked().to_string());
+        self.window_height
+            .set(self.signals.window_height.get_untracked().to_string());
     }
 }
 
@@ -65,6 +72,8 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         stress: RwSignal::new(snapshot.stress.to_string()),
         anxiety: RwSignal::new(snapshot.anxiety.to_string()),
         femininity: RwSignal::new(snapshot.femininity.to_string()),
+        window_width: RwSignal::new(signals.window_width.get_untracked().to_string()),
+        window_height: RwSignal::new(signals.window_height.get_untracked().to_string()),
     };
 
     let filter = RwSignal::new(String::new());
@@ -233,6 +242,38 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                     .font_family("system-ui, -apple-system, sans-serif".to_string())
             }),
             h_stack((
+                text_input(ctx.window_width)
+                    .placeholder("Width")
+                    .style(input_style(signals)),
+                text_input(ctx.window_height)
+                    .placeholder("Height")
+                    .style(input_style(signals)),
+                action_button("Apply Size", signals, {
+                    let ctx = ctx.clone();
+                    move || match parse_window_size_inputs(
+                        &ctx.window_width.get_untracked(),
+                        &ctx.window_height.get_untracked(),
+                    ) {
+                        Some((width, height)) => {
+                            ctx.run(DevCommand::SetWindowSize { width, height })
+                        }
+                        None => ctx
+                            .status
+                            .set("Window size must be positive numbers".to_string()),
+                    }
+                }),
+                action_button("Default", signals, {
+                    let ctx = ctx.clone();
+                    move || {
+                        let (width, height) = default_window_size();
+                        ctx.window_width.set(width.to_string());
+                        ctx.window_height.set(height.to_string());
+                        ctx.run(DevCommand::SetWindowSize { width, height });
+                    }
+                }),
+            ))
+            .style(|s| s.gap(8.0).flex_wrap(floem::style::FlexWrap::Wrap)),
+            h_stack((
                 window_size_button(
                     WINDOW_SIZE_PRESETS[0].0,
                     WINDOW_SIZE_PRESETS[0].1,
@@ -327,12 +368,22 @@ fn format_runtime_snapshot_json(snapshot: &RuntimeSnapshot) -> String {
     serde_json::to_string_pretty(snapshot).unwrap_or_else(|err| format!("{{\"error\":\"{err}\"}}"))
 }
 
-fn window_size_button(
-    width: f64,
-    height: f64,
-    ctx: DevContext,
-    signals: AppSignals,
-) -> impl View {
+fn parse_window_size_inputs(width: &str, height: &str) -> Option<(f64, f64)> {
+    let width = width.trim().parse::<f64>().ok()?;
+    let height = height.trim().parse::<f64>().ok()?;
+
+    if !(width.is_finite() && height.is_finite()) || width <= 0.0 || height <= 0.0 {
+        return None;
+    }
+
+    Some((width, height))
+}
+
+fn default_window_size() -> (f64, f64) {
+    (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
+}
+
+fn window_size_button(width: f64, height: f64, ctx: DevContext, signals: AppSignals) -> impl View {
     let label_text = format!("{width:.0}x{height:.0}");
     action_button_owned(label_text, signals, move || {
         ctx.run(DevCommand::SetWindowSize { width, height });
@@ -449,7 +500,11 @@ fn action_button_owned(
 
 #[cfg(test)]
 mod tests {
-    use super::{filter_scene_ids, format_runtime_snapshot_json, WINDOW_SIZE_PRESETS};
+    use super::{
+        default_window_size, filter_scene_ids, format_runtime_snapshot_json,
+        parse_window_size_inputs, WINDOW_SIZE_PRESETS,
+    };
+    use crate::layout::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
     use crate::runtime_snapshot::{
         ActiveNpcSnapshot, ArcStateSnapshot, PlayerSummarySnapshot, RuntimeSnapshot,
         VisibleActionSnapshot, WorldSummarySnapshot,
@@ -473,6 +528,8 @@ mod tests {
         let formatted = format_runtime_snapshot_json(&RuntimeSnapshot {
             phase: "in_game".into(),
             tab: "dev".into(),
+            window_width: 1800.0,
+            window_height: 1000.0,
             current_scene_id: Some("base::coffee_shop".into()),
             awaiting_continue: false,
             story_paragraphs: vec!["Hello".into()],
@@ -520,5 +577,28 @@ mod tests {
     #[test]
     fn window_size_presets_include_wide_layout_target() {
         assert!(WINDOW_SIZE_PRESETS.contains(&(1800.0, 1000.0)));
+    }
+
+    #[test]
+    fn parse_window_size_inputs_accepts_positive_numbers() {
+        assert_eq!(
+            parse_window_size_inputs("1800", "1000"),
+            Some((1800.0, 1000.0))
+        );
+    }
+
+    #[test]
+    fn parse_window_size_inputs_rejects_empty_or_non_positive_values() {
+        assert_eq!(parse_window_size_inputs("", "1000"), None);
+        assert_eq!(parse_window_size_inputs("0", "1000"), None);
+        assert_eq!(parse_window_size_inputs("1800", "-1"), None);
+    }
+
+    #[test]
+    fn default_window_size_matches_shared_layout_defaults() {
+        assert_eq!(
+            default_window_size(),
+            (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
+        );
     }
 }

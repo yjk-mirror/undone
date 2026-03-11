@@ -8,6 +8,8 @@ use crate::{AppPhase, AppSignals, AppTab, NpcSnapshot, PlayerSnapshot};
 pub struct RuntimeSnapshot {
     pub phase: String,
     pub tab: String,
+    pub window_width: f64,
+    pub window_height: f64,
     pub current_scene_id: Option<String>,
     pub awaiting_continue: bool,
     pub story_paragraphs: Vec<String>,
@@ -83,6 +85,8 @@ pub fn snapshot_runtime(signals: AppSignals, gs: &GameState) -> RuntimeSnapshot 
     RuntimeSnapshot {
         phase: phase_name(signals.phase.get_untracked()).to_string(),
         tab: tab_name(signals.tab.get_untracked()).to_string(),
+        window_width: signals.window_width.get_untracked(),
+        window_height: signals.window_height.get_untracked(),
         current_scene_id: gs.engine.current_scene_id(),
         awaiting_continue: signals.awaiting_continue.get_untracked(),
         story_paragraphs: story_paragraphs(&signals.story.get_untracked()),
@@ -228,6 +232,8 @@ mod tests {
         signals.phase.set(AppPhase::InGame);
         signals.tab.set(AppTab::Dev);
         signals.awaiting_continue.set(true);
+        signals.window_width.set(1800.0);
+        signals.window_height.set(1000.0);
         signals
             .story
             .set("First paragraph.\n\nSecond paragraph.".into());
@@ -292,6 +298,8 @@ mod tests {
             })
         );
         assert_eq!(snapshot.player.name, "Robin");
+        assert_eq!(snapshot.window_width, 1800.0);
+        assert_eq!(snapshot.window_height, 1000.0);
         assert!(snapshot
             .world
             .game_flags

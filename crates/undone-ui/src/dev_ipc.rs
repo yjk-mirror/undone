@@ -649,6 +649,8 @@ mod tests {
             .expect("get_runtime_state should include snapshot data");
         assert!(data.get("story_paragraphs").is_some());
         assert!(data.get("visible_actions").is_some());
+        assert!(data.get("window_width").is_some());
+        assert!(data.get("window_height").is_some());
     }
 
     #[test]
