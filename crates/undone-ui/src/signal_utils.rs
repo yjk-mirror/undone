@@ -3,6 +3,7 @@ use floem::reactive::{RwSignal, SignalGet};
 #[cfg(test)]
 use floem::reactive::Scope;
 
+#[cfg(test)]
 pub(crate) fn get_or<T>(signal: RwSignal<T>, default: T) -> T
 where
     T: Clone + 'static,

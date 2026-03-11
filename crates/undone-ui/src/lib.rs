@@ -3,6 +3,7 @@ pub mod dev_ipc;
 pub mod dev_panel;
 pub mod game_state;
 pub mod landing_page;
+pub mod layout;
 pub mod left_panel;
 pub mod right_panel;
 pub mod runtime_controller;
@@ -18,7 +19,8 @@ use floem::prelude::*;
 use floem::reactive::RwSignal;
 use floem::style::Position;
 use floem::views::drag_resize_window_area;
-use floem::window::ResizeDirection;
+use floem::window::{ResizeDirection, WindowId};
+use floem::{event::EventListener, event::Event};
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::SkillId;
@@ -29,6 +31,7 @@ use crate::char_creation::{char_creation_view, fem_creation_view};
 use crate::dev_panel::dev_panel;
 use crate::game_state::{init_game, GameState, PreGameState};
 use crate::landing_page::landing_view;
+use crate::layout::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use crate::left_panel::story_panel;
 use crate::right_panel::sidebar_panel;
 use crate::runtime_controller::RuntimeController;
@@ -86,6 +89,9 @@ pub struct AppSignals {
     pub scroll_gen: RwSignal<u64>,
     pub scene_epoch: RwSignal<u64>,
     pub dev_tick: RwSignal<u64>,
+    pub window_width: RwSignal<f64>,
+    pub window_height: RwSignal<f64>,
+    pub window_id: Option<WindowId>,
     /// When true, the player has finished a scene and should see a "Continue"
     /// button instead of action choices. Clicking Continue loads the next scene.
     pub awaiting_continue: RwSignal<bool>,
@@ -99,6 +105,10 @@ impl Default for AppSignals {
 
 impl AppSignals {
     pub fn new() -> Self {
+        Self::new_with_window(None)
+    }
+
+    pub fn new_with_window(window_id: Option<WindowId>) -> Self {
         Self {
             story: RwSignal::new(String::new()),
             actions: RwSignal::new(Vec::new()),
@@ -110,6 +120,9 @@ impl AppSignals {
             scroll_gen: RwSignal::new(0),
             scene_epoch: RwSignal::new(0),
             dev_tick: RwSignal::new(0),
+            window_width: RwSignal::new(DEFAULT_WINDOW_WIDTH),
+            window_height: RwSignal::new(DEFAULT_WINDOW_HEIGHT),
+            window_id,
             awaiting_continue: RwSignal::new(false),
         }
     }
@@ -167,8 +180,8 @@ impl NpcSnapshot {
     }
 }
 
-pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
-    let signals = AppSignals::new();
+pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl View {
+    let signals = AppSignals::new_with_window(Some(window_id));
 
     // Load packs (no world yet — waits for char creation)
     let pre_state: Rc<RefCell<Option<PreGameState>>> = Rc::new(RefCell::new(Some(init_game())));
@@ -349,7 +362,14 @@ pub fn app_view(dev_mode: bool, quick_start: bool) -> impl View {
     .style(|s| s.flex_grow(1.0).flex_basis(0.0).min_height(0.0));
 
     // Title bar is always visible (both CharCreation and InGame phases).
-    let body = v_stack((title_bar(signals, dev_mode), content)).style(move |s| {
+    let body = v_stack((title_bar(signals, dev_mode), content))
+        .on_event_cont(EventListener::WindowResized, move |e| {
+            if let Event::WindowResized(size) = e {
+                signals.window_width.set(size.width);
+                signals.window_height.set(size.height);
+            }
+        })
+        .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.size_full().background(colors.ground)
     });

@@ -77,6 +77,42 @@ Rules:
 
 The `dyn_view!` macro exists in `0.2.0`, but `dyn_container(...)` is usually easier to read in this codebase.
 
+### Window resize signals
+
+```rust
+let body = root_view
+    .on_event_cont(EventListener::WindowResized, move |event| {
+        if let Event::WindowResized(size) = event {
+            window_width.set(size.width);
+            window_height.set(size.height);
+        }
+    });
+```
+
+Rules:
+
+- `floem-0.2.0/src/event.rs` defines both `EventListener::WindowResized` and `Event::WindowResized(Size)`
+- `floem-0.2.0/src/views/decorator.rs` shows `.on_event_cont(...)` keeps propagation going after your handler runs
+- In this repo, attach resize tracking once on a stable ancestor above scene/phase `dyn_container(...)` wrappers
+- Store the metrics in long-lived app-level signals (`AppSignals`), not scene-local signals
+- If resize-driven layout must survive scene changes, do not rely on handlers or signals created inside a scene-specific subtree
+
+### Programmatic window resize
+
+```rust
+use floem::{kurbo::Size, WindowIdExt};
+
+window_id.set_content_size(Size::new(1800.0, 1000.0));
+```
+
+Rules:
+
+- `floem-0.2.0/src/window_id.rs` defines `WindowIdExt::set_content_size(Size)`
+- `floem-0.2.0/src/window.rs` re-exports `WindowId`, and `floem-0.2.0/src/lib.rs` re-exports `WindowIdExt`
+- `Application::new().window(...)` passes a real `WindowId` into the root app-view closure; thread that id into app-level state if dev tooling or test hooks need to resize the live window
+- For this repo, keep a single resize path by routing dev-tab presets and external dev commands through the same `SetWindowSize` command
+- Update the app-level width/height signals when issuing a programmatic resize so the dev UI reflects the new target immediately, even before the OS resize event comes back through Floem
+
 ### Dynamic lists
 
 ```rust
@@ -204,6 +240,21 @@ Important:
 - For "at least viewport height" inside a scroll child, use `min_height_pct(100.0)` where it actually resolves correctly
 - In column layouts, scroll areas usually need `.flex_grow(1.0).flex_basis(0.0)`
 
+### Wide-window split-layout rule
+
+For this repo's game screen, treat prose width and action-bar width as separate concerns.
+
+- Keep prose readable with a fixed max width like `680px`
+- Center the prose column independently
+- Let the action bar use the wider story region width derived from live window metrics
+- If you reuse the prose max width for action buttons, wide windows collapse back into a narrow centered strip even when the right side has ample space
+
+Verified in the live app on 2026-03-11:
+
+- prose stayed intentionally narrow and centered
+- action buttons expanded across the available story region at `1800x1000`
+- the same responsive sizing survived a slot-driven scene change once runtime state was correctly advanced
+
 ## Common Failure Modes
 
 ### Wrong Floem generation
@@ -226,6 +277,16 @@ If list rows redraw strangely, selection jumps, or state resets, check the `dyn_
 
 Do not treat `scroll(child)` like a normal container. It is a viewport plus a child with special sizing behavior.
 
+### Runtime bug disguised as layout bug
+
+If a scene change appears to "revert" the layout, check runtime state before changing Floem layout code.
+
+In this repo, a slot-based scene transition bug left stale story/actions on screen, which looked like a layout regression even though the real issue was controller state progression. Verify:
+
+- `current_scene_id`
+- visible action ids
+- whether the controller consumed `EngineEvent::SlotRequested(...)`
+
 ## Debugging Checklist
 
 1. Confirm the crate version is still `0.2.0`
@@ -233,8 +294,11 @@ Do not treat `scroll(child)` like a normal container. It is a viewport plus a ch
 3. Add `.debug_name("...")` to important wrappers when layout is confusing
 4. Check every full-page `dyn_container` for `.style(|s| s.size_full())`
 5. Check every flex-contained `scroll(...)` for `.scroll_style(|s| s.shrink_to_fit())`
-6. Check whether the problem is really axis confusion: `justify_*` vs `items_*`
-7. If scroll won't shrink for growing siblings, use reactive `max_height` (see "Scroll flex-shrink bug" above)
+6. Check that resize-dependent widths/heights come from app-level `WindowResized` signals, not scene-local state
+7. For wide screens, confirm prose max width and action-bar max width are not accidentally coupled
+8. Check whether the problem is really axis confusion: `justify_*` vs `items_*`
+9. If scroll won't shrink for growing siblings, use reactive `max_height` (see "Scroll flex-shrink bug" above)
+10. If a scene change looks wrong, verify runtime/controller state before assuming Floem is at fault
 
 ## Supporting Reference
 

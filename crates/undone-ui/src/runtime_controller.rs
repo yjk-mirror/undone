@@ -3,8 +3,10 @@ use floem::prelude::{SignalGet, SignalUpdate};
 use crate::game_state::GameState;
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{
-    process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab, PlayerSnapshot,
+    process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab,
+    PlayerSnapshot,
 };
+use undone_scene::engine::EngineEvent;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeCommandOutcome {
@@ -49,8 +51,19 @@ impl<'a> RuntimeController<'a> {
             self.gs
                 .engine
                 .advance_with_action(action_id, &mut self.gs.world, &self.gs.registry);
+        let requested_slot = events.iter().find_map(|event| {
+            if let EngineEvent::SlotRequested(slot) = event {
+                Some(slot.clone())
+            } else {
+                None
+            }
+        });
         let scene_finished =
             process_events(events, self.signals, &self.gs.world, self.gs.femininity_id);
+
+        if let Some(slot_name) = requested_slot {
+            return Ok(self.start_requested_slot(&slot_name));
+        }
 
         if scene_finished {
             if self.signals.phase.get_untracked() == AppPhase::TransformationIntro {
@@ -128,6 +141,30 @@ impl<'a> RuntimeController<'a> {
             }
         }
 
+        Ok(self.show_no_scene_available())
+    }
+
+    fn start_requested_slot(&mut self, slot_name: &str) -> RuntimeCommandOutcome {
+        if let Some(result) =
+            self.gs
+                .scheduler
+                .pick(slot_name, &self.gs.world, &self.gs.registry, &mut self.gs.rng)
+        {
+            if result.once_only {
+                self.gs
+                    .world
+                    .game_data
+                    .set_flag(format!("ONCE_{}", result.scene_id));
+            }
+            return self
+                .start_scene_internal(result.scene_id)
+                .expect("scheduler returned a known scene id");
+        }
+
+        self.show_no_scene_available()
+    }
+
+    fn show_no_scene_available(&mut self) -> RuntimeCommandOutcome {
         reset_scene_ui_state(self.signals);
         self.signals
             .story
@@ -138,7 +175,7 @@ impl<'a> RuntimeController<'a> {
             self.gs.femininity_id,
         ));
 
-        Ok(self.outcome(None, false))
+        self.outcome(None, false)
     }
 
     fn outcome(
@@ -226,6 +263,14 @@ mod tests {
         let pre = test_pre_state();
         let config = crate::char_creation::robin_quick_config(&pre.registry);
         start_game(pre, config, true)
+    }
+
+    fn action_ids(snapshot: &RuntimeSnapshot) -> Vec<&str> {
+        snapshot
+            .visible_actions
+            .iter()
+            .map(|action| action.id.as_str())
+            .collect()
     }
 
     fn test_male_npc(personality: PersonalityId) -> MaleNpc {
@@ -441,5 +486,58 @@ mod tests {
             snapshot.story_paragraphs
         );
         assert_ne!(signals.story.get(), "stale");
+    }
+
+    #[test]
+    fn runtime_controller_choose_action_advances_slot_requests_into_new_scene() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+
+        let mut controller = RuntimeController::new(&mut gs, signals);
+        controller.start_scene("base::plan_your_day").unwrap();
+        for _ in 0..28 {
+            controller.gs.world.game_data.advance_time_slot();
+        }
+
+        let before = controller.snapshot();
+        assert_eq!(before.current_scene_id.as_deref(), Some("base::plan_your_day"));
+        assert_eq!(action_ids(&before), vec!["go_out", "run_errands", "stay_in"]);
+
+        let mut probe_rng = controller.gs.rng.clone();
+        let expected = controller
+            .gs
+            .scheduler
+            .pick(
+                "free_time",
+                &controller.gs.world,
+                &controller.gs.registry,
+                &mut probe_rng,
+            )
+            .expect("free_time slot should have at least one eligible scene");
+
+        let outcome = controller.choose_action("go_out").unwrap();
+        let after = controller.snapshot();
+
+        assert_eq!(
+            outcome.current_scene_id.as_deref(),
+            Some(expected.scene_id.as_str())
+        );
+        assert_eq!(
+            after.current_scene_id.as_deref(),
+            Some(expected.scene_id.as_str())
+        );
+        assert_ne!(
+            action_ids(&after),
+            vec!["go_out", "run_errands", "stay_in"],
+            "slot-based scene transitions must replace stale hub actions"
+        );
+        assert!(
+            after
+                .story_paragraphs
+                .iter()
+                .all(|paragraph| !paragraph.contains("Coffee, window, list.")),
+            "slot-based scene transitions must replace stale hub prose: {:?}",
+            after.story_paragraphs
+        );
     }
 }

@@ -1,8 +1,10 @@
+use crate::layout::sidebar_width_for_window;
 use crate::theme::{ThemeColors, ThemeMode};
 use crate::{AppSignals, NpcSnapshot, PlayerSnapshot};
 use floem::peniko::Color;
 use floem::prelude::*;
 use floem::reactive::RwSignal;
+use floem::style::FlexWrap;
 use undone_domain::{AttractionLevel, LikingLevel};
 
 pub fn sidebar_panel(signals: AppSignals) -> impl View {
@@ -13,7 +15,9 @@ pub fn sidebar_panel(signals: AppSignals) -> impl View {
     ))
     .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.width(280.0)
+        let sidebar_width = sidebar_width_for_window(signals.window_width.get()) as f32;
+        s.width(sidebar_width)
+            .min_width(sidebar_width)
             .height_full()
             .background(colors.sidebar_ground)
             .border_right(1.0)
@@ -220,7 +224,11 @@ fn mode_toggle(signals: AppSignals) -> impl View {
     ))
     .style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.padding(12.0).border_top(1.0).border_color(colors.seam)
+        s.padding(12.0)
+            .border_top(1.0)
+            .border_color(colors.seam)
+            .flex_wrap(FlexWrap::Wrap)
+            .width_full()
     })
 }
 

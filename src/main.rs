@@ -68,10 +68,13 @@ fn main() {
 
     Application::new()
         .window(
-            move |_| undone_ui::app_view(dev_mode, quick_start),
+            move |window_id| undone_ui::app_view(window_id, dev_mode, quick_start),
             Some(
                 WindowConfig::default()
-                    .size(Size::new(1200.0, 800.0))
+                    .size(Size::new(
+                        undone_ui::layout::DEFAULT_WINDOW_WIDTH,
+                        undone_ui::layout::DEFAULT_WINDOW_HEIGHT,
+                    ))
                     .title("Undone")
                     .show_titlebar(false),
             ),

@@ -1,6 +1,9 @@
 use crate::game_state::GameState;
+use crate::layout::{
+    story_panel_max_height, story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
+};
 use crate::runtime_controller::RuntimeController;
-use crate::signal_utils::{get_or, get_or_default};
+use crate::signal_utils::get_or_default;
 use crate::theme::NumberKeyMode;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
@@ -349,16 +352,12 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let centered_prose = container(prose_label)
         .style(|s| s.width_full().flex_row().justify_center().padding_top(16.0));
 
-    // Track actual window height via WindowResized events. Initialized to
-    // the default window height (800) minus the custom title bar (40).
-    let panel_height = create_rw_signal(760.0f64);
-
     // Reactive max_height for the scroll area. Floem's taffy integration
     // hardcodes overflow:visible on every node (to_taffy_style uses
     // ..Default::default()), which prevents flex_grow+flex_basis(0) from
     // shrinking the scroll below its content height. max_height is the one
     // constraint that taffy reliably respects. We compute it from the
-    // actual panel height and the number of action buttons.
+    // live window metrics so the layout survives resizes and scene changes.
     let scroll_area = scroll(centered_prose)
         .scroll_to(move || {
             let gen = scroll_gen.get();
@@ -371,16 +370,11 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .scroll_style(|s| s.shrink_to_fit())
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            // Estimate the bottom bar height from the action count.
-            // Each button is ~56px (48 min-height + 8 margin). Use worst case
-            // (1 button per row) — long labels can prevent wrapping 2-per-row.
-            // Detail strip is ~41px.
-            let n = actions.get().len().max(1) as f64;
-            let choices_height = n * 56.0 + 25.0; // padding_vert(12)*2 + border(1)
-            let detail_height = 41.0;
-            let bottom_height = choices_height + detail_height;
-            let available = get_or(panel_height, 760.0);
-            let max_h = (available - bottom_height - 8.0).max(200.0);
+            let max_h = story_panel_max_height(
+                signals.window_width.get(),
+                signals.window_height.get(),
+                actions.get().len(),
+            );
             s.max_height(max_h as f32)
                 .flex_grow(1.0)
                 .flex_basis(0.0)
@@ -450,12 +444,6 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .keyboard_navigable()
         .on_event_stop(EventListener::KeyDown, move |e| {
             keyboard_handler(e);
-        })
-        .on_event_cont(EventListener::WindowResized, move |e| {
-            if let Event::WindowResized(size) = e {
-                // Window height minus title bar (40px).
-                panel_height.set(size.height - 40.0);
-            }
         })
         .style(|s| s.flex_grow(1.0).min_height(0.0).height_full())
 }
@@ -570,6 +558,9 @@ fn choices_bar(
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 let highlighted = is_highlighted();
                 s.margin(4.0)
+                    .min_width(ACTION_BUTTON_MIN_WIDTH as f32)
+                    .flex_grow(1.0)
+                    .flex_basis(ACTION_BUTTON_MIN_WIDTH as f32)
                     .padding_horiz(20.0)
                     .padding_vert(12.0)
                     .min_height(48.0)
@@ -598,10 +589,12 @@ fn choices_bar(
             })
         },
     )
-    .style(|s| {
+    .style(move |s| {
+        let max_width = story_region_width_for_window(signals.window_width.get()) as f32;
         s.flex_row()
             .flex_wrap(FlexWrap::Wrap)
-            .max_width(680.0)
+            .width_full()
+            .max_width(max_width)
             .padding_horiz(24.0)
     });
 
@@ -617,4 +610,32 @@ fn choices_bar(
             .justify_center()
             .background(colors.page)
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::layout::{
+        action_button_columns_for_window, action_button_rows_for_window, sidebar_width_for_window,
+    };
+
+    #[test]
+    fn sidebar_width_shrinks_before_story_column_becomes_unusable() {
+        assert_eq!(sidebar_width_for_window(1200.0), 280.0);
+        assert_eq!(sidebar_width_for_window(920.0), 220.0);
+        assert_eq!(sidebar_width_for_window(650.0), 180.0);
+    }
+
+    #[test]
+    fn action_button_columns_collapse_as_window_narrows() {
+        assert_eq!(action_button_columns_for_window(1200.0), 3);
+        assert_eq!(action_button_columns_for_window(900.0), 2);
+        assert_eq!(action_button_columns_for_window(650.0), 1);
+    }
+
+    #[test]
+    fn action_button_rows_follow_the_responsive_column_count() {
+        assert_eq!(action_button_rows_for_window(1200.0, 5), 2);
+        assert_eq!(action_button_rows_for_window(900.0, 5), 3);
+        assert_eq!(action_button_rows_for_window(650.0, 2), 2);
+    }
 }

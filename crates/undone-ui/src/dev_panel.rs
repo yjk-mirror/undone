@@ -12,6 +12,8 @@ use crate::signal_utils::get_or_default;
 use crate::theme::ThemeColors;
 use crate::AppSignals;
 
+const WINDOW_SIZE_PRESETS: [(f64, f64); 3] = [(1200.0, 800.0), (1400.0, 900.0), (1800.0, 1000.0)];
+
 /// Bundles the shared state that every dev panel widget needs.
 #[derive(Clone)]
 struct DevContext {
@@ -214,6 +216,47 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         signals,
     );
 
+    let window_section = section_card(
+        "Window",
+        v_stack((
+            label(move || {
+                format!(
+                    "Current content size: {:.0}x{:.0}",
+                    signals.window_width.get(),
+                    signals.window_height.get()
+                )
+            })
+            .style(move |s| {
+                let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                s.color(colors.ink_dim)
+                    .font_size(13.0)
+                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+            }),
+            h_stack((
+                window_size_button(
+                    WINDOW_SIZE_PRESETS[0].0,
+                    WINDOW_SIZE_PRESETS[0].1,
+                    ctx.clone(),
+                    signals,
+                ),
+                window_size_button(
+                    WINDOW_SIZE_PRESETS[1].0,
+                    WINDOW_SIZE_PRESETS[1].1,
+                    ctx.clone(),
+                    signals,
+                ),
+                window_size_button(
+                    WINDOW_SIZE_PRESETS[2].0,
+                    WINDOW_SIZE_PRESETS[2].1,
+                    ctx.clone(),
+                    signals,
+                ),
+            ))
+            .style(|s| s.gap(8.0).flex_wrap(floem::style::FlexWrap::Wrap)),
+        )),
+        signals,
+    );
+
     let inspector_section = section_card(
         "State Inspector",
         scroll(
@@ -255,6 +298,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
         stats_section,
         flag_section,
         quick_section,
+        window_section,
         inspector_section,
     )))
     .scroll_style(|s| s.shrink_to_fit())
@@ -281,6 +325,18 @@ fn filter_scene_ids(scene_ids: Vec<String>, filter_text: &str) -> Vec<String> {
 
 fn format_runtime_snapshot_json(snapshot: &RuntimeSnapshot) -> String {
     serde_json::to_string_pretty(snapshot).unwrap_or_else(|err| format!("{{\"error\":\"{err}\"}}"))
+}
+
+fn window_size_button(
+    width: f64,
+    height: f64,
+    ctx: DevContext,
+    signals: AppSignals,
+) -> impl View {
+    let label_text = format!("{width:.0}x{height:.0}");
+    action_button_owned(label_text, signals, move || {
+        ctx.run(DevCommand::SetWindowSize { width, height });
+    })
 }
 
 fn stat_editor_row(
@@ -365,7 +421,15 @@ fn action_button(
     signals: AppSignals,
     on_click: impl Fn() + 'static,
 ) -> impl View {
-    label(move || text.to_string())
+    action_button_owned(text.to_string(), signals, on_click)
+}
+
+fn action_button_owned(
+    text: String,
+    signals: AppSignals,
+    on_click: impl Fn() + 'static,
+) -> impl View {
+    label(move || text.clone())
         .keyboard_navigable()
         .on_click_stop(move |_| on_click())
         .style(move |s| {
@@ -385,7 +449,7 @@ fn action_button(
 
 #[cfg(test)]
 mod tests {
-    use super::{filter_scene_ids, format_runtime_snapshot_json};
+    use super::{filter_scene_ids, format_runtime_snapshot_json, WINDOW_SIZE_PRESETS};
     use crate::runtime_snapshot::{
         ActiveNpcSnapshot, ArcStateSnapshot, PlayerSummarySnapshot, RuntimeSnapshot,
         VisibleActionSnapshot, WorldSummarySnapshot,
@@ -451,5 +515,10 @@ mod tests {
         assert!(formatted.contains("\"story_paragraphs\""));
         assert!(formatted.contains("\"visible_actions\""));
         assert!(formatted.contains("\"current_scene_id\""));
+    }
+
+    #[test]
+    fn window_size_presets_include_wide_layout_target() {
+        assert!(WINDOW_SIZE_PRESETS.contains(&(1800.0, 1000.0)));
     }
 }

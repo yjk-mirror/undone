@@ -4,7 +4,9 @@ use std::rc::Rc;
 use std::time::Duration;
 
 use floem::action::exec_after;
+use floem::kurbo::Size;
 use floem::prelude::SignalUpdate;
+use floem::WindowIdExt;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use undone_domain::{BoundedStat, SkillValue};
@@ -27,6 +29,7 @@ pub enum DevCommand {
     SetFlag { flag: String },
     RemoveFlag { flag: String },
     AdvanceTime { weeks: u32 },
+    SetWindowSize { width: f64, height: f64 },
     SetNpcLiking { npc_name: String, level: String },
     SetAllNpcLiking { level: String },
 }
@@ -133,6 +136,7 @@ pub fn execute_command(
         DevCommand::SetFlag { flag } => set_flag(gs, signals, &flag),
         DevCommand::RemoveFlag { flag } => remove_flag(gs, signals, &flag),
         DevCommand::AdvanceTime { weeks } => advance_time(gs, weeks),
+        DevCommand::SetWindowSize { width, height } => set_window_size(gs, signals, width, height),
         DevCommand::SetNpcLiking { npc_name, level } => set_npc_liking(gs, &npc_name, &level),
         DevCommand::SetAllNpcLiking { level } => set_all_npc_liking(gs, &level),
     }
@@ -367,6 +371,31 @@ fn advance_time(gs: &mut GameState, weeks: u32) -> DevCommandResponse {
         message: format!("Advanced {weeks} week(s)"),
         data: None,
     }
+}
+
+fn set_window_size(
+    gs: &mut GameState,
+    signals: AppSignals,
+    width: f64,
+    height: f64,
+) -> DevCommandResponse {
+    if !(width.is_finite() && height.is_finite()) {
+        return error_response("Window size must be finite".to_string());
+    }
+    if width <= 0.0 || height <= 0.0 {
+        return error_response("Window size must be positive".to_string());
+    }
+
+    signals.window_width.set(width);
+    signals.window_height.set(height);
+    if let Some(window_id) = signals.window_id {
+        window_id.set_content_size(Size::new(width, height));
+    }
+
+    success_runtime_response(
+        format!("Set window size to {:.0}x{:.0}", width, height),
+        runtime_state_snapshot(gs, signals),
+    )
 }
 
 fn set_all_npc_liking(gs: &mut GameState, level: &str) -> DevCommandResponse {
@@ -697,6 +726,27 @@ mod tests {
 
         assert!(!response.success);
         assert!(response.message.contains("Unknown tab"));
+    }
+
+    #[test]
+    fn execute_set_window_size_updates_window_metric_signals() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+
+        let response = execute_command(
+            &mut gs,
+            signals,
+            DevCommand::SetWindowSize {
+                width: 1800.0,
+                height: 1000.0,
+            },
+        );
+
+        assert!(response.success);
+        assert_eq!(signals.window_width.get(), 1800.0);
+        assert_eq!(signals.window_height.get(), 1000.0);
+        assert!(response.message.contains("1800"));
+        assert!(response.message.contains("1000"));
     }
 
     #[test]
