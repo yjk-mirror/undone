@@ -8,7 +8,7 @@
 
 **Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
-**Branch:** `codex/window-tooling-followup`
+**Branch:** `master`
 **Verification (2026-03-11):** `cargo build`, `cargo test -p undone-ui`, `cargo test -p game-input-mcp` (in `tools/`), and fresh live acceptance against `undone --dev --quick` all passed. Live acceptance covered `set_tab("dev")`, `set_window_size(1800, 1000)`, `get_runtime_state()`, `jump_to_scene("base::plan_your_day")`, `advance_time(1)`, `choose_action("go_out")`, and before/after screenshots at the resized window size.
 **Scenes:** 49 total (33 pre-writing-session + 16 new).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
@@ -27,7 +27,7 @@
 
 ## ⚡ Next Action
 
-**Next recommended execution:** Finish branch wrap-up and merge `codex/window-tooling-followup`. The resize tooling, runtime snapshot metrics, Dev tab controls, live acceptance flow, and responsive audit are complete.
+**Next recommended execution:** Verify simulator cadence, then return to FemCreation depth work. The window-tooling follow-up is merged and verified on `master`.
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
