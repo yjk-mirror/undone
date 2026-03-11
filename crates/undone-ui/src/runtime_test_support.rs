@@ -148,7 +148,7 @@ mod tests {
     }
 
     fn play_until_continue(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
-        for _ in 0..8 {
+        for _ in 0..32 {
             let current = harness.snapshot();
             if current.awaiting_continue || current.visible_actions.is_empty() {
                 return current;
@@ -159,6 +159,48 @@ mod tests {
             controller.choose_action(&action_id).unwrap();
         }
 
+        harness.snapshot()
+    }
+
+    fn settle_workplace_route(gs: &mut GameState) {
+        gs.world.game_data.set_flag("ROUTE_WORKPLACE");
+        gs.world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        gs.world.game_data.set_flag("MET_LANDLORD");
+        gs.world.game_data.set_flag("FIRST_MEETING_DONE");
+        gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
+        gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_clothes");
+        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_work_meeting");
+        gs.world.game_data.set_flag("ONCE_base::workplace_evening");
+        for _ in 0..28 {
+            gs.world.game_data.advance_time_slot();
+        }
+    }
+
+    fn advance_first_action_runtime(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
+        let current = harness.snapshot();
+        if current.awaiting_continue || current.current_scene_id.is_none() {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+            return harness.snapshot();
+        }
+
+        let action_id = current
+            .visible_actions
+            .first()
+            .expect("runtime should expose a visible action before advancing")
+            .id
+            .clone();
+        let mut controller = harness.controller();
+        controller.choose_action(&action_id).unwrap();
         harness.snapshot()
     }
 
@@ -358,6 +400,96 @@ mod tests {
                 .any(|paragraph| paragraph.contains("[Scene error:")),
             "runtime errors should surface in visible story output: {:?}",
             snapshot.story_paragraphs
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_robin_route_reaches_week_two_without_dev_time_travel() {
+        let mut harness = make_harness();
+        let mut saw_week_two_content = false;
+        let mut last_snapshot = harness.snapshot();
+
+        for _ in 0..400 {
+            let snapshot = advance_first_action_runtime(&mut harness);
+            if matches!(
+                snapshot.current_scene_id.as_deref(),
+                Some("base::coffee_shop") | Some("base::plan_your_day")
+            ) || snapshot.world.game_flags.iter().any(|flag| {
+                matches!(
+                    flag.as_str(),
+                    "MET_JAKE" | "ONCE_base::coffee_shop" | "ONCE_base::plan_your_day"
+                )
+            }) {
+                saw_week_two_content = true;
+            }
+            if snapshot.world.week >= 2 && saw_week_two_content {
+                last_snapshot = snapshot;
+                break;
+            }
+            last_snapshot = snapshot;
+        }
+
+        assert!(
+            last_snapshot.world.week >= 2,
+            "runtime should reach week 2 without dev-only time travel, got week/day/slot = {:?}/{:?}/{:?}",
+            last_snapshot.world.week,
+            last_snapshot.world.day,
+            last_snapshot.world.time_slot
+        );
+        assert!(
+            saw_week_two_content,
+            "runtime should naturally reach week-2 gated Robin content, final scene {:?}, flags {:?}",
+            last_snapshot.current_scene_id,
+            last_snapshot.world.game_flags
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_settled_slot_scene_consumes_one_time_slot() {
+        let mut harness = make_harness();
+        settle_workplace_route(&mut harness.gs);
+
+        {
+            let mut controller = harness.controller();
+            controller.start_scene("base::plan_your_day").unwrap();
+        }
+
+        {
+            let mut controller = harness.controller();
+            controller.choose_action("go_out").unwrap();
+        }
+
+        let slot_scene = harness.snapshot();
+        assert_ne!(
+            slot_scene.current_scene_id.as_deref(),
+            Some("base::plan_your_day"),
+            "slot request should start a scheduled free_time scene"
+        );
+
+        let mut expected = harness.gs.world.game_data.clone();
+        expected.advance_time_slot();
+        let expected_time_slot = format!("{:?}", expected.time_slot);
+
+        let paused = play_until_continue(&mut harness);
+        assert!(
+            paused.awaiting_continue,
+            "free_time scene should finish into awaiting-continue state"
+        );
+
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let after = harness.snapshot();
+
+        assert_eq!(
+            (
+                after.world.week,
+                after.world.day,
+                after.world.time_slot.clone(),
+            ),
+            (expected.week, expected.day, expected_time_slot),
+            "finishing a settled slot scene should consume exactly one time slot before the next global pick"
         );
     }
 }
