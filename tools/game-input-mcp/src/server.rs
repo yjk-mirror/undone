@@ -138,6 +138,14 @@ pub struct SetTabInput {
     pub tab: String,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SetWindowSizeInput {
+    /// Requested window width in logical pixels.
+    pub width: f64,
+    /// Requested window height in logical pixels.
+    pub height: f64,
+}
+
 #[derive(Clone)]
 pub struct GameInputServer {
     tool_router: ToolRouter<Self>,
@@ -169,6 +177,15 @@ fn set_tab_payload(tab: &str) -> String {
     json!({
         "command": "set_tab",
         "tab": tab,
+    })
+    .to_string()
+}
+
+fn set_window_size_payload(width: f64, height: f64) -> String {
+    json!({
+        "command": "set_window_size",
+        "width": width,
+        "height": height,
     })
     .to_string()
 }
@@ -445,6 +462,18 @@ impl GameInputServer {
         .await
     }
 
+    #[tool(description = "Resize the running Undone window in dev mode to an exact width and height.")]
+    async fn set_window_size(
+        &self,
+        params: Parameters<SetWindowSizeInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: set_window_size_payload(params.0.width, params.0.height),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
     #[tool(description = "Set a dev-editable stat in a running Undone game in dev mode.")]
     async fn set_game_stat(
         &self,
@@ -596,6 +625,7 @@ impl ServerHandler for GameInputServer {
                  if it's running and get the PID, and dev-mode IPC helpers such as \
                  get_game_state(), get_runtime_state(), jump_to_scene(scene_id), \
                  choose_action(action_id), continue_scene(), set_tab(tab), \
+                 set_window_size(width, height), \
                  set_game_stat(stat, value), \
                  set_game_flag(flag), remove_game_flag(flag), advance_time(weeks), \
                  set_npc_liking(npc_name, level), and set_all_npc_liking(level)."
@@ -610,7 +640,8 @@ impl ServerHandler for GameInputServer {
 #[cfg(test)]
 mod tests {
     use super::{
-        choose_action_payload, continue_scene_payload, runtime_state_payload, set_tab_payload,
+        choose_action_payload, continue_scene_payload, runtime_state_payload,
+        set_tab_payload, set_window_size_payload,
     };
     use serde_json::json;
 
@@ -643,6 +674,19 @@ mod tests {
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&set_tab_payload("dev")).unwrap(),
             json!({ "command": "set_tab", "tab": "dev" })
+        );
+    }
+
+    #[test]
+    fn set_window_size_payload_uses_resize_command_name() {
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&set_window_size_payload(1800.0, 1000.0))
+                .unwrap(),
+            json!({
+                "command": "set_window_size",
+                "width": 1800.0,
+                "height": 1000.0
+            })
         );
     }
 }
