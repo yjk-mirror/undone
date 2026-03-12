@@ -258,6 +258,26 @@ fn filler_cleanup_cluster_has_no_known_fine_test_phrases() {
     assert!(!report.has_finding("packs/base/scenes/work_friday.toml", "fine_test_failure"));
 }
 
+#[test]
+fn player_agency_audit_report() {
+    let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
+    let agency_findings: Vec<_> = report
+        .prose_findings
+        .iter()
+        .filter(|f| f.kind == "player_speech_in_intro" || f.kind == "player_action_in_intro")
+        .collect();
+
+    // Print the report for human review
+    for f in &agency_findings {
+        eprintln!(
+            "[{}] {} (line {:?}): {}",
+            f.kind, f.file_path, f.line, f.message
+        );
+    }
+
+    eprintln!("\nTotal player-agency findings: {}", agency_findings.len());
+}
+
 // These tests scope to finding types that were cleaned in prior sessions.
 // Player agency findings (player_speech_in_intro, player_action_in_intro)
 // are expected to exist until Phase 2 rewrites land.
