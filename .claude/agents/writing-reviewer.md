@@ -28,7 +28,17 @@ pointing things out. Not literary, not dramatic, not performing. Read Sample 0 i
 Read `docs/review-core.md` for the complete detection checklist. The key severity levels:
 
 **Critical** — must fix before commit:
-- Narrator deciding player actions in intro (ordering drinks, choosing where to sit, speaking)
+- **Player speech in intro** — any quoted dialogue attributed to the player before
+  an action button. Look for `"..." You [verb]` patterns and `You say/tell/ask`.
+- **Player deliberate actions in intro** — player sitting, grabbing, walking, nodding,
+  ordering, opening, picking, choosing in intro prose. The intro describes the world;
+  actions are what the player decides. Exclude involuntary body responses (feel, notice,
+  hear, see, hands going cold, body responding).
+- **Extended player autopilot in intro** — multiple paragraphs of the player acting
+  (getting dressed, commuting, shaking hands) without any choice point. Needs
+  restructuring into setup + action buttons.
+- **Can you identify the player's first CHOICE?** If the intro narrates past where
+  the first decision should be, the scene needs restructuring.
 - Narrator analyzing body/transformation ("none of this was conscious," "your body is making calculations")
 - Full articulated thoughts in player's head ("*more of that, please*," "*I'm here and I'm fine*")
 - Narrator explaining motivation ("which is what you came here for")
