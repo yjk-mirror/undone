@@ -1,5 +1,6 @@
 use floem::prelude::SignalGet;
 use serde::{Deserialize, Serialize};
+use undone_scene::engine::BoundNpcData;
 
 use crate::game_state::GameState;
 use crate::{AppPhase, AppSignals, AppTab, NpcSnapshot, PlayerSnapshot};
@@ -15,6 +16,7 @@ pub struct RuntimeSnapshot {
     pub story_paragraphs: Vec<String>,
     pub visible_actions: Vec<VisibleActionSnapshot>,
     pub active_npc: Option<ActiveNpcSnapshot>,
+    pub active_npcs: Vec<BoundActiveNpcSnapshot>,
     pub player: PlayerSummarySnapshot,
     pub world: WorldSummarySnapshot,
     pub init_error: Option<String>,
@@ -29,6 +31,18 @@ pub struct VisibleActionSnapshot {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ActiveNpcSnapshot {
+    pub name: String,
+    pub age: String,
+    pub personality: String,
+    pub relationship: String,
+    pub pc_liking: String,
+    pub pc_attraction: String,
+    pub known: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct BoundActiveNpcSnapshot {
+    pub binding: String,
     pub name: String,
     pub age: String,
     pub personality: String,
@@ -81,6 +95,12 @@ pub fn snapshot_runtime(signals: AppSignals, gs: &GameState) -> RuntimeSnapshot 
     arc_states.sort_by(|left, right| left.id.cmp(&right.id));
 
     let player = PlayerSnapshot::from_player(&gs.world.player, gs.femininity_id);
+    let active_npcs = gs
+        .engine
+        .current_bound_npcs(&gs.world, &gs.registry)
+        .into_iter()
+        .map(bound_npc_snapshot)
+        .collect();
 
     RuntimeSnapshot {
         phase: phase_name(signals.phase.get_untracked()).to_string(),
@@ -101,6 +121,7 @@ pub fn snapshot_runtime(signals: AppSignals, gs: &GameState) -> RuntimeSnapshot 
             })
             .collect(),
         active_npc: signals.active_npc.get_untracked().map(active_npc_snapshot),
+        active_npcs,
         player: PlayerSummarySnapshot {
             name: player.name,
             femininity: player.femininity,
@@ -130,7 +151,7 @@ fn story_paragraphs(story: &str) -> Vec<String> {
 }
 
 fn active_npc_snapshot(npc: NpcSnapshot) -> ActiveNpcSnapshot {
-    let known = npc.is_known();
+    let known = is_known_npc(&npc.relationship, &npc.pc_liking, &npc.pc_attraction);
     ActiveNpcSnapshot {
         name: npc.name,
         age: npc.age,
@@ -140,6 +161,34 @@ fn active_npc_snapshot(npc: NpcSnapshot) -> ActiveNpcSnapshot {
         pc_attraction: format!("{:?}", npc.pc_attraction),
         known,
     }
+}
+
+fn bound_npc_snapshot(bound: BoundNpcData) -> BoundActiveNpcSnapshot {
+    let known = is_known_npc(
+        &bound.npc.relationship,
+        &bound.npc.pc_liking,
+        &bound.npc.pc_attraction,
+    );
+    BoundActiveNpcSnapshot {
+        binding: bound.binding,
+        name: bound.npc.name,
+        age: format!("{:?}", bound.npc.age),
+        personality: bound.npc.personality,
+        relationship: format!("{:?}", bound.npc.relationship),
+        pc_liking: format!("{:?}", bound.npc.pc_liking),
+        pc_attraction: format!("{:?}", bound.npc.pc_attraction),
+        known,
+    }
+}
+
+fn is_known_npc(
+    relationship: &undone_domain::RelationshipStatus,
+    pc_liking: &undone_domain::LikingLevel,
+    pc_attraction: &undone_domain::AttractionLevel,
+) -> bool {
+    !matches!(relationship, undone_domain::RelationshipStatus::Stranger)
+        || !matches!(pc_liking, undone_domain::LikingLevel::Neutral)
+        || !matches!(pc_attraction, undone_domain::AttractionLevel::Unattracted)
 }
 
 fn phase_name(phase: AppPhase) -> &'static str {
@@ -167,9 +216,16 @@ mod tests {
     use crate::game_state::{start_game, PreGameState};
     use crate::{AppPhase, AppTab, NpcSnapshot};
     use floem::prelude::SignalUpdate;
+    use lasso::Key;
+    use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
-    use undone_domain::{AttractionLevel, LikingLevel, RelationshipStatus};
+    use std::sync::Arc;
+    use undone_domain::{
+        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
+        NpcCore, PersonalityId, RelationshipStatus,
+    };
     use undone_scene::engine::{ActionView, EngineCommand};
+    use undone_scene::{Action, EffectDef, NpcAction, SceneDefinition, SceneEngine, SceneNpcRef};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -188,6 +244,41 @@ mod tests {
         let pre = test_pre_state();
         let config = crate::char_creation::robin_quick_config(&pre.registry);
         start_game(pre, config, true)
+    }
+
+    fn test_male_npc(personality: PersonalityId) -> MaleNpc {
+        MaleNpc {
+            core: NpcCore {
+                name: "Jake".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Acquaintance,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Attracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        }
     }
 
     #[test]
@@ -270,6 +361,7 @@ mod tests {
                 known: true,
             })
         );
+        assert!(snapshot.active_npcs.is_empty());
         assert_eq!(snapshot.player.name, "Robin");
         assert_eq!(snapshot.window_width, 1800.0);
         assert_eq!(snapshot.window_height, 1000.0);
@@ -282,5 +374,196 @@ mod tests {
             .arc_states
             .iter()
             .any(|arc| arc.id == "base::workplace_opening" && arc.state == "arrived"));
+    }
+
+    #[test]
+    fn runtime_snapshot_lists_multiple_active_npcs() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        let romantic = gs.registry.intern_personality("ROMANTIC");
+        let calm = gs.registry.intern_personality("CALM");
+        let male_key = gs.world.male_npcs.insert(test_male_npc(romantic));
+        let female_key = gs.world.female_npcs.insert(undone_domain::FemaleNpc {
+            core: NpcCore {
+                name: "Mia".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "green".into(),
+                hair_colour: "black".into(),
+                personality: calm,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Friend,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            char_type: undone_domain::CharTypeId::from_spur(
+                lasso::Spur::try_from_usize(0).unwrap(),
+            ),
+            figure: undone_domain::PlayerFigure::Slim,
+            breasts: undone_domain::BreastSize::Average,
+            clothing: undone_domain::FemaleClothing::default(),
+            pregnancy: None,
+            virgin: true,
+        });
+        let mut role_bindings = HashMap::new();
+        role_bindings.insert("ROLE_TEAM_LEAD".to_string(), SceneNpcRef::Male(male_key));
+        role_bindings.insert("ROLE_DESIGNER".to_string(), SceneNpcRef::Female(female_key));
+
+        gs.engine.start_scene_with_role_bindings(
+            "base::rain_shelter".into(),
+            None,
+            None,
+            role_bindings,
+            &gs.world,
+            &gs.registry,
+        );
+        gs.engine.drain();
+
+        let snapshot = snapshot_runtime(signals, &gs);
+        assert_eq!(
+            snapshot.active_npcs,
+            vec![
+                BoundActiveNpcSnapshot {
+                    binding: "ROLE_DESIGNER".into(),
+                    name: "Mia".into(),
+                    age: "MidLateTwenties".into(),
+                    personality: "CALM".into(),
+                    relationship: "Friend".into(),
+                    pc_liking: "Like".into(),
+                    pc_attraction: "Unattracted".into(),
+                    known: true,
+                },
+                BoundActiveNpcSnapshot {
+                    binding: "ROLE_TEAM_LEAD".into(),
+                    name: "Jake".into(),
+                    age: "MidLateTwenties".into(),
+                    personality: "ROMANTIC".into(),
+                    relationship: "Acquaintance".into(),
+                    pc_liking: "Like".into(),
+                    pc_attraction: "Attracted".into(),
+                    known: true,
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn multi_npc_scene_contract_supports_prose_effects_and_snapshot() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        let romantic = gs.registry.intern_personality("ROMANTIC");
+        let calm = gs.registry.intern_personality("CALM");
+        let male_key = gs.world.male_npcs.insert(test_male_npc(romantic));
+        let female_key = gs.world.female_npcs.insert(undone_domain::FemaleNpc {
+            core: NpcCore {
+                name: "Mia".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "green".into(),
+                hair_colour: "black".into(),
+                personality: calm,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Friend,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            char_type: undone_domain::CharTypeId::from_spur(
+                lasso::Spur::try_from_usize(0).unwrap(),
+            ),
+            figure: undone_domain::PlayerFigure::Slim,
+            breasts: undone_domain::BreastSize::Average,
+            clothing: undone_domain::FemaleClothing::default(),
+            pregnancy: None,
+            virgin: true,
+        });
+        let mut scenes = HashMap::new();
+        scenes.insert(
+            "test::multi_npc".to_string(),
+            Arc::new(SceneDefinition {
+                id: "test::multi_npc".into(),
+                pack: "test".into(),
+                intro_prose:
+                    r#"{{ role.getName("ROLE_TEAM_LEAD") }} and {{ role.getName("ROLE_DESIGNER") }}"#
+                        .into(),
+                intro_variants: vec![],
+                intro_thoughts: vec![],
+                actions: vec![Action {
+                    id: "approve".into(),
+                    label: "Approve".into(),
+                    detail: "Move things forward.".into(),
+                    condition: None,
+                    prose: String::new(),
+                    allow_npc_actions: false,
+                    effects: vec![EffectDef::AddNpcLiking {
+                        npc: "ROLE_TEAM_LEAD".into(),
+                        delta: 1,
+                    }],
+                    next: vec![],
+                    thoughts: vec![],
+                }],
+                npc_actions: Vec::<NpcAction>::new(),
+            }),
+        );
+        gs.engine = SceneEngine::new(scenes);
+
+        let mut role_bindings = HashMap::new();
+        role_bindings.insert("ROLE_TEAM_LEAD".to_string(), SceneNpcRef::Male(male_key));
+        role_bindings.insert("ROLE_DESIGNER".to_string(), SceneNpcRef::Female(female_key));
+        gs.engine.start_scene_with_role_bindings(
+            "test::multi_npc".into(),
+            None,
+            None,
+            role_bindings,
+            &gs.world,
+            &gs.registry,
+        );
+        let events = gs.engine.drain();
+        let intro = events
+            .iter()
+            .find_map(|event| match event {
+                undone_scene::engine::EngineEvent::ProseAdded(text) => Some(text.as_str()),
+                _ => None,
+            })
+            .expect("intro prose should render");
+        assert!(intro.contains("Jake"));
+        assert!(intro.contains("Mia"));
+
+        gs.engine
+            .advance_with_action("approve", &mut gs.world, &gs.registry);
+        assert_eq!(
+            gs.world.male_npcs[male_key].core.pc_liking,
+            LikingLevel::Close
+        );
+
+        let snapshot = snapshot_runtime(signals, &gs);
+        assert_eq!(snapshot.active_npcs.len(), 2);
     }
 }

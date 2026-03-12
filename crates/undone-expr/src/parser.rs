@@ -3,11 +3,12 @@ use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Receiver {
-    Player,    // w
-    MaleNpc,   // m
-    FemaleNpc, // f
-    Scene,     // scene
-    GameData,  // gd
+    Player,     // w
+    MaleNpc,    // m
+    FemaleNpc,  // f
+    Scene,      // scene
+    GameData,   // gd
+    RoleLookup, // role
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -195,6 +196,7 @@ impl Parser {
                     "f" => Receiver::FemaleNpc,
                     "scene" => Receiver::Scene,
                     "gd" => Receiver::GameData,
+                    "role" => Receiver::RoleLookup,
                     other => return Err(ParseError::UnknownReceiver(other.to_string())),
                 };
                 let method = if let Token::Ident(m) = self.advance().clone() {
@@ -297,6 +299,19 @@ mod tests {
     #[test]
     fn errors_on_unknown_receiver() {
         assert!(parse("x.something()").is_err());
+    }
+
+    #[test]
+    fn parses_role_lookup_receiver() {
+        let expr = parse("role.getName('ROLE_TEAM_LEAD')").unwrap();
+        assert_eq!(
+            expr,
+            Expr::Call(Call {
+                receiver: Receiver::RoleLookup,
+                method: "getName".into(),
+                args: vec![Value::Str("ROLE_TEAM_LEAD".into())],
+            })
+        );
     }
 
     #[test]

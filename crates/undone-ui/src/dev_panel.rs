@@ -522,8 +522,8 @@ mod tests {
     };
     use crate::layout::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
     use crate::runtime_snapshot::{
-        ActiveNpcSnapshot, ArcStateSnapshot, PlayerSummarySnapshot, RuntimeSnapshot,
-        VisibleActionSnapshot, WorldSummarySnapshot,
+        ActiveNpcSnapshot, ArcStateSnapshot, BoundActiveNpcSnapshot, PlayerSummarySnapshot,
+        RuntimeSnapshot, VisibleActionSnapshot, WorldSummarySnapshot,
     };
 
     #[test]
@@ -563,6 +563,16 @@ mod tests {
                 pc_attraction: "Attracted".into(),
                 known: true,
             }),
+            active_npcs: vec![BoundActiveNpcSnapshot {
+                binding: "ROLE_TEAM_LEAD".into(),
+                name: "Jake".into(),
+                age: "MidLateTwenties".into(),
+                personality: "Romantic".into(),
+                relationship: "Acquaintance".into(),
+                pc_liking: "Like".into(),
+                pc_attraction: "Attracted".into(),
+                known: true,
+            }],
             player: PlayerSummarySnapshot {
                 name: "Robin".into(),
                 femininity: 10,

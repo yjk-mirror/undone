@@ -14,6 +14,7 @@ pub use scheduler::{
     load_schedule, validate_entry_scene_references, PickResult, Scheduler, SchedulerError,
 };
 pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
+pub use undone_expr::SceneNpcRef;
 
 #[cfg(test)]
 mod integration_tests {

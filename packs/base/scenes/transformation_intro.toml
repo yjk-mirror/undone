@@ -9,43 +9,41 @@ description = "Night flight to the new city. You board as the person you were an
 
 [intro]
 prose = """
-Gate C31. Grey-and-maroon airport carpet, the Cinnabon across the concourse, a kid asleep across two seats near the window.
+Gate C31. Grey carpet gone shiny with use. A Cinnabon across the concourse. A child asleep across two vinyl seats with one sneaker half off.
 
-{% if not w.alwaysFemale() %}Your boarding pass says **{{ w.beforeName() }}**.{% endif %}
+{% if w.wasTransformed() %}Your boarding pass says {{ w.beforeName() }}.{% endif %}
 
 {% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
-Three weeks ago, a company in a city you've visited once offered you a job. Software engineering. The salary matched your ten years of experience even if the title didn't. You said yes because the old job was going nowhere and because sometimes you just need to go somewhere.
+Three weeks ago a company in a city you barely knew offered you a job. Software engineering. Better pay than the old place, thinner title than you deserved, clean enough excuse to leave anyway.
 
-Your apartment lease starts tomorrow. Your boxes shipped Monday. There's a badge photo sitting in an HR system with your face and your name, and on Monday morning someone is going to try to match that photo to whoever walks through the door.
+The lease starts tomorrow. Your boxes shipped Monday. Somewhere in an HR system there is already a badge photo attached to your name, waiting for Monday morning to make it official.
 {% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
-Orientation starts Thursday. Your dorm assignment came through last week — a double in one of the old stone buildings, roommate TBD. You've read the acceptance letter four times. The financial aid folder on your phone has been opened more often than you'd admit.
-
-You got in. Now you have to show up and be the person who got in.
+Orientation starts Thursday. Your housing assignment came through last week, double room, old stone dorm, roommate still unknown. The acceptance email is starred, archived, and still easy to find.
 {% else %}
-You've been telling people you're starting fresh, which is true enough. The sublet starts tomorrow. The plan after that is loose.
+You have a sublet, a suitcase, and a plan that gets less precise every time you say it out loud.
 {% endif %}
 
-{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
-{% if not w.alwaysFemale() %}Ten years in the industry. A name people recognized in meetings. A reputation built one clean commit, one shipped feature, one mentored junior at a time. The man on the boarding pass had a career that made sense.{% endif %}
-{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
-{% if not w.alwaysFemale() %}The acceptance letter is still in your phone's screenshots. The person who applied had a transcript and a personal statement and an eighteen-year-old certainty that the world would make room.{% endif %}
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") and w.wasTransformed() %}
+Ten years in the industry. Enough shipped work that people stopped second-guessing you once the meeting started. The life attached to that boarding pass made practical sense from every angle except whether it was worth keeping.
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") and w.wasTransformed() %}
+The version of you who applied had a transcript, a personal statement, and the kind of certainty eighteen-year-olds can still mistake for structure.
 {% endif %}
 
-{% if not w.alwaysFemale() %}Around you, the gate area does normal airport things. A businessman laughs into his phone. A college kid hugs her backpack like a pillow. The Cinnabon line inches forward. You're doing a normal airport thing too — sitting, waiting, going somewhere. Everything is still normal.{% endif %}
+The gate does what gates do. Phones glow. Wheelie bags click over tile. Somebody laughs too loudly into a headset and nobody even turns.
 
 {% if w.hasTrait("AMBITIOUS") %}
-You've mapped the first week already. Airport to apartment, unpack, sleep. Monday is accounted for. The rest is contingency.
+You have already arranged the first week into steps. Land. Keys. Sleep. Wake up ready. Anything that does not fit the list can be solved when it appears.
 {% elif w.hasTrait("ANALYTICAL") %}
-You go through the logistics one more time. Lands at 9:40. Ground transport. Keys from the lockbox, code in your email. If the apartment matches the photos, unpacked by midnight.
+You run the sequence again. Land at 9:40. Transit or cab depending on the line. Lockbox code from the email. If the apartment matches the photos, unpacked before midnight.
 {% elif w.hasTrait("SHY") %}
-The gate area is loud. You've found a seat near the wall — close enough for the boarding call, far enough from the nearest group conversation.
+You chose a seat near the wall. Close enough to hear boarding, far enough that nobody has to make conversation unless they insist.
 {% elif w.hasTrait("OUTGOING") %}
-The woman in the next seat has a travel pillow, a paperback, and the relaxed posture of someone who flies regularly. She caught your eye when you sat down — quick smile, back to her book.
+The woman beside you has a paperback open on one knee and the settled look of somebody who flies often. When you sat down she smiled, small and automatic, then went back to reading.
 {% else %}
-You wait. Airports are mostly waiting.
+You sit, wait, and let the airport move around you.
 {% endif %}
 
-They call your zone.
+They call your zone at last.
 """
 
 [[actions]]
@@ -53,53 +51,53 @@ id     = "board_and_sleep"
 label  = "Board the flight"
 detail = "Find your seat. The city can wait."
 prose = """
-The jet bridge smells like hydraulic fluid and rain. You file in with everyone else.
+The jet bridge smells like wet metal and recycled air. You move with the line, find your row, lift the bag, sit.
 
-{% if not w.alwaysFemale() %}{% if w.beforeHeight() == "Tall" or w.beforeHeight() == "VeryTall" %}
-Your knees have opinions about the next three hours. You fold into the window seat and accept the legroom situation.
+{% if w.wasTransformed() %}{% if w.beforeHeight() == "Tall" or w.beforeHeight() == "VeryTall" %}
+Your knees wedge in immediately. Three hours in a window seat becomes a negotiation.
 {% elif w.beforeFigure() == "Muscular" or w.beforeFigure() == "Thickset" %}
-The window seat is tight across the shoulders. You take it, claim the armrest.
+The seat is narrow across the shoulders. You settle anyway and claim what space there is.
 {% else %}
-You find your row, stow your bag, sit down, buckle.
+You buckle in, slide your phone into the seat pocket, and wait for the door to close.
 {% endif %}{% endif %}
 
-The overhead bins close one by one. A flight attendant does the safety demonstration to an audience of nobody.
+The overhead bins slam shut in stages. A flight attendant points out exits to people already staring at their screens.
 
 {% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
-Somewhere in that city there's a desk, a codebase you've read the docs for, and a team expecting someone they've never met.
+Somewhere ahead there is a desk, a codebase, and a team expecting competence from a person they have never met.
 {% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
-Somewhere in that city there's a dorm room with a bare mattress and a meal plan card and a roommate who's probably already there.
+Somewhere ahead there is a dorm room with a bare mattress, a student ID, and a roommate who may already be there.
 {% else %}
-Somewhere in that city there's an apartment with your boxes in it and nothing else.
+Somewhere ahead there is an apartment with your boxes in it and no memory of you yet.
 {% endif %}
 
-The runway lights stretch into streaks. The engines rise. The ground drops away.
+The runway lights smear into lines. The engines climb. The city drops away.
 
 {% if w.hasTrait("SHY") %}
-Window seat. You angle toward the glass and watch the lights below shrink into a grid. Nobody expects anything from you up here.
+The window helps. Outside, nobody needs anything from you.
 {% elif w.hasTrait("ANALYTICAL") %}
-The city grid rotates below. You catch yourself calculating altitude by the size of the headlights. It doesn't matter and the calculation was automatic.
+You watch the street grid tilt beneath the wing and catch yourself estimating altitude from the size of the headlights below.
 {% endif %}
 
-The cabin lights go down. The engine noise settles into a hum.
+Once the cabin settles, the flight becomes pure background noise: a low engine hum, occasional glassware, the soft cough and rustle of strangers trying to get comfortable.
 
-{% if not w.alwaysFemale() %}You flip your phone to airplane mode. The lock screen shows a picture you took last month — nothing important, just the view from your old apartment. You don't look at it long.
-
-The in-flight magazine has an article about the ten best airports for layovers. You read half a page before your eyes start drifting.{% endif %}
+{% if w.wasTransformed() %}
+You flip your phone to airplane mode. The lock screen photo is from your old apartment window. You look at it just long enough to recognize the habit.
+{% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}
-Your mind runs the week one more time. Apartment, keys, unpack. Grocery run. The commute route you memorized from Google Maps. The numbers line up. They always line up. That's how your head works — systems, sequences, things that fit.
+You run the week again. Keys. Groceries. Commute. Monday. The sequence is clean, and for a while that is enough.
 {% elif w.hasTrait("AMBITIOUS") %}
-Monday. The handshake, the name introduction, the first meeting where they figure out what you're worth. You've done this before. Different city, same playbook.
+Monday matters. First impressions always matter. New office, new city, same private promise to be obviously worth hiring.
 {% elif w.hasTrait("SHY") %}
-The window seat is good. No one in the middle. The aisle passenger fell asleep first, which means you don't have to figure out the armrest situation. Small mercies.
+The aisle passenger falls asleep before drink service. That removes at least one social problem from the evening.
 {% elif w.hasTrait("OUTGOING") %}
-The seatmate tried to start a conversation during takeoff. You matched her energy for ten minutes — where are you headed, what do you do — and then it tapered into comfortable silence. Good people know when a conversation is done.
+Your seatmate gives the conversation one polite opening and lets it go when you do. The silence that follows is easy.
 {% endif %}
 
-{% if not w.alwaysFemale() %}This is the last version of you that makes sense. The man on the boarding pass, with the right name and the right body and a plan that fits the shape of his life. Everything from here works the way it always has.{% endif %}
+{% if w.wasTransformed() %}For the moment, everything still answers to the life you boarded with. Name. body. history. plan.{% endif %}
 
-Somewhere over Ohio, your eyes close.
+Somewhere over Ohio, you fall asleep.
 """
 
   [[actions.effects]]

@@ -327,7 +327,13 @@ Tagged by `type`:
 | `set_npc_behaviour` | `npc, behaviour` | Set NPC's behaviour state |
 | `set_contactable` | `npc, value: bool` | Mark an NPC as contactable (or not) |
 | `add_sexual_activity` | `npc, activity` | Record a sexual activity with an NPC |
-| `set_npc_role` | `npc, role` | Bind an NPC to a named role for the current scene |
+| `set_npc_role` | `npc, role` | Add a named role tag to an NPC so later scenes, schedule checks, and lookups can resolve them |
+
+For every NPC-targeted effect above, `npc` may be:
+
+- `m` for `SceneCtx.active_male`
+- `f` for `SceneCtx.active_female`
+- any authored role id currently bound in `SceneCtx.role_bindings`, such as `ROLE_TEAM_LEAD`
 
 **Navigation**
 

@@ -3,7 +3,7 @@ use undone_domain::{
     AlcoholLevel, ArousalLevel, AttractionLevel, Behaviour, FemaleNpcKey, LikingLevel, LoveLevel,
     MaleNpcKey, NpcKey, RelationshipStatus, SkillValue,
 };
-use undone_expr::SceneCtx;
+use undone_expr::{SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
@@ -11,7 +11,7 @@ use crate::types::EffectDef;
 
 #[derive(Debug, Error)]
 pub enum EffectError {
-    #[error("effect 'add_npc_liking': npc ref '{0}' is not 'm' or 'f'")]
+    #[error("effect npc ref '{0}' is not 'm', 'f', or a bound scene role")]
     BadNpcRef(String),
     #[error("effect requires active male NPC but none is set")]
     NoActiveMale,
@@ -416,7 +416,11 @@ fn resolve_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<NpcRef, EffectError> {
             .active_female
             .map(NpcRef::Female)
             .ok_or(EffectError::NoActiveFemale),
-        _ => Err(EffectError::BadNpcRef(npc.to_string())),
+        role => match ctx.role_binding(role) {
+            Some(SceneNpcRef::Male(key)) => Ok(NpcRef::Male(key)),
+            Some(SceneNpcRef::Female(key)) => Ok(NpcRef::Female(key)),
+            None => Err(EffectError::BadNpcRef(role.to_string())),
+        },
     }
 }
 
@@ -615,6 +619,28 @@ mod tests {
         )
         .unwrap();
         assert_eq!(world.male_npcs[key].core.pc_liking, LikingLevel::Close);
+    }
+
+    #[test]
+    fn add_npc_liking_can_target_role_bound_npc() {
+        let mut world = make_world();
+        let key = world.male_npcs.insert(make_male_npc());
+        let mut ctx = SceneCtx::new();
+        ctx.bind_role("ROLE_TEAM_LEAD", SceneNpcRef::Male(key));
+        let reg = PackRegistry::new();
+
+        apply_effect(
+            &EffectDef::AddNpcLiking {
+                npc: "ROLE_TEAM_LEAD".into(),
+                delta: 1,
+            },
+            &mut world,
+            &mut ctx,
+            &reg,
+        )
+        .unwrap();
+
+        assert_eq!(world.male_npcs[key].core.pc_liking, LikingLevel::Ok);
     }
 
     #[test]

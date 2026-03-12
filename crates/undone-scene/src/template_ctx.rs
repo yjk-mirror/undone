@@ -9,7 +9,7 @@ use minijinja::{
     Error, ErrorKind, State,
 };
 use undone_domain::PcOrigin;
-use undone_expr::SceneCtx;
+use undone_expr::{SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
@@ -285,6 +285,73 @@ impl fmt::Display for NpcCtx {
     }
 }
 
+#[derive(Debug)]
+pub struct RoleLookupCtx {
+    pub bindings: HashMap<String, Arc<NpcCtx>>,
+}
+
+impl fmt::Display for RoleLookupCtx {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "RoleLookupCtx")
+    }
+}
+
+impl Object for RoleLookupCtx {
+    fn repr(self: &Arc<Self>) -> ObjectRepr {
+        ObjectRepr::Plain
+    }
+
+    fn call_method(
+        self: &Arc<Self>,
+        _state: &State<'_, '_>,
+        method: &str,
+        args: &[Value],
+    ) -> Result<Value, Error> {
+        let role = string_arg(method, args, 0)?;
+        let npc = self.bindings.get(role.as_str()).ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidOperation,
+                format!("role has no bound npc for '{}'", role),
+            )
+        })?;
+
+        match method {
+            "getName" => Ok(Value::from(npc.name.as_str())),
+            "getLiking" => Ok(Value::from(npc.pc_liking.to_string())),
+            "getLove" => Ok(Value::from(format!("{:?}", npc.pc_love))),
+            "getAttraction" => Ok(Value::from(npc.pc_attraction.to_string())),
+            "getBehaviour" => Ok(Value::from(format!("{:?}", npc.behaviour))),
+            "hasFlag" => {
+                let flag = string_arg(method, args, 1)?;
+                Ok(Value::from(npc.relationship_flags.contains(flag.as_str())))
+            }
+            "hasRole" => {
+                let nested_role = string_arg(method, args, 1)?;
+                Ok(Value::from(npc.roles.contains(nested_role.as_str())))
+            }
+            "isPartner" => Ok(Value::from(matches!(
+                npc.relationship,
+                undone_domain::RelationshipStatus::Partner { .. }
+                    | undone_domain::RelationshipStatus::Married
+            ))),
+            "isFriend" => Ok(Value::from(matches!(
+                npc.relationship,
+                undone_domain::RelationshipStatus::Friend
+                    | undone_domain::RelationshipStatus::Partner { .. }
+                    | undone_domain::RelationshipStatus::Married
+            ))),
+            "isContactable" => Ok(Value::from(npc.contactable)),
+            "isPregnant" => Ok(Value::from(npc.pregnant)),
+            "isVirgin" => Ok(Value::from(npc.virgin)),
+            "hadOrgasm" => Ok(Value::from(npc.had_orgasm)),
+            _ => Err(Error::new(
+                ErrorKind::UnknownMethod,
+                format!("role has no method '{method}'"),
+            )),
+        }
+    }
+}
+
 impl Object for NpcCtx {
     fn repr(self: &Arc<Self>) -> ObjectRepr {
         ObjectRepr::Plain
@@ -528,6 +595,45 @@ pub fn render_prose(
             })
         })
         .unwrap_or(Value::UNDEFINED);
+    let role_lookup = {
+        let mut bindings = HashMap::new();
+        for (role, npc_ref) in &ctx.role_bindings {
+            let npc_ctx = match npc_ref {
+                SceneNpcRef::Male(key) => world.male_npc(*key).map(|npc| NpcCtx {
+                    name: npc.core.name.clone(),
+                    relationship: npc.core.relationship.clone(),
+                    pc_liking: npc.core.pc_liking,
+                    pc_love: npc.core.pc_love,
+                    pc_attraction: npc.core.pc_attraction,
+                    behaviour: npc.core.behaviour,
+                    relationship_flags: npc.core.relationship_flags.clone(),
+                    roles: npc.core.roles.clone(),
+                    contactable: npc.core.contactable,
+                    pregnant: false,
+                    virgin: false,
+                    had_orgasm: npc.had_orgasm,
+                }),
+                SceneNpcRef::Female(key) => world.female_npc(*key).map(|npc| NpcCtx {
+                    name: npc.core.name.clone(),
+                    relationship: npc.core.relationship.clone(),
+                    pc_liking: npc.core.pc_liking,
+                    pc_love: npc.core.pc_love,
+                    pc_attraction: npc.core.pc_attraction,
+                    behaviour: npc.core.behaviour,
+                    relationship_flags: npc.core.relationship_flags.clone(),
+                    roles: npc.core.roles.clone(),
+                    contactable: npc.core.contactable,
+                    pregnant: npc.pregnancy.is_some(),
+                    virgin: npc.virgin,
+                    had_orgasm: false,
+                }),
+            };
+            if let Some(npc_ctx) = npc_ctx {
+                bindings.insert(role.clone(), Arc::new(npc_ctx));
+            }
+        }
+        Value::from_object(RoleLookupCtx { bindings })
+    };
 
     let mut env = minijinja::Environment::new();
     env.add_template("prose", template_str)?;
@@ -539,6 +645,7 @@ pub fn render_prose(
         scene => Value::from_object(scene_view),
         m => active_male,
         f => active_female,
+        role => role_lookup,
     };
 
     tmpl.render(render_ctx)
@@ -552,6 +659,7 @@ pub fn render_prose(
 #[allow(non_snake_case)]
 mod tests {
     use super::*;
+    use lasso::Key;
     use undone_domain::{Appearance, BeforeVoice};
 
     use undone_world::test_helpers::make_test_world as make_world;
@@ -739,5 +847,94 @@ mod tests {
         world.player.skills.get_mut(&fem_id).unwrap().value = 75;
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert_eq!(result.trim(), "Eva");
+    }
+
+    #[test]
+    fn role_lookup_can_render_multiple_bound_npcs() {
+        let mut registry = undone_packs::PackRegistry::new();
+        let romantic = registry.intern_personality("ROMANTIC");
+        let calm = registry.intern_personality("CALM");
+        let mut world = make_world();
+
+        let male = undone_domain::MaleNpc {
+            core: undone_domain::NpcCore {
+                name: "Dan".into(),
+                age: undone_domain::Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality: romantic,
+                traits: HashSet::new(),
+                relationship: undone_domain::RelationshipStatus::Acquaintance,
+                pc_liking: undone_domain::LikingLevel::Like,
+                npc_liking: undone_domain::LikingLevel::Neutral,
+                pc_love: undone_domain::LoveLevel::None,
+                npc_love: undone_domain::LoveLevel::None,
+                pc_attraction: undone_domain::AttractionLevel::Attracted,
+                npc_attraction: undone_domain::AttractionLevel::Ok,
+                behaviour: undone_domain::Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: undone_domain::MaleFigure::Average,
+            clothing: undone_domain::MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        let female = undone_domain::FemaleNpc {
+            core: undone_domain::NpcCore {
+                name: "Mia".into(),
+                age: undone_domain::Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "green".into(),
+                hair_colour: "black".into(),
+                personality: calm,
+                traits: HashSet::new(),
+                relationship: undone_domain::RelationshipStatus::Acquaintance,
+                pc_liking: undone_domain::LikingLevel::Like,
+                npc_liking: undone_domain::LikingLevel::Neutral,
+                pc_love: undone_domain::LoveLevel::None,
+                npc_love: undone_domain::LoveLevel::None,
+                pc_attraction: undone_domain::AttractionLevel::Unattracted,
+                npc_attraction: undone_domain::AttractionLevel::Unattracted,
+                behaviour: undone_domain::Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            char_type: undone_domain::CharTypeId::from_spur(
+                lasso::Spur::try_from_usize(0).unwrap(),
+            ),
+            figure: undone_domain::PlayerFigure::Slim,
+            breasts: undone_domain::BreastSize::Average,
+            clothing: undone_domain::FemaleClothing::default(),
+            pregnancy: None,
+            virgin: true,
+        };
+
+        let male_key = world.male_npcs.insert(male);
+        let female_key = world.female_npcs.insert(female);
+        let mut ctx = SceneCtx::new();
+        ctx.bind_role("ROLE_TEAM_LEAD", SceneNpcRef::Male(male_key));
+        ctx.bind_role("ROLE_DESIGNER", SceneNpcRef::Female(female_key));
+
+        let template =
+            r#"{{ role.getName("ROLE_TEAM_LEAD") }} and {{ role.getName("ROLE_DESIGNER") }}"#;
+        let result = render_prose(template, &world, &ctx, &registry).unwrap();
+        assert!(result.contains("Dan"));
+        assert!(result.contains("Mia"));
     }
 }

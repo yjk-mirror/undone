@@ -11,9 +11,16 @@ use crate::parser::{Call, Expr, Receiver, Value};
 
 /// Per-scene mutable state passed to the evaluator.
 /// Lives only for the duration of a scene run.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SceneNpcRef {
+    Male(MaleNpcKey),
+    Female(FemaleNpcKey),
+}
+
 pub struct SceneCtx {
     pub active_male: Option<MaleNpcKey>,
     pub active_female: Option<FemaleNpcKey>,
+    pub role_bindings: HashMap<String, SceneNpcRef>,
     pub scene_flags: HashSet<String>,
     pub weighted_map: HashMap<String, i32>,
     /// Cached percentile rolls (1–100) keyed by skill_id string.
@@ -29,6 +36,7 @@ impl SceneCtx {
         Self {
             active_male: None,
             active_female: None,
+            role_bindings: HashMap::new(),
             scene_flags: HashSet::new(),
             weighted_map: HashMap::new(),
             skill_rolls: RefCell::new(HashMap::new()),
@@ -42,6 +50,14 @@ impl SceneCtx {
 
     pub fn set_flag(&mut self, flag: impl Into<String>) {
         self.scene_flags.insert(flag.into());
+    }
+
+    pub fn bind_role(&mut self, role: impl Into<String>, npc: SceneNpcRef) {
+        self.role_bindings.insert(role.into(), npc);
+    }
+
+    pub fn role_binding(&self, role: &str) -> Option<SceneNpcRef> {
+        self.role_bindings.get(role).copied()
     }
 
     /// Force a specific roll value for testing. Call before evaluating checkSkill.
@@ -84,6 +100,8 @@ pub enum EvalError {
     UnknownNpcTrait(String),
     #[error("unknown skill '{0}'")]
     UnknownSkill(String),
+    #[error("no NPC bound for role '{0}'")]
+    UnknownNpcRole(String),
 }
 
 /// Evaluate a parsed expression to bool.
@@ -183,6 +201,31 @@ enum EvalValue {
     Str(String),
     Int(i64),
     Bool(bool),
+}
+
+enum ResolvedRoleNpc<'a> {
+    Male(&'a undone_domain::MaleNpc),
+    Female(&'a undone_domain::FemaleNpc),
+}
+
+fn resolve_role_npc<'a>(
+    role: &str,
+    world: &'a World,
+    ctx: &SceneCtx,
+) -> Result<ResolvedRoleNpc<'a>, EvalError> {
+    match ctx
+        .role_binding(role)
+        .ok_or_else(|| EvalError::UnknownNpcRole(role.to_string()))?
+    {
+        SceneNpcRef::Male(key) => world
+            .male_npc(key)
+            .map(ResolvedRoleNpc::Male)
+            .ok_or(EvalError::NpcNotFound),
+        SceneNpcRef::Female(key) => world
+            .female_npc(key)
+            .map(ResolvedRoleNpc::Female)
+            .ok_or(EvalError::NpcNotFound),
+    }
 }
 
 /// Evaluate a method call that returns bool.
@@ -421,6 +464,54 @@ pub(crate) fn eval_call_bool(
                 }),
             }
         }
+        Receiver::RoleLookup => {
+            let role = str_arg(0)?;
+            let npc = resolve_role_npc(role, world, ctx)?;
+            match call.method.as_str() {
+                "isPartner" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.is_partner(),
+                    ResolvedRoleNpc::Female(npc) => npc.core.is_partner(),
+                }),
+                "isFriend" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.is_friend(),
+                    ResolvedRoleNpc::Female(npc) => npc.core.is_friend(),
+                }),
+                "isContactable" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.contactable,
+                    ResolvedRoleNpc::Female(npc) => npc.core.contactable,
+                }),
+                "isPregnant" => Ok(match npc {
+                    ResolvedRoleNpc::Male(_) => false,
+                    ResolvedRoleNpc::Female(npc) => npc.pregnancy.is_some(),
+                }),
+                "isVirgin" => Ok(match npc {
+                    ResolvedRoleNpc::Male(_) => false,
+                    ResolvedRoleNpc::Female(npc) => npc.virgin,
+                }),
+                "hadOrgasm" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.had_orgasm,
+                    ResolvedRoleNpc::Female(_) => false,
+                }),
+                "hasFlag" => {
+                    let flag = str_arg(1)?;
+                    Ok(match npc {
+                        ResolvedRoleNpc::Male(npc) => npc.core.relationship_flags.contains(flag),
+                        ResolvedRoleNpc::Female(npc) => npc.core.relationship_flags.contains(flag),
+                    })
+                }
+                "hasRole" => {
+                    let nested_role = str_arg(1)?;
+                    Ok(match npc {
+                        ResolvedRoleNpc::Male(npc) => npc.core.roles.contains(nested_role),
+                        ResolvedRoleNpc::Female(npc) => npc.core.roles.contains(nested_role),
+                    })
+                }
+                _ => Err(EvalError::UnknownMethod {
+                    receiver: "role".into(),
+                    method: call.method.clone(),
+                }),
+            }
+        }
     }
 }
 
@@ -478,6 +569,10 @@ pub(crate) fn eval_call_int(
                 method: call.method.clone(),
             }),
         },
+        Receiver::RoleLookup => Err(EvalError::UnknownMethod {
+            receiver: "role".into(),
+            method: call.method.clone(),
+        }),
         _ => Err(EvalError::UnknownMethod {
             receiver: format!("{:?}", call.receiver),
             method: call.method.clone(),
@@ -668,6 +763,36 @@ pub(crate) fn eval_call_string(
                 "getBehaviour" => Ok(format!("{:?}", npc.core.behaviour)),
                 _ => Err(EvalError::UnknownMethod {
                     receiver: "f".into(),
+                    method: call.method.clone(),
+                }),
+            }
+        }
+        Receiver::RoleLookup => {
+            let role = str_arg(0)?;
+            let npc = resolve_role_npc(role, world, ctx)?;
+            match call.method.as_str() {
+                "getName" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.name.clone(),
+                    ResolvedRoleNpc::Female(npc) => npc.core.name.clone(),
+                }),
+                "getLiking" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.pc_liking.to_string(),
+                    ResolvedRoleNpc::Female(npc) => npc.core.pc_liking.to_string(),
+                }),
+                "getLove" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => format!("{:?}", npc.core.pc_love),
+                    ResolvedRoleNpc::Female(npc) => format!("{:?}", npc.core.pc_love),
+                }),
+                "getAttraction" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => npc.core.pc_attraction.to_string(),
+                    ResolvedRoleNpc::Female(npc) => npc.core.pc_attraction.to_string(),
+                }),
+                "getBehaviour" => Ok(match npc {
+                    ResolvedRoleNpc::Male(npc) => format!("{:?}", npc.core.behaviour),
+                    ResolvedRoleNpc::Female(npc) => format!("{:?}", npc.core.behaviour),
+                }),
+                _ => Err(EvalError::UnknownMethod {
+                    receiver: "role".into(),
                     method: call.method.clone(),
                 }),
             }
@@ -1264,6 +1389,96 @@ mod tests {
         let ctx = SceneCtx::new();
         // No NPC with ROLE_NOBODY exists — should return "Neutral"
         let expr = parse("gd.npcLiking('ROLE_NOBODY') == 'Neutral'").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn role_bound_npc_bool_methods_work() {
+        let mut reg = undone_packs::PackRegistry::new();
+        let personality = reg.intern_personality("ROMANTIC");
+        let mut world = make_world();
+        let male = undone_domain::MaleNpc {
+            core: undone_domain::NpcCore {
+                name: "Dan".into(),
+                age: undone_domain::Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Acquaintance,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Attracted,
+                npc_attraction: AttractionLevel::Ok,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::from(["introduced".to_string()]),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        let male_key = world.male_npcs.insert(male);
+        let mut ctx = SceneCtx::new();
+        ctx.bind_role("ROLE_TEAM_LEAD", SceneNpcRef::Male(male_key));
+
+        let expr = parse("role.hasFlag('ROLE_TEAM_LEAD', 'introduced')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn role_bound_npc_string_methods_work() {
+        let mut reg = undone_packs::PackRegistry::new();
+        let personality = reg.intern_personality("ROMANTIC");
+        let mut world = make_world();
+        let male = undone_domain::MaleNpc {
+            core: undone_domain::NpcCore {
+                name: "Dan".into(),
+                age: undone_domain::Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Acquaintance,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Attracted,
+                npc_attraction: AttractionLevel::Ok,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        let male_key = world.male_npcs.insert(male);
+        let mut ctx = SceneCtx::new();
+        ctx.bind_role("ROLE_TEAM_LEAD", SceneNpcRef::Male(male_key));
+
+        let expr = parse("role.getName('ROLE_TEAM_LEAD') == 'Dan'").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
     }
 }

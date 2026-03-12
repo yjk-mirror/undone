@@ -217,7 +217,7 @@ pub enum EffectDef {
         to_state: String,
     },
     SetNpcRole {
-        /// "m" or "f"
+        /// "m", "f", or a role bound in SceneCtx.role_bindings
         npc: String,
         role: String,
     },

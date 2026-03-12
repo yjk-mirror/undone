@@ -531,6 +531,35 @@ fn validate_call_signature(
                 format!("unknown method 'gd.{}'", call.method),
             ))
         }
+        Receiver::RoleLookup => {
+            let method = call.method.as_str();
+            if matches!(
+                method,
+                "isPartner"
+                    | "isFriend"
+                    | "isContactable"
+                    | "isPregnant"
+                    | "isVirgin"
+                    | "hadOrgasm"
+                    | "getName"
+                    | "getLiking"
+                    | "getLove"
+                    | "getAttraction"
+                    | "getBehaviour"
+            ) {
+                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
+            }
+
+            if matches!(method, "hasFlag" | "hasRole") {
+                return expect_args(call, &[ArgType::Str, ArgType::Str], scene_id, expr_str);
+            }
+
+            Err(bad_condition(
+                scene_id,
+                expr_str,
+                format!("unknown method 'role.{}'", call.method),
+            ))
+        }
     }
 }
 

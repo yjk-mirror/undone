@@ -5,7 +5,7 @@ use std::{
 
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use undone_domain::{FemaleNpcKey, MaleNpcKey};
-use undone_expr::{eval, SceneCtx};
+use undone_expr::{eval, SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
@@ -98,6 +98,12 @@ impl NpcActivatedData {
 }
 
 #[derive(Debug, Clone)]
+pub struct BoundNpcData {
+    pub binding: String,
+    pub npc: NpcActivatedData,
+}
+
+#[derive(Debug, Clone)]
 pub struct ActionView {
     pub id: String,
     pub label: String,
@@ -124,7 +130,7 @@ impl SceneEngine {
         self.transition_count = 0;
         match cmd {
             EngineCommand::StartScene(id) => {
-                self.start_scene(id, world, registry, None, None);
+                self.start_scene(id, world, registry, None, None, HashMap::new());
             }
             EngineCommand::ChooseAction(action_id) => {
                 self.choose_action(action_id, world, registry);
@@ -171,6 +177,55 @@ impl SceneEngine {
         self.stack.last().map(|frame| frame.def.id.clone())
     }
 
+    pub fn current_bound_npcs(&self, world: &World, registry: &PackRegistry) -> Vec<BoundNpcData> {
+        let Some(frame) = self.stack.last() else {
+            return Vec::new();
+        };
+
+        let mut bound = Vec::new();
+        if let Some(key) = frame.ctx.active_male {
+            if let Some(npc) = world.male_npc(key) {
+                bound.push(BoundNpcData {
+                    binding: "m".into(),
+                    npc: NpcActivatedData::from_npc(&npc.core, registry),
+                });
+            }
+        }
+        if let Some(key) = frame.ctx.active_female {
+            if let Some(npc) = world.female_npc(key) {
+                bound.push(BoundNpcData {
+                    binding: "f".into(),
+                    npc: NpcActivatedData::from_npc(&npc.core, registry),
+                });
+            }
+        }
+
+        let mut roles: Vec<_> = frame.ctx.role_bindings.iter().collect();
+        roles.sort_by(|left, right| left.0.cmp(right.0));
+        for (role, npc_ref) in roles {
+            match npc_ref {
+                SceneNpcRef::Male(key) => {
+                    if let Some(npc) = world.male_npc(*key) {
+                        bound.push(BoundNpcData {
+                            binding: role.clone(),
+                            npc: NpcActivatedData::from_npc(&npc.core, registry),
+                        });
+                    }
+                }
+                SceneNpcRef::Female(key) => {
+                    if let Some(npc) = world.female_npc(*key) {
+                        bound.push(BoundNpcData {
+                            binding: role.clone(),
+                            npc: NpcActivatedData::from_npc(&npc.core, registry),
+                        });
+                    }
+                }
+            }
+        }
+
+        bound
+    }
+
     pub fn start_scene_with_bindings(
         &mut self,
         scene_id: String,
@@ -180,7 +235,34 @@ impl SceneEngine {
         registry: &PackRegistry,
     ) {
         self.transition_count = 0;
-        self.start_scene(scene_id, world, registry, active_male, active_female);
+        self.start_scene(
+            scene_id,
+            world,
+            registry,
+            active_male,
+            active_female,
+            HashMap::new(),
+        );
+    }
+
+    pub fn start_scene_with_role_bindings(
+        &mut self,
+        scene_id: String,
+        active_male: Option<MaleNpcKey>,
+        active_female: Option<FemaleNpcKey>,
+        role_bindings: HashMap<String, SceneNpcRef>,
+        world: &World,
+        registry: &PackRegistry,
+    ) {
+        self.transition_count = 0;
+        self.start_scene(
+            scene_id,
+            world,
+            registry,
+            active_male,
+            active_female,
+            role_bindings,
+        );
     }
 
     /// Convenience: send a ChooseAction command and immediately drain events.
@@ -262,6 +344,7 @@ impl SceneEngine {
         registry: &PackRegistry,
         active_male: Option<MaleNpcKey>,
         active_female: Option<FemaleNpcKey>,
+        role_bindings: HashMap<String, SceneNpcRef>,
     ) {
         self.transition_count += 1;
         if self.transition_count > MAX_TRANSITIONS_PER_COMMAND {
@@ -295,6 +378,7 @@ impl SceneEngine {
         ctx.scene_id = Some(def.id.clone());
         ctx.active_male = active_male;
         ctx.active_female = active_female;
+        ctx.role_bindings = role_bindings;
 
         // Select intro prose: use first passing variant, fall back to base intro
         let intro_prose = Self::select_intro_prose(
@@ -674,7 +758,7 @@ impl SceneEngine {
             if let Some(goto) = &branch.goto {
                 let target = goto.clone();
                 self.stack.pop();
-                self.start_scene(target, world, registry, None, None);
+                self.start_scene(target, world, registry, None, None, HashMap::new());
                 return;
             }
 
@@ -703,6 +787,7 @@ impl SceneEngine {
 mod tests {
     use std::collections::{HashMap, HashSet};
 
+    use lasso::Key;
     use undone_domain::*;
 
     use super::*;
@@ -780,6 +865,101 @@ mod tests {
                 .any(|e| matches!(e, EngineEvent::ActionsAvailable(_))),
             "expected ActionsAvailable"
         );
+    }
+
+    #[test]
+    fn start_scene_with_role_bindings_exposes_bound_npcs() {
+        let mut engine = make_engine_with(make_simple_scene());
+        let mut world = make_world();
+        let mut registry = undone_packs::PackRegistry::new();
+        let romantic = registry.intern_personality("ROMANTIC");
+        let calm = registry.intern_personality("CALM");
+        let male_key = world.male_npcs.insert(MaleNpc {
+            core: NpcCore {
+                name: "Dan".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality: romantic,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Acquaintance,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Attracted,
+                npc_attraction: AttractionLevel::Ok,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        });
+        let female_key = world.female_npcs.insert(FemaleNpc {
+            core: NpcCore {
+                name: "Mia".into(),
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "green".into(),
+                hair_colour: "black".into(),
+                personality: calm,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Friend,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            char_type: CharTypeId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
+            figure: PlayerFigure::Slim,
+            breasts: BreastSize::Average,
+            clothing: FemaleClothing::default(),
+            pregnancy: None,
+            virgin: true,
+        });
+        let mut role_bindings = HashMap::new();
+        role_bindings.insert("ROLE_TEAM_LEAD".to_string(), SceneNpcRef::Male(male_key));
+        role_bindings.insert("ROLE_DESIGNER".to_string(), SceneNpcRef::Female(female_key));
+
+        engine.start_scene_with_role_bindings(
+            "test::simple".into(),
+            None,
+            None,
+            role_bindings,
+            &world,
+            &registry,
+        );
+        engine.drain();
+
+        let bound = engine.current_bound_npcs(&world, &registry);
+        assert_eq!(bound.len(), 2);
+        assert_eq!(bound[0].binding, "ROLE_DESIGNER");
+        assert_eq!(bound[0].npc.name, "Mia");
+        assert_eq!(bound[1].binding, "ROLE_TEAM_LEAD");
+        assert_eq!(bound[1].npc.name, "Dan");
     }
 
     #[test]

@@ -183,6 +183,7 @@ Scene expression/effect receivers:
 
 - `m` means the active male NPC in `SceneCtx.active_male`
 - `f` means the active female NPC in `SceneCtx.active_female`
+- role ids such as `ROLE_TEAM_LEAD` and `ROLE_DESIGNER` resolve through `SceneCtx.role_bindings`
 
 The engine does not pick semantic NPCs on its own. The caller supplies active NPC bindings through:
 
@@ -214,10 +215,13 @@ Persistent NPC mutations include:
 - PC liking of NPC
 - PC attraction to NPC
 
-Current limitation:
+Role-binding contract:
 
-- scene runtime supports one active male NPC and one active female NPC at a time
-- richer multi-NPC selection remains a UI/runtime-layer follow-up, not part of the current contract
+- scenes may also carry a small map of authored role bindings in `SceneCtx.role_bindings`
+- expression receiver `role.*` resolves NPC state by authored role id
+- NPC-targeted effects accept `m`, `f`, or a currently bound role id
+- `SceneEngine::start_scene_with_role_bindings(...)` seeds those authored bindings at scene start
+- runtime snapshot tooling exposes the full bound roster through `RuntimeSnapshot.active_npcs`
 
 ## 7. Runtime Snapshot Contract
 
@@ -233,6 +237,7 @@ It currently includes:
 - `story_paragraphs`
 - `visible_actions` with stable `id`, `label`, and `detail`
 - `active_npc`
+- `active_npcs`
 - player summary fields matching the sidebar
 - world summary fields: `week`, `day`, `time_slot`, sorted `game_flags`, sorted `arc_states`
 

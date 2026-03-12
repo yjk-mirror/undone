@@ -325,12 +325,11 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
                     let gs_cell = Rc::clone(&gs_cell);
                     move |tab| match tab {
                         AppTab::Settings => settings_view(signals).into_any(),
-                        AppTab::Game | AppTab::Saves | AppTab::Dev => h_stack((
-                            sidebar_panel(signals),
-                            story_panel(signals, Rc::clone(&gs_cell)),
-                        ))
-                        .style(|s| s.size_full())
-                        .into_any(),
+                        AppTab::Game | AppTab::Saves | AppTab::Dev => {
+                            container(story_panel(signals, Rc::clone(&gs_cell)))
+                                .style(|s| s.size_full())
+                                .into_any()
+                        }
                     }
                 })
                 .style(|s| s.size_full())

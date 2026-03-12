@@ -440,6 +440,48 @@ fn fem_form_defaults(
     }
 }
 
+fn fem_creation_bridge_copy(partial: Option<&PartialCharState>) -> String {
+    let Some(partial) = partial else {
+        return "You take a breath and steady yourself. This body is yours. The story starts from here."
+            .to_string();
+    };
+
+    if partial.origin == PcOrigin::AlwaysFemale {
+        return "You smooth your top, check your reflection once, and let yourself arrive in the moment.\n\nNothing happened to your body on the flight. The choice in front of you is simpler and stranger than that: decide who you are going to be, then step into the city as her."
+            .to_string();
+    }
+
+    let discovery = format!(
+        "You wake before landing with the seatbelt pressed into curves that were not there when you closed your eyes. In the airplane bathroom the mirror gives you {} face, sleep-flushed and unmistakably female. You check once, then again, because disbelief keeps reaching for a mistake and not finding one.",
+        if partial.before_name.is_empty() {
+            "a stranger's".to_string()
+        } else {
+            format!("a stranger wearing {}", partial.before_name)
+        }
+    );
+
+    let route_pressure = if partial
+        .starting_flags
+        .iter()
+        .any(|flag| flag == "ROUTE_WORKPLACE")
+    {
+        "The job is still waiting. There is still an apartment, a lockbox code, a badge photo, a Monday morning meeting. None of that paused just because somewhere over Ohio the shape of your life stopped matching the shape of your body."
+    } else if partial
+        .starting_flags
+        .iter()
+        .any(|flag| flag == "ROUTE_CAMPUS")
+    {
+        "Orientation is still waiting. There is still a dorm room, a roommate you have not met, a campus full of strangers who are about to read you at a glance and move on."
+    } else {
+        "The city is still waiting. There is still a key, a bed, a first walk outside, and the immediate problem of learning how to move through public space without looking as shaken as you feel."
+    };
+
+    format!(
+        "{}\n\n{} Right now you need a name, a body, and enough composure to walk out through arrivals without freezing.",
+        discovery, route_pressure
+    )
+}
+
 /// Build a complete CharCreationConfig for the Robin preset.
 /// Used by `--quick` start and later dev tooling entry points.
 pub fn robin_quick_config(registry: &PackRegistry) -> CharCreationConfig {
@@ -901,13 +943,8 @@ pub fn fem_creation_view(
         )
     };
 
-    let framing_prose = label(move || {
-        "Somewhere between Ohio and here, everything changed. You don't remember it. \
-         You just woke up and the body was different — the weight, the proportions, \
-         the face in the airplane bathroom mirror. You're still you. The rest is new."
-            .to_string()
-    })
-    .style(move |s| {
+    let bridge_copy = fem_creation_bridge_copy(partial.as_ref());
+    let framing_prose = label(move || bridge_copy.clone()).style(move |s| {
         let prefs = signals.prefs.get();
         let colors = ThemeColors::from_mode(prefs.mode);
         s.width_full()
@@ -2257,6 +2294,37 @@ mod tests {
         assert_eq!(config.female_count, 3);
         assert_eq!(config.appearance, PRESET_ROBIN.appearance);
         assert_eq!(config.starting_traits.len(), PRESET_ROBIN.trait_ids.len());
+    }
+
+    #[test]
+    fn fem_creation_bridge_copy_is_route_aware_for_workplace_preset() {
+        let partial = PartialCharState {
+            origin: PcOrigin::CisMaleTransformed,
+            before_name: "Robin".into(),
+            before_age: Age::Thirties,
+            before_race: "White".into(),
+            before_sexuality: BeforeSexuality::AttractedToWomen,
+            starting_traits: vec![],
+            starting_flags: vec!["ROUTE_WORKPLACE".into()],
+            preset_idx: Some(0),
+            appearance: Appearance::Average,
+        };
+
+        let prose = fem_creation_bridge_copy(Some(&partial));
+        let paragraphs: Vec<&str> = prose.split("\n\n").collect();
+
+        assert!(
+            paragraphs.len() >= 2,
+            "workplace bridge should feel like a real beat, not a one-line placeholder: {prose}"
+        );
+        assert!(
+            prose.contains("mirror") || prose.contains("bathroom"),
+            "bridge should include physical discovery: {prose}"
+        );
+        assert!(
+            prose.contains("job") || prose.contains("Monday"),
+            "workplace bridge should stay tied to the route pressure: {prose}"
+        );
     }
 
     /// Physical/body traits from PRESET_ROBIN must NOT appear in BeforeCreation's

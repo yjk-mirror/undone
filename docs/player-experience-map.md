@@ -4,7 +4,7 @@
 step. Updated after content changes. Agents must consult this before claiming work
 is complete.
 
-**Last updated:** 2026-03-08
+**Last updated:** 2026-03-12
 
 ---
 
@@ -24,49 +24,35 @@ is complete.
 - **Status:** Clean layout. Penis size shown (correct for adult game).
 
 ### 3. TransformationIntro — Plane Scene
-- Stats sidebar appears (FEMININITY 10, MONEY $500, STRESS 0, etc.)
-- "People Here: No one else is in focus yet."
-- Prose: Gate C31, boarding pass says Robin, ROUTE_WORKPLACE motivation,
-  AMBITIOUS trait branch, "They call your zone."
+- Full-width story presentation only. No gameplay sidebar chrome, no empty NPC panel.
+- Prose: Gate C31, boarding pass, route-pressure setup, and trait-sensitive internal framing.
 - Single action: "Board the flight"
-- **Issues:**
-  - Stats sidebar showing during what should feel like a narrative pre-game moment
-  - "People Here" section is empty and cluttering
+- **Status:** Improved. The opening reads like authored narrative rather than a live sandbox scene.
 
 ### 4. TransformationIntro — Board Action Result
 - Action prose appends below intro (no visual break)
-- Jet bridge, finding row, overhead bins, runway, falls asleep
-- ANALYTICAL trait branch fires: calculating altitude by headlight size
-- "Somewhere over Ohio, your eyes close."
+- Jet bridge, seat, route-pressure callback, trait-sensitive in-flight beat,
+  "Somewhere over Ohio, you fall asleep."
 - Scene finishes → transitions to FemCreation
 - **Issues:**
   - No visual separator between intro prose and action prose
   - The "scene finished" transition is invisible to the player
 
 ### 5. FemCreation — "Who Are You Now?"
+- Opens with a two-paragraph transformation bridge instead of dropping straight into raw form fields.
 - Shows: Name Robin, Figure Petite, Breasts Huge, traits list, Race East Asian,
   Age Late Teen
 - Button: "Begin Your Story"
-- **CRITICAL ISSUES:**
-  - **No prose.** The transformation — the game's reason for existing — is a data form.
-    No waking up, no discovery, no "your hands are wrong."
-  - **No interaction.** One button. Player doesn't explore who they are.
-  - **Traits line overflows** off right edge, clipped at "Naturally sm..."
-  - **"Traits" label jammed** against list: "TraitsStraight hair" — no separator
-  - **This is the game's biggest gap.** Needs 4-5 interactive discovery beats.
+- **Current issues:**
+  - Discovery is framed, but still not interactive.
+  - Traits and body presentation remain dense for presets.
+  - This still wants 4-5 actual discovery beats, not only better setup prose.
 
-### 6. First In-Game Scene — **BUG: Wrong Scene**
-- **Shows rain_shelter instead of workplace_arrival**
-- Root cause: `lib.rs:299` — `opening_scene.take()` fires before `pick_next()`.
-  New games always use pack.toml's `opening_scene = "base::rain_shelter"`,
-  bypassing the scheduler. The ROUTE_WORKPLACE trigger never gets a chance.
-- The fix: call `pick_next()` first; only fall back to `opening_scene` when the
-  scheduler returns `None`.
+### 6. First In-Game Scene
+- Workplace route now starts from scheduler-picked opening content instead of falling through to `base::rain_shelter`.
 
 ### 6a. Rain Shelter Scene (what the player actually sees)
-- Prose flows directly from transformation_intro with **no visual break**.
-  "Somewhere over Ohio, your eyes close." → "The sky opened up three blocks
-  from your apartment." — looks like one continuous scene.
+- No longer the default Robin/workplace opening.
 - **Writing issues (uncalibrated scene):**
   - *"You used to do this, you think, without knowing you were doing anything."*
     — THE banned phrase, word for word
@@ -92,9 +78,7 @@ is complete.
 1. Title → New Game
 2. BeforeCreation → pick Robin → Next
 3. TransformationIntro → plane scene → "Board the flight"
-4. **[MISSING] Transformation Discovery** — 4-5 beats: wake up wrong, bathroom/mirror,
-   body inventory, going public. Character creation woven into discovery.
-5. FemCreation → confirm body (should be aftermath of discovery, not cold form)
+4. FemCreation → transformation bridge prose, then body confirmation
 6. **workplace_arrival** — airport, ID checkpoint, subway/cab → apartment
 7. workplace_landlord → meet landlord, get keys
 8. workplace_first_night → first night alone, body in private
@@ -115,8 +99,8 @@ is complete.
 | No choice echo | Major | After choosing, no indicator of what you chose |
 | No round separator | Major | Multi-round scenes have no beat transitions |
 | Button overflow | Major | 3+ buttons can clip below visible area |
-| Stats during narrative | Minor | Sidebar showing during TransformationIntro |
-| "People Here" empty | Minor | Shows "No one else is in focus yet" — noise |
+| Stats during narrative | Resolved | TransformationIntro no longer shows gameplay sidebar chrome |
+| "People Here" empty | Resolved | TransformationIntro no longer shows the empty NPC panel |
 
 ---
 
@@ -162,10 +146,10 @@ The remaining 29 contain some or all of:
 
 | Gap | Priority | Description |
 |-----|----------|-------------|
-| Transformation sequence | Critical | 4-5 interactive beats: waking, mirror, body, going public |
+| Transformation sequence | Critical | Better framed now, but still missing 4-5 interactive discovery beats |
 | Adult content | Critical | Zero explicit scenes. Game can't prove its premise. |
 | Scene transitions in UI | Critical | Engine/presentation problem, not content |
-| First-scene bug fix | Critical | `opening_scene` bypassing scheduler |
+| First-scene bug fix | Resolved | Routed new games now reach scheduler-picked opening scenes first |
 | Writing register pass | High | 29 scenes in old register |
 | Campus post-arc scenes | Low | No work/activity slot for campus route |
 
@@ -173,20 +157,5 @@ The remaining 29 contain some or all of:
 
 ## Scheduler Bug Detail
 
-**File:** `crates/undone-ui/src/lib.rs:279-310`
-
-**Current logic (broken):**
-```
-if opening_scene is Some → use it (rain_shelter)
-else → call pick_next() (would return workplace_arrival)
-```
-
-**Correct logic:**
-```
-try pick_next() first
-if pick_next() returns None AND opening_scene is Some → use opening_scene
-else if neither → show "no scene available"
-```
-
-This ensures arc triggers fire before the generic opening_scene fallback.
-The opening_scene is for custom-route players with no arc flags set.
+Resolved in runtime flow. Routed new games now try `pick_next()` before falling
+back to `opening_scene`, so workplace and campus opening arcs can actually fire.
