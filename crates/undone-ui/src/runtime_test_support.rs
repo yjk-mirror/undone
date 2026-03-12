@@ -8,17 +8,14 @@ mod tests {
     use lasso::Key;
     use rand::{rngs::SmallRng, SeedableRng};
     use std::collections::{HashMap, HashSet};
-    use std::path::PathBuf;
+    use std::fs;
+    use std::path::{Path, PathBuf};
     use std::time::{SystemTime, UNIX_EPOCH};
     use undone_domain::{
         Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
         NpcCore, PersonalityId, RelationshipStatus,
     };
-    use undone_packs::load_packs;
-    use undone_scene::loader::load_scenes;
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
     use undone_scene::types::SceneDefinition;
-
     struct RuntimeHarness {
         gs: GameState,
         signals: AppSignals,
@@ -44,36 +41,7 @@ mod tests {
     }
 
     pub fn make_test_pre_state() -> PreGameState {
-        let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
-                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
-                scenes.insert(scene_id, scene);
-            }
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        PreGameState {
-            registry,
-            scenes,
-            scheduler,
-            rng: SmallRng::seed_from_u64(7),
-            init_error: None,
-        }
+        crate::game_state::test_pre_state_from_dir(&packs_dir())
     }
 
     pub fn make_test_game_state() -> GameState {
@@ -110,6 +78,45 @@ mod tests {
             .unwrap()
             .as_nanos();
         std::env::temp_dir().join(format!("undone_runtime_{name}_{unique}.json"))
+    }
+
+    fn copy_dir_recursive(src: &Path, dst: &Path) {
+        fs::create_dir_all(dst).unwrap();
+        for entry in fs::read_dir(src).unwrap() {
+            let entry = entry.unwrap();
+            let dst_path = dst.join(entry.file_name());
+            if entry.file_type().unwrap().is_dir() {
+                copy_dir_recursive(&entry.path(), &dst_path);
+            } else {
+                fs::copy(entry.path(), dst_path).unwrap();
+            }
+        }
+    }
+
+    fn bad_runtime_fixture_dir() -> PathBuf {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let fixture_root = std::env::temp_dir().join(format!("undone_runtime_fixture_{unique}"));
+        let fixture_packs_dir = fixture_root.join("packs");
+        copy_dir_recursive(&packs_dir(), &fixture_packs_dir);
+
+        let skills_path = fixture_packs_dir
+            .join("base")
+            .join("data")
+            .join("skills.toml");
+        let skills = fs::read_to_string(&skills_path).unwrap();
+        fs::write(
+            &skills_path,
+            skills.replace(
+                "id          = \"FEMININITY\"",
+                "id          = \"FEMININITY_MISSING\"",
+            ),
+        )
+        .unwrap();
+
+        fixture_packs_dir
     }
 
     fn test_male_npc(personality: PersonalityId) -> MaleNpc {
@@ -182,11 +189,15 @@ mod tests {
         gs.world.game_data.set_flag("FIRST_MEETING_DONE");
         gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
         gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_night");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_first_clothes");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_day");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_work_meeting");
@@ -224,6 +235,28 @@ mod tests {
             !snapshot.visible_actions.is_empty(),
             "initial runtime should expose visible action choices"
         );
+    }
+
+    #[test]
+    fn test_pre_state_uses_shared_loader_contract() {
+        let pre = make_test_pre_state();
+
+        assert!(pre.init_error.is_none());
+        assert!(!pre.scenes.is_empty());
+    }
+
+    #[test]
+    fn malformed_runtime_content_surfaces_error_state() {
+        let fixture_packs_dir = bad_runtime_fixture_dir();
+        let state = crate::game_state::init_game_from_dir(&fixture_packs_dir);
+
+        assert!(state.init_error.is_some());
+        assert!(state
+            .init_error
+            .as_deref()
+            .is_some_and(|message| message.contains("FEMININITY")));
+
+        fs::remove_dir_all(fixture_packs_dir.parent().unwrap()).unwrap();
     }
 
     #[test]

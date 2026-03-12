@@ -5,17 +5,17 @@ description = "Trying to study. The body is the problem. An assumption surfaces.
 
 [intro]
 prose = """
-The study room in the science building is open until midnight and mostly empty on Tuesday afternoons. She got here at two. She's been here for an hour. Her notebook has twelve lines in it, three of which are useful.
+The study room in the science building is open until midnight and mostly empty on Tuesday afternoons. You got here at two. You've been here for an hour. Your notebook has twelve lines in it, three of which are useful.
 
-The material is not the problem. She knows this because she read the chapter twice the night before and it clicked — all of it, the kind of clicking that used to make her feel better about herself than it had any right to. Raul was the student who could just sit down and go. She has been sitting down for an hour and she has twelve lines.
+The material is not the problem. You know this because you read the chapter twice the night before and it clicked — all of it, the kind of clicking that used to make you feel better about yourself than it had any right to. Raul was the student who could just sit down and go. You've been sitting down for an hour and you have twelve lines.
 
-The room has a whiteboard along one wall with someone's problem set still on it from the morning, half-erased. There are three other people — two over by the windows working on something she can't see, and one guy at the table two spots down from her, reading a textbook, occasionally writing something in the margin. She knows this because she's been clocking all of it instead of doing the reading. She can't seem to stop.
+The room has a whiteboard along one wall with someone's problem set still on it from the morning, half-erased. There are three other people — two over by the windows working on something you can't see, and one guy at the table two spots down from you, reading a textbook, occasionally writing something in the margin. You know this because you've been clocking all of it instead of doing the reading. You can't seem to stop.
 
-It's the body. Specifically: she doesn't know how to sit in it. She's tried three positions. In two of them she's aware of her hair against her neck. In the third she's aware of her posture in a way that makes her think about her posture, which is the opposite of working. She keeps wanting to run a hand through her hair the way she used to, and when she does it, it lands wrong — too long, too much of it.
+It's the body. Specifically: you don't know how to sit in it. You've tried three positions. In two of them you're aware of your hair against your neck. In the third you're aware of your posture in a way that makes you think about your posture, which is the opposite of working. You keep wanting to run a hand through your hair the way you used to, and when you do it, it lands wrong — too long, too much of it.
 
-She puts her pen down and looks at the ceiling for a moment. The ceiling has fluorescent lights and a water stain shaped like nothing in particular.
+You put your pen down and look at the ceiling for a moment. The ceiling has fluorescent lights and a water stain shaped like nothing in particular.
 
-Fine. She'll take five minutes and then she'll work. She looks back at the study room.
+Fine. You'll take five minutes and then you'll work. You look back at the study room.
 """
 
 [[actions]]
@@ -32,9 +32,9 @@ It's not a loud thought. It's the kind of thought that arrives fully formed, pre
 
 The thought is already gone before she recognizes what it was.
 
-She looks down at her notebook. Twelve lines. Most of them copied from the chapter she read last night, which she understood because she read it carefully and it clicked, because she's always been good at this, because — because —
+You look down at your notebook. Twelve lines. Most of them copied from the chapter you read last night, which you understood because you read it carefully and it clicked, because you've always been good at this, because — because —
 
-She puts the pen down again. The girl by the window is still explaining, and her lab partner is nodding and writing things down, and it looks like the exact, unremarkable way smart people talk through problems together. It looks exactly like that.
+You put the pen down again. The girl by the window is still explaining, and her lab partner is nodding and writing things down, and it looks like the exact, unremarkable way smart people talk through problems together. It looks exactly like that.
 
 *Oh*, she thinks, and doesn't finish the thought.
 
@@ -44,97 +44,93 @@ The guy at the table two spots down has been reading for an hour. He looks up at
 
 He's not looking at her. His eyes are somewhere in the middle distance between her and the whiteboard, the way people's eyes go when they're solving something. He has good cheekbones and the specific kind of tiredness that looks like concentration. He doesn't register her at all.
 
-She looks back at her notebook.
+You look back at your notebook.
 
-Three lines down, she realizes she's thought about his cheekbones twice more. She doesn't do anything about this. She just notices the direction of it, the specific person it keeps returning to, the fact that it happens without her deciding anything. She holds that for a moment before anything else.
+Three lines down, you realize you've thought about his cheekbones twice more. You don't do anything about this. You just notice the direction of it, the specific person it keeps returning to, the fact that it happens without your deciding anything. You hold that for a moment before anything else.
 
-Then the rest of it arrives. She knows what those jokes meant. She's known for a while. The registering came first — before she knew what she was registering, before any decision — and then the recognition, and then the accounting of what the jokes were, which is a different kind of knowing and worse.
+Then the rest of it arrives. You know what those jokes meant. You've known for a while. The registering came first — before you knew what you were registering, before any decision — and then the recognition, and then the accounting of what the jokes were, which is a different kind of knowing and worse.
 
-He turns a page. She reads the same sentence for the third time and this time she actually reads it.
+He turns a page. You read the same sentence for the third time and this time you actually read it.
 {% elif w.hasTrait("AMBITIOUS") %}
 Ninety minutes in, she counts what she's actually done.
 
 Two-thirds of the reading. The first three problems out of eight. A page of notes that are mostly repetition from the chapter rather than her own working through it. The kind of session that looks productive if you squint and don't count the time.
 
-She's always been able to work. Not in the sense of working hard — she's never loved the effort — but in the sense of just sitting down and doing it, of being able to close off everything external and point herself at the problem until it resolved. It was one of the things she was quietly sure of. She wasn't the most organized. She wasn't always the most prepared. But she could always, when it mattered, just *go*.
+You've always been able to work. Not in the sense of working hard — you've never loved the effort — but in the sense of just sitting down and doing it, of being able to close off everything external and point yourself at the problem until it resolved. It was one of the things you were quietly sure of. You weren't the most organized. You weren't always the most prepared. But you could always, when it mattered, just *go*.
 
-She is not going. She's been here ninety minutes and she has two-thirds of a reading and three problems, and the study room is quiet and there are no external distractions and the work is not even particularly hard. She understands the material. She checked. When she actually reads a sentence she knows what it means.
+You are not going. You've been here ninety minutes and you have two-thirds of a reading and three problems, and the study room is quiet and there are no external distractions and the work is not even particularly hard. You understand the material. You checked. When you actually read a sentence you know what it means.
 
 The problem is she keeps not reading the sentences.
 
-She flips back through the notebook to the first useful line. She wrote it forty minutes ago. The handwriting after it deteriorates for two lines and then stops. She was going to finish the thought and then she lost the thread and started writing about something else for a line and a half and then stopped entirely.
+You flip back through the notebook to the first useful line. You wrote it forty minutes ago. The handwriting after it deteriorates for two lines and then stops. You were going to finish the thought and then you lost the thread and started writing about something else for a line and a half and then stopped entirely.
 
-She was going to be the person in this building who had things under control. She had a very clear plan for who she was going to be, arriving here.
+You were going to be the person in this building who had things under control. You had a very clear plan for who you were going to be, arriving here.
 
-She draws a line under the last useful line and starts from there.
+You draw a line under the last useful line and start from there.
 {% else %}
 The two students by the windows pack up and leave sometime after three, and the study room is quieter without them, and she still hasn't produced anything useful.
 
-She's not distracted by anything specific. That's the part she keeps turning over. There's no reason. The room is quiet. The material is fine. She had a plan for this afternoon — two hours of reading, problem set started, at least forty minutes of real productive time — and she's been sitting here for ninety minutes doing an impression of a person who is about to start.
+You're not distracted by anything specific. That's the part you keep turning over. There's no reason. The room is quiet. The material is fine. You had a plan for this afternoon — two hours of reading, problem set started, at least forty minutes of real productive time — and you've been sitting here for ninety minutes doing an impression of a person who is about to start.
 
-Her body keeps interrupting her. Not dramatically. Just the awareness of it: the hair, the chair, the way she's holding her pen, the specific way the light is hitting her hand. She catches herself noticing these things and then spends a second being annoyed that she noticed them and then she's lost another half a minute.
+Your body keeps interrupting you. Not dramatically. Just the awareness of it: the hair, the chair, the way you're holding your pen, the specific way the light is hitting your hand. You catch yourself noticing these things and then spend a second being annoyed that you noticed them and then you've lost another half a minute.
 
-{% if w.alwaysFemale() %}
-She's always been able to just start. That's the part she can't account for. There's nothing external to blame. The room is quiet. The material is fine. She has always been the kind of person who sits down and does the work.
-{% else %}
-Raul could sit down anywhere and just start. She knew this about herself as a certainty. She'd never had to think about being inside her own body; it had just been where she was, background, present and unremarkable.
-{% endif %}
+You've always been able to just start. That's the part you can't account for. There's nothing external to blame. The room is quiet. The material is fine. You have always been the kind of person who sits down and does the work.
 
-She reads the next sentence in the chapter. She understands it. She writes it down.
+You read the next sentence in the chapter. You understand it. You write it down.
 
 Okay. Okay.
 {% endif %}
 
 {% if w.hasTrait("SEXIST") %}
-She works through the rest of the problem set in order. It takes her an hour. The work is fine; the problems go the way problems go when you understand the material, which she does, and she finishes before she expected to.
+You work through the rest of the problem set in order. It takes you an hour. The work is solid; the problems go the way problems go when you understand the material, which you do, and you finish before you expected to.
 
-She doesn't look at the students by the window again. She doesn't not-look at them either, which would be its own kind of thing. She just works.
+You don't look at the students by the window again. You don't not-look at them either, which would be its own kind of thing. You just work.
 
 Somewhere in the last hour, the girl who was explaining the diagram finishes whatever she was explaining and both of them close their notebooks and leave together, talking. Camila hears a fragment of what they're saying — something about a lab section, something about Thursday — and it sounds exactly the way any two students sound when they're leaving a study session that went well.
 
-She finishes problem eight, closes the notebook, and sits for a second.
+You finish problem eight, close the notebook, and sit for a second.
 
-She had that thought before she'd finished forming it. She caught it, but she caught it late, which is different from not having it. She doesn't know what to do with the difference yet. She puts her notebook in her bag and heads for the door.
+You had that thought before you'd finished forming it. You caught it, but you caught it late, which is different from not having it. You don't know what to do with the difference yet. You put your notebook in your bag and head for the door.
 
 The girl was clearly explaining the diagram to someone who didn't understand it yet.
 {% elif w.hasTrait("HOMOPHOBIC") %}
-She finishes the reading. She does all eight problems. She doesn't look up again — not deliberately, just out of a kind of focused attention that is ninety percent real and ten percent protective, and she takes the productivity where she finds it.
+You finish the reading. You do all eight problems. You don't look up again — not deliberately, just out of a kind of focused attention that is ninety percent real and ten percent protective, and you take the productivity where you find it.
 
-The guy two spots down leaves around four-thirty. She hears the chair. She doesn't look.
+The guy two spots down leaves around four-thirty. You hear the chair. You don't look.
 
-She stays another twenty minutes, working through the last two problems, and then she packs up and goes. In the hall outside she passes a group heading to dinner, laughing at something, and the sound of it is just people, just a Tuesday.
+You stay another twenty minutes, working through the last two problems, and then you pack up and go. In the hall outside you pass a group heading to dinner, laughing at something, and the sound of it is just people, just a Tuesday.
 
-The shame came after. She catches herself being careful about the order, making sure she has it right, because the order matters. The registering came first — before she knew what she was registering, before she'd made any decision — and then came the recognition of what it was, and then the jokes she used to make.
+The shame came after. You catch yourself being careful about the order, making sure you have it right, because the order matters. The registering came first — before you knew what you were registering, before you'd made any decision — and then came the recognition of what it was, and then the jokes you used to make.
 
-She can't unknow what the jokes meant. She's known for a while. But knowing something and having it land in your body in a study room on a Tuesday afternoon are different kinds of knowing, and she's had both of them now, and she doesn't know what to do with the gap.
+You can't unknow what the jokes meant. You've known for a while. But knowing something and having it land in your body in a study room on a Tuesday afternoon are different kinds of knowing, and you've had both of them now, and you don't know what to do with the gap.
 
-She goes to dinner. The food is fine.
+You go to dinner. The food is cafeteria food, hot enough to count.
 {% elif w.hasTrait("AMBITIOUS") %}
-She gets through it. That's the honest version: she gets through it, with effort, over the next ninety minutes, in a way that feels like work in the bad sense.
+You get through it. That's the honest version: you get through it, with effort, over the next ninety minutes, in a way that feels like work in the bad sense.
 
-Problems four through eight go slowly. She has to read some of the chapter sections twice. Not because she doesn't understand them — she does, she checks, she quizzes herself — but because she has to read them twice to actually hold them, and the second read takes twice as long as it should because she's spending part of her attention managing the fact that she's not working as fast as she should be.
+Problems four through eight go slowly. You have to read some of the chapter sections twice. Not because you don't understand them — you do, you check, you quiz yourself — but because you have to read them twice to actually hold them, and the second read takes twice as long as it should because you're spending part of your attention managing the fact that you're not working as fast as you should be.
 
-She finishes at five-fifteen. The problem set is done. The reading is done. She has notes she can actually use.
+You finish at five-fifteen. The problem set is done. The reading is done. You have notes you can actually use.
 
-It took her three and a half hours to do something that should have taken two. She knows this. She is doing the math while she packs up her bag.
+It took you three and a half hours to do something that should have taken two. You know this. You're doing the math while you pack up your bag.
 
-She's not bad at this. She knows she's not bad at this; she was at the top of her class for four years and she reads fast and she understood everything in that chapter. She was not bad at this today. She was just slower than she's supposed to be, slower than she used to be, and the gap between supposed to be and actually was is going to bother her for the rest of the night and she knows it.
+You're not bad at this. You know you're not bad at this; you were at the top of your class for four years and you read fast and you understood everything in that chapter. You were not bad at this today. You were just slower than you're supposed to be, slower than you used to be, and the gap between supposed to be and actually was is going to bother you for the rest of the night and you know it.
 
-She zips up the bag. Stands up. The study room is still quiet, the whiteboard still half-erased.
+You zip up the bag. Stand up. The study room is still quiet, the whiteboard still half-erased.
 
-She'll be faster next time. She'll have to be.
+You'll be faster next time. You'll have to be.
 {% else %}
-She works. Slowly, then not-slowly. The reading comes together across the next hour and a half in the way that work sometimes does when you stop waiting for it to feel right and just do it — not inspired, not flowing, just sentence by sentence until there's enough of them and they add up.
+You work. Slowly, then not-slowly. The reading comes together across the next hour and a half in the way that work sometimes does when you stop waiting for it to feel right and just do it — not inspired, not flowing, just sentence by sentence until there's enough of them and they add up.
 
 The problems go okay. Three of them are straightforward. The other two take longer than she'd like.
 
 At five o'clock she has everything done and she sits for a minute, her hands flat on the notebook, letting the end of the session settle. The study room is nearly empty. Someone outside the door is on a phone call, voice low and fast.
 
-Her body is still there — it's always there, always slightly too present — but she's not thinking about it right now, which is maybe as much as she can ask for on a Tuesday.
+Your body is still there — it's always there, always slightly too present — but you're not thinking about it right now, which is maybe as much as you can ask for on a Tuesday.
 
-She'll figure out how to sit in it. Probably. She's figured out other things.
+You'll figure out how to sit in it. Probably. You've figured out other things.
 
-She packs up and goes.
+You pack up and go.
 {% endif %}
 """
 

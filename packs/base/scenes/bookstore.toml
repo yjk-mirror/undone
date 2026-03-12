@@ -47,7 +47,7 @@ You find a biography in the back corner — a figure you've been meaning to read
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The clerk said "have a good day" without looking up from making change. You said it back. Outside with a book in a bag, and the whole thing went exactly the way it was supposed to go.
+The clerk says "have a good day" without looking up from making change. You say it back. Outside with a book in a bag, the whole errand settles into something plain and satisfying.
 {% endif %}
 """
 

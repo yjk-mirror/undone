@@ -769,10 +769,7 @@ mod tests {
 
         let result = validate_ids(&saved, Some(1), &mut registry);
         assert!(
-            matches!(
-                result,
-                Err(SaveError::IdMismatch { index: 1, .. })
-            ),
+            matches!(result, Err(SaveError::IdMismatch { index: 1, .. })),
             "runtime tails cannot be replayed after pack IDs shift"
         );
     }
@@ -796,7 +793,10 @@ mod tests {
         ];
 
         let result = validate_ids(&saved, Some(1), &mut registry);
-        assert!(result.is_ok(), "matching runtime prefix should be extendable");
+        assert!(
+            result.is_ok(),
+            "matching runtime prefix should be extendable"
+        );
         assert_eq!(registry.all_interned_strings(), saved);
     }
 

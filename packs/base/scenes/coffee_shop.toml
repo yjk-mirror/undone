@@ -20,7 +20,7 @@ He gives you a once-over that takes slightly too long. You return it with the fl
 {% elif w.hasTrait("FLIRTY") %}
 You catch his eye before he catches yours — or maybe it was simultaneous. Hard to tell. Doesn't matter. You smile. It's a reflex, like blinking, except you know exactly what it does.
 {% else %}
-He nods. You nod back. The universal coffee-shop acknowledgment — *we are both here, we are both waiting, this is fine.*
+He nods. You nod back. For a second the line feels companionable instead of anonymous.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 35 %}

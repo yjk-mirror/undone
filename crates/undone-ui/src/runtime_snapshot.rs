@@ -167,15 +167,9 @@ mod tests {
     use crate::game_state::{start_game, PreGameState};
     use crate::{AppPhase, AppTab, NpcSnapshot};
     use floem::prelude::SignalUpdate;
-    use rand::{rngs::SmallRng, SeedableRng};
-    use std::collections::HashMap;
     use std::path::PathBuf;
     use undone_domain::{AttractionLevel, LikingLevel, RelationshipStatus};
-    use undone_packs::load_packs;
     use undone_scene::engine::{ActionView, EngineCommand};
-    use undone_scene::loader::load_scenes;
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
-    use undone_scene::types::SceneDefinition;
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -187,42 +181,21 @@ mod tests {
     }
 
     fn test_pre_state() -> PreGameState {
-        let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
-                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
-                scenes.insert(scene_id, scene);
-            }
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        PreGameState {
-            registry,
-            scenes,
-            scheduler,
-            rng: SmallRng::seed_from_u64(7),
-            init_error: None,
-        }
+        crate::game_state::test_pre_state_from_dir(&packs_dir())
     }
 
     fn test_game_state() -> GameState {
         let pre = test_pre_state();
         let config = crate::char_creation::robin_quick_config(&pre.registry);
         start_game(pre, config, true)
+    }
+
+    #[test]
+    fn valid_runtime_content_still_reaches_character_creation() {
+        let pre = crate::game_state::init_game_from_dir(&packs_dir());
+
+        assert!(pre.init_error.is_none());
+        assert!(!pre.scenes.is_empty());
     }
 
     #[test]
