@@ -2,6 +2,8 @@
 
 ## Current State
 
+**Latest session (2026-03-12, workplace month-one merge):** Workplace month-one foundation work is merged to `master`. The engine now supports authored multi-NPC role bindings through scene evaluation, runtime snapshots, and scene effects. The opening flow was rewritten through `transformation_intro` and the workplace week-one spine, then expanded with persistent opening-memory flags, callback scenes, and stronger week-two carry-forward. Month-one gameplay now has real adult-route state: Jake, Marcus, bar-stranger, and party-stranger explicit paths persist sexual history/virginity state, Jake can pay off in week 4, and the party-outside setup now has a real explicit follow-up. The final audit found and fixed one last mismatch: Jake's `kiss_and_see` apartment payoff now matches the persistent full-intimacy state it sets.
+
 **Latest session (2026-03-12):** Engineering + creative cleanup complete. UI runtime loading now goes through a shared bootstrap path, live character-creation/runtime contract failures surface as recoverable errors instead of panics, and `validate-pack` now exposes a reusable library API with prose-audit coverage shared by tests and the CLI. The targeted scene cleanup landed for the campus cluster plus the known filler/fine-test scenes (`weekend_morning`, `coffee_shop`, `bookstore`, `work_friday`). A post-implementation audit found one additional live-flow bug and fixed it: pack-load/init failures now force the app into the visible in-game error panel instead of leaving the user stranded in the landing flow.
 
 **Latest session (2026-03-11):** Window tooling follow-up complete. `game-input-mcp` now exposes a first-class `set_window_size(width, height)` tool over the existing dev-command path, `RuntimeSnapshot` now serializes live `window_width` / `window_height`, and the Dev tab now supports custom width/height inputs plus a `Default` reset wired to the shared layout defaults. Live acceptance passed on a fresh `undone --dev --quick` launch: `set_tab("dev")` → `set_window_size(1800, 1000)` → `get_runtime_state()` reported `1800x1000`, then `jump_to_scene("base::plan_your_day")` → `advance_time(1)` → `choose_action("go_out")` progressed to a different scene with a new action set while preserving the wide layout in screenshots. Responsive audit of `saves_panel`, `settings_panel`, `title_bar`, `landing_page`, and `char_creation` found no additional reproduced wide-window regressions. One live-only bug found during acceptance was fixed: the Dev tab resize inputs now resync from app-level window signals after external/tooling-triggered resizes.
@@ -11,8 +13,8 @@
 **Latest session (2026-03-09, second pass):** Conductor autonomous batch — 8 technical debt tasks. Char creation: preset names flow through (no more hardcoded Eva/Ev), before-phase no longer leaks post-transformation traits, traits displayed as categorized chips. SetAllNpcLiking: unit test + MCP wrapper added. Refactoring: 7 duplicate make_world() test helpers → shared test_helpers module, ID newtypes sealed (inner Spur private), registry fields encapsulated, eval helpers narrowed to pub(crate), hardcoded content ID audit (one runtime fix, rest documented).
 
 **Branch:** `master`
-**Verification (2026-03-12):** `cargo fmt`, `cargo test -p undone-ui --lib`, `cargo test --test validate_pack_simulation -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, and `cargo run --bin validate-pack` all passed. Fresh runtime launch against `cargo run --bin undone -- --dev --quick` also passed and rendered a usable in-game window. `validate-pack` still reports non-blocking pre-existing prose warnings outside the touched cleanup slice (`neighborhood_bar`, `shopping_mall`, `transformation_intro`, `workplace_*`, `work_marcus_drinks`).
-**Scenes:** 49 total (33 pre-writing-session + 16 new).
+**Verification (2026-03-12):** `cargo test -p undone-scene -p undone-ui -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo test --test validate_pack_simulation -- --nocapture`, and `cargo run --bin validate-pack` all passed on `master`. Fresh runtime launch against `target\debug\undone.exe --dev --quick` also passed and rendered the live workplace opening. `validate-pack` still reports only non-blocking pre-existing warnings in `campus_library`, `neighborhood_bar`, `shopping_mall`, and `work_marcus_drinks`, plus reachability warnings for exact-liking Marcus/Jake gates.
+**Scenes:** 54 total.
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -29,7 +31,7 @@
 
 ## ⚡ Next Action
 
-**Next recommended execution:** Either expand the prose-audit cleanup beyond the targeted campus/filler cluster or return to FemCreation depth work after confirming simulator cadence. The engineering + creative cleanup pass is implemented and verified.
+**Next recommended execution:** Continue enriching workplace weeks 2-4 now that the opening, route memory, and month-one explicit state are live. The highest-value gaps are deeper trait-sensitive erotic variants, stronger aftermath/consequence scenes, and broader consumption of the new week-one carry flags across work/social follow-ups.
 
 **Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
 
