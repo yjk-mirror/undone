@@ -11,6 +11,8 @@ Not by accident, exactly. More like habit forming in real time.
 
 {% if gd.hasGameFlag("FIRST_CLOTHES_MIRROR") %}
 The department-store dressing room taught you that clothes can suddenly make the outline cohere. The hallway mirror is less flattering and much smaller, but the memory of that first sharp recognition is still there.
+{% elif gd.hasGameFlag("FIRST_CLOTHES_FUNCTIONAL") %}
+The first shopping trip was not revelation. It was efficiently handled triage: solve the problem, pay for the answer, leave. The hallway mirror is where the practical choice starts turning into an actual self-image.
 {% else %}
 Letting the sales associate help you solved more than sizing. The clothes fit, the silhouette works, and the act of putting them on asks less of you than it did the first week.
 {% endif %}
@@ -24,6 +26,10 @@ label  = "Take the small win"
 detail = "Not vanity. Calibration."
 prose  = """
 The door clicks shut behind you.
+
+{% if gd.hasGameFlag("FIRST_CLOTHES_FUNCTIONAL") %}
+You handled the first shopping trip like a systems problem. Useful. The strange part is realizing the solution keeps becoming more personal after the fact.
+{% endif %}
 
 The city is full of mirrors that do not care what you feel about them. This one was manageable. Maybe even useful.
 """

@@ -15,6 +15,14 @@ The first night here you staged tomorrow into existence with a charger, a folded
 The first night here you survived it the direct way: food, floor, sleep, forward motion. There is something bracing about remembering that version of yourself from a place that already feels slightly more livable.
 {% endif %}
 
+{% if gd.hasGameFlag("LANDLORD_KEPT_TRANSACTIONAL") %}
+The landlord taught you something too: narrow the exchange, keep it factual, move it along. Useful instinct. It follows you home more often than you like.
+{% elif gd.hasGameFlag("LANDLORD_WAITED_HIM_OUT") %}
+You remember waiting the landlord out in the doorway, letting him tire himself of the mismatch before you gave him anything else. That same endurance has been carrying more weight than you expected.
+{% elif gd.hasGameFlag("LANDLORD_EXPLAINED_BRIEFLY") %}
+You remember the quick smoothing explanation you gave the landlord, the one that made the whole interaction easier and left something sour behind anyway. Some forms of grace cost more than they look like they should.
+{% endif %}
+
 Outside, somebody laughs on the sidewalk and keeps walking. Inside, the radiator ticks once and settles.
 """
 

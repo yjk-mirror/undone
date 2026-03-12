@@ -10,6 +10,12 @@ The bodega clerk asks if you want a receipt and for half a second the question f
 Not because of the receipt. Because you know the move now: keep the exchange narrow, factual, almost frictionless. Give the world as little surface area as possible.
 
 It worked at the airport. It worked with the landlord. It might work here too.
+
+{% if gd.hasGameFlag("OPENING_ID_PREEMPTED") %}
+At the airport it felt efficient. Head them off, answer the visible question, keep moving.
+{% elif gd.hasGameFlag("OPENING_ID_WAITED_OUT") %}
+At the airport you tried the opposite: let the scrutiny spend itself. Either way, you're still thinking about how much effort ordinary transactions ask for now.
+{% endif %}
 """
 
 [[actions]]

@@ -544,4 +544,124 @@ mod tests {
             "finishing a settled slot scene should consume exactly one time slot before the next global pick"
         );
     }
+
+    #[test]
+    fn acceptance_runtime_jake_explicit_scene_exposes_action_and_sets_progress_flag() {
+        let mut harness = make_harness();
+
+        {
+            let mut controller = harness.controller();
+            controller.start_scene("base::jake_apartment").unwrap();
+        }
+        let before = harness.snapshot();
+
+        assert_eq!(
+            before.current_scene_id.as_deref(),
+            Some("base::jake_apartment")
+        );
+        assert!(
+            before
+                .visible_actions
+                .iter()
+                .any(|action| action.id == "let_him_lead"),
+            "Jake explicit scene should expose its forward romantic action"
+        );
+        assert!(
+            before
+                .story_paragraphs
+                .iter()
+                .any(|paragraph| paragraph.contains("door is closed")),
+            "Jake explicit scene should render visible romantic setup prose"
+        );
+
+        {
+            let mut controller = harness.controller();
+            controller.choose_action("let_him_lead").unwrap();
+        }
+        let after = harness.snapshot();
+
+        assert!(
+            after.world.game_flags.iter().any(|flag| flag == "JAKE_INTIMATE"),
+            "choosing the explicit Jake action should surface JAKE_INTIMATE in runtime state"
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_party_follow_up_exposes_action_and_sets_progress_flag() {
+        let mut harness = make_harness();
+
+        {
+            let mut controller = harness.controller();
+            controller.start_scene("base::party_stranger_after").unwrap();
+        }
+        let before = harness.snapshot();
+
+        assert_eq!(
+            before.current_scene_id.as_deref(),
+            Some("base::party_stranger_after")
+        );
+        assert!(
+            before
+                .visible_actions
+                .iter()
+                .any(|action| action.id == "go_with_him"),
+            "party follow-up should expose its explicit forward action"
+        );
+        assert!(
+            before
+                .story_paragraphs
+                .iter()
+                .any(|paragraph| paragraph.contains("stairwell") || paragraph.contains("hallway")),
+            "party follow-up should render visible post-party setup prose"
+        );
+
+        {
+            let mut controller = harness.controller();
+            controller.choose_action("go_with_him").unwrap();
+        }
+        let after = harness.snapshot();
+
+        assert!(
+            after
+                .world
+                .game_flags
+                .iter()
+                .any(|flag| flag == "PARTY_STRANGER_SLEPT"),
+            "choosing the party follow-up action should surface PARTY_STRANGER_SLEPT in runtime state"
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_work_lunch_visibly_reflects_first_day_lunch_memory() {
+        let mut desk_harness = make_harness();
+        desk_harness.gs.world.game_data.set_flag("FIRST_DAY_LUNCH_DESK");
+        {
+            let mut controller = desk_harness.controller();
+            controller.start_scene("base::work_lunch").unwrap();
+        }
+        let desk_snapshot = desk_harness.snapshot();
+
+        let mut group_harness = make_harness();
+        group_harness.gs.world.game_data.set_flag("FIRST_DAY_LUNCH_GROUP");
+        {
+            let mut controller = group_harness.controller();
+            controller.start_scene("base::work_lunch").unwrap();
+        }
+        let group_snapshot = group_harness.snapshot();
+
+        assert!(
+            desk_snapshot
+                .story_paragraphs
+                .iter()
+                .any(|paragraph| paragraph.contains("stayed at your desk")),
+            "desk-lunch memory should be visible in later lunch prose"
+        );
+        assert!(
+            group_snapshot
+                .story_paragraphs
+                .iter()
+                .any(|paragraph| paragraph.contains("clusters already have names")),
+            "group-lunch memory should be visible in later lunch prose"
+        );
+    }
 }

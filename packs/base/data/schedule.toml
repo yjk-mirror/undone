@@ -36,14 +36,20 @@ consumes_time = true
 
   [[slot.events]]
   scene     = "base::opening_callback_mirror_afterglow"
-  weight    = 0
-  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_MIRROR_AFTERGLOW') && (gd.hasGameFlag('FIRST_CLOTHES_MIRROR') || gd.hasGameFlag('FIRST_CLOTHES_ASKED_HELP'))"
+  weight    = 6
+  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_MIRROR_AFTERGLOW') && (gd.hasGameFlag('FIRST_CLOTHES_MIRROR') || gd.hasGameFlag('FIRST_CLOTHES_ASKED_HELP') || gd.hasGameFlag('FIRST_CLOTHES_FUNCTIONAL'))"
   once_only = true
 
   [[slot.events]]
   scene     = "base::opening_callback_first_week_solitude"
-  weight    = 0
-  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_FIRST_WEEK_SOLITUDE') && (gd.hasGameFlag('FIRST_NIGHT_CRASHED') || gd.hasGameFlag('FIRST_NIGHT_RESEARCHED') || gd.hasGameFlag('FIRST_NIGHT_STAGED_TOMORROW'))"
+  weight    = 6
+  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_FIRST_WEEK_SOLITUDE') && (gd.hasGameFlag('FIRST_NIGHT_CRASHED') || gd.hasGameFlag('FIRST_NIGHT_RESEARCHED') || gd.hasGameFlag('FIRST_NIGHT_STAGED_TOMORROW'))"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::opening_callback_transactional_defense"
+  weight    = 5
+  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_TRANSACTIONAL_DEFENSE') && gd.hasGameFlag('LANDLORD_KEPT_TRANSACTIONAL')"
   once_only = true
 
   [[slot.events]]
@@ -99,7 +105,7 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::jake_apartment"
   weight    = 0
-  trigger   = "gd.week() >= 5 && gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
+  trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
   once_only = true
 
   [[slot.events]]
@@ -146,6 +152,12 @@ consumes_time = true
   scene     = "base::bar_stranger_night"
   weight    = 0
   trigger   = "gd.hasGameFlag('BAR_STRANGER_INVITED') && !gd.hasGameFlag('BAR_STRANGER_SLEPT')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::party_stranger_after"
+  weight    = 0
+  trigger   = "gd.week() >= 4 && gd.hasGameFlag('PARTY_STRANGER_OUTSIDE') && !gd.hasGameFlag('PARTY_STRANGER_SLEPT')"
   once_only = true
 
   [[slot.events]]

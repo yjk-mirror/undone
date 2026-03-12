@@ -83,6 +83,15 @@ The room is quiet. The sheets smell different now. You lie there until your brea
   flag = "BAR_STRANGER_SLEPT"
 
   [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 4
@@ -139,6 +148,15 @@ The front door opens and closes. You straighten. Your underwear is on the floor.
   [[actions.effects]]
   type = "set_game_flag"
   flag = "BAR_STRANGER_SLEPT"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
 
   [[actions.effects]]
   type   = "skill_increase"

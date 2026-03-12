@@ -17,6 +17,12 @@ Monday bought you this, apparently. One sharp correction, one room recalibrating
 On Monday you dragged the conversation back to the code and let the repo do the work for you. The consequence is here now: people skip straight to substance.
 {% endif %}
 
+{% if gd.hasGameFlag("OPENING_ID_PREEMPTED") %}
+It lands cleanly in part because you've been doing this since the airport: getting ahead of the question before the question can harden into scrutiny.
+{% elif gd.hasGameFlag("OPENING_ID_WAITED_OUT") %}
+Some part of you notices the contrast. At the airport you let the room catch up to you slowly. Here the room is catching up faster.
+{% endif %}
+
 You answer in three sentences and attach the benchmark link. The reply comes back almost immediately.
 
 "Perfect. That's what I needed."

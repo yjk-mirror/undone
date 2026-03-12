@@ -58,16 +58,16 @@ remember *how* the player stabilized rather than only that the arc was completed
 
 | Flag | Source | Meaning | Status |
 |---|---|---|---|
-| `OPENING_ID_PREEMPTED` | `workplace_arrival:id_preempt` | She learned to get ahead of scrutiny before it formed into a question. | reserved callback |
-| `OPENING_ID_WAITED_OUT` | `workplace_arrival:id_wait` | She tolerated scrutiny and let the room arrive at the answer slowly. | reserved callback |
+| `OPENING_ID_PREEMPTED` | `workplace_arrival:id_preempt` | She learned to get ahead of scrutiny before it formed into a question. | used now in status/transactionality callbacks |
+| `OPENING_ID_WAITED_OUT` | `workplace_arrival:id_wait` | She tolerated scrutiny and let the room arrive at the answer slowly. | used now in status/transactionality callbacks |
 
 ### Landlord handling
 
 | Flag | Source | Meaning | Status |
 |---|---|---|---|
-| `LANDLORD_WAITED_HIM_OUT` | `workplace_landlord:wait_him_out` | She absorbed social friction by outlasting it. | reserved callback |
-| `LANDLORD_EXPLAINED_BRIEFLY` | `workplace_landlord:explain_briefly` | She used a small socially smoothing explanation to keep the interaction moving. | reserved callback |
-| `LANDLORD_KEPT_TRANSACTIONAL` | `workplace_landlord:keep_it_transactional` | She pushed the moment back onto paperwork and logistics. | dormant callback authored |
+| `LANDLORD_WAITED_HIM_OUT` | `workplace_landlord:wait_him_out` | She absorbed social friction by outlasting it. | used now in solitude callback |
+| `LANDLORD_EXPLAINED_BRIEFLY` | `workplace_landlord:explain_briefly` | She used a small socially smoothing explanation to keep the interaction moving. | used now in solitude callback |
+| `LANDLORD_KEPT_TRANSACTIONAL` | `workplace_landlord:keep_it_transactional` | She pushed the moment back onto paperwork and logistics. | used now, active weighted callback |
 
 ### First-night coping
 
@@ -82,7 +82,7 @@ remember *how* the player stabilized rather than only that the arc was completed
 
 | Flag | Source | Meaning | Status |
 |---|---|---|---|
-| `FIRST_CLOTHES_FUNCTIONAL` | `workplace_first_clothes:get_basics` | She solved the wardrobe problem efficiently and impersonally. | reserved callback |
+| `FIRST_CLOTHES_FUNCTIONAL` | `workplace_first_clothes:get_basics` | She solved the wardrobe problem efficiently and impersonally. | used now, active weighted callback |
 | `FIRST_CLOTHES_MIRROR` | `workplace_first_clothes:dwell_on_mirror` | She stayed with self-recognition long enough for it to matter. | used now, active callback |
 | `FIRST_CLOTHES_ASKED_HELP` | `workplace_first_clothes:ask_for_help_outright` | She accepted expert feminine help instead of improvising alone. | used now, active callback |
 | `FIRST_CLOTHES_MINIMUM` | `workplace_first_clothes:buy_minimum_and_leave` | She scoped the problem down to survival and bought time. | used now in prose |
@@ -94,9 +94,9 @@ remember *how* the player stabilized rather than only that the arc was completed
 | `FIRST_DAY_ASSERTED_STATUS` | `workplace_first_day:assert_expertise` | She corrected the room directly. | used now, active callback |
 | `FIRST_DAY_DEFERRED_STATUS` | `workplace_first_day:let_it_go` | She let later work make the point. | used now in prose |
 | `FIRST_DAY_REDIRECTED_STATUS` | `workplace_first_day:redirect_to_work` | She grounded status in technical substance instead of social correction. | used now, active callback |
-| `FIRST_DAY_LUNCH_DESK` | `workplace_first_day:lunch_at_desk` | She consolidated authority through competence-first isolation. | planned erotic/social relevance |
-| `FIRST_DAY_LUNCH_GROUP` | `workplace_first_day:lunch_with_group` | She accepted early social exposure and table-read pressure. | planned erotic/social relevance |
-| `FIRST_DAY_LUNCH_ALONE` | `workplace_first_day:lunch_alone` | She built urban self-command through controlled withdrawal. | planned erotic/social relevance |
+| `FIRST_DAY_LUNCH_DESK` | `workplace_first_day:lunch_at_desk` | She consolidated authority through competence-first isolation. | used now in later lunch routing |
+| `FIRST_DAY_LUNCH_GROUP` | `workplace_first_day:lunch_with_group` | She accepted early social exposure and table-read pressure. | used now in later lunch routing |
+| `FIRST_DAY_LUNCH_ALONE` | `workplace_first_day:lunch_alone` | She built urban self-command through controlled withdrawal. | used now in later lunch routing |
 
 ## Callback Layer
 
@@ -106,11 +106,14 @@ remember *how* the player stabilized rather than only that the arc was completed
   Fires in `free_time` from week 2 onward once the route is settled if she either
   asserted status directly or redirected the room back onto the code.
 - `base::opening_callback_mirror_afterglow`
-  Fires in `free_time` from week 2 onward if her first-clothes path created a stronger
-  presentation/self-recognition memory.
+  Appears in `free_time` from week 2 onward as a weighted callback if her first-clothes path
+  created a stronger presentation/self-recognition memory or a strongly functional wardrobe logic.
 - `base::opening_callback_first_week_solitude`
-  Fires in `free_time` from week 2 onward if her first-night coping style left a clear
-  apartment-solitude signature.
+  Appears in `free_time` from week 2 onward as a weighted callback if her first-night coping style
+  left a clear apartment-solitude signature.
+- `base::opening_callback_transactional_defense`
+  Appears in `free_time` from week 2 onward as a weighted callback if she handled the landlord
+  transactionally and carried that defense into ordinary city life.
 
 ### Dormant authored hook
 

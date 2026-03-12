@@ -20,9 +20,11 @@ pub use undone_expr::SceneNpcRef;
 mod integration_tests {
     use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
+    use std::sync::Arc;
 
     use lasso::Key;
     use undone_domain::*;
+    use undone_packs::load_packs;
     use undone_world::World;
 
     use crate::engine::{EngineCommand, EngineEvent, SceneEngine};
@@ -79,6 +81,70 @@ mod integration_tests {
             had_orgasm: false,
             has_baby_with_pc: false,
         }
+    }
+
+    fn load_base_content() -> (
+        undone_packs::PackRegistry,
+        crate::scheduler::Scheduler,
+        HashMap<String, Arc<crate::types::SceneDefinition>>,
+    ) {
+        let (registry, metas) = load_packs(&packs_dir()).unwrap();
+        let scheduler = crate::scheduler::load_schedule(&metas, &registry).unwrap();
+        let scenes_dir = packs_dir().join("base").join("scenes");
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
+        (registry, scheduler, scenes)
+    }
+
+    fn make_robin_world(registry: &undone_packs::PackRegistry) -> World {
+        make_world_with_shy(registry)
+    }
+
+    fn start_scene_with_male_binding(
+        scene_id: &str,
+    ) -> (
+        undone_packs::PackRegistry,
+        World,
+        SceneEngine,
+        MaleNpcKey,
+    ) {
+        let (registry, _scheduler, scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        let male_npc_key = world.male_npcs.insert(make_male_npc());
+        let mut engine = SceneEngine::new(scenes);
+        engine.send(
+            EngineCommand::StartScene(scene_id.to_string()),
+            &mut world,
+            &registry,
+        );
+        engine.send(
+            EngineCommand::SetActiveMale(male_npc_key),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+        (registry, world, engine, male_npc_key)
+    }
+
+    fn render_scene_intro(scene_id: &str, world: &mut World) -> String {
+        let (registry, _scheduler, scenes) = load_base_content();
+        let mut engine = SceneEngine::new(scenes);
+        engine.send(
+            EngineCommand::StartScene(scene_id.to_string()),
+            world,
+            &registry,
+        );
+        let events = engine.drain();
+        events
+            .into_iter()
+            .filter_map(|event| {
+                if let EngineEvent::ProseAdded(text) = event {
+                    Some(text)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 
     #[test]
@@ -561,6 +627,244 @@ mod integration_tests {
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_status_assertion".into()));
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_mirror_afterglow".into()));
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_first_week_solitude".into()));
-        assert!(!scheduled_scene_ids.contains(&"base::opening_callback_transactional_defense".into()));
+        assert!(scheduled_scene_ids.contains(&"base::opening_callback_transactional_defense".into()));
+    }
+
+    #[test]
+    fn jake_apartment_explicit_path_updates_persistent_sexual_state() {
+        let (registry, mut world, mut engine, male_npc_key) =
+            start_scene_with_male_binding("base::jake_apartment");
+
+        let events = engine.advance_with_action("let_him_lead", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished)),
+            "explicit scene should finish after selecting the primary action"
+        );
+
+        assert!(
+            !world.player.virgin,
+            "jake_apartment should clear player virginity on the explicit path"
+        );
+        assert_eq!(
+            world.player.partner,
+            Some(NpcKey::Male(male_npc_key)),
+            "Jake route should preserve romantic continuity through player partner"
+        );
+        let npc = world
+            .male_npc(male_npc_key)
+            .expect("active male npc should still exist");
+        assert!(
+            npc.core.sexual_activities.contains("vaginal"),
+            "jake_apartment should record vaginal sexual activity"
+        );
+    }
+
+    #[test]
+    fn marcus_closet_explicit_path_updates_persistent_sexual_state() {
+        let (registry, mut world, mut engine, male_npc_key) =
+            start_scene_with_male_binding("base::work_marcus_closet");
+
+        let events = engine.advance_with_action("close_the_door", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished)),
+            "Marcus explicit scene should finish after choosing the forward action"
+        );
+
+        assert!(
+            !world.player.virgin,
+            "work_marcus_closet should clear player virginity on the explicit path"
+        );
+        let npc = world
+            .male_npc(male_npc_key)
+            .expect("active male npc should still exist");
+        assert!(
+            npc.core.sexual_activities.contains("vaginal"),
+            "work_marcus_closet should record vaginal sexual activity"
+        );
+    }
+
+    #[test]
+    fn bar_stranger_explicit_path_updates_persistent_sexual_state() {
+        let (registry, mut world, mut engine, male_npc_key) =
+            start_scene_with_male_binding("base::bar_stranger_night");
+
+        let events = engine.advance_with_action("wait_let_him_move", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished)),
+            "bar stranger scene should finish after the explicit forward action"
+        );
+
+        assert!(
+            !world.player.virgin,
+            "bar_stranger_night should clear player virginity on the explicit path"
+        );
+        let npc = world
+            .male_npc(male_npc_key)
+            .expect("active male npc should still exist");
+        assert!(
+            npc.core.sexual_activities.contains("vaginal"),
+            "bar_stranger_night should record vaginal sexual activity"
+        );
+    }
+
+    #[test]
+    fn jake_apartment_can_trigger_in_week_four_once_second_date_is_done() {
+        let (registry, scheduler, _scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        world.game_data.week = 4;
+        world.game_data.set_flag("MET_JAKE");
+        world.game_data.set_flag("JAKE_FIRST_DATE");
+        world.game_data.set_flag("JAKE_SECOND_DATE");
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("ONCE_base::plan_your_day");
+        world.game_data.set_flag("ONCE_base::neighborhood_bar");
+
+        let pick = scheduler.check_triggers("free_time", &world, &registry);
+        assert!(
+            matches!(pick, Some(ref result) if result.scene_id == "base::jake_apartment"),
+            "week-4 Jake timing should allow jake_apartment, got {:?}",
+            pick.map(|result| result.scene_id)
+        );
+    }
+
+    #[test]
+    fn party_stranger_outside_has_follow_up_trigger() {
+        let (registry, scheduler, _scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        world.game_data.week = 4;
+        world.game_data.set_flag("PARTY_STRANGER_OUTSIDE");
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("ONCE_base::plan_your_day");
+        world.game_data.set_flag("ONCE_base::neighborhood_bar");
+
+        let pick = scheduler.check_triggers("free_time", &world, &registry);
+        assert!(
+            matches!(pick, Some(ref result) if result.scene_id == "base::party_stranger_after"),
+            "party outside branch should schedule a dedicated follow-up, got {:?}",
+            pick.map(|result| result.scene_id)
+        );
+    }
+
+    #[test]
+    fn party_stranger_after_explicit_path_updates_persistent_state() {
+        let (registry, mut world, mut engine, male_npc_key) =
+            start_scene_with_male_binding("base::party_stranger_after");
+
+        let events = engine.advance_with_action("go_with_him", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished)),
+            "party stranger follow-up should finish after the explicit forward action"
+        );
+
+        assert!(
+            !world.player.virgin,
+            "party stranger follow-up should clear player virginity on first-time play"
+        );
+        let npc = world
+            .male_npc(male_npc_key)
+            .expect("active male npc should still exist");
+        assert!(
+            npc.core.sexual_activities.contains("vaginal"),
+            "party stranger follow-up should record vaginal sexual activity"
+        );
+    }
+
+    #[test]
+    fn transactional_defense_callback_is_scheduled_for_transactional_opening_branch() {
+        let (_registry, scheduler, _scenes) = load_base_content();
+        assert!(
+            scheduler
+                .all_scene_ids()
+                .contains(&"base::opening_callback_transactional_defense".to_string()),
+            "transactional landlord branch should have a scheduled callback scene"
+        );
+        assert!(
+            scheduler.references_game_flag("LANDLORD_KEPT_TRANSACTIONAL"),
+            "schedule should reference LANDLORD_KEPT_TRANSACTIONAL once the callback is live"
+        );
+    }
+
+    #[test]
+    fn mirror_afterglow_handles_functional_clothes_branch() {
+        let (registry, _scheduler, _scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        world.game_data.set_flag("FIRST_CLOTHES_FUNCTIONAL");
+
+        let prose = render_scene_intro("base::opening_callback_mirror_afterglow", &mut world);
+        assert!(
+            prose.contains("efficiently") || prose.contains("impersonally"),
+            "functional first-clothes branch should have dedicated callback prose, got: {prose}"
+        );
+    }
+
+    #[test]
+    fn work_lunch_changes_based_on_first_day_lunch_memory() {
+        let (registry, _scheduler, _scenes) = load_base_content();
+        let mut desk_world = make_robin_world(&registry);
+        desk_world.game_data.set_flag("FIRST_DAY_LUNCH_DESK");
+        let desk_prose = render_scene_intro("base::work_lunch", &mut desk_world);
+
+        let mut group_world = make_robin_world(&registry);
+        group_world.game_data.set_flag("FIRST_DAY_LUNCH_GROUP");
+        let group_prose = render_scene_intro("base::work_lunch", &mut group_world);
+
+        assert_ne!(
+            desk_prose, group_prose,
+            "later work lunch should materially differ based on first-day lunch posture"
+        );
+    }
+
+    #[test]
+    fn mirror_afterglow_is_not_trigger_first_once_week_two_opens_up() {
+        let (registry, scheduler, _scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        world.game_data.week = 2;
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .arc_states
+            .insert("base::workplace_opening".into(), "settled".into());
+        world.game_data.set_flag("FIRST_CLOTHES_MIRROR");
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("ONCE_base::plan_your_day");
+        world.game_data.set_flag("ONCE_base::neighborhood_bar");
+
+        let pick = scheduler.check_triggers("free_time", &world, &registry);
+        assert!(
+            !matches!(pick, Some(ref result) if result.scene_id == "base::opening_callback_mirror_afterglow"),
+            "mirror afterglow should blend into weighted free-time content, got {:?}",
+            pick.map(|result| result.scene_id)
+        );
+    }
+
+    #[test]
+    fn first_week_solitude_is_not_trigger_first_once_week_two_opens_up() {
+        let (registry, scheduler, _scenes) = load_base_content();
+        let mut world = make_robin_world(&registry);
+        world.game_data.week = 2;
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .arc_states
+            .insert("base::workplace_opening".into(), "settled".into());
+        world.game_data.set_flag("FIRST_NIGHT_RESEARCHED");
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("ONCE_base::plan_your_day");
+        world.game_data.set_flag("ONCE_base::neighborhood_bar");
+
+        let pick = scheduler.check_triggers("free_time", &world, &registry);
+        assert!(
+            !matches!(pick, Some(ref result) if result.scene_id == "base::opening_callback_first_week_solitude"),
+            "first-week solitude should blend into weighted free-time content, got {:?}",
+            pick.map(|result| result.scene_id)
+        );
     }
 }

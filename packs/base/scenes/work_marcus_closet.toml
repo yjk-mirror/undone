@@ -92,6 +92,15 @@ After, you're both still in the conference room and the floor is still empty and
   flag = "MARCUS_INTIMATE"
 
   [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
   type  = "add_npc_liking"
   npc   = "m"
   delta = 3
@@ -165,6 +174,15 @@ The person who ran a standup this morning is still in here somewhere. Right now 
   [[actions.effects]]
   type = "set_game_flag"
   flag = "MARCUS_INTIMATE"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
 
   [[actions.effects]]
   type  = "add_npc_liking"

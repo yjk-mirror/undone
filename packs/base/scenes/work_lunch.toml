@@ -11,6 +11,30 @@ You wait a beat to see which way the current goes before committing.
 """
 
 [[intro_variants]]
+condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_DESK')"
+prose = """
+12:15. The office energy shifts and this is not the first time you've had to make the lunch calculation here.
+
+On the first day you stayed at your desk and let competence stand in for company. The memory is still in your body now — the relief of not having to perform, the faint aftertaste of self-protection. You watch the chairs roll back and know exactly how easy it would be to stay put again.
+"""
+
+[[intro_variants]]
+condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_GROUP')"
+prose = """
+12:15. The office energy shifts and this time the clusters already have names.
+
+On the first day you went with the group and let the room read you over lunch. That bought you something. Not belonging exactly, but a map: who talks, who hangs back, which table can absorb one more person without making it a test.
+"""
+
+[[intro_variants]]
+condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_ALONE')"
+prose = """
+12:15. The office energy shifts and your body already knows one answer.
+
+On the first day you went out alone and learned the relief of leaving the office without having to explain yourself to it. Now you know the route to the sandwich place, the pace of the block, the precise amount of privacy available in forty-five minutes.
+"""
+
+[[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 12:15. The office energy shifts and you're still learning what it means.

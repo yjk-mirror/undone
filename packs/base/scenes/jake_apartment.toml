@@ -100,6 +100,24 @@ He takes his time. So do you.
   flag = "JAKE_INTIMATE"
 
   [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type = "set_relationship"
+  npc  = "m"
+  status = "Partner"
+
+  [[actions.effects]]
+  type = "set_player_partner"
+  npc  = "m"
+
+  [[actions.effects]]
   type  = "add_npc_liking"
   npc   = "m"
   delta = 3
@@ -154,6 +172,24 @@ You lie with your forehead against his chest. His breathing slows back down. So 
   [[actions.effects]]
   type = "set_game_flag"
   flag = "JAKE_INTIMATE"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type = "set_relationship"
+  npc  = "m"
+  status = "Partner"
+
+  [[actions.effects]]
+  type = "set_player_partner"
+  npc  = "m"
 
   [[actions.effects]]
   type  = "add_npc_liking"
@@ -279,6 +315,11 @@ When it's over you lie with your leg thrown over his and the room is dim and war
   [[actions.effects]]
   type = "set_game_flag"
   flag = "JAKE_INTIMATE"
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "fingering"
 
   [[actions.effects]]
   type  = "add_npc_liking"
