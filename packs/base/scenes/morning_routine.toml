@@ -18,7 +18,7 @@ Teeth. Face. The usual negotiation with hair.
 {% if w.hasTrait("POSH") %}
 The closet is a decision in itself. The wrong top with the wrong jacket sends a message nobody wrote on purpose, and people in this city read the message before they hear the sentence.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-Jeans. That black top that works with everything. Done. Some women spend an hour getting dressed. Impossible to figure out what they're doing in there.
+Jeans. That black top that works with everything. Some women spend an hour getting dressed.
 {% elif w.hasTrait("CUTE") %}
 The yellow sweater — the one that suggests a person who has her life together, even when the evidence is against it. The reflection in the bathroom mirror is smiling back.
 {% elif w.hasTrait("SULTRY") %}
@@ -32,8 +32,6 @@ Getting dressed is still a small negotiation. Not the mechanics — you've got t
 {% endif %}
 
 Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
-
-Monday.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

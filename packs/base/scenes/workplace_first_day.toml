@@ -40,7 +40,7 @@ Fourth floor. Open plan. Whiteboards crowded with diagrams you could redraw from
 Ten o'clock, standup. Someone says, "Robin's joining us from the Seattle office," and the room does the usual new-hire math. Seven handshakes, four names retained, which is adequate for a Monday.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-One of them holds the handshake a beat too long. You can feel him cataloging face, body, age estimate. The read is quick and automatic and completely familiar from the other side.
+One of them holds the handshake a beat too long. You can feel him cataloging face, body, age estimate. The read is quick and automatic.
 {% endif %}
 
 At 11:15, a backend engineer named Dan stops by your desk and starts walking you through the authentication architecture with the bright, volunteer-helpfulness reserved for new hires who look as if they might need rescuing.
