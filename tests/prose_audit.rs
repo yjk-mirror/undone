@@ -137,6 +137,30 @@ You sit down at the counter and order a drink.
 }
 
 #[test]
+fn prose_audit_flags_player_speech_verb_in_intro() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = """
+The manager is waiting.
+
+You say your name before he can ask.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        findings
+            .iter()
+            .any(|finding| finding.kind == "player_speech_in_intro"),
+        "expected player_speech_in_intro for 'You say' pattern, got: {:?}",
+        findings
+    );
+}
+
+#[test]
 fn prose_audit_does_not_flag_involuntary_body_response_in_intro() {
     let scene = r#"[scene]
 id = "test::scene"
