@@ -27,6 +27,7 @@ mod integration_tests {
 
     use crate::engine::{EngineCommand, EngineEvent, SceneEngine};
     use crate::loader::load_scenes;
+    use crate::EffectDef;
     use undone_world::test_helpers::make_test_world;
 
     fn packs_dir() -> PathBuf {
@@ -465,5 +466,101 @@ mod integration_tests {
 
         let expr = parse("gd.npcLiking('ROLE_TEST') == 'Ok'").unwrap();
         assert!(eval(&expr, &world, &ctx, &registry).unwrap());
+    }
+
+    #[test]
+    fn workplace_opening_branch_contract_exposes_memory_flags_and_callbacks() {
+        use crate::scheduler::load_schedule;
+
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+        let scenes_dir = packs_dir().join("base").join("scenes");
+        let scenes = load_scenes(&scenes_dir, &registry).unwrap();
+
+        let landlord = &scenes["base::workplace_landlord"];
+        let landlord_actions: Vec<&str> =
+            landlord.actions.iter().map(|action| action.id.as_str()).collect();
+        assert!(landlord_actions.contains(&"keep_it_transactional"));
+        assert!(landlord
+            .actions
+            .iter()
+            .find(|action| action.id == "wait_him_out")
+            .unwrap()
+            .effects
+            .contains(&EffectDef::SetGameFlag {
+                flag: "LANDLORD_WAITED_HIM_OUT".into(),
+            }));
+        assert!(landlord
+            .actions
+            .iter()
+            .find(|action| action.id == "explain_briefly")
+            .unwrap()
+            .effects
+            .contains(&EffectDef::SetGameFlag {
+                flag: "LANDLORD_EXPLAINED_BRIEFLY".into(),
+            }));
+
+        let first_night = &scenes["base::workplace_first_night"];
+        let first_night_actions: Vec<&str> = first_night
+            .actions
+            .iter()
+            .map(|action| action.id.as_str())
+            .collect();
+        assert!(first_night_actions.contains(&"unpack_and_stage_tomorrow"));
+        assert!(first_night
+            .actions
+            .iter()
+            .find(|action| action.id == "order_food_sleep")
+            .unwrap()
+            .effects
+            .contains(&EffectDef::SetGameFlag {
+                flag: "FIRST_NIGHT_CRASHED".into(),
+            }));
+
+        let first_clothes = &scenes["base::workplace_first_clothes"];
+        let first_clothes_actions: Vec<&str> = first_clothes
+            .actions
+            .iter()
+            .map(|action| action.id.as_str())
+            .collect();
+        assert!(first_clothes_actions.contains(&"ask_for_help_outright"));
+        assert!(first_clothes_actions.contains(&"buy_minimum_and_leave"));
+
+        let first_day = &scenes["base::workplace_first_day"];
+        let first_day_actions: Vec<&str> = first_day
+            .actions
+            .iter()
+            .map(|action| action.id.as_str())
+            .collect();
+        assert!(first_day_actions.contains(&"redirect_to_work"));
+        assert!(first_day
+            .actions
+            .iter()
+            .find(|action| action.id == "assert_expertise")
+            .unwrap()
+            .effects
+            .contains(&EffectDef::SetGameFlag {
+                flag: "FIRST_DAY_ASSERTED_STATUS".into(),
+            }));
+        assert!(first_day
+            .actions
+            .iter()
+            .find(|action| action.id == "lunch_with_group")
+            .unwrap()
+            .effects
+            .contains(&EffectDef::SetGameFlag {
+                flag: "FIRST_DAY_LUNCH_GROUP".into(),
+            }));
+
+        assert!(scenes.contains_key("base::opening_callback_status_assertion"));
+        assert!(scenes.contains_key("base::opening_callback_mirror_afterglow"));
+        assert!(scenes.contains_key("base::opening_callback_first_week_solitude"));
+        assert!(scenes.contains_key("base::opening_callback_transactional_defense"));
+
+        let scheduled_scene_ids = scheduler.all_scene_ids();
+        assert!(scheduled_scene_ids.contains(&"base::opening_callback_status_assertion".into()));
+        assert!(scheduled_scene_ids.contains(&"base::opening_callback_mirror_afterglow".into()));
+        assert!(scheduled_scene_ids.contains(&"base::opening_callback_first_week_solitude".into()));
+        assert!(!scheduled_scene_ids.contains(&"base::opening_callback_transactional_defense".into()));
     }
 }

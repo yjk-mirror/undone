@@ -29,6 +29,24 @@ consumes_time = true
   once_only = true
 
   [[slot.events]]
+  scene     = "base::opening_callback_status_assertion"
+  weight    = 0
+  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_STATUS_ASSERTION') && (gd.hasGameFlag('FIRST_DAY_ASSERTED_STATUS') || gd.hasGameFlag('FIRST_DAY_REDIRECTED_STATUS'))"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::opening_callback_mirror_afterglow"
+  weight    = 0
+  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_MIRROR_AFTERGLOW') && (gd.hasGameFlag('FIRST_CLOTHES_MIRROR') || gd.hasGameFlag('FIRST_CLOTHES_ASKED_HELP'))"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::opening_callback_first_week_solitude"
+  weight    = 0
+  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_FIRST_WEEK_SOLITUDE') && (gd.hasGameFlag('FIRST_NIGHT_CRASHED') || gd.hasGameFlag('FIRST_NIGHT_RESEARCHED') || gd.hasGameFlag('FIRST_NIGHT_STAGED_TOMORROW'))"
+  once_only = true
+
+  [[slot.events]]
   scene     = "base::bookstore"
   weight    = 8
   condition = "gd.week() >= 1"

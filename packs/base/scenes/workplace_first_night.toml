@@ -80,6 +80,10 @@ Tomorrow: shopping. The bra problem specifically. The rest of the list after tha
   amount = -18
 
   [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_CRASHED"
+
+  [[actions.effects]]
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "week_one"
@@ -115,6 +119,10 @@ You add *specialty store??* to your list and go to sleep.
   [[actions.effects]]
   type   = "change_anxiety"
   amount = 3
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_RESEARCHED"
 
   [[actions.effects]]
   type     = "advance_arc"
@@ -172,6 +180,53 @@ You plug your phone in on the floor beside you. The radiator ticks.
   [[actions.effects]]
   type   = "change_stress"
   amount = -3
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_CALLED_BACK_HOME"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "unpack_and_stage_tomorrow"
+label = "Stage tomorrow anyway"
+detail = "Bathroom kit. Charger. One outfit. Pretend preparation is the same as control."
+prose = """
+You unzip the carry-on on the bedroom floor and start making small islands of order.
+
+Toiletries in the bathroom. Charger by the outlet. Laptop on the kitchen counter. One blouse and one pair of underwear folded over the back of the chair because there is no closet system yet and tomorrow will arrive whether the apartment is ready or not.
+
+{% if w.hasTrait("AMBITIOUS") %}
+This is not unpacking. This is triage with standards.
+{% elif w.hasTrait("ANALYTICAL") %}
+The goal is not comfort. The goal is reducing decision count between waking up and getting out the door.
+{% else %}
+It helps. Not much, but enough to feel the room stop fighting you for a minute.
+{% endif %}
+
+You set your shoes by the door. Badge paperwork on top of the laptop. Painfully ordinary things. Reassuring because they are ordinary.
+
+The apartment is still empty when you finish. The difference is that now it looks like someone intends to wake up here on purpose.
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -2
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_STAGED_TOMORROW"
 
   [[actions.effects]]
   type     = "advance_arc"

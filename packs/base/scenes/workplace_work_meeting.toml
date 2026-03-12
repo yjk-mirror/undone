@@ -9,7 +9,23 @@ The meeting room has a glass wall facing the open floor, a projector that still 
 
 Your laptop is open. The slides are up. You've reviewed the deck four times since last night, not because you're uncertain about the content — you designed this system, you can present it in your sleep — but because the deck has forty slides and you want to know which ones you'll skip when the conversation goes long. You have opinions about which slides matter. You have opinions about which slides you put in to satisfy people who need to feel consulted. You've been in enough design reviews to know the difference.
 
+{% if gd.hasGameFlag("FIRST_DAY_ASSERTED_STATUS") %}
+Monday bought you a certain amount of credit. Not everyone in the office knows why, but enough of them know you are not the person to explain your own system back to.
+{% elif gd.hasGameFlag("FIRST_DAY_REDIRECTED_STATUS") %}
+The easiest way you found into the room was the code itself. People come to your desk with questions now instead of tutorials, and the change happened quickly enough to be noticeable.
+{% elif gd.hasGameFlag("FIRST_DAY_DEFERRED_STATUS") %}
+The first-day misunderstanding has mostly burned off. Mostly. The work corrected the room, but not all at once.
+{% endif %}
+
 People filter in at 10:02. Two from your immediate team, one you haven't met. A product manager named Carter who writes things down even when the thing isn't worth writing down. A senior engineer from the platform side who is going to have opinions about the API layer regardless of what the slides say. And Marcus from adjacent infrastructure, who you know by reputation and who settles into the chair directly across from you.
+
+{% if gd.hasGameFlag("FIRST_CLOTHES_MIRROR") %}
+You straighten one cuff before the meeting starts and catch the same competent outline the dressing-room mirror gave you. It lasts half a second. Long enough.
+{% elif gd.hasGameFlag("FIRST_CLOTHES_MINIMUM") %}
+The blouse is serviceable and not especially forgiving. It does the job. So do you.
+{% elif gd.hasGameFlag("FIRST_CLOTHES_ASKED_HELP") %}
+The blouse fits properly because you let someone competent help you solve the problem. The practical relief of that still surprises you.
+{% endif %}
 
 {% if w.hasTrait("OBJECTIFYING") %}
 Marcus looks at you. Looks at your slides. Looks at you again. His eyes do the thing — the quick trip down and back up that takes less than a second and that he probably doesn't know he's doing. Your neck gets warm.
@@ -95,6 +111,12 @@ Two follow-up tasks: send Marcus the load test data, reply to whatever Carter is
 {% else %}
 The hallway is quiet. You drink the water. The meeting was good. The content held. Kevin did his thing and the room moved past it.
 
+{% endif %}
+
+{% if gd.hasGameFlag("FIRST_DAY_DEFERRED_STATUS") %}
+Part of what sits under your ribs is how familiar the pattern feels: let the room underestimate you, then make it walk itself back. Efficient. Still annoying.
+{% elif gd.hasGameFlag("FIRST_DAY_REDIRECTED_STATUS") %}
+This one landed the same way Monday did. The work changed the room faster than any speech about seniority could have.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}

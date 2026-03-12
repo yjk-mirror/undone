@@ -84,6 +84,10 @@ Boxes Monday. Work Monday. You're ahead of schedule, approximately.
   amount = -4
 
   [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_CLOTHES_FUNCTIONAL"
+
+  [[actions.effects]]
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "clothes_done"
@@ -125,6 +129,10 @@ You take what you need to the register.
   amount = 2
 
   [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_CLOTHES_MIRROR"
+
+  [[actions.effects]]
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "clothes_done"
@@ -133,6 +141,96 @@ You take what you need to the register.
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "ask_for_help_outright"
+label = "Ask for full help"
+detail = "Tell her what you actually need: a workweek, not one bra."
+prose = """
+You stop pretending you have a plan and tell the associate the truth in the most practical version available.
+
+"I need enough to get through a first week at a new office," you say. "Basics, work clothes, whatever I am least likely to get wrong."
+
+The associate nods like this is both normal and fixable. Which, apparently, it is.
+
+The next forty-five minutes are brisk and oddly calming. Options appear with the speed of someone solving a known class of problem. You answer yes, no, maybe, and step in and out of the dressing room while your sense of what counts as "basic" gets revised upward in real time.
+
+{% if w.hasTrait("SHY") %}
+Being handled this efficiently should be mortifying. Instead it feels like relief.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+Useful expertise is useful expertise. You stop arguing with that after the second blouse.
+{% endif %}
+
+You leave with more than you planned to buy and fewer things to worry about on Monday morning.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -240
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_CLOTHES_ASKED_HELP"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "clothes_done"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 6
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "buy_minimum_and_leave"
+label = "Buy the minimum and leave"
+detail = "One bra. One blouse. Enough to survive Monday."
+prose = """
+You make the smallest possible version of the problem.
+
+One bra that fits well enough. One blouse you do not hate. One backup pair of underwear. No experimentation. No standing under flattering or unflattering light for longer than necessary. Just enough to get through Monday and buy yourself time for the rest later.
+
+{% if w.hasTrait("ANALYTICAL") %}
+This is not avoidance. It is scope control.
+{% else %}
+It might be avoidance. It is also effective.
+{% endif %}
+
+You pay, leave, and do not look back at the fitting rooms. The relief is immediate, though not especially noble.
+"""
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -95
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -1
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_CLOTHES_MINIMUM"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "clothes_done"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
 
   [[actions.next]]
   finish = true

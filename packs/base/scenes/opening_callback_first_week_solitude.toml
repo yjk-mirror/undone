@@ -1,0 +1,40 @@
+[scene]
+id          = "base::opening_callback_first_week_solitude"
+pack        = "base"
+description = "Week-two callback. Her first-night coping style changes how later apartment quiet feels."
+
+[intro]
+prose = """
+The apartment is quiet again, but not the same kind of quiet it was that first week.
+
+{% if gd.hasGameFlag("FIRST_NIGHT_RESEARCHED") %}
+The first night here you sat on the floor and turned practical panic into browser tabs. The apartment still remembers that version of you a little: searching, sorting, trying to solve embodiment like a technical problem.
+{% elif gd.hasGameFlag("FIRST_NIGHT_STAGED_TOMORROW") %}
+The first night here you staged tomorrow into existence with a charger, a folded blouse, and shoes by the door. The room still holds some of that improvised order.
+{% else %}
+The first night here you survived it the direct way: food, floor, sleep, forward motion. There is something bracing about remembering that version of yourself from a place that already feels slightly more livable.
+{% endif %}
+
+Outside, somebody laughs on the sidewalk and keeps walking. Inside, the radiator ticks once and settles.
+"""
+
+[[actions]]
+id     = "sit_with_it"
+label  = "Sit with the quiet"
+detail = "The apartment is no longer a stranger. Not quite."
+prose  = """
+You do not make the room prove itself tonight. You just let it exist around you.
+
+That is newer than it sounds.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_CALLBACK_FIRST_WEEK_SOLITUDE"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.next]]
+  finish = true

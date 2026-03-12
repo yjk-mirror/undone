@@ -1,0 +1,46 @@
+[scene]
+id          = "base::opening_callback_status_assertion"
+pack        = "base"
+description = "Week-two callback. Early competence choices from the first day have started changing how coworkers approach Robin."
+
+[intro]
+prose = """
+Mid-morning, a Slack notification pops up from someone on the platform side you have only spoken to once.
+
+It is not a tutorial. Not a check-in. Not somebody carefully restating the obvious at you.
+
+It is a real question about the auth rollout, written in the clipped shorthand engineers use when they assume the other person already knows the shape of the problem.
+
+{% if gd.hasGameFlag("FIRST_DAY_ASSERTED_STATUS") %}
+Monday bought you this, apparently. One sharp correction, one room recalibrating, and now the question arrives without preamble.
+{% else %}
+On Monday you dragged the conversation back to the code and let the repo do the work for you. The consequence is here now: people skip straight to substance.
+{% endif %}
+
+You answer in three sentences and attach the benchmark link. The reply comes back almost immediately.
+
+"Perfect. That's what I needed."
+"""
+
+[[actions]]
+id     = "answer_and_move_on"
+label  = "Answer it cleanly"
+detail = "Let the work keep building the reputation."
+prose  = """
+You set the phone down and get back to the ticket in front of you.
+
+The exchange is small. So small you could miss what it means if you were not paying attention.
+
+The room is changing around you, a little at a time.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_CALLBACK_STATUS_ASSERTION"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.next]]
+  finish = true

@@ -1,0 +1,45 @@
+[scene]
+id          = "base::opening_callback_mirror_afterglow"
+pack        = "base"
+description = "Week-two callback. The first-clothes branch leaves a quieter, more deliberate memory around presentation and self-recognition."
+
+[intro]
+prose = """
+You catch yourself in the hallway mirror on the way out the door.
+
+Not by accident, exactly. More like habit forming in real time.
+
+{% if gd.hasGameFlag("FIRST_CLOTHES_MIRROR") %}
+The department-store dressing room taught you that clothes can suddenly make the outline cohere. The hallway mirror is less flattering and much smaller, but the memory of that first sharp recognition is still there.
+{% else %}
+Letting the sales associate help you solved more than sizing. The clothes fit, the silhouette works, and the act of putting them on asks less of you than it did the first week.
+{% endif %}
+
+You smooth the fabric once at the waist and head for the train before the moment can become a performance.
+"""
+
+[[actions]]
+id     = "take_the_win"
+label  = "Take the small win"
+detail = "Not vanity. Calibration."
+prose  = """
+The door clicks shut behind you.
+
+The city is full of mirrors that do not care what you feel about them. This one was manageable. Maybe even useful.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_CALLBACK_MIRROR_AFTERGLOW"
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true

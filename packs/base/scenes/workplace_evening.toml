@@ -11,6 +11,14 @@ You knew it would be. Apartments do not rearrange themselves. The fact that your
 
 The city is doing its early-evening thing outside: delivery cyclists, someone in the building across the street pacing with a phone, a bus dragging away from the stop. None of it requires anything from you.
 
+{% if gd.hasGameFlag("FIRST_NIGHT_STAGED_TOMORROW") %}
+Your shoes are still lined up by the door the way you left them that first night, toes out, bag hook within reach. The apartment has learned a little of your shape since then.
+{% elif gd.hasGameFlag("FIRST_NIGHT_RESEARCHED") %}
+There is still one browser tab from that first night open on your laptop, something about bra sizing or strap geometry or a problem you were too tired to solve cleanly. You ignore it for now.
+{% elif gd.hasGameFlag("FIRST_NIGHT_CALLED_BACK_HOME") %}
+There is a stale text thread on your phone from the first night in the apartment. Nothing urgent. Just proof you were not entirely alone in it.
+{% endif %}
+
 {% if w.hasTrait("ANALYTICAL") %}
 You do a brief audit. Day was a net positive: the PR got merged, the design review ran long but concluded, no one said anything that needed immediate correction. You gave feedback on two pull requests before lunch. Three items carried over to tomorrow. You know where each of them lives in the backlog.
 
@@ -61,6 +69,14 @@ You grip the edge of the sink. The porcelain is cold. You turn off the light and
 The kettle starts to rumble in the other room. You go back out to deal with it.
 {% endif %}
 
+{% if gd.hasGameFlag("FIRST_DAY_ASSERTED_STATUS") %}
+You established yourself this week by saying the difficult sentence out loud when it needed saying. The room eventually accepted it. The fact that it needed saying at all still has a residue.
+{% elif gd.hasGameFlag("FIRST_DAY_DEFERRED_STATUS") %}
+You let the work make the point for you and it did. There is a satisfaction in that. There is also a cost in waiting for the room to catch up.
+{% elif gd.hasGameFlag("FIRST_DAY_REDIRECTED_STATUS") %}
+The easiest version of authority this week was the one grounded in the repo, the diagram, the benchmark. Facts are kinder to you than first impressions have been.
+{% endif %}
+
 {% if w.hasTrait("ANALYTICAL") %}
 You make tea — the box of green tea you bought on Sunday because it was the familiar brand and you weren't prepared to make any additional decisions — and sit at the kitchen table with your laptop. Not working. You open a notes file and write: *light switch L→R. bathroom mirror. adaptation lag normal, cached motor patterns. no action required.*
 
@@ -75,6 +91,14 @@ You close the laptop and order from the Thai place down the block.
 You make tea and sit with it by the window. The bus stop below has two people waiting. One is reading something on her phone; the other is just standing. The bus comes. They both get on. The stop is empty.
 
 You drink the tea. The apartment is quiet in a way that's becoming, if not comfortable, at least familiar.
+{% endif %}
+
+{% if gd.hasGameFlag("FIRST_CLOTHES_MIRROR") %}
+The dressing-room version of you is still in the back of your mind somewhere: not fantasy, exactly, just the sharp surprise of seeing the outline come together on purpose.
+{% elif gd.hasGameFlag("FIRST_CLOTHES_MINIMUM") %}
+You bought the minimum because that was what you could tolerate. Monday still happened. That fact is steadier than your mood.
+{% elif gd.hasGameFlag("FIRST_CLOTHES_ASKED_HELP") %}
+There is a low-grade relief in having let someone competent help you solve a problem you did not yet know how to name properly.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 40 %}
@@ -180,7 +204,7 @@ You call your sister.
 
 On the third ring, you hear, "Hey, stranger." Not annoyed. Just accounting for the gap. You tell her about the apartment, the neighborhood, the job. Then come the practical questions: are you eating, are you okay. You say yes to both. Both answers are close enough to true.
 
-"Come visit," she says. You say you will. The timeline stays vague on purpose. The call lasts eight minutes. When you hang up, the apartment feels quieter than it did before you picked up the phone.
+"Come visit," comes through the phone. You say you will. The timeline stays vague on purpose. The call lasts eight minutes. When you hang up, the apartment feels quieter than it did before you picked up the phone.
 {% else %}
 You hover over a name. Then another. The contacts list is a museum of a life you are still technically living: same number, same name in most of them, same relationships on paper. The gap is in the details. The details are everything.
 

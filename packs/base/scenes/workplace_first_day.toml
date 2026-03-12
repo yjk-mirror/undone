@@ -86,6 +86,10 @@ The coworker from standup, Matt, glances your way four times in the next hour. N
   type = "set_scene_flag"
   flag = "dan_done"
 
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_ASSERTED_STATUS"
+
 [[actions]]
 id        = "let_it_go"
 label     = "\"Thanks. I'll dig into it.\""
@@ -114,6 +118,39 @@ Matt glances your direction when he thinks you're not looking. Quick. Automatic.
   [[actions.effects]]
   type = "set_scene_flag"
   flag = "dan_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_DEFERRED_STATUS"
+
+[[actions]]
+id        = "redirect_to_work"
+label     = "\"Let's look at the repo.\""
+detail    = "Skip the status negotiation. Move straight to the code."
+condition = "!scene.hasFlag('dan_done') && (w.hasTrait('ANALYTICAL') || w.hasTrait('DOWN_TO_EARTH') || w.hasTrait('CONFIDENT'))"
+prose = """
+"Let's look at the repo," you say, swiveling the laptop toward him before the explanation can turn into a seminar.
+
+You pull up the auth flow diagram, then the actual implementation. Two minutes later Dan is no longer onboarding you. He is standing beside your desk while you walk him through a cache edge case he did not know existed.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You do not tell him you wrote the spec. You do not need to. The code path does it for you.
+{% elif w.hasTrait("CONFIDENT") %}
+By the time he says "oh, got it," the hierarchy of the conversation has already changed.
+{% else %}
+It is cleaner this way. No social correction. Just work.
+{% endif %}
+
+When he leaves, he does it with an actual technical question queued for later instead of a smile meant for a nervous new hire.
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "dan_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_REDIRECTED_STATUS"
 
 # ── Round 2: Lunch ────────────────────────────────────────────────────
 
@@ -144,6 +181,10 @@ By five you've pushed two more commits. Nobody has asked how old you are since t
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_DESK"
 
   [[actions.effects]]
   type = "set_game_flag"
@@ -191,6 +232,10 @@ The afternoon is code. By five you've pushed your first commit and the day, impr
 
   [[actions.effects]]
   type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_GROUP"
+
+  [[actions.effects]]
+  type = "set_game_flag"
   flag = "STARTED_JOB"
 
   [[actions.effects]]
@@ -226,6 +271,10 @@ The afternoon is code. By five you've pushed your first commit and the tests are
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_ALONE"
 
   [[actions.effects]]
   type = "set_game_flag"

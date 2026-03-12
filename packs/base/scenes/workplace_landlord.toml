@@ -79,6 +79,10 @@ The key is warm from the hook. It fits in your palm differently than keys used t
   flag = "MET_LANDLORD"
 
   [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_WAITED_HIM_OUT"
+
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 2
@@ -113,6 +117,56 @@ Three flights. The banister is cold under your hand. Your grip on it is lighter 
   [[actions.effects]]
   type = "set_game_flag"
   flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_EXPLAINED_BRIEFLY"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "keep_it_transactional"
+label = "Keep it on the paperwork"
+detail = "Point to the lease. Treat the moment like admin, not confession."
+prose = """
+You slide the lease printout half an inch forward with one finger.
+
+{% if w.hasTrait("ANALYTICAL") %}
+"The signed copy, the cashier's check, and the move-in addendum are all there," you say. Not defensive. Just directing attention back to the only things that matter.
+{% elif w.hasTrait("CONFIDENT") %}
+"Everything you need is in the folder," you say, and hold the moment there until he follows the cue.
+{% else %}
+"The paperwork should all be in order," you say. It gives him somewhere safer to look than your face.
+{% endif %}
+
+He takes the out. The lease, the check, the signature line. Tangible things. Solvable things.
+
+From upstairs comes a woman's voice: "Frank, did you tell her about the radiator?"
+
+"In a second," he calls back.
+
+That settles it. He hands you the key. Unit 4B. Third floor, no elevator. Garbage is Tuesday and Thursday. The sentence arrives in pieces, all of them logistical, and you meet them at the same level.
+
+You thank him, tuck the key into your palm, and take the stairs before the exchange can widen into anything else.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_KEPT_TRANSACTIONAL"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
 
   [[actions.effects]]
   type   = "skill_increase"

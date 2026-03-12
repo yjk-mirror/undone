@@ -68,6 +68,10 @@ He waves you through.
   type = "set_scene_flag"
   flag = "id_done"
 
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_ID_PREEMPTED"
+
 [[actions]]
 id        = "id_wait"
 label     = "Wait for him to work it out"
@@ -92,6 +96,10 @@ He studies the card one more time. Waves you through.
   [[actions.effects]]
   type = "set_scene_flag"
   flag = "id_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_ID_WAITED_OUT"
 
 # ── Round 2: Transport ────────────────────────────────────────────────
 
