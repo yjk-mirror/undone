@@ -101,12 +101,7 @@ mod integration_tests {
 
     fn start_scene_with_male_binding(
         scene_id: &str,
-    ) -> (
-        undone_packs::PackRegistry,
-        World,
-        SceneEngine,
-        MaleNpcKey,
-    ) {
+    ) -> (undone_packs::PackRegistry, World, SceneEngine, MaleNpcKey) {
         let (registry, _scheduler, scenes) = load_base_content();
         let mut world = make_robin_world(&registry);
         let male_npc_key = world.male_npcs.insert(make_male_npc());
@@ -544,8 +539,11 @@ mod integration_tests {
         let scenes = load_scenes(&scenes_dir, &registry).unwrap();
 
         let landlord = &scenes["base::workplace_landlord"];
-        let landlord_actions: Vec<&str> =
-            landlord.actions.iter().map(|action| action.id.as_str()).collect();
+        let landlord_actions: Vec<&str> = landlord
+            .actions
+            .iter()
+            .map(|action| action.id.as_str())
+            .collect();
         assert!(landlord_actions.contains(&"keep_it_transactional"));
         assert!(landlord
             .actions
@@ -627,7 +625,9 @@ mod integration_tests {
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_status_assertion".into()));
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_mirror_afterglow".into()));
         assert!(scheduled_scene_ids.contains(&"base::opening_callback_first_week_solitude".into()));
-        assert!(scheduled_scene_ids.contains(&"base::opening_callback_transactional_defense".into()));
+        assert!(
+            scheduled_scene_ids.contains(&"base::opening_callback_transactional_defense".into())
+        );
     }
 
     #[test]

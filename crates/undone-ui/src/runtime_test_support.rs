@@ -581,7 +581,11 @@ mod tests {
         let after = harness.snapshot();
 
         assert!(
-            after.world.game_flags.iter().any(|flag| flag == "JAKE_INTIMATE"),
+            after
+                .world
+                .game_flags
+                .iter()
+                .any(|flag| flag == "JAKE_INTIMATE"),
             "choosing the explicit Jake action should surface JAKE_INTIMATE in runtime state"
         );
     }
@@ -592,7 +596,9 @@ mod tests {
 
         {
             let mut controller = harness.controller();
-            controller.start_scene("base::party_stranger_after").unwrap();
+            controller
+                .start_scene("base::party_stranger_after")
+                .unwrap();
         }
         let before = harness.snapshot();
 
@@ -634,7 +640,11 @@ mod tests {
     #[test]
     fn acceptance_runtime_work_lunch_visibly_reflects_first_day_lunch_memory() {
         let mut desk_harness = make_harness();
-        desk_harness.gs.world.game_data.set_flag("FIRST_DAY_LUNCH_DESK");
+        desk_harness
+            .gs
+            .world
+            .game_data
+            .set_flag("FIRST_DAY_LUNCH_DESK");
         {
             let mut controller = desk_harness.controller();
             controller.start_scene("base::work_lunch").unwrap();
@@ -642,7 +652,11 @@ mod tests {
         let desk_snapshot = desk_harness.snapshot();
 
         let mut group_harness = make_harness();
-        group_harness.gs.world.game_data.set_flag("FIRST_DAY_LUNCH_GROUP");
+        group_harness
+            .gs
+            .world
+            .game_data
+            .set_flag("FIRST_DAY_LUNCH_GROUP");
         {
             let mut controller = group_harness.controller();
             controller.start_scene("base::work_lunch").unwrap();

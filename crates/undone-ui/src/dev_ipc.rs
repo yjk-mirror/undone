@@ -16,6 +16,10 @@ use crate::runtime_controller::RuntimeController;
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{AppSignals, AppTab, PlayerSnapshot};
 
+fn saves_dir() -> Option<PathBuf> {
+    dirs::data_dir().map(|d| d.join("undone").join("saves"))
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(tag = "command", rename_all = "snake_case")]
 pub enum DevCommand {
@@ -32,6 +36,11 @@ pub enum DevCommand {
     SetWindowSize { width: f64, height: f64 },
     SetNpcLiking { npc_name: String, level: String },
     SetAllNpcLiking { level: String },
+    ListScenes,
+    GetSceneInfo { scene_id: String },
+    SaveGame { name: String },
+    LoadSave { name: String },
+    ListSaves,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -139,6 +148,11 @@ pub fn execute_command(
         DevCommand::SetWindowSize { width, height } => set_window_size(gs, signals, width, height),
         DevCommand::SetNpcLiking { npc_name, level } => set_npc_liking(gs, &npc_name, &level),
         DevCommand::SetAllNpcLiking { level } => set_all_npc_liking(gs, &level),
+        DevCommand::ListScenes => list_scenes(gs),
+        DevCommand::GetSceneInfo { scene_id } => get_scene_info(gs, &scene_id),
+        DevCommand::SaveGame { name } => save_game(gs, &name),
+        DevCommand::LoadSave { name } => load_save(gs, signals, &name),
+        DevCommand::ListSaves => list_saves(),
     }
 }
 
@@ -428,6 +442,143 @@ fn set_all_npc_liking(gs: &mut GameState, level: &str) -> DevCommandResponse {
         success: true,
         message: format!("Set all NPC liking to {level}"),
         data: None,
+    }
+}
+
+fn list_scenes(gs: &GameState) -> DevCommandResponse {
+    let summaries = gs.engine.all_scene_summaries();
+    DevCommandResponse {
+        success: true,
+        message: format!("{} scenes loaded", summaries.len()),
+        data: Some(
+            serde_json::to_value(summaries)
+                .unwrap_or_else(|_| json!({"error": "failed to serialize scene list"})),
+        ),
+    }
+}
+
+fn get_scene_info(gs: &GameState, scene_id: &str) -> DevCommandResponse {
+    match gs.engine.scene_info(scene_id) {
+        Some(info) => DevCommandResponse {
+            success: true,
+            message: format!("Scene '{scene_id}' info"),
+            data: Some(
+                serde_json::to_value(info)
+                    .unwrap_or_else(|_| json!({"error": "failed to serialize scene info"})),
+            ),
+        },
+        None => error_response(format!("Unknown scene '{scene_id}'")),
+    }
+}
+
+fn save_game(gs: &GameState, name: &str) -> DevCommandResponse {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return error_response("Save name cannot be empty".to_string());
+    }
+
+    let dir = match saves_dir() {
+        Some(d) => d,
+        None => return error_response("Cannot determine saves directory".to_string()),
+    };
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        return error_response(format!("Cannot create saves directory: {e}"));
+    }
+
+    let path = dir.join(format!("{trimmed}.json"));
+    match undone_save::save_game(&gs.world, &gs.registry, &path) {
+        Ok(()) => DevCommandResponse {
+            success: true,
+            message: format!("Saved to '{}'", path.display()),
+            data: None,
+        },
+        Err(e) => error_response(format!("Save failed: {e}")),
+    }
+}
+
+fn load_save(gs: &mut GameState, signals: AppSignals, name: &str) -> DevCommandResponse {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return error_response("Save name cannot be empty".to_string());
+    }
+
+    let dir = match saves_dir() {
+        Some(d) => d,
+        None => return error_response("Cannot determine saves directory".to_string()),
+    };
+
+    let path = dir.join(format!("{trimmed}.json"));
+    if !path.exists() {
+        return error_response(format!("Save file not found: '{}'", path.display()));
+    }
+
+    if let Err(e) = crate::game_state::load_world_from_save(gs, &path) {
+        return error_response(format!("Load failed: {e}"));
+    }
+
+    let mut controller = RuntimeController::new(gs, signals);
+    match controller.resume_from_current_world() {
+        Ok(_) => {
+            success_runtime_response(format!("Loaded save '{trimmed}'"), controller.snapshot())
+        }
+        Err(e) => error_response(format!("Resume after load failed: {e}")),
+    }
+}
+
+fn list_saves() -> DevCommandResponse {
+    let dir = match saves_dir() {
+        Some(d) => d,
+        None => {
+            return DevCommandResponse {
+                success: true,
+                message: "No saves directory".to_string(),
+                data: Some(json!([])),
+            };
+        }
+    };
+
+    if !dir.exists() {
+        return DevCommandResponse {
+            success: true,
+            message: "No saves yet".to_string(),
+            data: Some(json!([])),
+        };
+    }
+
+    let mut saves: Vec<serde_json::Value> = Vec::new();
+    if let Ok(entries) = std::fs::read_dir(&dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().is_some_and(|ext| ext == "json") {
+                let name = path
+                    .file_stem()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+                let modified = entry
+                    .metadata()
+                    .ok()
+                    .and_then(|m| m.modified().ok())
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map(|d| d.as_secs())
+                    .unwrap_or(0);
+                saves.push(json!({
+                    "name": name,
+                    "modified_epoch": modified,
+                }));
+            }
+        }
+    }
+    saves.sort_by(|a, b| {
+        b["modified_epoch"]
+            .as_u64()
+            .cmp(&a["modified_epoch"].as_u64())
+    });
+
+    DevCommandResponse {
+        success: true,
+        message: format!("{} save(s) found", saves.len()),
+        data: Some(json!(saves)),
     }
 }
 

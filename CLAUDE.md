@@ -292,6 +292,10 @@ When a writing audit completes, always feed findings back into the writing tools
   PostMessage (no focus steal). `scroll(title, x, y, delta)` sends WM_MOUSEMOVE
   then WM_MOUSEWHEEL (floem routes wheel events using cached cursor_position,
   so the preceding WM_MOUSEMOVE is required for correct widget targeting).
+- **game-input MCP dev IPC tools** (require `--dev` flag): `get_runtime_state`,
+  `choose_action`, `continue_scene`, `jump_to_scene`, `list_scenes`,
+  `get_scene_info`, `save_game`, `load_save`, `list_saves`, plus stat/flag/NPC
+  manipulation. The playtester agent uses these for reliable programmatic play.
 
 ## Guardrails — Runtime
 
@@ -380,7 +384,7 @@ Project-specific agents invoked via `subagent_type` in the Task tool.
 |---|---|---|
 | scene-writer | `scene-writer` | Writing new scenes or expanding existing ones. Has Write/Edit, minijinja validation. |
 | writing-reviewer | `writing-reviewer` | Quality review of scene prose. Read-only. Returns Critical/Important/Minor findings. |
-| playtester | `playtester` | Plays through the game as an actual player — launches, clicks, reads, reports. Unbiased feedback on writing quality, choices, flow, UI. Has screenshot + game-input MCP tools. |
+| playtester | `playtester` | Plays through the game as an actual player — hybrid mode: dev IPC for reliable prose reading + action selection, screenshots for visual verification. Has full game-input + screenshot MCP tools. |
 
 **Mandatory playtesting:** After ANY session that changes UI code, scene prose, or game
 flow, launch the `playtester` agent to play through affected scenes BEFORE claiming done.

@@ -110,6 +110,33 @@ pub struct ActionView {
     pub detail: String,
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SceneSummary {
+    pub id: String,
+    pub pack: String,
+    pub description: String,
+    pub action_count: usize,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SceneInfo {
+    pub id: String,
+    pub pack: String,
+    pub actions: Vec<SceneActionInfo>,
+    pub npc_action_count: usize,
+    pub has_intro_variants: bool,
+    pub has_thoughts: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SceneActionInfo {
+    pub id: String,
+    pub label: String,
+    pub detail: String,
+    pub has_condition: bool,
+    pub has_next: bool,
+}
+
 // ---------------------------------------------------------------------------
 // Implementation
 // ---------------------------------------------------------------------------
@@ -171,6 +198,50 @@ impl SceneEngine {
 
     pub fn has_scene(&self, scene_id: &str) -> bool {
         self.scenes.contains_key(scene_id)
+    }
+
+    /// Return a summary of every loaded scene (id, pack, description, action count).
+    pub fn all_scene_summaries(&self) -> Vec<SceneSummary> {
+        let mut summaries: Vec<SceneSummary> = self
+            .scenes
+            .values()
+            .map(|def| SceneSummary {
+                id: def.id.clone(),
+                pack: def.pack.clone(),
+                description: def.intro_prose.chars().take(120).collect::<String>()
+                    + if def.intro_prose.len() > 120 {
+                        "..."
+                    } else {
+                        ""
+                    },
+                action_count: def.actions.len(),
+            })
+            .collect();
+        summaries.sort_by(|a, b| a.id.cmp(&b.id));
+        summaries
+    }
+
+    /// Return detailed info about a single scene.
+    pub fn scene_info(&self, scene_id: &str) -> Option<SceneInfo> {
+        let def = self.scenes.get(scene_id)?;
+        Some(SceneInfo {
+            id: def.id.clone(),
+            pack: def.pack.clone(),
+            actions: def
+                .actions
+                .iter()
+                .map(|a| SceneActionInfo {
+                    id: a.id.clone(),
+                    label: a.label.clone(),
+                    detail: a.detail.clone(),
+                    has_condition: a.condition.is_some(),
+                    has_next: !a.next.is_empty(),
+                })
+                .collect(),
+            npc_action_count: def.npc_actions.len(),
+            has_intro_variants: !def.intro_variants.is_empty(),
+            has_thoughts: !def.intro_thoughts.is_empty(),
+        })
     }
 
     pub fn current_scene_id(&self) -> Option<String> {

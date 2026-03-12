@@ -146,6 +146,30 @@ pub struct SetWindowSizeInput {
     pub height: f64,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ListScenesInput {}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct GetSceneInfoInput {
+    /// Scene ID to inspect, e.g. `base::coffee_shop`.
+    pub scene_id: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct SaveGameInput {
+    /// Name for the save file (without extension).
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct LoadSaveInput {
+    /// Name of the save file to load (without extension).
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ListSavesInput {}
+
 #[derive(Clone)]
 pub struct GameInputServer {
     tool_router: ToolRouter<Self>,
@@ -426,7 +450,9 @@ impl GameInputServer {
         .await
     }
 
-    #[tool(description = "Choose a visible action by stable id in a running Undone game in dev mode.")]
+    #[tool(
+        description = "Choose a visible action by stable id in a running Undone game in dev mode."
+    )]
     async fn choose_action(
         &self,
         params: Parameters<ChooseActionInput>,
@@ -438,7 +464,9 @@ impl GameInputServer {
         .await
     }
 
-    #[tool(description = "Continue the runtime after a scene finishes in a running Undone game in dev mode.")]
+    #[tool(
+        description = "Continue the runtime after a scene finishes in a running Undone game in dev mode."
+    )]
     async fn continue_scene(
         &self,
         _params: Parameters<ContinueSceneInput>,
@@ -451,10 +479,7 @@ impl GameInputServer {
     }
 
     #[tool(description = "Switch the active app tab in a running Undone game in dev mode.")]
-    async fn set_tab(
-        &self,
-        params: Parameters<SetTabInput>,
-    ) -> Result<CallToolResult, McpError> {
+    async fn set_tab(&self, params: Parameters<SetTabInput>) -> Result<CallToolResult, McpError> {
         self.dev_command(Parameters(DevCommandInput {
             command_json: set_tab_payload(&params.0.tab),
             timeout_ms: Some(2000),
@@ -462,7 +487,9 @@ impl GameInputServer {
         .await
     }
 
-    #[tool(description = "Resize the running Undone window in dev mode to an exact width and height.")]
+    #[tool(
+        description = "Resize the running Undone window in dev mode to an exact width and height."
+    )]
     async fn set_window_size(
         &self,
         params: Parameters<SetWindowSizeInput>,
@@ -557,6 +584,88 @@ impl GameInputServer {
     }
 
     #[tool(
+        description = "List all loaded scenes with IDs, pack, description snippet, and action count. Requires dev mode."
+    )]
+    async fn list_scenes(
+        &self,
+        _params: Parameters<ListScenesInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "list_scenes"
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(
+        description = "Get detailed info about a specific scene: actions (id, label, detail, conditions), NPC action count, intro variants. Requires dev mode."
+    )]
+    async fn get_scene_info(
+        &self,
+        params: Parameters<GetSceneInfoInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "get_scene_info",
+                "scene_id": params.0.scene_id,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Save the current game state to a named save file. Requires dev mode.")]
+    async fn save_game(
+        &self,
+        params: Parameters<SaveGameInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "save_game",
+                "name": params.0.name,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "Load a named save file and resume gameplay from it. Requires dev mode.")]
+    async fn load_save(
+        &self,
+        params: Parameters<LoadSaveInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "load_save",
+                "name": params.0.name,
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(description = "List all available save files. Requires dev mode.")]
+    async fn list_saves(
+        &self,
+        _params: Parameters<ListSavesInput>,
+    ) -> Result<CallToolResult, McpError> {
+        self.dev_command(Parameters(DevCommandInput {
+            command_json: json!({
+                "command": "list_saves"
+            })
+            .to_string(),
+            timeout_ms: Some(2000),
+        }))
+        .await
+    }
+
+    #[tool(
         description = "Set all NPCs' liking level at once in a running Undone game in dev mode."
     )]
     async fn set_all_npc_liking(
@@ -628,7 +737,9 @@ impl ServerHandler for GameInputServer {
                  set_window_size(width, height), \
                  set_game_stat(stat, value), \
                  set_game_flag(flag), remove_game_flag(flag), advance_time(weeks), \
-                 set_npc_liking(npc_name, level), and set_all_npc_liking(level)."
+                 set_npc_liking(npc_name, level), set_all_npc_liking(level), \
+                 list_scenes(), get_scene_info(scene_id), save_game(name), \
+                 load_save(name), and list_saves()."
                     .into(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
@@ -640,8 +751,8 @@ impl ServerHandler for GameInputServer {
 #[cfg(test)]
 mod tests {
     use super::{
-        choose_action_payload, continue_scene_payload, runtime_state_payload,
-        set_tab_payload, set_window_size_payload,
+        choose_action_payload, continue_scene_payload, runtime_state_payload, set_tab_payload,
+        set_window_size_payload,
     };
     use serde_json::json;
 
