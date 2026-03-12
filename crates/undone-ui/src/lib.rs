@@ -20,7 +20,8 @@ use floem::reactive::RwSignal;
 use floem::style::Position;
 use floem::views::drag_resize_window_area;
 use floem::window::{ResizeDirection, WindowId};
-use floem::{event::EventListener, event::Event};
+use floem::{event::Event, event::EventListener};
+use rand::SeedableRng;
 use std::cell::RefCell;
 use std::rc::Rc;
 use undone_domain::SkillId;
@@ -196,16 +197,52 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
         if let Some(ref pre) = *ps {
             if let Some(ref err) = pre.init_error {
                 signals.story.set(err.clone());
+                signals.phase.set(AppPhase::InGame);
             }
         }
     }
 
     if quick_start {
-        if let Some(pre) = pre_state.borrow_mut().take() {
+        let startup_error = {
+            let pre_borrow = pre_state.borrow();
+            pre_borrow.as_ref().and_then(|pre| {
+                let errors = crate::char_creation::validate_startup_contract(
+                    &pre.registry,
+                    undone_domain::PcOrigin::CisMaleTransformed,
+                );
+                (!errors.is_empty()).then(|| {
+                    format!(
+                        "Character creation contract error(s):\n{}",
+                        errors.join("\n")
+                    )
+                })
+            })
+        };
+
+        if let Some(message) = startup_error {
+            if let Some(ref mut pre) = *pre_state.borrow_mut() {
+                pre.init_error = Some(message);
+            }
+            signals.phase.set(AppPhase::InGame);
+        } else if let Some(pre) = pre_state.borrow_mut().take() {
             if pre.init_error.is_none() {
                 let config = crate::char_creation::robin_quick_config(&pre.registry);
-                *game_state.borrow_mut() = Some(crate::game_state::start_game(pre, config, true));
-                signals.phase.set(AppPhase::InGame);
+                match crate::game_state::start_game_checked(pre, config, true) {
+                    Ok(gs) => {
+                        *game_state.borrow_mut() = Some(gs);
+                        signals.phase.set(AppPhase::InGame);
+                    }
+                    Err(message) => {
+                        *pre_state.borrow_mut() = Some(PreGameState {
+                            registry: undone_packs::PackRegistry::new(),
+                            scenes: std::collections::HashMap::new(),
+                            scheduler: undone_scene::scheduler::Scheduler::empty(),
+                            rng: rand::rngs::SmallRng::from_entropy(),
+                            init_error: Some(message),
+                        });
+                        signals.phase.set(AppPhase::InGame);
+                    }
+                }
             } else {
                 *pre_state.borrow_mut() = Some(pre);
             }
@@ -216,6 +253,7 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
     let game_state_cc = Rc::clone(&game_state);
     let pre_state_lp = Rc::clone(&pre_state);
     let game_state_lp = Rc::clone(&game_state);
+    let pre_state_ig = Rc::clone(&pre_state);
     let game_state_ig = Rc::clone(&game_state);
 
     let phase = signals.phase;
@@ -334,7 +372,15 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
                 let inner_gs: GameState = match gs_ref.borrow_mut().take() {
                     Some(gs) => gs,
                     None => {
-                        return placeholder_panel("Game state missing", signals).into_any();
+                        let init_error = pre_state_ig
+                            .borrow()
+                            .as_ref()
+                            .and_then(|pre| pre.init_error.clone());
+                        return placeholder_panel(
+                            init_error.unwrap_or_else(|| "Game state missing".to_string()),
+                            signals,
+                        )
+                        .into_any();
                     }
                 };
                 let gs_cell: Rc<RefCell<GameState>> = Rc::new(RefCell::new(inner_gs));
@@ -370,9 +416,9 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
             }
         })
         .style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.size_full().background(colors.ground)
-    });
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.size_full().background(colors.ground)
+        });
 
     let main_column = body.style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -615,8 +661,9 @@ pub fn process_events(
     scene_finished
 }
 
-fn placeholder_panel(msg: &'static str, signals: AppSignals) -> impl View {
-    container(label(move || msg.to_string()).style(move |s| {
+fn placeholder_panel(msg: impl Into<String>, signals: AppSignals) -> impl View {
+    let msg = msg.into();
+    container(label(move || msg.clone()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.color(colors.ink_dim).font_size(16.0)
     }))
@@ -629,16 +676,12 @@ mod tests {
     use crate::dev_ipc::runtime_state_snapshot;
     use crate::game_state::{start_game, PreGameState};
     use lasso::Key;
-    use rand::SeedableRng;
     use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
     use std::sync::Arc;
     use undone_domain::*;
-    use undone_packs::load_packs;
     use undone_packs::PackRegistry;
     use undone_scene::engine::{EngineCommand, SceneEngine};
-    use undone_scene::loader::load_scenes;
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
     use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
     use undone_world::test_helpers::make_test_world as test_world;
 
@@ -687,36 +730,7 @@ mod tests {
     }
 
     fn test_pre_state() -> PreGameState {
-        let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
-                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
-                scenes.insert(scene_id, scene);
-            }
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        PreGameState {
-            registry,
-            scenes,
-            scheduler,
-            rng: rand::rngs::SmallRng::seed_from_u64(7),
-            init_error: None,
-        }
+        crate::game_state::test_pre_state_from_dir(&packs_dir())
     }
 
     #[test]

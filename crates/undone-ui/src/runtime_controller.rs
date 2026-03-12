@@ -3,8 +3,7 @@ use floem::prelude::{SignalGet, SignalUpdate};
 use crate::game_state::{GameState, SceneTimeAnchor};
 use crate::runtime_snapshot::{snapshot_runtime, RuntimeSnapshot};
 use crate::{
-    process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab,
-    PlayerSnapshot,
+    process_events, reset_scene_ui_state, start_scene, AppPhase, AppSignals, AppTab, PlayerSnapshot,
 };
 use undone_scene::engine::EngineEvent;
 
@@ -158,11 +157,12 @@ impl<'a> RuntimeController<'a> {
     }
 
     fn start_requested_slot(&mut self, slot_name: &str) -> RuntimeCommandOutcome {
-        if let Some(result) =
-            self.gs
-                .scheduler
-                .pick(slot_name, &self.gs.world, &self.gs.registry, &mut self.gs.rng)
-        {
+        if let Some(result) = self.gs.scheduler.pick(
+            slot_name,
+            &self.gs.world,
+            &self.gs.registry,
+            &mut self.gs.rng,
+        ) {
             if result.once_only {
                 self.gs
                     .world
@@ -238,10 +238,9 @@ mod tests {
         Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
         NpcCore, PersonalityId, RelationshipStatus, SkillId,
     };
-    use undone_packs::{load_packs, PackRegistry};
+    use undone_packs::PackRegistry;
     use undone_scene::engine::{ActionView, SceneEngine};
-    use undone_scene::loader::load_scenes;
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references, Scheduler};
+    use undone_scene::scheduler::Scheduler;
     use undone_scene::types::{Action, NextBranch, SceneDefinition};
     use undone_world::test_helpers::make_test_world as test_world;
 
@@ -255,36 +254,7 @@ mod tests {
     }
 
     fn test_pre_state() -> PreGameState {
-        let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
-                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
-                scenes.insert(scene_id, scene);
-            }
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        PreGameState {
-            registry,
-            scenes,
-            scheduler,
-            rng: SmallRng::seed_from_u64(7),
-            init_error: None,
-        }
+        crate::game_state::test_pre_state_from_dir(&packs_dir())
     }
 
     fn test_game_state() -> GameState {
@@ -368,11 +338,15 @@ mod tests {
         gs.world.game_data.set_flag("FIRST_MEETING_DONE");
         gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
         gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_night");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_first_clothes");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_day");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_work_meeting");
@@ -568,8 +542,14 @@ mod tests {
         }
 
         let before = controller.snapshot();
-        assert_eq!(before.current_scene_id.as_deref(), Some("base::plan_your_day"));
-        assert_eq!(action_ids(&before), vec!["go_out", "run_errands", "stay_in"]);
+        assert_eq!(
+            before.current_scene_id.as_deref(),
+            Some("base::plan_your_day")
+        );
+        assert_eq!(
+            action_ids(&before),
+            vec!["go_out", "run_errands", "stay_in"]
+        );
 
         let mut probe_rng = controller.gs.rng.clone();
         let expected = controller
@@ -641,7 +621,11 @@ mod tests {
                 controller.gs.world.game_data.day,
                 format!("{:?}", controller.gs.world.game_data.time_slot),
             ),
-            (expected.week, expected.day, format!("{:?}", expected.time_slot)),
+            (
+                expected.week,
+                expected.day,
+                format!("{:?}", expected.time_slot)
+            ),
             "continue_flow should consume exactly one time slot after a settled free_time scene"
         );
     }
@@ -656,11 +640,15 @@ mod tests {
         gs.world.game_data.set_flag("FIRST_MEETING_DONE");
         gs.world.game_data.set_flag("ONCE_base::workplace_arrival");
         gs.world.game_data.set_flag("ONCE_base::workplace_landlord");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_night");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_night");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_first_clothes");
-        gs.world.game_data.set_flag("ONCE_base::workplace_first_day");
+        gs.world
+            .game_data
+            .set_flag("ONCE_base::workplace_first_day");
         gs.world
             .game_data
             .set_flag("ONCE_base::workplace_work_meeting");

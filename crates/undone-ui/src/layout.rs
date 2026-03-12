@@ -43,6 +43,8 @@ pub fn action_bar_height_for_window(window_width: f64, action_count: usize) -> f
 
 pub fn story_panel_max_height(window_width: f64, window_height: f64, action_count: usize) -> f64 {
     let available_height = (window_height - CUSTOM_TITLE_BAR_HEIGHT).max(STORY_MIN_HEIGHT);
-    (available_height - DETAIL_STRIP_HEIGHT - action_bar_height_for_window(window_width, action_count))
-        .max(STORY_MIN_HEIGHT)
+    (available_height
+        - DETAIL_STRIP_HEIGHT
+        - action_bar_height_for_window(window_width, action_count))
+    .max(STORY_MIN_HEIGHT)
 }

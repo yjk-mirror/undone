@@ -55,7 +55,7 @@ You make a list in your head. Groceries. Laundry. The thing with the shower curt
 
 The list is still there ten minutes later. You haven't moved. This is data.
 {% else %}
-You check your phone — no work emergencies, two texts from numbers you don't recognize that are probably spam, a weather notification you dismiss without reading. You put it back down.
+You glance at the screen — no work emergencies, two texts from numbers you don't recognize that are probably spam, a weather notification you dismiss without reading. Then you set it back on the nightstand.
 
 The radiator clicks. The upstairs neighbor runs water. The morning accumulates around you and you let it.
 {% endif %}

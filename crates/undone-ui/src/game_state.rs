@@ -25,6 +25,12 @@ pub struct PreGameState {
     pub init_error: Option<String>,
 }
 
+pub struct LoadedRuntimeContent {
+    pub registry: PackRegistry,
+    pub scenes: HashMap<String, std::sync::Arc<SceneDefinition>>,
+    pub scheduler: Scheduler,
+}
+
 pub struct GameState {
     pub world: World,
     pub registry: PackRegistry,
@@ -89,11 +95,20 @@ fn failed_pre(
     msg: String,
 ) -> PreGameState {
     log::error!("[init] {msg}");
+    failed_pre_with_rng(registry, scenes, SmallRng::from_entropy(), msg)
+}
+
+fn failed_pre_with_rng(
+    registry: PackRegistry,
+    scenes: HashMap<String, std::sync::Arc<SceneDefinition>>,
+    rng: SmallRng,
+    msg: String,
+) -> PreGameState {
     PreGameState {
         registry,
         scenes,
         scheduler: Scheduler::empty(),
-        rng: SmallRng::from_entropy(),
+        rng,
         init_error: Some(msg),
     }
 }
@@ -101,111 +116,118 @@ fn failed_pre(
 /// Load all packs and return a `PreGameState` ready for character creation.
 /// Does NOT create a world — that happens in `start_game()`.
 pub fn init_game() -> PreGameState {
-    let packs_dir = resolve_packs_dir();
+    init_game_from_dir(&resolve_packs_dir())
+}
 
-    let (registry, metas) = match load_packs(&packs_dir) {
-        Ok(r) => r,
-        Err(e) => {
-            return failed_pre(
-                PackRegistry::new(),
-                HashMap::new(),
-                format!("Failed to load packs: {e}"),
-            );
-        }
-    };
+pub fn init_game_from_dir(packs_dir: &Path) -> PreGameState {
+    match load_runtime_content(packs_dir) {
+        Ok(loaded) => PreGameState {
+            registry: loaded.registry,
+            scenes: loaded.scenes,
+            scheduler: loaded.scheduler,
+            rng: SmallRng::from_entropy(),
+            init_error: None,
+        },
+        Err(msg) => failed_pre(PackRegistry::new(), HashMap::new(), msg),
+    }
+}
 
-    // Validate trait conflict references (dangling conflicts = content error)
+#[cfg(test)]
+pub(crate) fn test_pre_state_from_dir(packs_dir: &Path) -> PreGameState {
+    match load_runtime_content(packs_dir) {
+        Ok(loaded) => PreGameState {
+            registry: loaded.registry,
+            scenes: loaded.scenes,
+            scheduler: loaded.scheduler,
+            rng: SmallRng::seed_from_u64(7),
+            init_error: None,
+        },
+        Err(msg) => failed_pre_with_rng(
+            PackRegistry::new(),
+            HashMap::new(),
+            SmallRng::seed_from_u64(7),
+            msg,
+        ),
+    }
+}
+
+pub fn load_runtime_content(packs_dir: &Path) -> Result<LoadedRuntimeContent, String> {
+    let (registry, metas) =
+        load_packs(packs_dir).map_err(|e| format!("Failed to load packs: {e}"))?;
+
     let conflict_errors = registry.validate_trait_conflicts();
     if !conflict_errors.is_empty() {
-        return failed_pre(
-            registry,
-            HashMap::new(),
-            format!("Trait conflict errors:\n{}", conflict_errors.join("\n")),
-        );
+        return Err(format!(
+            "Trait conflict errors:\n{}",
+            conflict_errors.join("\n")
+        ));
     }
 
-    // Load scenes from all packs into a combined map
     let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
     let mut scene_sources: HashMap<String, String> = HashMap::new();
     for meta in &metas {
         let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-        match load_scenes(&scene_dir, &registry) {
-            Ok(pack_scenes) => {
-                if let Err(e) = extend_scenes_checked(
-                    &mut scenes,
-                    &mut scene_sources,
-                    pack_scenes,
-                    &meta.manifest.pack.id,
-                ) {
-                    return failed_pre(
-                        registry,
-                        scenes,
-                        format!("Scene load error in pack '{}': {e}", meta.manifest.pack.id),
-                    );
-                }
-            }
-            Err(e) => {
-                return failed_pre(
-                    registry,
-                    scenes,
-                    format!("Scene load error in pack '{}': {e}", meta.manifest.pack.id),
-                );
-            }
-        }
+        let pack_scenes = load_scenes(&scene_dir, &registry)
+            .map_err(|e| format!("Scene load error in pack '{}': {e}", meta.manifest.pack.id))?;
+        extend_scenes_checked(
+            &mut scenes,
+            &mut scene_sources,
+            pack_scenes,
+            &meta.manifest.pack.id,
+        )
+        .map_err(|e| format!("Scene load error in pack '{}': {e}", meta.manifest.pack.id))?;
     }
 
-    // Validate cross-references between scenes
-    if let Err(e) = undone_scene::loader::validate_cross_references(&scenes) {
-        return failed_pre(registry, scenes, format!("Scene validation error: {e}"));
-    }
+    undone_scene::loader::validate_cross_references(&scenes)
+        .map_err(|e| format!("Scene validation error: {e}"))?;
 
-    let scheduler = match load_schedule(&metas, &registry) {
-        Ok(s) => s,
-        Err(e) => {
-            return failed_pre(registry, scenes, format!("Schedule load error: {e}"));
-        }
-    };
-
-    if let Err(e) = scheduler.validate_scene_references(&scenes) {
-        return failed_pre(registry, scenes, format!("Schedule validation error: {e}"));
-    }
-
-    if let Err(e) = validate_entry_scene_references(
+    let scheduler =
+        load_schedule(&metas, &registry).map_err(|e| format!("Schedule load error: {e}"))?;
+    scheduler
+        .validate_scene_references(&scenes)
+        .map_err(|e| format!("Schedule validation error: {e}"))?;
+    validate_entry_scene_references(
         &scenes,
         registry.opening_scene(),
         registry.transformation_scene(),
-    ) {
-        return failed_pre(
-            registry,
-            scenes,
-            format!("Entry scene validation error: {e}"),
-        );
-    }
+    )
+    .map_err(|e| format!("Entry scene validation error: {e}"))?;
 
     let char_creation_errors =
         crate::char_creation::validate_runtime_contract(&registry, &scheduler);
     if !char_creation_errors.is_empty() {
-        return failed_pre(
-            registry,
-            scenes,
-            format!(
-                "Character creation contract error(s):\n{}",
-                char_creation_errors.join("\n")
-            ),
-        );
+        return Err(format!(
+            "Character creation contract error(s):\n{}",
+            char_creation_errors.join("\n")
+        ));
     }
 
-    PreGameState {
+    Ok(LoadedRuntimeContent {
         registry,
         scenes,
         scheduler,
-        rng: SmallRng::from_entropy(),
-        init_error: None,
-    }
+    })
 }
 
 /// Create a world from character creation config and build the full `GameState`.
 pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool) -> GameState {
+    start_game_checked(pre, config, dev_mode).unwrap_or_else(|message| panic!("{message}"))
+}
+
+pub fn start_game_checked(
+    pre: PreGameState,
+    config: CharCreationConfig,
+    dev_mode: bool,
+) -> Result<GameState, String> {
+    let startup_errors =
+        crate::char_creation::validate_startup_contract(&pre.registry, config.origin);
+    if !startup_errors.is_empty() {
+        return Err(format!(
+            "Character creation contract error(s):\n{}",
+            startup_errors.join("\n")
+        ));
+    }
+
     let PreGameState {
         mut registry,
         scenes,
@@ -216,13 +238,14 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool)
     let opening_scene = registry.opening_scene().map(|s| s.to_owned());
     let femininity_id = registry
         .femininity_skill()
-        .expect("PackRegistry must include required skill id FEMININITY");
+        .map_err(|_| {
+            "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
+        })?;
     let world = new_game(config, &mut registry, &mut rng);
-    let engine = SceneEngine::new(scenes);
-    GameState {
+    Ok(GameState {
         world,
         registry,
-        engine,
+        engine: SceneEngine::new(scenes),
         scheduler,
         rng,
         dev_mode,
@@ -230,7 +253,40 @@ pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool)
         opening_scene,
         femininity_id,
         current_scene_time_anchor: None,
+    })
+}
+
+pub fn build_throwaway_game_state(
+    pre: &mut PreGameState,
+    config: CharCreationConfig,
+    dev_mode: bool,
+) -> Result<GameState, String> {
+    let startup_errors =
+        crate::char_creation::validate_startup_contract(&pre.registry, config.origin);
+    if !startup_errors.is_empty() {
+        return Err(format!(
+            "Character creation contract error(s):\n{}",
+            startup_errors.join("\n")
+        ));
     }
+
+    let opening_scene = pre.registry.opening_scene().map(|s| s.to_owned());
+    let femininity_id = pre.registry.femininity_skill().map_err(|_| {
+        "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
+    })?;
+    let world = new_game(config, &mut pre.registry, &mut pre.rng);
+    Ok(GameState {
+        world,
+        registry: pre.registry.clone(),
+        engine: SceneEngine::new(pre.scenes.clone()),
+        scheduler: pre.scheduler.clone(),
+        rng: SmallRng::from_entropy(),
+        dev_mode,
+        init_error: pre.init_error.clone(),
+        opening_scene,
+        femininity_id,
+        current_scene_time_anchor: None,
+    })
 }
 
 fn extend_scenes_checked(
@@ -357,8 +413,6 @@ mod tests {
     };
     use undone_packs::char_creation::CharCreationConfig;
     use undone_scene::engine::{EngineCommand, EngineEvent};
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
-
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
@@ -370,42 +424,24 @@ mod tests {
 
     fn test_pre_state() -> PreGameState {
         let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            extend_scenes_checked(
-                &mut scenes,
-                &mut scene_sources,
-                load_scenes(&scene_dir, &registry).unwrap(),
-                &meta.manifest.pack.id,
-            )
-            .unwrap();
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        let char_creation_errors =
-            crate::char_creation::validate_runtime_contract(&registry, &scheduler);
-        assert!(char_creation_errors.is_empty());
+        let loaded = load_runtime_content(&packs_dir).unwrap();
 
         PreGameState {
-            registry,
-            scenes,
-            scheduler,
+            registry: loaded.registry,
+            scenes: loaded.scenes,
+            scheduler: loaded.scheduler,
             rng: SmallRng::seed_from_u64(7),
             init_error: None,
         }
+    }
+
+    #[test]
+    fn load_runtime_content_returns_validated_registry_scenes_and_scheduler() {
+        let packs_dir = packs_dir();
+        let loaded = load_runtime_content(&packs_dir).expect("shared loader should succeed");
+
+        assert!(!loaded.scenes.is_empty());
+        assert!(loaded.registry.opening_scene().is_some());
     }
 
     fn workplace_config() -> CharCreationConfig {
@@ -455,6 +491,12 @@ mod tests {
         }
     }
 
+    fn malformed_pre_state_without_femininity() -> PreGameState {
+        let mut pre = test_pre_state();
+        pre.registry = PackRegistry::new();
+        pre
+    }
+
     fn play_scene_to_finish(gs: &mut GameState) {
         loop {
             let events = gs.engine.drain();
@@ -500,6 +542,14 @@ mod tests {
     fn resolve_packs_dir_returns_path_ending_in_packs() {
         let dir = resolve_packs_dir();
         assert_eq!(dir.file_name().unwrap(), "packs");
+    }
+
+    #[test]
+    fn start_game_reports_missing_femininity_skill_as_init_error() {
+        let pre = malformed_pre_state_without_femininity();
+        let result = start_game_checked(pre, workplace_config(), false);
+
+        assert!(matches!(result, Err(message) if message.contains("FEMININITY")));
     }
 
     #[test]

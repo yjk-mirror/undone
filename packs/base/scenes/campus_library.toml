@@ -5,48 +5,44 @@ description = "First week study session. A male classmate sits nearby. The attra
 
 [intro]
 prose = """
-The main library reading room has the specific quality of places where nothing is supposed to happen. High ceilings, long tables, the ambient sound of keyboards and very quiet conversation. She's been here twice already this week. She likes it here.
+The main library reading room has the specific quality of places where nothing is supposed to happen. High ceilings, long tables, the ambient sound of keyboards and very quiet conversation. You've been here twice already this week. You like it here.
 
-It's Thursday. She has a problem set due Monday and a reading due tomorrow. She's set up at the far end of one of the long tables — laptop, textbook, notebook, coffee in a spill-proof cup because she's learned — and she's been working for about forty minutes when someone sits down across from her.
+It's Thursday. You have a problem set due Monday and a reading due tomorrow. You're set up at the far end of one of the long tables — laptop, textbook, notebook, coffee in a spill-proof cup because you've learned — and you've been working for about forty minutes when someone sits down across from you.
 
-She doesn't look up immediately. She finishes the sentence she's writing. Then she looks up.
+You don't look up immediately. You finish the sentence you're writing. Then you look up.
 
 He's about her age. Dark hair, serious face, the kind of jaw that you notice before you've decided to notice anything. He's opening a problem set that looks like hers — same course number at the top, she can see it from here.
 
-{% if not w.alwaysFemale() %}
-She registers all of this in about a second, and then she registers that she registered it, and then she looks back at her notes.
+You register all of this in about a second, and then you register that you registered it, and then you look back at your notes.
 
 *Oh*, she thinks. *Okay.*
 
-She is not ready for this. She was ready for the general concept, which she'd been processing for a week. She was not ready for it to arrive with a jaw and a problem set and sit across from her in the library at 3 PM on a Thursday.
-{% else %}
-She nods if he looks up. He doesn't. They work in silence, which is the correct library behavior.
-{% endif %}
+You are not ready for this. You were ready for the general concept, which you'd been processing for a week. You were not ready for it to arrive with a jaw and a problem set and sit across from you in the library at 3 PM on a Thursday.
 """
 
 [[intro_variants]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-Thursday. The library. She's been here forty minutes and it's going fine.
+Thursday. The library. You've been here forty minutes and it's going fine.
 
-He sits down across from her. She finishes the sentence she's writing and then looks up. The sentence she finishes takes three extra beats.
+He sits down across from you. You finish the sentence you're writing and then look up. The sentence you finish takes three extra beats.
 
 He's in the same course. Same problem set. He doesn't look up from his bag.
 
-*Okay*, she thinks. She looks back at her notes. Her handwriting for the next two lines is slightly different from the two lines before. She notices this later.
+*Okay*, you think. You look back at your notes. Your handwriting for the next two lines is slightly different from the two lines before. You notice this later.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale()"
+condition = "w.getSkill('FEMININITY') < 50"
 style     = "inner_voice"
 prose = """
-She'd thought about this in the abstract. She'd been thinking about it for a week in the abstract. The abstract had the advantage of not having a face or a jaw or the specific way a person's hands move when they're opening a textbook.
+You'd thought about this in the abstract. You'd been thinking about it for a week in the abstract. The abstract had the advantage of not having a face or a jaw or the specific way a person's hands move when they're opening a textbook.
 
-*This is just attraction*, she thinks. *This is what attraction is.* She knows what attraction is. She's had it before, pointed in different directions, and it always felt like this: the registering before the reasoning, the body ahead of the thought.
+*This is just attraction*, you think. *This is what attraction is.* You know what attraction is. You've had it before, pointed in different directions, and it always felt like this: the registering before the reasoning, the body ahead of the thought.
 
 The difference is just the direction. Theoretically.
 
-She looks back at her problem set. Line six. She was on line six.
+You look back at your problem set. Line six. You were on line six.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -57,17 +53,13 @@ label = "Keep working. Stay focused."
 detail = "You're here to study. The problem set doesn't care about your feelings."
 allow_npc_actions = true
 prose = """
-She works. He works. The reading room does what reading rooms do.
+You work. He works. The reading room does what reading rooms do.
 
-Ninety minutes later she's through the problem set and into the reading, and the person across from her has packed up and left at some point in the last twenty minutes, and she didn't notice when. She notices his absence and then notes that she noticed it.
+Ninety minutes later you're through the problem set and into the reading, and the person across from you has packed up and left at some point in the last twenty minutes, and you didn't notice when. You notice his absence and then note that you noticed it.
 
-{% if not w.alwaysFemale() %}
 *Okay*, she thinks. *Information. Filed.*
 
-She closes her laptop and gathers her things. She'll process it later. She's processed everything else later and that's worked approximately as well as anything.
-{% else %}
-She closes her laptop at six and goes to dinner. Fine day. Good work session.
-{% endif %}
+You close your laptop and gather your things. You'll process it later. You've processed everything else later and that's worked approximately as well as anything.
 """
 
   [[actions.next]]
@@ -79,21 +71,19 @@ label = "Say something. You have an excuse."
 detail = "Same problem set. It's a natural opening."
 condition = "!scene.hasFlag('talked')"
 prose = """
-She waits until there's a natural pause in whatever he's doing and says: "Are you in 201? I'm stuck on problem four."
+You wait until there's a natural pause in whatever he's doing and say: "Are you in 201? I'm stuck on problem four."
 
 He looks up. He has brown eyes and the slightly surprised look of someone who wasn't expecting to be talked to.
 
-{% if not w.alwaysFemale() %}
-She watches herself watch him and thinks: *I am doing this. I am doing this on purpose. I don't know why I'm doing this.*
+You watch yourself watch him and think: *I am doing this. I am doing this on purpose. I don't know why I'm doing this.*
 
-She knows why she's doing this.
-{% endif %}
+You know why you're doing this.
 
 "Problem four's the worst," he says. "I think you need the lemma from last week's reading." He says it without condescension, which is the good version of being told you need a lemma.
 
-They talk through it for ten minutes. He explains the lemma. She already knew the lemma, mostly, but the explanation is useful and she doesn't correct him because it turns out she was missing a step. His name is Theo. He's in her section.
+They talk through it for ten minutes. He explains the lemma. You already knew the lemma, mostly, but the explanation is useful and you don't correct him because it turns out you were missing a step. His name is Theo. He's in your section.
 
-When she goes back to her problem set her face is doing something she doesn't have a name for yet.
+When you go back to your problem set your face is doing something you don't have a name for yet.
 """
 
   [[actions.effects]]
@@ -113,11 +103,9 @@ condition = "!scene.hasFlag('talked') && !scene.hasFlag('noticed')"
 prose = """
 He looks up — maybe she moved, maybe he just needed a break from the problem set — and they make eye contact for about a second.
 
-He looks back at his work. She looks back at hers.
+He looks back at his work. You look back at yours.
 
-{% if not w.alwaysFemale() %}
-One second. She was fine before that second. She is also fine after it. But the second is — it's something. She adds it to the list of things she's processing.
-{% endif %}
+One second. You were fine before that second. You are also fine after it. But the second is — it's something. You add it to the list of things you're processing.
 """
 
   [[npc_actions.effects]]

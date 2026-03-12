@@ -198,7 +198,9 @@ pub fn simulate(
                 break;
             }
 
-            let scene_id = engine.current_scene_id().unwrap_or_else(|| "<no-scene>".to_string());
+            let scene_id = engine
+                .current_scene_id()
+                .unwrap_or_else(|| "<no-scene>".to_string());
             let action_id = actions
                 .iter()
                 .find(|action| tried_actions.insert((scene_id.clone(), action.id.clone())))
@@ -304,7 +306,8 @@ fn visible_actions(events: &[EngineEvent]) -> Option<Vec<crate::engine::ActionVi
 }
 
 fn consume_scene_time(world: &mut World, current_scene_time_anchor: &mut Option<SceneTimeAnchor>) {
-    let should_advance = current_scene_time_anchor.is_some_and(|anchor| anchor.matches_world(world));
+    let should_advance =
+        current_scene_time_anchor.is_some_and(|anchor| anchor.matches_world(world));
     *current_scene_time_anchor = None;
     if should_advance {
         world.game_data.advance_time_slot();

@@ -492,13 +492,7 @@ mod tests {
     use crate::game_state::{start_game, PreGameState};
     use crate::runtime_controller::RuntimeController;
     use floem::prelude::SignalGet;
-    use rand::{rngs::SmallRng, SeedableRng};
-    use std::collections::HashMap;
     use std::path::PathBuf;
-    use undone_packs::load_packs;
-    use undone_scene::loader::load_scenes;
-    use undone_scene::scheduler::{load_schedule, validate_entry_scene_references};
-    use undone_scene::types::SceneDefinition;
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -510,36 +504,7 @@ mod tests {
     }
 
     fn test_pre_state() -> PreGameState {
-        let packs_dir = packs_dir();
-        let (registry, metas) = load_packs(&packs_dir).unwrap();
-
-        let mut scenes: HashMap<String, std::sync::Arc<SceneDefinition>> = HashMap::new();
-        let mut scene_sources: HashMap<String, String> = HashMap::new();
-        for meta in &metas {
-            let scene_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
-            for (scene_id, scene) in load_scenes(&scene_dir, &registry).unwrap() {
-                scene_sources.insert(scene_id.clone(), meta.manifest.pack.id.clone());
-                scenes.insert(scene_id, scene);
-            }
-        }
-        undone_scene::loader::validate_cross_references(&scenes).unwrap();
-
-        let scheduler = load_schedule(&metas, &registry).unwrap();
-        scheduler.validate_scene_references(&scenes).unwrap();
-        validate_entry_scene_references(
-            &scenes,
-            registry.opening_scene(),
-            registry.transformation_scene(),
-        )
-        .unwrap();
-
-        PreGameState {
-            registry,
-            scenes,
-            scheduler,
-            rng: SmallRng::seed_from_u64(7),
-            init_error: None,
-        }
+        crate::game_state::test_pre_state_from_dir(&packs_dir())
     }
 
     fn test_game_state() -> GameState {

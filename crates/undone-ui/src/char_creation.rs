@@ -4,6 +4,7 @@ use floem::views::dropdown::Dropdown;
 use floem::views::Checkbox;
 use rand::SeedableRng;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 use undone_domain::{
     Age, Appearance, BeforeIdentity, BeforeSexuality, BeforeVoice, BreastSize, ButtSize,
@@ -14,7 +15,7 @@ use undone_domain::{
 use undone_packs::{char_creation::CharCreationConfig, PackRegistry};
 use undone_scene::scheduler::Scheduler;
 
-use crate::game_state::{start_game, GameState, PreGameState};
+use crate::game_state::{build_throwaway_game_state, start_game_checked, GameState, PreGameState};
 use crate::theme::ThemeColors;
 use crate::{AppPhase, AppSignals, PartialCharState};
 
@@ -301,6 +302,104 @@ pub fn validate_runtime_contract(registry: &PackRegistry, scheduler: &Scheduler)
     errors
 }
 
+pub fn validate_startup_contract(registry: &PackRegistry, origin: PcOrigin) -> Vec<String> {
+    let mut errors = Vec::new();
+
+    if registry.femininity_skill().is_err() {
+        errors.push(
+            "character creation requires skill 'FEMININITY', but it is not registered".to_string(),
+        );
+    }
+
+    match origin {
+        PcOrigin::TransWomanTransformed => {
+            if registry.trans_woman_trait().is_err() {
+                errors.push(
+                    "character creation requires trait 'TRANS_WOMAN', but it is not registered"
+                        .to_string(),
+                );
+            }
+        }
+        PcOrigin::CisFemaleTransformed => {
+            if registry.always_female_trait().is_err() {
+                errors.push(
+                    "character creation requires trait 'ALWAYS_FEMALE', but it is not registered"
+                        .to_string(),
+                );
+            }
+        }
+        PcOrigin::AlwaysFemale => {
+            if registry.always_female_trait().is_err() {
+                errors.push(
+                    "character creation requires trait 'ALWAYS_FEMALE', but it is not registered"
+                        .to_string(),
+                );
+            }
+            if registry.not_transformed_trait().is_err() {
+                errors.push(
+                    "character creation requires trait 'NOT_TRANSFORMED', but it is not registered"
+                        .to_string(),
+                );
+            }
+        }
+        PcOrigin::CisMaleTransformed => {}
+    }
+
+    errors.sort();
+    errors.dedup();
+    errors
+}
+
+pub fn resolve_starting_traits(
+    registry: &PackRegistry,
+    trait_names: &[&str],
+    include_rough: bool,
+    likes_rough: bool,
+) -> Result<Vec<TraitId>, String> {
+    let mut errors = Vec::new();
+    let mut starting_traits = Vec::new();
+
+    for trait_name in trait_names {
+        match registry.resolve_trait(trait_name) {
+            Ok(trait_id) => starting_traits.push(trait_id),
+            Err(_) => errors.push(format!(
+                "character creation requires trait '{trait_name}', but it is not registered"
+            )),
+        }
+    }
+
+    if !include_rough {
+        match registry.block_rough_trait() {
+            Ok(trait_id) => starting_traits.push(trait_id),
+            Err(_) => errors.push(
+                "character creation requires trait 'BLOCK_ROUGH', but it is not registered"
+                    .to_string(),
+            ),
+        }
+    }
+
+    if likes_rough {
+        match registry.likes_rough_trait() {
+            Ok(trait_id) => starting_traits.push(trait_id),
+            Err(_) => errors.push(
+                "character creation requires trait 'LIKES_ROUGH', but it is not registered"
+                    .to_string(),
+            ),
+        }
+    }
+
+    errors.sort();
+    errors.dedup();
+    if errors.is_empty() {
+        Ok(starting_traits)
+    } else {
+        Err(format!(
+            "Character creation contract error(s):\n{}",
+            errors.join("\n")
+        ))
+    }
+}
+
 fn preset_by_idx(idx: Option<u8>) -> Option<&'static PresetData> {
     match idx {
         Some(0) => Some(&PRESET_ROBIN),
@@ -429,6 +528,34 @@ fn read_male_names(pre_state: &Rc<RefCell<Option<PreGameState>>>) -> Vec<String>
         }
     }
     vec!["Matt".to_string(), "Ryan".to_string(), "David".to_string()]
+}
+
+fn store_runtime_init_error(pre_state: &Rc<RefCell<Option<PreGameState>>>, message: String) {
+    let mut pre_mut = pre_state.borrow_mut();
+    if let Some(ref mut pre) = *pre_mut {
+        pre.init_error = Some(message);
+        return;
+    }
+
+    *pre_mut = Some(PreGameState {
+        registry: PackRegistry::new(),
+        scenes: HashMap::new(),
+        scheduler: Scheduler::empty(),
+        rng: rand::rngs::SmallRng::from_entropy(),
+        init_error: Some(message),
+    });
+}
+
+fn surface_runtime_init_error(
+    pre_state: &Rc<RefCell<Option<PreGameState>>>,
+    game_state: &Rc<RefCell<Option<GameState>>>,
+    signals: AppSignals,
+    message: String,
+) {
+    store_runtime_init_error(pre_state, message);
+    *game_state.borrow_mut() = None;
+    signals.tab.set(crate::AppTab::Game);
+    signals.phase.set(AppPhase::InGame);
 }
 
 // ── BeforeCreation form signals ───────────────────────────────────────────────
@@ -1341,36 +1468,26 @@ fn build_next_button(
                 trait_names = tn;
             }
 
-            // Resolve trait IDs from registry
-            let mut starting_traits: Vec<_> = {
+            let starting_traits = {
                 let pre_borrow = pre_state.borrow();
                 if let Some(ref pre) = *pre_borrow {
-                    trait_names
-                        .iter()
-                        .map(|name| {
-                            pre.registry.resolve_trait(name).unwrap_or_else(|_| {
-                                panic!(
-                                    "character creation trait '{name}' must be validated during init"
-                                )
-                            })
-                        })
-                        .collect()
+                    match resolve_starting_traits(
+                        &pre.registry,
+                        &trait_names,
+                        form.include_rough.get_untracked(),
+                        form.likes_rough.get_untracked(),
+                    ) {
+                        Ok(traits) => traits,
+                        Err(message) => {
+                            drop(pre_borrow);
+                            surface_runtime_init_error(&pre_state, &game_state, signals, message);
+                            return;
+                        }
+                    }
                 } else {
                     vec![]
                 }
             };
-            if let Some(ref pre) = *pre_state.borrow() {
-                if !form.include_rough.get_untracked() {
-                    starting_traits.push(pre.registry.block_rough_trait().unwrap_or_else(|_| {
-                        panic!("character creation trait 'BLOCK_ROUGH' must be validated during init")
-                    }));
-                }
-                if form.likes_rough.get_untracked() {
-                    starting_traits.push(pre.registry.likes_rough_trait().unwrap_or_else(|_| {
-                        panic!("character creation trait 'LIKES_ROUGH' must be validated during init")
-                    }));
-                }
-            }
 
             // Presets declare their own starting game flags; custom players
             // start freeform with no preset routing flags.
@@ -1509,29 +1626,21 @@ fn build_next_button(
                 {
                     let mut pre_mut = pre_state.borrow_mut();
                     if let Some(ref mut pre) = *pre_mut {
-                        let throwaway_world = undone_packs::char_creation::new_game(
-                            throwaway_config,
-                            &mut pre.registry,
-                            &mut pre.rng,
-                        );
-                        let engine = undone_scene::engine::SceneEngine::new(pre.scenes.clone());
-                        let femininity_id = pre
-                            .registry
-                            .femininity_skill()
-                            .expect("PackRegistry must include required skill id FEMININITY");
-                        let throwaway_gs = GameState {
-                            world: throwaway_world,
-                            registry: pre.registry.clone(),
-                            engine,
-                            scheduler: pre.scheduler.clone(),
-                            rng: rand::rngs::SmallRng::from_entropy(),
-                            dev_mode: false,
-                            init_error: None,
-                            opening_scene: pre.registry.opening_scene().map(|s| s.to_owned()),
-                            femininity_id,
-                            current_scene_time_anchor: None,
-                        };
-                        *game_state.borrow_mut() = Some(throwaway_gs);
+                        match build_throwaway_game_state(pre, throwaway_config, false) {
+                            Ok(throwaway_gs) => {
+                                *game_state.borrow_mut() = Some(throwaway_gs);
+                            }
+                            Err(message) => {
+                                drop(pre_mut);
+                                surface_runtime_init_error(
+                                    &pre_state,
+                                    &game_state,
+                                    signals,
+                                    message,
+                                );
+                                return;
+                            }
+                        }
                     }
                 }
 
@@ -1569,11 +1678,6 @@ fn build_begin_button(
     label(|| "Begin Your Story".to_string())
         .keyboard_navigable()
         .on_click_stop(move |_| {
-            let pre = match pre_state.borrow_mut().take() {
-                Some(p) => p,
-                None => return, // already started
-            };
-
             let partial = partial_char.get_untracked().unwrap_or_else(|| {
                 // AlwaysFemale path: partial may not carry before-data.
                 PartialCharState {
@@ -1704,10 +1808,37 @@ fn build_begin_button(
                 }
             };
 
-            let gs = start_game(pre, config, dev_mode);
-            *game_state.borrow_mut() = Some(gs);
-            signals.tab.set(crate::AppTab::Game);
-            signals.phase.set(AppPhase::InGame);
+            if let Some(ref pre) = *pre_state.borrow() {
+                let startup_errors = validate_startup_contract(&pre.registry, config.origin);
+                if !startup_errors.is_empty() {
+                    surface_runtime_init_error(
+                        &pre_state,
+                        &game_state,
+                        signals,
+                        format!(
+                            "Character creation contract error(s):\n{}",
+                            startup_errors.join("\n")
+                        ),
+                    );
+                    return;
+                }
+            }
+
+            let pre = match pre_state.borrow_mut().take() {
+                Some(p) => p,
+                None => return, // already started
+            };
+
+            match start_game_checked(pre, config, dev_mode) {
+                Ok(gs) => {
+                    *game_state.borrow_mut() = Some(gs);
+                    signals.tab.set(crate::AppTab::Game);
+                    signals.phase.set(AppPhase::InGame);
+                }
+                Err(message) => {
+                    surface_runtime_init_error(&pre_state, &game_state, signals, message);
+                }
+            }
         })
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);

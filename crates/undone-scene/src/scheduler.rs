@@ -129,16 +129,19 @@ impl Scheduler {
     /// Return true when any schedule condition or trigger references the given
     /// game flag via `gd.hasGameFlag("...")`.
     pub fn references_game_flag(&self, flag: &str) -> bool {
-        self.slots.values().flat_map(|slot| slot.events.iter()).any(|event| {
-            event
-                .condition
-                .as_ref()
-                .is_some_and(|expr| expr_references_game_flag(expr, flag))
-                || event
-                    .trigger
+        self.slots
+            .values()
+            .flat_map(|slot| slot.events.iter())
+            .any(|event| {
+                event
+                    .condition
                     .as_ref()
                     .is_some_and(|expr| expr_references_game_flag(expr, flag))
-        })
+                    || event
+                        .trigger
+                        .as_ref()
+                        .is_some_and(|expr| expr_references_game_flag(expr, flag))
+            })
     }
 
     pub fn all_conditions(&self) -> Vec<(String, Expr)> {
@@ -496,11 +499,13 @@ pub fn load_schedule(
                 consumes_time,
                 events,
             } = slot_toml;
-            let slot = slots.entry(slot_name.clone()).or_insert_with(|| ScheduleSlot {
-                name: slot_name.clone(),
-                consumes_time: consumes_time.unwrap_or(false),
-                events: Vec::new(),
-            });
+            let slot = slots
+                .entry(slot_name.clone())
+                .or_insert_with(|| ScheduleSlot {
+                    name: slot_name.clone(),
+                    consumes_time: consumes_time.unwrap_or(false),
+                    events: Vec::new(),
+                });
             if let Some(consumes_time) = consumes_time {
                 slot.consumes_time = consumes_time;
             }
