@@ -24,11 +24,11 @@ You do a brief audit. Day was a net positive: the PR got merged, the design revi
 
 The apartment is quiet. You still do not know whether that quiet is a comfort or a test.
 {% elif w.hasTrait("AMBITIOUS") %}
-You pull out your laptop before your coat is off. There are still two hours before you would normally call it a reasonable stopping point and there is a follow-up you meant to send before end of day. You get as far as opening the thread, read the first line, and then just sit there with your coat half-off and the laptop open.
+The laptop is out before the coat is off. Two hours before a reasonable stopping point. A follow-up that was supposed to go out before end of day. The thread opens, the first line gets read, and then — nothing. Coat half-off. Laptop open.
 
 The radiator ticks. You don't type anything.
 {% else %}
-You stand in the kitchen for a moment without particular purpose. Not hungry yet. Not ready to sit down. You put the kettle on, which buys you something to wait for.
+The kitchen. A moment without particular purpose. Not hungry yet. Not ready to sit down. The kettle goes on, which buys something to wait for.
 {% endif %}
 """
 

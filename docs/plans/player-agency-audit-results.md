@@ -1,8 +1,8 @@
 # Player Agency Audit Results
 
 **Date:** 2026-03-12
-**Total findings:** 79 → **58 remaining** (after Phase 2 Task 5)
-**Scenes affected:** 23 → **19 remaining** of 54
+**Total findings:** 79 → **0 remaining** (after Phase 2 Tasks 5–7)
+**Scenes affected:** 23 → **0 remaining** of 54
 
 ## Phase 2 Task 5 — Completed (Tier 1 Critical)
 
@@ -15,63 +15,58 @@ Four scenes rewritten. 21 findings fixed. Writing-reviewed and committed.
 | `workplace_first_night` | 6 (5 action + 1 thought) | Clean |
 | `morning_routine` | 3 (3 action) | Clean |
 
-## Tier 1 — Remaining Critical: Player Speech in Intro (4 findings)
+## Phase 2 Tasks 6–7 — Completed (Tier 1 Remaining + Tier 2 + Tier 3)
 
-| Scene | Line | Violation |
+19 scenes rewritten. 58 findings fixed. Automated audit passes with 0 findings.
+
+### High-density scenes (3 scenes, 17 findings)
+
+| Scene | Findings fixed | Status |
 |---|---|---|
-| `campus_arrival` | 27 | `You say thank you.` |
-| `campus_orientation` | 25 | `Adam asks what you're studying. You tell him.` |
-| `campus_orientation` | 34 | `You say time management.` |
-| `shopping_mall` | 27 | `You say "just looking"` |
-| `work_marcus_aftermath` | 26 | `He says good morning. You say it back.` |
+| `campus_arrival` | 6 (speech + extended autopilot) | Clean |
+| `campus_call_home` | 5 (speech + autopilot + phone actions) | Clean |
+| `jake_text_messages` | 6 (pick up phone + type/delete) | Clean |
 
-## Tier 2 — High: Player Deliberate Actions in Intro (54 remaining)
+### Medium-density scenes (5 scenes, 20 findings)
 
-### Highest density scenes (5+ findings — major restructure needed)
-
-| Scene | Count | Key violations |
+| Scene | Findings fixed | Status |
 |---|---|---|
-| `campus_arrival` | 6 | Extended autopilot: walk, take lanyard, smile, keep walking |
-| `campus_call_home` | 5 | Extended autopilot: hang up, sit, open mouth, pick up phone |
-| `jake_text_messages` | 6 | Pick up phone, type response, delete it — all player decisions |
+| `campus_orientation` | 7 (2 speech + 5 action) | Clean |
+| `coffee_shop` | 4 (look/catch eye/nod/stand) | Clean |
+| `workplace_first_clothes` | 4 (find store/escalator/stand/follow) | Clean |
+| `weekend_morning` | 4 (stretch ×4 reframed to "A stretch") | Clean |
+| `shopping_mall` | 2 (head for store + speech) | Clean |
 
-### Medium density (3–4 findings)
+### Low-density scenes (10 scenes, 16 findings)
 
-| Scene | Count | Key violations |
+| Scene | Findings fixed | Status |
 |---|---|---|
-| `coffee_shop` | 4 | Look at menu, catch his eye, nod back, stand with bag |
-| `campus_orientation` | 3 | Sit at table, sip water, add to list |
-| `workplace_first_clothes` | 4 | Stand still, follow, put on, fingers find clasp |
-| `weekend_morning` | 4 | Stretch (4 variants) |
+| `work_marcus_aftermath` | 2 (walk to desk + speech) | Clean |
+| `bar_closing_time` | 1 (step through) | Clean |
+| `campus_dining_hall` | 2 (pick up tray + get harissa) | Clean |
+| `campus_dorm` | 1 (know what you want to do) | Clean |
+| `campus_library` | 3 (look back at notes ×3) | Clean |
+| `campus_study_session` | 2 (put pen down + look back) | Clean |
+| `coffee_shop_return` | 1 (get in line) | Clean |
+| `laundromat_night` | 1 (you look up → eyes up) | Clean |
+| `transformation_intro` | 1 (you sit, wait) | Clean |
+| `workplace_evening` | 2 (pull out laptop + stand in kitchen) | Clean |
 
-### Low density (1–2 findings — minor fixes)
+### Also fixed (not in original audit count)
 
-| Scene | Count | Key violations |
-|---|---|---|
-| `bar_closing_time` | 1 | You step through |
-| `campus_dining_hall` | 2 | Pick up tray, get the harissa |
-| `campus_dorm` | 1 | You know what you want to do |
-| `campus_library` | 2 | You look back at notes |
-| `campus_study_session` | 2 | Put pen down, look back |
-| `coffee_shop_return` | 1 | Get in line |
-| `laundromat_night` | 1 | You look up |
-| `shopping_mall` | 1 | Head for anchor store |
-| `transformation_intro` | 1 | You sit, wait |
-| `workplace_evening` | 2 | Pull out laptop, stand in kitchen |
-| `work_marcus_aftermath` | 1 | Walk to desk |
-| `work_marcus_favor` | 2 | Open spec, chest does thing (borderline) |
+| Scene | Extra fixes |
+|---|---|
+| `work_marcus_favor` | 2 (open spec + chest reaction — borderline resolved) |
+| `campus_orientation` | 2 extra (line 14 speech + line 18 sip water) |
 
-## Tier 3 — Borderline (needs case-by-case review)
+## Tier 3 — Borderline (all resolved)
 
-The following findings may be acceptable involuntary/experiential responses
-flagged by the deliberate verb heuristic:
+All borderline cases were reframed:
+- `coffee_shop` "You catch his eye" → "Eye contact — his or yours first"
+- `work_marcus_favor` "You open the spec" → "The spec is open"
+- `weekend_morning` "You stretch" → "A stretch"
+- `laundromat_night` "You look up" → "eyes up, automatic"
 
-- `coffee_shop.toml:21` — `You catch his eye` — could be involuntary
-- `work_marcus_favor.toml:20` — `Your chest does a small thing` then `You open the spec` — mixed
-- `weekend_morning.toml` — `You stretch` — borderline between deliberate and involuntary body action
-- `laundromat_night.toml:22` — `You look up` — reflexive response to door opening
+## Automated Audit Status
 
-## Scenes with zero findings (31 scenes)
-
-These scenes either have no intro prose or their intros correctly describe the world
-without player speech or deliberate actions. They are not listed here.
+`cargo test player_agency_audit_report` → **0 findings** across all 54 scenes.

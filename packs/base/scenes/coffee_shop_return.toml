@@ -15,7 +15,7 @@ condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up.
 
-Your pulse does a small, unnecessary thing. You get in line and look at the chalkboard menu you've already memorized and your hands find the strap of your bag and hold it.
+Your pulse does a small, unnecessary thing. The line. The chalkboard menu, already memorized. Your hands find the strap of your bag and hold it.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

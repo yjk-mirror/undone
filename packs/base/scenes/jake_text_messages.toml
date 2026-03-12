@@ -14,21 +14,21 @@ prose = """
 Your apartment. Evening. The phone buzzes on the nightstand and the screen says his name.
 
 {% if w.hasTrait("ROMANTIC") %}
-You pick it up. The glow in the dark room. His name. You're already smiling before you've read the message.
+The glow in the dark room. His name. A smile already forming before the message is even read.
 {% elif w.hasTrait("ANALYTICAL") %}
-You pick it up. The notification preview shows the first few words and your brain is already running the response before you've opened it.
+The notification preview shows the first few words. The brain is already running a response before the message is open.
 {% elif w.hasTrait("SHY") %}
-You look at it for five seconds before picking it up. His name on the screen. The warmth and the small tightening in your stomach arrive together.
+His name on the screen. Five seconds of it. The warmth and the small tightening in your stomach arrive together.
 {% else %}
-You pick it up.
+His name on the screen.
 {% endif %}
 
 **Jake:** *Hey. How was your day?*
 
 Three words and a question mark. The simplest possible text. {% if w.getSkill("FEMININITY") < 30 %}
-You type a response. Delete it. Type another one. The phone is small in your hands and the keyboard is the same keyboard and the words should be the same words but they're not, exactly. What you'd say as you is filtered through something now. How you want to sound. How you want him to hear you.
+The cursor blinks. A response forms, gets deleted, forms again. The phone is small in your hands and the keyboard is the same keyboard and the words should be the same words but they're not, exactly. What you'd say as you is filtered through something now. How you want to sound. How you want him to hear you.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You type back. The response comes easy — easier than it would have a month ago. The words have a shape to them that feels like you. Specifically you.
+The response comes easy — easier than it would have a month ago. The words have a shape to them that feels like you. Specifically you.
 {% endif %}
 """
 

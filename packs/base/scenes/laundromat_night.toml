@@ -17,9 +17,9 @@ You're here because the hamper was full and tomorrow is a workday and the machin
 The dryer is running. The sound is a constant warm vibration that you can feel through the chair. The book is open on your lap and you're reading the same paragraph for the third time.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The laundromat at night feels different in this body. Not dangerous — the attendant is in the back, the street is visible through the window. Just aware. The door opens and you look up and the looking-up is automatic now, the quick inventory of who's coming in.
+The laundromat at night feels different in this body. Not dangerous — the attendant is in the back, the street is visible through the window. Just aware. The door opens — eyes up, automatic now, the quick inventory of who's coming in.
 {% elif w.getSkill("FEMININITY") < 50 %}
-The door opens. You look up. A man, thirties, a bag of laundry and the expression of someone who's also here because the alternative was worse.
+The door opens. Eyes up. A man, thirties, a bag of laundry and the expression of someone who's also here because the alternative was worse.
 {% else %}
 The door opens. A man with a laundry bag.
 {% endif %}

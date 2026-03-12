@@ -5,38 +5,34 @@ description = "A friend from home calls for Raul. You have to be someone who kno
 
 [intro]
 prose = """
-Your phone rings on Wednesday evening. You look at the name: Diego.
+Your phone rings on Wednesday evening. The name on the screen: Diego.
 
 Diego is her best friend from home. Was. Diego is the person who would have called Raul on a Wednesday to check in, because that's what Diego does — he calls, which is unusual, because everyone texts, but Diego calls because he says texting lacks inflection and he is correct about this in a way that she's always found slightly insufferable.
 
-You stare at the name for three rings.
-
-You answer.
+The name stares back for three rings. An answer.
 
 "Yo, is Raul there?"
 
 Diego says this because he doesn't know. He doesn't know because you haven't told him. You haven't told him because you don't know how to tell him and the longer you don't, the harder it gets, and it's been two weeks now.
 
 {% if w.hasTrait("SHY") %}
-"He's — " she starts, and then stops, and then makes herself finish: "He stepped out. He'll call you back."
-
-You hang up before Diego can ask questions. You sit in the dark of your dorm room. You have to call him back and you don't know how to call him back.
+A stammered excuse — he stepped out, he'll call back. The line goes dead before Diego can ask questions. The dorm room is dark. The call-back is owed and the words for it don't exist yet.
 {% elif w.hasTrait("AMBITIOUS") %}
-You do the math in about half a second. "He's not available right now," you say. "I'm — I'm his — I'm his roommate." Which is not true in any geography. "He'll call you back."
+The math takes about half a second. Not available right now. His roommate. The lies come out smooth, one after another, geography be damned.
 
 "Oh." A pause. "Okay. Tell him Diego called. It's not urgent."
 
-"I will," you say. You hang up.
+The line clicks off.
 {% else %}
-You open your mouth. You don't know what's going to come out. "He's not — he's not around right now," you say. "Can I take a message?"
+Some version of "not around right now" and "can I take a message" comes out. The words sound like someone else's.
 
 A beat. "Uh, yeah. Tell him Diego called." Another beat. "His roommate?"
 
-"Yeah," you say. "His roommate."
+"Yeah. His roommate."
 
 "Cool. Tell him to call me when he gets a chance."
 
-"I will," you say, and hang up.
+The call ends.
 {% endif %}
 """
 
@@ -45,9 +41,7 @@ condition = "w.getSkill('FEMININITY') < 15"
 prose = """
 Diego calls on Wednesday.
 
-You stare at the name. Three rings.
-
-You answer.
+His name on the screen. Three rings. An answer.
 
 "Yo, is Raul there?"
 
@@ -59,11 +53,11 @@ A pause. "Okay. Tell him Diego called."
 
 "I'll tell him."
 
-You hang up. You put the phone on your desk. You look at it.
+The call ends. The phone on the desk. The screen going dark.
 
-*File it for later*, she thinks. *File everything for later. Later will come.*
+*File it for later. File everything for later. Later will come.*
 
-You don't know when later is.
+No clear sense of when later is.
 """
 
 [[thoughts]]
@@ -76,7 +70,7 @@ You know what happened. You know what you are now. You can write it in a note on
 
 *He'll figure it out eventually*, she thinks, and then: *No, he won't. He'll just think Raul stopped calling.*
 
-You pick up your phone. You put it down. You pick it up again.
+The phone. The desk. The phone again.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

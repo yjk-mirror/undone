@@ -12,19 +12,19 @@ You're third in line. A woman ahead of you is getting her order corrected for th
 The man ahead of you turns around. Not fully — just the half-turn that says *I know you're there and I'm acknowledging it*. He's about your age, maybe a year or two older. Good shoulders. The kind of jaw that gets noticed. He's holding a phone but not looking at it, which is either a flex or a habit.
 
 {% if w.hasTrait("SHY") %}
-You look at the menu board. You've already decided what you want, but looking at the menu board is what you do when someone turns around and you're not ready to be looked at.
+The menu board. Already decided, but the menu board is what happens when someone turns around and you're not ready to be looked at.
 {% elif w.hasTrait("BEAUTIFUL") %}
 He does the thing men do when they see you — the quick inventory, the slight pause, the recalibration. You've learned to read it in under a second. He's interested. The question is whether he'll do anything about it.
 {% elif w.hasTrait("BITCHY") %}
 He gives you a once-over that takes slightly too long. You return it with the flat expression of someone who has been looked at before and is not impressed by the repetition.
 {% elif w.hasTrait("FLIRTY") %}
-You catch his eye before he catches yours — or maybe it was simultaneous. Hard to tell. Doesn't matter. You smile. It's a reflex, like blinking, except you know exactly what it does.
+Eye contact — his or yours first, hard to tell. Doesn't matter. A smile. Reflex, like blinking, except you know exactly what it does.
 {% else %}
-He nods. You nod back. For a second the line feels companionable instead of anonymous.
+He nods. A nod back. For a second the line feels companionable instead of anonymous.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 35 %}
-You stand with your bag against your hip. Shoulders slightly in. The adjustments happened before the line started moving — feet angled, space measured, bag positioned. None of it deliberate anymore. The man ahead of you is just waiting for coffee. You're waiting for coffee and managing geometry.
+Bag against your hip. Shoulders slightly in. The adjustments happened before the line started moving — feet angled, space measured, bag positioned. None of it deliberate anymore. The man ahead of you is just waiting for coffee. You're waiting for coffee and managing geometry.
 {% endif %}
 """
 

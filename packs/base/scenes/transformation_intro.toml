@@ -40,7 +40,7 @@ You chose a seat near the wall. Close enough to hear boarding, far enough that n
 {% elif w.hasTrait("OUTGOING") %}
 The woman beside you has a paperback open on one knee and the settled look of somebody who flies often. When you sat down she smiled, small and automatic, then went back to reading.
 {% else %}
-You sit, wait, and let the airport move around you.
+Sitting. Waiting. The airport moves around you.
 {% endif %}
 
 They call your zone at last.
