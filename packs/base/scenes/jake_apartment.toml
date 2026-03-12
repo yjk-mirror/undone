@@ -83,6 +83,10 @@ He finds a place low on your belly that makes your breath catch. Then he finds a
 
 The orgasm rolls through you from somewhere below the waist upward, and it's different from anything you've had before — wider somehow, less localized. You clutch his shoulders through it. He doesn't stop until you tell him to.
 
+Then he shifts over you, lines himself up, and pauses just long enough to make sure you're still with him. When he pushes inside, the fullness is immediate and startling and exactly what the whole evening had been leaning toward.
+
+You hold on to him while he moves. The rhythm settles. The body takes the rhythm and keeps answering it back.
+
 Afterward, the room comes back. His arm around you.
 {% else %}
 You know this body. You know the particular way arousal sits in your hips, the place on your throat where his mouth is going to undo you, the threshold between you want more and you need more.
@@ -90,6 +94,8 @@ You know this body. You know the particular way arousal sits in your hips, the p
 What you don't know is him.
 
 His hands are different from any hands that have been here. His weight has its own distribution. The way he pays attention — the pause when he finds something that works, the return to it — is his, not a template. The pleasure is familiar in texture and his in shape, and the combination of both is what does it.
+
+When he slides into you, the wanting resolves into something cleaner and stronger than wanting. You know how to meet him there. You do.
 
 He takes his time. So do you.
 {% endif %}
@@ -154,18 +160,24 @@ Move it. Not roughly — just with intent. This is where. That's the direction. 
 You know what you want in general. What you're learning is the specific route in this body. The map isn't complete but you're adding to it in real time, and having his full attention while you do it means every discovery gets confirmed twice — once by your nerves and once by his hands returning to the same place, the fact of them saying: noted.
 
 When you come, it's with his face against your shoulder and your hand still directing, because that's who you are, and the orgasm is a complete white-out of the machinery that makes you that person for about twenty seconds.
+
+You guide him again after, lower this time, and the next thing you're directing is the way he enters you. The map is still being drawn, but this part of it is unmistakable.
 {% elif w.getSkill("FEMININITY") > 50 %}
 You know what you want. Getting him there takes about two redirects. He's a quick study. His hands move with purpose and you arch up and the ceiling is close.
 
 He checks your face the way he checks everything — quietly, paying attention. When he finds the thing that makes you tighten, his eyes stay on yours, which is almost too much. You look away first.
 
 The orgasm is long. You come back to the room slowly.
+
+Then he kisses you again, slower now, and slides into you while you're still soft with it. You pull him closer by the back of the neck and let the second wave build from there.
 {% else %}
 You don't have complete information — you're going on instinct and on what the body does when you get close to the right place. His thumb traces the inside of your thigh and there's a signal from somewhere south of your navel. Down, you think, and pull his hand, and then his fingers find the right spot and the thought ends there.
 
 He can tell. His rhythm steadies. You don't tell him to stop and then you absolutely have to tell him to stop and even after, your hips are still moving.
 
 You lie with your forehead against his chest. His breathing slows back down. So does yours.
+
+When he asks, quiet and close, you pull him down for your answer. He enters you carefully and the care itself almost undoes you.
 {% endif %}
 """
 
@@ -290,6 +302,8 @@ The sound comes again.
 
 His hands find their way. The arousal doesn't peak and resolve — it layers, it deepens, it pulls you down somewhere warm. Every touch adds to it. His fingers inside you and the whole thing tips sideways in the best possible way and you're clutching the dark blue comforter and he is absolutely paying attention to everything you do.
 
+When he finally pushes into you, it lands as the obvious next thing and a complete surprise at the same time. You pull him closer with both arms and let the surprise turn into motion.
+
 The orgasm takes a while to come and it comes from everywhere at once.
 
 Afterward the city is still there and neither of you moves right away.
@@ -317,9 +331,22 @@ When it's over you lie with your leg thrown over his and the room is dim and war
   flag = "JAKE_INTIMATE"
 
   [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
   type     = "add_sexual_activity"
   npc      = "m"
-  activity = "fingering"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type = "set_relationship"
+  npc  = "m"
+  status = "Partner"
+
+  [[actions.effects]]
+  type = "set_player_partner"
+  npc  = "m"
 
   [[actions.effects]]
   type  = "add_npc_liking"

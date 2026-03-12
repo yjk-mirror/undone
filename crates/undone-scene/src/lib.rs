@@ -662,6 +662,37 @@ mod integration_tests {
     }
 
     #[test]
+    fn jake_kiss_and_see_path_updates_full_romantic_intimacy_state() {
+        let (registry, mut world, mut engine, male_npc_key) =
+            start_scene_with_male_binding("base::jake_apartment");
+
+        let events = engine.advance_with_action("kiss_and_see", &mut world, &registry);
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, EngineEvent::SceneFinished)),
+            "kiss_and_see should finish after the forward romantic action"
+        );
+
+        assert!(
+            !world.player.virgin,
+            "kiss_and_see should clear player virginity once the route commits to full sex"
+        );
+        assert_eq!(
+            world.player.partner,
+            Some(NpcKey::Male(male_npc_key)),
+            "kiss_and_see should establish the same romantic continuity as the other Jake payoff paths"
+        );
+        let npc = world
+            .male_npc(male_npc_key)
+            .expect("active male npc should still exist");
+        assert!(
+            npc.core.sexual_activities.contains("vaginal"),
+            "kiss_and_see should record vaginal sexual activity"
+        );
+    }
+
+    #[test]
     fn marcus_closet_explicit_path_updates_persistent_sexual_state() {
         let (registry, mut world, mut engine, male_npc_key) =
             start_scene_with_male_binding("base::work_marcus_closet");
