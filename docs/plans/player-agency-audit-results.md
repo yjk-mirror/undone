@@ -1,12 +1,21 @@
 # Player Agency Audit Results
 
 **Date:** 2026-03-12
-**Total findings:** 79 (8 speech, 71 action)
-**Scenes affected:** 23 of 54
+**Total findings:** 79 → **58 remaining** (after Phase 2 Task 5)
+**Scenes affected:** 23 → **19 remaining** of 54
 
-## Tier 1 — Critical: Player Speech in Intro (8 findings)
+## Phase 2 Task 5 — Completed (Tier 1 Critical)
 
-Player dialogue that should be moved to action buttons or removed.
+Four scenes rewritten. 21 findings fixed. Writing-reviewed and committed.
+
+| Scene | Findings fixed | Status |
+|---|---|---|
+| `workplace_arrival` | 5 (2 speech + 3 action) | Clean |
+| `workplace_first_day` | 7 (2 speech + 5 action) | Clean |
+| `workplace_first_night` | 6 (5 action + 1 thought) | Clean |
+| `morning_routine` | 3 (3 action) | Clean |
+
+## Tier 1 — Remaining Critical: Player Speech in Intro (4 findings)
 
 | Scene | Line | Violation |
 |---|---|---|
@@ -14,14 +23,9 @@ Player dialogue that should be moved to action buttons or removed.
 | `campus_orientation` | 25 | `Adam asks what you're studying. You tell him.` |
 | `campus_orientation` | 34 | `You say time management.` |
 | `shopping_mall` | 27 | `You say "just looking"` |
-| `workplace_arrival` | 21 | `"Thanks." You take the bag` (ANALYTICAL branch) |
-| `workplace_arrival` | 25 | `"Thanks." You take the bag and keep moving` (default branch) |
-| `workplace_first_day` | 36 | `You say your name before he can decide what expression to wear.` |
 | `work_marcus_aftermath` | 26 | `He says good morning. You say it back.` |
 
-## Tier 2 — High: Player Deliberate Actions in Intro (71 findings)
-
-Player taking deliberate actions before any choice button is presented.
+## Tier 2 — High: Player Deliberate Actions in Intro (54 remaining)
 
 ### Highest density scenes (5+ findings — major restructure needed)
 
@@ -30,17 +34,13 @@ Player taking deliberate actions before any choice button is presented.
 | `campus_arrival` | 6 | Extended autopilot: walk, take lanyard, smile, keep walking |
 | `campus_call_home` | 5 | Extended autopilot: hang up, sit, open mouth, pick up phone |
 | `jake_text_messages` | 6 | Pick up phone, type response, delete it — all player decisions |
-| `workplace_first_day` | 5 | Get off bus, take badge, stand up, grab bag, get set up |
-| `workplace_first_night` | 5 | Set carry-on down, text shipping company, add to list, sit |
 
 ### Medium density (3–4 findings)
 
 | Scene | Count | Key violations |
 |---|---|---|
 | `coffee_shop` | 4 | Look at menu, catch his eye, nod back, stand with bag |
-| `morning_routine` | 3 | Get yourself together, grab sweater, get dressed |
 | `campus_orientation` | 3 | Sit at table, sip water, add to list |
-| `workplace_arrival` | 3 | Stand, reach for carry-on, take bag |
 | `workplace_first_clothes` | 4 | Stand still, follow, put on, fingers find clasp |
 | `weekend_morning` | 4 | Stretch (4 variants) |
 
