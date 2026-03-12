@@ -7,23 +7,23 @@ description = "First night in the empty apartment. The boxes aren't here. The ci
 prose = """
 Unit 4B is empty.
 
-You knew the boxes were not here yet. The shipping company said Monday. You confirmed Monday. The confirmation email is still in your inbox. None of that changes the fact of standing in an empty apartment with a carry-on bag and a body that has been awake for thirty-three hours.
+The boxes aren't here. The shipping company said Monday. The confirmation email is in the inbox. None of that changes the fact of an empty apartment, a carry-on bag, and a body that has been awake for thirty-three hours.
 
-The apartment is fine. Better than fine, actually: old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress if you ever get one in here. There is a radiator in the bedroom. It is not warm yet. Frank's wife said it takes a few minutes.
+The apartment is fine. Better than fine, actually: old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress. The radiator in the bedroom is not warm yet. Frank's wife said it takes a few minutes.
 
-You set your carry-on down and do a circuit. Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. You open a note on your phone and start typing.
+Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. The list on the phone is already growing.
 
 {% if w.hasTrait("AMBITIOUS") %}
-The list is organized in twenty minutes. Priority-ranked. You text the shipping company to confirm the Monday window before you remember it's 11 PM. You send it anyway.
+The list is sorted in twenty minutes. One column, by priority. The shipping company has a confirmation text before the clock registers 11 PM.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-The list is practical. You don't overthink it. You've slept on floors before. This is not the worst situation you've been in.
+The list is practical. Floors have been slept on before. This is not the worst situation.
 {% else %}
-The list gets long. You look at it for a moment. Add *bra* and then look at that word sitting there between *food* and *towels*.
+The list gets long. Then *bra* appears between *food* and *towels*, and sits there.
 {% endif %}
 
 Right. The bra problem.
 
-You got through the day on forward momentum alone: airport, keys, landlord, deposit, the manageable fiction that logistics were the hard part. What you are wearing under your shirt is a sports bra from the airport gift shop, and it is not doing the job.
+The day ran on forward momentum: airport, keys, landlord, deposit, the manageable fiction that logistics were the hard part. Under the shirt, a sports bra from the airport gift shop. It is not doing the job.
 
 *Right. Okay.*
 """
@@ -33,15 +33,15 @@ condition = "w.getSkill('FEMININITY') < 15"
 prose = """
 Unit 4B is empty.
 
-You knew the boxes weren't here. You'd confirmed the Monday window. The confirmation is in your email.
+The boxes aren't here. The Monday window was confirmed. The confirmation is in the email.
 
-You set the carry-on down and do a circuit. Bedroom, bathroom, kitchen, living room, back to the door. You make a list on your phone. Furniture. Bedding. Food. Towels. You try to think of what you're forgetting.
+Bedroom, bathroom, kitchen, living room. The phone has a list growing on it. Furniture. Bedding. Food. Towels. Something's missing.
 
-*Bra*, you think, and then don't think anything for a moment.
+*Bra*, and then nothing for a moment.
 
-Right. You don't — the list said *clothes*, generally, meaning Monday, meaning you'd had a vague plan to deal with *clothes* and hadn't extended that plan to include the specific practical reality of —
+Right. The list said *clothes*, generally, meaning Monday, meaning a vague plan to deal with *clothes* that hadn't extended to include the specific practical reality of —
 
-You add *bra* to the list. The word looks wrong in the note. You stare at it.
+*Bra* goes on the list. The word looks wrong in the note.
 
 *On the list. Lists get solved.*
 """
@@ -50,9 +50,9 @@ You add *bra* to the list. The word looks wrong in the note. You stare at it.
 condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-You sit on the floor, because there is no furniture and the floor is clean enough, and look out at the city through the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound too high. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
+The floor is clean enough, and the city is out the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound too high. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
 
-Your reflection in the dark glass is someone you are still learning to recognize. The proportions. The hair. The way your shoulders fall. You tilt your head and the reflection tilts with you and for one second the distance between recognition and ownership feels measurable.
+Your reflection in the dark glass is someone you are still learning to recognize. The proportions. The hair. The way your shoulders fall. A tilt of the head and the reflection tilts back, and for one second the distance between recognition and ownership feels measurable.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

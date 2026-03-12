@@ -13,35 +13,31 @@ The financial district is twenty minutes from your apartment by train. You teste
 
 The blouse collar sits differently than you expected. The laptop bag rides against a shoulder that is narrower than the one your old commute belonged to.
 
-You get off at the right stop. The building is glass, steel, badge readers, polished stone. Ground-floor lobby designed to communicate money before anyone speaks.
+The right stop, and then: glass, steel, badge readers, polished stone. Ground-floor lobby designed to communicate money before anyone speaks.
 
-The guard looks at your badge request. "First day?"
+The guard at the desk looks at the badge request. "First day?" He types. The system takes a moment. A visitor badge and a lanyard slide across the desk. "Someone will meet you."
 
-"Yes. Robin. Software engineering."
+The morning rush moves through the turnstiles — people who know exactly where they're going.
 
-He types. The system takes a moment. "Visitor badge until your card comes through. Someone will meet you."
-
-You take the badge and find a seat in the lobby. The morning rush moves through the turnstiles — people who know exactly where they're going.
-
-At 9:02, your new manager comes through the turnstiles looking for you.
+At 9:02, your new manager comes through the turnstiles.
 
 {% if w.hasTrait("SHY") %}
-You stand up too fast and grab your bag before it can slide off the chair.
+He scans the lobby. His eyes pass you twice before they land.
 {% else %}
-You stand. He finds you by elimination. Everyone else in the lobby moves like they belong here already.
+He finds you by elimination — everyone else in the lobby moves like they belong here already.
 {% endif %}
 
-He sees you and his step hitches. Just a fraction, but enough. Whatever image your resume built in his head, you do not match it.
+He sees you and his step hitches. Just a fraction, but enough. Whatever image your resume built in his head, the face waiting here doesn't match it.
 
-You say your name before he can decide what expression to wear. He shakes your hand. His grip adjusts mid-shake, lighter on the release than on the approach.
+"Robin?" His grip adjusts mid-shake, lighter on the release than on the approach.
 
 {% if w.hasTrait("ANALYTICAL") %}
-You clock the adjustment. Noted. You are going to see that recalibration all day.
+The adjustment registers. That recalibration is going to happen all day.
 {% endif %}
 
-Fourth floor. Open plan. Whiteboards crowded with diagrams you could redraw from memory. Your desk is temporary, your laptop is still in the box, and the office smells faintly of burnt coffee and dry-erase marker.
+Fourth floor. Open plan. Whiteboards crowded with diagrams you could redraw from memory. The desk is temporary, the laptop still in its box, and the office smells faintly of burnt coffee and dry-erase marker.
 
-You get set up. At ten, the team gathers for standup. Someone says, "Robin's joining us from the Seattle office," and the room does the usual new-hire math. You shake seven hands and remember four names, which is adequate for a Monday.
+Ten o'clock, standup. Someone says, "Robin's joining us from the Seattle office," and the room does the usual new-hire math. Seven handshakes, four names retained, which is adequate for a Monday.
 
 {% if w.hasTrait("OBJECTIFYING") %}
 One of them holds the handshake a beat too long. You can feel him cataloging face, body, age estimate. The read is quick and automatic and completely familiar from the other side.
