@@ -5,11 +5,11 @@ description = "Robin meets the landlord. The lease, the ID, the voice that doesn
 
 [intro]
 prose = """
-The building has a buzzer panel with half the names missing. Yours isn't on it yet. You called ahead — last week, when the logistics were still the problem — and the landlord said come by Saturday afternoon.
+The building has a buzzer panel with half the nameplates missing and the other half yellowed with age. Yours is not on it yet. You called ahead last week, when logistics still felt like the whole problem, and the landlord told you to stop by Saturday afternoon.
 
 You buzz the manager unit.
 
-The man who opens the door is mid-fifties, flannel shirt, reading glasses pushed up on his forehead. He looks at you. He looks at the folder in your hand — lease printout, ID, first month's check.
+The man who opens the door is mid-fifties, flannel shirt, reading glasses pushed up on his forehead. His eyes move from your face to the folder in your hand: lease printout, ID, first month's check, everything arranged in the order you will need it.
 
 "Robin?" he says. He means it as a question.
 
@@ -18,7 +18,7 @@ The man who opens the door is mid-fifties, flannel shirt, reading glasses pushed
 {% if w.hasTrait("SHY") %}
 Your voice is quieter than you expected. He waits for more. You don't give him any.
 {% elif w.hasTrait("BITCHY") %}
-You hold his gaze. He looks at the folder instead.
+You hold his gaze. He looks back down at the folder instead.
 {% endif %}
 
 He opens the folder. The check is correct. The lease is signed in the right places. The ID is a valid driver's license with a clear photo of a white man in his early thirties.
@@ -70,7 +70,7 @@ A pause. "Tell her the radiator in the bedroom takes a few minutes to warm up."
 He hands back the folder — keeping the check — and takes a key from a hook by the door. Unit 4B. Third floor, no elevator. He says the garbage is Tuesday and Thursday. You say yes, got it, thank you. He says welcome to the building, and seems to mean it.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The key is warm from the hook. It fits in your palm differently than keys used to — or maybe you're just paying attention to things like that now.
+The key is warm from the hook. It fits in your palm differently than keys used to, or maybe you are just paying attention now to every small thing that changed without asking.
 {% endif %}
 """
 
@@ -103,10 +103,10 @@ prose = """
 He looks at you for a moment. Then nods — the way people nod when they've decided that whatever is happening is not their problem today.
 {% endif %}
 
-He hands you the key. Unit 4B. Third floor. You thank him and find the stairs.
+He hands you the key. Unit 4B. Third floor. You thank him and head for the stairs before he can decide this moment needs one more question.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-Three flights. The banister is cold under your hand. Your grip on it is lighter than it would have been a month ago — less palm, more fingers. You notice. You keep climbing.
+Three flights. The banister is cold under your hand. Your grip on it is lighter than it would have been a month ago, less palm and more fingers. You notice. You keep climbing.
 {% endif %}
 """
 

@@ -145,3 +145,34 @@ fn validate_pack_reports_clean_results_for_touched_scene_cluster() {
         report.findings_for_prefix("packs/base/scenes/campus_")
     );
 }
+
+#[test]
+fn workplace_opening_spine_has_no_current_known_prose_audit_findings() {
+    let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
+    let files = [
+        "packs/base/scenes/workplace_arrival.toml",
+        "packs/base/scenes/workplace_landlord.toml",
+        "packs/base/scenes/workplace_first_night.toml",
+        "packs/base/scenes/workplace_first_clothes.toml",
+        "packs/base/scenes/workplace_first_day.toml",
+        "packs/base/scenes/workplace_work_meeting.toml",
+        "packs/base/scenes/workplace_evening.toml",
+    ];
+
+    let mut findings = Vec::new();
+    for file in files {
+        findings.extend(
+            report
+                .prose_findings
+                .iter()
+                .filter(|finding| finding.file_path == file)
+                .cloned(),
+        );
+    }
+
+    assert!(
+        findings.is_empty(),
+        "expected workplace opening spine to be free of prose audit findings, got: {:?}",
+        findings
+    );
+}

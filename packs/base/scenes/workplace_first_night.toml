@@ -7,9 +7,9 @@ description = "First night in the empty apartment. The boxes aren't here. The ci
 prose = """
 Unit 4B is empty.
 
-You knew the boxes weren't here yet — the shipping company said Monday, which you'd confirmed, which means you knew — but knowing it and standing in an empty apartment with a carry-on bag and a body that has been awake for thirty-three hours are two different things.
+You knew the boxes were not here yet. The shipping company said Monday. You confirmed Monday. The confirmation email is still in your inbox. None of that changes the fact of standing in an empty apartment with a carry-on bag and a body that has been awake for thirty-three hours.
 
-The apartment is fine. The apartment is actually fine: pre-war floors, good light from the windows, a kitchen with actual counter space. There is a radiator in the bedroom. It's not on yet. It will take a few minutes.
+The apartment is fine. Better than fine, actually: old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress if you ever get one in here. There is a radiator in the bedroom. It is not warm yet. Frank's wife said it takes a few minutes.
 
 You set your carry-on down and do a circuit. Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. You open a note on your phone and start typing.
 
@@ -18,12 +18,12 @@ The list is organized in twenty minutes. Priority-ranked. You text the shipping 
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
 The list is practical. You don't overthink it. You've slept on floors before. This is not the worst situation you've been in.
 {% else %}
-The list gets long. You look at it for a moment. Add *bra* and then look at that word.
+The list gets long. You look at it for a moment. Add *bra* and then look at that word sitting there between *food* and *towels*.
 {% endif %}
 
 Right. The bra problem.
 
-You'd managed all day on sheer forward momentum — airport, subway, landlord, deposit — without stopping to think about the fact that what you're wearing under your shirt is a sports bra you grabbed at the airport gift shop, and it is not doing the job.
+You got through the day on forward momentum alone: airport, keys, landlord, deposit, the manageable fiction that logistics were the hard part. What you are wearing under your shirt is a sports bra from the airport gift shop, and it is not doing the job.
 
 *Right. Okay.*
 """
@@ -50,9 +50,9 @@ You add *bra* to the list. The word looks wrong in the note. You stare at it.
 condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-You sit on the floor — no furniture, floor is clean enough — and look at the city through the window. The building across the street has lit windows. Someone in 3C is watching something with the sound up. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
+You sit on the floor, because there is no furniture and the floor is clean enough, and look out at the city through the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound too high. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
 
-Your reflection in the dark glass is someone you're still learning to recognize. The shape is wrong. The proportions. The hair. You tilt your head and the reflection tilts back and it's still not you, not yet, not quite.
+Your reflection in the dark glass is someone you are still learning to recognize. The proportions. The hair. The way your shoulders fall. You tilt your head and the reflection tilts with you and for one second the distance between recognition and ownership feels measurable.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ id    = "order_food_sleep"
 label = "Order food and sleep"
 detail = "Food. Phone charging on the floor. Eight hours. Tomorrow is tomorrow."
 prose = """
-You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait you sit on the floor with your back against the wall and read the email from your new manager — the standard first-day logistics, parking you don't need, badge pickup, the name of someone who will meet you in the lobby — and file it.
+You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait, you sit on the floor with your back against the wall and reread the email from your new manager: parking you do not need, badge pickup, the name of the person who will meet you in the lobby, all the ordinary details of a life that somehow did not pause for any of this.
 
 The food arrives. You eat on the floor. The radiator has warmed up.
 
@@ -99,14 +99,14 @@ detail = "How hard can it be. Open a browser. Figure it out."
 prose = """
 You open your phone and start searching.
 
-Forty minutes later you have learned: bra sizing is a system that was apparently designed by someone who thought the metric system was too intuitive; that H-cup does not mean what you assumed it meant; that most department stores carry up to a DDD and then sort of stop; that there are specialty stores; that the specialty stores have names you're going to have to say out loud to a sales associate; and that you have, apparently, been categorically misunderstanding how underwire works for the entire time you've had opinions about it.
+Forty minutes later you have learned that bra sizing is a system apparently designed by someone who found the metric system too merciful; that H-cup does not mean what you assumed it meant; that most department stores stop at DDD and then become theoretical; that specialty stores exist; that the specialty stores have names you are going to have to say out loud to a sales associate; and that you have, apparently, misunderstood underwire for your entire life.
 
 You put your phone down.
 
 {% if w.hasTrait("DOWN_TO_EARTH") %}
 You add *department store, early* to your list. You'll tell them what you need in factual terms and get what works. Sleep first.
 {% else %}
-The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups and specialty stores and the number of times in your life you walked past a lingerie department without thinking anything at all.
+The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups, specialty stores, and the number of times in your life you walked past a lingerie department without granting it a second of thought.
 
 You add *specialty store??* to your list and go to sleep.
 {% endif %}

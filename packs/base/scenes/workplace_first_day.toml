@@ -9,11 +9,11 @@ description = "First day at the tech company. The lobby, the manager, the cowork
 
 [intro]
 prose = """
-The financial district is twenty minutes from your apartment by train. You tested the route yesterday on a dry run and you're confirming it now with your actual body on an actual Monday morning.
+The financial district is twenty minutes from your apartment by train. You tested the route yesterday with an empty bag and no stakes. Today is the real version: Monday morning, laptop over one shoulder, visitor-badge smile ready if anyone asks for one.
 
-The blouse has a collar that sits differently than you expected. Your laptop bag pulls at a shoulder that's narrower than it was a week ago.
+The blouse collar sits differently than you expected. The laptop bag rides against a shoulder that is narrower than the one your old commute belonged to.
 
-You get off at the right stop. The building is glass and steel — ground-floor lobby, security desk, badge readers.
+You get off at the right stop. The building is glass, steel, badge readers, polished stone. Ground-floor lobby designed to communicate money before anyone speaks.
 
 The guard looks at your badge request. "First day?"
 
@@ -23,31 +23,31 @@ He types. The system takes a moment. "Visitor badge until your card comes throug
 
 You take the badge and find a seat in the lobby. The morning rush moves through the turnstiles — people who know exactly where they're going.
 
-At 9:02, your new manager comes through looking for you.
+At 9:02, your new manager comes through the turnstiles looking for you.
 
 {% if w.hasTrait("SHY") %}
 You stand up too fast and grab your bag before it can slide off the chair.
 {% else %}
-You stand. He finds you by elimination — you're the only one sitting here who doesn't look like they belong yet.
+You stand. He finds you by elimination. Everyone else in the lobby moves like they belong here already.
 {% endif %}
 
-He sees you and his step hitches. Just a fraction — the recalibration. Whatever he was expecting from your resume, you don't match it.
+He sees you and his step hitches. Just a fraction, but enough. Whatever image your resume built in his head, you do not match it.
 
-You say your name before he can work out what to say. He shakes your hand. His grip adjusts mid-shake — lighter than it started.
+You say your name before he can decide what expression to wear. He shakes your hand. His grip adjusts mid-shake, lighter on the release than on the approach.
 
 {% if w.hasTrait("ANALYTICAL") %}
-You clock the adjustment. You're going to see this today. Probably tomorrow too.
+You clock the adjustment. Noted. You are going to see that recalibration all day.
 {% endif %}
 
-Fourth floor. Open plan. Whiteboards with diagrams you could redraw from memory. Your desk is temporary — pending permanent assignment — and the laptop is still in the box.
+Fourth floor. Open plan. Whiteboards crowded with diagrams you could redraw from memory. Your desk is temporary, your laptop is still in the box, and the office smells faintly of burnt coffee and dry-erase marker.
 
-You get set up. At ten, the team gathers for standup. Someone introduces you: "Robin, she's joining us from the Seattle office." You shake seven hands and remember four names.
+You get set up. At ten, the team gathers for standup. Someone says, "Robin's joining us from the Seattle office," and the room does the usual new-hire math. You shake seven hands and remember four names, which is adequate for a Monday.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-One of them holds the handshake a beat too long. You can feel him cataloging — face, body, age estimate. The read is fast and automatic and you recognize every part of it.
+One of them holds the handshake a beat too long. You can feel him cataloging face, body, age estimate. The read is quick and automatic and completely familiar from the other side.
 {% endif %}
 
-At 11:15, a coworker named Dan from the backend team finds your desk. He starts walking you through the authentication architecture with the helpful energy of someone onboarding a new hire who might be lost.
+At 11:15, a backend engineer named Dan stops by your desk and starts walking you through the authentication architecture with the bright, volunteer-helpfulness reserved for new hires who look as if they might need rescuing.
 
 You wrote the original spec for this system. Your name is in the commit history.
 
@@ -55,9 +55,9 @@ He finishes the explanation and looks at you.
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
 style     = "inner_voice"
-prose = "You have ten years of experience, institutional knowledge, and a mass-produced visitor badge. Your manager decided you might be an intern. You watched him make this decision in real time. *Okay.* Work the problem."
+prose = "Ten years of experience. Institutional memory. A mass-produced visitor badge hanging from a borrowed lanyard. Your manager took one look at you and briefly sorted you into the wrong category. Fine. Work the problem."
 
 # ── Round 1: How to handle Dan ────────────────────────────────────────
 
@@ -68,17 +68,17 @@ detail    = "Set the record straight. Once."
 condition = "!scene.hasFlag('dan_done') && (w.hasTrait('AMBITIOUS') || w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY'))"
 prose = """
 {% if w.hasTrait("BITCHY") %}
-"The spec for that is in the repo," you say. "The one I wrote." You say it without inflection. You're smiling. He stops.
+"The spec for that is in the repo," you say. "The one I wrote." You smile just enough to keep it deniable. He stops talking.
 {% elif w.hasTrait("AMBITIOUS") %}
-"I know — I wrote the original requirements doc. The one in the repo, not the presentation deck." You say it like a fact, because it is one. He processes this. Nods. Finds something else to do.
+"I know. I wrote the original requirements doc. The one in the repo, not the presentation deck." You keep it flat and professional. He processes the sentence in visible stages, nods once, and finds somewhere else to look.
 {% else %}
-"I was on the design review for that, actually. I wrote the initial spec." Even. Professional. He nods once and moves on.
+"I was on the design review for that, actually. I wrote the initial spec." Even. Professional. Enough precision to end the misunderstanding without dramatizing it.
 {% endif %}
 
-The rest of the morning shifts after that. Not dramatically — just the small adjustments that happen when a room recalibrates. Someone asks you a real question about the auth module. You answer it.
+The rest of the morning shifts after that. Not dramatically, just the small click of a room updating its assumptions. Somebody asks you a real question about the auth module. You answer it without looking anything up.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-The coworker from standup — Matt, you've learned — glances your direction four times in the next hour. Not at your screen. The inventory is quick each time. You recognize the efficiency of it.
+The coworker from standup, Matt, glances your way four times in the next hour. Not at your screen. The inventory is quick each time. You recognize the efficiency of it.
 {% endif %}
 """
 
@@ -94,20 +94,20 @@ condition = "!scene.hasFlag('dan_done')"
 prose = """
 "Thanks, I'll take a look," you say, and he walks away satisfied.
 
-You turn back to the codebase you've had open since 9:30. You wrote half of what you're looking at and he doesn't know that, and for now that's fine.
+You turn back to the codebase you've had open since 9:30. You wrote half of what you are looking at and he has no idea. For now, that is information you can spend later.
 
 {% if w.hasTrait("ANALYTICAL") %}
-You know exactly what's wrong with his explanation. You didn't say it. The gap between what you know and what he thinks you know will close on its own — you just need to ship something.
+You know exactly what was wrong with his explanation. You do not correct him. The gap between what you know and what he thinks you know will close the first time he has to review your code.
 {% elif w.hasTrait("AMBITIOUS") %}
-By lunch you'll have found three things you'd do differently. You've said nothing about any of them. Not yet.
+By lunch you have already found three things you would do differently. You say nothing. Shipping will make the point more cleanly than arguing.
 {% elif w.hasTrait("SHY") %}
-At your desk, you look at the notes you took during his explanation. You know every word of it already. The afternoon stretches ahead, long and quiet, and you fill it with work.
+At your desk, you look down at the notes you took while he talked. You already knew every line of them. The afternoon stretches out ahead, long and quiet, and you fill it with work.
 {% else %}
 The morning moves on. You work. People leave you alone, which is fine.
 {% endif %}
 
 {% if w.hasTrait("OBJECTIFYING") %}
-The coworker from standup — Matt — glances your direction when he thinks you're not looking. Quick. Automatic. You don't look back. You're at work.
+Matt glances your direction when he thinks you're not looking. Quick. Automatic. You do not look back. You are at work.
 {% endif %}
 """
 
@@ -134,7 +134,7 @@ When the team comes back, someone notices the commit in Slack. "Already?" he say
 {% elif w.hasTrait("ANALYTICAL") %}
 First commit. Tests green. Forty-seven minutes ahead of your internal schedule. You open the next ticket.
 {% else %}
-The team comes back. The afternoon starts. You're ahead of where you expected to be, which counts for something.
+The team comes back and the afternoon starts. You are ahead of where you expected to be, which counts for more than something.
 {% endif %}
 
 By five you've pushed two more commits. Nobody has asked how old you are since this morning. The day, on balance, worked.
@@ -163,9 +163,9 @@ label     = "Join the group for lunch"
 detail    = "Six people. A sandwich place two blocks away."
 condition = "scene.hasFlag('dan_done') && !w.hasTrait('SHY')"
 prose = """
-Six of you walk to a place two blocks away that someone describes as "fine, it's fine." It is fine. Sandwiches. Bright lighting. The kind of restaurant that exists to feed office workers and doesn't pretend otherwise.
+Six of you walk to a place two blocks away that someone describes as "fine, it's fine." It is exactly that. Sandwiches. Bright lighting. Tables designed for people who want calories and then to get back upstairs.
 
-The conversation is first-day stuff — where are you from, where were you before, what team. Then someone asks how old you are.
+The conversation sticks to first-day material at first: where you came from, what team, how long you've been in town. Then someone asks how old you are.
 
 {% if w.hasTrait("CONFIDENT") %}
 "Thirty-two," you say, and let the number do its work. A beat. Someone does the math. "You look..." they start. "I know," you say. That's the end of it.
@@ -176,12 +176,12 @@ The conversation is first-day stuff — where are you from, where were you befor
 {% endif %}
 
 {% if w.hasTrait("OBJECTIFYING") %}
-Matt sits across from you and directs most of his conversation your way. The positioning is familiar — close, attentive, angled to exclude the rest of the table.
+Matt sits across from you and directs most of his conversation your way. The positioning is familiar: attentive, a little too focused, angled so the rest of the table turns into backdrop.
 {% endif %}
 
 Walking back to the office, someone holds the door for you. Quick, automatic, not a thing.
 
-The afternoon is code. By five you've pushed your first commit and the tests pass and the day worked.
+The afternoon is code. By five you've pushed your first commit and the day, improbably enough, has worked.
 """
 
   [[actions.effects]]
@@ -207,14 +207,14 @@ label     = "Slip out on your own"
 detail    = "The group is still deciding where to go. You already know."
 condition = "scene.hasFlag('dan_done')"
 prose = """
-You leave while the group is still debating restaurants. The neighborhood around the office is financial district standard — sandwich shops, a Starbucks, a park with benches and pigeons and people eating lunches out of paper bags.
+You leave while the group is still debating restaurants. The neighborhood around the office is financial-district standard: sandwich shops, a Starbucks, a strip of polished lobby entrances, a small park doing its best to look generous.
 
 You find a bench. The sandwich is adequate. The sun is out.
 
 {% if w.hasTrait("SHY") %}
-This is better. The office was a lot of people reading you at once — your face, your age, your body, the gap between your badge and what they were expecting. Out here, nobody knows any of that. You're just someone on a bench eating a sandwich. The simplicity of it is a relief.
+This is better. The office was too many people reading you at once: face, age, body, seniority, the gap between the resume and the person in the chair. Out here, nobody knows any of that. You are just someone on a bench eating a sandwich. The simplicity is a relief.
 {% elif w.hasTrait("ANALYTICAL") %}
-You map the neighborhood while you eat. Coffee shop on the corner — potential morning stop. The park has a path that looks like it connects to the waterfront. Grocery store across from the station. You're building infrastructure, the same way you'd build a dev environment. One dependency at a time.
+You map the neighborhood while you eat. Coffee shop on the corner, possible morning stop. Park path that probably connects to the waterfront. Grocery store across from the station. You are building infrastructure the way you would build a dev environment: one dependency at a time.
 {% else %}
 You eat. You watch the city. A man walks by with a dog and the dog looks at you with the open curiosity that dogs have and people don't. You finish the sandwich and go back.
 {% endif %}

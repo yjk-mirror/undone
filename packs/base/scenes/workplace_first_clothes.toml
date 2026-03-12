@@ -5,22 +5,22 @@ description = "Shopping for work clothes. The department store, the dressing roo
 
 [intro]
 prose = """
-You find the department store by searching *bra fitting near me* and taking the result with the highest rating that isn't a fifteen-minute subway ride. It's a fifteen-minute walk. Close enough.
+You find the department store by searching *bra fitting near me* and taking the highest-rated result that does not require a train. It is still a fifteen-minute walk. Close enough.
 
 Sunday morning. The store is half-empty, the good light from the tall windows hitting the displays. You take the escalator to the second floor and follow the signs.
 
-The lingerie department is in the back, which you've learned is always where it is, as if it's something the store would prefer to not have to acknowledge. A sales associate with reading glasses on a chain and an expression of total professional equilibrium looks up when you approach.
+The lingerie department is in the back, which you have already learned is always where it is, as if the store would prefer not to acknowledge it too directly. A sales associate with reading glasses on a chain and an expression of complete professional equilibrium looks up when you approach.
 
 "Hi. I need help with sizing."
 
-"Sure." She looks at you — the practiced, clinical look, not the other kind — and names a section. "Starting there. Your measurements, or you haven't been fitted?"
+"Sure." She looks at you with the practiced clinical look, not the other kind, and names a section. "Starting there. Your measurements, or you haven't been fitted?"
 
 "Haven't been fitted."
 
 "Okay. I can do that. Two minutes."
 
 {% if w.hasTrait("SHY") %}
-You stand very still for the measurement. The associate is brisk and efficient and treats the whole thing with the detachment of someone who has done it several thousand times. You are still slightly mortified.
+You stand very still for the measurement. The associate is brisk, efficient, and utterly uninterested in making the moment larger than it is. You are still slightly mortified.
 {% elif w.hasTrait("POSH") %}
 You submit to the measurement with the awareness that you are in a department store rather than somewhere with a fitting room that has natural light. You don't say this. It's not relevant.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
@@ -35,7 +35,7 @@ condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 You find the department store. Nine AM. You are the first customer in the lingerie section.
 
-The associate who helps you has done this for approximately ever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads you to a rack of options with the specific efficiency of a professional who has been told a size and knows where sizes live.
+The associate who helps you has been doing this for approximately forever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads you to a rack of options with the efficiency of a professional who knows exactly where the numbers live.
 
 You follow. Your face is neutral. Your hands are in your pockets because you don't know what else to do with them.
 """
@@ -55,7 +55,7 @@ The second one is different. Different shape, different support. You didn't know
 condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-The dressing room mirror is well-lit and at an angle you haven't seen yet. The fluorescent overhead, the three-panel setup.
+The dressing room mirror is well-lit and angled in a way you have not seen yet. Fluorescent overhead, three-panel setup, nowhere to hide in it.
 
 Your collarbones. Your waist. The way the fabric sits across your chest. Two days ago you were on a plane and this body was still a series of logistics. Now it's in a department store dressing room and the light is very, very honest.
 """
@@ -68,9 +68,9 @@ label = "Get what you need, efficiently"
 detail = "Bras, underwear, basics. In and out. You have a list."
 allow_npc_actions = true
 prose = """
-You spend forty minutes and come out with: three bras, a week of underwear, a pair of dress pants that needed minimal alteration, two work blouses, a sweater. You pay. The total is more than you expected.
+You spend forty minutes and come out with three bras, a week of underwear, a pair of dress pants that need only minimal alteration, two work blouses, and a sweater. You pay. The total is more than you expected and exactly what you should have expected.
 
-Outside the store, you check the list on your phone. The most urgent items are crossed off. You get coffee from the Dunkin' across the street — you were going to get the independent café but it's Sunday and there's a line — and drink it on the walk back.
+Outside the store, you check the list on your phone. The most urgent items are crossed off. You get coffee from the Dunkin' across the street instead of the independent place with the Sunday line and drink it on the walk back.
 
 Boxes Monday. Work Monday. You're ahead of schedule, approximately.
 """
@@ -103,14 +103,14 @@ detail = "The mirror. You've been avoiding this. You don't have to, particularly
 prose = """
 You stay in the dressing room longer than you need to.
 
-The mirror is what the mirror is. Full length, well lit. The dress pants sit on your hips differently than any pants have sat before. The blouse buttons the wrong way. You fasten them anyway.
+The mirror is what it is: full length, well lit, impossible to negotiate with. The dress pants sit on your hips differently than any pants have sat before. The blouse buttons the wrong way. You fasten it anyway.
 
 {% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
 You think about Monday. You, in the office, in the dress pants and the work blouse. The manager's face when you say *I know, I wrote that spec.* You've practiced this face in your head so many times that you almost know what it looks like. You think you look competent. You hope you look competent. You decide to look competent regardless.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
 You note what's true. You don't spend time on it that you don't have. You get dressed and take the practical items to the register.
 {% else %}
-The person in the mirror looks like someone you might pass on the street without a second thought. Average height. Brown hair. Professional clothes that fit correctly. She looks ready for Monday. That's enough.
+The person in the mirror looks like someone you might pass on the street without a second thought. Average height. Brown hair. Professional clothes that fit correctly. Ready for Monday. That is enough.
 
 You take what you need to the register.
 {% endif %}
@@ -145,7 +145,7 @@ label     = "A man in the aisle notices her"
 weight    = 6
 condition = "!scene.hasFlag('noticed')"
 prose = """
-You're comparing two options — same brand, different cut — when you become aware of the man at the edge of your peripheral vision.
+You are comparing two options, same brand and different cut, when you become aware of a man at the edge of your peripheral vision.
 
 He's shopping, technically. He has a bag. He's looking at you. The two-second look, the held gaze that's slightly too long.
 

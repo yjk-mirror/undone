@@ -7,16 +7,16 @@ description = "After work. The apartment. You have been competent all day. Somet
 prose = """
 The apartment is the same as you left it this morning.
 
-You knew it would be. Apartments don't rearrange themselves. The awareness that this is not a thought worth having tells you you're more tired than you estimated. The bag goes on the chair. Your shoes go by the door. You're getting better at the shoes-by-the-door thing — you forget maybe one morning in three now, instead of every morning.
+You knew it would be. Apartments do not rearrange themselves. The fact that your brain offered the thought anyway tells you more about your fatigue than any honest self-report would. The bag goes on the chair. Your shoes go by the door. You are getting better at the shoes-by-the-door thing. Not good. Better.
 
-The city is doing its early-evening thing outside: delivery cyclists, someone on the third floor of the building across the street pacing with a phone, a bus pulling away from the stop. None of it requires anything from you.
+The city is doing its early-evening thing outside: delivery cyclists, someone in the building across the street pacing with a phone, a bus dragging away from the stop. None of it requires anything from you.
 
 {% if w.hasTrait("ANALYTICAL") %}
 You do a brief audit. Day was a net positive: the PR got merged, the design review ran long but concluded, no one said anything that needed immediate correction. You gave feedback on two pull requests before lunch. Three items carried over to tomorrow. You know where each of them lives in the backlog.
 
-The apartment is quiet. You don't have a read on the quiet yet.
+The apartment is quiet. You still do not know whether that quiet is a comfort or a test.
 {% elif w.hasTrait("AMBITIOUS") %}
-You pull out your laptop before your coat is off. There's still two hours before you'd call it a reasonable stopping point and there's a follow-up you meant to send before end of day. You get as far as opening your email, read the first line of the thread, and then just sit there with your coat half-off and the laptop open.
+You pull out your laptop before your coat is off. There are still two hours before you would normally call it a reasonable stopping point and there is a follow-up you meant to send before end of day. You get as far as opening the thread, read the first line, and then just sit there with your coat half-off and the laptop open.
 
 The radiator ticks. You don't type anything.
 {% else %}
@@ -42,7 +42,7 @@ The face in the mirror takes a second. Not because you don't know it — you kno
 *That's you.* The correction takes no time at all. It's just the gap before the correction that you notice.
 
 You run the water cold. You wash your face. You've developed a particular way of managing the mirrors in this apartment, and you use it now.
-{% elif w.getSkill("FEMININITY") < 50 %}
+{% elif w.getSkill("FEMININITY") < 40 %}
 You catch yourself in the mirror mid-reach and hold there for a second. Not startled, exactly — you know the face. But the light switch thing and then the mirror thing in the same moment layers in a way that's harder to file away cleanly.
 
 You run the water and wash your face and go back out to the kitchen.
@@ -178,11 +178,11 @@ Not tonight. The excuse you'd give — traveling, busy, new job — is true enou
 {% elif w.hasTrait("CONFIDENT") %}
 You call your sister.
 
-She picks up on the third ring. "Hey, stranger." Not annoyed. Just noting the gap. You tell her about the apartment. The neighborhood. The job. She asks if you're eating. You say yes. She asks if you're okay. You say yes. Both answers are close enough to true.
+On the third ring, you hear, "Hey, stranger." Not annoyed. Just accounting for the gap. You tell her about the apartment, the neighborhood, the job. Then come the practical questions: are you eating, are you okay. You say yes to both. Both answers are close enough to true.
 
-"Come visit," she says. You say you will. You both know the timeline is vague. The call lasts eight minutes. When you hang up, the apartment is quieter than it was before you picked up the phone.
+"Come visit," she says. You say you will. The timeline stays vague on purpose. The call lasts eight minutes. When you hang up, the apartment feels quieter than it did before you picked up the phone.
 {% else %}
-You hover over a name. Then another. The contacts list is a museum of a life you're still technically living — same number, same name in most of them, same relationships on paper. The gap is in the details. The details are everything.
+You hover over a name. Then another. The contacts list is a museum of a life you are still technically living: same number, same name in most of them, same relationships on paper. The gap is in the details. The details are everything.
 
 You put the phone down. Open the delivery app instead. Thai food. The pad see ew from the place on 43rd.
 {% endif %}
@@ -192,9 +192,9 @@ The phone is dark on the counter. The contacts are all still there.
 {% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}
-You eat at the kitchen table with your laptop open. Not working — reading. The food is good. The apartment is becoming, incrementally, a place where you live rather than a place where you're staying.
+You eat at the kitchen table with your laptop open. Not working, just reading. The food is good. The apartment is becoming, incrementally, a place where you live rather than a place where you are staying.
 {% else %}
-The food arrives. You eat on the couch with the TV on something you're not watching. The apartment settles into its evening noises — radiator, street, the neighbor's music through the wall. It's not comfortable yet. But it's closer than last week.
+The food arrives. You eat on the couch with the TV on something you are not watching. The apartment settles into its evening noises: radiator, street, the neighbor's music through the wall. It is not comfortable yet. But it is closer than last week.
 {% endif %}
 """
 

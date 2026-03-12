@@ -11,33 +11,35 @@ description = "First hours in the city. Airport exit, the ID that doesn't match,
 prose = """
 The seat belt sign clicks off.
 
-Around you, people are already standing, pulling bags from overheads. A flight attendant in the aisle ahead is crouched at someone's row. The plane smells like recycled air and bad sleep.
+Around you, the cabin turns restless all at once. Belts snap loose. Phones come back to life. A flight attendant in the aisle ahead is already crouched at someone's row, helping with a stroller jammed under a seat. The plane smells like coffee, stale air, and the flat chemical cold of recycled ventilation.
 
-You stand up. The overhead bin is higher than you remember overhead bins being. You reach for your carry-on and a man behind you gets to it first, lifts it down one-handed.
+You stand. The overhead bin is a little higher than your body expects it to be. You reach up for your carry-on and a man behind you gets there first, lifting it down in one smooth motion.
 
 "Here you go."
 
 {% if w.hasTrait("ANALYTICAL") %}
-"Thanks." You take the bag. That's twice in the last minute someone has reached something for you without being asked. You file the pattern.
+"Thanks." You take the bag by the side handle. That's the second unasked-for piece of help in ten minutes. You file the pattern instead of reacting to it.
 {% elif w.hasTrait("SHY") %}
-"Thanks." It comes out quiet. He was being helpful. You take the bag and go.
+"Thanks." It comes out softer than you intended. He was only being helpful. You take the bag and move with the line before he can decide to be friendly.
 {% else %}
-"Thanks." You take the bag and keep moving.
+"Thanks." You take the bag and keep moving with everyone else.
 {% endif %}
 
-Jet bridge. Terminal. Big, bright, the kind of institutional lighting that doesn't care what time zone you're in. Signs for Ground Transportation, Baggage Claim, Rental Cars.
+Jet bridge. Terminal. Big bright concourse, polished floor, the kind of institutional lighting that does not care what time zone your body thinks it is. Signs for Ground Transportation, Baggage Claim, Rental Cars.
 
-{% if not w.alwaysFemale() %}
-At the exit checkpoint, the agent takes your ID. Looks at the photo. Looks at you.
+{% if w.wasTransformed() %}
+At the exit checkpoint, the agent takes your ID, glances at the photo, then gives you a second look that lands harder than the first.
 
 **{{ w.beforeName() }}**, says the card. The face in the photo is not the face standing here. His hand pauses.
+{% else %}
+At the exit checkpoint, the agent scans your ID, checks the name, and waves you through with the fast, practiced indifference of someone who has already looked at a thousand faces today.
 {% endif %}
 """
 
 [[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 20"
+condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
 style     = "inner_voice"
-prose = "*Okay.* Problems, in order. You keep reaching for things at the wrong height. Your voice is at a pitch you haven't mapped. Your hands are cold — they didn't get cold like this before. The city is tomorrow's problem. Tonight: keys, door, sleep."
+prose = "*Okay.* Problems, in order. The reach is off. The voice is still unfamiliar at the edges. Your hands keep going cold for no reason you believe in. The city can stay tomorrow's problem. Tonight is keys, door, sleep."
 
 # ── Round 1: The ID check ────────────────────────────────────────────
 
@@ -45,18 +47,18 @@ prose = "*Okay.* Problems, in order. You keep reaching for things at the wrong h
 id        = "id_preempt"
 label     = "\"I know. I just look young.\""
 detail    = "Get ahead of it."
-condition = "!scene.hasFlag('id_done') && !w.alwaysFemale()"
+condition = "!scene.hasFlag('id_done') && w.wasTransformed()"
 prose = """
 You say it before he can figure out the question.
 
 {% if w.hasTrait("ANALYTICAL") %}
-The sentence was prepared. You rehearsed it on the plane without realizing you were rehearsing. It worked. You'll use it again.
+The sentence was waiting for him before he asked for it. You rehearsed it on the plane without meaning to. It lands cleanly now. Useful.
 {% elif w.hasTrait("SHY") %}
-You said it too fast — the words came out in a rush, but the tone was even. He blinks, looks at the ID again, looks at the line behind you.
+You say it too fast. The words come out in a rush, but at least they come out steady. He blinks, looks at the card again, notices the line behind you.
 {% elif w.hasTrait("CONFIDENT") %}
-You say it the way you'd say something in a standup — clear, informational, moving on. He doesn't have a follow-up.
+You deliver it the way you'd deliver an update in standup. Short, factual, already moving on. He does not find a follow-up quickly enough to matter.
 {% else %}
-He looks at the card. Looks at you. The line behind you is getting longer.
+He looks at the card. Looks at you. Looks at the line building behind you and decides not to make this his problem.
 {% endif %}
 
 He waves you through.
@@ -70,9 +72,9 @@ He waves you through.
 id        = "id_wait"
 label     = "Wait for him to work it out"
 detail    = "It's your ID. He'll get there."
-condition = "!scene.hasFlag('id_done') && !w.alwaysFemale()"
+condition = "!scene.hasFlag('id_done') && w.wasTransformed()"
 prose = """
-He turns the card over. Looks at the photo again. You can see the math happening — the name, the face, the age that doesn't add up.
+He turns the card over, checks the back as if the answer might be there, then studies the photo again. You can watch the math happen: the name, the jawline, the age, the mismatch that doesn't sort itself out.
 
 {% if w.hasTrait("CONFIDENT") %}
 You wait. It's your ID. The answer is yes, and he'll arrive at it.
@@ -97,36 +99,36 @@ He studies the card one more time. Waves you through.
 id        = "take_subway"
 label     = "Take the subway"
 detail    = "Platform B. Transfer at Central. The app says twenty-two minutes."
-condition = "scene.hasFlag('id_done') || w.alwaysFemale()"
+condition = "scene.hasFlag('id_done') || !w.wasTransformed()"
 prose = """
-The platform is underground and ten degrees cooler than the terminal. A transit map on the wall confirms what your phone already says: Platform B, transfer at Central, eleven stops.
+The platform is underground and colder than the terminal by a clean ten degrees. A transit map on the wall confirms what your phone already told you: Platform B, transfer at Central, eleven stops.
 
-The train arrives with a screech and a rush of displaced air. You board. The car is half full — evening commuters, a man with a bicycle wedged against the door, a woman reading a paperback with headphones in.
+The train arrives with a screech and a slap of displaced air. You board into a half-full car: evening commuters, a man with a bicycle wedged against the door, a woman reading a paperback with one knee angled into the aisle.
 
-You find a seat near the door. Your bag goes on your lap because the overhead rack is a reach you'd rather not attempt in public.
+You take a seat near the door. The bag stays in your lap because you are not reaching for the overhead rack in public unless you have to.
 
 {% if w.hasTrait("BEAUTIFUL") %}
-A man across the aisle looks up when you sit down. The look lasts about two seconds — the automatic scan, the quick read — and then he's back on his phone. You're past it and into the next thought before the train starts moving.
+A man across the aisle looks up when you sit down. Two seconds, maybe less. Automatic scan. Quick read. Then he is back on his phone and you are already forcing your attention onto the route map.
 {% endif %}
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You know that look. The two-second read, the inventory. You've done it yourself, from the same kind of seat. You just didn't know it had a texture from this side.
+You know that look because you have used it. The quick inventory, the efficient read. You did not know how physical it would feel from the receiving side until now.
 {% endif %}
 
 {% if w.hasTrait("SHY") %}
-You keep your eyes on your phone. The train fills and empties at each stop. Nobody talks to you. Nobody expects anything. The city scrolls past the windows in strips of light, then goes underground, then comes back.
+You keep your eyes on your phone and let the stops happen around you. The car fills, empties, fills again. Nobody talks to you. Nobody expects conversation. The city appears in strips of lit windows and then disappears back underground.
 {% elif w.hasTrait("ANALYTICAL") %}
-Eleven stops. You count them. The neighborhoods change through the windows — commercial, residential, a stretch of construction, then trees. Your station is the one after the park. The transit system makes sense.
+Eleven stops. You count them. The neighborhoods change through the windows: commercial blocks, residential rows, a strip of construction fencing, then trees. Your stop is the one after the park. The transit system, at least, makes sense.
 {% endif %}
 
 Twenty-two minutes. Your stop.
 
-The building is a five-minute walk from the station. Four stories, brick, a bodega on the corner. The lockbox on the front door has your keys.
+The building is a five-minute walk from the station. Four stories, brick, narrow windows, bodega on the corner. The lockbox on the front door has your keys.
 
 {% if w.hasTrait("AMBITIOUS") %}
 *Okay.* Apartment. Unpack. Sleep. Monday.
 {% else %}
-You stand outside for a second with your bag and your keys and the cold air of a city you don't know yet.
+You stand outside for one full second with your bag, your keys, and the cold air of a city that still has no memory of you.
 {% endif %}
 """
 
@@ -151,16 +153,16 @@ You stand outside for a second with your bag and your keys and the cold air of a
 id        = "call_a_cab"
 label     = "Call a cab"
 detail    = "Skip the subway. Forty dollars."
-condition = "scene.hasFlag('id_done') || w.alwaysFemale()"
+condition = "scene.hasFlag('id_done') || !w.wasTransformed()"
 prose = """
 You open your phone and request a ride. Forty dollars. You've been awake for thirty-one hours and you're not navigating a transit map right now.
 
-The driver is a middle-aged man who asks where you're headed and then stops talking, which is exactly what you needed. The city scrolls past the window — downtown glass, a park, a stretch of fast food joints, then residential. Trees. Actual trees. Then the neighborhood the listing described as "up-and-coming," which looks about halfway through the process.
+The driver is a middle-aged man who confirms the address, nods once, and then stops talking. Exactly right. The city moves past the window in pieces: downtown glass, a park gone dark at the edges, a strip of fast-food signs, then residential blocks with stoops and half-lit windows. The listing called the neighborhood *up-and-coming*. Through the cab window it looks like a place that is trying hard not to advertise the transition while it is still happening.
 
 {% if w.hasTrait("ANALYTICAL") %}
-You watch the neighborhoods change and build a mental map as they pass. The commercial strip near the station. The cross street with a bodega. Residential blocks with front stoops and small yards. There's a logic to this city. You'll learn it.
+You watch the neighborhoods change and start building a map as they pass. Commercial strip by the station. Cross street with a bodega. Residential blocks with short stoops and narrow yards. The city has a structure. You can learn a structure.
 {% elif w.hasTrait("SHY") %}
-The back seat of a cab is its own kind of quiet. Nobody looks at you. Nobody expects conversation. You watch the city go by and let your shoulders drop for the first time since the plane landed.
+The back seat of a cab is its own kind of privacy. Nobody looks at you. Nobody expects anything. You watch the city pass and feel your shoulders drop for the first time since the plane landed.
 {% endif %}
 
 The car stops in front of your building. Four stories, brick, a bodega on the corner.
@@ -172,7 +174,7 @@ You get out into the early spring cold. The lockbox on the front door has your k
 {% if w.hasTrait("AMBITIOUS") %}
 *Okay.* Keys. Address. Monday is three days away and you're going to be ready.
 {% else %}
-You stand there for a second with your bag and your keys and the fact of being here.
+You stand there for a second with your bag, your keys, and the fact of having arrived as someone this city has never seen before.
 {% endif %}
 """
 
