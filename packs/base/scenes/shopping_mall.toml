@@ -12,19 +12,19 @@ prose = """
 The mall on Chambers is the kind of place that smells like cinnamon pretzels and new shoes and the low-grade exhaustion of people who've been here since it opened. Two floors, a food court, an anchor store that's hanging on. You're here because you need — want — something. Not the emergency shopping you did that first week, grabbing whatever fit without looking at yourself too long. This is different.
 
 {% if w.hasTrait("POSH") %}
-You bypass the anchor store entirely and head for the row of smaller shops along the east corridor. Names you recognize. Price points you don't look at. You already know what you're looking for — the question is whether they have it in your size, which is a question you've recently learned to ask without hesitating.
+The anchor store is beneath consideration. The row of smaller shops along the east corridor — names you recognize, price points you don't look at. The question is whether they have it in your size, which is a question you've recently learned to ask without hesitating.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-You head for the anchor store because it has everything in one place and you don't want to be here longer than you need to be. Jeans. Maybe a jacket. Get in, get out.
+The anchor store. Everything in one place. Jeans. Maybe a jacket. Get in, get out.
 {% elif w.hasTrait("CUTE") %}
-You gravitate toward a window display with a yellow cardigan and a pair of boots that would look good with the skirt you bought last week, and you're already inside before you've finished the thought.
+A window display with a yellow cardigan and a pair of boots that would look good with the skirt you bought last week. Already inside before the thought finishes forming.
 {% else %}
-You drift through the first floor without a specific destination. Past the accessories kiosk. Past the shoe store. Past a woman your age carrying four bags with the focused expression of someone on a mission. You're not on a mission. You're browsing, which is a thing you're learning to do.
+The first floor without a specific destination. Past the accessories kiosk. Past the shoe store. Past a woman your age carrying four bags with the focused expression of someone on a mission. Not a mission. Browsing, which is a thing you're learning to do.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The saleswoman at the first store you enter says "Can I help you find something?" and you say "just looking" in the way that means *I have no idea what I'm looking for and the number of options in this store is making my vision swim*. She nods and backs off. Professional distance.
+The saleswoman at the first store says "Can I help you find something?" and "just looking" comes out in the way that means *I have no idea what I'm looking for and the number of options in this store is making my vision swim*. She nods and backs off. Professional distance.
 {% elif w.getSkill("FEMININITY") < 45 %}
-A saleswoman greets you. You say "just looking" but you mean it this time — you have opinions now. Vague ones, but they're there. Something about a neckline. Something about a color. The opinions arrived without an announcement.
+A saleswoman greets you. "Just looking" — but meaning it this time — you have opinions now. Vague ones, but they're there. Something about a neckline. Something about a color. The opinions arrived without an announcement.
 {% endif %}
 
 The fitting rooms are at the back. Fluorescent overhead. Three items over the limit. The mirror is waiting.

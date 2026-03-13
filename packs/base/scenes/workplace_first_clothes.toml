@@ -5,9 +5,9 @@ description = "Shopping for work clothes. The department store, the dressing roo
 
 [intro]
 prose = """
-You find the department store by searching *bra fitting near me* and taking the highest-rated result that does not require a train. It is still a fifteen-minute walk. Close enough.
+The department store is a fifteen-minute walk — the highest-rated result for *bra fitting near me* that doesn't require a train. Close enough.
 
-Sunday morning. The store is half-empty, the good light from the tall windows hitting the displays. You take the escalator to the second floor and follow the signs.
+Sunday morning. The store is half-empty, the good light from the tall windows hitting the displays. The escalator to the second floor. Signs for lingerie.
 
 The lingerie department is in the back, which you have already learned is always where it is, as if the store would prefer not to acknowledge it too directly. A sales associate with reading glasses on a chain and an expression of complete professional equilibrium looks up when you approach.
 
@@ -20,7 +20,7 @@ The lingerie department is in the back, which you have already learned is always
 "Okay. I can do that. Two minutes."
 
 {% if w.hasTrait("SHY") %}
-You stand very still for the measurement. The associate is brisk, efficient, and utterly uninterested in making the moment larger than it is. You are still slightly mortified.
+The measurement. Standing very still. The associate is brisk, efficient, and utterly uninterested in making the moment larger than it is. Slight mortification anyway.
 {% elif w.hasTrait("POSH") %}
 You submit to the measurement with the awareness that you are in a department store rather than somewhere with a fitting room that has natural light. You don't say this. It's not relevant.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
@@ -37,7 +37,7 @@ You find the department store. Nine AM. You are the first customer in the linger
 
 The associate who helps you has been doing this for approximately forever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads you to a rack of options with the efficiency of a professional who knows exactly where the numbers live.
 
-You follow. Your face is neutral. Your hands are in your pockets because you don't know what else to do with them.
+The rack of options. Neutral face. Hands in pockets because there's nothing else to do with them.
 """
 
 [[thoughts]]
@@ -46,7 +46,7 @@ style     = "inner_voice"
 prose = """
 Dressing room. Door closed. Four options on the hook.
 
-You put on the first one. The clasp is in the back. Your fingers find it on the second try. Something tightens and settles and you look down and — *oh.* That's what it does.
+The first one. The clasp is in the back. Fingers find it on the second try. Something tightens and settles and you look down and — *oh.* That's what it does.
 
 The second one is different. Different shape, different support. You didn't know there were different shapes. You are learning that there are different shapes.
 """

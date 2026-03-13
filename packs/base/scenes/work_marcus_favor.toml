@@ -7,7 +7,7 @@ description = "Marcus messages: can you look at this spec? Not a big ask. Just a
 prose = """
 The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
 
-The link goes to a twelve-page infrastructure spec. You open it and spend thirty seconds skimming the structure. Section headers, latency assumptions, a rollback plan on page nine, a dependency diagram that's going to need to be explained to at least four people. This is not a ten-minute ask.
+The link goes to a twelve-page infrastructure spec. Thirty seconds of skimming the structure. Section headers, latency assumptions, a rollback plan on page nine, a dependency diagram that's going to need to be explained to at least four people. This is not a ten-minute ask.
 
 You send back: "Sure — give me a bit." He doesn't reply. He assumed you'd just look at it.
 """
@@ -17,7 +17,7 @@ condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
 
-Your chest does a small thing at the notification. Not the ask — the name. You open the spec before deciding whether to analyze that.
+Your chest does a small thing at the notification. Not the ask — the name. The spec is open before the reaction gets analyzed.
 
 Twelve pages. Infrastructure. The rollback plan is on page nine and is going to be a problem. You send back: "Sure — give me a bit." He doesn't reply. He just assumed you'd look.
 """

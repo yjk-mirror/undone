@@ -821,6 +821,30 @@ she acts* (stolen agency).
 
 This is a game. Every moment is "what do you do?"
 
+#### Violation taxonomy
+
+The automated prose audit flags these patterns. Flagged intros need restructuring,
+not just deletion — the fix is to reframe the world so the player's first choice
+lands naturally.
+
+| Category | Severity | Example | Fix pattern |
+|---|---|---|---|
+| **Player speech in intro** | Critical | `"Thanks." You take the bag.` | Remove dialogue or move to action |
+| **Player deliberate action** | High | `You sit down` / `You grab the sweater` / `You nod back` | Reframe as world-state ("The seat is open") or move to action |
+| **Player internal decision** | High | `You file the pattern instead of reacting to it` | Cut or convert to thought fragment |
+| **Player chooses/orders/responds** | Critical | `"Yes. Robin. Software engineering."` | Move dialogue to action button |
+| **Extended player autopilot** | Critical | Multiple paragraphs of player acting (getting dressed, commuting) | Split into setup + choice points |
+| **Involuntary body response** | Acceptable | `Your hands go cold` / `The stool is higher than expected` | **Not a violation** — the body acts, not the player |
+
+**Before (violation):**
+> You sit down at the counter and order a coffee. The bartender nods.
+
+**After (fixed):**
+> The counter has one open seat. The bartender is already looking your way.
+
+The intro sets up the situation. The action button says "Order a coffee." The
+player decides.
+
 ### Anatomy of a good scene
 
 1. **An inciting situation** — something happens before the player decides anything.

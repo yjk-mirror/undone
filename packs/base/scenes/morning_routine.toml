@@ -13,18 +13,18 @@ The apartment is the same apartment. One bedroom off Clement Ave, third floor, t
 The bathroom mirror catches you before you're ready — hair pressed flat on one side, face still soft with sleep. The face is yours. You know the face is yours. The quarter-second before that knowledge arrives is the part you're still getting used to.
 {% endif %}
 
-You get yourself together. Teeth, face, the usual negotiation with your hair.
+Teeth. Face. The usual negotiation with hair.
 
 {% if w.hasTrait("POSH") %}
-You spend actual minutes deciding what to wear. Not because you don't know — you always know — but because the wrong top with the wrong jacket sends a message you didn't write, and you've learned that people in this city read the message before they hear the sentence.
+The closet is a decision in itself. The wrong top with the wrong jacket sends a message nobody wrote on purpose, and people in this city read the message before they hear the sentence.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-Jeans. That black top that works with everything. Done. Some women spend an hour getting dressed. You can't figure out what they're doing in there.
+Jeans. That black top that works with everything. Some women spend an hour getting dressed.
 {% elif w.hasTrait("CUTE") %}
-You grab the yellow sweater — the one that makes you look like you have your life together, even when the evidence is against it. You catch yourself smiling at your reflection and decide not to interrogate that.
+The yellow sweater — the one that suggests a person who has her life together, even when the evidence is against it. The reflection in the bathroom mirror is smiling back.
 {% elif w.hasTrait("SULTRY") %}
-The dress or the skirt. You hold both up. The dress says *try me*. The skirt says *I already know*. The skirt wins.
+The dress or the skirt. The dress says *try me*. The skirt says *I already know*. The skirt wins.
 {% else %}
-You get dressed without ceremony. Whatever's clean, whatever fits the weather. It'll do.
+Whatever's clean, whatever fits the weather. It'll do.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
@@ -32,8 +32,6 @@ Getting dressed is still a small negotiation. Not the mechanics — you've got t
 {% endif %}
 
 Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
-
-Monday.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

@@ -13,16 +13,16 @@ The seat belt sign clicks off.
 
 Around you, the cabin turns restless all at once. Belts snap loose. Phones come back to life. A flight attendant in the aisle ahead is already crouched at someone's row, helping with a stroller jammed under a seat. The plane smells like coffee, stale air, and the flat chemical cold of recycled ventilation.
 
-You stand. The overhead bin is a little higher than your body expects it to be. You reach up for your carry-on and a man behind you gets there first, lifting it down in one smooth motion.
+The overhead bin is higher than expected — the geometry of shoulder-to-shelf wrong by just enough to matter. A man behind you gets there first, lifting the carry-on down in one smooth motion.
 
 "Here you go."
 
 {% if w.hasTrait("ANALYTICAL") %}
-"Thanks." You take the bag by the side handle. That's the second unasked-for piece of help in ten minutes. You file the pattern instead of reacting to it.
+The bag changes hands. That's the second unasked-for piece of help in ten minutes. The pattern files itself.
 {% elif w.hasTrait("SHY") %}
-"Thanks." It comes out softer than you intended. He was only being helpful. You take the bag and move with the line before he can decide to be friendly.
+The bag is in your hands before you've worked out what your face is doing. He's already turning back to his own row. The aisle carries you forward.
 {% else %}
-"Thanks." You take the bag and keep moving with everyone else.
+The bag changes hands and the aisle carries you forward with everyone else.
 {% endif %}
 
 Jet bridge. Terminal. Big bright concourse, polished floor, the kind of institutional lighting that does not care what time zone your body thinks it is. Signs for Ground Transportation, Baggage Claim, Rental Cars.

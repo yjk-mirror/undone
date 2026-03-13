@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use rand::{rngs::SmallRng, SeedableRng};
+use toml::Value;
 use undone_packs::{load_packs, LoadedPackMeta, PackRegistry};
 use undone_scene::scheduler::Scheduler;
 use undone_scene::simulator::{SimulationConfig, SimulationResult};
@@ -182,7 +183,167 @@ pub fn audit_scene_text(file_path: &str, scene_text: &str) -> Vec<ProseFinding> 
         }
     }
 
+    // Intro-specific player agency checks (requires TOML parsing)
+    findings.extend(audit_intro_agency(file_path, scene_text));
+
     findings
+}
+
+// Verbs that represent deliberate player decisions — choosing to act.
+// Involuntary/experiential verbs (feel, notice, hear, see, smell, know, remember,
+// realize, sense, wonder, recognize) are intentionally excluded.
+const DELIBERATE_ACTION_VERBS: &[&str] = &[
+    "accept", "add", "carry", "change", "check", "choose", "close", "decide", "dress", "drink",
+    "drop", "eat", "file", "follow", "get", "grab", "hang", "head", "lean", "lift", "lock", "look",
+    "move", "nod", "open", "order", "pay", "pick", "place", "pull", "push", "put", "reach", "set",
+    "shake", "shift", "sip", "sit", "slip", "smile", "stand", "step", "stretch", "swap", "take",
+    "text", "turn", "type", "walk", "wave", "wear",
+];
+
+fn audit_intro_agency(file_path: &str, scene_text: &str) -> Vec<ProseFinding> {
+    let Ok(doc) = scene_text.parse::<Value>() else {
+        return Vec::new();
+    };
+
+    let mut intro_prose_list: Vec<&str> = Vec::new();
+
+    // [intro].prose
+    if let Some(prose) = doc
+        .get("intro")
+        .and_then(|v| v.get("prose"))
+        .and_then(|v| v.as_str())
+    {
+        intro_prose_list.push(prose);
+    }
+
+    // [[intro_variants]][].prose
+    if let Some(variants) = doc.get("intro_variants").and_then(|v| v.as_array()) {
+        for variant in variants {
+            if let Some(prose) = variant.get("prose").and_then(|v| v.as_str()) {
+                intro_prose_list.push(prose);
+            }
+        }
+    }
+
+    // [[thoughts]][].prose
+    if let Some(thoughts) = doc.get("thoughts").and_then(|v| v.as_array()) {
+        for thought in thoughts {
+            if let Some(prose) = thought.get("prose").and_then(|v| v.as_str()) {
+                intro_prose_list.push(prose);
+            }
+        }
+    }
+
+    let mut findings = Vec::new();
+    for prose in intro_prose_list {
+        for line in prose.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with("{%") || trimmed.starts_with("{#") {
+                continue;
+            }
+
+            if detect_player_speech(trimmed) {
+                findings.push(ProseFinding {
+                    file_path: file_path.to_string(),
+                    kind: "player_speech_in_intro".to_string(),
+                    line: find_line_in_source(scene_text, trimmed),
+                    message: format!("player speech in intro: {}", truncate_prose(trimmed, 100)),
+                });
+            }
+
+            if detect_player_deliberate_action(trimmed) {
+                findings.push(ProseFinding {
+                    file_path: file_path.to_string(),
+                    kind: "player_action_in_intro".to_string(),
+                    line: find_line_in_source(scene_text, trimmed),
+                    message: format!(
+                        "player takes deliberate action in intro: {}",
+                        truncate_prose(trimmed, 100)
+                    ),
+                });
+            }
+        }
+    }
+
+    findings
+}
+
+/// Detects player speech in intro prose.
+///
+/// Pattern 1: `"Thanks." You take the bag` — quoted text followed by `You` acting.
+/// Pattern 2: `You say/tell/ask` at sentence boundary — player speech verbs.
+fn detect_player_speech(line: &str) -> bool {
+    // Pattern 1: line starts with quoted text, closing quote followed by " You "
+    if line.starts_with('"') {
+        if let Some(close_offset) = line[1..].find('"') {
+            let after_close = &line[close_offset + 2..];
+            let after_trimmed = after_close.trim_start();
+            if after_trimmed.starts_with("You ") {
+                return true;
+            }
+        }
+    }
+
+    // Pattern 2: "you say/tell/ask" at sentence start
+    let lower = line.to_ascii_lowercase();
+    for verb in ["you say ", "you tell ", "you ask "] {
+        if lower.starts_with(verb) {
+            return true;
+        }
+        // Mid-sentence after period
+        if lower.contains(&format!(". {verb}")) {
+            return true;
+        }
+    }
+
+    false
+}
+
+/// Detects deliberate player actions in intro prose.
+///
+/// Matches `You [deliberate_verb]` at sentence boundaries. Excludes involuntary
+/// body responses (feel, notice, hear, etc.) which are acceptable in intros.
+fn detect_player_deliberate_action(line: &str) -> bool {
+    for (pos, _) in line.match_indices("You ") {
+        if pos == 0 || is_at_sentence_start(line, pos) {
+            let rest = &line[pos + 4..];
+            let verb = rest
+                .split(|c: char| !c.is_ascii_alphabetic())
+                .next()
+                .unwrap_or("");
+            if DELIBERATE_ACTION_VERBS.contains(&verb.to_ascii_lowercase().as_str()) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+fn is_at_sentence_start(line: &str, pos: usize) -> bool {
+    let before = line[..pos].trim_end();
+    before.ends_with('.')
+        || before.ends_with('!')
+        || before.ends_with('?')
+        || before.ends_with('"')
+        || before.ends_with('\u{2014}') // em-dash
+        || before.ends_with(':')
+}
+
+fn find_line_in_source(scene_text: &str, needle: &str) -> Option<usize> {
+    scene_text
+        .lines()
+        .enumerate()
+        .find(|(_, line)| line.contains(needle))
+        .map(|(i, _)| i + 1)
+}
+
+fn truncate_prose(s: &str, max: usize) -> String {
+    if s.chars().count() <= max {
+        s.to_string()
+    } else {
+        let end = s.char_indices().nth(max).map(|(i, _)| i).unwrap_or(s.len());
+        format!("{}...", &s[..end])
+    }
 }
 
 fn collect_validation(

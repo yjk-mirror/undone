@@ -18,12 +18,12 @@ Marcus is at his desk. You can see the back of his head from here. He's typing. 
 {% if w.getSkill("FEMININITY") < 30 %}
 Your body remembers before your brain does. His hands. The conference room door. The thing that happened between the lock clicking and the door opening again. Your stomach tightens and you keep walking toward your desk and nobody in this room knows and the normality of it is absurd.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You walk to your desk. The walk is the same walk. Your heels on the carpet, your bag on your shoulder, the same nod to the same receptionist. Everything is the same except the thing that isn't, which is that you slept with the man sitting thirty feet from your monitor.
+The walk to the desk is the same walk. Heels on the carpet, your bag on your shoulder, the same nod to the same receptionist. Everything is the same except the thing that isn't, which is that you slept with the man sitting thirty feet from your monitor.
 {% else %}
-You walk to your desk. Everything is normal. You are normal. Monday is normal. The conference room door down the hall is closed and it's just a door.
+The desk. Everything is normal. You are normal. Monday is normal. The conference room door down the hall is closed and it's just a door.
 {% endif %}
 
-Dan is at his desk already. He says good morning. You say it back. The screen comes on. Slack has forty unread messages. The week starts.
+Dan is at his desk already. He says good morning. Good morning back. The screen comes on. Slack has forty unread messages. The week starts.
 """
 
 [[thoughts]]

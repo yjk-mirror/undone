@@ -24,7 +24,7 @@ Outside, someone laughs loud enough that Camila hears it through the wall. Colle
 condition = "w.getSkill('FEMININITY') < 20"
 style     = "anxiety"
 prose = """
-You know what you want to do and you're not going to do it because you're in a room with another person and you don't know what this means and you're not ready to know what this means. You pull the blanket up. You stare at the ceiling.
+The want is there — clear, physical, undeniable — and it's not happening tonight. Not with another person in the room. Not when the meaning of it is still an open question. Blanket up. Ceiling.
 
 The thing about shame is it doesn't argue. You can't reason with it. It just sits there saying *you know what this means* and you say *I don't know what it means* and it says *yes you do.*
 

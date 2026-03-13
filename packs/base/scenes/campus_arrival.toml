@@ -20,26 +20,26 @@ The junior types it. Finds it. Because *Camila* is in the system — your parent
 "Here you go." The junior hands her a lanyard with her room key and a campus map. "Aldrich Hall, room 214. Elevator's on the left. Welcome!"
 
 {% if w.hasTrait("SHY") %}
-"Thanks," you say. You take the lanyard and move before the junior can ask anything else.
+The lanyard changes hands. The junior has moved on before anything else can follow.
 {% elif w.hasTrait("AMBITIOUS") %}
-You take the lanyard with the efficiency of someone who has already memorized the campus map from the PDF and doesn't need the paper one. "Thanks," you say, and locate Aldrich Hall before you're ten feet from the table.
+The lanyard, the map — unnecessary, the PDF version was memorized days ago. Aldrich Hall is east of the quad.
 {% else %}
-You say thank you. The junior has already moved on to the next person. You stand for a moment with the lanyard in your hands, looking at the campus, before you start walking.
+The junior has already moved on to the next person. The lanyard is light. The campus stretches ahead.
 {% endif %}
 """
 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 15"
 prose = """
-Move-in day. You walk up to the check-in table, say your name when you're asked, and watch the junior type it into a laptop before handing you a lanyard.
+Move-in day. The check-in table. A name, when asked. The junior types it into a laptop and a lanyard slides across.
 
 *Welcome.*
 
-You walk toward Aldrich Hall. The campus is full of families doing the thing families do on move-in day: carrying boxes, pointing at buildings, taking photos. A woman — a mother — looks at you as you pass. Smiles the way people smile at freshmen on move-in day.
+The campus is full of families doing the thing families do on move-in day: carrying boxes, pointing at buildings, taking photos. A woman — a mother — smiles the way people smile at freshmen on move-in day.
 
-You smile back. The woman looks away. You keep walking.
+A smile back. The woman looks away.
 
-*That happened*, you think. *That was that.* You add it to the list of things that are happening and file it under *later*.
+*That happened*, you think. *That was that.* It goes on the list. Filed under *later*.
 """
 
 [[thoughts]]
@@ -52,7 +52,7 @@ You've been welcomed to things before. Orientation at your private school. The l
 
 Camila, the junior just assumed. Not *welcome, whichever gender you are* — just *welcome.* Like it was obvious.
 
-You walk toward your dorm. It was obvious, you suppose. You suppose that's the whole situation.
+It was obvious, you suppose. You suppose that's the whole situation.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────

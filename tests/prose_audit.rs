@@ -89,6 +89,155 @@ fn prose_audit_flags_meta_analysis_phrasing() {
 }
 
 #[test]
+fn prose_audit_flags_player_speech_in_intro() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = """
+The man hands you the bag.
+
+"Thanks." You take it and keep moving.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        findings
+            .iter()
+            .any(|finding| finding.kind == "player_speech_in_intro"),
+        "expected player_speech_in_intro finding, got: {:?}",
+        findings
+    );
+}
+
+#[test]
+fn prose_audit_flags_player_deliberate_action_in_intro() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = """
+The coffee shop is warm.
+
+You sit down at the counter and order a drink.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        findings
+            .iter()
+            .any(|finding| finding.kind == "player_action_in_intro"),
+        "expected player_action_in_intro finding, got: {:?}",
+        findings
+    );
+}
+
+#[test]
+fn prose_audit_flags_player_speech_verb_in_intro() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = """
+The manager is waiting.
+
+You say your name before he can ask.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        findings
+            .iter()
+            .any(|finding| finding.kind == "player_speech_in_intro"),
+        "expected player_speech_in_intro for 'You say' pattern, got: {:?}",
+        findings
+    );
+}
+
+#[test]
+fn prose_audit_does_not_flag_involuntary_body_response_in_intro() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = """
+The room is cold.
+
+Your hands go numb. You feel the weight of it.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        !findings
+            .iter()
+            .any(|finding| finding.kind == "player_action_in_intro"),
+        "involuntary body response should not be flagged, got: {:?}",
+        findings
+    );
+}
+
+#[test]
+fn prose_audit_does_not_flag_player_speech_in_action_prose() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = "The man is waiting."
+
+[[actions]]
+id = "greet"
+label = "Say hello"
+prose = """
+"Hey there." You smile.
+""""#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        !findings
+            .iter()
+            .any(|finding| finding.kind == "player_speech_in_intro"),
+        "player speech in action prose should not be flagged as intro violation, got: {:?}",
+        findings
+    );
+}
+
+#[test]
+fn prose_audit_flags_player_action_in_thought_prose() {
+    let scene = r#"[scene]
+id = "test::scene"
+pack = "test"
+description = "test"
+
+[intro]
+prose = "The room is quiet."
+
+[[thoughts]]
+condition = "true"
+style = "inner_voice"
+prose = "You grab the notebook from the shelf."
+"#;
+
+    let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
+    assert!(
+        findings
+            .iter()
+            .any(|finding| finding.kind == "player_action_in_intro"),
+        "player action in thought prose should be flagged, got: {:?}",
+        findings
+    );
+}
+
+#[test]
 fn validate_pack_report_includes_prose_findings() {
     let fixture_packs_dir = invalid_prose_pack_dir();
     let report = undone::validate_pack::validate_pack_dir(&fixture_packs_dir).expect("report");
@@ -134,20 +283,55 @@ fn filler_cleanup_cluster_has_no_known_fine_test_phrases() {
 }
 
 #[test]
+fn player_agency_audit_report() {
+    let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
+    let agency_findings: Vec<_> = report
+        .prose_findings
+        .iter()
+        .filter(|f| f.kind == "player_speech_in_intro" || f.kind == "player_action_in_intro")
+        .collect();
+
+    // Print the report for human review
+    for f in &agency_findings {
+        eprintln!(
+            "[{}] {} (line {:?}): {}",
+            f.kind, f.file_path, f.line, f.message
+        );
+    }
+
+    eprintln!("\nTotal player-agency findings: {}", agency_findings.len());
+}
+
+// These tests scope to finding types that were cleaned in prior sessions.
+// Player agency findings (player_speech_in_intro, player_action_in_intro)
+// are expected to exist until Phase 2 rewrites land.
+const PROSE_QUALITY_KINDS: &[&str] = &[
+    "third_person_player_narration",
+    "unnecessary_always_female_guard",
+    "filler_action",
+    "meta_analysis",
+    "fine_test_failure",
+];
+
+#[test]
 fn validate_pack_reports_clean_results_for_touched_scene_cluster() {
     let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
 
+    let findings: Vec<_> = report
+        .findings_for_prefix("packs/base/scenes/campus_")
+        .into_iter()
+        .filter(|f| PROSE_QUALITY_KINDS.contains(&f.kind.as_str()))
+        .collect();
+
     assert!(
-        report
-            .findings_for_prefix("packs/base/scenes/campus_")
-            .is_empty(),
-        "expected cleaned campus cluster to be free of audit findings, got: {:?}",
-        report.findings_for_prefix("packs/base/scenes/campus_")
+        findings.is_empty(),
+        "expected cleaned campus cluster to be free of prose quality findings, got: {:?}",
+        findings
     );
 }
 
 #[test]
-fn workplace_opening_spine_has_no_current_known_prose_audit_findings() {
+fn workplace_opening_spine_has_no_prose_quality_findings() {
     let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
     let files = [
         "packs/base/scenes/workplace_arrival.toml",
@@ -165,14 +349,14 @@ fn workplace_opening_spine_has_no_current_known_prose_audit_findings() {
             report
                 .prose_findings
                 .iter()
-                .filter(|finding| finding.file_path == file)
+                .filter(|f| f.file_path == file && PROSE_QUALITY_KINDS.contains(&f.kind.as_str()))
                 .cloned(),
         );
     }
 
     assert!(
         findings.is_empty(),
-        "expected workplace opening spine to be free of prose audit findings, got: {:?}",
+        "expected workplace opening spine to be free of prose quality findings, got: {:?}",
         findings
     );
 }

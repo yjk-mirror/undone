@@ -11,33 +11,33 @@ You're at a round table with seven other freshmen. The table has been given an i
 
 The people at her table go around. One person is nervous about the workload. One person is excited about the research opportunities. A guy two seats over — broad, easy smile, one of those people who are comfortable everywhere — says he's excited to "meet new people" and nervous about nothing, which gets a laugh, which he clocked and aimed for.
 
-When it gets to her she says she's excited about the coursework and nervous about time management.
+When it gets to her: excitement about the coursework. Nerves about time management.
 
 The broad guy across the table — his name tag says ADAM — gives you the smile that you now know what to do with, which is to clock it and file it and decide later whether it has implications.
 
-It's the same smile you gave to women at parties. You know exactly what it's for. You know exactly how it reads from the other side now. You take a sip of water.
+It's the same smile you gave to women at parties. You know exactly what it's for. You know exactly how it reads from the other side now.
 
 {% if w.hasTrait("SHY") %}
 Nobody asks follow-up questions. The card moves on. You're relieved.
 {% elif w.hasTrait("AMBITIOUS") %}
 Three people at the table ask follow-up questions. You field them with the ease of someone who's been in rooms where she needs to be taken seriously and has learned how.
 {% else %}
-Adam asks what you're studying. You tell him. He nods like it's interesting, which it probably is, or probably isn't, and you can't quite tell which.
+Adam asks what you're studying. He nods like it's interesting, which it probably is, or probably isn't, and you can't quite tell which.
 {% endif %}
 """
 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 15"
 prose = """
-Freshman orientation. You sit at the assigned table. The icebreaker card says *Share something.*
+Freshman orientation. The assigned table. The icebreaker card says *Share something.*
 
-You say time management. The real answer is different but the real answer is not for this table.
+Time management. The real answer is different but the real answer is not for this table.
 
 The guy two seats over — broad, easy smile — does the thing with the smile. You watch him do it. Watch it land in the room. You've been on the other side of that smile and you know exactly what it's encoding.
 
 *You're watching this from the outside now*, she thinks, and then corrects herself: *No. You're watching it from the other side.* That's different. That's the whole thing.
 
-You take a sip of water. Orientation continues.
+Orientation continues.
 """
 
 [[thoughts]]
@@ -50,7 +50,7 @@ You know what that means. You've done it. The specific warmth of it, the manufac
 
 You're standing on the other side of it. He hasn't done anything wrong — he's being perfectly nice. You're just seeing the blueprint now instead of the wall.
 
-You don't know what to do with this information. You add it to the list.
+No clear protocol for this information. It goes on the list.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
