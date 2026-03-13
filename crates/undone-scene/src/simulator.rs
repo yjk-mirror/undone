@@ -402,6 +402,7 @@ mod tests {
                     weight: 10,
                     once_only: false,
                     trigger: None,
+                    npc_role: None,
                 },
                 crate::scheduler::ScheduleEvent {
                     scene: "test::b".into(),
@@ -409,6 +410,7 @@ mod tests {
                     weight: 10,
                     once_only: false,
                     trigger: None,
+                    npc_role: None,
                 },
             ],
         )]));
@@ -444,6 +446,7 @@ mod tests {
                     weight: 10,
                     once_only: false,
                     trigger: None,
+                    npc_role: None,
                 },
                 crate::scheduler::ScheduleEvent {
                     scene: "test::never".into(),
@@ -451,6 +454,7 @@ mod tests {
                     weight: 10,
                     once_only: false,
                     trigger: None,
+                    npc_role: None,
                 },
             ],
         )]));

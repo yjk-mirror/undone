@@ -368,7 +368,13 @@ pub fn resume_current_world(gs: &mut GameState) -> ResumeGameResult {
         gs.current_scene_time_anchor = result
             .consumes_time
             .then(|| SceneTimeAnchor::capture(&gs.world));
-        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, result.scene_id);
+        crate::start_scene(
+            &mut gs.engine,
+            &gs.world,
+            &gs.registry,
+            result.scene_id,
+            result.npc_role.as_deref(),
+        );
     }
 
     ResumeGameResult {
@@ -573,7 +579,13 @@ mod tests {
                 .game_data
                 .set_flag(format!("ONCE_{}", first_pick.scene_id));
         }
-        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, first_pick.scene_id);
+        crate::start_scene(
+            &mut gs.engine,
+            &gs.world,
+            &gs.registry,
+            first_pick.scene_id,
+            first_pick.npc_role.as_deref(),
+        );
         play_scene_to_finish(&mut gs);
 
         assert_eq!(
@@ -656,6 +668,7 @@ mod tests {
             &source.world,
             &source.registry,
             first_pick.scene_id,
+            first_pick.npc_role.as_deref(),
         );
         play_scene_to_finish(&mut source);
 
@@ -696,7 +709,13 @@ mod tests {
                 .game_data
                 .set_flag(format!("ONCE_{}", first_pick.scene_id));
         }
-        crate::start_scene(&mut gs.engine, &gs.world, &gs.registry, first_pick.scene_id);
+        crate::start_scene(
+            &mut gs.engine,
+            &gs.world,
+            &gs.registry,
+            first_pick.scene_id,
+            first_pick.npc_role.as_deref(),
+        );
         play_scene_to_finish(&mut gs);
 
         let save_path = temp_save_path("resume_snapshot_reset");

@@ -503,17 +503,34 @@ pub fn app_view(window_id: WindowId, dev_mode: bool, quick_start: bool) -> impl 
 /// Start a scene and wire in the active NPCs so effects like `set_npc_role` and
 /// `add_npc_liking` can resolve their `npc = "m"` / `npc = "f"` references.
 ///
-/// The game loop is responsible for this — the engine only stores the active NPC
-/// keys, it doesn't pick them. For now we activate the first male and first female
-/// NPC in the world's slotmaps (the spawner guarantees at least one of each).
+/// When `npc_role` is provided (from the schedule event), the NPC with that role
+/// is preferred as the active male/female. Falls back to the first NPC in the
+/// slotmap when no role is specified or no NPC has the requested role.
 pub fn start_scene(
     engine: &mut undone_scene::engine::SceneEngine,
     world: &World,
     registry: &undone_packs::PackRegistry,
     scene_id: String,
+    npc_role: Option<&str>,
 ) {
-    let active_male = world.male_npcs.iter().next().map(|(key, _)| key);
-    let active_female = world.female_npcs.iter().next().map(|(key, _)| key);
+    let active_male = npc_role
+        .and_then(|role| {
+            world
+                .male_npcs
+                .iter()
+                .find(|(_, npc)| npc.core.roles.contains(role))
+                .map(|(key, _)| key)
+        })
+        .or_else(|| world.male_npcs.iter().next().map(|(key, _)| key));
+    let active_female = npc_role
+        .and_then(|role| {
+            world
+                .female_npcs
+                .iter()
+                .find(|(_, npc)| npc.core.roles.contains(role))
+                .map(|(key, _)| key)
+        })
+        .or_else(|| world.female_npcs.iter().next().map(|(key, _)| key));
     engine.start_scene_with_bindings(scene_id, active_male, active_female, world, registry);
 }
 
@@ -892,7 +909,13 @@ mod tests {
         let personality = registry.intern_personality("ROMANTIC");
         let male_key = world.male_npcs.insert(test_male_npc(personality));
 
-        start_scene(&mut engine, &world, &registry, "test::npc_binding".into());
+        start_scene(
+            &mut engine,
+            &world,
+            &registry,
+            "test::npc_binding".into(),
+            None,
+        );
         engine.drain();
 
         engine.send(
@@ -938,6 +961,7 @@ mod tests {
             &world,
             &registry,
             "test::intro_time_npc".into(),
+            None,
         );
         let events = engine.drain();
 

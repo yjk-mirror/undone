@@ -32,7 +32,7 @@ impl<'a> RuntimeController<'a> {
             return Err(format!("Unknown scene '{scene_id}'"));
         }
 
-        self.start_scene_internal(scene_id, None)
+        self.start_scene_internal(scene_id, None, None)
     }
 
     pub fn choose_action(&mut self, action_id: &str) -> RuntimeCommandResult {
@@ -109,6 +109,7 @@ impl<'a> RuntimeController<'a> {
         &mut self,
         scene_id: String,
         scene_time_anchor: Option<SceneTimeAnchor>,
+        npc_role: Option<&str>,
     ) -> RuntimeCommandResult {
         self.gs.current_scene_time_anchor = scene_time_anchor;
         reset_scene_ui_state(self.signals);
@@ -117,6 +118,7 @@ impl<'a> RuntimeController<'a> {
             &self.gs.world,
             &self.gs.registry,
             scene_id.clone(),
+            npc_role,
         );
         let events = self.gs.engine.drain();
         let scene_finished =
@@ -144,12 +146,16 @@ impl<'a> RuntimeController<'a> {
             let scene_time_anchor = result
                 .consumes_time
                 .then(|| SceneTimeAnchor::capture(&self.gs.world));
-            return self.start_scene_internal(result.scene_id, scene_time_anchor);
+            return self.start_scene_internal(
+                result.scene_id,
+                scene_time_anchor,
+                result.npc_role.as_deref(),
+            );
         }
 
         if allow_opening_scene {
             if let Some(scene_id) = self.gs.opening_scene.take() {
-                return self.start_scene_internal(scene_id, None);
+                return self.start_scene_internal(scene_id, None, None);
             }
         }
 
@@ -173,7 +179,11 @@ impl<'a> RuntimeController<'a> {
                 .consumes_time
                 .then(|| SceneTimeAnchor::capture(&self.gs.world));
             return self
-                .start_scene_internal(result.scene_id, scene_time_anchor)
+                .start_scene_internal(
+                    result.scene_id,
+                    scene_time_anchor,
+                    result.npc_role.as_deref(),
+                )
                 .expect("scheduler returned a known scene id");
         }
 

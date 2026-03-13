@@ -88,6 +88,7 @@ consumes_time = true
   scene     = "base::jake_outside"
   weight    = 7
   condition = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE')"
+  npc_role  = "ROLE_JAKE"
 
   # Jake romance arc — gated by progressive flags
   [[slot.events]]
@@ -95,29 +96,34 @@ consumes_time = true
   weight    = 0
   trigger   = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && (gd.npcLiking('ROLE_JAKE') == 'Like' || gd.npcLiking('ROLE_JAKE') == 'Close')"
   once_only = true
+  npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_second_date"
   weight    = 0
   trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
   once_only = true
+  npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_apartment"
   weight    = 0
   trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
   once_only = true
+  npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_morning_after"
   weight    = 0
   trigger   = "gd.hasGameFlag('JAKE_INTIMATE') && !gd.hasGameFlag('JAKE_MORNING_AFTER')"
   once_only = true
+  npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_text_messages"
   weight    = 5
   condition = "gd.hasGameFlag('JAKE_INTIMATE')"
+  npc_role  = "ROLE_JAKE"
 
   # New universal scenes
   [[slot.events]]
@@ -255,35 +261,41 @@ consumes_time = true
   scene     = "base::work_marcus_coffee"
   weight    = 9
   condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE')"
+  npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_favor"
   weight    = 7
   condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
+  npc_role  = "ROLE_MARCUS"
 
   # Marcus tension arc — escalation scenes
   [[slot.events]]
   scene     = "base::work_marcus_late"
   weight    = 8
   condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
+  npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_drinks"
   weight    = 0
   trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_LATE_NIGHT') && !gd.hasGameFlag('MARCUS_DRINKS') && gd.npcLiking('ROLE_MARCUS') == 'Like'"
   once_only = true
+  npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_closet"
   weight    = 0
   trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_DRINKS') && !gd.hasGameFlag('MARCUS_INTIMATE')"
   once_only = true
+  npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_aftermath"
   weight    = 0
   trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_INTIMATE') && !gd.hasGameFlag('MARCUS_AFTERMATH')"
   once_only = true
+  npc_role  = "ROLE_MARCUS"
 
 # ── Campus opening arc ────────────────────────────────────────────────
 

@@ -61,6 +61,8 @@ struct ScheduleEventToml {
     once_only: bool,
     #[serde(default)]
     trigger: Option<String>,
+    #[serde(default)]
+    npc_role: Option<String>,
 }
 
 fn default_weight() -> u32 {
@@ -78,6 +80,7 @@ pub(crate) struct ScheduleEvent {
     pub(crate) weight: u32,
     pub(crate) once_only: bool,
     pub(crate) trigger: Option<Expr>,
+    pub(crate) npc_role: Option<String>,
 }
 
 #[derive(Clone)]
@@ -98,6 +101,9 @@ pub struct PickResult {
     pub once_only: bool,
     pub slot_name: String,
     pub consumes_time: bool,
+    /// When set, the runtime should bind the NPC with this role as the active
+    /// male (or female) NPC before starting the scene.
+    pub npc_role: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -251,6 +257,7 @@ impl Scheduler {
                 once_only: e.once_only,
                 slot_name: slot.name.clone(),
                 consumes_time: slot.consumes_time,
+                npc_role: e.npc_role.clone(),
             })
     }
 
@@ -292,6 +299,7 @@ impl Scheduler {
                 once_only: e.once_only,
                 slot_name: slot.name.clone(),
                 consumes_time: slot.consumes_time,
+                npc_role: e.npc_role.clone(),
             })
     }
 
@@ -348,6 +356,7 @@ impl Scheduler {
                         once_only: e.once_only,
                         slot_name: slot.name.clone(),
                         consumes_time: slot.consumes_time,
+                        npc_role: e.npc_role.clone(),
                     });
                 }
             }
@@ -399,6 +408,7 @@ impl Scheduler {
                 once_only: e.once_only,
                 slot_name: slot.name.clone(),
                 consumes_time: slot.consumes_time,
+                npc_role: e.npc_role.clone(),
             })
     }
 
@@ -539,6 +549,7 @@ pub fn load_schedule(
                     weight: ev.weight,
                     once_only: ev.once_only,
                     trigger,
+                    npc_role: ev.npc_role,
                 });
             }
         }
@@ -649,6 +660,7 @@ mod tests {
             weight: 5,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let work_event = ScheduleEvent {
             scene: "test::work_scene".into(),
@@ -656,6 +668,7 @@ mod tests {
             weight: 100,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let scheduler = Scheduler {
             slots: HashMap::from([
@@ -792,6 +805,7 @@ mod tests {
             weight: 0,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -817,6 +831,7 @@ mod tests {
                 weight: 5,
                 once_only: false,
                 trigger: None,
+                npc_role: None,
             },
             ScheduleEvent {
                 scene: "test::scene_b".into(),
@@ -824,6 +839,7 @@ mod tests {
                 weight: 5,
                 once_only: false,
                 trigger: None,
+                npc_role: None,
             },
         ];
         let mut slots = HashMap::new();
@@ -860,6 +876,7 @@ mod tests {
             weight: 10,
             once_only: true,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -895,6 +912,7 @@ mod tests {
             weight: 10,
             once_only: true,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -923,6 +941,7 @@ mod tests {
             weight: 0,
             once_only: false,
             trigger: Some(trigger_expr),
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -948,6 +967,7 @@ mod tests {
             weight: 0,
             once_only: false,
             trigger: Some(trigger_expr),
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -972,6 +992,7 @@ mod tests {
             weight: 0,
             once_only: true,
             trigger: Some(trigger_expr),
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -996,6 +1017,7 @@ mod tests {
             weight: 1,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
@@ -1049,6 +1071,7 @@ mod tests {
             weight: 10,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
@@ -1071,6 +1094,7 @@ mod tests {
             weight: 0, // zero weight — only eligible via trigger
             once_only: false,
             trigger: Some(trigger_expr),
+            npc_role: None,
         };
         let weighted_event = ScheduleEvent {
             scene: "test::weighted".into(),
@@ -1078,6 +1102,7 @@ mod tests {
             weight: 100,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         // Put triggered in "a_slot" (sorts first alphabetically) and weighted in "b_slot"
@@ -1132,6 +1157,7 @@ mod tests {
             weight: 10,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let route_condition = undone_expr::parse("gd.hasGameFlag('ROUTE_WORKPLACE')").unwrap();
         let arc_event = ScheduleEvent {
@@ -1140,6 +1166,7 @@ mod tests {
             weight: 100, // much higher weight — should dominate when eligible
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![free_event]);
@@ -1323,6 +1350,7 @@ mod tests {
             weight: 1,
             once_only: false,
             trigger: None,
+            npc_role: None,
         };
         let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 
@@ -1338,6 +1366,7 @@ mod tests {
             weight: 1,
             once_only: false,
             trigger: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_CAMPUS')").unwrap()),
+            npc_role: None,
         };
         let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 
