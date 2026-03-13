@@ -137,14 +137,14 @@ He comes back with coffee and sits close and your bare shoulder touches his arm 
 [[actions]]
 id     = "get_up_quietly"
 label  = "Get up quietly"
-detail = "She needs to process alone."
+detail = "You need to process alone."
 prose  = """
 You slide out from under his arm. Slow. He shifts but doesn't wake — a murmured sound, then the breathing evens out.
 
 Your clothes are on the floor. You find them in the order they came off, which is the reverse order of last night's narrative and you're not thinking about that. Underwear. Jeans. The shirt that smells like the bar and like him.
 
 {% if w.hasTrait("ANALYTICAL") %}
-You dress in the bathroom. The mirror shows you a woman who had sex last night — flushed, hair tangled, a mark on her collarbone that she touches once and then buttons her shirt over. You splash water on your face. The analysis will come later. Right now you're operating on autopilot and autopilot says: leave, walk, process.
+You dress in the bathroom. The mirror shows you a woman who had sex last night — flushed, hair tangled, a mark on your collarbone that you touch once and then button your shirt over. You splash water on your face. The analysis will come later. Right now you're operating on autopilot and autopilot says: leave, walk, process.
 {% elif w.hasTrait("SHY") %}
 You dress fast, in the hallway, listening for his breathing to change. It doesn't. The apartment is quiet. His keys are on the counter and his coffee maker is there and his whole life is here in this small apartment and you were in it last night and now you're leaving it.
 
@@ -188,7 +188,7 @@ The walk home is twenty minutes. You put your headphones in and don't play anyth
 [[actions]]
 id     = "wake_him"
 label  = "Wake him up"
-detail = "The morning is its own thing. She's not done."
+detail = "The morning is its own thing. You're not done."
 prose  = """
 You turn over. His face is close — eyes closed, mouth slightly open, the particular slack of a man deeply asleep. His jaw in the morning light. You touch it.
 

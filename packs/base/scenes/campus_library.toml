@@ -11,11 +11,11 @@ It's Thursday. You have a problem set due Monday and a reading due tomorrow. You
 
 You don't look up immediately. You finish the sentence you're writing. Then you look up.
 
-He's about her age. Dark hair, serious face, the kind of jaw that you notice before you've decided to notice anything. He's opening a problem set that looks like hers — same course number at the top, she can see it from here.
+He's about your age. Dark hair, serious face, the kind of jaw that you notice before you've decided to notice anything. He's opening a problem set that looks like yours — same course number at the top, you can see it from here.
 
 All of this registers in about a second, and then the registration itself registers, and then — back to notes.
 
-*Oh*, she thinks. *Okay.*
+*Oh.* *Okay.*
 
 You are not ready for this. You were ready for the general concept, which you'd been processing for a week. You were not ready for it to arrive with a jaw and a problem set and sit across from you in the library at 3 PM on a Thursday.
 """
@@ -57,7 +57,7 @@ You work. He works. The reading room does what reading rooms do.
 
 Ninety minutes later you're through the problem set and into the reading, and the person across from you has packed up and left at some point in the last twenty minutes, and you didn't notice when. You notice his absence and then note that you noticed it.
 
-*Okay*, she thinks. *Information. Filed.*
+*Okay. Information. Filed.*
 
 You close your laptop and gather your things. You'll process it later. You've processed everything else later and that's worked approximately as well as anything.
 """
@@ -101,7 +101,7 @@ label  = "He looks up from his work"
 weight = 6
 condition = "!scene.hasFlag('talked') && !scene.hasFlag('noticed')"
 prose = """
-He looks up — maybe she moved, maybe he just needed a break from the problem set — and they make eye contact for about a second.
+He looks up — maybe you moved, maybe he just needed a break from the problem set — and you make eye contact for about a second.
 
 He looks back at his work. You look back at yours.
 

@@ -21,28 +21,28 @@ Five minutes. Then work. The study room.
 [[actions]]
 id     = "distraction"
 label  = "Continue"
-detail = "Something pulls her attention before the five minutes are up."
+detail = "Something pulls your attention before the five minutes are up."
 prose = """
 {% if w.hasTrait("SEXIST") %}
-The two students by the windows are sharing notes on something. One of them is showing the other a diagram — she can see them pointing at it, back and forth. The one doing the explaining is a girl, maybe a year older than Camila, talking through something with patient precision.
+The two students by the windows are sharing notes on something. One of them is showing the other a diagram — you can see them pointing at it, back and forth. The one doing the explaining is a girl, maybe a year older, talking through something with patient precision.
 
-Camila watches this for a second and catches herself having a thought.
+You watch this for a second and catch yourself having a thought.
 
 It's not a loud thought. It's the kind of thought that arrives fully formed, pre-verbal, the way old opinions do before you've examined them: *yeah, but does she actually understand it, or is she just explaining what someone else told her?*
 
-The thought is already gone before she recognizes what it was.
+The thought is already gone before you recognize what it was.
 
 You look down at your notebook. Twelve lines. Most of them copied from the chapter you read last night, which you understood because you read it carefully and it clicked, because you've always been good at this, because — because —
 
 You put the pen down again. The girl by the window is still explaining, and her lab partner is nodding and writing things down, and it looks like the exact, unremarkable way smart people talk through problems together. It looks exactly like that.
 
-*Oh*, she thinks, and doesn't finish the thought.
+*Oh.* The thought doesn't finish.
 
-The guy at the table two spots down turns a page in his textbook. Outside, someone is walking by with a coffee. The fluorescent light over the whiteboard flickers once and goes still, and she picks up her pen.
+The guy at the table two spots down turns a page in his textbook. Outside, someone is walking by with a coffee. The fluorescent light over the whiteboard flickers once and goes still, and you pick up your pen.
 {% elif w.hasTrait("HOMOPHOBIC") %}
-The guy at the table two spots down has been reading for an hour. He looks up at some point — to think, or to rest his eyes, she doesn't know — and for a second he's looking in her direction.
+The guy at the table two spots down has been reading for an hour. He looks up at some point — to think, or to rest his eyes, you don't know — and for a second he's looking in your direction.
 
-He's not looking at her. His eyes are somewhere in the middle distance between her and the whiteboard, the way people's eyes go when they're solving something. He has good cheekbones and the specific kind of tiredness that looks like concentration. He doesn't register her at all.
+He's not looking at you. His eyes are somewhere in the middle distance between you and the whiteboard, the way people's eyes go when they're solving something. He has good cheekbones and the specific kind of tiredness that looks like concentration. He doesn't register you at all.
 
 You look back at your notebook.
 
@@ -52,15 +52,15 @@ Then the rest of it arrives. You know what those jokes meant. You've known for a
 
 He turns a page. You read the same sentence for the third time and this time you actually read it.
 {% elif w.hasTrait("AMBITIOUS") %}
-Ninety minutes in, she counts what she's actually done.
+Ninety minutes in, you count what you've actually done.
 
-Two-thirds of the reading. The first three problems out of eight. A page of notes that are mostly repetition from the chapter rather than her own working through it. The kind of session that looks productive if you squint and don't count the time.
+Two-thirds of the reading. The first three problems out of eight. A page of notes that are mostly repetition from the chapter rather than your own working through it. The kind of session that looks productive if you squint and don't count the time.
 
 You've always been able to work. Not in the sense of working hard — you've never loved the effort — but in the sense of just sitting down and doing it, of being able to close off everything external and point yourself at the problem until it resolved. It was one of the things you were quietly sure of. You weren't the most organized. You weren't always the most prepared. But you could always, when it mattered, just *go*.
 
 You are not going. You've been here ninety minutes and you have two-thirds of a reading and three problems, and the study room is quiet and there are no external distractions and the work is not even particularly hard. You understand the material. You checked. When you actually read a sentence you know what it means.
 
-The problem is she keeps not reading the sentences.
+The problem is you keep not reading the sentences.
 
 You flip back through the notebook to the first useful line. You wrote it forty minutes ago. The handwriting after it deteriorates for two lines and then stops. You were going to finish the thought and then you lost the thread and started writing about something else for a line and a half and then stopped entirely.
 
@@ -68,7 +68,7 @@ You were going to be the person in this building who had things under control. Y
 
 You draw a line under the last useful line and start from there.
 {% else %}
-The two students by the windows pack up and leave sometime after three, and the study room is quieter without them, and she still hasn't produced anything useful.
+The two students by the windows pack up and leave sometime after three, and the study room is quieter without them, and you still haven't produced anything useful.
 
 You're not distracted by anything specific. That's the part you keep turning over. There's no reason. The room is quiet. The material is fine. You had a plan for this afternoon — two hours of reading, problem set started, at least forty minutes of real productive time — and you've been sitting here for ninety minutes doing an impression of a person who is about to start.
 
@@ -86,7 +86,7 @@ You work through the rest of the problem set in order. It takes you an hour. The
 
 You don't look at the students by the window again. You don't not-look at them either, which would be its own kind of thing. You just work.
 
-Somewhere in the last hour, the girl who was explaining the diagram finishes whatever she was explaining and both of them close their notebooks and leave together, talking. Camila hears a fragment of what they're saying — something about a lab section, something about Thursday — and it sounds exactly the way any two students sound when they're leaving a study session that went well.
+Somewhere in the last hour, the girl who was explaining the diagram finishes whatever she was explaining and both of them close their notebooks and leave together, talking. You hear a fragment of what they're saying — something about a lab section, something about Thursday — and it sounds exactly the way any two students sound when they're leaving a study session that went well.
 
 You finish problem eight, close the notebook, and sit for a second.
 
@@ -122,9 +122,9 @@ You'll be faster next time. You'll have to be.
 {% else %}
 You work. Slowly, then not-slowly. The reading comes together across the next hour and a half in the way that work sometimes does when you stop waiting for it to feel right and just do it — not inspired, not flowing, just sentence by sentence until there's enough of them and they add up.
 
-The problems go okay. Three of them are straightforward. The other two take longer than she'd like.
+The problems go okay. Three of them are straightforward. The other two take longer than you'd like.
 
-At five o'clock she has everything done and she sits for a minute, her hands flat on the notebook, letting the end of the session settle. The study room is nearly empty. Someone outside the door is on a phone call, voice low and fast.
+At five o'clock you have everything done and you sit for a minute, your hands flat on the notebook, letting the end of the session settle. The study room is nearly empty. Someone outside the door is on a phone call, voice low and fast.
 
 Your body is still there — it's always there, always slightly too present — but you're not thinking about it right now, which is maybe as much as you can ask for on a Tuesday.
 

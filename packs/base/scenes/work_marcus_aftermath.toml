@@ -93,7 +93,7 @@ You flush. You wash your hands. You go back to your desk.
 [[actions]]
 id     = "find_him"
 label  = "Find him"
-detail = "She needs to know where they stand. Not feelings. Logistics."
+detail = "You need to know where they stand. Not feelings. Logistics."
 prose  = """
 You wait until 10:30. The standup is done. The first round of coffee is cleared. You get up, walk to the kitchen, and he's there — refilling his mug, back to the door.
 

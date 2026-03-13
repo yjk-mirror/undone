@@ -13,11 +13,11 @@ You have a duffel bag and a laptop case and a driver's license that says Raul, a
 
 You almost say Raul.
 
-"Camila," she says instead.
+"Camila," you say instead.
 
 The junior types it. Finds it. Because *Camila* is in the system — your parents' emergency contact, which you'd filled out months ago under your old name, had been quietly updated when the enrollment office got your email last week. You'd called it "a legal name update." The office person had been completely normal about it, which you had not expected and still don't know what to do with.
 
-"Here you go." The junior hands her a lanyard with her room key and a campus map. "Aldrich Hall, room 214. Elevator's on the left. Welcome!"
+"Here you go." The junior hands you a lanyard with your room key and a campus map. "Aldrich Hall, room 214. Elevator's on the left. Welcome!"
 
 {% if w.hasTrait("SHY") %}
 The lanyard changes hands. The junior has moved on before anything else can follow.
@@ -101,14 +101,14 @@ A knock on the open door. A junior — tall, natural hair, clipboard — leans i
 
 "Hey, I'm Priya, your RA. Just doing a quick check-in. You get the key okay?"
 
-"Yeah," Camila says. "Thank you."
+"Yeah," you say. "Thank you."
 
 Priya glances at the room. "Your roommate's Janette — she's usually here by noon." She gives the spiel: quiet hours, common room, her door is always open, weekly study breaks on Wednesdays. She delivers it with the warmth of someone who's done it enough times to mean it.
 
 {% if w.hasTrait("SHY") %}
-Camila nods at the right moments. When Priya leaves she feels slightly better about the whole thing, which she didn't expect.
+You nod at the right moments. When Priya leaves you feel slightly better about the whole thing, which you didn't expect.
 {% else %}
-Camila asks one question — where's the nearest laundry — and Priya answers it and is gone in thirty seconds. Efficient. Camila approves.
+You ask one question — where's the nearest laundry — and Priya answers it and is gone in thirty seconds. Efficient. Approved.
 {% endif %}
 
 You go back to unpacking.

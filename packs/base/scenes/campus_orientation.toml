@@ -5,13 +5,13 @@ description = "Freshman orientation. The quad, the panels, the men who talk to h
 
 [intro]
 prose = """
-Freshman orientation is a series of large rooms with name tags and people who have practiced their welcome. The Dean of Students speaks for thirty minutes. Two upperclassmen do a skit about campus resources that is slightly painful. Someone explains the honor code with genuine conviction, which Camila finds almost touching.
+Freshman orientation is a series of large rooms with name tags and people who have practiced their welcome. The Dean of Students speaks for thirty minutes. Two upperclassmen do a skit about campus resources that is slightly painful. Someone explains the honor code with genuine conviction, which you find almost touching.
 
 You're at a round table with seven other freshmen. The table has been given an icebreaker card: *Share one thing you're excited about and one thing you're nervous about.*
 
-The people at her table go around. One person is nervous about the workload. One person is excited about the research opportunities. A guy two seats over — broad, easy smile, one of those people who are comfortable everywhere — says he's excited to "meet new people" and nervous about nothing, which gets a laugh, which he clocked and aimed for.
+The people at your table go around. One person is nervous about the workload. One person is excited about the research opportunities. A guy two seats over — broad, easy smile, one of those people who are comfortable everywhere — says he's excited to "meet new people" and nervous about nothing, which gets a laugh, which he clocked and aimed for.
 
-When it gets to her: excitement about the coursework. Nerves about time management.
+When it gets to you: excitement about the coursework. Nerves about time management.
 
 The broad guy across the table — his name tag says ADAM — gives you the smile that you now know what to do with, which is to clock it and file it and decide later whether it has implications.
 
@@ -20,7 +20,7 @@ It's the same smile you gave to women at parties. You know exactly what it's for
 {% if w.hasTrait("SHY") %}
 Nobody asks follow-up questions. The card moves on. You're relieved.
 {% elif w.hasTrait("AMBITIOUS") %}
-Three people at the table ask follow-up questions. You field them with the ease of someone who's been in rooms where she needs to be taken seriously and has learned how.
+Three people at the table ask follow-up questions. You field them with the ease of someone who's been in rooms where you need to be taken seriously and learned how.
 {% else %}
 Adam asks what you're studying. He nods like it's interesting, which it probably is, or probably isn't, and you can't quite tell which.
 {% endif %}
@@ -35,7 +35,7 @@ Time management. The real answer is different but the real answer is not for thi
 
 The guy two seats over — broad, easy smile — does the thing with the smile. You watch him do it. Watch it land in the room. You've been on the other side of that smile and you know exactly what it's encoding.
 
-*You're watching this from the outside now*, she thinks, and then corrects herself: *No. You're watching it from the other side.* That's different. That's the whole thing.
+*Watching this from the outside now.* And then: *No. From the other side.* That's different. That's the whole thing.
 
 Orientation continues.
 """
@@ -63,9 +63,9 @@ allow_npc_actions = true
 prose = """
 You stay for the afternoon sessions — academic resources, financial aid, the campus wellness center — and actually take notes on things you didn't know. The financial aid session in particular is useful. You talk to an advisor for ten minutes after and come out with information that you wouldn't have if you'd cut early.
 
-By four she's back in the dorm with a folder of pamphlets and a slightly better sense of where everything is.
+By four you're back in the dorm with a folder of pamphlets and a slightly better sense of where everything is.
 
-Janette is in the room, already complaining cheerfully about the icebreaker cards. Camila drops her bag. You agree that the icebreaker cards were bad. Janette laughs. This is a fine basis for a living situation.
+Janette is in the room, already complaining cheerfully about the icebreaker cards. You drop your bag. You agree that the icebreaker cards were bad. Janette laughs. This is a fine basis for a living situation.
 """
 
   [[actions.effects]]
@@ -106,12 +106,12 @@ label     = "Adam keeps the conversation going"
 weight    = 7
 condition = "!scene.hasFlag('adam_done')"
 prose = """
-After the morning session Adam materializes next to her at the coffee table with the ease of someone who is used to materializing next to people at coffee tables.
+After the morning session Adam materializes next to you at the coffee table with the ease of someone who is used to materializing next to people at coffee tables.
 
 "Your major's actually kind of interesting," he says. "I was thinking about doing something similar but then I took one look at the prerequisites."
 
 {% if w.hasTrait("AMBITIOUS") %}
-"The prerequisites are the easy part," she says, and he laughs, which was not the intended effect but she'll take it.
+"The prerequisites are the easy part," you say, and he laughs, which was not the intended effect but you'll take it.
 {% elif w.hasTrait("FLIRTY") %}
 "The prerequisites are miserable," you agree. "Worth it though." You say it like you know, which you do, and he leans slightly more toward you than the conversation requires.
 {% else %}
