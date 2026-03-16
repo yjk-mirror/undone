@@ -217,6 +217,16 @@ fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
     let _ = controller.continue_flow();
 }
 
+fn centered_action_hitbox_contains(bar_width: f64, control_width: f64, point_x: f64) -> bool {
+    if bar_width <= 0.0 || point_x < 0.0 || point_x > bar_width {
+        return false;
+    }
+
+    let visible_width = control_width.clamp(0.0, bar_width);
+    let inset = (bar_width - visible_width) / 2.0;
+    point_x >= inset && point_x <= inset + visible_width
+}
+
 pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
     let story = signals.story;
     let actions = signals.actions;
@@ -449,24 +459,25 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
 }
 
 fn continue_button(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
-    let btn = label(move || "Continue".to_string()).style(move |s| {
-        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-        s.padding_vert(12.0)
-            .padding_horiz(24.0)
-            .border_radius(4.0)
-            .border(1.0)
-            .border_color(colors.seam)
-            .color(colors.ink)
-            .font_size(15.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
-            .cursor(floem::style::CursorStyle::Pointer)
-            .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
-    });
-
-    container(btn)
+    let btn = label(move || "Continue".to_string())
         .on_click_stop(move |_| {
             continue_to_next_scene(&state, signals);
         })
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.padding_vert(12.0)
+                .padding_horiz(24.0)
+                .border_radius(4.0)
+                .border(1.0)
+                .border_color(colors.seam)
+                .color(colors.ink)
+                .font_size(15.0)
+                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .cursor(floem::style::CursorStyle::Pointer)
+                .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
+        });
+
+    container(btn)
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.width_full()
@@ -614,6 +625,7 @@ fn choices_bar(
 
 #[cfg(test)]
 mod tests {
+    use super::centered_action_hitbox_contains;
     use crate::layout::{
         action_button_columns_for_window, action_button_rows_for_window, sidebar_width_for_window,
     };
@@ -637,5 +649,19 @@ mod tests {
         assert_eq!(action_button_rows_for_window(1200.0, 5), 2);
         assert_eq!(action_button_rows_for_window(900.0, 5), 3);
         assert_eq!(action_button_rows_for_window(650.0, 2), 2);
+    }
+
+    #[test]
+    fn continue_hitbox_is_limited_to_visible_chrome() {
+        assert!(centered_action_hitbox_contains(480.0, 132.0, 240.0));
+        assert!(!centered_action_hitbox_contains(480.0, 132.0, 48.0));
+        assert!(!centered_action_hitbox_contains(480.0, 132.0, 432.0));
+    }
+
+    #[test]
+    fn action_bar_dead_space_is_not_owned_by_centered_controls() {
+        assert!(centered_action_hitbox_contains(960.0, 720.0, 480.0));
+        assert!(!centered_action_hitbox_contains(960.0, 720.0, 80.0));
+        assert!(!centered_action_hitbox_contains(960.0, 720.0, 920.0));
     }
 }
