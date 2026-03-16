@@ -1,6 +1,7 @@
 use crate::game_state::GameState;
 use crate::layout::{
-    story_panel_max_height, story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
+    story_panel_max_height, story_region_width_for_window, ACTION_BAR_SIDE_PADDING,
+    ACTION_BUTTON_MIN_WIDTH,
 };
 use crate::runtime_controller::RuntimeController;
 use crate::signal_utils::get_or_default;
@@ -244,6 +245,11 @@ fn centered_action_hitbox_contains(bar_width: f64, control_width: f64, point_x: 
     let visible_width = control_width.clamp(0.0, bar_width);
     let inset = (bar_width - visible_width) / 2.0;
     point_x >= inset && point_x <= inset + visible_width
+}
+
+#[cfg(test)]
+fn action_bar_side_padding() -> f64 {
+    ACTION_BAR_SIDE_PADDING
 }
 
 pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl View {
@@ -625,7 +631,7 @@ fn choices_bar(
             .flex_wrap(FlexWrap::Wrap)
             .width_full()
             .max_width(max_width)
-            .padding_horiz(24.0)
+            .padding_horiz(ACTION_BAR_SIDE_PADDING as f32)
     });
 
     container(buttons).style(move |s| {
@@ -645,11 +651,12 @@ fn choices_bar(
 #[cfg(test)]
 mod tests {
     use super::{
-        action_feedback_reset_generation, centered_action_hitbox_contains, markdown_to_text_layout,
+        action_bar_side_padding, action_feedback_reset_generation, centered_action_hitbox_contains,
+        markdown_to_text_layout,
     };
     use crate::layout::{
         action_button_columns_for_window, action_button_rows_for_window, sidebar_width_for_window,
-        story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
+        story_region_width_for_window, ACTION_BAR_HORIZONTAL_PADDING, ACTION_BUTTON_MIN_WIDTH,
     };
     use floem::peniko::Color;
     use floem::text::Weight;
@@ -717,6 +724,14 @@ mod tests {
         assert_eq!(action_button_columns_for_window(1200.0), 3);
         assert_eq!(action_button_columns_for_window(900.0), 2);
         assert_eq!(action_button_columns_for_window(760.0), 1);
+    }
+
+    #[test]
+    fn action_bar_side_padding_matches_layout_budget() {
+        assert_eq!(
+            action_bar_side_padding() * 2.0,
+            ACTION_BAR_HORIZONTAL_PADDING
+        );
     }
 
     #[test]

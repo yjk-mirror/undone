@@ -1,9 +1,6 @@
-#[cfg(target_os = "windows")]
-mod input;
-#[cfg(target_os = "windows")]
-mod server;
-
 use anyhow::Result;
+#[cfg(target_os = "windows")]
+use game_input_mcp::server::GameInputServer;
 #[cfg(target_os = "windows")]
 use rmcp::{transport::stdio, ServiceExt};
 use tracing_subscriber::EnvFilter;
@@ -20,7 +17,7 @@ async fn main() -> Result<()> {
 
     #[cfg(target_os = "windows")]
     {
-        let service = server::GameInputServer::new()
+        let service = GameInputServer::new()
             .serve(stdio())
             .await
             .inspect_err(|e| tracing::error!("server error: {:?}", e))?;
