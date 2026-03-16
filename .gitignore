@@ -7,6 +7,7 @@ Thumbs.db
 .env
 opencode.json
 tmp/
+/.worktrees/
 
 # Override global gitignore — track docs and dot folders in this repo
 !*.md
