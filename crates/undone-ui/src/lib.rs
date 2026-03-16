@@ -825,6 +825,24 @@ mod tests {
     }
 
     #[test]
+    fn reset_scene_ui_state_preserves_phase_and_tab_while_advancing_scene_epoch() {
+        let signals = AppSignals::new();
+        signals.phase.set(AppPhase::InGame);
+        signals.tab.set(AppTab::Dev);
+        signals.scene_epoch.set(7);
+        signals.story.set("stale".into());
+        signals.awaiting_continue.set(true);
+
+        reset_scene_ui_state(signals);
+
+        assert_eq!(signals.phase.get(), AppPhase::InGame);
+        assert_eq!(signals.tab.get(), AppTab::Dev);
+        assert_eq!(signals.scene_epoch.get(), 8);
+        assert!(signals.story.get().is_empty());
+        assert!(!signals.awaiting_continue.get());
+    }
+
+    #[test]
     fn npc_snapshot_is_known_false_for_stranger_defaults() {
         let npc = NpcSnapshot {
             name: "Alex".to_string(),

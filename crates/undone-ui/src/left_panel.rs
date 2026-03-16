@@ -217,6 +217,25 @@ fn continue_to_next_scene(state: &Rc<RefCell<GameState>>, signals: AppSignals) {
     let _ = controller.continue_flow();
 }
 
+fn action_feedback_reset_generation(
+    scene_epoch: u64,
+    actions: &[ActionView],
+) -> (u64, Vec<String>) {
+    (
+        scene_epoch,
+        actions.iter().map(|action| action.id.clone()).collect(),
+    )
+}
+
+fn reset_action_feedback_state(
+    hovered_detail: floem::reactive::RwSignal<String>,
+    highlighted_idx: RwSignal<Option<usize>>,
+) {
+    highlighted_idx.set(None);
+    hovered_detail.set(String::new());
+}
+
+#[cfg(test)]
 fn centered_action_hitbox_contains(bar_width: f64, control_width: f64, point_x: f64) -> bool {
     if bar_width <= 0.0 || point_x < 0.0 || point_x > bar_width {
         return false;
@@ -238,9 +257,10 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let hi_reset = highlighted_idx;
     let detail_reset = hovered_detail;
     create_effect(move |_| {
-        let _ = actions.get(); // reactive dependency
-        hi_reset.set(None);
-        detail_reset.set(String::new());
+        let reset_generation =
+            action_feedback_reset_generation(signals.scene_epoch.get(), &actions.get());
+        let _ = reset_generation;
+        reset_action_feedback_state(detail_reset, hi_reset);
     });
 
     let state_for_continue = Rc::clone(&state);
@@ -477,19 +497,18 @@ fn continue_button(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
         });
 
-    container(btn)
-        .style(move |s| {
-            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-            s.width_full()
-                .flex_row()
-                .justify_center()
-                .padding_vert(12.0)
-                .min_height(64.0)
-                .flex_shrink(0.0)
-                .border_top(1.0)
-                .border_color(colors.seam)
-                .background(colors.page)
-        })
+    container(btn).style(move |s| {
+        let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+        s.width_full()
+            .flex_row()
+            .justify_center()
+            .padding_vert(12.0)
+            .min_height(64.0)
+            .flex_shrink(0.0)
+            .border_top(1.0)
+            .border_color(colors.seam)
+            .background(colors.page)
+    })
 }
 
 fn choices_bar(
@@ -625,11 +644,38 @@ fn choices_bar(
 
 #[cfg(test)]
 mod tests {
-    use super::centered_action_hitbox_contains;
-    use crate::layout::{
-        action_button_columns_for_window, action_button_rows_for_window,
-        sidebar_width_for_window, story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
+    use super::{
+        action_feedback_reset_generation, centered_action_hitbox_contains, markdown_to_text_layout,
     };
+    use crate::layout::{
+        action_button_columns_for_window, action_button_rows_for_window, sidebar_width_for_window,
+        story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
+    };
+    use floem::peniko::Color;
+    use floem::text::Weight;
+    use undone_scene::engine::ActionView;
+
+    fn markdown_layout_lines(markdown: &str) -> Vec<String> {
+        markdown_to_text_layout(markdown, Color::rgb8(0, 0, 0), "system-ui", 16.0, 1.4)
+            .lines()
+            .iter()
+            .map(|line| line.text().to_string())
+            .collect()
+    }
+
+    fn markdown_layout_line_heights(markdown: &str) -> Vec<f32> {
+        let layout =
+            markdown_to_text_layout(markdown, Color::rgb8(0, 0, 0), "system-ui", 16.0, 1.4);
+        let mut heights = Vec::new();
+        let mut last_line = None;
+        for run in layout.layout_runs() {
+            if last_line != Some(run.line_i) {
+                heights.push(run.line_height);
+                last_line = Some(run.line_i);
+            }
+        }
+        heights
+    }
 
     #[test]
     fn sidebar_width_shrinks_before_story_column_becomes_unusable() {
@@ -682,7 +728,80 @@ mod tests {
 
     #[test]
     fn story_region_width_stays_usable_and_grows_on_wide_windows() {
-        assert_eq!(story_region_width_for_window(320.0), ACTION_BUTTON_MIN_WIDTH);
+        assert_eq!(
+            story_region_width_for_window(320.0),
+            ACTION_BUTTON_MIN_WIDTH
+        );
         assert!(story_region_width_for_window(1600.0) > story_region_width_for_window(1200.0));
+    }
+
+    #[test]
+    fn markdown_to_text_layout_preserves_paragraph_breaks() {
+        let lines = markdown_layout_lines("First paragraph.\n\nSecond paragraph.");
+
+        assert_eq!(lines, vec!["First paragraph.", "", "Second paragraph."]);
+    }
+
+    #[test]
+    fn markdown_to_text_layout_makes_headings_larger_than_body_copy() {
+        let layout = markdown_to_text_layout(
+            "# Heading\n\nBody copy.",
+            Color::rgb8(0, 0, 0),
+            "system-ui",
+            16.0,
+            1.4,
+        );
+        let heading_attrs = layout.lines()[0].attrs_list().get_span(0);
+        let line_heights = markdown_layout_line_heights("# Heading\n\nBody copy.");
+
+        assert_eq!(heading_attrs.weight, Weight::BOLD);
+        assert!(line_heights[0] > line_heights[2]);
+    }
+
+    #[test]
+    fn markdown_to_text_layout_renders_horizontal_rules_as_separator_lines() {
+        let lines = markdown_layout_lines("Before\n\n---\n\nAfter");
+
+        assert_eq!(lines, vec!["Before", "", "——————————", "", "After"]);
+    }
+
+    #[test]
+    fn markdown_to_text_layout_keeps_soft_and_hard_breaks_readable() {
+        let lines = markdown_layout_lines("Soft\nbreak\n\nHard\\\nbreak");
+
+        assert_eq!(lines, vec!["Soft break", "", "Hard", "break"]);
+    }
+
+    #[test]
+    fn action_feedback_reset_generation_changes_when_scene_epoch_changes() {
+        let repeated_actions = vec![ActionView {
+            id: "wait".into(),
+            label: "Wait".into(),
+            detail: "Hold steady.".into(),
+        }];
+
+        assert_ne!(
+            action_feedback_reset_generation(1, &repeated_actions),
+            action_feedback_reset_generation(2, &repeated_actions)
+        );
+    }
+
+    #[test]
+    fn action_feedback_reset_generation_changes_when_action_ids_change() {
+        let first_actions = vec![ActionView {
+            id: "wait".into(),
+            label: "Wait".into(),
+            detail: "Hold steady.".into(),
+        }];
+        let second_actions = vec![ActionView {
+            id: "leave".into(),
+            label: "Leave".into(),
+            detail: "Move on.".into(),
+        }];
+
+        assert_ne!(
+            action_feedback_reset_generation(3, &first_actions),
+            action_feedback_reset_generation(3, &second_actions)
+        );
     }
 }

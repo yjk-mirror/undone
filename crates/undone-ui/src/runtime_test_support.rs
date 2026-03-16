@@ -3,7 +3,7 @@ mod tests {
     use crate::game_state::{load_world_from_save, start_game, GameState, PreGameState};
     use crate::runtime_controller::RuntimeController;
     use crate::runtime_snapshot::RuntimeSnapshot;
-    use crate::AppSignals;
+    use crate::{AppSignals, AppTab};
     use floem::prelude::SignalUpdate;
     use lasso::Key;
     use rand::{rngs::SmallRng, SeedableRng};
@@ -227,6 +227,23 @@ mod tests {
         })
     }
 
+    fn assert_runtime_snapshot_coherent(snapshot: &RuntimeSnapshot) {
+        assert!(
+            snapshot.window_width > 0.0 && snapshot.window_height > 0.0,
+            "runtime snapshot should expose positive window metrics: {snapshot:?}"
+        );
+        assert!(
+            snapshot.current_scene_id.is_none() || !snapshot.story_paragraphs.is_empty(),
+            "active runtime scenes should expose visible story context: {snapshot:?}"
+        );
+        if snapshot.awaiting_continue {
+            assert!(
+                snapshot.visible_actions.is_empty(),
+                "awaiting-continue snapshots must not expose stale actions: {snapshot:?}"
+            );
+        }
+    }
+
     #[test]
     fn acceptance_runtime_new_game_launch_exposes_visible_prose_and_choices() {
         let mut harness = make_harness();
@@ -361,6 +378,84 @@ mod tests {
                 || resumed.story_paragraphs != paused.story_paragraphs
                 || resumed.visible_actions != paused.visible_actions,
             "only the explicit continue path should replace the paused runtime snapshot"
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_resize_preserves_window_metrics_across_scene_progression() {
+        let mut harness = make_harness();
+        harness.signals.window_width.set(1600.0);
+        harness.signals.window_height.set(960.0);
+
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let before = harness.snapshot();
+
+        assert_runtime_snapshot_coherent(&before);
+        assert_eq!(before.window_width, 1600.0);
+        assert_eq!(before.window_height, 960.0);
+        assert!(
+            !before.visible_actions.is_empty(),
+            "resized runtime should still expose visible actions before progression"
+        );
+
+        let action_id = before.visible_actions[0].id.clone();
+        {
+            let mut controller = harness.controller();
+            controller.choose_action(&action_id).unwrap();
+        }
+        let after_action = harness.snapshot();
+
+        assert_runtime_snapshot_coherent(&after_action);
+        assert_eq!(after_action.window_width, 1600.0);
+        assert_eq!(after_action.window_height, 960.0);
+
+        let paused = play_until_continue(&mut harness);
+        if paused.awaiting_continue {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let after_scene = harness.snapshot();
+
+        assert_runtime_snapshot_coherent(&after_scene);
+        assert_eq!(after_scene.window_width, 1600.0);
+        assert_eq!(after_scene.window_height, 960.0);
+        assert!(
+            after_scene.current_scene_id != before.current_scene_id
+                || after_scene.story_paragraphs != before.story_paragraphs
+                || after_scene.visible_actions != before.visible_actions,
+            "scene progression after resize should replace the visible runtime contract"
+        );
+    }
+
+    #[test]
+    fn reset_scene_ui_state_tab_round_trip_keeps_continue_contract_coherent() {
+        let mut harness = make_harness();
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let paused = play_until_continue(&mut harness);
+        assert!(paused.awaiting_continue);
+
+        harness.signals.tab.set(AppTab::Saves);
+        harness.signals.tab.set(AppTab::Game);
+
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let resumed = harness.snapshot();
+
+        assert_runtime_snapshot_coherent(&resumed);
+        assert_eq!(resumed.tab, "game");
+        assert!(
+            resumed.current_scene_id != paused.current_scene_id
+                || resumed.story_paragraphs != paused.story_paragraphs
+                || resumed.visible_actions != paused.visible_actions,
+            "tab changes should not resurrect stale continue-state UI after progression"
         );
     }
 
