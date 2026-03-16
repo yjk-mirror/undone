@@ -154,12 +154,15 @@ mod tests {
         }
     }
 
-    fn play_until_continue(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
+    fn play_until_continue_with_last_action(
+        harness: &mut RuntimeHarness,
+    ) -> (RuntimeSnapshot, Option<String>) {
         let mut tried_actions = HashSet::new();
+        let mut last_action_id = None;
         for _ in 0..32 {
             let current = harness.snapshot();
             if current.awaiting_continue || current.visible_actions.is_empty() {
-                return current;
+                return (current, last_action_id);
             }
 
             let scene_id = current
@@ -173,11 +176,16 @@ mod tests {
                 .unwrap_or(&current.visible_actions[0])
                 .id
                 .clone();
+            last_action_id = Some(action_id.clone());
             let mut controller = harness.controller();
             controller.choose_action(&action_id).unwrap();
         }
 
-        harness.snapshot()
+        (harness.snapshot(), last_action_id)
+    }
+
+    fn play_until_continue(harness: &mut RuntimeHarness) -> RuntimeSnapshot {
+        play_until_continue_with_last_action(harness).0
     }
 
     fn settle_workplace_route(gs: &mut GameState) {
@@ -307,6 +315,52 @@ mod tests {
         assert!(
             after.current_scene_id != before.current_scene_id || after.current_scene_id.is_none(),
             "continue should advance to a new scene or to no-scene state"
+        );
+    }
+
+    #[test]
+    fn acceptance_runtime_continue_requires_explicit_continue_path() {
+        let mut harness = make_harness();
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let (paused, last_action_id) = play_until_continue_with_last_action(&mut harness);
+
+        assert!(
+            paused.awaiting_continue,
+            "runtime should reach an explicit continue state before advancing"
+        );
+        assert!(
+            !paused.story_paragraphs.is_empty(),
+            "continue state should preserve visible story context"
+        );
+        assert!(
+            paused.visible_actions.is_empty(),
+            "continue state must not expose stale action choices"
+        );
+
+        let stale_action_id = last_action_id.expect("fixture should choose at least one action");
+        {
+            let mut controller = harness.controller();
+            let error = controller.choose_action(&stale_action_id).unwrap_err();
+            assert!(
+                error.contains("not currently visible"),
+                "continue state must reject stale action ids, got: {error}"
+            );
+        }
+
+        {
+            let mut controller = harness.controller();
+            controller.continue_flow().unwrap();
+        }
+        let resumed = harness.snapshot();
+
+        assert!(
+            resumed.current_scene_id != paused.current_scene_id
+                || resumed.story_paragraphs != paused.story_paragraphs
+                || resumed.visible_actions != paused.visible_actions,
+            "only the explicit continue path should replace the paused runtime snapshot"
         );
     }
 
