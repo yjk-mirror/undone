@@ -627,7 +627,8 @@ fn choices_bar(
 mod tests {
     use super::centered_action_hitbox_contains;
     use crate::layout::{
-        action_button_columns_for_window, action_button_rows_for_window, sidebar_width_for_window,
+        action_button_columns_for_window, action_button_rows_for_window,
+        sidebar_width_for_window, story_region_width_for_window, ACTION_BUTTON_MIN_WIDTH,
     };
 
     #[test]
@@ -663,5 +664,25 @@ mod tests {
         assert!(centered_action_hitbox_contains(960.0, 720.0, 480.0));
         assert!(!centered_action_hitbox_contains(960.0, 720.0, 80.0));
         assert!(!centered_action_hitbox_contains(960.0, 720.0, 920.0));
+    }
+
+    #[test]
+    fn action_button_columns_account_for_action_bar_padding() {
+        assert_eq!(action_button_columns_for_window(1200.0), 3);
+        assert_eq!(action_button_columns_for_window(900.0), 2);
+        assert_eq!(action_button_columns_for_window(760.0), 1);
+    }
+
+    #[test]
+    fn action_button_rows_recompute_after_width_changes() {
+        assert_eq!(action_button_rows_for_window(1200.0, 4), 2);
+        assert_eq!(action_button_rows_for_window(760.0, 4), 4);
+        assert_eq!(action_button_rows_for_window(1600.0, 7), 2);
+    }
+
+    #[test]
+    fn story_region_width_stays_usable_and_grows_on_wide_windows() {
+        assert_eq!(story_region_width_for_window(320.0), ACTION_BUTTON_MIN_WIDTH);
+        assert!(story_region_width_for_window(1600.0) > story_region_width_for_window(1200.0));
     }
 }

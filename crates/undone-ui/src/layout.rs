@@ -3,6 +3,7 @@ pub const DEFAULT_WINDOW_HEIGHT: f64 = 800.0;
 pub const CUSTOM_TITLE_BAR_HEIGHT: f64 = 40.0;
 pub const STORY_COLUMN_MAX_WIDTH: f64 = 680.0;
 pub const ACTION_BUTTON_MIN_WIDTH: f64 = 240.0;
+pub const ACTION_BAR_HORIZONTAL_PADDING: f64 = 48.0;
 
 const ACTION_BUTTON_OUTER_WIDTH: f64 = ACTION_BUTTON_MIN_WIDTH + 8.0;
 const ACTION_BAR_CHROME_HEIGHT: f64 = 25.0;
@@ -25,8 +26,9 @@ pub fn story_region_width_for_window(window_width: f64) -> f64 {
 }
 
 pub fn action_button_columns_for_window(window_width: f64) -> usize {
-    let usable_width = story_region_width_for_window(window_width);
-    let columns = ((usable_width + 8.0) / ACTION_BUTTON_OUTER_WIDTH).floor() as usize;
+    let usable_width =
+        (story_region_width_for_window(window_width) - ACTION_BAR_HORIZONTAL_PADDING).max(0.0);
+    let columns = (usable_width / ACTION_BUTTON_OUTER_WIDTH).floor() as usize;
     columns.max(1)
 }
 
