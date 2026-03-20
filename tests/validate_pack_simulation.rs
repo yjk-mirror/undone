@@ -37,10 +37,7 @@ fn simulator_robin_route_reaches_week_two_naturally() {
     // ── Week-2-gated trigger scenes must fire ──────────────────────────
     // coffee_shop requires `gd.week() >= 2` as a trigger condition.
     // If the simulator never advances time past week 1, this stays at 0.
-    let coffee_shop = counts
-        .get("base::coffee_shop")
-        .copied()
-        .unwrap_or(0);
+    let coffee_shop = counts.get("base::coffee_shop").copied().unwrap_or(0);
     assert!(
         coffee_shop > 0,
         "coffee_shop (week >= 2 trigger) should fire at least once across 5 runs, \
@@ -49,10 +46,7 @@ fn simulator_robin_route_reaches_week_two_naturally() {
     );
 
     // plan_your_day also requires `gd.week() >= 2` as a trigger.
-    let plan_your_day = counts
-        .get("base::plan_your_day")
-        .copied()
-        .unwrap_or(0);
+    let plan_your_day = counts.get("base::plan_your_day").copied().unwrap_or(0);
     assert!(
         plan_your_day > 0,
         "plan_your_day (week >= 2 trigger) should fire at least once across 5 runs. \
@@ -62,23 +56,15 @@ fn simulator_robin_route_reaches_week_two_naturally() {
     // ── Opening-arc scenes should fire exactly once per run ────────────
     // These are once_only triggers in the workplace_opening slot
     // (consumes_time=false). They should fire in every run.
-    let arrival = counts
-        .get("base::workplace_arrival")
-        .copied()
-        .unwrap_or(0);
+    let arrival = counts.get("base::workplace_arrival").copied().unwrap_or(0);
     assert_eq!(
-        arrival,
-        result.runs as u64,
+        arrival, result.runs as u64,
         "workplace_arrival (once_only opening arc) should fire exactly once per run"
     );
 
-    let landlord = counts
-        .get("base::workplace_landlord")
-        .copied()
-        .unwrap_or(0);
+    let landlord = counts.get("base::workplace_landlord").copied().unwrap_or(0);
     assert_eq!(
-        landlord,
-        result.runs as u64,
+        landlord, result.runs as u64,
         "workplace_landlord (once_only opening arc) should fire exactly once per run"
     );
 
@@ -118,10 +104,7 @@ fn simulator_robin_route_reaches_week_two_naturally() {
     }
 
     // ── Campus scenes should never fire (Robin is ROUTE_WORKPLACE) ─────
-    let campus_arrival = counts
-        .get("base::campus_arrival")
-        .copied()
-        .unwrap_or(0);
+    let campus_arrival = counts.get("base::campus_arrival").copied().unwrap_or(0);
     assert_eq!(
         campus_arrival, 0,
         "campus_arrival should never fire in a Robin (ROUTE_WORKPLACE) simulation"
