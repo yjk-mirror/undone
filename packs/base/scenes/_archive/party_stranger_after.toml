@@ -1,0 +1,162 @@
+[scene]
+id          = "base::party_stranger_after"
+pack        = "base"
+description = "After the balcony. The stairwell landing, the hallway, and the heat of having left the room together."
+
+# Content level: SEXUAL — explicit consensual content with a clear forward path.
+
+[intro]
+prose = """
+The hallway outside the apartment is cooler than the party was.
+
+The air still smells faintly like beer and somebody's perfume, but the music is behind a closed door now, muffled into bass and crowd-noise. He stays close beside you as the door clicks shut. Not touching you yet. Just close in the way men get when the room has already chosen a direction for both of you.
+
+The stairwell landing is one flight down. Concrete steps. Yellow wall paint. A window with city light smeared across it. The party is still right there if either of you goes back.
+
+Neither of you does.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+You know this shape from the inside out: the crowd, the balcony, the smaller space after, the point where private attention goes from possible to decided. You saw it forming before he held the door for you.
+{% elif w.hasTrait("SHY") %}
+Your pulse is still carrying the room in it. Out here there is only him, the concrete smell of the stairwell, and the fact that you followed.
+{% elif w.hasTrait("FLIRTY") %}
+This is the hottest part sometimes — not the room itself, but leaving it. The knowledge that people saw enough to know something and not enough to know what.
+{% else %}
+The party is one door away and already feels far off. Out here the attention doesn't have an audience anymore.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+Your bare arms are cold. His body heat isn't.
+{% elif w.getSkill("FEMININITY") < 50 %}
+Your skin still has the room on it: warmth, sweat at the back of your neck, the live charge of being looked at before you stepped away.
+{% endif %}
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style     = "inner_voice"
+prose     = "*You left the room with him.*"
+
+[[actions]]
+id     = "go_with_him"
+label  = "Keep going"
+detail = "The heat came out of the room with you. Don't cool it off."
+prose  = """
+He takes one step closer.
+
+You don't give him room to wonder. Your hand catches the front of his shirt and pulls him in. His back hits the stairwell wall with a dull sound and then his mouth is on yours and the restraint goes out of both of you at once.
+
+{% if w.hasTrait("CONFIDENT") %}
+You kiss him hard enough to make the point. Your hand slides down his chest, lower, feeling him already hard through his jeans. "Don't take me back in there," you say, and he makes a low sound like the sentence hit somewhere physical.
+{% elif w.hasTrait("FLIRTY") %}
+You bite his lower lip lightly on the way in. "Thought you wanted air," you murmur. He laughs once, breathless, and his hands are already under your skirt.
+{% elif w.hasTrait("ANALYTICAL") %}
+You notice three things in quick order: the scrape of his jacket against painted concrete, the sound insulation of the stairwell door, and the exact second the wanting stops being a forecast and becomes a physical emergency.
+{% elif w.hasTrait("SHY") %}
+The first kiss is almost careful. The second one isn't. His hand lands at the small of your back and the noise that leaves you is small and helpless and enough to change the rest of the night.
+{% else %}
+His hands find your waist and then your hips and then the edge of your skirt. The stairwell light is ugly and it doesn't matter.
+{% endif %}
+
+He gets you down one more flight, where the building's back entrance opens into a service hallway with locked storage doors and no one in it. There's a radiator humming against one wall. Concrete underfoot. The city somewhere beyond the wire-glass panel at the end of the hall.
+
+He kisses you again with one hand up under your top, thumb dragging over your nipple until your back arches off the wall.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The body gets there before the mind does. His hand between your legs and you're wet enough that the fact of it shocks you for half a second, then doesn't matter because he's feeling it too and looking at your face when he realizes.
+{% elif w.getSkill("FEMININITY") < 50 %}
+His fingers find you through your underwear first, rougher than Jake, less composed than Marcus, carried by the afterburn of the party. You grab his shoulders to steady yourself and end up pulling him closer instead.
+{% else %}
+Your body is already ahead of the room you left behind. The hallway, the locked doors, the chance that someone could come through and not quite soon enough to matter — it all sharpens everything.
+{% endif %}
+
+He hooks your underwear aside. His hand works you open. You kiss him to keep from making too much noise and fail at that almost immediately.
+
+When he pushes into you, it's fast and direct and half-drunken in the way that still knows exactly what it's doing. Your heel catches against the concrete wall. His hand braces beside your head. The service hallway narrows to the place where your bodies meet and the heat keeps building.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+You know what you must look like against the wall — skirt pushed up, his hand on your thigh, his mouth open against your throat — and the knowledge goes through you as hard as the thrust that follows it.
+{% elif w.hasTrait("ROMANTIC") %}
+This is not romance. That's part of why it works. The wanting does not ask to be made into something softer before it gets to exist.
+{% elif w.hasTrait("AMBITIOUS") %}
+You are nowhere near work, nowhere near competence, nowhere near the version of yourself that inventories consequences first. For once the absence feels like part of the reward.
+{% endif %}
+
+Your orgasm hits fast, dragged out of you by the public residue still clinging to the whole thing. He feels it happen and swears softly against your neck. He comes a moment later with his forehead against your shoulder, breathing hard, still holding you pinned to the wall in a way that would be too much if you didn't want exactly that.
+
+For a few seconds neither of you moves. Then the building comes back: radiator hum, bass through pipes, somebody laughing faintly two floors up.
+
+He fixes your skirt with surprising care. You smooth his shirt front with both hands. The party is still going. Neither of you says that out loud.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "PARTY_STRANGER_SLEPT"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "kiss_then_stop"
+label  = "Kiss him, then stop"
+detail = "Take the heat. Keep the rest for another night."
+prose  = """
+You pull him in by the shirt and kiss him hard enough that the question changes shape.
+
+His hand comes to your waist, then higher. He tastes like beer and mint. The stairwell landing holds the two of you for a minute that could have gone further.
+
+Then you put your palm flat on his chest and keep it there.
+
+"Not out here," you say.
+
+He takes a breath, nods once, and does not turn the moment into an argument.
+
+{% if w.hasTrait("SHY") %}
+The relief is hot, not cold. You wanted this. You still want it. Stopping doesn't cancel that.
+{% elif w.hasTrait("FLIRTY") %}
+"Cruel," he says.
+"A little," you say.
+{% else %}
+The wanting stays in the air between you, unfinished and very much alive.
+{% endif %}
+
+He kisses your forehead once, unexpectedly tender for the setting. Then the two of you go back upstairs separately enough that it could almost be denied.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 2
+
+  [[actions.next]]
+  finish = true

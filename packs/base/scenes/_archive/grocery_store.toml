@@ -1,0 +1,97 @@
+[scene]
+id          = "base::grocery_store"
+pack        = "base"
+description = "The weekly grocery run. Small navigations in domestic space."
+
+[intro]
+prose = """
+Thursday evening, the grocery store two blocks from your apartment. You have a list. Two months of shopping here — long enough to know where things are and which checkout lane is fastest. There's a particular satisfaction to a task with clear parameters, and the grocery run is close to perfect: finite, completable, with a beginning and an end.
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') < 20"
+prose = """
+Thursday evening, the grocery store two blocks from your apartment. You have a list.
+
+The basket handle sits differently in your hand — smaller grip, different angle at the elbow. You navigate around a woman at the dairy case and your body does the geometry automatically: angle, yield, pass. It worked. You notice it worked, which means it's not fully automatic yet.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 35"
+style = "inner_voice"
+prose = "*Produce section. The long way around. Didn't decide to.*"
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "shop_the_list"
+label             = "Get what's on the list. Get out."
+detail            = "Clean run. Someone reaches across you for the pasta."
+allow_npc_actions = false
+prose = """
+You move through the store efficiently — produce first, then the middle aisles, then dairy last to keep it cold. A man reaches across you at the pasta shelf with an "excuse me" that's more reflex than request. You shift slightly. He takes what he needed and moves on.
+
+{% if w.getSkill("FEMININITY") < 20 %}
+You moved before he asked. Read the angle of his reach, cleared the space. Still deliberate — your body waiting for your brain to sign off on each small adjustment.
+{% elif w.getSkill("FEMININITY") < 40 %}
+You moved before he asked. The angle of his reach, the space to clear — your body handled it without consulting you. Two months and counting.
+{% endif %}
+
+The list is done in twenty minutes. That's the correct number of minutes for this list.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "take_your_time"
+label             = "No rush. Read labels you don't need to read."
+detail            = "Someone asks if you know where to find something. You do."
+allow_npc_actions = false
+prose = """
+You're not in a hurry tonight. You read two ingredients lists for things you've bought a dozen times, spend four minutes in the olive oil section for a decision that doesn't require four minutes, pick up something you didn't have on the list because it looked good.
+
+A woman in the next aisle asks if you know whether the store stocks miso paste. You do — Asian ingredients, back wall, middle shelf. She thanks you and goes.
+
+The whole thing takes fifteen seconds, and it turns out knowing where the miso is, and knowing you know, is its own minor satisfaction.
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id                = "checkout_exchange"
+label             = "The checkout lane. An ordinary transaction."
+detail            = "The clerk says 'have a good night.' It lands."
+allow_npc_actions = false
+prose = """
+You get the short lane — only two people ahead of you. The clerk has the practiced speed of someone who does this for eight hours a day and has made a kind of peace with it. She scans everything without looking at it and makes brief eye contact when she gives you the total.
+
+"Have a good night," she says when you take your bags.
+
+{% if w.getSkill("FEMININITY") < 35 %}
+It's a phrase she says to everyone. Something in it lands anyway — the automatic warmth of a stranger being kind to you without thinking about it. You take your bags and the warmth stays for a few steps past the automatic doors.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true

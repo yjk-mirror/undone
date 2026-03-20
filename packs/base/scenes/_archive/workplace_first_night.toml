@@ -1,0 +1,242 @@
+[scene]
+id          = "base::workplace_first_night"
+pack        = "base"
+description = "First night in the empty apartment. The boxes aren't here. The city is outside. The bra problem is tonight's problem."
+
+[intro]
+prose = """
+Unit 4B is empty.
+
+The boxes aren't here. The shipping company said Monday. The confirmation email is in the inbox. None of that changes the fact of an empty apartment, a carry-on bag, and a body that has been awake for thirty-three hours.
+
+The apartment is fine. Better than fine, actually: old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress. The radiator in the bedroom is not warm yet. Frank's wife said it takes a few minutes.
+
+Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. The list on the phone is already growing.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The list is sorted in twenty minutes. One column, by priority. The shipping company has a confirmation text before the clock registers 11 PM.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+The list is practical. Floors have been slept on before. This is not the worst situation.
+{% else %}
+The list gets long. Then *bra* appears between *food* and *towels*, and sits there.
+{% endif %}
+
+Right. The bra problem.
+
+The day ran on forward momentum: airport, keys, landlord, deposit, the manageable fiction that logistics were the hard part. Under the shirt, a sports bra from the airport gift shop. It is not doing the job.
+
+*Right. Okay.*
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') < 15"
+prose = """
+Unit 4B is empty.
+
+The boxes aren't here. The Monday window was confirmed. The confirmation is in the email.
+
+Bedroom, bathroom, kitchen, living room. The phone has a list growing on it. Furniture. Bedding. Food. Towels. Something's missing.
+
+*Bra*, and then nothing for a moment.
+
+Right. The list said *clothes*, generally, meaning Monday, meaning a vague plan to deal with *clothes* that hadn't extended to include the specific practical reality of —
+
+*Bra* goes on the list. The word looks wrong in the note.
+
+*On the list. Lists get solved.*
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 25"
+style     = "inner_voice"
+prose = """
+The floor is clean enough, and the city is out the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound too high. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
+
+Your reflection in the dark glass is someone you are still learning to recognize. The proportions. The hair. The way your shoulders fall. A tilt of the head and the reflection tilts back, and for one second the distance between recognition and ownership feels measurable.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "order_food_sleep"
+label = "Order food and sleep"
+detail = "Food. Phone charging on the floor. Eight hours. Tomorrow is tomorrow."
+prose = """
+You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait, you sit on the floor with your back against the wall and reread the email from your new manager: parking you do not need, badge pickup, the name of the person who will meet you in the lobby, all the ordinary details of a life that somehow did not pause for any of this.
+
+The food arrives. You eat on the floor. The radiator has warmed up.
+
+You charge your phone, roll your jacket into a pillow, and lie down on the floor of your bedroom. It's not comfortable. You're asleep in four minutes.
+
+Tomorrow: shopping. The bra problem specifically. The rest of the list after that.
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -18
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_CRASHED"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "research_bra_situation"
+label = "Figure out the bra situation"
+detail = "How hard can it be. Open a browser. Figure it out."
+prose = """
+You open your phone and start searching.
+
+Forty minutes later you have learned that bra sizing is a system apparently designed by someone who found the metric system too merciful; that H-cup does not mean what you assumed it meant; that most department stores stop at DDD and then become theoretical; that specialty stores exist; that the specialty stores have names you are going to have to say out loud to a sales associate; and that you have, apparently, misunderstood underwire for your entire life.
+
+You put your phone down.
+
+{% if w.hasTrait("DOWN_TO_EARTH") %}
+You add *department store, early* to your list. You'll tell them what you need in factual terms and get what works. Sleep first.
+{% else %}
+The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups, specialty stores, and the number of times in your life you walked past a lingerie department without granting it a second of thought.
+
+You add *specialty store??* to your list and go to sleep.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = 3
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_RESEARCHED"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "call_someone"
+label = "Call someone back home"
+detail = "There's a name in the contacts. You're not going to explain anything. You just need to hear a voice."
+prose = """
+You pick a contact without thinking too hard about it: Marcus, who you've known since grad school, who would pick up no matter what time it is.
+
+He picks up on the second ring. "Hey, where'd you end up landing?"
+
+"The city," you say. "Just got in."
+
+"How's the apartment?"
+
+"Empty. Boxes on Monday."
+
+"Classic." A pause. "You okay? You sound weird."
+
+{% if w.hasTrait("SHY") %}
+"I'm tired," you say. Which is true. You leave it there. He lets you.
+
+"Get some sleep," he says. "Text me when you're settled."
+
+"Yeah," you say. "Yeah."
+
+You hang up and hold the phone for a moment. You couldn't explain it even if you tried. You're not going to try.
+{% else %}
+"Just tired," you say. "Long day."
+
+"Thirty-one hours or something, right? You're insane." He says it like it's a compliment.
+
+"Thirty-three now," you say, and somehow that's the funniest thing either of you have said all week. He laughs. You laugh. It doesn't explain anything. It doesn't need to.
+
+"Go to sleep," he says. "Text when you're alive."
+
+"Yeah." You lean your head against the wall. "Good night."
+{% endif %}
+
+You plug your phone in on the floor beside you. The radiator ticks.
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_CALLED_BACK_HOME"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "unpack_and_stage_tomorrow"
+label = "Stage tomorrow anyway"
+detail = "Bathroom kit. Charger. One outfit. Pretend preparation is the same as control."
+prose = """
+You unzip the carry-on on the bedroom floor and start making small islands of order.
+
+Toiletries in the bathroom. Charger by the outlet. Laptop on the kitchen counter. One blouse and one pair of underwear folded over the back of the chair because there is no closet system yet and tomorrow will arrive whether the apartment is ready or not.
+
+{% if w.hasTrait("AMBITIOUS") %}
+This is not unpacking. This is triage with standards.
+{% elif w.hasTrait("ANALYTICAL") %}
+The goal is not comfort. The goal is reducing decision count between waking up and getting out the door.
+{% else %}
+It helps. Not much, but enough to feel the room stop fighting you for a minute.
+{% endif %}
+
+You set your shoes by the door. Badge paperwork on top of the laptop. Painfully ordinary things. Reassuring because they are ordinary.
+
+The apartment is still empty when you finish. The difference is that now it looks like someone intends to wake up here on purpose.
+"""
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = -2
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_NIGHT_STAGED_TOMORROW"
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "week_one"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true

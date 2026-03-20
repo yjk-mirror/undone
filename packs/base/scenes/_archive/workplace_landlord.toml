@@ -1,0 +1,210 @@
+[scene]
+id          = "base::workplace_landlord"
+pack        = "base"
+description = "Robin meets the landlord. The lease, the ID, the voice that doesn't match the photo."
+
+[intro]
+prose = """
+The building has a buzzer panel with half the nameplates missing and the other half yellowed with age. Yours is not on it yet. You called ahead last week, when logistics still felt like the whole problem, and the landlord told you to stop by Saturday afternoon.
+
+You buzz the manager unit.
+
+The man who opens the door is mid-fifties, flannel shirt, reading glasses pushed up on his forehead. His eyes move from your face to the folder in your hand: lease printout, ID, first month's check, everything arranged in the order you will need it.
+
+"Robin?" he says. He means it as a question.
+
+"Yes," you say.
+
+{% if w.hasTrait("SHY") %}
+Your voice is quieter than you expected. He waits for more. You don't give him any.
+{% elif w.hasTrait("BITCHY") %}
+You hold his gaze. He looks back down at the folder instead.
+{% endif %}
+
+He opens the folder. The check is correct. The lease is signed in the right places. The ID is a valid driver's license with a clear photo of a white man in his early thirties.
+
+He looks at the photo. He looks at you. He looks at the photo again.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 20"
+style     = "inner_voice"
+prose = """
+{% if w.hasTrait("ANALYTICAL") %}
+*Three data points. Voice on the phone. Photo on the ID. Person at the door.* His face is doing the math. You watch him not arrive at an answer.
+{% else %}
+*The photo.* Your hands look different than the ones that signed that lease. Smaller. The pen would sit differently now. He's staring at the signature line like it might explain something.
+{% endif %}
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id                = "wait_him_out"
+label             = "Let him work through it"
+detail            = "He'll get there. Give him time."
+allow_npc_actions = true
+prose = """
+He looks at the ID again. Looks at you. Back to the paperwork.
+
+{% if w.hasTrait("SHY") %}
+The silence stretches. You're aware of your hands — where to put them, what they're doing. You fold them. The gesture is smaller than it should be.
+{% elif w.hasTrait("AMBITIOUS") %}
+He's processing. From somewhere upstairs, a television. You wait the way you'd wait for a slow build to compile — it'll finish when it finishes.
+{% else %}
+From somewhere upstairs, the muffled sound of a television. You wait. He processes.
+{% endif %}
+
+From upstairs: "Frank, is that the new tenant?"
+
+"Yeah," he calls back.
+
+A pause. "Tell her the radiator in the bedroom takes a few minutes to warm up."
+
+*Her.*
+
+"Right." He looks at you. "The radiator in the bedroom takes a few minutes."
+
+"Understood," you say.
+
+He hands back the folder — keeping the check — and takes a key from a hook by the door. Unit 4B. Third floor, no elevator. He says the garbage is Tuesday and Thursday. You say yes, got it, thank you. He says welcome to the building, and seems to mean it.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The key is warm from the hook. It fits in your palm differently than keys used to, or maybe you are just paying attention now to every small thing that changed without asking.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_WAITED_HIM_OUT"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "explain_briefly"
+label = "Give him a sentence"
+detail = "One sentence. Enough to move things along."
+prose = """
+{% if w.hasTrait("SHY") %}
+"The photo's a little old," you say. It comes out almost like a question. He looks at you, then at the photo, then back at you.
+
+"Okay," he says. He says it twice. Then he decides the paperwork is in order and that's enough.
+{% elif w.hasTrait("POSH") %}
+"I look different than the photo." You say it flat, like a fact about the weather. He nods once. Whatever he was going to ask stays behind his teeth.
+{% else %}
+"I just look younger than the photo." You say it before he can figure out the question.
+
+He looks at you for a moment. Then nods — the way people nod when they've decided that whatever is happening is not their problem today.
+{% endif %}
+
+He hands you the key. Unit 4B. Third floor. You thank him and head for the stairs before he can decide this moment needs one more question.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Three flights. The banister is cold under your hand. Your grip on it is lighter than it would have been a month ago, less palm and more fingers. You notice. You keep climbing.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_EXPLAINED_BRIEFLY"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "keep_it_transactional"
+label = "Keep it on the paperwork"
+detail = "Point to the lease. Treat the moment like admin, not confession."
+prose = """
+You slide the lease printout half an inch forward with one finger.
+
+{% if w.hasTrait("ANALYTICAL") %}
+"The signed copy, the cashier's check, and the move-in addendum are all there," you say. Not defensive. Just directing attention back to the only things that matter.
+{% elif w.hasTrait("CONFIDENT") %}
+"Everything you need is in the folder," you say, and hold the moment there until he follows the cue.
+{% else %}
+"The paperwork should all be in order," you say. It gives him somewhere safer to look than your face.
+{% endif %}
+
+He takes the out. The lease, the check, the signature line. Tangible things. Solvable things.
+
+From upstairs comes a woman's voice: "Frank, did you tell her about the radiator?"
+
+"In a second," he calls back.
+
+That settles it. He hands you the key. Unit 4B. Third floor, no elevator. Garbage is Tuesday and Thursday. The sentence arrives in pieces, all of them logistical, and you meet them at the same level.
+
+You thank him, tuck the key into your palm, and take the stairs before the exchange can widen into anything else.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "LANDLORD_KEPT_TRANSACTIONAL"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -1
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions (Frank, the landlord) ────────────────────────────────
+
+[[npc_actions]]
+id        = "frank_radiator"
+label     = "His wife calls down about the radiator"
+weight    = 8
+condition = "!scene.hasFlag('frank_called')"
+prose = """
+From upstairs: "Frank." A pause. "The radiator."
+
+He tilts his head toward the ceiling. "Radiator in the bedroom takes a minute," he says. "Just letting you know."
+
+"Thank you," you say.
+
+He looks at your paperwork again, briefly, then folds the folder closed. Whatever question he had, he's letting it go.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "frank_called"
+
+  [[npc_actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_LANDLORD"
+
+  [[npc_actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[npc_actions.next]]
+  finish = true

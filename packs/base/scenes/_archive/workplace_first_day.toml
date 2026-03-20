@@ -1,0 +1,285 @@
+[scene]
+id          = "base::workplace_first_day"
+pack        = "base"
+description = "First day at the tech company. The lobby, the manager, the coworker who explains something you invented. Two rounds of choices."
+
+# Content level: VANILLA — no sexual content.
+# Round 1: How you handle Dan's explanation (!dan_done)
+# Round 2: Lunch (dan_done)
+
+[intro]
+prose = """
+The financial district is twenty minutes from your apartment by train. You tested the route yesterday with an empty bag and no stakes. Today is the real version: Monday morning, laptop over one shoulder, visitor-badge smile ready if anyone asks for one.
+
+The blouse collar sits differently than you expected. The laptop bag rides against a shoulder that is narrower than the one your old commute belonged to.
+
+The right stop, and then: glass, steel, badge readers, polished stone. Ground-floor lobby designed to communicate money before anyone speaks.
+
+The guard at the desk looks at the badge request. "First day?" He types. The system takes a moment. A visitor badge and a lanyard slide across the desk. "Someone will meet you."
+
+The morning rush moves through the turnstiles — people who know exactly where they're going.
+
+At 9:02, your new manager comes through the turnstiles.
+
+{% if w.hasTrait("SHY") %}
+He scans the lobby. His eyes pass you twice before they land.
+{% else %}
+He finds you by elimination — everyone else in the lobby moves like they belong here already.
+{% endif %}
+
+He sees you and his step hitches. Just a fraction, but enough. Whatever image your resume built in his head, the face waiting here doesn't match it.
+
+"Robin?" His grip adjusts mid-shake, lighter on the release than on the approach.
+
+{% if w.hasTrait("ANALYTICAL") %}
+The adjustment registers. That recalibration is going to happen all day.
+{% endif %}
+
+Fourth floor. Open plan. Whiteboards crowded with diagrams you could redraw from memory. The desk is temporary, the laptop still in its box, and the office smells faintly of burnt coffee and dry-erase marker.
+
+Ten o'clock, standup. Someone says, "Robin's joining us from the Seattle office," and the room does the usual new-hire math. Seven handshakes, four names retained, which is adequate for a Monday.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+One of them holds the handshake a beat too long. You can feel him cataloging face, body, age estimate. The read is quick and automatic.
+{% endif %}
+
+At 11:15, a backend engineer named Dan stops by your desk and starts walking you through the authentication architecture with the bright, volunteer-helpfulness reserved for new hires who look as if they might need rescuing.
+
+You wrote the original spec for this system. Your name is in the commit history.
+
+He finishes the explanation and looks at you.
+"""
+
+[[thoughts]]
+condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
+style     = "inner_voice"
+prose = "Ten years of experience. Institutional memory. A mass-produced visitor badge hanging from a borrowed lanyard. Your manager took one look at you and briefly sorted you into the wrong category. Fine. Work the problem."
+
+# ── Round 1: How to handle Dan ────────────────────────────────────────
+
+[[actions]]
+id        = "assert_expertise"
+label     = "\"I wrote that spec.\""
+detail    = "Set the record straight. Once."
+condition = "!scene.hasFlag('dan_done') && (w.hasTrait('AMBITIOUS') || w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY'))"
+prose = """
+{% if w.hasTrait("BITCHY") %}
+"The spec for that is in the repo," you say. "The one I wrote." You smile just enough to keep it deniable. He stops talking.
+{% elif w.hasTrait("AMBITIOUS") %}
+"I know. I wrote the original requirements doc. The one in the repo, not the presentation deck." You keep it flat and professional. He processes the sentence in visible stages, nods once, and finds somewhere else to look.
+{% else %}
+"I was on the design review for that, actually. I wrote the initial spec." Even. Professional. Enough precision to end the misunderstanding without dramatizing it.
+{% endif %}
+
+The rest of the morning shifts after that. Not dramatically, just the small click of a room updating its assumptions. Somebody asks you a real question about the auth module. You answer it without looking anything up.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+The coworker from standup, Matt, glances your way four times in the next hour. Not at your screen. The inventory is quick each time. You recognize the efficiency of it.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "dan_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_ASSERTED_STATUS"
+
+[[actions]]
+id        = "let_it_go"
+label     = "\"Thanks. I'll dig into it.\""
+detail    = "Let your work do the talking."
+condition = "!scene.hasFlag('dan_done')"
+prose = """
+"Thanks, I'll take a look," you say, and he walks away satisfied.
+
+You turn back to the codebase you've had open since 9:30. You wrote half of what you are looking at and he has no idea. For now, that is information you can spend later.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You know exactly what was wrong with his explanation. You do not correct him. The gap between what you know and what he thinks you know will close the first time he has to review your code.
+{% elif w.hasTrait("AMBITIOUS") %}
+By lunch you have already found three things you would do differently. You say nothing. Shipping will make the point more cleanly than arguing.
+{% elif w.hasTrait("SHY") %}
+At your desk, you look down at the notes you took while he talked. You already knew every line of them. The afternoon stretches out ahead, long and quiet, and you fill it with work.
+{% else %}
+The morning moves on. You work. People leave you alone, which is fine.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Matt glances your direction when he thinks you're not looking. Quick. Automatic. You do not look back. You are at work.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "dan_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_DEFERRED_STATUS"
+
+[[actions]]
+id        = "redirect_to_work"
+label     = "\"Let's look at the repo.\""
+detail    = "Skip the status negotiation. Move straight to the code."
+condition = "!scene.hasFlag('dan_done') && (w.hasTrait('ANALYTICAL') || w.hasTrait('DOWN_TO_EARTH') || w.hasTrait('CONFIDENT'))"
+prose = """
+"Let's look at the repo," you say, swiveling the laptop toward him before the explanation can turn into a seminar.
+
+You pull up the auth flow diagram, then the actual implementation. Two minutes later Dan is no longer onboarding you. He is standing beside your desk while you walk him through a cache edge case he did not know existed.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You do not tell him you wrote the spec. You do not need to. The code path does it for you.
+{% elif w.hasTrait("CONFIDENT") %}
+By the time he says "oh, got it," the hierarchy of the conversation has already changed.
+{% else %}
+It is cleaner this way. No social correction. Just work.
+{% endif %}
+
+When he leaves, he does it with an actual technical question queued for later instead of a smile meant for a nervous new hire.
+"""
+
+  [[actions.effects]]
+  type = "set_scene_flag"
+  flag = "dan_done"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_REDIRECTED_STATUS"
+
+# ── Round 2: Lunch ────────────────────────────────────────────────────
+
+[[actions]]
+id        = "lunch_at_desk"
+label     = "Eat at your desk"
+detail    = "You've got momentum. Keep it."
+condition = "scene.hasFlag('dan_done')"
+prose = """
+The team starts filtering out for lunch around noon. Someone asks if you want to join.
+
+"I'm good — I want to get through this." You gesture at your screen. They go.
+
+You eat the protein bar from your bag and keep working. The office is quiet with most people gone. The code makes sense — you should know, you designed half of it. By 1 PM you've pushed your first commit and the tests pass.
+
+{% if w.hasTrait("AMBITIOUS") %}
+When the team comes back, someone notices the commit in Slack. "Already?" he says. "Yeah," you say. That one syllable does more than Dan's walkthrough ever could.
+{% elif w.hasTrait("ANALYTICAL") %}
+First commit. Tests green. Forty-seven minutes ahead of your internal schedule. You open the next ticket.
+{% else %}
+The team comes back and the afternoon starts. You are ahead of where you expected to be, which counts for more than something.
+{% endif %}
+
+By five you've pushed two more commits. Nobody has asked how old you are since this morning. The day, on balance, worked.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_DESK"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "lunch_with_group"
+label     = "Join the group for lunch"
+detail    = "Six people. A sandwich place two blocks away."
+condition = "scene.hasFlag('dan_done') && !w.hasTrait('SHY')"
+prose = """
+Six of you walk to a place two blocks away that someone describes as "fine, it's fine." It is exactly that. Sandwiches. Bright lighting. Tables designed for people who want calories and then to get back upstairs.
+
+The conversation sticks to first-day material at first: where you came from, what team, how long you've been in town. Then someone asks how old you are.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Thirty-two," you say, and let the number do its work. A beat. Someone does the math. "You look..." they start. "I know," you say. That's the end of it.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+"Old enough to have opinions about the auth system," you say. It gets a laugh. The conversation moves on. You eat your sandwich.
+{% else %}
+"Thirty-two." The table recalibrates. You can see it happen — the assumptions reshuffling. Not hostile. Just surprise. You eat your sandwich and let the number sit.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Matt sits across from you and directs most of his conversation your way. The positioning is familiar: attentive, a little too focused, angled so the rest of the table turns into backdrop.
+{% endif %}
+
+Walking back to the office, someone holds the door for you. Quick, automatic, not a thing.
+
+The afternoon is code. By five you've pushed your first commit and the day, improbably enough, has worked.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_GROUP"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "lunch_alone"
+label     = "Slip out on your own"
+detail    = "The group is still deciding where to go. You already know."
+condition = "scene.hasFlag('dan_done')"
+prose = """
+You leave while the group is still debating restaurants. The neighborhood around the office is financial-district standard: sandwich shops, a Starbucks, a strip of polished lobby entrances, a small park doing its best to look generous.
+
+You find a bench. The sandwich is adequate. The sun is out.
+
+{% if w.hasTrait("SHY") %}
+This is better. The office was too many people reading you at once: face, age, body, seniority, the gap between the resume and the person in the chair. Out here, nobody knows any of that. You are just someone on a bench eating a sandwich. The simplicity is a relief.
+{% elif w.hasTrait("ANALYTICAL") %}
+You map the neighborhood while you eat. Coffee shop on the corner, possible morning stop. Park path that probably connects to the waterfront. Grocery store across from the station. You are building infrastructure the way you would build a dev environment: one dependency at a time.
+{% else %}
+You eat. You watch the city. A man walks by with a dog and the dog looks at you with the open curiosity that dogs have and people don't. You finish the sandwich and go back.
+{% endif %}
+
+The afternoon is code. By five you've pushed your first commit and the tests are green and nobody has asked how old you are since this morning.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::workplace_opening"
+  to_state = "working"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "FIRST_DAY_LUNCH_ALONE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "STARTED_JOB"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true

@@ -1,0 +1,36 @@
+[scene]
+id          = "base::opening_callback_transactional_defense"
+pack        = "base"
+description = "Dormant callback hook. Early defensive transactionality can later resurface in routine city interactions."
+
+[intro]
+prose = """
+The bodega clerk asks if you want a receipt and for half a second the question feels larger than it is.
+
+Not because of the receipt. Because you know the move now: keep the exchange narrow, factual, almost frictionless. Give the world as little surface area as possible.
+
+It worked at the airport. It worked with the landlord. It might work here too.
+
+{% if gd.hasGameFlag("OPENING_ID_PREEMPTED") %}
+At the airport it felt efficient. Head them off, answer the visible question, keep moving.
+{% elif gd.hasGameFlag("OPENING_ID_WAITED_OUT") %}
+At the airport you tried the opposite: let the scrutiny spend itself. Either way, you're still thinking about how much effort ordinary transactions ask for now.
+{% endif %}
+"""
+
+[[actions]]
+id     = "keep_it_narrow"
+label  = "Keep it narrow"
+detail = "Transaction first. Everything else later."
+prose  = """
+You answer, take the bag, and step back out into the street before the moment has time to become anything else.
+
+Useful habit. Maybe too useful.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "OPENING_CALLBACK_TRANSACTIONAL_DEFENSE"
+
+  [[actions.next]]
+  finish = true

@@ -1,0 +1,73 @@
+[scene]
+id          = "base::campus_dining_hall"
+pack        = "base"
+description = "The dining hall. Social hierarchies, inverted. The shape of what she doesn't know."
+
+[intro]
+prose = """
+The Ivy dining hall is large enough that it has factions. You can see them from the entrance — the clustered tables, the particular density of certain groups, the territories that formed around the second week without any apparent announcement. In high school you knew exactly where you stood in this kind of map. You were good at rooms. You read the room and then put yourself correctly in it.
+
+A tray. The line. The woman behind you — a sophomore, maybe a junior, one of those people who carry themselves with the specific confidence of having survived a year of this — steps closer to point at the grain bowl and says, "Get the harissa, not the tahini, the tahini's been sitting out all morning." She says it like you know each other. Like helping is just a thing she does.
+
+The tip lands like a small kindness and a small lesson at the same time.
+
+The harissa. It's good. Tray in hand, the factions map stretching out ahead, the math happening on its own.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "hierarchy"
+label  = "Find somewhere to sit"
+detail = "The room has rules. You're learning them from the wrong side."
+prose = """
+You identify a table with space at the end — three people already there, talking, not an established territory. You walk over. One of the guys at the table — broad shoulders, easy sprawl, the kind of person who takes up space without thinking about it — glances up and then back down. His backpack is on the seat next to him.
+
+He doesn't move it.
+
+You stand there for a second. In high school you were the one with the backpack on the seat — not to exclude anyone, but because spaces filled with the people you expected them to fill with, and everyone else was background. You knew you were doing it. You just didn't know what it looked like from out here.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Is that seat taken?" you ask, meaning the backpack.
+
+He looks up. There's a half-second where he reads you — the same way you read rooms, you're watching him do it — and then he moves the backpack with a shrug and gestures at the seat.
+
+You sit. He doesn't start a conversation. You don't need him to. But you noticed the half-second. You're going to be thinking about what he was calculating for the rest of the meal.
+{% elif w.hasTrait("OUTGOING") %}
+You're halfway into "is that seat free" when you read his face and stop. He's not hostile. He's just not interested in rearranging for you. You know that face — you've made that face. You change the sentence mid-word into "never mind, I see another spot," which comes out almost natural, and walk away toward a table by the window.
+
+The table by the window has two women who move their bags without being asked and say hello. The conversation that follows is ordinary and easy enough, and you're paying a different kind of attention the entire time, turning over what happened with the backpack like an object you can't quite identify.
+{% else %}
+You don't say anything. You find another table. This is probably the clearest thing anyone has shown you all week and nobody said a word.
+{% endif %}
+
+You finish the grain bowl. Get coffee. Sit.
+
+The dining hall noise is steady around you — trays, conversations, the scrape of chairs, someone across the room who laughs loud and specific, the kind of laugh that other people's tables hear. The world has its own life in here. You're just eating in it.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You try to think through what you actually know versus what you assumed. In high school you understood the hierarchy because you were running the same operating system as everyone else in it — the rules were written in a language you spoke natively. This place is running a different OS. You keep submitting commands that don't work and getting outputs you didn't expect.
+
+You called your mom on Tuesday. Everything's great, you said. Classes are interesting. I'm making friends. Your mom said you sounded tired. You said you were fine, just adjusting. You are fine. You are adjusting. You just can't explain what you're adjusting *to*, because the explanation starts three weeks ago and you don't have the words and even if you did, this is not a conversation that happens over the phone on a Tuesday.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You've been cataloguing. Not deliberately — it's just happening. The woman in the lunch line. The backpack. The junior who held a door yesterday and then did a visible recalibration when you said thank you without the particular warmth he'd been expecting. All these small data points accumulating into a picture you don't have a frame for yet.
+
+You called home this week. Your dad asked about your classes. Your mom asked if you were eating. You said yes to both. There was a thing you wanted to say, hovering right at the surface, and you said nothing. You don't know who you'd even explain it to.
+{% else %}
+You've been at this for a week and you've made a list, not on paper but in the back of your head, of things you were wrong about. The list is longer than you thought it would be. Not catastrophically longer. Just longer.
+
+You called your dad yesterday. He wanted to hear about your classes. You told him about your classes. He sounded proud in the way he always sounds proud, which is the thing you miss — being known well enough to be predicted. Here, nobody knows what to expect from you, and you don't know what to expect from yourself.
+{% endif %}
+
+You're not going to understand this place in a week. You know that. A week is enough to know the shape of what you don't know yet.
+
+You finish the coffee, drop the tray, and walk back to the dorm.
+"""
+
+  [[actions.effects]]
+  type     = "advance_arc"
+  arc      = "base::campus_opening"
+  to_state = "first_week"
+
+  [[actions.next]]
+  finish = true

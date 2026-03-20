@@ -1,0 +1,108 @@
+[scene]
+id          = "base::transformation_intro"
+pack        = "base"
+description = "Night flight to the new city. You board as the person you were and fall asleep over Ohio."
+
+# Content level: VANILLA — no sexual content.
+# Shown during TransformationIntro char creation phase.
+# One continue-style action. No real choices.
+
+[intro]
+prose = """
+Gate C31. Grey carpet gone shiny with use. A Cinnabon across the concourse. A child asleep across two vinyl seats with one sneaker half off.
+
+{% if w.wasTransformed() %}Your boarding pass says {{ w.beforeName() }}.{% endif %}
+
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
+Three weeks ago a company in a city you barely knew offered you a job. Software engineering. Better pay than the old place, thinner title than you deserved, clean enough excuse to leave anyway.
+
+The lease starts tomorrow. Your boxes shipped Monday. Somewhere in an HR system there is already a badge photo attached to your name, waiting for Monday morning to make it official.
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
+Orientation starts Thursday. Your housing assignment came through last week, double room, old stone dorm, roommate still unknown. The acceptance email is starred, archived, and still easy to find.
+{% else %}
+You have a sublet, a suitcase, and a plan that gets less precise every time you say it out loud.
+{% endif %}
+
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") and w.wasTransformed() %}
+Ten years in the industry. Enough shipped work that people stopped second-guessing you once the meeting started. The life attached to that boarding pass made practical sense from every angle except whether it was worth keeping.
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") and w.wasTransformed() %}
+The version of you who applied had a transcript, a personal statement, and the kind of certainty eighteen-year-olds can still mistake for structure.
+{% endif %}
+
+The gate does what gates do. Phones glow. Wheelie bags click over tile. Somebody laughs too loudly into a headset and nobody even turns.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You have already arranged the first week into steps. Land. Keys. Sleep. Wake up ready. Anything that does not fit the list can be solved when it appears.
+{% elif w.hasTrait("ANALYTICAL") %}
+You run the sequence again. Land at 9:40. Transit or cab depending on the line. Lockbox code from the email. If the apartment matches the photos, unpacked before midnight.
+{% elif w.hasTrait("SHY") %}
+You chose a seat near the wall. Close enough to hear boarding, far enough that nobody has to make conversation unless they insist.
+{% elif w.hasTrait("OUTGOING") %}
+The woman beside you has a paperback open on one knee and the settled look of somebody who flies often. When you sat down she smiled, small and automatic, then went back to reading.
+{% else %}
+Sitting. Waiting. The airport moves around you.
+{% endif %}
+
+They call your zone at last.
+"""
+
+[[actions]]
+id     = "board_and_sleep"
+label  = "Board the flight"
+detail = "Find your seat. The city can wait."
+prose = """
+The jet bridge smells like wet metal and recycled air. You move with the line, find your row, lift the bag, sit.
+
+{% if w.wasTransformed() %}{% if w.beforeHeight() == "Tall" or w.beforeHeight() == "VeryTall" %}
+Your knees wedge in immediately. Three hours in a window seat becomes a negotiation.
+{% elif w.beforeFigure() == "Muscular" or w.beforeFigure() == "Thickset" %}
+The seat is narrow across the shoulders. You settle anyway and claim what space there is.
+{% else %}
+You buckle in, slide your phone into the seat pocket, and wait for the door to close.
+{% endif %}{% endif %}
+
+The overhead bins slam shut in stages. A flight attendant points out exits to people already staring at their screens.
+
+{% if gd.hasGameFlag("ROUTE_WORKPLACE") %}
+Somewhere ahead there is a desk, a codebase, and a team expecting competence from a person they have never met.
+{% elif gd.hasGameFlag("ROUTE_CAMPUS") %}
+Somewhere ahead there is a dorm room with a bare mattress, a student ID, and a roommate who may already be there.
+{% else %}
+Somewhere ahead there is an apartment with your boxes in it and no memory of you yet.
+{% endif %}
+
+The runway lights smear into lines. The engines climb. The city drops away.
+
+{% if w.hasTrait("SHY") %}
+The window helps. Outside, nobody needs anything from you.
+{% elif w.hasTrait("ANALYTICAL") %}
+You watch the street grid tilt beneath the wing and catch yourself estimating altitude from the size of the headlights below.
+{% endif %}
+
+Once the cabin settles, the flight becomes pure background noise: a low engine hum, occasional glassware, the soft cough and rustle of strangers trying to get comfortable.
+
+{% if w.wasTransformed() %}
+You flip your phone to airplane mode. The lock screen photo is from your old apartment window. You look at it just long enough to recognize the habit.
+{% endif %}
+
+{% if w.hasTrait("ANALYTICAL") %}
+You run the week again. Keys. Groceries. Commute. Monday. The sequence is clean, and for a while that is enough.
+{% elif w.hasTrait("AMBITIOUS") %}
+Monday matters. First impressions always matter. New office, new city, same private promise to be obviously worth hiring.
+{% elif w.hasTrait("SHY") %}
+The aisle passenger falls asleep before drink service. That removes at least one social problem from the evening.
+{% elif w.hasTrait("OUTGOING") %}
+Your seatmate gives the conversation one polite opening and lets it go when you do. The silence that follows is easy.
+{% endif %}
+
+{% if w.wasTransformed() %}For the moment, everything still answers to the life you boarded with. Name. body. history. plan.{% endif %}
+
+Somewhere over Ohio, you fall asleep.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "TRANSFORMATION_WITNESSED"
+
+  [[actions.next]]
+  finish = true
