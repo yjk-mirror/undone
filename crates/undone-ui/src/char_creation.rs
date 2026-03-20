@@ -12,7 +12,7 @@ use undone_domain::{
     LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity, PcOrigin, PenisSize, PlayerFigure,
     PubicHairStyle, SkinTone, TraitId, WaistSize, WetnessBaseline,
 };
-use undone_packs::{char_creation::CharCreationConfig, PackRegistry};
+use undone_packs::{char_creation::CharCreationConfig, PackRegistry, PresetData};
 use undone_scene::scheduler::Scheduler;
 
 use crate::game_state::{build_throwaway_game_state, start_game_checked, GameState, PreGameState};
@@ -20,205 +20,9 @@ use crate::theme::ThemeColors;
 use crate::{AppPhase, AppSignals, PartialCharState};
 
 // ── Preset character data ─────────────────────────────────────────────────────
-
-struct PresetData {
-    // Identity
-    before_name: &'static str,
-    before_age: Age,
-    origin: PcOrigin,
-    before_sexuality: BeforeSexuality,
-    before_race: &'static str,
-    trait_ids: &'static [&'static str],
-    blurb: &'static str,
-    /// Starting game flags seeded at game start. Presets use these to opt into
-    /// a route; custom players start freeform with no preset flags.
-    starting_flags: &'static [&'static str],
-
-    // Before-life physical
-    before_figure: MaleFigure,
-    before_height: Height,
-    before_hair_colour: HairColour,
-    before_eye_colour: EyeColour,
-    before_skin_tone: SkinTone,
-    before_penis_size: PenisSize,
-    before_voice: BeforeVoice,
-
-    // After-transformation physical
-    age: Age,
-    race: &'static str,
-    figure: PlayerFigure,
-    height: Height,
-    breasts: BreastSize,
-    butt: ButtSize,
-    waist: WaistSize,
-    lips: LipShape,
-    hair_colour: HairColour,
-    hair_length: HairLength,
-    eye_colour: EyeColour,
-    skin_tone: SkinTone,
-    complexion: Complexion,
-    appearance: Appearance,
-    pubic_hair: PubicHairStyle,
-    natural_pubic_hair: NaturalPubicHair,
-
-    // Sexual attributes
-    nipple_sensitivity: NippleSensitivity,
-    clit_sensitivity: ClitSensitivity,
-    inner_labia: InnerLabiaSize,
-    wetness_baseline: WetnessBaseline,
-
-    // Names (post-transformation)
-    name_fem: &'static str,
-    name_masc: &'static str,
-}
-
-const PRESET_ROBIN: PresetData = PresetData {
-    // Identity
-    before_name: "Robin",
-    before_age: Age::Thirties,
-    origin: PcOrigin::CisMaleTransformed,
-    before_sexuality: BeforeSexuality::AttractedToWomen,
-    before_race: "White",
-    trait_ids: &[
-        // Personality
-        "AMBITIOUS",
-        "ANALYTICAL",
-        "DOWN_TO_EARTH",
-        "OBJECTIFYING",
-        // Physical
-        "STRAIGHT_HAIR",
-        "SWEET_VOICE",
-        "ALMOND_EYES",
-        "WIDE_HIPS",
-        "NARROW_WAIST",
-        "SMALL_HANDS",
-        "PRONOUNCED_COLLARBONES",
-        "THIGH_GAP",
-        "SOFT_SKIN",
-        "NATURALLY_SMOOTH",
-        "INTOXICATING_SCENT",
-        // Sexual response
-        "HAIR_TRIGGER",
-        "HEAVY_SQUIRTER",
-        "MULTI_ORGASMIC",
-        "ORAL_FIXATION",
-        "SENSITIVE_NECK",
-        "SENSITIVE_EARS",
-        "SENSITIVE_INNER_THIGHS",
-        "SUBMISSIVE",
-        "PRAISE_KINK",
-        "EASILY_WET",
-        "BACK_ARCHER",
-        "TOE_CURLER",
-        // Arousal response
-        "NIPPLE_GETTER",
-        "FLUSHER",
-        "THIGH_CLENCHER",
-        "BREATH_CHANGER",
-        "LIP_BITER",
-        // Sexual preference
-        "LIKES_ORAL_GIVING",
-        "LIKES_DOUBLE_PENETRATION",
-        // Dark content
-        "FREEZE_RESPONSE",
-        // Body
-        "REGULAR_PERIODS",
-    ],
-    blurb: "You're thirty-two, a software engineer with ten years of experience. \
-            You took a job offer in a city you didn't know — new company, new start, \
-            boxes shipped to an apartment you've never seen. When things go sideways, \
-            you inventory and solve. You're very good at that.",
-    starting_flags: &["ROUTE_WORKPLACE"],
-
-    // Before-life physical (all unremarkable)
-    before_figure: MaleFigure::Average,
-    before_height: Height::Average,
-    before_hair_colour: HairColour::Brown,
-    before_eye_colour: EyeColour::Brown,
-    before_skin_tone: SkinTone::Light,
-    before_penis_size: PenisSize::Average,
-    before_voice: BeforeVoice::Average,
-
-    // After physical
-    age: Age::LateTeen,
-    race: "East Asian",
-    figure: PlayerFigure::Petite,
-    height: Height::Short,
-    breasts: BreastSize::Huge,
-    butt: ButtSize::Big,
-    waist: WaistSize::Narrow,
-    lips: LipShape::Full,
-    hair_colour: HairColour::Black,
-    hair_length: HairLength::Long,
-    eye_colour: EyeColour::DarkBrown,
-    skin_tone: SkinTone::Light,
-    complexion: Complexion::Glowing,
-    appearance: Appearance::Stunning,
-    pubic_hair: PubicHairStyle::Bare,
-    natural_pubic_hair: NaturalPubicHair::None,
-
-    // Sexual
-    nipple_sensitivity: NippleSensitivity::High,
-    clit_sensitivity: ClitSensitivity::High,
-    inner_labia: InnerLabiaSize::Average,
-    wetness_baseline: WetnessBaseline::Wet,
-
-    // Names: Robin keeps the same name (gender-neutral)
-    name_fem: "Robin",
-    name_masc: "Robin",
-};
-
-const PRESET_RAUL: PresetData = PresetData {
-    // Identity
-    before_name: "Raul",
-    before_age: Age::LateTeen,
-    origin: PcOrigin::CisMaleTransformed,
-    before_sexuality: BeforeSexuality::AttractedToWomen,
-    before_race: "Latina",
-    trait_ids: &["AMBITIOUS", "CONFIDENT", "OUTGOING", "SEXIST", "HOMOPHOBIC"],
-    blurb: "You're eighteen, starting at a university your family has talked about for years. \
-            You arrived with your expectations calibrated: you knew who you were, where you \
-            were headed, and what the next four years were supposed to look like. \
-            Things have always worked out. You've never had a real reason to think they wouldn't.",
-    starting_flags: &["ROUTE_CAMPUS"],
-
-    // Before-life physical
-    before_figure: MaleFigure::Toned,
-    before_height: Height::Tall,
-    before_hair_colour: HairColour::Black,
-    before_eye_colour: EyeColour::DarkBrown,
-    before_skin_tone: SkinTone::Olive,
-    before_penis_size: PenisSize::AboveAverage,
-    before_voice: BeforeVoice::Average,
-
-    // After physical
-    age: Age::LateTeen,
-    race: "Latina",
-    figure: PlayerFigure::Hourglass,
-    height: Height::Average,
-    breasts: BreastSize::Full,
-    butt: ButtSize::Round,
-    waist: WaistSize::Average,
-    lips: LipShape::Average,
-    hair_colour: HairColour::DarkBrown,
-    hair_length: HairLength::Shoulder,
-    eye_colour: EyeColour::DarkBrown,
-    skin_tone: SkinTone::Olive,
-    complexion: Complexion::Normal,
-    appearance: Appearance::Attractive,
-    pubic_hair: PubicHairStyle::Trimmed,
-    natural_pubic_hair: NaturalPubicHair::Full,
-
-    // Sexual
-    nipple_sensitivity: NippleSensitivity::Normal,
-    clit_sensitivity: ClitSensitivity::Normal,
-    inner_labia: InnerLabiaSize::Average,
-    wetness_baseline: WetnessBaseline::Normal,
-
-    // Names
-    name_fem: "Camila",
-    name_masc: "Raul",
-};
+//
+// Presets are loaded from TOML files in packs/<pack>/data/presets/ and stored in
+// PackRegistry::presets(). The `PresetData` type is defined in undone-packs::preset.
 
 const CUSTOM_STARTING_TRAIT_IDS: &[&str] = &[
     "SHY",
@@ -252,11 +56,16 @@ struct FemFormDefaults {
 pub fn validate_registry_contract(registry: &PackRegistry) -> Vec<String> {
     let mut errors = Vec::new();
 
+    let preset_trait_ids: Vec<&str> = registry
+        .presets()
+        .iter()
+        .flat_map(|preset| preset.trait_ids.iter().map(|s| s.as_str()))
+        .collect();
+
     for trait_id in CUSTOM_STARTING_TRAIT_IDS
         .iter()
         .copied()
-        .chain(PRESET_ROBIN.trait_ids.iter().copied())
-        .chain(PRESET_RAUL.trait_ids.iter().copied())
+        .chain(preset_trait_ids)
     {
         if registry.resolve_trait(trait_id).is_err() {
             errors.push(format!(
@@ -286,8 +95,8 @@ pub fn validate_registry_contract(registry: &PackRegistry) -> Vec<String> {
 pub fn validate_runtime_contract(registry: &PackRegistry, scheduler: &Scheduler) -> Vec<String> {
     let mut errors = validate_registry_contract(registry);
 
-    for preset in [PRESET_ROBIN, PRESET_RAUL] {
-        for flag in preset.starting_flags {
+    for preset in registry.presets() {
+        for flag in &preset.starting_flags {
             if !scheduler.references_game_flag(flag) {
                 errors.push(format!(
                     "character creation preset '{}' seeds starting flag '{flag}', but the scheduler never references it",
@@ -400,25 +209,22 @@ pub fn resolve_starting_traits(
     }
 }
 
-fn preset_by_idx(idx: Option<u8>) -> Option<&'static PresetData> {
-    match idx {
-        Some(0) => Some(&PRESET_ROBIN),
-        Some(1) => Some(&PRESET_RAUL),
-        _ => None,
-    }
+fn preset_by_idx<'a>(registry: &'a PackRegistry, idx: Option<u8>) -> Option<&'a PresetData> {
+    idx.and_then(|i| registry.presets().get(i as usize))
 }
 
 fn fem_form_defaults(
+    registry: &PackRegistry,
     partial: Option<&PartialCharState>,
     fallback_race: Option<&str>,
 ) -> FemFormDefaults {
-    if let Some(preset) = partial.and_then(|partial| preset_by_idx(partial.preset_idx)) {
+    if let Some(preset) = partial.and_then(|partial| preset_by_idx(registry, partial.preset_idx)) {
         return FemFormDefaults {
-            name_fem: preset.name_fem.to_string(),
+            name_fem: preset.name_fem.clone(),
             age: preset.age,
             figure: preset.figure,
             breasts: preset.breasts,
-            race: preset.race.to_string(),
+            race: preset.race.clone(),
         };
     }
 
@@ -484,60 +290,72 @@ fn fem_creation_bridge_copy(partial: Option<&PartialCharState>) -> String {
 
 /// Build a complete CharCreationConfig for the Robin preset.
 /// Used by `--quick` start and later dev tooling entry points.
+///
+/// Panics if Robin is not found in the loaded presets.
 pub fn robin_quick_config(registry: &PackRegistry) -> CharCreationConfig {
-    let starting_traits: Vec<TraitId> = PRESET_ROBIN
+    let idx = registry
+        .presets()
+        .iter()
+        .position(|p| p.before_name == "Robin")
+        .expect("Robin preset must be loaded from base pack");
+    config_from_preset(registry, idx)
+}
+
+/// Build a CharCreationConfig from a preset at the given index in `registry.presets()`.
+///
+/// Panics if the index is out of bounds.
+fn config_from_preset(registry: &PackRegistry, idx: usize) -> CharCreationConfig {
+    let p = &registry.presets()[idx];
+
+    let starting_traits: Vec<TraitId> = p
         .trait_ids
         .iter()
         .filter_map(|trait_id| registry.resolve_trait(trait_id).ok())
         .collect();
 
     CharCreationConfig {
-        name_fem: PRESET_ROBIN.name_fem.to_string(),
-        name_masc: PRESET_ROBIN.name_masc.to_string(),
-        age: PRESET_ROBIN.age,
-        race: PRESET_ROBIN.race.to_string(),
-        figure: PRESET_ROBIN.figure,
-        breasts: PRESET_ROBIN.breasts,
-        origin: PRESET_ROBIN.origin,
+        name_fem: p.name_fem.clone(),
+        name_masc: p.name_masc.clone(),
+        age: p.age,
+        race: p.race.clone(),
+        figure: p.figure,
+        breasts: p.breasts,
+        origin: p.origin,
         before: Some(BeforeIdentity {
-            name: PRESET_ROBIN.before_name.to_string(),
-            age: PRESET_ROBIN.before_age,
-            race: PRESET_ROBIN.before_race.to_string(),
-            sexuality: PRESET_ROBIN.before_sexuality,
-            figure: PRESET_ROBIN.before_figure,
-            height: PRESET_ROBIN.before_height,
-            hair_colour: PRESET_ROBIN.before_hair_colour,
-            eye_colour: PRESET_ROBIN.before_eye_colour,
-            skin_tone: PRESET_ROBIN.before_skin_tone,
-            penis_size: PRESET_ROBIN.before_penis_size,
-            voice: PRESET_ROBIN.before_voice,
+            name: p.before_name.clone(),
+            age: p.before_age,
+            race: p.before_race.clone(),
+            sexuality: p.before_sexuality,
+            figure: p.before_figure,
+            height: p.before_height,
+            hair_colour: p.before_hair_colour,
+            eye_colour: p.before_eye_colour,
+            skin_tone: p.before_skin_tone,
+            penis_size: p.before_penis_size,
+            voice: p.before_voice,
             traits: std::collections::HashSet::new(),
         }),
         starting_traits,
         male_count: 6,
         female_count: 3,
-        starting_flags: PRESET_ROBIN
-            .starting_flags
-            .iter()
-            .map(|flag| (*flag).to_string())
-            .collect(),
+        starting_flags: p.starting_flags.iter().cloned().collect(),
         starting_arc_states: std::collections::HashMap::new(),
-        height: PRESET_ROBIN.height,
-        butt: PRESET_ROBIN.butt,
-        waist: PRESET_ROBIN.waist,
-        lips: PRESET_ROBIN.lips,
-        hair_colour: PRESET_ROBIN.hair_colour,
-        hair_length: PRESET_ROBIN.hair_length,
-        eye_colour: PRESET_ROBIN.eye_colour,
-        skin_tone: PRESET_ROBIN.skin_tone,
-        complexion: PRESET_ROBIN.complexion,
-        appearance: PRESET_ROBIN.appearance,
-        pubic_hair: PRESET_ROBIN.pubic_hair,
-        natural_pubic_hair: PRESET_ROBIN.natural_pubic_hair,
-        nipple_sensitivity: PRESET_ROBIN.nipple_sensitivity,
-        clit_sensitivity: PRESET_ROBIN.clit_sensitivity,
-        inner_labia: PRESET_ROBIN.inner_labia,
-        wetness_baseline: PRESET_ROBIN.wetness_baseline,
+        height: p.height,
+        butt: p.butt,
+        waist: p.waist,
+        lips: p.lips,
+        hair_colour: p.hair_colour,
+        hair_length: p.hair_length,
+        eye_colour: p.eye_colour,
+        skin_tone: p.skin_tone,
+        complexion: p.complexion,
+        appearance: p.appearance,
+        pubic_hair: p.pubic_hair,
+        natural_pubic_hair: p.natural_pubic_hair,
+        nipple_sensitivity: p.nipple_sensitivity,
+        clit_sensitivity: p.clit_sensitivity,
+        inner_labia: p.inner_labia,
+        wetness_baseline: p.wetness_baseline,
     }
 }
 
@@ -710,6 +528,15 @@ pub fn char_creation_view(
     }
     let male_names = read_male_names(&pre_state);
 
+    // Clone presets from registry so closures can own them.
+    let presets: Vec<PresetData> = {
+        let pre_borrow = pre_state.borrow();
+        pre_borrow
+            .as_ref()
+            .map(|pre| pre.registry.presets().to_vec())
+            .unwrap_or_default()
+    };
+
     let next_btn = build_next_button(signals, form, pre_state, game_state, partial_char);
 
     let races_for_dyn = races_list;
@@ -724,13 +551,10 @@ pub fn char_creation_view(
                     section_content_prefs(signals, form),
                 ))
                 .into_any()
-            } else {
-                let preset: &'static PresetData = if mode == 0 {
-                    &PRESET_ROBIN
-                } else {
-                    &PRESET_RAUL
-                };
+            } else if let Some(preset) = presets.get(mode as usize) {
                 section_preset_detail(signals, preset).into_any()
+            } else {
+                empty().into_any()
             }
         },
     );
@@ -771,13 +595,34 @@ pub fn fem_creation_view(
 ) -> impl View {
     let races_list = read_races(&pre_state);
     let partial = partial_char.get_untracked();
-    let preset_ref = partial
-        .as_ref()
-        .and_then(|partial| preset_by_idx(partial.preset_idx));
-    let defaults = fem_form_defaults(
-        partial.as_ref(),
-        races_list.first().map(|race| race.as_str()),
-    );
+    // Clone the preset (if any) so it outlives the borrow.
+    let preset_owned: Option<PresetData> = {
+        let pre_borrow = pre_state.borrow();
+        pre_borrow.as_ref().and_then(|pre| {
+            partial
+                .as_ref()
+                .and_then(|partial| preset_by_idx(&pre.registry, partial.preset_idx))
+                .cloned()
+        })
+    };
+    let preset_ref = preset_owned.as_ref();
+    let defaults = {
+        let pre_borrow = pre_state.borrow();
+        let registry = pre_borrow.as_ref().map(|pre| &pre.registry);
+        if let Some(reg) = registry {
+            fem_form_defaults(
+                reg,
+                partial.as_ref(),
+                races_list.first().map(|race| race.as_str()),
+            )
+        } else {
+            fem_form_defaults(
+                &PackRegistry::new(),
+                partial.as_ref(),
+                races_list.first().map(|race| race.as_str()),
+            )
+        }
+    };
     let form = FemFormSignals::from_defaults(&defaults);
 
     let is_always_female = partial
@@ -844,7 +689,8 @@ pub fn fem_creation_view(
             .trait_ids
             .iter()
             .filter(|id| {
-                !PERSONALITY_TRAIT_IDS.contains(id) && BODY_APPEARANCE_TRAIT_IDS.contains(id)
+                let s = id.as_str();
+                !PERSONALITY_TRAIT_IDS.contains(&s) && BODY_APPEARANCE_TRAIT_IDS.contains(&s)
             })
             .map(|id| trait_id_to_display(id))
             .collect();
@@ -852,7 +698,8 @@ pub fn fem_creation_view(
             .trait_ids
             .iter()
             .filter(|id| {
-                !PERSONALITY_TRAIT_IDS.contains(id) && !BODY_APPEARANCE_TRAIT_IDS.contains(id)
+                let s = id.as_str();
+                !PERSONALITY_TRAIT_IDS.contains(&s) && !BODY_APPEARANCE_TRAIT_IDS.contains(&s)
             })
             .map(|id| trait_id_to_display(id))
             .collect();
@@ -1370,32 +1217,44 @@ const BODY_APPEARANCE_TRAIT_IDS: &[&str] = &[
     "IRREGULAR_PERIODS",
 ];
 
-fn section_preset_detail(signals: AppSignals, preset: &'static PresetData) -> impl View {
+fn section_preset_detail(signals: AppSignals, preset: &PresetData) -> impl View {
     let personality_traits: Vec<String> = preset
         .trait_ids
         .iter()
-        .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
+        .filter(|id| PERSONALITY_TRAIT_IDS.contains(&id.as_str()))
         .map(|id| trait_id_to_display(id))
         .collect();
 
+    let blurb = preset.blurb.clone();
+    let name = preset.before_name.clone();
+    let age = preset.before_age.to_string();
+    let race = preset.before_race.clone();
+    let build = preset.before_figure.to_string();
+    let height = preset.before_height.to_string();
+    let hair = preset.before_hair_colour.to_string();
+    let eyes = preset.before_eye_colour.to_string();
+    let skin = preset.before_skin_tone.to_string();
+    let voice = preset.before_voice.to_string();
+    let penis = preset.before_penis_size.to_string();
+
     v_stack((
-        label(move || preset.blurb.to_string()).style(move |s| {
+        label(move || blurb.clone()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
                 .color(colors.ink)
                 .margin_bottom(20.0)
                 .font_family("system-ui, -apple-system, sans-serif".to_string())
         }),
-        read_only_row("Name", preset.before_name.to_string(), signals),
-        read_only_row("Age", preset.before_age.to_string(), signals),
-        read_only_row("Race", preset.before_race.to_string(), signals),
-        read_only_row("Build", preset.before_figure.to_string(), signals),
-        read_only_row("Height", preset.before_height.to_string(), signals),
-        read_only_row("Hair", preset.before_hair_colour.to_string(), signals),
-        read_only_row("Eyes", preset.before_eye_colour.to_string(), signals),
-        read_only_row("Skin tone", preset.before_skin_tone.to_string(), signals),
-        read_only_row("Voice", preset.before_voice.to_string(), signals),
-        read_only_row("Penis size", preset.before_penis_size.to_string(), signals),
+        read_only_row("Name", name, signals),
+        read_only_row("Age", age, signals),
+        read_only_row("Race", race, signals),
+        read_only_row("Build", build, signals),
+        read_only_row("Height", height, signals),
+        read_only_row("Hair", hair, signals),
+        read_only_row("Eyes", eyes, signals),
+        read_only_row("Skin tone", skin, signals),
+        read_only_row("Voice", voice, signals),
+        read_only_row("Penis size", penis, signals),
         trait_chips("Personality", personality_traits, signals),
     ))
     .style(|s| s.flex_col().width_full().margin_bottom(24.0))
@@ -1420,26 +1279,35 @@ fn build_next_button(
             let before_age: Age;
             let before_race: String;
             let before_sexuality: BeforeSexuality;
-            let trait_names: Vec<&'static str>;
+            let trait_names: Vec<String>;
 
-            let preset_ref: Option<&'static PresetData>;
-            if char_mode < 2 {
-                // Preset mode — Robin (0) or Raul (1)
-                let preset: &'static PresetData = if char_mode == 0 {
-                    &PRESET_ROBIN
-                } else {
-                    &PRESET_RAUL
-                };
-                preset_ref = Some(preset);
+            // Clone the preset (if any) from the registry so it outlives the borrow.
+            let preset_owned: Option<PresetData> = {
+                let pre_borrow = pre_state.borrow();
+                pre_borrow
+                    .as_ref()
+                    .and_then(|pre| pre.registry.presets().get(char_mode as usize).cloned())
+            };
+            // char_mode < number-of-presets means preset mode; otherwise custom.
+            let num_presets = {
+                let pre_borrow = pre_state.borrow();
+                pre_borrow
+                    .as_ref()
+                    .map(|pre| pre.registry.presets().len())
+                    .unwrap_or(0)
+            };
+
+            if (char_mode as usize) < num_presets {
+                // Preset mode
+                let preset = preset_owned.as_ref().unwrap();
                 origin = preset.origin;
-                before_name = preset.before_name.to_string();
+                before_name = preset.before_name.clone();
                 before_age = preset.before_age;
-                before_race = preset.before_race.to_string();
+                before_race = preset.before_race.clone();
                 before_sexuality = preset.before_sexuality;
-                trait_names = preset.trait_ids.to_vec();
+                trait_names = preset.trait_ids.iter().map(|s| s.to_string()).collect();
             } else {
                 // Custom mode
-                preset_ref = None;
                 let origin_idx = form.origin_idx.get_untracked();
                 if origin_idx != 3 && form.before_name.get_untracked().trim().is_empty() {
                     return;
@@ -1450,67 +1318,68 @@ fn build_next_button(
                 before_race = form.before_race.get_untracked();
                 before_sexuality = form.before_sexuality.get_untracked();
 
-                let mut tn: Vec<&'static str> = Vec::new();
+                let mut tn: Vec<String> = Vec::new();
                 if form.trait_shy.get_untracked() {
-                    tn.push("SHY");
+                    tn.push("SHY".into());
                 }
                 if form.trait_cute.get_untracked() {
-                    tn.push("CUTE");
+                    tn.push("CUTE".into());
                 }
                 if form.trait_posh.get_untracked() {
-                    tn.push("POSH");
+                    tn.push("POSH".into());
                 }
                 if form.trait_sultry.get_untracked() {
-                    tn.push("SULTRY");
+                    tn.push("SULTRY".into());
                 }
                 if form.trait_down_to_earth.get_untracked() {
-                    tn.push("DOWN_TO_EARTH");
+                    tn.push("DOWN_TO_EARTH".into());
                 }
                 if form.trait_bitchy.get_untracked() {
-                    tn.push("BITCHY");
+                    tn.push("BITCHY".into());
                 }
                 if form.trait_refined.get_untracked() {
-                    tn.push("REFINED");
+                    tn.push("REFINED".into());
                 }
                 if form.trait_romantic.get_untracked() {
-                    tn.push("ROMANTIC");
+                    tn.push("ROMANTIC".into());
                 }
                 if form.trait_flirty.get_untracked() {
-                    tn.push("FLIRTY");
+                    tn.push("FLIRTY".into());
                 }
                 if form.trait_ambitious.get_untracked() {
-                    tn.push("AMBITIOUS");
+                    tn.push("AMBITIOUS".into());
                 }
                 if form.trait_outgoing.get_untracked() {
-                    tn.push("OUTGOING");
+                    tn.push("OUTGOING".into());
                 }
                 if form.trait_overactive_imagination.get_untracked() {
-                    tn.push("OVERACTIVE_IMAGINATION");
+                    tn.push("OVERACTIVE_IMAGINATION".into());
                 }
                 if form.trait_analytical.get_untracked() {
-                    tn.push("ANALYTICAL");
+                    tn.push("ANALYTICAL".into());
                 }
                 if form.trait_confident.get_untracked() {
-                    tn.push("CONFIDENT");
+                    tn.push("CONFIDENT".into());
                 }
                 if form.trait_sexist.get_untracked() {
-                    tn.push("SEXIST");
+                    tn.push("SEXIST".into());
                 }
                 if form.trait_homophobic.get_untracked() {
-                    tn.push("HOMOPHOBIC");
+                    tn.push("HOMOPHOBIC".into());
                 }
                 if form.trait_objectifying.get_untracked() {
-                    tn.push("OBJECTIFYING");
+                    tn.push("OBJECTIFYING".into());
                 }
                 trait_names = tn;
             }
 
+            let trait_name_strs: Vec<&str> = trait_names.iter().map(|s| s.as_str()).collect();
             let starting_traits = {
                 let pre_borrow = pre_state.borrow();
                 if let Some(ref pre) = *pre_borrow {
                     match resolve_starting_traits(
                         &pre.registry,
-                        &trait_names,
+                        &trait_name_strs,
                         form.include_rough.get_untracked(),
                         form.likes_rough.get_untracked(),
                     ) {
@@ -1528,17 +1397,12 @@ fn build_next_button(
 
             // Presets declare their own starting game flags; custom players
             // start freeform with no preset routing flags.
-            let starting_flags = preset_ref
-                .map(|preset| {
-                    preset
-                        .starting_flags
-                        .iter()
-                        .map(|flag| (*flag).to_string())
-                        .collect()
-                })
+            let starting_flags = preset_owned
+                .as_ref()
+                .map(|preset| preset.starting_flags.clone())
                 .unwrap_or_default();
 
-            let appearance = if let Some(p) = preset_ref {
+            let appearance = if let Some(ref p) = preset_owned {
                 p.appearance
             } else {
                 form.appearance.get_untracked()
@@ -1551,7 +1415,7 @@ fn build_next_button(
                 before_sexuality,
                 starting_traits,
                 starting_flags,
-                preset_idx: preset_ref.map(|_| char_mode),
+                preset_idx: preset_owned.as_ref().map(|_| char_mode),
                 appearance,
             };
             partial_char.set(Some(partial.clone()));
@@ -1563,7 +1427,7 @@ fn build_next_button(
                 // Create a throwaway world for the transformation intro scene.
                 // This world is discarded after the intro — the real world is
                 // created at FemCreation submit via new_game().
-                let before_identity = if let Some(p) = preset_ref {
+                let before_identity = if let Some(ref p) = preset_owned {
                     Some(BeforeIdentity {
                         name: partial.before_name.clone(),
                         age: partial.before_age,
@@ -1594,12 +1458,12 @@ fn build_next_button(
                         traits: std::collections::HashSet::new(),
                     })
                 };
-                let throwaway_config = if let Some(p) = preset_ref {
+                let throwaway_config = if let Some(ref p) = preset_owned {
                     CharCreationConfig {
-                        name_fem: p.name_fem.to_string(),
-                        name_masc: p.name_masc.to_string(),
+                        name_fem: p.name_fem.clone(),
+                        name_masc: p.name_masc.clone(),
                         age: p.age,
-                        race: p.race.to_string(),
+                        race: p.race.clone(),
                         figure: p.figure,
                         breasts: p.breasts,
                         origin,
@@ -1732,10 +1596,15 @@ fn build_begin_button(
 
             let origin = partial.origin;
 
-            // Resolve preset reference (if any) so we can pull physical attributes
-            let preset_ref = preset_by_idx(partial.preset_idx);
+            // Clone the preset (if any) from the registry so it outlives the borrow.
+            let preset_owned: Option<PresetData> = {
+                let pre_borrow = pre_state.borrow();
+                pre_borrow
+                    .as_ref()
+                    .and_then(|pre| preset_by_idx(&pre.registry, partial.preset_idx).cloned())
+            };
 
-            let config = if let Some(p) = preset_ref {
+            let config = if let Some(ref p) = preset_owned {
                 // Preset mode: all physical/sexual attributes come from PresetData
                 let before = if origin.was_transformed() {
                     Some(BeforeIdentity {
@@ -1756,10 +1625,10 @@ fn build_begin_button(
                     None
                 };
                 CharCreationConfig {
-                    name_fem: p.name_fem.to_string(),
-                    name_masc: p.name_masc.to_string(),
+                    name_fem: p.name_fem.clone(),
+                    name_masc: p.name_masc.clone(),
                     age: p.age,
-                    race: p.race.to_string(),
+                    race: p.race.clone(),
                     figure: p.figure,
                     breasts: p.breasts,
                     origin,
@@ -2184,6 +2053,33 @@ mod tests {
     use undone_packs::load_packs;
     use undone_scene::scheduler::load_schedule;
 
+    fn packs_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("packs")
+    }
+
+    /// Helper: find the Robin preset by before_name from the loaded registry.
+    fn robin_preset(registry: &PackRegistry) -> &PresetData {
+        registry
+            .presets()
+            .iter()
+            .find(|p| p.before_name == "Robin")
+            .expect("Robin preset should be loaded from pack data")
+    }
+
+    /// Helper: find the Camila/Raul preset by before_name from the loaded registry.
+    fn camila_preset(registry: &PackRegistry) -> &PresetData {
+        registry
+            .presets()
+            .iter()
+            .find(|p| p.before_name == "Raul")
+            .expect("Camila/Raul preset should be loaded from pack data")
+    }
+
     #[test]
     fn validate_registry_contract_reports_missing_traits() {
         let registry = PackRegistry::new();
@@ -2197,6 +2093,14 @@ mod tests {
 
     #[test]
     fn fem_form_defaults_use_preset_values_when_present() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        let robin = robin_preset(&registry);
+        let robin_idx = registry
+            .presets()
+            .iter()
+            .position(|p| p.before_name == "Robin")
+            .unwrap() as u8;
+
         let partial = PartialCharState {
             origin: PcOrigin::CisMaleTransformed,
             before_name: "Robin".into(),
@@ -2205,20 +2109,27 @@ mod tests {
             before_sexuality: BeforeSexuality::AttractedToWomen,
             starting_traits: vec![],
             starting_flags: vec!["ROUTE_WORKPLACE".into()],
-            preset_idx: Some(0),
+            preset_idx: Some(robin_idx),
             appearance: Appearance::Average,
         };
 
-        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        let defaults = fem_form_defaults(&registry, Some(&partial), Some("White"));
         assert_eq!(defaults.name_fem, "Robin");
-        assert_eq!(defaults.figure, PRESET_ROBIN.figure);
-        assert_eq!(defaults.breasts, PRESET_ROBIN.breasts);
-        assert_eq!(defaults.race, PRESET_ROBIN.race);
+        assert_eq!(defaults.figure, robin.figure);
+        assert_eq!(defaults.breasts, robin.breasts);
+        assert_eq!(defaults.race, robin.race);
     }
 
     #[test]
     fn fem_form_defaults_use_camila_name_for_raul_preset() {
-        // preset_idx=1 → PRESET_RAUL → name_fem should be "Camila", not "Eva"
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        let camila = camila_preset(&registry);
+        let camila_idx = registry
+            .presets()
+            .iter()
+            .position(|p| p.before_name == "Raul")
+            .unwrap() as u8;
+
         let partial = PartialCharState {
             origin: PcOrigin::CisMaleTransformed,
             before_name: "Raul".into(),
@@ -2227,19 +2138,21 @@ mod tests {
             before_sexuality: BeforeSexuality::AttractedToWomen,
             starting_traits: vec![],
             starting_flags: vec!["ROUTE_CAMPUS".into()],
-            preset_idx: Some(1),
+            preset_idx: Some(camila_idx),
             appearance: Appearance::Average,
         };
 
-        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        let defaults = fem_form_defaults(&registry, Some(&partial), Some("White"));
         assert_eq!(defaults.name_fem, "Camila");
-        assert_eq!(defaults.figure, PRESET_RAUL.figure);
-        assert_eq!(defaults.breasts, PRESET_RAUL.breasts);
-        assert_eq!(defaults.race, PRESET_RAUL.race);
+        assert_eq!(defaults.figure, camila.figure);
+        assert_eq!(defaults.breasts, camila.breasts);
+        assert_eq!(defaults.race, camila.race);
     }
 
     #[test]
     fn fem_form_defaults_fall_back_to_before_race_for_custom_mode() {
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+
         let partial = PartialCharState {
             origin: PcOrigin::CisMaleTransformed,
             before_name: "Evan".into(),
@@ -2252,19 +2165,10 @@ mod tests {
             appearance: Appearance::Average,
         };
 
-        let defaults = fem_form_defaults(Some(&partial), Some("White"));
+        let defaults = fem_form_defaults(&registry, Some(&partial), Some("White"));
         assert_eq!(defaults.name_fem, "Eva");
         assert_eq!(defaults.race, "Latina");
         assert_eq!(defaults.age, Age::EarlyTwenties);
-    }
-
-    fn packs_dir() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("packs")
     }
 
     #[test]
@@ -2284,16 +2188,17 @@ mod tests {
     #[test]
     fn robin_quick_config_builds_workplace_preset() {
         let (registry, _) = load_packs(&packs_dir()).unwrap();
+        let robin = robin_preset(&registry);
 
         let config = robin_quick_config(&registry);
 
-        assert_eq!(config.name_fem, PRESET_ROBIN.name_fem);
-        assert_eq!(config.name_masc, PRESET_ROBIN.name_masc);
+        assert_eq!(config.name_fem, robin.name_fem);
+        assert_eq!(config.name_masc, robin.name_masc);
         assert!(config.starting_flags.contains("ROUTE_WORKPLACE"));
         assert_eq!(config.male_count, 6);
         assert_eq!(config.female_count, 3);
-        assert_eq!(config.appearance, PRESET_ROBIN.appearance);
-        assert_eq!(config.starting_traits.len(), PRESET_ROBIN.trait_ids.len());
+        assert_eq!(config.appearance, robin.appearance);
+        assert_eq!(config.starting_traits.len(), robin.trait_ids.len());
     }
 
     #[test]
@@ -2327,7 +2232,7 @@ mod tests {
         );
     }
 
-    /// Physical/body traits from PRESET_ROBIN must NOT appear in BeforeCreation's
+    /// Physical/body traits from presets must NOT appear in BeforeCreation's
     /// personality display — they are post-transformation attributes.
     #[test]
     fn before_creation_personality_display_excludes_physical_traits() {
@@ -2352,10 +2257,13 @@ mod tests {
     /// filtering on PERSONALITY_TRAIT_IDS must exclude all physical/sexual traits.
     #[test]
     fn robin_preset_personality_display_excludes_body_and_sexual_traits() {
-        let displayed: Vec<&str> = PRESET_ROBIN
+        let (registry, _) = load_packs(&packs_dir()).unwrap();
+        let robin = robin_preset(&registry);
+
+        let displayed: Vec<&str> = robin
             .trait_ids
             .iter()
-            .copied()
+            .map(|s| s.as_str())
             .filter(|id| PERSONALITY_TRAIT_IDS.contains(id))
             .collect();
 

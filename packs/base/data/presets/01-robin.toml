@@ -1,0 +1,96 @@
+[identity]
+before_name = "Robin"
+name_fem = "Robin"
+name_masc = "Robin"
+origin = "CisMaleTransformed"
+before_age = "Thirties"
+before_sexuality = "AttractedToWomen"
+before_race = "White"
+blurb = """\
+You're thirty-two, a software engineer with ten years of experience. \
+You took a job offer in a city you didn't know — new company, new start, \
+boxes shipped to an apartment you've never seen. When things go sideways, \
+you inventory and solve. You're very good at that."""
+
+[before]
+figure = "Average"
+height = "Average"
+hair_colour = "Brown"
+eye_colour = "Brown"
+skin_tone = "Light"
+penis_size = "Average"
+voice = "Average"
+
+[after]
+age = "LateTeen"
+race = "East Asian"
+figure = "Petite"
+height = "Short"
+breasts = "Huge"
+butt = "Big"
+waist = "Narrow"
+lips = "Full"
+hair_colour = "Black"
+hair_length = "Long"
+eye_colour = "DarkBrown"
+skin_tone = "Light"
+complexion = "Glowing"
+appearance = "Stunning"
+pubic_hair = "Bare"
+natural_pubic_hair = "None"
+
+[sexual]
+nipple_sensitivity = "High"
+clit_sensitivity = "High"
+inner_labia = "Average"
+wetness_baseline = "Wet"
+
+[personality]
+traits = [
+    # Personality
+    "AMBITIOUS",
+    "ANALYTICAL",
+    "DOWN_TO_EARTH",
+    "OBJECTIFYING",
+    # Physical
+    "STRAIGHT_HAIR",
+    "SWEET_VOICE",
+    "ALMOND_EYES",
+    "WIDE_HIPS",
+    "NARROW_WAIST",
+    "SMALL_HANDS",
+    "PRONOUNCED_COLLARBONES",
+    "THIGH_GAP",
+    "SOFT_SKIN",
+    "NATURALLY_SMOOTH",
+    "INTOXICATING_SCENT",
+    # Sexual response
+    "HAIR_TRIGGER",
+    "HEAVY_SQUIRTER",
+    "MULTI_ORGASMIC",
+    "ORAL_FIXATION",
+    "SENSITIVE_NECK",
+    "SENSITIVE_EARS",
+    "SENSITIVE_INNER_THIGHS",
+    "SUBMISSIVE",
+    "PRAISE_KINK",
+    "EASILY_WET",
+    "BACK_ARCHER",
+    "TOE_CURLER",
+    # Arousal response
+    "NIPPLE_GETTER",
+    "FLUSHER",
+    "THIGH_CLENCHER",
+    "BREATH_CHANGER",
+    "LIP_BITER",
+    # Sexual preference
+    "LIKES_ORAL_GIVING",
+    "LIKES_DOUBLE_PENETRATION",
+    # Dark content
+    "FREEZE_RESPONSE",
+    # Body
+    "REGULAR_PERIODS",
+]
+
+[game]
+starting_flags = ["ROUTE_WORKPLACE"]

@@ -5,6 +5,7 @@ use thiserror::Error;
 use undone_domain::{NpcTraitId, PersonalityId, Player, SkillId, StatId, StuffId, TraitId};
 
 use crate::data::{ArcDef, CategoryDef, NpcTraitDef, SkillDef, StatDef, TraitDef};
+use crate::preset::PresetData;
 
 #[derive(Debug, Error)]
 pub enum RegistryError {
@@ -34,6 +35,7 @@ pub struct PackRegistry {
     registered_stats: HashSet<StatId>,
     opening_scene: Option<String>,
     transformation_scene: Option<String>,
+    presets: Vec<PresetData>,
 }
 
 impl PackRegistry {
@@ -61,6 +63,7 @@ impl PackRegistry {
             registered_stats: HashSet::new(),
             opening_scene: None,
             transformation_scene: None,
+            presets: Vec::new(),
         }
     }
 
@@ -351,6 +354,16 @@ impl PackRegistry {
     /// Return the transformation scene ID declared by the pack, if any.
     pub fn transformation_scene(&self) -> Option<&str> {
         self.transformation_scene.as_deref()
+    }
+
+    /// Register character presets loaded from pack data files.
+    pub fn register_presets(&mut self, presets: Vec<PresetData>) {
+        self.presets.extend(presets);
+    }
+
+    /// Return the loaded character presets.
+    pub fn presets(&self) -> &[PresetData] {
+        &self.presets
     }
 
     /// Return all interned strings in Spur-index order (index 0 first).

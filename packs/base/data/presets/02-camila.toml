@@ -1,0 +1,58 @@
+[identity]
+before_name = "Raul"
+name_fem = "Camila"
+name_masc = "Raul"
+origin = "CisMaleTransformed"
+before_age = "LateTeen"
+before_sexuality = "AttractedToWomen"
+before_race = "Latina"
+blurb = """\
+You're eighteen, starting at a university your family has talked about for years. \
+You arrived with your expectations calibrated: you knew who you were, where you \
+were headed, and what the next four years were supposed to look like. \
+Things have always worked out. You've never had a real reason to think they wouldn't."""
+
+[before]
+figure = "Toned"
+height = "Tall"
+hair_colour = "Black"
+eye_colour = "DarkBrown"
+skin_tone = "Olive"
+penis_size = "AboveAverage"
+voice = "Average"
+
+[after]
+age = "LateTeen"
+race = "Latina"
+figure = "Hourglass"
+height = "Average"
+breasts = "Full"
+butt = "Round"
+waist = "Average"
+lips = "Average"
+hair_colour = "DarkBrown"
+hair_length = "Shoulder"
+eye_colour = "DarkBrown"
+skin_tone = "Olive"
+complexion = "Normal"
+appearance = "Attractive"
+pubic_hair = "Trimmed"
+natural_pubic_hair = "Full"
+
+[sexual]
+nipple_sensitivity = "Normal"
+clit_sensitivity = "Normal"
+inner_labia = "Average"
+wetness_baseline = "Normal"
+
+[personality]
+traits = [
+    "AMBITIOUS",
+    "CONFIDENT",
+    "OUTGOING",
+    "SEXIST",
+    "HOMOPHOBIC",
+]
+
+[game]
+starting_flags = ["ROUTE_CAMPUS"]

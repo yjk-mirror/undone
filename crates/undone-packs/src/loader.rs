@@ -221,6 +221,10 @@ fn load_one_pack(
         registry.register_arcs(arcs_file.arc);
     }
 
+    // Load character presets (optional — directory may not exist)
+    let presets = crate::preset::load_presets(pack_dir)?;
+    registry.register_presets(presets);
+
     Ok(LoadedPackMeta {
         manifest,
         pack_dir: pack_dir.to_path_buf(),
