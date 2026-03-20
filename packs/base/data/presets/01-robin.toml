@@ -94,3 +94,44 @@ traits = [
 
 [game]
 starting_flags = ["ROUTE_WORKPLACE"]
+
+# ── Discovery beats (FemCreation interactive flow) ───────────────────────
+#
+# Each [[discovery]] beat shows prose, reveals attribute groups, and
+# optionally presents reaction choices that set game flags.
+#
+# reveals: "scale" | "body" | "face" | "name" | "sexual" | "begin"
+#
+# Prose is placeholder — user replaces with final text.
+
+[[discovery]]
+reveals = ["scale"]
+prose = "[PROSE SLOT — Beat 1: Scale. She wakes. Everything is wrong-sized. Reveals: figure, height.]"
+
+  [[discovery.choices]]
+  label = "[CHOICE — pragmatic reaction]"
+  flag = "DISCOVERY_INVENTORY"
+
+  [[discovery.choices]]
+  label = "[CHOICE — panic reaction]"
+  flag = "DISCOVERY_PANIC"
+
+  [[discovery.choices]]
+  label = "[CHOICE — freeze reaction]"
+  flag = "DISCOVERY_FREEZE"
+
+[[discovery]]
+reveals = ["body"]
+prose = "[PROSE SLOT — Beat 2: Body. Weight shifts. Something heavy. Reveals: breasts, butt, waist, lips.]"
+
+[[discovery]]
+reveals = ["face"]
+prose = "[PROSE SLOT — Beat 3: Face. Window reflection. Wrong hair, wrong eyes. Reveals: hair, eyes, skin, race, appearance.]"
+
+[[discovery]]
+reveals = ["name"]
+prose = "[PROSE SLOT — Beat 4: Name. Flight attendant speaks. The boarding pass. Reveals: name input.]"
+
+[[discovery]]
+reveals = ["sexual", "begin"]
+prose = "[PROSE SLOT — Beat 5: Begin. Standing up. Everything at the wrong height. Reveals: sexual attributes, Begin button.]"

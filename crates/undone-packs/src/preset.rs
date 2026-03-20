@@ -72,6 +72,31 @@ struct GameRaw {
     starting_flags: Vec<String>,
 }
 
+/// A single discovery beat in the FemCreation flow (TOML `[[discovery]]`).
+///
+/// Each beat has prose (written by the user — placeholder until filled),
+/// a list of attribute groups to reveal, and optional reaction choices
+/// that set game flags.
+#[derive(Debug, Deserialize)]
+struct DiscoveryBeatRaw {
+    /// Which attribute groups to reveal after this beat's prose.
+    /// Valid values: "scale", "body", "face", "name", "sexual", "begin"
+    reveals: Vec<String>,
+    /// Prose displayed before the attribute reveal. User-written content.
+    prose: String,
+    /// Optional reaction choices. If empty, beat auto-advances after prose.
+    #[serde(default)]
+    choices: Vec<ReactionChoiceRaw>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ReactionChoiceRaw {
+    /// Button label shown to the player.
+    label: String,
+    /// Game flag set when this choice is picked.
+    flag: String,
+}
+
 #[derive(Debug, Deserialize)]
 struct PresetFile {
     identity: IdentityRaw,
@@ -80,6 +105,10 @@ struct PresetFile {
     sexual: SexualRaw,
     personality: PersonalityRaw,
     game: GameRaw,
+    /// Optional discovery beats for interactive FemCreation flow.
+    /// If absent, FemCreation falls back to the flat form layout.
+    #[serde(default)]
+    discovery: Vec<DiscoveryBeatRaw>,
 }
 
 // ── Public preset type ──────────────────────────────────────────────────────
@@ -139,6 +168,65 @@ pub struct PresetData {
 
     // Game flags
     pub starting_flags: Vec<String>,
+
+    // Discovery beats for interactive FemCreation (preset-only).
+    // Empty means the flat form layout is used instead.
+    pub discovery_beats: Vec<DiscoveryBeat>,
+}
+
+/// A discovery beat in the FemCreation interactive flow.
+///
+/// Each beat shows prose, optionally reveals attribute groups, and
+/// optionally presents reaction choices that set game flags. The user
+/// writes all prose — the engine provides the scaffolding.
+#[derive(Debug, Clone)]
+pub struct DiscoveryBeat {
+    /// Prose displayed before the attribute reveal.
+    pub prose: String,
+    /// Which attribute groups to reveal. See `RevealGroup`.
+    pub reveals: Vec<RevealGroup>,
+    /// Reaction choices. Empty = auto-advance (prose-only beat).
+    pub choices: Vec<ReactionChoice>,
+}
+
+/// Attribute groups that can be revealed during a discovery beat.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RevealGroup {
+    /// figure, height
+    Scale,
+    /// breasts, butt, waist, lips
+    Body,
+    /// hair, eyes, skin, race, appearance, complexion
+    Face,
+    /// feminine name input
+    Name,
+    /// nipple_sensitivity, clit_sensitivity, wetness, etc.
+    Sexual,
+    /// "Begin Your Story" button
+    Begin,
+}
+
+impl RevealGroup {
+    fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "scale" => Some(Self::Scale),
+            "body" => Some(Self::Body),
+            "face" => Some(Self::Face),
+            "name" => Some(Self::Name),
+            "sexual" => Some(Self::Sexual),
+            "begin" => Some(Self::Begin),
+            _ => None,
+        }
+    }
+}
+
+/// A reaction choice the player can pick during a discovery beat.
+#[derive(Debug, Clone)]
+pub struct ReactionChoice {
+    /// Button label.
+    pub label: String,
+    /// Game flag set when chosen (e.g. "DISCOVERY_INVENTORY", "DISCOVERY_PANIC").
+    pub flag: String,
 }
 
 impl From<PresetFile> for PresetData {
@@ -190,6 +278,28 @@ impl From<PresetFile> for PresetData {
             // Traits + flags
             trait_ids: f.personality.traits,
             starting_flags: f.game.starting_flags,
+
+            // Discovery beats
+            discovery_beats: f
+                .discovery
+                .into_iter()
+                .map(|beat| DiscoveryBeat {
+                    prose: beat.prose,
+                    reveals: beat
+                        .reveals
+                        .iter()
+                        .filter_map(|s| RevealGroup::from_str(s))
+                        .collect(),
+                    choices: beat
+                        .choices
+                        .into_iter()
+                        .map(|c| ReactionChoice {
+                            label: c.label,
+                            flag: c.flag,
+                        })
+                        .collect(),
+                })
+                .collect(),
         }
     }
 }

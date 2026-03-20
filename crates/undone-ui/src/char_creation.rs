@@ -586,6 +586,11 @@ pub fn char_creation_view(
 }
 
 /// FemCreation phase: who you are now.
+///
+/// For presets with `discovery_beats`, renders an interactive step-driven flow:
+/// each beat shows prose, optionally reveals attribute groups, and optionally
+/// presents reaction choices that set game flags. For presets without beats
+/// (or custom characters), falls back to the flat form layout.
 pub fn fem_creation_view(
     signals: AppSignals,
     pre_state: Rc<RefCell<Option<PreGameState>>>,
@@ -605,6 +610,47 @@ pub fn fem_creation_view(
                 .cloned()
         })
     };
+
+    let has_discovery = preset_owned
+        .as_ref()
+        .map(|p| !p.discovery_beats.is_empty())
+        .unwrap_or(false);
+
+    if has_discovery {
+        fem_creation_discovery_view(
+            signals,
+            pre_state,
+            game_state,
+            partial_char,
+            dev_mode,
+            preset_owned.unwrap(),
+        )
+        .into_any()
+    } else {
+        fem_creation_flat_view(
+            signals,
+            pre_state,
+            game_state,
+            partial_char,
+            dev_mode,
+            preset_owned,
+            races_list,
+        )
+        .into_any()
+    }
+}
+
+/// Flat FemCreation layout (custom characters or presets without discovery beats).
+fn fem_creation_flat_view(
+    signals: AppSignals,
+    pre_state: Rc<RefCell<Option<PreGameState>>>,
+    game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
+    dev_mode: bool,
+    preset_owned: Option<PresetData>,
+    races_list: Vec<String>,
+) -> impl View {
+    let partial = partial_char.get_untracked();
     let preset_ref = preset_owned.as_ref();
     let defaults = {
         let pre_borrow = pre_state.borrow();
@@ -828,6 +874,291 @@ pub fn fem_creation_view(
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.size_full().background(colors.page)
         })
+}
+
+/// Discovery-beat FemCreation layout (presets with interactive beats).
+///
+/// Renders one beat at a time. Each beat shows prose, reveals attribute groups
+/// as read-only chips, and optionally presents reaction choice buttons. The
+/// player advances through beats via choices or a Continue button.
+fn fem_creation_discovery_view(
+    signals: AppSignals,
+    pre_state: Rc<RefCell<Option<PreGameState>>>,
+    game_state: Rc<RefCell<Option<GameState>>>,
+    partial_char: RwSignal<Option<PartialCharState>>,
+    dev_mode: bool,
+    preset: PresetData,
+) -> impl View {
+    let partial = partial_char.get_untracked();
+    let defaults = {
+        let pre_borrow = pre_state.borrow();
+        let registry = pre_borrow.as_ref().map(|pre| &pre.registry);
+        if let Some(reg) = registry {
+            fem_form_defaults(reg, partial.as_ref(), None)
+        } else {
+            fem_form_defaults(&PackRegistry::new(), partial.as_ref(), None)
+        }
+    };
+    let form = FemFormSignals::from_defaults(&defaults);
+
+    // Current beat index — drives the dyn_container.
+    let beat_idx = RwSignal::new(0usize);
+    let beat_count = preset.discovery_beats.len();
+
+    // Pre-compute all reveal views for each beat.
+    // We use an Rc to share the preset across closures.
+    let preset_rc = Rc::new(preset);
+    let preset_for_dyn = preset_rc.clone();
+    let begin_btn = build_begin_button(
+        signals,
+        form,
+        pre_state.clone(),
+        game_state.clone(),
+        partial_char,
+        dev_mode,
+    );
+
+    let beat_view = dyn_container(
+        move || beat_idx.get(),
+        move |idx| {
+            if idx >= beat_count {
+                return empty().into_any();
+            }
+            let beat = &preset_for_dyn.discovery_beats[idx];
+            let prose_text = beat.prose.clone();
+            let has_choices = !beat.choices.is_empty();
+
+            // ── Prose ────────────────────────────────────────────────
+            let prose = label(move || prose_text.clone()).style(move |s| {
+                let prefs = signals.prefs.get();
+                let colors = ThemeColors::from_mode(prefs.mode);
+                s.width_full()
+                    .padding_vert(16.0)
+                    .padding_horiz(4.0)
+                    .color(colors.ink_dim)
+                    .font_size(prefs.font_size as f32 * 0.95)
+                    .line_height(1.6)
+            });
+
+            // ── Reveals ──────────────────────────────────────────────
+            let reveals = build_discovery_reveals(signals, &preset_for_dyn, &beat.reveals, form);
+
+            // ── Choices or Continue button ────────────────────────────
+            let advance: Box<dyn View> = if has_choices {
+                let buttons: Vec<Box<dyn View>> = beat
+                    .choices
+                    .iter()
+                    .map(|choice| {
+                        let flag = choice.flag.clone();
+                        let lbl = choice.label.clone();
+                        Box::new(
+                            label(move || lbl.clone())
+                                .keyboard_navigable()
+                                .on_click_stop(move |_| {
+                                    // Store reaction flag in partial char state
+                                    partial_char.update(|opt| {
+                                        if let Some(ref mut p) = opt {
+                                            if !p.starting_flags.contains(&flag) {
+                                                p.starting_flags.push(flag.clone());
+                                            }
+                                        }
+                                    });
+                                    beat_idx.set(idx + 1);
+                                })
+                                .style(move |s| {
+                                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                                    s.padding_vert(10.0)
+                                        .padding_horiz(20.0)
+                                        .border(1.0)
+                                        .border_radius(6.0)
+                                        .border_color(colors.ink_dim.multiply_alpha(0.3))
+                                        .color(colors.ink)
+                                        .cursor(floem::style::CursorStyle::Pointer)
+                                        .hover(|s| {
+                                            s.background(colors.ink_dim.multiply_alpha(0.08))
+                                        })
+                                }),
+                        ) as Box<dyn View>
+                    })
+                    .collect();
+                Box::new(
+                    v_stack_from_iter(buttons).style(|s| s.gap(8.0).margin_top(16.0).width_full()),
+                )
+            } else {
+                // No choices — show Continue button to advance
+                Box::new(
+                    label(|| "Continue".to_string())
+                        .keyboard_navigable()
+                        .on_click_stop(move |_| {
+                            beat_idx.set(idx + 1);
+                        })
+                        .style(move |s| {
+                            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                            s.padding_vert(10.0)
+                                .padding_horiz(24.0)
+                                .border(1.0)
+                                .border_radius(6.0)
+                                .border_color(colors.ink_dim.multiply_alpha(0.3))
+                                .color(colors.ink)
+                                .margin_top(16.0)
+                                .cursor(floem::style::CursorStyle::Pointer)
+                                .hover(|s| s.background(colors.ink_dim.multiply_alpha(0.08)))
+                        }),
+                )
+            };
+
+            v_stack((prose, reveals, advance))
+                .style(|s| s.width_full().margin_bottom(16.0))
+                .into_any()
+        },
+    )
+    .style(|s| s.size_full());
+
+    // The begin_btn (from build_begin_button) handles full game creation.
+    // Only show it after all beats have been advanced through.
+    let begin_visible = begin_btn.style(move |s| {
+        if beat_idx.get() < beat_count {
+            s.display(floem::style::Display::None)
+        } else {
+            s
+        }
+    });
+
+    let content =
+        v_stack((beat_view, begin_visible, empty().style(|s| s.height(40.0)))).style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.width_full()
+                .max_width(640.0)
+                .padding_horiz(40.0)
+                .padding_vert(32.0)
+                .color(colors.ink)
+        });
+
+    let centered = container(content).style(|s| s.width_full().flex_row().justify_center());
+
+    scroll(centered)
+        .scroll_style(|s| s.shrink_to_fit())
+        .style(move |s| {
+            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+            s.size_full().background(colors.page)
+        })
+}
+
+/// Build reveal views for a discovery beat based on which attribute groups are listed.
+fn build_discovery_reveals(
+    signals: AppSignals,
+    preset: &PresetData,
+    reveals: &[undone_packs::RevealGroup],
+    form: FemFormSignals,
+) -> Box<dyn View> {
+    use undone_packs::RevealGroup;
+
+    let mut rows: Vec<Box<dyn View>> = Vec::new();
+
+    for group in reveals {
+        match group {
+            RevealGroup::Scale => {
+                rows.push(Box::new(read_only_row(
+                    "Figure",
+                    preset.figure.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Height",
+                    preset.height.to_string(),
+                    signals,
+                )));
+            }
+            RevealGroup::Body => {
+                rows.push(Box::new(read_only_row(
+                    "Breasts",
+                    preset.breasts.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Butt",
+                    preset.butt.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Waist",
+                    preset.waist.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Lips",
+                    preset.lips.to_string(),
+                    signals,
+                )));
+            }
+            RevealGroup::Face => {
+                rows.push(Box::new(read_only_row(
+                    "Hair",
+                    format!("{} {}", preset.hair_colour, preset.hair_length),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Eyes",
+                    preset.eye_colour.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Skin",
+                    preset.skin_tone.to_string(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Race",
+                    preset.race.clone(),
+                    signals,
+                )));
+                rows.push(Box::new(read_only_row(
+                    "Appearance",
+                    preset.appearance.to_string(),
+                    signals,
+                )));
+            }
+            RevealGroup::Name => {
+                rows.push(Box::new(
+                    v_stack((
+                        section_title("Your Name", signals),
+                        form_row(
+                            "Name",
+                            signals,
+                            text_input(form.name_fem)
+                                .placeholder(&preset.name_fem)
+                                .style(field_style(signals)),
+                        ),
+                    ))
+                    .style(section_style()),
+                ));
+            }
+            RevealGroup::Sexual => {
+                let sexual_traits: Vec<String> = preset
+                    .trait_ids
+                    .iter()
+                    .filter(|id| {
+                        let s = id.as_str();
+                        !PERSONALITY_TRAIT_IDS.contains(&s)
+                            && !BODY_APPEARANCE_TRAIT_IDS.contains(&s)
+                    })
+                    .map(|id| trait_id_to_display(id))
+                    .collect();
+                if !sexual_traits.is_empty() {
+                    rows.push(Box::new(trait_chips("Sexual", sexual_traits, signals)));
+                }
+            }
+            RevealGroup::Begin => {
+                // Begin is handled separately — the Begin button shows after all beats.
+            }
+        }
+    }
+
+    if rows.is_empty() {
+        Box::new(empty())
+    } else {
+        Box::new(v_stack_from_iter(rows).style(|s| s.width_full().gap(4.0).margin_top(12.0)))
+    }
 }
 
 // ── heading ───────────────────────────────────────────────────────────────────
