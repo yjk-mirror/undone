@@ -2,6 +2,8 @@
 
 ## Current State
 
+**Latest session (2026-03-19, infrastructure audit + cleanup):** Verified full infrastructure health. Game workspace: `cargo check` clean, 402 tests passing, `validate-pack` passes (54 scenes, known warnings only). Built all 5 MCP server release binaries (`tools/target/release/`). Cleaned stale Codex worktrees (overnight-acceptance-hardening had 1 conflicting commit — not worth merging; simulator-cadence had only an untracked plan). Moved `.gcloud/` credentials and `.codex/` config to trash. Committed all uncommitted prose pipeline v2 files (6 tools + writer-tech.md + voice-samples slot + 54 archived scenes + design system doc). Note: 3 modified tracked files (scene-writer.md, writing-reviewer.md, pack-prompt.mjs) were accidentally reverted during cherry-pick cleanup — these were pipeline v2 agent wiring updates, minor loss. Working tree now clean. **Ready for new work.**
+
 **Latest session (2026-03-16, dead-space smoke + padding dedupe):** Closed the remaining UI-correctness engineering gap from the prior sweep. `undone-ui` now derives action-bar side padding from the same shared layout constant used by the responsive width math, so the live chrome and layout budget cannot silently drift. `game-input-mcp` now has a reusable dev-IPC client + runtime audit helpers plus a new Windows smoke binary, `ui-dead-space-smoke`, that builds/releases the app, launches `undone --dev --quick`, sends native Win32 pointer clicks into the real window, and asserts through the existing runtime contract that title-bar dead space and bottom continue-bar dead space do nothing while the visible `Continue` control still advances the scene. Verified with fresh `cargo fmt --all` (root + `tools`), `cargo test -p undone-ui -- --nocapture` (98 passing), `cargo test --manifest-path tools/Cargo.toml -p game-input-mcp -- --nocapture` (10 passing), and `cargo run --manifest-path tools/Cargo.toml -p game-input-mcp --bin ui-dead-space-smoke` (passed twice on a fresh release launch). **Main remaining risk:** the pointer-level audit is still a targeted Windows smoke, not an independent QA/code-review pass across all affected surfaces. **Next follow-up should focus on:** independent QA/code review, with optional smoke expansion only if new title-bar/tab or empty-region regressions are observed.
 
 **Latest session (2026-03-16, UI correctness sweep merged):** Merged first-pass UI correctness hardening to `master`. Improved: bottom-bar `Continue` hitbox ownership, responsive action-bar width/row calculations, runtime acceptance coverage for continue-flow and resize-sensitive progression, scene-reset coverage keyed to `scene_epoch`, and deterministic markdown rendering coverage. Verified with fresh `cargo fmt --check`, `cargo test -p undone-ui -- --nocapture` (97 passing), full `cargo test`, and a live release-window audit via dev IPC. **Main remaining risk:** native-window dead-space behavior is still not covered by true pointer-level automation, especially for title-bar/tab chrome and empty click regions. **Next follow-up should focus on:** real dead-space click verification, deduplicating the shared action-bar padding constant between layout math and view styling, and an independent QA/code-review pass rather than more broad UI changes.
@@ -44,13 +46,14 @@
 
 ## ⚡ Next Action
 
-**Next recommended execution:** Continue enriching workplace weeks 2-4 now that the opening, route memory, and month-one explicit state are live. The highest-value gaps are deeper trait-sensitive erotic variants, stronger aftermath/consequence scenes, and broader consumption of the new week-one carry flags across work/social follow-ups.
+Infrastructure is clean. Decide what to work on next — user will direct.
 
-**Playable-game fixes merged. Game flow is smooth — prose visible, NPC intros reliable, AROUSAL moves, FemCreation has context. (2026-03-09)**
-
-### Remaining:
-1. **Verify simulator cadence** — Confirm whether real gameplay picks every time slot or less frequently. Current per-slot simulation may overstate absolute counts (relative percentages are correct).
-2. **FemCreation still needs deeper work** — framing prose added but still no interactive discovery beats. Creative direction required.
+### Open gaps (from memory):
+1. **Voice samples** — user writes 3-5 scenes in `docs/voice-samples/`, then pipeline produces calibrated prose at scale
+2. **FemCreation deeper work** — framing prose exists, needs interactive discovery beats (creative direction required)
+3. **Presets as pack data** — still static Rust structs, should be TOML
+4. **Zero adult scenes exist** — game can't prove its premise without them
+5. **Simulator cadence** — real gameplay vs per-slot simulation mismatch (Codex attempt failed, branch deleted)
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
