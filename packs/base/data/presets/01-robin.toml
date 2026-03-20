@@ -97,41 +97,46 @@ starting_flags = ["ROUTE_WORKPLACE"]
 
 # ── Discovery beats (FemCreation interactive flow) ───────────────────────
 #
-# Each [[discovery]] beat shows prose, reveals attribute groups, and
-# optionally presents reaction choices that set game flags.
+# Each [[discovery]] beat shows minijinja prose (same syntax as scene
+# prose — w.hasTrait(), w.getSkill(), etc.) and reveals attribute groups.
+# Trait branches determine the reaction — no player choices during
+# discovery. The character's traits ARE the reaction.
 #
 # reveals: "scale" | "body" | "face" | "name" | "sexual" | "begin"
 #
-# Prose is placeholder — user replaces with final text.
+# Prose is placeholder — user replaces with final text including
+# jinja2 trait branches.
 
 [[discovery]]
 reveals = ["scale"]
-prose = "[PROSE SLOT — Beat 1: Scale. She wakes. Everything is wrong-sized. Reveals: figure, height.]"
-
-  [[discovery.choices]]
-  label = "[CHOICE — pragmatic reaction]"
-  flag = "DISCOVERY_INVENTORY"
-
-  [[discovery.choices]]
-  label = "[CHOICE — panic reaction]"
-  flag = "DISCOVERY_PANIC"
-
-  [[discovery.choices]]
-  label = "[CHOICE — freeze reaction]"
-  flag = "DISCOVERY_FREEZE"
+prose = """\
+[PROSE SLOT — Beat 1: Scale]
+{% if w.hasTrait("ANALYTICAL") %}
+[ANALYTICAL branch — inventories, problem-solves]
+{% elif w.hasTrait("FREEZE_RESPONSE") %}
+[FREEZE branch — locks up, can't move]
+{% else %}
+[Default branch]
+{% endif %}
+"""
 
 [[discovery]]
 reveals = ["body"]
-prose = "[PROSE SLOT — Beat 2: Body. Weight shifts. Something heavy. Reveals: breasts, butt, waist, lips.]"
+prose = """\
+[PROSE SLOT — Beat 2: Body]
+{% if w.hasTrait("HAIR_TRIGGER") %}
+[HAIR_TRIGGER branch — body reacts before mind catches up]
+{% endif %}
+"""
 
 [[discovery]]
 reveals = ["face"]
-prose = "[PROSE SLOT — Beat 3: Face. Window reflection. Wrong hair, wrong eyes. Reveals: hair, eyes, skin, race, appearance.]"
+prose = "[PROSE SLOT — Beat 3: Face. Window reflection.]"
 
 [[discovery]]
 reveals = ["name"]
-prose = "[PROSE SLOT — Beat 4: Name. Flight attendant speaks. The boarding pass. Reveals: name input.]"
+prose = "[PROSE SLOT — Beat 4: Name. Flight attendant speaks.]"
 
 [[discovery]]
 reveals = ["sexual", "begin"]
-prose = "[PROSE SLOT — Beat 5: Begin. Standing up. Everything at the wrong height. Reveals: sexual attributes, Begin button.]"
+prose = "[PROSE SLOT — Beat 5: Standing up. Everything at the wrong height.]"

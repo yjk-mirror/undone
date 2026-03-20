@@ -74,27 +74,21 @@ struct GameRaw {
 
 /// A single discovery beat in the FemCreation flow (TOML `[[discovery]]`).
 ///
-/// Each beat has prose (written by the user — placeholder until filled),
-/// a list of attribute groups to reveal, and optional reaction choices
-/// that set game flags.
+/// Each beat has a minijinja prose template (with trait branches — same syntax
+/// as scene prose) and a list of attribute groups to reveal. The template is
+/// rendered against a throwaway World built from the preset, so `w.hasTrait()`,
+/// `w.getSkill()`, and all other template methods work.
+///
+/// There are no player choices in discovery beats — the character's traits
+/// determine the reaction. Player agency lives in scenes, not in discovery.
 #[derive(Debug, Deserialize)]
 struct DiscoveryBeatRaw {
     /// Which attribute groups to reveal after this beat's prose.
     /// Valid values: "scale", "body", "face", "name", "sexual", "begin"
     reveals: Vec<String>,
-    /// Prose displayed before the attribute reveal. User-written content.
+    /// Minijinja prose template. Rendered with the full template context
+    /// (w.hasTrait, w.getSkill, etc.) against a throwaway world.
     prose: String,
-    /// Optional reaction choices. If empty, beat auto-advances after prose.
-    #[serde(default)]
-    choices: Vec<ReactionChoiceRaw>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ReactionChoiceRaw {
-    /// Button label shown to the player.
-    label: String,
-    /// Game flag set when this choice is picked.
-    flag: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -105,7 +99,7 @@ struct PresetFile {
     sexual: SexualRaw,
     personality: PersonalityRaw,
     game: GameRaw,
-    /// Optional discovery beats for interactive FemCreation flow.
+    /// Discovery beats for interactive FemCreation flow (optional).
     /// If absent, FemCreation falls back to the flat form layout.
     #[serde(default)]
     discovery: Vec<DiscoveryBeatRaw>,
@@ -176,17 +170,16 @@ pub struct PresetData {
 
 /// A discovery beat in the FemCreation interactive flow.
 ///
-/// Each beat shows prose, optionally reveals attribute groups, and
-/// optionally presents reaction choices that set game flags. The user
-/// writes all prose — the engine provides the scaffolding.
+/// Each beat shows prose (a minijinja template rendered with the full
+/// template context) and optionally reveals attribute groups. Trait
+/// branches in the prose determine what the player sees — there are no
+/// player choices during discovery. The character's traits ARE the reaction.
 #[derive(Debug, Clone)]
 pub struct DiscoveryBeat {
-    /// Prose displayed before the attribute reveal.
+    /// Minijinja prose template (same syntax as scene prose).
     pub prose: String,
-    /// Which attribute groups to reveal. See `RevealGroup`.
+    /// Which attribute groups to reveal after this beat.
     pub reveals: Vec<RevealGroup>,
-    /// Reaction choices. Empty = auto-advance (prose-only beat).
-    pub choices: Vec<ReactionChoice>,
 }
 
 /// Attribute groups that can be revealed during a discovery beat.
@@ -218,15 +211,6 @@ impl RevealGroup {
             _ => None,
         }
     }
-}
-
-/// A reaction choice the player can pick during a discovery beat.
-#[derive(Debug, Clone)]
-pub struct ReactionChoice {
-    /// Button label.
-    pub label: String,
-    /// Game flag set when chosen (e.g. "DISCOVERY_INVENTORY", "DISCOVERY_PANIC").
-    pub flag: String,
 }
 
 impl From<PresetFile> for PresetData {
@@ -289,14 +273,6 @@ impl From<PresetFile> for PresetData {
                         .reveals
                         .iter()
                         .filter_map(|s| RevealGroup::from_str(s))
-                        .collect(),
-                    choices: beat
-                        .choices
-                        .into_iter()
-                        .map(|c| ReactionChoice {
-                            label: c.label,
-                            flag: c.flag,
-                        })
                         .collect(),
                 })
                 .collect(),

@@ -12,6 +12,6 @@ pub use data::{
 };
 pub use loader::{load_packs, LoadedPackMeta, PackLoadError};
 pub use manifest::{PackContent, PackManifest, PackMeta};
-pub use preset::{DiscoveryBeat, PresetData, ReactionChoice, RevealGroup};
+pub use preset::{DiscoveryBeat, PresetData, RevealGroup};
 pub use registry::{PackRegistry, RegistryError};
 pub use spawner::{spawn_npcs, NpcSpawnConfig};

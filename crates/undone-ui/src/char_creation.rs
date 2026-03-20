@@ -905,10 +905,9 @@ fn fem_creation_discovery_view(
     let beat_idx = RwSignal::new(0usize);
     let beat_count = preset.discovery_beats.len();
 
-    // Pre-compute all reveal views for each beat.
-    // We use an Rc to share the preset across closures.
     let preset_rc = Rc::new(preset);
     let preset_for_dyn = preset_rc.clone();
+
     let begin_btn = build_begin_button(
         signals,
         form,
@@ -918,17 +917,57 @@ fn fem_creation_discovery_view(
         dev_mode,
     );
 
+    // Build a throwaway world from the full preset so we can render
+    // discovery prose through minijinja with trait/skill branches.
+    let rendered_beats: Vec<String> = {
+        let pre_borrow = pre_state.borrow();
+        if let Some(pre) = pre_borrow.as_ref() {
+            if let Some(idx) = partial.as_ref().and_then(|p| p.preset_idx) {
+                let cfg = config_from_preset(&pre.registry, idx as usize);
+                let mut reg_clone = pre.registry.clone();
+                let mut rng = rand::rngs::SmallRng::from_entropy();
+                let world = undone_packs::new_game(cfg, &mut reg_clone, &mut rng);
+                let empty_ctx = undone_scene::SceneCtx::new();
+                preset_rc
+                    .discovery_beats
+                    .iter()
+                    .map(|beat| {
+                        undone_scene::template_ctx::render_prose(
+                            &beat.prose,
+                            &world,
+                            &empty_ctx,
+                            &reg_clone,
+                        )
+                        .unwrap_or_else(|_| beat.prose.clone())
+                    })
+                    .collect()
+            } else {
+                preset_rc
+                    .discovery_beats
+                    .iter()
+                    .map(|beat| beat.prose.clone())
+                    .collect()
+            }
+        } else {
+            preset_rc
+                .discovery_beats
+                .iter()
+                .map(|beat| beat.prose.clone())
+                .collect()
+        }
+    };
+    let rendered_beats = Rc::new(rendered_beats);
+    let rendered_for_dyn = rendered_beats.clone();
+
     let beat_view = dyn_container(
         move || beat_idx.get(),
         move |idx| {
             if idx >= beat_count {
                 return empty().into_any();
             }
-            let beat = &preset_for_dyn.discovery_beats[idx];
-            let prose_text = beat.prose.clone();
-            let has_choices = !beat.choices.is_empty();
+            let prose_text = rendered_for_dyn[idx].clone();
 
-            // ── Prose ────────────────────────────────────────────────
+            // ── Prose (rendered through minijinja with trait branches) ─
             let prose = label(move || prose_text.clone()).style(move |s| {
                 let prefs = signals.prefs.get();
                 let colors = ThemeColors::from_mode(prefs.mode);
@@ -941,73 +980,33 @@ fn fem_creation_discovery_view(
             });
 
             // ── Reveals ──────────────────────────────────────────────
-            let reveals = build_discovery_reveals(signals, &preset_for_dyn, &beat.reveals, form);
+            let reveals = build_discovery_reveals(
+                signals,
+                &preset_for_dyn,
+                &preset_for_dyn.discovery_beats[idx].reveals,
+                form,
+            );
 
-            // ── Choices or Continue button ────────────────────────────
-            let advance: Box<dyn View> = if has_choices {
-                let buttons: Vec<Box<dyn View>> = beat
-                    .choices
-                    .iter()
-                    .map(|choice| {
-                        let flag = choice.flag.clone();
-                        let lbl = choice.label.clone();
-                        Box::new(
-                            label(move || lbl.clone())
-                                .keyboard_navigable()
-                                .on_click_stop(move |_| {
-                                    // Store reaction flag in partial char state
-                                    partial_char.update(|opt| {
-                                        if let Some(ref mut p) = opt {
-                                            if !p.starting_flags.contains(&flag) {
-                                                p.starting_flags.push(flag.clone());
-                                            }
-                                        }
-                                    });
-                                    beat_idx.set(idx + 1);
-                                })
-                                .style(move |s| {
-                                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                                    s.padding_vert(10.0)
-                                        .padding_horiz(20.0)
-                                        .border(1.0)
-                                        .border_radius(6.0)
-                                        .border_color(colors.ink_dim.multiply_alpha(0.3))
-                                        .color(colors.ink)
-                                        .cursor(floem::style::CursorStyle::Pointer)
-                                        .hover(|s| {
-                                            s.background(colors.ink_dim.multiply_alpha(0.08))
-                                        })
-                                }),
-                        ) as Box<dyn View>
-                    })
-                    .collect();
-                Box::new(
-                    v_stack_from_iter(buttons).style(|s| s.gap(8.0).margin_top(16.0).width_full()),
-                )
-            } else {
-                // No choices — show Continue button to advance
-                Box::new(
-                    label(|| "Continue".to_string())
-                        .keyboard_navigable()
-                        .on_click_stop(move |_| {
-                            beat_idx.set(idx + 1);
-                        })
-                        .style(move |s| {
-                            let colors = ThemeColors::from_mode(signals.prefs.get().mode);
-                            s.padding_vert(10.0)
-                                .padding_horiz(24.0)
-                                .border(1.0)
-                                .border_radius(6.0)
-                                .border_color(colors.ink_dim.multiply_alpha(0.3))
-                                .color(colors.ink)
-                                .margin_top(16.0)
-                                .cursor(floem::style::CursorStyle::Pointer)
-                                .hover(|s| s.background(colors.ink_dim.multiply_alpha(0.08)))
-                        }),
-                )
-            };
+            // ── Continue button ──────────────────────────────────────
+            let continue_btn = label(|| "Continue".to_string())
+                .keyboard_navigable()
+                .on_click_stop(move |_| {
+                    beat_idx.set(idx + 1);
+                })
+                .style(move |s| {
+                    let colors = ThemeColors::from_mode(signals.prefs.get().mode);
+                    s.padding_vert(10.0)
+                        .padding_horiz(24.0)
+                        .border(1.0)
+                        .border_radius(6.0)
+                        .border_color(colors.ink_dim.multiply_alpha(0.3))
+                        .color(colors.ink)
+                        .margin_top(16.0)
+                        .cursor(floem::style::CursorStyle::Pointer)
+                        .hover(|s| s.background(colors.ink_dim.multiply_alpha(0.08)))
+                });
 
-            v_stack((prose, reveals, advance))
+            v_stack((prose, reveals, continue_btn))
                 .style(|s| s.width_full().margin_bottom(16.0))
                 .into_any()
         },
