@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Latest session (2026-03-19, infrastructure + Tracks B/C):** Infrastructure audit, then executed two plan tracks. **Track B (presets as TOML):** Robin and Camila presets moved from hardcoded Rust statics to `packs/base/data/presets/*.toml`, loaded by `undone-packs` via new `preset.rs` module. PackRegistry.presets() provides access. char_creation.rs drops ~200 lines of statics. Net -75 lines, 5 new preset tests. **Track C (simulator cadence):** Audit confirmed simulator already matches RuntimeController behavior — no fix needed. Added `simulator_robin_route_reaches_week_two_naturally` verification test proving natural time advancement works. **Infrastructure:** Built all 5 MCP server release binaries. Cleaned stale Codex worktrees + branches. Committed prose pipeline v2 files + scene archive + design system doc. 408 tests passing, validate-pack clean.
+**Latest session (2026-03-19, full session):** Infrastructure audit → Track B (presets as TOML) → Track C (simulator cadence verified) → FemCreation discovery scaffolding → skill/doc updates. **446 tests passing.** Presets now TOML data files loaded by undone-packs. Discovery beats render minijinja prose through throwaway World (same template context as scene prose — trait branches determine reaction, no player choice buttons). Robin preset has 5 placeholder beats with jinja2 stubs for user to fill. scene-writer/writing-reviewer agents updated for pipeline v2. CLAUDE.md updated with presets architecture. **Next session: user writes discovery prose in `01-robin.toml` + voice samples in `docs/voice-samples/`.**
 
 **Previous (2026-03-19, infrastructure audit + cleanup):** Verified full infrastructure health. Built MCP servers. Cleaned worktrees. Committed uncommitted pipeline files. 3 modified tracked files (scene-writer.md, writing-reviewer.md, pack-prompt.mjs) accidentally reverted during cherry-pick cleanup — minor loss (pipeline v2 agent wiring).
 
@@ -48,14 +48,32 @@
 
 ## ⚡ Next Action
 
-Infrastructure is clean. Decide what to work on next — user will direct.
+**User writes, then we build.** Two files to fill:
 
-### Open gaps (from memory):
-1. **Voice samples** — user writes 3-5 scenes in `docs/voice-samples/`, then pipeline produces calibrated prose at scale
-2. **FemCreation deeper work** — framing prose exists, needs interactive discovery beats (creative direction required)
-3. ~~**Presets as pack data**~~ — DONE (TOML files in packs/base/data/presets/, loaded by undone-packs)
-4. **Zero adult scenes exist** — game can't prove its premise without them
-5. ~~**Simulator cadence**~~ — VERIFIED correct, test added
+### 1. Discovery prose — `packs/base/data/presets/01-robin.toml`
+
+The `[[discovery]]` beats at the bottom have `[PROSE SLOT]` placeholders. Replace with
+minijinja prose (same syntax as scene prose). Trait branches like
+`{% if w.hasTrait("ANALYTICAL") %}` work — they render through a throwaway World with
+Robin's full trait set. 5 beats: Scale → Body → Face → Name → Begin.
+
+### 2. Voice samples — `docs/voice-samples/`
+
+Write 3-5 scenes in the simple labeled format (`INTRO:`, `ACTION: id`, etc.).
+These are few-shot examples for DeepSeek — they define the voice the pipeline produces.
+Suggested: bar intro (Sample 0 from writing-samples.md), a workplace scene, an adult scene.
+
+### After user writes:
+- Run `node tools/scene-pipeline.mjs --spec-file <spec>` to produce calibrated scene prose
+- Playtest the FemCreation discovery flow visually
+- Begin batch scene production through the pipeline
+
+### Remaining open gaps:
+1. ~~**Presets as pack data**~~ — DONE
+2. ~~**Simulator cadence**~~ — VERIFIED
+3. ~~**FemCreation scaffolding**~~ — DONE (awaiting prose)
+4. **Zero adult scenes** — game can't prove its premise
+5. **Tech debt** — see `memory/project_tech_debt_audit.md`
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
