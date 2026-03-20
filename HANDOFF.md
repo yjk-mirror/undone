@@ -2,7 +2,9 @@
 
 ## Current State
 
-**Latest session (2026-03-19, infrastructure audit + cleanup):** Verified full infrastructure health. Game workspace: `cargo check` clean, 402 tests passing, `validate-pack` passes (54 scenes, known warnings only). Built all 5 MCP server release binaries (`tools/target/release/`). Cleaned stale Codex worktrees (overnight-acceptance-hardening had 1 conflicting commit — not worth merging; simulator-cadence had only an untracked plan). Moved `.gcloud/` credentials and `.codex/` config to trash. Committed all uncommitted prose pipeline v2 files (6 tools + writer-tech.md + voice-samples slot + 54 archived scenes + design system doc). Note: 3 modified tracked files (scene-writer.md, writing-reviewer.md, pack-prompt.mjs) were accidentally reverted during cherry-pick cleanup — these were pipeline v2 agent wiring updates, minor loss. Working tree now clean. **Ready for new work.**
+**Latest session (2026-03-19, infrastructure + Tracks B/C):** Infrastructure audit, then executed two plan tracks. **Track B (presets as TOML):** Robin and Camila presets moved from hardcoded Rust statics to `packs/base/data/presets/*.toml`, loaded by `undone-packs` via new `preset.rs` module. PackRegistry.presets() provides access. char_creation.rs drops ~200 lines of statics. Net -75 lines, 5 new preset tests. **Track C (simulator cadence):** Audit confirmed simulator already matches RuntimeController behavior — no fix needed. Added `simulator_robin_route_reaches_week_two_naturally` verification test proving natural time advancement works. **Infrastructure:** Built all 5 MCP server release binaries. Cleaned stale Codex worktrees + branches. Committed prose pipeline v2 files + scene archive + design system doc. 408 tests passing, validate-pack clean.
+
+**Previous (2026-03-19, infrastructure audit + cleanup):** Verified full infrastructure health. Built MCP servers. Cleaned worktrees. Committed uncommitted pipeline files. 3 modified tracked files (scene-writer.md, writing-reviewer.md, pack-prompt.mjs) accidentally reverted during cherry-pick cleanup — minor loss (pipeline v2 agent wiring).
 
 **Latest session (2026-03-16, dead-space smoke + padding dedupe):** Closed the remaining UI-correctness engineering gap from the prior sweep. `undone-ui` now derives action-bar side padding from the same shared layout constant used by the responsive width math, so the live chrome and layout budget cannot silently drift. `game-input-mcp` now has a reusable dev-IPC client + runtime audit helpers plus a new Windows smoke binary, `ui-dead-space-smoke`, that builds/releases the app, launches `undone --dev --quick`, sends native Win32 pointer clicks into the real window, and asserts through the existing runtime contract that title-bar dead space and bottom continue-bar dead space do nothing while the visible `Continue` control still advances the scene. Verified with fresh `cargo fmt --all` (root + `tools`), `cargo test -p undone-ui -- --nocapture` (98 passing), `cargo test --manifest-path tools/Cargo.toml -p game-input-mcp -- --nocapture` (10 passing), and `cargo run --manifest-path tools/Cargo.toml -p game-input-mcp --bin ui-dead-space-smoke` (passed twice on a fresh release launch). **Main remaining risk:** the pointer-level audit is still a targeted Windows smoke, not an independent QA/code-review pass across all affected surfaces. **Next follow-up should focus on:** independent QA/code review, with optional smoke expansion only if new title-bar/tab or empty-region regressions are observed.
 
@@ -51,9 +53,9 @@ Infrastructure is clean. Decide what to work on next — user will direct.
 ### Open gaps (from memory):
 1. **Voice samples** — user writes 3-5 scenes in `docs/voice-samples/`, then pipeline produces calibrated prose at scale
 2. **FemCreation deeper work** — framing prose exists, needs interactive discovery beats (creative direction required)
-3. **Presets as pack data** — still static Rust structs, should be TOML
+3. ~~**Presets as pack data**~~ — DONE (TOML files in packs/base/data/presets/, loaded by undone-packs)
 4. **Zero adult scenes exist** — game can't prove its premise without them
-5. **Simulator cadence** — real gameplay vs per-slot simulation mismatch (Codex attempt failed, branch deleted)
+5. ~~**Simulator cadence**~~ — VERIFIED correct, test added
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
