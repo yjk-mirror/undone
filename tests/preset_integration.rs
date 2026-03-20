@@ -235,9 +235,20 @@ fn preset_ordering_is_stable_across_multiple_loads() {
     let reg1 = load_registry();
     let reg2 = load_registry();
 
-    let names1: Vec<&str> = reg1.presets().iter().map(|p| p.before_name.as_str()).collect();
-    let names2: Vec<&str> = reg2.presets().iter().map(|p| p.before_name.as_str()).collect();
-    assert_eq!(names1, names2, "preset ordering must be stable across loads");
+    let names1: Vec<&str> = reg1
+        .presets()
+        .iter()
+        .map(|p| p.before_name.as_str())
+        .collect();
+    let names2: Vec<&str> = reg2
+        .presets()
+        .iter()
+        .map(|p| p.before_name.as_str())
+        .collect();
+    assert_eq!(
+        names1, names2,
+        "preset ordering must be stable across loads"
+    );
 }
 
 // ── Acceptance criterion 6: Trait IDs are valid SCREAMING_SNAKE_CASE ────────
