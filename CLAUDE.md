@@ -256,13 +256,28 @@ detail strip). 1200×800. Three themes: Warm Paper (default), Sepia, Night.
 For UI changes see `.interface-design/system.md` (design system spec) and
 `crates/undone-ui/src/` source files.
 
+## Presets — Data-Driven
+
+Character presets (Robin, Camila) are TOML files in `packs/base/data/presets/`,
+loaded by `undone-packs::preset`. NOT hardcoded Rust structs.
+
+Presets can define `[[discovery]]` beats for interactive FemCreation: each beat
+has minijinja prose (rendered through a throwaway World with full template context)
+and attribute group reveals. Trait branches in prose determine the character's
+reaction — no player choice buttons during discovery. See `01-robin.toml` for
+the schema.
+
 ## Writing and Content — Current State
 
 Engine is fully end-to-end. Writing guide is established (`docs/writing-guide.md`).
-33 scenes in `packs/base/scenes/`. Use the `scene-writer` custom agent for new scenes
-and `writing-reviewer` for quality passes. See `docs/arcs/` for arc structure and
-`docs/characters/` for NPC profiles. See `docs/content-schema.md` for the complete
-content schema reference (pack → schedule → scenes → actions → effects).
+54 scenes in `packs/base/scenes/` (prose rejected, awaiting rewrite via pipeline v2).
+54 archived scenes in `packs/base/scenes/_archive/`. Use the `scene-writer` custom
+agent for new scenes and `writing-reviewer` for quality passes. See `docs/arcs/` for
+arc structure and `docs/characters/` for NPC profiles. See `docs/content-schema.md`
+for the complete content schema reference (pack → schedule → scenes → actions → effects).
+
+**Prose pipeline v2:** `tools/scene-pipeline.mjs` orchestrates DeepSeek drafting with
+voice-sample calibration. Blocked on user writing samples in `docs/voice-samples/`.
 
 ### Key content rules
 - **Always second-person present tense.** No "she" narration. Ever.

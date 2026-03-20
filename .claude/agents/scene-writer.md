@@ -50,19 +50,31 @@ that, please.*" These are the narrator analyzing or thinking for the player.
 
 ## Workflow
 
+### Pipeline v2 (preferred — uses DeepSeek with voice sample calibration)
+
 1. Read `docs/creative-direction.md` and `docs/writing-guide.md` if not read this session
 2. Get a scene spec from the user (scene_id, route, brief, traits, etc.)
 3. Write the spec as JSON to `tmp/spec-<name>.json`
-4. Run: `node tools/pack-prompt.mjs --spec-file tmp/spec-<name>.json`
-5. Run: `node tools/deepseek-helper.mjs draft --system-file docs/writer-core.md --prompt-file tmp/prompt-<name>.md --output-file tmp/draft-<name>.toml`
-6. Run: `node tools/deepseek-helper.mjs review --system-file docs/review-core.md --prompt-file tmp/draft-<name>.toml --output-file tmp/review-<name>.md`
-7. Read the review findings
-8. Read the draft TOML
-9. Fix Critical/Important findings — rewrite prose yourself, don't just patch adjectives
-10. **Verify the intro/action split** — does the intro decide anything for the player? Fix it.
-11. **Verify action depth** — does every action lead somewhere? Cut filler.
-12. Validate all prose fields with `mcp__minijinja__jinja_validate_template`
-13. Write the final TOML to `packs/base/scenes/<name>.toml`
+4. Run the full pipeline: `node tools/scene-pipeline.mjs --spec-file tmp/spec-<name>.json`
+   - This runs: spec-validate → pack-prompt (voice samples + tech rules) → DeepSeek draft → prose-lint → revise → prose-to-toml
+   - System prompt: `docs/writer-tech.md` (mechanical rules only — voice comes from samples)
+   - Voice samples: `docs/voice-samples/*.md` (user-written few-shot examples)
+5. Read the output TOML and lint results from `tmp/`
+6. Fix Critical/Important findings — rewrite prose yourself, don't just patch adjectives
+7. **Verify the intro/action split** — does the intro decide anything for the player? Fix it.
+8. **Verify action depth** — does every action lead somewhere? Cut filler.
+9. Validate all prose fields with `mcp__minijinja__jinja_validate_template`
+10. Write the final TOML to `packs/base/scenes/<name>.toml`
+
+### Individual tools (when pipeline isn't needed)
+
+- `node tools/prose-lint.mjs <file>` — deterministic regex quality gate (banned phrases, POV, AI-isms)
+- `node tools/spec-validate.mjs <spec.json>` — validate scene spec before drafting
+- `node tools/prose-to-toml.mjs --spec <spec.json> --prose <draft.md>` — convert labeled prose to TOML
+- `node tools/pack-prompt.mjs --spec-file <spec.json>` — assemble prompt from voice samples + context
+
+**Note:** Voice samples in `docs/voice-samples/` must exist for the pipeline to produce
+calibrated prose. If empty, use `--skip-lint` flag or write prose manually.
 
 ## Key Rules (full rules in docs/writing-guide.md)
 

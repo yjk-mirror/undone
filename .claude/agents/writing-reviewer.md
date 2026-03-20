@@ -60,10 +60,20 @@ Read `docs/review-core.md` for the complete detection checklist. The key severit
 **Minor** — polish:
 - Sentence starter variety, weak NPC dialogue, missed branching opportunities
 
-## DeepSeek Second Opinion
+## Automated checks (run first)
 
-When useful, run: `node tools/deepseek-helper.mjs review --system-file docs/review-core.md --prompt-file <scene> --output-file tmp/ds-review-<name>.md`
+Run `node tools/prose-lint.mjs <scene.toml>` before manual review. This catches:
+- Banned phrases (regex-based, deterministic)
+- POV violations (third-person narration)
+- Player-acts-in-intro patterns
+- AI-isms (staccato closers, em-dash reveals)
 
+Treat lint findings as confirmed issues. Focus your manual review on structural quality
+that regex can't catch: branching depth, scene distinctness, transformation texture.
+
+## DeepSeek Second Opinion (optional)
+
+When useful for nuance the linter can't catch, run via the review pipeline.
 Treat DeepSeek's output as input to your review, not as the final word.
 
 ## Output Format
