@@ -5,17 +5,19 @@ description = "Dormant callback hook. Early defensive transactionality can later
 
 [intro]
 prose = """
-The bodega clerk asks if you want a receipt and for half a second the question feels larger than it is.
+The bodega clerk holds the receipt over the counter and asks if you want it.
 
-Not because of the receipt. Because you know the move now: keep the exchange narrow, factual, almost frictionless. Give the world as little surface area as possible.
-
-It worked at the airport. It worked with the landlord. It might work here too.
+He is looking at a point somewhere past your shoulder. His hand is still out.
 
 {% if gd.hasGameFlag("OPENING_ID_PREEMPTED") %}
-At the airport it felt efficient. Head them off, answer the visible question, keep moving.
+At the airport you answered before the gate agent got the second question out. The response ready before the pause landed. The clerk's hand is still out.
 {% elif gd.hasGameFlag("OPENING_ID_WAITED_OUT") %}
-At the airport you tried the opposite: let the scrutiny spend itself. Either way, you're still thinking about how much effort ordinary transactions ask for now.
+At the airport you held the gate agent's eye and let the silence go long enough that she moved on without the follow-up. The clerk's hand is still out.
+{% else %}
+The clerk's hand is still out.
 {% endif %}
+
+The bag is on the counter. The line behind you is short.
 """
 
 [[actions]]
@@ -23,9 +25,9 @@ id     = "keep_it_narrow"
 label  = "Keep it narrow"
 detail = "Transaction first. Everything else later."
 prose  = """
-You answer, take the bag, and step back out into the street before the moment has time to become anything else.
+"No thanks." You take the bag and step left around the person coming in.
 
-Useful habit. Maybe too useful.
+The door swings shut. The street is cold and loud and does not ask you anything.
 """
 
   [[actions.effects]]

@@ -5,25 +5,23 @@ description = "Week-two callback. Early competence choices from the first day ha
 
 [intro]
 prose = """
-Mid-morning, a Slack notification pops up from someone on the platform side you have only spoken to once.
+Mid-morning, a Slack notification from someone on the platform side — Tariq, one message in the thread from two weeks ago.
 
-It is not a tutorial. Not a check-in. Not somebody carefully restating the obvious at you.
-
-It is a real question about the auth rollout, written in the clipped shorthand engineers use when they assume the other person already knows the shape of the problem.
+It is not a tutorial. Not a check-in. The question is about the auth rollout, written in the shorthand engineers use when they assume you already know the shape of the problem.
 
 {% if gd.hasGameFlag("FIRST_DAY_ASSERTED_STATUS") %}
-Monday bought you this, apparently. One sharp correction, one room recalibrating, and now the question arrives without preamble.
+On Monday you cut the introductory framing short and redirected the conversation to the ticket. Tariq was in that room.
 {% else %}
-On Monday you dragged the conversation back to the code and let the repo do the work for you. The consequence is here now: people skip straight to substance.
+On Monday you kept the conversation on the code and let the repo speak for itself. Tariq was in that room.
 {% endif %}
 
 {% if gd.hasGameFlag("OPENING_ID_PREEMPTED") %}
-It lands cleanly in part because you've been doing this since the airport: getting ahead of the question before the question can harden into scrutiny.
+The question arrives without preamble. No setup, no checking whether you're following.
 {% elif gd.hasGameFlag("OPENING_ID_WAITED_OUT") %}
-Some part of you notices the contrast. At the airport you let the room catch up to you slowly. Here the room is catching up faster.
+The question arrives without preamble. No setup, no checking whether you're following. At the airport that same silence cost you twenty minutes.
 {% endif %}
 
-You answer in three sentences and attach the benchmark link. The reply comes back almost immediately.
+You type three sentences and attach the benchmark link. The reply comes back before you have closed the tab.
 
 "Perfect. That's what I needed."
 """
@@ -33,11 +31,9 @@ id     = "answer_and_move_on"
 label  = "Answer it cleanly"
 detail = "Let the work keep building the reputation."
 prose  = """
-You set the phone down and get back to the ticket in front of you.
+You set the phone face-down and pull the open ticket back up on the screen.
 
-The exchange is small. So small you could miss what it means if you were not paying attention.
-
-The room is changing around you, a little at a time.
+Outside the window a bus goes by. The office chat keeps ticking.
 """
 
   [[actions.effects]]

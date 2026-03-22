@@ -5,25 +5,25 @@ description = "Week-two callback. Her first-night coping style changes how later
 
 [intro]
 prose = """
-The apartment is quiet again, but not the same kind of quiet it was that first week.
+The apartment is quiet. The radiator makes its noise. The window faces the same alley it faced the first night.
 
 {% if gd.hasGameFlag("FIRST_NIGHT_RESEARCHED") %}
-The first night here you sat on the floor and turned practical panic into browser tabs. The apartment still remembers that version of you a little: searching, sorting, trying to solve embodiment like a technical problem.
+The first night you sat on the floor with the laptop open, three dozen tabs across two windows, the screen the only light in the room. The marks are still on the floor where the charger cord wore a groove into the baseboards.
 {% elif gd.hasGameFlag("FIRST_NIGHT_STAGED_TOMORROW") %}
-The first night here you staged tomorrow into existence with a charger, a folded blouse, and shoes by the door. The room still holds some of that improvised order.
+The first night you laid the blouse out flat on the chair and put the shoes by the door and plugged the phone in before you let yourself sit down. The chair is still in the same spot. The shoes still go by the door.
 {% else %}
-The first night here you survived it the direct way: food, floor, sleep, forward motion. There is something bracing about remembering that version of yourself from a place that already feels slightly more livable.
+The first night you ate standing up over the sink and slept in your clothes and set the alarm for six. The bed has sheets on it now. The alarm is still set for six.
 {% endif %}
 
 {% if gd.hasGameFlag("LANDLORD_KEPT_TRANSACTIONAL") %}
-The landlord taught you something too: narrow the exchange, keep it factual, move it along. Useful instinct. It follows you home more often than you like.
+The landlord's number is still in the phone under "Building — do not elaborate." The last exchange was four words: leak, fixed, confirmed, thanks.
 {% elif gd.hasGameFlag("LANDLORD_WAITED_HIM_OUT") %}
-You remember waiting the landlord out in the doorway, letting him tire himself of the mismatch before you gave him anything else. That same endurance has been carrying more weight than you expected.
+The landlord stopped filling silences around the third week. Now the exchanges are short, factual, done.
 {% elif gd.hasGameFlag("LANDLORD_EXPLAINED_BRIEFLY") %}
-You remember the quick smoothing explanation you gave the landlord, the one that made the whole interaction easier and left something sour behind anyway. Some forms of grace cost more than they look like they should.
+The landlord has not raised the move-in questions again. The brief explanation held.
 {% endif %}
 
-Outside, somebody laughs on the sidewalk and keeps walking. Inside, the radiator ticks once and settles.
+Outside, somebody laughs on the sidewalk and keeps walking.
 """
 
 [[actions]]
@@ -31,9 +31,9 @@ id     = "sit_with_it"
 label  = "Sit with the quiet"
 detail = "The apartment is no longer a stranger. Not quite."
 prose  = """
-You do not make the room prove itself tonight. You just let it exist around you.
+You set the keys on the counter and leave the overhead light off.
 
-That is newer than it sounds.
+The radiator ticks once and settles. The window goes dark as the alley lamp flicks on.
 """
 
   [[actions.effects]]

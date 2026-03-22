@@ -31,11 +31,6 @@ The stool takes a small hop to get onto. The bar top comes up higher than you ex
 The coaster is waiting. The bartender is waiting.
 """
 
-[[thoughts]]
-condition = "!w.alwaysFemale() && w.getSkill('FEMININITY') < 25"
-style     = "inner_voice"
-prose = "*Okay.* You're in a bar. You've been in bars. This is the same thing from a different seat."
-
 # ── Round 1: Get a drink ─────────────────────────────────────────────
 
 [[actions]]
@@ -57,7 +52,7 @@ You ask what they have that's decent. She names three. You pick the middle one. 
 The first sip tells your shoulders they can come down. The bar settles around you. The game at the far end gets a reaction from one of the three guys and a shrug from the other two. The bartender goes back to restocking.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The glass sits differently in your hand. Wider than your grip wants it to be. You adjust and drink and don't think about the adjustment.
+The glass sits differently in your hand. Wider than your grip wants it to be. You adjust and drink.
 {% endif %}
 """
 
@@ -76,7 +71,7 @@ You settle onto the stool and put your jacket on the one next to you. The barten
 The bar does its thing around you. Someone at the far end says something that gets a laugh. The woman with the wine turns a page on her phone.
 
 {% if w.hasTrait("SHY") %}
-This is easier than you expected. Enough people that you don't stand out, few enough that nobody's in your space.
+Enough people that you don't stand out, few enough that nobody's in your space.
 {% elif w.hasTrait("ANALYTICAL") %}
 You read the room: three groups, one solo, one bartender running the place alone. Slow night or she's that good. Probably both.
 {% endif %}
@@ -148,7 +143,7 @@ You finish what's in front of you. The bartender nods when you put cash on the b
 {% if w.hasTrait("SHY") %}
 The cold air outside is a relief. The quiet street, the two-block walk where nobody is looking at you or reading you or expecting anything. The apartment is dark when you get in. You turn on the kitchen light and leave the rest off.
 {% else %}
-The cold hits you outside. Two blocks. The apartment is dark and quiet and yours. You turn on the kitchen light and stand there for a second, jacket still on, and then take it off and put the kettle on because that's what you do now, apparently.
+The cold hits you outside. Two blocks. The apartment is dark and quiet and yours. You turn on the kitchen light, jacket still on, and stand there for a second before taking it off.
 {% endif %}
 """
 
@@ -168,7 +163,7 @@ detail    = "He's offering. You're deciding."
 condition = "scene.hasFlag('drink_offered')"
 prose = """
 {% if w.hasTrait("SHY") %}
-"Oh — thanks." You take the glass and look at it instead of at him because looking at him requires something you haven't assembled yet. The drink is cold. That's something to hold. You hold it.
+"Oh — thanks." You take the glass and look at it instead of at him. The drink is cold. That's something to hold. You hold it.
 
 He says something about the neighborhood. You answer. He says something else. The conversation moves in small steps. At some point you've been talking for fifteen minutes and the drink is half gone and the evening has a shape now.
 
@@ -180,16 +175,14 @@ The conversation that follows has a direction. He's funny — actually funny, no
 You leave on your own terms. The "good night" covers exactly as much as you want it to.
 
 {% elif w.hasTrait("ANALYTICAL") %}
-"Sure, thanks." You take the drink. You're aware that a transaction has started and you're cataloging the parts — the bought drink, the proximity, the way he turned his body to wall off the rest of the bar.
+"Sure, thanks." You take the drink. The bought drink, the proximity, the way he turned his body to wall off the rest of the bar — you catalog all of it.
 
-You can see every piece of this. What you didn't expect is his forearm resting on the bar. The tendons. Something about it pulls at you low and warm and you don't have a framework for that yet.
+Then his forearm on the bar. The tendons. Something low and warm, and the catalog goes quiet.
 
-The conversation lasts twenty minutes. You leave when you've gathered enough data. On the walk home, the data is not the interesting part.
+The conversation lasts twenty minutes. You leave when you're ready. On the walk home, the forearm is what you're still seeing.
 
 {% elif w.hasTrait("OBJECTIFYING") %}
-You accept. The whole exchange has a shape you weren't expecting to recognize — the approach, the timing, the way he positioned himself. Something in your body cataloged the pattern before your brain caught up.
-
-The conversation goes where these go. You give him signals and withhold others and track what he does with the information. He's not bad at this. You leave when the evening has given you what it has.
+You accept. The approach, the timing, the way he positioned himself — it has a shape. You track what he does with the signals you give him and what he does when you withhold them. He's not bad at this. You leave when the evening has given you what it has.
 
 {% else %}
 "Sure, thanks." The drink arrives. There's a moment where the bar contracts to just the two of you and the closing distance between your stools.

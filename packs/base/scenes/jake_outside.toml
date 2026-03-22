@@ -5,23 +5,18 @@ description = "Running into Jake on the street. A different context than the cou
 
 [intro]
 prose = """
-Lexington Ave, a Tuesday afternoon. Jake, going the other way, a grocery bag in one hand, his phone in the other. He sees you before you've fully decided whether you've seen him — that particular street physics where the other person's recognition arrives before you've committed to yours.
+Lexington Ave, a Tuesday afternoon. Jake, coming the other way, a grocery bag in one hand and his phone in the other. He spots you before you've quite settled on whether you've spotted him — that particular moment of street timing where one person's recognition lands first.
 
-He smiles. Not the careful smile of a man working out whether to approach, just the easy reflex of someone who remembers you and isn't complicated about it. "Hey."
+He smiles. The easy one, no calculation in it. "Hey."
 """
 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-Coffee shop Jake was at a table, approximately eye-level, at a remove. Street Jake is taller than you expected. Taller and closer and the grocery bag puts his forearm at an angle that your eyes follow before your brain catches up. Something warm in your stomach, fast and involuntary.
+Lexington Ave, a Tuesday afternoon. Jake, coming the other way with a grocery bag. At the coffee shop he was sitting down, at a table, across a counter. Here on the sidewalk he's taller than you clocked — the bag has his arm out at an angle, forearm visible below the sleeve. Your eyes are there before you're looking at his face.
 
-He sees you and the smile comes without delay. "Hey."
+He sees you. The smile comes without hesitation. "Hey."
 """
-
-[[thoughts]]
-condition = "w.getSkill('FEMININITY') < 45"
-style     = "inner_voice"
-prose     = "*A man and a woman stopped on the sidewalk, talking. You're the woman. The thought arrives and leaves.*"
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -86,11 +81,11 @@ You say: "I'm usually there Tuesday mornings."
 He looks up. "Yeah?" And then: "Okay." Like it was already decided, and he was just waiting for the confirmation.
 
 {% if w.hasTrait("HOMOPHOBIC") %}
-The wanting registers before the complication does. That's been happening more than you'd expect. He's easy to talk to, he's good-looking in an uncomplicated way, and you said something that sounds like a standing invitation, and some part of you knew it was before you finished saying it. The complication arrives a second later, as it does. You file both things and keep moving.
+He says "okay" and goes his way and you go yours. Your hands are in your pockets. The grocery bag is already half a block behind you and you are not thinking about it.
 {% elif w.hasTrait("OBJECTIFYING") %}
-You see the whole negotiation clearly from both sides at once — his assessment, the mild gamble, the "okay" that covers more than it says. You've made the same calculation in different shoes. You're curious how it plays out.
+You see the whole exchange clearly — his assessment, the small calculation, the "okay" that means more than it says. You know how this works. You've watched it from the other side enough times. You keep walking.
 {% else %}
-He says "okay" and there's something easy in it. No performance. You both keep walking in your respective directions, and you find yourself looking forward to Tuesday.
+He says "okay," and it's already decided. You both keep moving in your separate directions. Tuesday is in four days.
 {% endif %}
 """
 

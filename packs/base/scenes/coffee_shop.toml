@@ -5,26 +5,26 @@ description = "A local coffee shop, a man in line, the city doing what it does."
 
 [intro]
 prose = """
-The coffee shop on Union and Third is not a Starbucks, which is the first thing people say about it. It's the kind of place that has mismatched chairs and a chalkboard menu and an owner who remembers what you ordered last time even if you've only been once. The line moves at its own speed. Nobody complains. This is the social contract.
+The coffee shop on Union and Third is not a Starbucks, which is the first thing people say about it. Mismatched chairs, a chalkboard menu, an owner who remembers what you ordered last time even if you've only been in once. The line moves at its own speed. Nobody complains.
 
-You're third in line. A woman ahead of you is getting her order corrected for the second time with the patience of someone who has been through worse this morning. Behind the counter, a barista with sleeve tattoos and a septum ring makes drinks with the quiet competence of someone who could do this in her sleep and probably has.
+You're third in line. A woman ahead of you is getting her order corrected for the second time, waiting it out with the calm of someone who has been through worse this morning. Behind the counter, a barista with sleeve tattoos and a septum ring runs drinks with the steady competence of someone who stopped thinking about the steps a long time ago.
 
-The man ahead of you turns around. Not fully — just the half-turn that says *I know you're there and I'm acknowledging it*. He's about your age, maybe a year or two older. Good shoulders. The kind of jaw that gets noticed. He's holding a phone but not looking at it, which is either a flex or a habit.
+The man ahead of you turns around. Just the half-turn, enough to see you. He's mid-twenties, maybe a year or two older. Good shoulders. The kind of jaw that gets noticed. He's holding a phone, but his eyes are up.
 
 {% if w.hasTrait("SHY") %}
-The menu board. Already decided, but the menu board is what happens when someone turns around and you're not ready to be looked at.
+You look at the menu board. You already know what you want, but the menu board is there and it's easier than whatever this is.
 {% elif w.hasTrait("BEAUTIFUL") %}
-He does the thing men do when they see you — the quick inventory, the slight pause, the recalibration. You've learned to read it in under a second. He's interested. The question is whether he'll do anything about it.
+He clocks you in that way — the quick take, the small pause, something shifting behind his eyes. He looks away first. You face forward.
 {% elif w.hasTrait("BITCHY") %}
-He gives you a once-over that takes slightly too long. You return it with the flat expression of someone who has been looked at before and is not impressed by the repetition.
+He looks you over, a beat too long. You look back with the flat expression of someone who has been looked at before and isn't performing a reaction about it.
 {% elif w.hasTrait("FLIRTY") %}
-Eye contact — his or yours first, hard to tell. Doesn't matter. A smile. Reflex, like blinking, except you know exactly what it does.
+Eye contact opens up — his or yours first, it doesn't particularly matter. A smile. The line keeps moving.
 {% else %}
-He nods. A nod back. For a second the line feels companionable instead of anonymous.
+He nods. You nod back. The line moves.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 35 %}
-Bag against your hip. Shoulders slightly in. The adjustments happened before the line started moving — feet angled, space measured, bag positioned. None of it deliberate anymore. The man ahead of you is just waiting for coffee. You're waiting for coffee and managing geometry.
+Bag against your hip, shoulders slightly in. The line moves and you move with it, taking up the space you take up and no more. The man ahead of you is just here for coffee. So are you, and there is also this other thing, the geometry of it, which you have stopped trying to explain.
 {% endif %}
 """
 
@@ -43,29 +43,27 @@ detail    = "He turned around. Might as well."
 condition = "!scene.hasFlag('talked')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-"Busy today." You say it to the room as much as to him, and for a terrible second you think he didn't hear. Then he half-turns, and you wish he hadn't.
+"Busy today." You say it toward the counter rather than at him. A beat passes. He half-turns.
 
-"Always is," he says. "Monday thing." He gives you a smile that doesn't expect anything. You manage one back, and then the line moves, and you're both facing forward again.
+"Always is," he says. "Monday thing." A smile that isn't asking for anything. You get one back out before the line moves and you're both facing forward again.
+{% elif w.hasTrait("FLIRTY") %}
+"Is the oat milk latte actually good here, or is it one of those things?" A pause. "Virtue signaling in cup form."
 
-*That went fine*, you think, with the specific intensity of someone for whom *fine* is a victory.
-{% elif w.hasTrait("CUTE") %}
-"Is the oat milk latte actually good here, or is it one of those things people order to feel virtuous?" You said it before you decided to, which is how most of your conversations start.
+He laughs — the real kind. "It's actually good. The chai's a trap though."
 
-He laughs — the real kind, not the polite kind. "It's actually good. The chai is a trap though."
-
-"Noted." You're grinning. This is the part where a normal person would stop talking, but you've never been great at that part.
+"Good to know." You're grinning. He is too.
 {% elif w.hasTrait("BITCHY") %}
-"You're staring at your phone like it owes you money." You say it with exactly enough warmth to make it not an insult. Barely.
+"You're staring at your phone like it owes you money."
 
-He looks up, surprised. Then he grins. "It kind of does, actually." He puts it away. "Better?"
+He looks up. Surprised, then amused. "It kind of does, actually." He pockets it. "Better?"
 
 "Marginally."
 {% else %}
-"Long line today." Not inspired, but honest.
+"Long line today."
 
-"Could be worse," he says. "At least the coffee's worth it." He says it like he's trying to believe it, which is more honest than the words.
+"Could be worse," he says. "Coffee's worth it." He says it with the mild conviction of someone who comes here enough to mean it.
 
-You nod. The line moves. That's enough.
+The line moves.
 {% endif %}
 """
 
@@ -85,21 +83,21 @@ detail    = "You came here for coffee, not conversation."
 condition = "scene.hasFlag('reached_counter')"
 prose     = """
 {% if w.hasTrait("POSH") %}
-"Cortado, please." The barista nods — no explanation needed. You pay with your card, leave a dollar in the jar because it's the right thing to do, and take your drink to the end of the counter. Clean exit.
+"Cortado, please." The barista nods and writes nothing on the cup. You tap your card, leave a dollar in the jar, and collect your drink at the end of the counter.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-"Medium drip. Room for cream." Simple. The barista barely looks up, which is exactly the transaction you wanted.
+"Medium drip. Room for cream." The barista barely looks up. The transaction takes fifteen seconds. Good.
 {% else %}
-You order, you pay, you wait at the pickup end. The cup is warm in your hands and the shop smells like espresso and someone's croissant, and for thirty seconds the morning is something you don't mind.
+You order, you pay, you wait at the pickup end. The cup is warm and the shop smells like espresso and whoever ordered the croissant. The line keeps moving behind you.
 {% endif %}
 
 {% if scene.hasFlag("talked") and not w.hasTrait("SHY") %}
-On the way out, you pass him at his table. He looks up.
+On the way out you pass him at a table by the window. He looks up.
 
-"Enjoy your Monday," he says, and there's something in the way he says it that makes it sound like he means it.
+"Enjoy your Monday," he says.
 
-"You too." You push through the door and the city takes you back.
+"You too." The door closes behind you and the street takes over.
 {% else %}
-You push through the door into the street. The coffee is already cooling. Monday doesn't wait.
+You push through the door. The cold comes back. The coffee is already cooling.
 {% endif %}
 """
 
@@ -120,24 +118,22 @@ label     = "Sit with him"
 detail    = "He gestured at the empty chair. Why not."
 condition = "scene.hasFlag('invited')"
 prose     = """
-You take the chair across from him. It's a small table — the kind where your knees almost touch and you both pretend they don't.
+You take the chair across from him. Small table — knees nearly touching, both of you adjusted for it without discussion.
 
 {% if w.hasTrait("ROMANTIC") %}
-He wraps both hands around his mug the way people do in movies about autumn, and for a second you think *this is a moment*, and then you think *stop doing that*, and then you think *but what if it is*.
+He wraps both hands around his mug. He's looking at you, not out the window, which means the conversation has his actual attention. You wrap both hands around your cup.
 {% elif w.hasTrait("SULTRY") %}
-You sit. Cross your legs. Take a sip. Let him look. He does. You let the silence go on exactly one beat longer than comfortable, because you know what that does, and then you say something ordinary and watch him recalibrate.
+You sit, cross your legs, take a sip. He looks. You let the quiet stretch one beat past comfortable, then say something ordinary — and watch him come back from wherever that sent him.
 {% elif w.hasTrait("AMBITIOUS") %}
-You take the chair. Efficient. He's interesting enough to justify five minutes. More than that depends on the next thing he says.
+You take the chair. You've got a few minutes. He says the next right thing or he doesn't; you'll find out.
 {% else %}
-You sit down. He slides a sugar packet toward you without asking, which is either attentive or presumptuous. You take it, because you take sugar, and decide not to read into it.
+You sit down. Without asking, he slides a sugar packet toward you. You take it, because you take sugar.
 {% endif %}
 
-"I'm Jake," he says. He holds out his hand, which feels weirdly formal for a coffee shop but somehow works.
+"I'm Jake," he says. He puts his hand out — formal for a coffee shop, but it works somehow.
 
 {% if w.getSkill("FEMININITY") < 35 %}
-His hand is warm and bigger than yours. The handshake lasts exactly the right amount of time, and your fingers disappear inside his grip for a second before he lets go. Something in your stomach does a small, involuntary thing.
-
-*His hand.* That's the whole thought. Just: his hand.
+His hand is warm and your fingers disappear in his grip for a second before he lets go. Something in your stomach does a small, fast thing that you don't have a name for yet.
 {% endif %}
 """
 
@@ -192,9 +188,9 @@ He's sitting at a table by the window now, coffee in hand. He catches your eye a
 "You should sit," he says. Not a demand. Not a question, either. The empty chair across from him is already pulled out, like he planned this or like he's just optimistic.
 
 {% if w.hasTrait("PLAIN") %}
-He says it the way people say things to you — without the specific eagerness they reserve for other women. Just friendly. Just casual. You notice the absence of something you don't want to name.
+He says it the way people say things — easy, no particular weight behind it. Friendly. The empty chair is just a chair.
 {% elif w.hasTrait("BEAUTIFUL") %}
-He says it with the careful casualness of a man who has decided to be brave. Something in your chest tightens — not unpleasant, just quick. His eyes stay on yours a beat longer than the question needs.
+He says it with the careful lightness of someone who has made a small decision. His eyes hold on yours a beat past the question.
 {% endif %}
 """
 

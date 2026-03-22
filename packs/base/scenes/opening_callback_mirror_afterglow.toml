@@ -5,19 +5,17 @@ description = "Week-two callback. The first-clothes branch leaves a quieter, mor
 
 [intro]
 prose = """
-You catch yourself in the hallway mirror on the way out the door.
-
-Not by accident, exactly. More like habit forming in real time.
+You stop at the hallway mirror on the way out — not a full stop, just a pause with one hand on the door handle.
 
 {% if gd.hasGameFlag("FIRST_CLOTHES_MIRROR") %}
-The department-store dressing room taught you that clothes can suddenly make the outline cohere. The hallway mirror is less flattering and much smaller, but the memory of that first sharp recognition is still there.
+The department-store dressing room had better light. Bigger glass. The blouse was the same one. The hallway mirror is smaller and meaner, and the silhouette is still there.
 {% elif gd.hasGameFlag("FIRST_CLOTHES_FUNCTIONAL") %}
-The first shopping trip was not revelation. It was efficiently handled triage: solve the problem, pay for the answer, leave. The hallway mirror is where the practical choice starts turning into an actual self-image.
+The first shopping trip was efficiently impersonal: find the size, pay, leave. The blouse came out of the bag and went on the hanger and has been in the rotation since. The hallway mirror catches the line of it the same way every morning.
 {% else %}
-Letting the sales associate help you solved more than sizing. The clothes fit, the silhouette works, and the act of putting them on asks less of you than it did the first week.
+The sales associate at the department store pulled three options and waited while you decided. The one you chose has been in the rotation since. The hallway mirror shows you roughly the same thing it showed in the store.
 {% endif %}
 
-You smooth the fabric once at the waist and head for the train before the moment can become a performance.
+You smooth the fabric once at the waist.
 """
 
 [[actions]]
@@ -28,10 +26,12 @@ prose  = """
 The door clicks shut behind you.
 
 {% if gd.hasGameFlag("FIRST_CLOTHES_FUNCTIONAL") %}
-You handled the first shopping trip like a systems problem. Useful. The strange part is realizing the solution keeps becoming more personal after the fact.
+The blouse solved the problem. It keeps solving the problem. That is enough for this morning.
+{% else %}
+The hallway is narrow and the light is bad and none of that changed what the mirror showed.
 {% endif %}
 
-The city is full of mirrors that do not care what you feel about them. This one was manageable. Maybe even useful.
+The street is loud. You head for the train.
 """
 
   [[actions.effects]]

@@ -51,7 +51,7 @@ detail    = "Three blocks. You'll survive."
 condition = "!scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-You're already moving before you've decided. Better soaked than stuck in silence. The rain hits your face and you walk fast, shoulders up.
+You step back into the rain. The shelter is too small, the silence too close. The rain hits your face and you walk fast, shoulders up.
 {% elif w.hasTrait("AMBITIOUS") %}
 Three blocks is three blocks. You step out and walk with purpose.
 {% else %}
@@ -85,7 +85,7 @@ prose     = """
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-He's close enough that you can feel warmth coming off his arm. The top of your head is level with his chin. The umbrella smells like nylon and rain. You're standing in the space someone else made for you, which is a sentence that didn't used to apply.
+He's close enough that you can feel warmth coming off his arm. The top of your head is level with his chin. The umbrella smells like nylon and rain.
 {% endif %}
 
 "I'm David," he says. Not a question. Just information.
@@ -110,7 +110,7 @@ detail    = "Generous, but no."
 condition = "scene.hasFlag('umbrella_offered')"
 prose     = """
 {% if w.hasTrait("SHY") %}
-"I'm okay, thanks." Quieter than you intended. He nods once, puts the umbrella back at his side.
+"I'm okay, thanks." It comes out quiet. He nods once, puts the umbrella back at his side.
 {% elif w.hasTrait("BITCHY") %}
 "I'm fine." Something in how you say it makes him take a half-step back.
 {% else %}
