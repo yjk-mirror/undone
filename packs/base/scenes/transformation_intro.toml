@@ -31,16 +31,14 @@ The version of you who applied had a transcript, a personal statement, and the k
 
 The gate does what gates do. Phones glow. Wheelie bags click over tile. Somebody laughs too loudly into a headset and nobody even turns.
 
-{% if w.hasTrait("AMBITIOUS") %}
-You have already arranged the first week into steps. Land. Keys. Sleep. Wake up ready. Anything that does not fit the list can be solved when it appears.
-{% elif w.hasTrait("ANALYTICAL") %}
-You run the sequence again. Land at 9:40. Transit or cab depending on the line. Lockbox code from the email. If the apartment matches the photos, unpacked before midnight.
-{% elif w.hasTrait("SHY") %}
-You chose a seat near the wall. Close enough to hear boarding, far enough that nobody has to make conversation unless they insist.
+{% if w.hasTrait("SHY") %}
+Your seat is near the wall. Close enough to hear boarding, far enough that nobody has to make conversation unless they insist.
 {% elif w.hasTrait("OUTGOING") %}
 The woman beside you has a paperback open on one knee and the settled look of somebody who flies often. When you sat down she smiled, small and automatic, then went back to reading.
+{% elif w.hasTrait("ANALYTICAL") %}
+The departure board says 9:40. Transit or cab depending on the line. Lockbox code is in the email. If the apartment matches the photos, unpacked before midnight.
 {% else %}
-Sitting. Waiting. The airport moves around you.
+The gate fills slowly. Phones glow. Bags lean against legs. The airport moves around you.
 {% endif %}
 
 They call your zone at last.
@@ -85,17 +83,11 @@ Once the cabin settles, the flight becomes pure background noise: a low engine h
 You flip your phone to airplane mode. The lock screen photo is from your old apartment window. You look at it just long enough to recognize the habit.
 {% endif %}
 
-{% if w.hasTrait("ANALYTICAL") %}
-You run the week again. Keys. Groceries. Commute. Monday. The sequence is clean, and for a while that is enough.
-{% elif w.hasTrait("AMBITIOUS") %}
-Monday matters. First impressions always matter. New office, new city, same private promise to be obviously worth hiring.
-{% elif w.hasTrait("SHY") %}
-The aisle passenger falls asleep before drink service. That removes at least one social problem from the evening.
+{% if w.hasTrait("SHY") %}
+The aisle passenger falls asleep before drink service. One less social obligation for the evening.
 {% elif w.hasTrait("OUTGOING") %}
-Your seatmate gives the conversation one polite opening and lets it go when you do. The silence that follows is easy.
+Your seatmate gives the conversation one polite opening and lets it go when you do. The silence that follows is the comfortable kind.
 {% endif %}
-
-{% if w.wasTransformed() %}For the moment, everything still answers to the life you boarded with. Name. body. history. plan.{% endif %}
 
 Somewhere over Ohio, you fall asleep.
 """

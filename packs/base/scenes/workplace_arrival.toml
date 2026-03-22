@@ -11,35 +11,45 @@ description = "First hours in the city. Airport exit, the ID that doesn't match,
 prose = """
 The seat belt sign clicks off.
 
-Around you, the cabin turns restless all at once. Belts snap loose. Phones come back to life. A flight attendant in the aisle ahead is already crouched at someone's row, helping with a stroller jammed under a seat. The plane smells like coffee, stale air, and the flat chemical cold of recycled ventilation.
+Around you, the cabin turns restless all at once. Belts snap loose. Phones come back to life. A flight attendant in the aisle ahead is already crouched at someone's row, helping with a stroller jammed under a seat. The plane smells like recycled air and the stale sweetness of whatever the person three rows up had for dinner.
 
-The overhead bin is higher than expected — the geometry of shoulder-to-shelf wrong by just enough to matter. A man behind you gets there first, lifting the carry-on down in one smooth motion.
+The overhead bin is a reach too far. The geometry is off by just enough to matter — you get a hand on the bag but not leverage. A man behind you steps in, lifts it down in one motion.
 
 "Here you go."
 
 {% if w.hasTrait("ANALYTICAL") %}
-The bag changes hands. That's the second unasked-for piece of help in ten minutes. The pattern files itself.
+You take the bag. He's already turning back to his own row. You clock it: second time in ninety minutes someone's closed a gap before you had to ask.
 {% elif w.hasTrait("SHY") %}
-The bag is in your hands before you've worked out what your face is doing. He's already turning back to his own row. The aisle carries you forward.
+The bag is in your hands before you've decided what expression to make. He's already back to his row. The aisle moves you forward.
 {% else %}
-The bag changes hands and the aisle carries you forward with everyone else.
+You take the bag. The aisle carries you forward with everyone else.
 {% endif %}
 
-Jet bridge. Terminal. Big bright concourse, polished floor, the kind of institutional lighting that does not care what time zone your body thinks it is. Signs for Ground Transportation, Baggage Claim, Rental Cars.
+Jet bridge. Terminal. Then the concourse — big, bright, the kind of institutional lighting that runs on its own time zone. The floor is polished and wide and full of people moving at normal-person stride. Everything about the space is built for someone a head taller than you: the departure boards are angled up, the trash cans come to your hip, the escalator handrail is at shoulder height.
+
+Your carry-on rolls behind you on its wheels. At least that part is the same size.
+
+{% if w.hasTrait("BEAUTIFUL") or w.hasTrait("OBJECTIFYING") %}
+By the time you reach the midpoint of the concourse a man coming the other way has tracked you for three full seconds. Not stopping. Not doing anything. Just the slow pan of his attention moving across you as he passes.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Quick scan, lock, track until the distance closes the angle. You read the whole sequence in the time it takes him to pass. From this side it lands somewhere between your shoulders and your sternum. Not bad. Just present.
+{% endif %}
+
+{% endif %}
+
+Signs point toward Ground Transportation. You follow them.
 
 {% if w.wasTransformed() %}
-At the exit checkpoint, the agent takes your ID, glances at the photo, then gives you a second look that lands harder than the first.
+The exit checkpoint has an agent at a podium, ID checks for the international arrivals overflow. He takes your card, glances at the photo, then looks up at you.
 
-**{{ w.beforeName() }}**, says the card. The face in the photo is not the face standing here. His hand pauses.
+A pause that wasn't there for the person in front of you.
+
+The card says **{{ w.beforeName() }}**. The photo shows someone else. His hand stays on the card.
 {% else %}
-At the exit checkpoint, the agent scans your ID, checks the name, and waves you through with the fast, practiced indifference of someone who has already looked at a thousand faces today.
+The exit checkpoint agent scans your ID, checks the name, and waves you through with the flat efficiency of someone who has looked at a thousand faces today and has no interest in a thousand and one.
 {% endif %}
 """
-
-[[thoughts]]
-condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
-style     = "inner_voice"
-prose = "*Okay.* Problems, in order. The reach is off. The voice is still unfamiliar at the edges. Your hands keep going cold for no reason you believe in. The city can stay tomorrow's problem. Tonight is keys, door, sleep."
 
 # ── Round 1: The ID check ────────────────────────────────────────────
 
@@ -116,11 +126,11 @@ The train arrives with a screech and a slap of displaced air. You board into a h
 You take a seat near the door. The bag stays in your lap because you are not reaching for the overhead rack in public unless you have to.
 
 {% if w.hasTrait("BEAUTIFUL") %}
-A man across the aisle looks up when you sit down. Two seconds, maybe less. Automatic scan. Quick read. Then he is back on his phone and you are already forcing your attention onto the route map.
+A man across the aisle looks up when you sit down. Two seconds, maybe less. A quick scan that moves from your face to your chest and back. Then he's on his phone again.
 {% endif %}
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You know that look because you have used it. The quick inventory, the efficient read. You did not know how physical it would feel from the receiving side until now.
+Quick scan, lock, track until the distance closes the angle. You read the whole sequence in the time it takes him to pass. From this side it lands somewhere between your shoulders and your sternum.
 {% endif %}
 
 {% if w.hasTrait("SHY") %}
@@ -134,7 +144,7 @@ Twenty-two minutes. Your stop.
 The building is a five-minute walk from the station. Four stories, brick, narrow windows, bodega on the corner. The lockbox on the front door has your keys.
 
 {% if w.hasTrait("AMBITIOUS") %}
-*Okay.* Apartment. Unpack. Sleep. Monday.
+Apartment, unpack, sleep. Monday is waiting.
 {% else %}
 You stand outside for one full second with your bag, your keys, and the cold air of a city that still has no memory of you.
 {% endif %}
@@ -180,9 +190,9 @@ The car stops in front of your building. Four stories, brick, a bodega on the co
 You get out into the early spring cold. The lockbox on the front door has your keys. The street is quiet. A cat watches you from a fire escape across the road.
 
 {% if w.hasTrait("AMBITIOUS") %}
-*Okay.* Keys. Address. Monday is three days away and you're going to be ready.
+Keys, address, three days until Monday. The cold doesn't bother you yet.
 {% else %}
-You stand there for a second with your bag, your keys, and the fact of having arrived as someone this city has never seen before.
+You stand there for a second with your bag and your keys and the cold air of a city that has no memory of you.
 {% endif %}
 """
 

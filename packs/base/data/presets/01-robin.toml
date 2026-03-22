@@ -110,33 +110,148 @@ starting_flags = ["ROUTE_WORKPLACE"]
 [[discovery]]
 reveals = ["scale"]
 prose = """\
-[PROSE SLOT — Beat 1: Scale]
+The window is dark. The plane hums. Your neck is stiff from sleeping \
+against the seat back, and when you try to straighten up, the seat belt \
+is wrong — sitting too low across your lap, tight on your hips in a way \
+it wasn't before.
+
+Your hands are on your thighs. They're smaller than they should be. The \
+watch on your left wrist has slid down almost to your knuckles.
+
 {% if w.hasTrait("ANALYTICAL") %}
-[ANALYTICAL branch — inventories, problem-solves]
+You look at the hands for a moment, then at the seat belt, then at your \
+feet, which don't reach the floor properly — the balls of your feet \
+touch but your heels hang. You go through it methodically: the watch, \
+the belt, the seat. Everything a size too large, and you a size too \
+small for it. You put your hands flat on your thighs and press down, \
+which tells you nothing useful, but you do it anyway.
 {% elif w.hasTrait("FREEZE_RESPONSE") %}
-[FREEZE branch — locks up, can't move]
+You look at the hands and then you stop. You don't put them down, don't \
+adjust the seat belt, don't shift your weight. The plane hums. Somewhere \
+behind you someone coughs. You are aware of all of it and you are not \
+moving.
 {% else %}
-[Default branch]
+You flex your fingers. They move fine. You look up at the overhead bin \
+and then down at the floor, and between the two the proportions are \
+wrong — you are sitting lower than you were, the armrests are higher \
+than they were, and the geometry of where you are in this seat has \
+shifted.
 {% endif %}
 """
 
 [[discovery]]
 reveals = ["body"]
 prose = """\
-[PROSE SLOT — Beat 2: Body]
+There's weight on your chest that wasn't there when you fell asleep.
+
+You reach up, and your hand meets fabric and then the shape beneath \
+it — the seat belt has been pressing against something. You sit \
+forward. The weight shifts with you, pulls slightly, and settles.
+
+Your shirt is stretched across your chest. Hair falls forward over your \
+shoulder — black, straight, long enough to reach your collarbone — and \
+you have to push it back out of your face.
+
 {% if w.hasTrait("HAIR_TRIGGER") %}
-[HAIR_TRIGGER branch — body reacts before mind catches up]
+The fabric of your shirt moves when you push the hair back and grazes \
+something underneath, and the sensation arrives in your body before \
+you've finished the gesture. It's brief. It's not brief enough. You go \
+still and wait for it to stop.
+{% else %}
+You reach up with both hands and press them flat against your chest, \
+feeling the shape of it. Then you sit with your hands in your lap and \
+look at the seat back in front of you.
+
+The weight is still there. When you breathe, you feel it.
 {% endif %}
 """
 
 [[discovery]]
 reveals = ["face"]
-prose = "[PROSE SLOT — Beat 3: Face. Window reflection.]"
+prose = """\
+The window shade is up. Outside is flat black — cloud cover, no ground \
+lights, nothing. The window glass is dark enough to give you a \
+reflection.
+
+A girl is sitting in your seat.
+
+East Asian. Late teens or thereabouts. Long black hair pushed back from \
+her face from where she just moved it. The seat belt marks a faint line \
+across her chest where it was pressing.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Your eyes go to the face and run it before you've decided to. Bone \
+structure, eyes, the line of the jaw. You've spent time rating faces \
+like this — ten seconds on a dating app, half a second across a bar. \
+The number that surfaces is automatic and doesn't need to be said out \
+loud.
+
+You raise your right hand. The reflection raises hers.
+{% elif w.hasTrait("ANALYTICAL") %}
+You look for something you recognize. The eye color is close — dark \
+brown, same as before. That's it. The shape of the face is different, \
+the jaw is different, the nose and the hair and the age are all \
+different. You go through each feature the way you'd go through a \
+checklist and at the end of the checklist there's nothing to check off.
+
+You raise your right hand. The reflection raises hers.
+{% else %}
+You raise your right hand and touch your cheek with two fingers. In \
+the window, the girl does the same. The skin is warm and smoother than \
+you'd expect.
+
+You sit with your fingers against your cheek for a moment, looking at \
+her looking at you.
+{% endif %}
+"""
 
 [[discovery]]
 reveals = ["name"]
-prose = "[PROSE SLOT — Beat 4: Name. Flight attendant speaks.]"
+prose = """\
+The flight attendant comes back through the cabin with her tablet. She \
+stops at your row.
+
+"Excuse me, miss. Robin?" She checks the screen. "Pre-landing check — \
+you doing okay? Need anything before descent?"
+
+She's looking at you the way people look at a teenage girl traveling \
+alone. A little more careful. A little more patient.
+
+{% if w.hasTrait("ANALYTICAL") %}
+She checked the boarding pass. She looked at you. Nothing flagged. She \
+marks the tablet and moves to the next row.
+{% elif w.hasTrait("FREEZE_RESPONSE") %}
+Your throat doesn't open. She waits — two seconds, three. Then a small \
+note on the tablet, and she moves on.
+{% else %}
+You give her a small nod. She marks something and moves on down the \
+aisle.
+{% endif %}
+"""
 
 [[discovery]]
 reveals = ["sexual", "begin"]
-prose = "[PROSE SLOT — Beat 5: Standing up. Everything at the wrong height.]"
+prose = """\
+The attendants have gone back to their stations. The cabin is in \
+descent quiet — just engine noise and the occasional click from the \
+overhead panels.
+
+You shift in the seat to adjust, and something below the waist \
+registers wrong — no pain, just absence where there was always weight, \
+and in its place warmth and softness pressing lightly against the seat.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The awareness is enough on its own. Your thighs press together, not \
+decided, just done. A warmth starts somewhere low and spreads up \
+through your chest.
+{% elif w.hasTrait("ANALYTICAL") %}
+You hold still and account for it: the weight that was there, gone; \
+warmth and softness in its place; sensitivity that registers without \
+being touched. Then you look out the window.
+{% else %}
+The body settles into it. You look out the window.
+{% endif %}
+
+The city is spread out below — a new company, a new start, an \
+apartment full of boxes you've never opened.
+"""
