@@ -184,7 +184,7 @@ She doesn't look for a response. The dryer comes back on.
   amount = -2
 
   [[npc_actions.next]]
-  goto = "just_change"
+  finish = true
 
 [[npc_actions]]
 id        = "college_women_glance"
@@ -197,7 +197,7 @@ One of the college women stops mid-sentence. The other follows her gaze.
 A second, maybe two. Quick, involuntary — the assessment that runs before you decide to run it. Then they both look back at each other and the conversation picks up again, half a beat later than it dropped.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-The look is familiar. Evaluative — quick and without malice, the same inventory you used to run without calling it one.
+The look is familiar. Evaluative — quick and without malice.
 {% endif %}
 """
 
@@ -206,4 +206,4 @@ The look is familiar. Evaluative — quick and without malice, the same inventor
   flag = "women_glanced"
 
   [[npc_actions.next]]
-  goto = "just_change"
+  finish = true
