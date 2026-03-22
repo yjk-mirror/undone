@@ -50,49 +50,30 @@
 
 ## ⚡ Next Action
 
-**Port dev IPC tools to undone-tools, then playtest.**
+**Restore tools, fix focus-steal, then playtest.**
 
-### 1. Port game-input dev IPC to undone-tools (BLOCKING)
+### 1. Restore tools/ directory (BLOCKING)
 
-The `tools/` directory was moved to `../undone-tools/` but the move was incomplete.
-The new `undone-tools/game-input-mcp` only has 4 basic tools (press_key, click,
-scroll, hover). The full dev IPC suite (18 tools) needed by the playtester agent
-is missing. The old source is in git history.
+The `tools/` directory was deleted from the working tree but is fully intact in
+git HEAD (unstaged deletions). The sibling `../undone-tools/` was a partial move
+attempt — user decided to keep everything in one repo.
 
-**Task:** Port all dev IPC tools from the old `tools/game-input-mcp/` to
-`../undone-tools/game-input-mcp/`. Source files to port:
-- `dev_client.rs` — IPC client (named pipe to `undone --dev`)
-- `server.rs` — the full tool implementations (start_game, get_runtime_state,
-  choose_action, continue_scene, jump_to_scene, list_scenes, get_scene_info,
-  save_game, load_save, list_saves, set_tab, set_game_stat, set_game_flag,
-  remove_game_flag, advance_time, set_npc_liking, set_all_npc_liking,
-  set_window_size, dev_command)
-- `ui_audit.rs` — runtime audit helpers
-- `bin/ui-dead-space-smoke.rs` — Windows smoke test binary
-- `lib.rs` — public exports for the above
+**Task:** `git checkout -- tools/` to restore, then `cd tools && cargo build --release`.
+The `.mcp.json` already points to `tools/target/release/` so no config changes needed.
 
-Also missing from undone-tools: `rust-mcp/` (rust-analyzer MCP server).
+**Focus-steal fix:** While rebuilding, modify `tools/game-input-mcp/src/server.rs`
+`start_game` to avoid stealing focus. The game window (floem/winit) grabs foreground
+on creation — this is OS-level default behavior, not explicit code. Options:
+- Launch the release binary directly (`target/release/undone.exe`) instead of
+  `cargo run` — avoids the build console window entirely
+- Use Windows creation flags (`CREATE_NEW_PROCESS_GROUP`) or PowerShell
+  `Start-Process` wrapper to prevent foreground grab
+- Or: after spawning, use WinAPI to re-focus the caller's terminal
 
-**How to get the old source:** `git show HEAD:tools/game-input-mcp/src/dev_client.rs`
-etc. — the files are in git HEAD since the deletions are unstaged.
-
-**After porting:** rebuild (`cd ../undone-tools && cargo build --release`), update
-`.mcp.json` in the game repo to point to `../undone-tools/target/release/`.
-
-**Focus-steal fix:** While porting `start_game`, modify the process launch to avoid
-stealing focus from the user's active window. The current implementation uses basic
-`Command::new("cargo")` which causes the new window to grab foreground. Options:
-- Use Windows `STARTUPINFO` with `SW_SHOWNOACTIVATE` via `windows-sys` crate
-- Launch via PowerShell `Start-Process` with `-WindowStyle Normal` (no force-front)
-- Or: launch the release binary directly instead of `cargo run` (avoids build console)
-
-### 2. Update .mcp.json
-Point all server paths to `../undone-tools/target/release/`. Currently points to
-deleted `tools/target/release/`. Add `rust-mcp` if ported.
-
-### 3. Commit the tools/ deletion
-Once undone-tools is fully functional, stage and commit the `tools/` deletion
-from the game repo working tree. Clean up the 47 unstaged deletions.
+### 2. Playtest Robin flow
+Launch the playtester agent (**ALWAYS `run_in_background: true`**). Play through
+Robin's complete opening: creation → plane → discovery beats → arrival → opening arc.
+Screenshot every screen.
 
 ### 4. Playtest Robin flow
 Launch the playtester agent (IN BACKGROUND — `run_in_background: true` ALWAYS).
@@ -114,7 +95,7 @@ arrival → opening arc. Screenshot every screen.
 1. ~~**Discovery prose**~~ — DONE
 2. ~~**Scene prose**~~ — DONE (47 scenes)
 3. ~~**Adult scenes**~~ — DONE (3 explicit)
-4. **Dev IPC tools** — port to undone-tools (BLOCKING for playtesting)
+4. **Restore tools/** — `git checkout -- tools/`, rebuild, fix focus-steal (BLOCKING for playtesting)
 5. **Campus scenes** — 6 remaining (Camila, deprioritized)
 6. **Tech debt** — see `memory/project_tech_debt_audit.md`
 
