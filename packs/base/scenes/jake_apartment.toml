@@ -5,27 +5,22 @@ description = "Her apartment or his. Evening. After enough dates that this was c
 
 [intro]
 prose = """
-His apartment, or yours. The address doesn't matter. What matters is the door is closed and the city is on the other side of it, and neither of you is pretending there's somewhere else you need to be.
+His apartment, or yours. The door is closed. The city is on the other side of it.
 
 The floor lamp puts a circle of yellow light on the wall. His jacket is over the chair. Yours is on the floor by the door, which is how you know where the last hour went.
 
-He's sitting on the edge of the bed, looking at you. The way he's looking at you is quiet. Patient. He's not pushing. He's not hurrying himself.
+He's sitting on the edge of the bed, looking at you. Quiet. Patient. Not pushing.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You are at the far edge of what you understand about your own body. The part you don't know is the part where this body is involved — what arousal does from the inside now, what his hands will find when they get there. You've run the theory. The theory is going out the window.
+Something tight has settled in your chest and something warm has settled lower. His hands are right there on his knees and you are aware of them.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You've thought about this. The wanting has been there for a while. Getting from the wanting to the here is a thing you've managed, and now the here is actual and something low and warm has settled in your hips.
+The wanting has been there for weeks. Getting here from there is something you managed, and now the here is actual — the room, his hands, the particular quality of the silence.
 {% else %}
-You know what you want. You know what this body does when it gets close to what it wants. What you don't know is him, yet — his hands, his particular attention — and that's what the evening is about.
+You know what you want. What you don't know is him yet — his hands, where he pays attention, the shape of his particular slowness. That's what the evening is.
 {% endif %}
 
 He doesn't say anything. The room is warm.
 """
-
-[[thoughts]]
-condition = "w.getSkill('FEMININITY') < 30"
-style     = "inner_voice"
-prose     = "*Okay.*"
 
 # ── Player Actions ─────────────────────────────────────────────────────
 
@@ -34,68 +29,58 @@ id     = "let_him_lead"
 label  = "Let him set the pace"
 detail = "He's patient. He'll find you."
 prose  = """
-He stands and crosses to you. He cups your face in both hands first — just holds it, his thumbs along your jaw, looking at you. His eyes are dark.
+He stands and crosses to you. He cups your face in both hands first — just holds it, his thumbs along your jaw. Looking at you. His eyes are dark.
 
-Then he kisses you, and the kiss is slow in a way that dismantles the last of whatever you were bracing against.
+Then he kisses you. The kiss is slow in a way that takes the last of the tension somewhere and puts it down.
 
 {% if w.hasTrait("SHY") %}
-He moves at the pace of someone who isn't trying to get anywhere, which helps. His hands find your shoulders. He draws you down onto the bed and takes his time. Every place he touches is a question that doesn't require words. When he finds the hem of your shirt, he looks at you first.
+He moves at the pace of someone who isn't trying to get anywhere. His hands on your shoulders. He draws you down onto the bed. Every place he touches is deliberate, with space between. When he finds the hem of your shirt, he looks at you first.
 
 You don't stop him.
 
-The shirt comes off. He runs one hand from your shoulder down your side and settles it at your hip. Not moving yet. Just present. He looks at you again, and the looking isn't hunger, it's something more careful than that, and your eyes go down because you can't hold the weight of being looked at like that.
+The shirt comes off. He runs one hand from your shoulder down your side and settles at your hip. Not moving. Just there. He looks at you again, and the looking is more careful than hungry, and your eyes go down.
 
-"Hey," he says, quietly, and waits until you look up.
+"Hey," he says, and waits until you look up.
 {% elif w.hasTrait("ANALYTICAL") %}
-You're cataloguing. The weight of his hands on your shoulders. The height differential when you're both standing close. His mouth on your throat and what that does — your brain is trying to file it somewhere useful while your body is filing it in an entirely different place.
+You're tracking everything. The weight of his hands on your shoulders. The height difference when you're both standing close. His mouth on your throat and the signal it sends — down, low, immediate. The brain is tagging it. The body has already filed it.
 
-He gets your shirt off. He takes stock of you in the lamplight, and the cataloguing reverses direction. You're aware of being looked at and the awareness goes all the way down.
+He gets your shirt off. He looks at you in the lamplight, and the cataloguing reverses direction. You're aware of being seen and the awareness runs all the way down.
 
-The analysis runs for about another forty seconds. Then his hand moves and the analysis stops.
-
-*Oh.* And then nothing, because there's no room for it.
+His hand moves. The tracking stops. There's nothing else.
 {% elif w.hasTrait("FLIRTY") %}
-You've been building here. A coffee shop, a market, a restaurant, two hours of hands and proximity. This is what the building was for.
+A coffee shop, a market, a restaurant, two hours of hands close enough to matter. This is what all of that was building toward.
 
-He moves like he already knows what he's doing. His hands are warm and his attention is total and when you pull him down onto the bed by his collar he laughs, low, and lets himself be pulled.
+He moves like he already knows what he's doing. His hands are warm and his attention is total. When you pull him down onto the bed by his collar he laughs, low, and lets you.
 {% else %}
-He moves you toward the bed without any of it feeling like being moved — just the direction of things, where they were going anyway. His hands know what they're doing. You let yourself be taken.
+He moves you toward the bed without any of it feeling like being moved — just the direction of things, where they were already going. His hands know what they're doing. You let yourself be taken.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-His mouth goes to your neck. Your brain whites out.
+His mouth goes to your neck. Something drops — the whole register of the room — and then heat comes up to replace it. A sound comes out of you, high and soft, and you didn't choose it. He stills, hearing it. Does it again.
 
-A complete silence. A drop in everything. Then warmth, rising. You make a sound. You've never made that sound before. The pitch of it surprises you. He stills for a moment, hearing it, and then does it again.
+The arousal builds instead of peaking. Every touch adds to the last one — his hands on your breasts, the warmth there sharper than anywhere else, his fingers between your legs and your hips rolling up before you've decided to move them. He's watching. Paying attention to everything your body does.
 
-The arousal isn't what you knew. It doesn't arrive and peak — it builds. Every touch adds to it, layers onto it. His hands on your breasts and the warmth is different there than anywhere else, a focused heat that gathers. His fingers below and you arch up without meaning to, and the motion your hips make isn't anything you chose.
+When he finally pushes inside you, the fullness is something you have no reference for. More than you expected. He goes slow, watching your face. You close your eyes. He keeps going slow.
 
-He watches you. He's watching what he's doing to you, paying attention in a way that makes the whole thing worse in the best direction.
-
-When he finally pushes inside you, you gasp. The fullness is something you have no prior reference for. It's not what you expected. It's more than you expected. He goes slow, watching your face, and you close your eyes because keeping them open is too much.
-
-He moves. You move with him. His hands finding places that send the signal somewhere new, and the rising wave just keeps rising until it crests and breaks and you make another sound you've never made.
-
-He holds you through it. His chest warm against your back. The room is very quiet.
+He moves. You move with him. The wave builds and builds, and when it breaks you make another sound you've never made and he holds you through the aftershock, his chest warm against your back, until the room goes quiet.
 {% elif w.getSkill("FEMININITY") < 50 %}
-His hands on your hips, the weight of him over you, and what your body does under that weight — it responds faster than you expected. More directly. A touch in the right place and there's no committee meeting about it, the response is just there.
+His hands on your hips, his weight over you — your body responds faster than you expected. More directly. His fingers find a spot low on your belly and your breath catches. He does it again. He heard the first one.
 
-He finds a place low on your belly that makes your breath catch. Then he finds another one. He's paying attention. When he moves his fingers and you gasp, he keeps doing exactly that, and the fact that he keeps doing it means he heard you.
+The orgasm comes from below the waist and rolls upward, wider than anything you've had before. You clutch his shoulders. He keeps going until you tell him to stop.
 
-The orgasm rolls through you from somewhere below the waist upward, and it's different from anything you've had before — wider somehow, less localized. You clutch his shoulders through it. He doesn't stop until you tell him to.
+Then he lines up and pauses — just long enough to check your face — and pushes inside. The fullness is startling and immediate and exactly what the whole evening had been leaning toward.
 
-Then he shifts over you, lines himself up, and pauses just long enough to make sure you're still with him. When he pushes inside, the fullness is immediate and startling and exactly what the whole evening had been leaning toward.
-
-You hold on to him while he moves. The rhythm settles. The body takes the rhythm and keeps answering it back.
+You hold on while he moves. The rhythm settles. Your body keeps answering it.
 
 Afterward, the room comes back. His arm around you.
 {% else %}
-You know this body. You know the particular way arousal sits in your hips, the place on your throat where his mouth is going to undo you, the threshold between you want more and you need more.
+You know what this body does when it gets close to something it wants. His mouth on your throat and the pulse of heat it sends down. His hands on your hips and what your hips do. The threshold between wanting more and needing it.
 
 What you don't know is him.
 
-His hands are different from any hands that have been here. His weight has its own distribution. The way he pays attention — the pause when he finds something that works, the return to it — is his, not a template. The pleasure is familiar in texture and his in shape, and the combination of both is what does it.
+His hands are different from any hands that have been here. His weight has its own distribution. The way he pays attention — the pause when something lands, the return to it — is his specifically. The pleasure is familiar in texture and new in shape, and that combination is what does it.
 
-When he slides into you, the wanting resolves into something cleaner and stronger than wanting. You know how to meet him there. You do.
+When he slides into you, the wanting sharpens into something cleaner and more urgent than wanting. You know how to meet him. You do.
 
 He takes his time. So do you.
 {% endif %}
@@ -152,32 +137,32 @@ condition = "w.hasTrait('CONFIDENT') || w.getSkill('FEMININITY') > 30"
 prose     = """
 You take his hand.
 
-Move it. Not roughly — just with intent. This is where. That's the direction. He gets it immediately, which you knew he would, and the slight shift in his expression is something between pleased and focused.
+Move it. Not roughly — just with intent. This is where. He gets it immediately. His expression shifts: not surprised, just focused.
 
 {% if w.hasTrait("CONFIDENT") %}
-"Here," you say, and he goes. "Slower." He slows. "There." He stays. The word there isn't even out of your mouth before your eyes close.
+"Here," you say, and he goes. "Slower." He slows. "There." He stays. Your eyes close before the word is out.
 
-You know what you want in general. What you're learning is the specific route in this body. The map isn't complete but you're adding to it in real time, and having his full attention while you do it means every discovery gets confirmed twice — once by your nerves and once by his hands returning to the same place, the fact of them saying: noted.
+His hands confirm each discovery twice — once in your nerves, once when they come back to the same place. Every return is his way of saying noted. The map isn't finished but it's filling in fast.
 
-When you come, it's with his face against your shoulder and your hand still directing, because that's who you are, and the orgasm is a complete white-out of the machinery that makes you that person for about twenty seconds.
+When you come it's with his face against your shoulder and your hand still on his wrist, and the orgasm takes the part of you that's directing anything and whites it out for about twenty seconds.
 
-You guide him again after, lower this time, and the next thing you're directing is the way he enters you. The map is still being drawn, but this part of it is unmistakable.
+You guide him lower after. The next thing you're directing is the way he enters you — slow, where you want it, exactly that. This part of the map is unmistakable.
 {% elif w.getSkill("FEMININITY") > 50 %}
-You know what you want. Getting him there takes about two redirects. He's a quick study. His hands move with purpose and you arch up and the ceiling is close.
+You know what you want. Getting him there takes two redirects. He's fast. His hands move with purpose and you arch up and the ceiling is close.
 
-He checks your face the way he checks everything — quietly, paying attention. When he finds the thing that makes you tighten, his eyes stay on yours, which is almost too much. You look away first.
+He checks your face when he finds the thing that makes you tighten, and his eyes stay on yours. You look away first.
 
-The orgasm is long. You come back to the room slowly.
+The orgasm is long. The room comes back to you in pieces.
 
-Then he kisses you again, slower now, and slides into you while you're still soft with it. You pull him closer by the back of the neck and let the second wave build from there.
+He kisses you again after — slower, lower — and slides into you while you're still loose with it. You pull him closer by the back of the neck and let the second wave build from there.
 {% else %}
-You don't have complete information — you're going on instinct and on what the body does when you get close to the right place. His thumb traces the inside of your thigh and there's a signal from somewhere south of your navel. Down, you think, and pull his hand, and then his fingers find the right spot and the thought ends there.
+You're going on instinct. What the body does when it gets near the right place. His thumb traces the inside of your thigh and there's a signal from below your navel — pull his hand, there, and his fingers find the exact spot and the instinct and the response arrive at the same time.
 
-He can tell. His rhythm steadies. You don't tell him to stop and then you absolutely have to tell him to stop and even after, your hips are still moving.
+He can tell. His pace steadies. You don't tell him to stop. Then you have to. Even after, your hips are still moving.
 
-You lie with your forehead against his chest. His breathing slows back down. So does yours.
+His breathing slows. So does yours. The room gets quieter.
 
-When he asks, quiet and close, you pull him down for your answer. He enters you carefully and the care itself almost undoes you.
+When he asks — quiet, close — you pull him down for the answer. He pushes into you carefully, and the care itself is almost too much.
 {% endif %}
 """
 
@@ -229,36 +214,34 @@ id     = "stop_not_tonight"
 label  = "Stop. Not tonight."
 detail = "The wanting is real. You're choosing to wait."
 prose  = """
-"Not yet." It comes out quiet. "I can't. Not tonight."
+"Not yet." Quiet. "Not tonight."
 
-He stops. Doesn't try to re-close the distance or coax you or figure out what 'yet' means. He sits back on the bed beside you. Not wounded. Not performing patience — just actually patient.
+He stops. Doesn't try to close the distance back or figure out what yet means. He sits beside you on the bed. Not wounded. Not performing patience.
 
 "Okay," he says. Just that.
 
 {% if w.hasTrait("SHY") %}
-The relief is bigger than you expected. Not relief that he stopped — you're sure about the wanting. Relief that the stopping was this easy, that there's no negotiation, no explanation required. The wanting is still there and the room is warm and he's right there, and none of it got complicated.
+He picks your shirt up off the floor and hands it to you without a word. You pull it over your head.
 
-He passes you your shirt from the floor. You pull it over your head.
-
-After a while you put the lamp off and lie next to him in the dark, your shoulder against his. He doesn't try anything. The ceiling is there.
+After a while you put the lamp off and lie next to him in the dark, your shoulder against his. He doesn't try anything. The room is quiet. The ceiling is there.
 {% elif w.hasTrait("ROMANTIC") %}
-The apartment is warm and still. He's close and his breathing has steadied. Some part of you made this evening into something — the buildup, the particular quality of his patience — and the not-tonight has its own meaning in the sequence of it.
+The apartment is still. He's close and breathing slow and the not-tonight sits between you with its own weight — not regret, just the shape of everything that still could happen.
 
-You sit with the wanting. It has a shape now. It'll still have a shape next time.
+You stay where you are. He stays where he is. The evening doesn't end so much as change its plan.
 {% elif w.hasTrait("ANALYTICAL") %}
-The variables are still in play. The evening didn't end, just this particular thread. You do a quick inventory: still want him. Still trust him. The body still has an opinion, low and warm and persistent. The decision was yours, which is the relevant fact.
-
-He sits beside you. After a while he says, "I've got beer, if you want."
+The evening's still in play. Just not this thread. He sits next to you and after a minute says, "I've got beer, if you want."
 
 You do.
-{% else %}
-The room settles. He stretches out beside you, not crowding, and looks at the ceiling the same way you're looking at it.
 
-"Okay," you say, after a while. Which is not a continuation of anything. Just confirmation that the okay goes in both directions.
+The beer is cold and the conversation is easy and by the time you leave, the wanting is still there, smaller and more manageable, and the decision was yours, which is what matters.
+{% else %}
+The room settles. He stretches out beside you, not crowding, and looks at the ceiling.
+
+After a while you say "okay," which isn't a continuation of anything, just a confirmation that the okay goes both ways.
 
 "Yeah," he says.
 
-The lamp puts yellow light on the wall. The city is still out there. Neither of you is in a hurry to go back to it.
+The lamp puts yellow light on the wall. The city is out there. Neither of you is in a hurry.
 {% endif %}
 """
 
@@ -283,46 +266,36 @@ id     = "kiss_and_see"
 label  = "Kiss him and see what happens"
 detail = "No plan. Just this moment."
 prose  = """
-You lean in. No strategy. Just the fact of him being close and the evening having arrived here.
+You lean in. Just the fact of him being close and the evening being here.
 
 He meets you. The kiss starts slow and then your hand goes to the back of his neck and the slow drops off.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You end up on the bed without a clear narrative of how. He's over you and your hands are in his hair and the kissing has gone somewhere past kissing. He gets your shirt off and his mouth goes to your collarbone and a sound comes out of you that belongs to a body you're still getting acquainted with.
+You end up on the bed. He's over you, your hands in his hair, the kissing well past kissing. His mouth goes to your collarbone and a sound comes out of you — high, soft, your body doing it before anything else has caught up. The room catches it.
 
-High, soft, involuntary. The room catches it.
+He stills. Looks at you. Focused.
 
-He stills. Looks at you. His expression is something very focused, paying attention.
-
-He does it again. The same place. Same pressure.
+He does it again. Same place. Same pressure.
 
 The sound comes again.
 
-*Oh*, you think, which is not a thought so much as a complete account of the situation.
+His hands find their way down. The arousal doesn't peak and resolve — it builds in layers, each touch adding to the last. His fingers inside you and your hips roll up and you're clutching the sheets and he is paying attention to everything. Every sound, every movement.
 
-His hands find their way. The arousal doesn't peak and resolve — it layers, it deepens, it pulls you down somewhere warm. Every touch adds to it. His fingers inside you and the whole thing tips sideways in the best possible way and you're clutching the dark blue comforter and he is absolutely paying attention to everything you do.
+When he finally pushes inside you it lands as both the obvious next thing and a complete surprise. Full, slow, more than you expected. You pull him closer with both arms.
 
-When he finally pushes into you, it lands as the obvious next thing and a complete surprise at the same time. You pull him closer with both arms and let the surprise turn into motion.
-
-The orgasm takes a while to come and it comes from everywhere at once.
-
-Afterward the city is still there and neither of you moves right away.
+The orgasm takes its time and comes from everywhere at once. He stays close through it. The room goes quiet.
 {% elif w.getSkill("FEMININITY") < 50 %}
-His shirt ends up on the floor. Yours too. The kissing became hands and the hands have a direction and you're following both.
+His shirt ends up on the floor. Yours too. His mouth moves down your throat and you tilt your head without deciding to. The wanting is already somewhere ahead of everything.
 
-His mouth moves down your throat. You tilt your head without thinking. The wanting goes ahead of everything and the body knows where it's going even when the mind is a half-step behind.
+He moves between your legs. The fullness is immediate — no reference for it except this one, building right now. You pull him closer.
 
-He moves between your legs and the fullness of him is new in the exact way this body makes things new — a sensation you have no reference for except the one you're building right now. You pull him closer.
+His hips find a rhythm and your body finds it back. The orgasm rolls up from below your navel and takes you before you're ready for it.
 
-The orgasm rolls up from below your navel and takes you completely.
-
-When you come back, his cheek is against your hair. The lamp is still on.
+His cheek is against your hair when you come back. The lamp is still on.
 {% else %}
-The clothes go. The bed meets you both. His hands know where to go and so do yours and the evening becomes the evening, which is what it was always going to become.
+The clothes go. The bed. His hands know where to go and so do yours and the evening becomes what it was always going to become.
 
-He pays attention in the particular way that's his — the pause when something lands, the return to it, the quiet focus of a man who's actually here and not somewhere else. You give him back the same attention.
-
-When it's over you lie with your leg thrown over his and the room is dim and warm.
+He pays attention in the particular way that's his — the pause when something works, the return to it, the focused quiet of a man who is actually present. You give him back the same. It builds until it breaks and after you lie with your leg thrown over his and the room is warm.
 {% endif %}
 """
 

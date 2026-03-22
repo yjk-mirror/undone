@@ -9,21 +9,21 @@ Antico is the kind of place where the lighting is low enough that everyone looks
 
 He's already here. Standing near the host stand, jacket on, phone in his pocket for once. He spots you when you come through the door. The smile comes without any calculation in it.
 
-"Hey." He holds out his hand, a gesture that's half handshake and half something else, and then it becomes the thing where he guides you through the room with a hand briefly at the small of your back and you feel the heat of it through your jacket and then it's gone.
+"Hey." He holds out his hand — half handshake, half something else — and then he's guiding you through the room with a hand briefly at the small of your back, the heat of it through your jacket, and then it's gone.
 
-The table is small. His shoulders fill his side of it in a way they didn't at the coffee shop counter, and the candle sits between you, and the room narrows down to this.
+The table is small. His shoulders fill his side of it in a way they didn't at the coffee shop counter. The candle sits between you.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-He's been across from you before, at the coffee shop, at the table with the knees almost touching. This is different. This is on purpose. The wine list is in front of you and you haven't looked at it, and somewhere behind the ribs something is doing something you haven't approved.
+The wine list is in your hands. You haven't looked at it. His forearms are on the table, close enough that you can see the grain of his watch strap.
 {% elif w.getSkill("FEMININITY") < 50 %}
-The menu is in your hands and you're reading it and you're also aware of the candle, and his forearms on the table, and the way he's looking at you when he thinks you're looking at the menu. You're not entirely looking at the menu.
+The menu is in your hands. He's watching you read it when he thinks you're reading it. You're not entirely reading it.
 {% endif %}
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose     = "*On a date. Right.*"
+prose     = "The menu is in your hands. The candle is lit. Jake is across the table."
 
 # ── Player Actions ─────────────────────────────────────────────────────
 
@@ -35,19 +35,19 @@ prose  = """
 He orders the wine with the ease of someone who made the decision before you arrived, which should be presumptuous and somehow isn't. A glass appears in front of you. He asks about your week — a real question, not a polite one, and he waits for the actual answer.
 
 {% if w.hasTrait("SHY") %}
-The silence between his questions isn't awkward with Jake. It's just space. You find yourself using it — a beat, a breath, the time to say the actual thing instead of the first thing. He waits. Nobody does that.
+The silence between his questions isn't awkward. It's just space. You use it — a beat, a breath, the time to say the actual thing instead of the first thing. He waits without filling it.
 
-By the second glass you've told him about the project, the thing that went sideways, the fix that took three days and went nowhere because the problem turned out to be a person problem. He listens. He doesn't offer solutions. By the time the food arrives you've said more than you meant to, and it doesn't feel like a problem.
+By the second glass you've told him about the project, the thing that went sideways, the fix that took three days because the problem turned out to be a person problem. He listens without offering solutions. By the time the food arrives you've said more than you planned to, and the evening is still going.
 {% elif w.hasTrait("ANALYTICAL") %}
-He's reading the menu and asking about your work and doing three things at once in the way of someone comfortable with their own attention. You're cataloguing: the angle of his jaw in the candlelight, how he holds his glass, the specific way he laughs — short, real, surprised by it. You can see all of this clearly. What you didn't expect is to start caring about the answer to the question he just asked.
+He reads the menu and asks about your work and does three things at once in the way of someone comfortable with his own attention. You catalog: the angle of his jaw in the candlelight, the specific way he laughs — short, real, caught off guard by it. Then he asks you a follow-up question that's actually about the thing, and the counting stops.
 
-You answer it honestly. He asks a follow-up that's actually about the thing, and you're two courses in before you notice you stopped counting.
+Two courses in and you're still at it.
 {% elif w.hasTrait("ROMANTIC") %}
-The evening gathers itself into something. He tells a story about a trip, something that went wrong and then right, and he tells it like someone who knows how stories work — not performing it, just remembering it in the right order. You're watching his hands while he talks, the way they move when something was the wrong kind of funny.
+He tells a story about a trip — something that went wrong and then right — and tells it the way people tell things they actually remember, not the version cleaned up for strangers. You're watching his hands while he talks.
 
-*Origin story*, some part of you thinks, and then you put that away.
+He asks a question. You answer it. The candle burns lower.
 {% else %}
-He does most of the talking at first — not dominating, just comfortable with it, finding the shape of an evening. He asks about your week, your neighborhood, how you ended up in this part of the city. Good questions, but not interrogation. By the time the food arrives you've both talked roughly equally and you're not sure when the ratio changed.
+He does most of the talking at first — not dominating, just comfortable with it, finding the shape of an evening. He asks about your week, your neighborhood, how you ended up in this part of the city. Good questions, not interrogation. By the time the food arrives you've both talked roughly equally and neither of you negotiated for it.
 {% endif %}
 """
 
@@ -100,7 +100,7 @@ The question opens something. He talks about it the way people talk about the th
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 35 %}
-At some point he leans in to explain a thing, elbows on the table, and his face is close enough that you can hear him over the restaurant noise. You stay still. Your hand, on the table, is about four inches from his.
+At some point he leans in to explain a thing, elbows on the table, close enough that you can hear him over the restaurant noise. Your hand is on the table. His is about four inches away.
 {% endif %}
 """
 
@@ -150,7 +150,7 @@ You let the silence run. That's the move. He knows it's the move. You both know 
 
 You smile. You don't explain the smile.
 {% elif w.hasTrait("ANALYTICAL") %}
-You did it before you decided to. The analysis comes half a second after. His hand is warm under yours and the tendons along the back of it shift slightly and his face does the thing where the conversation he was having becomes completely secondary to the conversation happening right now.
+His hand is warm under yours and the tendons along the back of it shift slightly when his face changes — the conversation he was having becoming completely secondary to the one happening right now.
 
 You don't move your hand. The data is interesting.
 {% else %}
@@ -160,7 +160,7 @@ The dinner continues. It's a different dinner now.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 35 %}
-Your heartbeat is audible to no one but you, and you're aware of it anyway.
+Your pulse is up. The candle does nothing about it.
 {% endif %}
 """
 
@@ -195,21 +195,21 @@ label  = "Make an excuse. Call it a night."
 detail = "Not tonight. That's all. Just not tonight."
 prose  = """
 {% if w.hasTrait("SHY") %}
-The menu, the candle, the small table — it's all fine, except you've been here forty minutes and something keeps tightening between your shoulder blades. Not fear. Nothing that dramatic. Just the feeling of being looked at in a way that requires a response you don't have sorted out.
+The menu, the candle, the small table — you've been here forty minutes and something keeps tightening between your shoulder blades.
 
-You get your phone out. You glance at it in the way that means something came up. "I'm sorry — I have to — work thing." You can hear how thin it is. He can hear it too.
+You get your phone out. You glance at it in the way that means something came up. "I'm sorry — I have to — work thing." You can hear how thin it is. He can too.
 
-He doesn't make you explain it. That's worse than if he had.
+He doesn't make you explain it.
 
-"No worries," he says. Like it already doesn't matter. Like he's fine. You believe him, and that makes it harder.
+"No worries," he says. Like it already doesn't matter. Like he's fine.
 
-You leave a twenty on the table because you had the wine, and you get your jacket, and the door opens out into the cold, and the street takes you back.
+You leave a twenty on the table because you had the wine, and you get your jacket, and the door opens out into the cold.
 {% else %}
-The evening is fine. He's fine. None of this is bad. But there's a gear in it somewhere that won't catch, and you've been trying to find it for forty minutes and it hasn't given.
+The evening is fine. He's fine. None of this is bad. But there's a gear in it somewhere that won't catch.
 
-You tell him something came up — close enough to true that you don't feel terrible about it. He takes it clean: "Of course. Rain check." Not wounded. Not pointed. Just easy.
+You tell him something came up — close enough to true. He takes it clean: "Of course. Rain check." Not wounded. Not pointed. Just easy.
 
-You split the check and you get your coat and he holds the door and you step out into the cold and something in your chest unclenches and also, immediately, regrets it.
+You split the check and get your coat and he holds the door and you step out into the cold and the street opens up around you.
 
 The block is quiet. You could go back. You don't.
 {% endif %}

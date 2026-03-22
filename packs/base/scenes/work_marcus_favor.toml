@@ -5,21 +5,21 @@ description = "Marcus messages: can you look at this spec? Not a big ask. Just a
 
 [intro]
 prose = """
-The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
+The Slack notification lands at 2:07 PM: Marcus, with a link and a single line. "Hey — got 10 minutes to look at something?"
 
-The link goes to a twelve-page infrastructure spec. Thirty seconds of skimming the structure. Section headers, latency assumptions, a rollback plan on page nine, a dependency diagram that's going to need to be explained to at least four people. This is not a ten-minute ask.
+The link goes to a twelve-page infrastructure spec. Section headers, latency assumptions, a rollback plan on page nine, a dependency diagram that's going to need to be explained to at least four people. Not a ten-minute ask.
 
-You send back: "Sure — give me a bit." He doesn't reply. He assumed you'd just look at it.
+You send back: "Sure — give me a bit." He doesn't reply. He just expected you'd look.
 """
 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-The Slack notification lands at 2:07 PM: Marcus, with a link and a single line — "Hey — got 10 minutes to look at something?"
+The Slack notification lands at 2:07 PM: Marcus, with a link and a single line. "Hey — got 10 minutes to look at something?"
 
-Your chest does a small thing at the notification. Not the ask — the name. The spec is open before the reaction gets analyzed.
+The link is open before you've fully read it. Twelve pages. Infrastructure. The rollback plan is on page nine and is going to be a problem.
 
-Twelve pages. Infrastructure. The rollback plan is on page nine and is going to be a problem. You send back: "Sure — give me a bit." He doesn't reply. He just assumed you'd look.
+You send back: "Sure — give me a bit." He doesn't reply. He just expected you'd look.
 """
 
 # ── Actions ────────────────────────────────────────────────────────────────────
@@ -31,14 +31,14 @@ detail = "Forty minutes. Two structural concerns, one thing he got right that no
 prose  = """
 You spend forty minutes on it.
 
-Your comments are specific. The latency assumptions in section four don't account for the weekend load pattern — whoever wrote the benchmarks ran them on a Tuesday. The rollback plan assumes state recovery time that's optimistic by about forty percent under realistic failure conditions. And in section seven, there's an architectural choice that the rest of the team is going to dismiss on sight, and they'll be wrong to. You flag all three.
+The comments are specific. Latency assumptions in section four don't account for the weekend load pattern — whoever ran the benchmarks ran them on a Tuesday. The rollback plan assumes state recovery time that's optimistic by forty percent under realistic failure conditions. Section seven has an architectural choice the rest of the team will dismiss on sight and be wrong to. You flag all three.
 
-He responds the same day with three lines. Concedes on the latency section without argument — he knows. Concedes on the rollback timeline and adds a number to justify his original estimate that is, in fact, better than your number. Pushes back on the section seven note with a detail about how the data layer is actually structured, which changes your read of it.
+He responds the same day. Three lines. Concedes on the latency section without argument — he already knew. Concedes on the rollback timeline, then adds a number that's actually better than yours. Pushes back on section seven with a detail about how the data layer is structured that changes your read of it.
 
-Four messages total. You come out of it with an updated position on two out of three points, which is what a useful technical conversation produces. You close the thread and get back to what you were doing.
+Four messages. You come out with updated positions on two of three points. The thread closes. You get back to what you were doing.
 
 {% if w.getSkill("FEMININITY") < 35 %}
-Four messages. Two updated positions. The thread is closed and the spec is better for having been read by both of you. Something about the exchange sits warm under your sternum — a frequency you don't have a word for yet.
+Four messages. Two updated positions. The spec is better and the thread is closed and you sit with that for a second before you open the next tab.
 {% endif %}
 """
 
@@ -64,12 +64,12 @@ id     = "quick_pass"
 label  = "Skim it, leave two comments"
 detail = "Twenty minutes. Efficient."
 prose  = """
-You skim the spec in twenty minutes, surfacing two high-level comments — the kind that signal you read it without proving how carefully. One on the latency section, one on the rollback assumptions. Both defensible. Neither goes deep enough to catch the section seven thing, which you clock and don't flag.
+Twenty minutes. Two comments — one on the latency section, one on the rollback assumptions. High-level, defensible. The section seven thing is visible from where you're standing. You don't flag it.
 
 He messages back: "Thanks." Professional. Enough.
 
 {% if w.getSkill("FEMININITY") < 35 %}
-You scroll back to your own work. The section seven thing is still there, unflagged. Your fingers hover over the keyboard for a second — then keep scrolling.
+You scroll back to your own work. The section seven problem sits in the back of your screen for the rest of the afternoon, unflagged.
 {% endif %}
 """
 
@@ -95,7 +95,7 @@ You send back: "Buried this week — can you give it to Priya? She'd have better
 
 He responds: "Fair."
 
-That's the whole exchange. No friction, no hedge, no follow-up. You close the notification and get back to what you were doing.
+That's it. No friction, no follow-up. You close the notification.
 """
 
   [[actions.effects]]

@@ -22,9 +22,9 @@ Every touch lands louder than it should. The brush of his sleeve, the half-secon
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-He guides you through a tighter part of the crowd with his hand at the small of your back — flat, warm, three full seconds. Your brain stops. Just stops. A blank, clean pause. Then you're back and you're leaning slightly into him and his arm has come around and you didn't make that happen, it just happened.
+He guides you through a tighter part of the crowd with his hand at the small of your back — flat, warm, three full seconds. You're leaning slightly into him when the crowd opens up again and his arm has come around your shoulders.
 {% elif w.getSkill("FEMININITY") >= 30 and w.getSkill("FEMININITY") < 50 %}
-His hand finds the small of your back in the crowd. The warmth of it settles there and stays. Your breath catches. A low, waiting tightness below your ribs.
+His hand finds the small of your back in the crowd. The warmth of it settles there and stays. Your breath goes out slow.
 {% endif %}
 
 At the fruit stall, he picks up a peach and hands it to you. "Try this."
@@ -41,7 +41,7 @@ He reaches over and wipes the drop of juice from your chin with his thumb. His t
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose     = "*Invited. You did that.*"
+prose     = "Jake's thumb is still resting against the inside of your wrist."
 
 # ── Player Actions ─────────────────────────────────────────────────────
 
@@ -118,17 +118,17 @@ The kiss is careful. Patient. His other hand comes to your waist, light, steadyi
 {% if w.hasTrait("SHY") %}
 Your throat is too tight for more than a nod. He accepts that without comment and his thumb moves once against your side, then stills.
 {% elif w.hasTrait("ROMANTIC") %}
-"Yeah," you say. And then, because it's true and you can't not: "Yeah."
+"Yeah," you say.
 
-He smiles, slow. The afternoon is still there. It has more of itself now.
+He smiles, slow. The afternoon is still there.
 {% elif w.hasTrait("ANALYTICAL") %}
-You ran the scenario. He went through with it. You logged how it felt — the careful pressure, the patience in it, the hand at your waist. What you didn't log was how long you'd stand here before saying anything. A long time, it turns out.
+The careful pressure of it, the patience in it, the hand at your waist. You track all of it. Then you're still standing here and not saying anything, and the market keeps going around you.
 
 "Yeah," you manage.
 {% else %}
-"Yeah," you say. Your voice comes out steadier than the rest of you.
+"Yeah," you say. Your voice comes out steadier than you expected.
 
-He's still close. The city keeps going around you like it doesn't know.
+He's still close. The city keeps going around you.
 {% endif %}
 """
 
@@ -175,13 +175,13 @@ He watches you for a second. His mouth closes. His eyes hold yours for a beat, t
 He puts his hands back in his pockets. The walk back to the subway is quieter, but it's not a bad quiet. He doesn't make anything out of it. He says goodbye on the corner the same way he says everything — easy, no performance — and you walk your separate ways.
 
 {% if w.hasTrait("ROMANTIC") %}
-The afternoon has a shape you can still feel when you get home. Something unfinished. You're not sure if that's good or bad. You sit with it anyway.
+The afternoon is still there when you get home. The market noise, the light, his thumb on your chin. You sit with all of it.
 {% elif w.hasTrait("ANALYTICAL") %}
-You replay it on the train. His thumb on your chin. The two feet of charged air between you. The variables are all still in play. You put your headphones in and let the question sit.
+On the train, his thumb on your chin. The foot of charged air between you. You put your headphones in.
 {% elif w.hasTrait("SHY") %}
-You're relieved and you're not, in equal amounts. The tension is still there. You just took it home with you instead of resolving it, and you're not entirely sure that was wrong.
+He says goodbye on the corner the way he says everything — easy, no performance. The tension came home with you instead of resolving, and you're not entirely sure that was wrong.
 {% else %}
-You're almost to your building before you figure out what the feeling is. Not regret. Just — left open. A sentence that didn't finish.
+You're almost to your building before you place the feeling. Not regret. Just — left open.
 
 Maybe next time.
 {% endif %}
