@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Latest session (2026-03-22, fourth pass — consequences sprint + 4 new scenes):** Added 4 new scenes: `marcus_apartment` (explicit — Marcus's second encounter, his apartment, deliberate not impulsive, full sexual response trait integration, AMBITIOUS/ANALYTICAL/SUBMISSIVE/PRAISE_KINK branching, "leave" action sets MARCUS_REJECTED flag for genuine consequence), `campus_theo_morning` (Camila wakes up in Theo's bed — HOMOPHOBIC/SEXIST register, three structurally different paths: stay/slip out/wake him, the morning-after that makes the night real), `gym_changing_room` (Robin in a women's locker room — NOT sexual, transformation body-awareness, OBJECTIFYING trait produces the strongest branching, NPC actions from other women, three vulnerability levels: stall/change/shower), `jake_stays_over` (Jake at Robin's apartment overnight — domesticity, his shoes by the door, the morning routine from the other side, ANALYTICAL/SHY/ROMANTIC/AMBITIOUS branching). Enhanced `morning_routine` with post-sexual-awakening intro texture (mirror after you've been with a man, underwear drawer decisions, Jake text, Marcus office awareness). Enhanced `evening_home` with 2 new intro_variants (post-Marcus evening, post-any-partner evening) + 2 new actions ("text Jake" with SHY/FLIRTY/ANALYTICAL branches, "run a bath" with FEMININITY-tiered body awareness). Added 4 schedule entries. Writing-reviewed all 4 new scenes, fixed Important findings (narrator thematic lines, "the way" overuse, NPC surgery specificity, "its own kind of X" tic). **59 scenes total. All tests passing. validate-pack clean.**
+**Latest session (2026-03-22, fourth pass — consequences sprint, 7 new scenes):** Two batches. Batch 1 (4 scenes): `marcus_apartment` (explicit — Marcus's second encounter, deliberate, full sexual response traits, MARCUS_REJECTED flag for "leave"), `campus_theo_morning` (Camila wakes in Theo's bed — HOMOPHOBIC morning-after), `gym_changing_room` (Robin in women's locker room — OBJECTIFYING branching strongest), `jake_stays_over` (domesticity — Jake's morning routine in Robin's apartment). Enhanced `morning_routine` and `evening_home` with post-sexual texture (mirror after sex, underwear decisions, Jake text, bath scene, Marcus office awareness). Batch 2 (3 scenes): `marcus_monday_rejected` (consequence — Marcus's professional distance after Robin left his apartment), `bad_date` (Ryan from the app — three exit strategies, OBJECTIFYING reads the script he's running), `campus_dining_after_theo` (Camila sees Theo in public — HOMOPHOBIC visibility of desire). Writing-reviewed batch 1, fixed Important findings. **62 scenes total. All tests passing. validate-pack clean.**
 
 **Previous session (2026-03-22, third pass — adult content sprint + Camila playtest):** Deepened all 4 existing explicit scenes (jake_apartment, bar_stranger_night, work_marcus_closet, party_stranger_after) with Robin's 18 sexual response traits — HAIR_TRIGGER, NIPPLE_GETTER, SENSITIVE_NECK, EASILY_WET, SUBMISSIVE, PRAISE_KINK, MULTI_ORGASMIC, HEAVY_SQUIRTER, and 10 physical detail traits. Each trait produces structural physical changes (different pacing, different events), not adjective swaps. Deepened jake_morning_after "wake him up" action into explicit morning sex (sleepier, bodies that know each other, full trait integration). Created campus_theo_night — Camila's first sexual encounter with Theo, using HOMOPHOBIC (desire-before-shame) and SEXIST (male-gaze inversion) to produce a scene Robin couldn't have. Added MET_THEO flag to campus_library and schedule entry for campus_theo_night. Playtested Camila flow — playtester confirmed discovery beats strong (Beat 1 Scale + Beat 5 HOMOPHOBIC strongest), campus arc well-constructed, dining hall backpack moment "most emotionally potent thing in the arc", Theo night "genuinely hot." Fixed 2 bugs: (1) campus_orientation NPC action had `goto = "engage"` (action ID, not scene ID) → `finish = true`; (2) CRITICAL: "Begin Your Story" crashed the game — `phase.set(AppPhase::InGame)` inside `on_click_stop` caused floem reactive panic. Fixed by deferring with `exec_after(Duration::ZERO)` in 3 locations (char_creation begin, error surface, landing page load). **446 tests passing, 55 scenes, validate-pack clean.**
 
@@ -38,7 +38,7 @@
 
 **Branch:** `master`
 **Verification (2026-03-12):** `cargo test -p undone-scene -p undone-ui -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo test --test validate_pack_simulation -- --nocapture`, and `cargo run --bin validate-pack` all passed on `master`. Fresh runtime launch against `target\debug\undone.exe --dev --quick` also passed and rendered the live workplace opening. `validate-pack` still reports only non-blocking pre-existing warnings in `campus_library`, `neighborhood_bar`, `shopping_mall`, and `work_marcus_drinks`, plus reachability warnings for exact-liking Marcus/Jake gates.
-**Scenes:** 59 total (47 Robin scenes + 4 new [marcus_apartment, gym_changing_room, jake_stays_over, campus_theo_morning] + 7 campus scenes + 1 campus_theo_night, all in DM voice, 2026-03-22).
+**Scenes:** 62 total (47 Robin + 7 campus + 1 campus_theo_night + 7 new scenes [marcus_apartment, gym_changing_room, jake_stays_over, campus_theo_morning, marcus_monday_rejected, bad_date, campus_dining_after_theo], all in DM voice, 2026-03-22).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -77,16 +77,14 @@ it transitions to InGame without crashing.
   when gated flags are set.
 
 ### 3. Content expansion — next priorities
-- **Marcus rejection consequences** — MARCUS_REJECTED flag is set but nothing
-  reads it yet. Marcus's behavior should change if she left his apartment.
-- **Post-Theo campus life** — Camila after sleeping with Theo. The dining hall
-  when you see him. Study sessions with new subtext. Phone call home after
-  sleeping with a man (HOMOPHOBIC register).
-- **Jake relationship deepening** — text message scene has more to give. A
-  fight. A disagreement. The first time something goes wrong.
-- **A bad date scene** — not every encounter should be pleasant. Someone who
-  reads Robin wrong. The experience of being a woman on a bad date.
-- **plan_your_day consequences** — still has weak-consequence choices.
+- **Post-Theo campus life** — study sessions with new subtext, phone call
+  home after sleeping with a man (HOMOPHOBIC register)
+- **Jake relationship deepening** — a fight, a disagreement, the first time
+  something goes wrong
+- **Marcus continued arc** — after MARCUS_APARTMENT, what's the relationship?
+  Regular thing? Office complication? After MARCUS_TALKED, does respect evolve?
+- **plan_your_day consequences** — still has weak-consequence choices
+- **Stranger re-encounters** — the bar stranger again, the party stranger again
 
 ### 4. Tech debt
 - See `memory/project_tech_debt_audit.md`
@@ -97,12 +95,14 @@ it transitions to InGame without crashing.
   different physical anchors
 
 ### Completed this session (consequences sprint):
-- 4 new scenes written (marcus_apartment, campus_theo_morning, gym_changing_room, jake_stays_over)
+- 7 new scenes written in 2 batches:
+  - Batch 1: marcus_apartment, campus_theo_morning, gym_changing_room, jake_stays_over
+  - Batch 2: marcus_monday_rejected, bad_date, campus_dining_after_theo
 - morning_routine enhanced with post-sexual intro texture
 - evening_home enhanced with 2 new intro_variants + 2 new actions (text_jake, take_a_bath)
-- 4 schedule entries added
-- Writing-reviewed and fixed Important findings across all 4 new scenes
-- 59 scenes total, validate-pack clean
+- 7 schedule entries added (fixed duplicate campus_theo_morning entry)
+- Writing-reviewed batch 1, fixed Important findings
+- 62 scenes total, validate-pack clean
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
