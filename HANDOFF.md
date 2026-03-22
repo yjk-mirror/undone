@@ -50,35 +50,73 @@
 
 ## ⚡ Next Action
 
-**Playtest the full Robin flow, then campus scenes.**
+**Port dev IPC tools to undone-tools, then playtest.**
 
-### 1. Playtest
-Launch the game, play through Robin's preset from character creation through the
-opening arc. Screenshot every screen. Verify discovery beats render, prose reads well,
-trait branches fire correctly, memory flags carry forward.
+### 1. Port game-input dev IPC to undone-tools (BLOCKING)
 
-### 2. Campus scenes (optional)
-6 Camila scenes remain unrewritten — deprioritized per creative direction (CisMale→Woman
-only). Can rewrite in a future session if needed.
+The `tools/` directory was moved to `../undone-tools/` but the move was incomplete.
+The new `undone-tools/game-input-mcp` only has 4 basic tools (press_key, click,
+scroll, hover). The full dev IPC suite (18 tools) needed by the playtester agent
+is missing. The old source is in git history.
 
-### 3. Voice samples for DeepSeek (may no longer be needed)
-The rewritten scenes may themselves serve as calibration for the DeepSeek pipeline.
-The 47 scenes now define the voice more thoroughly than standalone samples would.
+**Task:** Port all dev IPC tools from the old `tools/game-input-mcp/` to
+`../undone-tools/game-input-mcp/`. Source files to port:
+- `dev_client.rs` — IPC client (named pipe to `undone --dev`)
+- `server.rs` — the full tool implementations (start_game, get_runtime_state,
+  choose_action, continue_scene, jump_to_scene, list_scenes, get_scene_info,
+  save_game, load_save, list_saves, set_tab, set_game_stat, set_game_flag,
+  remove_game_flag, advance_time, set_npc_liking, set_all_npc_liking,
+  set_window_size, dev_command)
+- `ui_audit.rs` — runtime audit helpers
+- `bin/ui-dead-space-smoke.rs` — Windows smoke test binary
+- `lib.rs` — public exports for the above
+
+Also missing from undone-tools: `rust-mcp/` (rust-analyzer MCP server).
+
+**How to get the old source:** `git show HEAD:tools/game-input-mcp/src/dev_client.rs`
+etc. — the files are in git HEAD since the deletions are unstaged.
+
+**After porting:** rebuild (`cd ../undone-tools && cargo build --release`), update
+`.mcp.json` in the game repo to point to `../undone-tools/target/release/`.
+
+**Focus-steal fix:** While porting `start_game`, modify the process launch to avoid
+stealing focus from the user's active window. The current implementation uses basic
+`Command::new("cargo")` which causes the new window to grab foreground. Options:
+- Use Windows `STARTUPINFO` with `SW_SHOWNOACTIVATE` via `windows-sys` crate
+- Launch via PowerShell `Start-Process` with `-WindowStyle Normal` (no force-front)
+- Or: launch the release binary directly instead of `cargo run` (avoids build console)
+
+### 2. Update .mcp.json
+Point all server paths to `../undone-tools/target/release/`. Currently points to
+deleted `tools/target/release/`. Add `rust-mcp` if ported.
+
+### 3. Commit the tools/ deletion
+Once undone-tools is fully functional, stage and commit the `tools/` deletion
+from the game repo working tree. Clean up the 47 unstaged deletions.
+
+### 4. Playtest Robin flow
+Launch the playtester agent (IN BACKGROUND — `run_in_background: true` ALWAYS).
+Play through Robin's complete opening: creation → plane → discovery beats →
+arrival → opening arc. Screenshot every screen.
+
+### 5. Campus scenes (optional)
+6 Camila scenes remain. Deprioritized.
 
 ### Completed this session (2026-03-22):
-- ~~Discovery prose~~ — 5 beats written in `01-robin.toml`
-- ~~Voice rewrite~~ — 47 Robin scenes rewritten across 6 commits
-- ~~Adult scenes~~ — jake_apartment, work_marcus_closet, bar_stranger_night all explicit
-- ~~Inner voice rule~~ — hardened to "no inner voice at all," overrides prior rule
-- Voice rule feedback saved to memory (`feedback_no_inner_voice.md`)
+- 5 discovery beats written for Robin preset
+- 47 Robin scenes rewritten in DM narrator voice (6 commits)
+- 3 explicit adult scenes written direct (jake_apartment, marcus_closet, stranger_night)
+- Inner voice rule hardened: no inner voice at all (overrides prior rule)
+- MCP tools rebuilt in `../undone-tools/` (4 of 5 servers, basic tools only)
+- Voice rule feedback + focus-steal feedback saved to memory
 
 ### Remaining gaps:
-1. ~~**Discovery prose**~~ — DONE (5 beats)
-2. ~~**Scene prose**~~ — DONE (47 scenes rewritten)
-3. ~~**Adult scenes**~~ — DONE (3 explicit scenes)
-4. **Campus scenes** — 6 remaining (Camila, deprioritized)
-5. **Tech debt** — see `memory/project_tech_debt_audit.md`
-6. **tools/ directory** — deleted from working tree, moved to `../undone-tools/`. Git shows unstaged deletions. Needs cleanup (either commit the deletion or restore).
+1. ~~**Discovery prose**~~ — DONE
+2. ~~**Scene prose**~~ — DONE (47 scenes)
+3. ~~**Adult scenes**~~ — DONE (3 explicit)
+4. **Dev IPC tools** — port to undone-tools (BLOCKING for playtesting)
+5. **Campus scenes** — 6 remaining (Camila, deprioritized)
+6. **Tech debt** — see `memory/project_tech_debt_audit.md`
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
