@@ -2,7 +2,9 @@
 
 ## Current State
 
-**Latest session (2026-03-22, prolific writing sprint):** Complete voice rewrite of all 47 Robin scenes + 5 discovery beats. Voice rules hardened mid-session: NO inner voice at all (overrides prior "fragments OK" rule), player speech only after player choice, DM describes world+body only. Read Newlife source material (15+ scenes) to calibrate register: Newlife's directness + Undone's physical specificity + BG3 narrator warmth. Orchestrated 18 parallel scene-writer agents across 6 phases. Every `[[thoughts]]` block converted from italic inner voice to physical DM observation. Every banned pattern stripped. **446 tests passing at every commit.** Explicit scenes (jake_apartment, work_marcus_closet, bar_stranger_night) written direct, not euphemized. Opening arc has full memory integration (7 flag stacks read back across scenes). **Next: playtest the full Robin flow visually, then campus scenes if desired.**
+**Latest session (2026-03-22, second pass — tools, playtest, campus):** Restored tools/ from git, rebuilt all 5 MCP servers. Fixed start_game focus-steal: now launches pre-built binary directly with DETACHED_PROCESS+CREATE_NEW_PROCESS_GROUP flags instead of cargo run. Built game release binary. Playtested Robin opening flow (workplace_arrival through week 1) — playtester confirmed: discovery beats are "the best writing in the game", explicit scenes land, DM voice is consistent, ID checkpoint is best choice design. Fixed `style = "inner_voice"` → `"observation"` across all 29 non-archive scenes. Wrote Camila's 5 discovery beats (Scale→Body→Face→Name→Sexual, trait-branched: CONFIDENT/AMBITIOUS/OUTGOING/SEXIST/HOMOPHOBIC). Rewrote all 7 campus scenes in DM narrator voice (parallel scene-writer agents). **446 tests passing. validate-pack clean.**
+
+**Previous session (2026-03-22, prolific writing sprint):** Complete voice rewrite of all 47 Robin scenes + 5 Robin discovery beats. Voice rules hardened: NO inner voice at all. 18 parallel scene-writer agents across 6 phases. Explicit scenes written direct. Opening arc has full memory integration (7 flag stacks).
 
 **Previous session (2026-03-19, full session):** Infrastructure audit → Track B (presets as TOML) → Track C (simulator cadence verified) → FemCreation discovery scaffolding → skill/doc updates. **446 tests passing.** Presets now TOML data files loaded by undone-packs. Discovery beats render minijinja prose through throwaway World. scene-writer/writing-reviewer agents updated for pipeline v2.
 
@@ -32,7 +34,7 @@
 
 **Branch:** `master`
 **Verification (2026-03-12):** `cargo test -p undone-scene -p undone-ui -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo test --test validate_pack_simulation -- --nocapture`, and `cargo run --bin validate-pack` all passed on `master`. Fresh runtime launch against `target\debug\undone.exe --dev --quick` also passed and rendered the live workplace opening. `validate-pack` still reports only non-blocking pre-existing warnings in `campus_library`, `neighborhood_bar`, `shopping_mall`, and `work_marcus_drinks`, plus reachability warnings for exact-liking Marcus/Jake gates.
-**Scenes:** 54 total (47 Robin scenes rewritten 2026-03-22, 6 campus untouched, 1 morning_routine pre-existing).
+**Scenes:** 54 total (47 Robin scenes + 7 campus scenes all rewritten in DM voice, 2026-03-22).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -50,54 +52,35 @@
 
 ## ⚡ Next Action
 
-**Restore tools, fix focus-steal, then playtest.**
+**All scenes rewritten. Playtest Camila flow, then expand content.**
 
-### 1. Restore tools/ directory (BLOCKING)
+### 1. Playtest Camila flow
+Launch `--quick` with Camila preset (need a `--quick camila` flag or manual
+preset selection). Play through discovery beats → campus_arrival → campus arc.
+Verify DM voice, trait branching, arc progression.
 
-The `tools/` directory was deleted from the working tree but is fully intact in
-git HEAD (unstaged deletions). The sibling `../undone-tools/` was a partial move
-attempt — user decided to keep everything in one repo.
+### 2. Content expansion options
+- **More Robin adult scenes** — playtester noted HAIR_TRIGGER/NIPPLE_GETTER
+  traits are underutilized in explicit scenes. Jake apartment and bar stranger
+  could lean harder into Robin's specific trait stack.
+- **Daily life consequence chains** — playtester noted plan_your_day, evening_home,
+  morning_routine have weak-consequence choices. Actions should build toward
+  meaningful downstream states.
+- **Week 2+ content** — more scenes for the settled state after opening arc.
 
-**Task:** `git checkout -- tools/` to restore, then `cd tools && cargo build --release`.
-The `.mcp.json` already points to `tools/target/release/` so no config changes needed.
+### 3. Tech debt
+- See `memory/project_tech_debt_audit.md`
+- Transient layout regression (screenshot at 35% width) — needs investigation
 
-**Focus-steal fix:** While rebuilding, modify `tools/game-input-mcp/src/server.rs`
-`start_game` to avoid stealing focus. The game window (floem/winit) grabs foreground
-on creation — this is OS-level default behavior, not explicit code. Options:
-- Launch the release binary directly (`target/release/undone.exe`) instead of
-  `cargo run` — avoids the build console window entirely
-- Use Windows creation flags (`CREATE_NEW_PROCESS_GROUP`) or PowerShell
-  `Start-Process` wrapper to prevent foreground grab
-- Or: after spawning, use WinAPI to re-focus the caller's terminal
-
-### 2. Playtest Robin flow
-Launch the playtester agent (**ALWAYS `run_in_background: true`**). Play through
-Robin's complete opening: creation → plane → discovery beats → arrival → opening arc.
-Screenshot every screen.
-
-### 4. Playtest Robin flow
-Launch the playtester agent (IN BACKGROUND — `run_in_background: true` ALWAYS).
-Play through Robin's complete opening: creation → plane → discovery beats →
-arrival → opening arc. Screenshot every screen.
-
-### 5. Campus scenes (optional)
-6 Camila scenes remain. Deprioritized.
-
-### Completed this session (2026-03-22):
-- 5 discovery beats written for Robin preset
-- 47 Robin scenes rewritten in DM narrator voice (6 commits)
-- 3 explicit adult scenes written direct (jake_apartment, marcus_closet, stranger_night)
-- Inner voice rule hardened: no inner voice at all (overrides prior rule)
-- MCP tools rebuilt in `../undone-tools/` (4 of 5 servers, basic tools only)
-- Voice rule feedback + focus-steal feedback saved to memory
-
-### Remaining gaps:
-1. ~~**Discovery prose**~~ — DONE
-2. ~~**Scene prose**~~ — DONE (47 scenes)
-3. ~~**Adult scenes**~~ — DONE (3 explicit)
-4. **Restore tools/** — `git checkout -- tools/`, rebuild, fix focus-steal (BLOCKING for playtesting)
-5. **Campus scenes** — 6 remaining (Camila, deprioritized)
-6. **Tech debt** — see `memory/project_tech_debt_audit.md`
+### Completed this session:
+- tools/ restored, all 5 MCP servers rebuilt
+- start_game focus-steal fixed (binary launch + Windows creation flags)
+- Game release binary built, 446 tests passing
+- Robin opening flow playtested — strong report, no critical bugs
+- `style = "inner_voice"` → `"observation"` across all 29 active scenes
+- Camila's 5 discovery beats written
+- All 7 campus scenes rewritten in DM narrator voice
+- Stale screenshots cleaned, .serena/ added to .gitignore
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
