@@ -25,13 +25,13 @@ The room is yours, but he's in it now. He's waiting.
 
 [[thoughts]]
 condition = "w.hasTrait('ANALYTICAL')"
-style     = "inner_voice"
-prose     = "*He's waiting. You're waiting.*"
+style     = "observation"
+prose     = "Two empty glasses. His jacket still on the arm of the couch. The silence has a shape."
 
 [[thoughts]]
 condition = "w.hasTrait('SHY') && w.getSkill('FEMININITY') > 30"
-style     = "inner_voice"
-prose     = "*Three feet.*"
+style     = "observation"
+prose     = "Three feet of floor between your chair and the couch."
 
 # ── Actions ─────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ You straddle him. Your skirt rides up your thighs. His hands slide under your sh
 {% elif w.hasTrait("FLIRTY") %}
 You roll your hips against him, feel the hard ridge of his cock through his jeans. He laughs low and his hands go under your skirt. He stands with you around him and walks you backward into the hall while you work the buttons of his shirt.
 {% elif w.hasTrait("ANALYTICAL") %}
-You're noting: stubble, the heat through his shirt, the way your hips settle against his — and then his tongue is in your mouth and *okay* and the inventory closes. He stands with you around him and carries you down the hall. The wall against your back. His mouth on your neck. The noting is done.
+You're noting: stubble, the heat through his shirt, the way your hips settle against his — and then his tongue is in your mouth and the rest of the catalogue drops. He stands with you around him and carries you down the hall. The wall against your back. His mouth on your neck.
 {% elif w.hasTrait("SHY") %}
 You kiss him. His hands on your waist feel huge. He pulls you onto his lap and you go still for a moment, then don't. He does all the moving from there — standing, carrying you, setting you down on your bed. You watch him from the pillows while he strips his shirt off.
 {% else %}
@@ -60,7 +60,7 @@ He takes over once you're in his lap. Hands under your thighs, standing, walking
 He undresses you without ceremony. Shirt over your head, bra gone, skirt down to the floor. His jeans follow. His cock is hard, curved slightly to the left, a dark thatch at the base. He kneels between your legs.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-His fingers touch you and your hips arch before you've made any decision at all. You're wet — already, unexpectedly — and he can feel it, and that registers somewhere on your face. He pushes into you. The fullness hits your spine. Your hands fly to his shoulders. He's inside you and the room has narrowed to the place where that's happening.
+His fingers touch you and your hips arch. You're wet — already, completely — and he can feel it, and your face does something you can't stop. He pushes into you. The fullness hits your spine. Your hands fly to his shoulders. He's inside you and the room narrows to the place where that's happening.
 {% elif w.getSkill("FEMININITY") < 50 %}
 You're wet. He slides two fingers in and you moan. When he lines up his cock and pushes, the stretch is a different stretch than a known person's — less careful, less anticipated. His weight, his smell, the particular rhythm he finds — all of it new. You wrap your legs around him. He fucks you deep, each thrust landing exactly where it lands.
 {% else %}
@@ -123,7 +123,7 @@ You lean back and let him. When his mouth finds you, you let out a slow breath a
 {% elif w.hasTrait("FLIRTY") %}
 You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them. You come against his face with your thighs clamped around his ears.
 {% elif w.hasTrait("ANALYTICAL") %}
-*Living room floor. Your chair.* The observation lands and then his tongue finds a rhythm and the clarity burns off. No more observations. Just the wet pressure of his mouth and the tension building low, tightening, until you cry out and grip the arms of the chair.
+Living room floor. Your chair. That detail catches for half a second and then his tongue finds a rhythm and the clarity drops. The wet pressure of his mouth. The tension building low, tightening. You cry out and grip the arms of the chair.
 {% elif w.hasTrait("SHY") %}
 His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one. You come quietly, your legs shaking, and then he's standing up.
 {% else %}
@@ -196,7 +196,7 @@ He leans in and kisses your cheek. His stubble crosses your skin and then he's p
 {% elif w.hasTrait("ANALYTICAL") %}
 "Good night," he says.
 "Good night."
-He goes. You lock the door and stand in your living room. Two glasses. A dent in the cushion. The scent of his jacket still in the air. The evening got this far and then you stopped it. You stand in that fact for a moment.
+He goes. You lock the door and stand in your living room. Two glasses. A dent in the cushion. The faint trace of his jacket still in the air.
 {% elif w.hasTrait("SHY") %}
 He says good night and steps out. The door clicks shut. You stand with your hand on the lock for a long time. You're not sure what you're listening for. The hallway goes quiet.
 {% else %}

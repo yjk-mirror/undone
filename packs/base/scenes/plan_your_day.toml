@@ -8,7 +8,7 @@ prose = """
 {% if gd.timeSlot() == "Morning" %}
 The coffee is still hot. You've been sitting with it long enough that you had to check.
 
-Outside, someone is doing something loud with a recycling bin. The city is already going. You don't have anywhere to be for another hour, which used to feel like nothing and now feels like a decision waiting to get made.
+Outside, someone is doing something loud with a recycling bin. The city is already going. You don't have anywhere to be for another hour. The recycling bin is still going. The list is on your phone.
 
 The list is on your phone. It's not a long list.
 {% elif gd.timeSlot() == "Afternoon" %}
@@ -42,7 +42,7 @@ There's still time in the afternoon. Not a lot, but enough that standing here de
 {% elif gd.timeSlot() == "Evening" %}
 Two weeks in, you know how the apartment sounds at this hour: the HVAC cycling, the woman upstairs with the dog, traffic on the through-street. You know the light from the window goes orange and then gray. You know which drawer the takeout menus are in even though you've been ordering off your phone.
 
-The routine is stacking up faster than you expected. You're not sure when that started.
+The routine is stacking up. The light is already going orange.
 {% else %}
 Late. The productive part of the day is behind you.
 
@@ -76,7 +76,7 @@ The apartment is quiet. Not unsettlingly quiet — the ordinary quiet of a space
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-prose = "*You bought the same coffee two weeks running without looking at alternatives. At some point that became the brand you buy.*"
+prose = "Same coffee two weeks running. Same brand, same shelf. You didn't look at anything else either time."
 style = "inner_voice"
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ label     = "Work on something"
 detail    = "The laptop is right there."
 condition = "gd.hasGameFlag('STARTED_JOB')"
 prose = """
-You sit down with the laptop. The work is familiar in the way that work gets familiar: the same tabs, the same files, the specific problem that was the same problem yesterday and will probably still be the same problem tomorrow but is at least *your* problem to work on.
+You sit down with the laptop. The work is familiar in the way that work gets familiar: the same tabs, the same files, the specific problem that was the same problem yesterday and will probably still be the same problem tomorrow.
 
 An hour passes faster than expected. Something gets done — not everything, but something specific and completable, and you close the laptop when it's done with the window already gone dark and the city doing its evening thing outside.
 """
@@ -131,13 +131,9 @@ label  = "Stay in"
 detail = "Not every day needs to go anywhere."
 prose = """
 {% if w.hasTrait("AMBITIOUS") %}
-You think about the list for a moment — specifically, whether crossing nothing off it today is a strategic choice or a failure of follow-through. You decide it's a strategic choice. Rest is a resource. You've been running at full capacity for two weeks and the yield on additional effort at this particular hour is diminishing.
-
-You make tea and sit with it, which is probably what two weeks of running at full capacity earns you.
+The list sits on your phone. You put it down. Tea, couch, window — and for the first time in two weeks you're not moving toward anything or away from anything. The apartment does its quiet thing around you.
 {% elif w.hasTrait("ANALYTICAL") %}
-You run the numbers: three items on the list, two of which have no deadline before Friday, one of which is discretionary. Net cost of not doing them today: negligible. Net benefit of a low-stimulation evening: probably positive, given the last two weeks' stress load.
-
-You close the list, make tea anyway, and sit near the window with it.
+You close the list, make tea, and sit near the window with it. Three items, none of them due before Friday. The apartment is quiet. The afternoon light crosses the floor.
 {% else %}
 You don't go anywhere. The apartment is fine. You make tea or order food — one of those — and settle into the couch and let the afternoon do whatever it's going to do, which turns out to be nothing that requires your attention.
 {% endif %}

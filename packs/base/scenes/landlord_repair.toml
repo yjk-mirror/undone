@@ -15,9 +15,7 @@ He called yesterday. The faucet — you'd mentioned it in the hallway last week,
 The landlord is in your bathroom. Flannel shirt, reading glasses pushed up, a toolbox that looks older than the building. He's crouched under the sink with a wrench, and the sounds coming from behind the vanity are the sounds of a man who's done this enough times to have opinions about the plumbing.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You're standing in the hallway between the bathroom and the kitchen and you're aware of every dimension of the space. The apartment is small. It felt small when it was just you. With a man crouched under your sink, the square footage contracts further. You can smell the metal of his toolbox and something that might be aftershave, and the apartment that is your space is temporarily his workspace.
-
-The smell of the toolbox — metal, WD-40, something oily and specific. Your hands are the wrong size for that wrench and you know it without checking. The apartment that is your space is temporarily someone else's project.
+You're standing in the hallway between the bathroom and the kitchen. The apartment is small. It felt small when it was just you. With a man crouched under your sink, the square footage contracts further. You can smell the metal of his toolbox and something that might be aftershave. The wrench turns. The pipe groans.
 {% elif w.getSkill("FEMININITY") < 45 %}
 You're in the kitchen, close enough to hear the wrench and the muttering and the occasional clang that means the pipe joint is being difficult. The apartment feels occupied in a way it usually isn't. A man's toolbox on your bathroom floor. A man's voice from under your sink.
 {% else %}
@@ -40,7 +38,7 @@ You're standing in the hallway cataloging the spatial dynamics. A man in your ba
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 30"
 style     = "inner_voice"
-prose     = "*His building. Your faucet. Four inches of hallway.*"
+prose     = """His building. Your faucet. Your hip four inches from the door frame and no reason to move further back than that."""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -81,9 +79,7 @@ You watch. The repair takes ten minutes. He replaces the washer, tests the valve
 He picks up the toolbox. Pauses in the hallway. "Apartment's in good shape," he says. Not a compliment, exactly. More like an inventory note. "The last tenant — " He stops. Whatever the last tenant did, he decides you don't need to know.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-He fills the doorway on his way out. For a second — toolbox in one hand, reading glasses on his forehead — he's just a large man in the frame of a door that's yours. The space he takes up. The space you make for him to pass. The automatic half-step back, the angling of your shoulder. He doesn't notice. Why would he. He's done this a thousand times.
-
-The door closes. The apartment is yours again. The faucet is silent. You stand in the hallway for a moment where he stood and the space feels larger and smaller at the same time.
+He fills the doorway on his way out — toolbox in one hand, reading glasses on his forehead — and you angle your shoulder back to let him pass. He doesn't notice. The door clicks. The faucet, when you test it, is silent.
 {% else %}
 He lets himself out. The door clicks. The apartment settles. The faucet, when you test it, is silent.
 {% endif %}
@@ -119,7 +115,7 @@ You sit at the kitchen table. The coffee cools. Your phone is out but you're not
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-A man in your bathroom. Fixing your faucet. You're in the kitchen with two cups of coffee. The wrench sounds through the thin wall. The coffee is getting cold. You sit there and listen.
+A man in your bathroom. Wrench sounds through the thin wall. The coffee cools in both cups.
 {% endif %}
 
 He comes out ten minutes later. "Done," he says. You hand him the coffee. He takes it without comment, which is its own kind of thank you.
@@ -178,14 +174,12 @@ You hold it. He works. The silence between you is the silence of two people focu
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-His eyebrows lifted. The quick rise, the pause. The wrench stopped mid-turn. Then the nod — slow, reassessing. He went back to work.
+His eyebrows go up. The wrench stops mid-turn. Then the nod — slow, and he goes back to work.
 {% endif %}
 
 The repair takes five minutes with two people. He packs the toolbox. Runs the tap. Silent.
 
 "Well," he says. "That was efficient." He sounds almost disappointed — like he'd been looking forward to the full diagnostic. He lets himself out.
-
-The faucet is fixed. You did the thing you know how to do. It felt like something.
 """
 
   [[actions.effects]]

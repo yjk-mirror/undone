@@ -40,8 +40,8 @@ The card table is right there. So is the kitchen. So is the dancing.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
-prose     = "*Okay.* Forty people."
+style     = "observation"
+prose     = "Forty people. The nearest cluster is already moving."
 
 # ── Actions ─────────────────────────────────────────────────────────────
 
@@ -170,9 +170,9 @@ The balcony is barely a balcony — iron railing, two feet of concrete, the city
 Cold air. The sound of traffic. He leans on the railing with his drink.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You can read the whole setup from here: the door held, the space left beside the railing, the way he's not quite looking at you yet. You ran this play before. Not from this side, but you know the shape of it from the inside out.
+You can read the whole setup from here: the door held, the space left beside the railing, the way he's not quite looking at you yet. The shape of it is familiar enough to name.
 
-You stand at the railing anyway. The city looks good from up here and you aren't going anywhere yet.
+The railing is right there. The city looks good from up here.
 
 He asks your name. You give it. He gives his. A beat of city noise fills the gap after that and neither of you rushes to cover it.
 
@@ -199,7 +199,7 @@ You clock him noticing you before he approaches the door. You follow, which is a
 
 Out here he's more comfortable than he was inside — less crowd noise to navigate, just the two of you and the city. He asks where you're from. You say here now. He picks it up as an invitation to ask about the before and you let him ask.
 
-You learn more than he intended to tell in the first fifteen minutes. He's an open book dressed like a closed one. The particular warmth in your sternum when he laughs is information you file separately.
+You learn more than he intended to tell in the first fifteen minutes. He's an open book dressed like a closed one. When he laughs there's a warmth in your sternum that has nothing to do with the analysis.
 
 {% else %}
 He turns when you come through the door and looks mildly pleased, the way people do when a thing they were thinking about happens.
@@ -214,7 +214,7 @@ At some point your shoulders drop.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The cold is on your bare arms. He's standing close enough that you're aware of how much warmer he runs. When he turns to say something his voice drops naturally and you have to lean slightly to catch it. Your stomach tightens. You lean.
+The cold is on your bare arms. He's standing close enough that you're aware of how much warmer he runs. When he turns to say something his voice drops naturally and you have to lean in to catch it. Your stomach tightens.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The party is muffled behind the glass. Out here you can think. His attention is a fixed point and you leave it there for now.
 {% endif %}

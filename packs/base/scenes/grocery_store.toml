@@ -19,7 +19,7 @@ The basket handle sits differently in your hand — smaller grip, different angl
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*Produce section. The long way around. Didn't decide to.*"
+prose = "Produce section. The long way around the cart in the middle of the aisle, not through it. You didn't plan that route."
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ prose = """
 You move through the store efficiently — produce first, then the middle aisles, then dairy last to keep it cold. A man reaches across you at the pasta shelf with an "excuse me" that's more reflex than request. You shift slightly. He takes what he needed and moves on.
 
 {% if w.getSkill("FEMININITY") < 20 %}
-You moved before he asked. Read the angle of his reach, cleared the space. Still deliberate — your body waiting for your brain to sign off on each small adjustment.
+You moved before he asked. Read the angle of his reach, cleared the space. A half-beat before your feet moved, you were already mapping where to go.
 {% elif w.getSkill("FEMININITY") < 40 %}
 You moved before he asked. The angle of his reach, the space to clear — your body handled it without consulting you. Two months and counting.
 {% endif %}
@@ -84,7 +84,7 @@ You get the short lane — only two people ahead of you. The clerk has the pract
 "Have a good night," she says when you take your bags.
 
 {% if w.getSkill("FEMININITY") < 35 %}
-It's a phrase she says to everyone. Something in it lands anyway — the automatic warmth of a stranger being kind to you without thinking about it. You take your bags and the warmth stays for a few steps past the automatic doors.
+She says it to everyone. You take your bags and go. The automatic doors open and the night air is cold and two steps outside you're still hearing it.
 {% endif %}
 """
 

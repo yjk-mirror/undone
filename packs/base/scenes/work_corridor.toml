@@ -54,7 +54,7 @@ You keep walking at the same pace. They don't stop talking as you pass.
 {% if w.hasTrait("ANALYTICAL") %}
 You catch about twelve seconds of it. Enough to identify both speakers by voice, enough to place the conversation in context — this is the tail end of something that started elsewhere, the part where the conclusion is being stated rather than argued. The name they mention is someone two levels above you. You file it, not because it's immediately useful, but because information about how this place works doesn't stop being useful just because you can't use it yet.
 {% else %}
-You don't slow down. Whatever they're working out, they're working it out without you, which is most of how an office functions — a hundred conversations happening in parallel, most of them nothing to do with you, all of them the texture of a place that has its own life.
+You don't slow down. They're still talking when you round the corner. The corridor is empty on the other side.
 {% endif %}
 """
 

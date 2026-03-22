@@ -35,7 +35,7 @@ No one expects you anywhere. The water stain on the ceiling is shaped like a com
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
 style     = "inner_voice"
-prose     = "*Saturday.* The thought is enough. You lie there with it."
+prose     = "Saturday. No alarm. The ceiling. The radiator clicking. That's the whole situation and there's nowhere to be."
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -49,11 +49,11 @@ You stay.
 Not forever — maybe another twenty minutes, maybe forty. Time moves differently on a Saturday morning with no alarm and no agenda. You roll onto your side. The pillow adjusts. The city does its thing outside the window.
 
 {% if w.hasTrait("ROMANTIC") %}
-You pull the blanket up to your chin and lie there and the morning is a small, warm country with a population of one. Your phone is on the nightstand and it can wait. Everything can wait. This is the first morning that's felt like a morning instead of a problem to solve, and you're not going to solve it.
+You pull the blanket up to your chin and lie there. The phone is on the nightstand. The city is doing something slow and quiet outside. The pillow is right. You stay exactly where you are.
 {% elif w.hasTrait("ANALYTICAL") %}
-You make a list in your head. Groceries. Laundry. The thing with the shower curtain rings. The list takes shape and you let it sit there without acting on it, which is a specific kind of luxury you haven't practiced.
+You make a list in your head. Groceries. Laundry. The thing with the shower curtain rings. The list takes shape and you let it sit there without acting on it.
 
-The list is still there ten minutes later. You haven't moved. This is data.
+Ten minutes later the list is still there. You haven't moved.
 {% else %}
 You glance at the screen — no work emergencies, two texts from numbers you don't recognize that are probably spam, a weather notification you dismiss without reading. Then you set it back on the nightstand.
 
@@ -95,9 +95,7 @@ The shower takes thirty seconds to warm up. You stand just outside the spray and
 {% if w.getSkill("FEMININITY") < 25 %}
 The water hits your shoulders and runs down your back and your skin is — alive. That's the only word for it. Every drop registers. The heat opens something in your chest and your breath comes out in a sound you weren't planning on. Your hands move through your hair — longer than you expect, every time, heavier when it's wet — and the shampoo smells like the one you picked last week and the water is hot and for a minute you are just a body in hot water and nothing else is required of you.
 
-Your hands. On your own skin. Soap and water. Ribs. Hip. The curve of your waist that your hand follows without thinking about it.
-
-*Oh.* The water. The warmth. Nobody asking anything.
+Your hands. Soap and water. Ribs. Hip. The curve of your waist, your palm following it. The water is still hot.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The water is hot and you turn it hotter. The shampoo — the good one, the Saturday one — lathers in hair that's getting long enough to need a decision. You wash your hair and the process takes five minutes and you don't mind. The conditioner needs two minutes. You stand there and let the water hit your shoulders while you wait.
 

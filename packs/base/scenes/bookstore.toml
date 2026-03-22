@@ -17,9 +17,9 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you. That particular pleasure of browsing — no agenda, no transaction until you decide there is one.
+The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you. No agenda. No transaction until you decide there is one.
 
-Your hands find the shelf at a different height than they expect. You linger at a spine and then move on, and the lingering felt calibrated rather than natural. The clerk doesn't look up, which helps.
+Your hands find the shelf at a different height than they expect. You reach for a spine, pull back, move on. The clerk doesn't look up.
 
 {% if gd.hasGameFlag("BOOKSTORE_VISITED") %}
 The clerk glances up when the door opens. "Back again," he says, then goes back to whatever he was reading. It's not unfriendly. It's a fact.
@@ -29,7 +29,7 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
 style     = "inner_voice"
-prose     = """*Miss. The clerk said miss. Still lands like a coin flipping in midair.*"""
+prose     = """The clerk said miss. You're two shelves deeper into the store and still standing in the same spot."""
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ You find a biography in the back corner — a figure you've been meaning to read
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The clerk says "have a good day" without looking up from making change. You say it back. Outside with a book in a bag, the whole errand settles into something plain and satisfying.
+The clerk says "have a good day" without looking up from making change. You say it back. Outside, the bag in your hand, the cold coming back.
 {% endif %}
 """
 
@@ -124,7 +124,7 @@ The next ten minutes involve neither of you conceding the central point, both of
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The conversation went without either of you navigating around anything. Two people in a bookstore with opinions. Your voice pitched differently than the one in your head, and neither of you noticed.
+Two people in a bookstore with opinions about journalism. It went fine.
 {% endif %}
 """
 

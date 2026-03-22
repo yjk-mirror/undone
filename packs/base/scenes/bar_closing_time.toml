@@ -32,8 +32,8 @@ The cold hits you. His footsteps start behind you on the pavement.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 30"
-style     = "inner_voice"
-prose     = "*Two blocks.* The same sidewalk."
+style     = "observation"
+prose     = "Two blocks. His stride is already longer than yours."
 
 # ── Actions ─────────────────────────────────────────────────────────────
 
@@ -51,7 +51,7 @@ Your shoulders are tight the whole first block. You're listening for whether the
 {% elif w.hasTrait("CONFIDENT") %}
 You walk. He walks. At the corner of Fifth, he turns north. The sound drops off. You keep going. The night is cold and clear and the street belongs to you, which is fine.
 {% elif w.hasTrait("FLIRTY") %}
-You can feel him watching your back for half the block. You don't turn. At the corner, his footsteps peel away north. The street goes quiet. You walk the last block with your hands in your pockets, something like a draft where his attention used to be.
+You can feel him watching your back for half the block. You don't turn. At the corner, his footsteps peel away north. The street goes quiet. You walk the last block with your hands in your pockets, the cold sharper where his attention stopped.
 {% else %}
 You walk. At the corner of Fifth, he turns north. His footsteps go quiet. You're alone with the streetlights and the sound of a bus somewhere on Clement. The apartment door clicks shut behind you. The quiet inside is deeper than the quiet outside.
 {% endif %}
@@ -91,7 +91,7 @@ You walk together. Not in sync — parallel. The street is quiet enough that you
 {% if w.hasTrait("SHY") %}
 Your eyes stay on the sidewalk ahead. Your hands stay in your pockets. You answer when he asks — where you're headed, do you come here often — in the fewest words that won't be rude. The two blocks stretch. At your building, you stop. He stops. Something hangs in the cold air between you. You say goodnight. He says goodnight. You go inside. The door locks. You lean against it and listen to his footsteps walk away.
 {% elif w.hasTrait("FLIRTY") %}
-You match his stride. You ask him where he's going. He's on Union, just past your street. The conversation finds its level — the neighborhood, the bar, the city on a weeknight. At your door, you turn to face him. The streetlight catches the side of his face. You let the moment hold. Then you smile. "Good night." He says it back. You go inside and wait by the window until you see him walk away.
+You match his stride. You ask him where he's going. He's on Union, just past your street. The conversation finds its level — the neighborhood, the bar, the city on a weeknight. At your door, you turn to face him. The streetlight catches the side of his face. You let the moment hold. Then you smile. "Good night." He says it back. You go inside. The window's there if you want it.
 {% elif w.hasTrait("CONFIDENT") %}
 You ask about his night. He asks about yours. The conversation is easy, surface-level, two people both aware of the subtext and neither rushing it. At your building, you stop. "This is me." He nods. "Nice talking to you." "You too." You go in. He watches the door close. Whatever happened, happened cleanly.
 {% else %}
@@ -188,9 +188,9 @@ He says it back softly. Doesn't move to leave right away — just stands there a
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-Inside, you stand at the window. The street is empty. His footsteps have been gone for thirty seconds and you can still place where they were. That's new.
+Inside, the street is empty. His footsteps have been gone thirty seconds and you can still map where they were on the pavement.
 {% elif w.getSkill("FEMININITY") < 50 %}
-Inside, the apartment is quiet. You pour a glass of water. His voice dropping when he laughed. The stride that was longer than yours. The cold on your face when he turned the corner.
+Inside, the apartment is quiet. You pour a glass of water and drink it standing at the sink.
 {% endif %}
 """
 

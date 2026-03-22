@@ -16,7 +16,7 @@ The stairwell landing is one flight down. Concrete steps. Yellow wall paint. A w
 Neither of you does.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You know this shape from the inside out: the crowd, the balcony, the smaller space after, the point where private attention goes from possible to decided. You saw it forming before he held the door for you.
+The shape of it was visible from the balcony: the door held, the smaller space chosen, the attention narrowed down to one point. You clocked it before you followed him out.
 {% elif w.hasTrait("SHY") %}
 Your pulse is still carrying the room in it. Out here there is only him, the concrete smell of the stairwell, and the fact that you followed.
 {% elif w.hasTrait("FLIRTY") %}
@@ -34,8 +34,8 @@ Your skin still has the room on it: warmth, sweat at the back of your neck, the 
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
-prose     = "*You left the room with him.*"
+style     = "observation"
+prose     = "The door closed and the party went behind glass and he's still right there."
 
 [[actions]]
 id     = "go_with_him"
@@ -65,7 +65,7 @@ He kisses you again with one hand up under your top, thumb dragging over your ni
 {% if w.getSkill("FEMININITY") < 25 %}
 The body gets there before the mind does. His hand between your legs and you're wet enough that the fact of it shocks you for half a second, then doesn't matter because he's feeling it too and looking at your face when he realizes.
 {% elif w.getSkill("FEMININITY") < 50 %}
-His fingers find you through your underwear first, rougher than Jake, less composed than Marcus, carried by the afterburn of the party. You grab his shoulders to steady yourself and end up pulling him closer instead.
+His fingers find you through your underwear first, the touch harder than you expected, carried by the afterburn of the party. You grab his shoulders to steady yourself and end up pulling him closer instead.
 {% else %}
 Your body is already ahead of the room you left behind. The hallway, the locked doors, the chance that someone could come through and not quite soon enough to matter — it all sharpens everything.
 {% endif %}
@@ -77,9 +77,9 @@ When he pushes into you, it's fast and direct and half-drunken in the way that s
 {% if w.hasTrait("OBJECTIFYING") %}
 You know what you must look like against the wall — skirt pushed up, his hand on your thigh, his mouth open against your throat — and the knowledge goes through you as hard as the thrust that follows it.
 {% elif w.hasTrait("ROMANTIC") %}
-This is not romance. That's part of why it works. The wanting does not ask to be made into something softer before it gets to exist.
+The concrete is cold. His mouth tastes like beer. The wanting has none of the usual dressing around it — just weight and heat and the locked doors at your back.
 {% elif w.hasTrait("AMBITIOUS") %}
-You are nowhere near work, nowhere near competence, nowhere near the version of yourself that inventories consequences first. For once the absence feels like part of the reward.
+Work is nowhere in this hallway. The concrete is cold and his hands are warm and neither of those things has a consequence you're counting.
 {% endif %}
 
 Your orgasm hits fast, dragged out of you by the public residue still clinging to the whole thing. He feels it happen and swears softly against your neck. He comes a moment later with his forehead against your shoulder, breathing hard, still holding you pinned to the wall in a way that would be too much if you didn't want exactly that.
@@ -134,7 +134,7 @@ Then you put your palm flat on his chest and keep it there.
 He takes a breath, nods once, and does not turn the moment into an argument.
 
 {% if w.hasTrait("SHY") %}
-The relief is hot, not cold. You wanted this. You still want it. Stopping doesn't cancel that.
+Your hand is still on his chest. His pulse is there under your palm.
 {% elif w.hasTrait("FLIRTY") %}
 "Cruel," he says.
 "A little," you say.

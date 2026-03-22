@@ -19,7 +19,7 @@ Your stride is shorter than it expects to be. You catch yourself correcting path
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
 style = "inner_voice"
-prose = "*Shorter stride. Narrower wake. The path feels wider than it is.*"
+prose = "Shorter stride than you set out with. Narrower track. A jogger came through and you gave way to the left without stopping."
 
 # ── Player Actions ────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ prose = """
 You do the full loop around the park — the outer path, past the dog run, past the fountain that's been turned off for the season, back around to the entrance. A man in a running jacket jogs past and nods without breaking stride. You nod back. The exchange is nothing.
 
 {% if w.getSkill("FEMININITY") < 35 %}
-The nod arrives and goes. His eyes stayed on yours for exactly one beat — nothing in them, no calculation, just the reflex of passing someone on a path. Your neck is warm for a second afterward and you don't know why.
+The nod arrives and goes. His eyes stayed on yours for exactly one beat — nothing in them, no calculation, just the reflex of passing someone on a path. Your neck is warm for a second. You keep walking.
 {% endif %}
 """
 
@@ -52,7 +52,7 @@ You find a bench that gets the late-afternoon light — the kind that comes in s
 
 A woman with a double stroller navigates around a group of pigeons that are extremely committed to not moving. Two teenagers on the grass have their backs to each other, both on their phones. A man on the outer path glances over as he passes — brief, automatic — and his gaze moves back to the path ahead.
 
-You notice the glance. You notice that you noticed it. You sit with that for a minute.
+You watch him go. The bench is warm from the sun.
 
 {% if w.hasTrait("SHY") %}
 Twenty minutes pass without your permission. Alone in a public space, visible but not required — there's a specific quality to this kind of alone that you couldn't have explained six months ago. The park keeps going around you. You sit until the light shifts, and then a little longer.
