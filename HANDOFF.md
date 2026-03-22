@@ -2,7 +2,9 @@
 
 ## Current State
 
-**Latest session (2026-03-19, full session):** Infrastructure audit → Track B (presets as TOML) → Track C (simulator cadence verified) → FemCreation discovery scaffolding → skill/doc updates. **446 tests passing.** Presets now TOML data files loaded by undone-packs. Discovery beats render minijinja prose through throwaway World (same template context as scene prose — trait branches determine reaction, no player choice buttons). Robin preset has 5 placeholder beats with jinja2 stubs for user to fill. scene-writer/writing-reviewer agents updated for pipeline v2. CLAUDE.md updated with presets architecture. **Next session: user writes discovery prose in `01-robin.toml` + voice samples in `docs/voice-samples/`.**
+**Latest session (2026-03-22, prolific writing sprint):** Complete voice rewrite of all 47 Robin scenes + 5 discovery beats. Voice rules hardened mid-session: NO inner voice at all (overrides prior "fragments OK" rule), player speech only after player choice, DM describes world+body only. Read Newlife source material (15+ scenes) to calibrate register: Newlife's directness + Undone's physical specificity + BG3 narrator warmth. Orchestrated 18 parallel scene-writer agents across 6 phases. Every `[[thoughts]]` block converted from italic inner voice to physical DM observation. Every banned pattern stripped. **446 tests passing at every commit.** Explicit scenes (jake_apartment, work_marcus_closet, bar_stranger_night) written direct, not euphemized. Opening arc has full memory integration (7 flag stacks read back across scenes). **Next: playtest the full Robin flow visually, then campus scenes if desired.**
+
+**Previous session (2026-03-19, full session):** Infrastructure audit → Track B (presets as TOML) → Track C (simulator cadence verified) → FemCreation discovery scaffolding → skill/doc updates. **446 tests passing.** Presets now TOML data files loaded by undone-packs. Discovery beats render minijinja prose through throwaway World. scene-writer/writing-reviewer agents updated for pipeline v2.
 
 **Previous (2026-03-19, infrastructure audit + cleanup):** Verified full infrastructure health. Built MCP servers. Cleaned worktrees. Committed uncommitted pipeline files. 3 modified tracked files (scene-writer.md, writing-reviewer.md, pack-prompt.mjs) accidentally reverted during cherry-pick cleanup — minor loss (pipeline v2 agent wiring).
 
@@ -30,7 +32,7 @@
 
 **Branch:** `master`
 **Verification (2026-03-12):** `cargo test -p undone-scene -p undone-ui -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo test --test validate_pack_simulation -- --nocapture`, and `cargo run --bin validate-pack` all passed on `master`. Fresh runtime launch against `target\debug\undone.exe --dev --quick` also passed and rendered the live workplace opening. `validate-pack` still reports only non-blocking pre-existing warnings in `campus_library`, `neighborhood_bar`, `shopping_mall`, and `work_marcus_drinks`, plus reachability warnings for exact-liking Marcus/Jake gates.
-**Scenes:** 54 total.
+**Scenes:** 54 total (47 Robin scenes rewritten 2026-03-22, 6 campus untouched, 1 morning_routine pre-existing).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -48,32 +50,35 @@
 
 ## ⚡ Next Action
 
-**User writes, then we build.** Two files to fill:
+**Playtest the full Robin flow, then campus scenes.**
 
-### 1. Discovery prose — `packs/base/data/presets/01-robin.toml`
+### 1. Playtest
+Launch the game, play through Robin's preset from character creation through the
+opening arc. Screenshot every screen. Verify discovery beats render, prose reads well,
+trait branches fire correctly, memory flags carry forward.
 
-The `[[discovery]]` beats at the bottom have `[PROSE SLOT]` placeholders. Replace with
-minijinja prose (same syntax as scene prose). Trait branches like
-`{% if w.hasTrait("ANALYTICAL") %}` work — they render through a throwaway World with
-Robin's full trait set. 5 beats: Scale → Body → Face → Name → Begin.
+### 2. Campus scenes (optional)
+6 Camila scenes remain unrewritten — deprioritized per creative direction (CisMale→Woman
+only). Can rewrite in a future session if needed.
 
-### 2. Voice samples — `docs/voice-samples/`
+### 3. Voice samples for DeepSeek (may no longer be needed)
+The rewritten scenes may themselves serve as calibration for the DeepSeek pipeline.
+The 47 scenes now define the voice more thoroughly than standalone samples would.
 
-Write 3-5 scenes in the simple labeled format (`INTRO:`, `ACTION: id`, etc.).
-These are few-shot examples for DeepSeek — they define the voice the pipeline produces.
-Suggested: bar intro (Sample 0 from writing-samples.md), a workplace scene, an adult scene.
+### Completed this session (2026-03-22):
+- ~~Discovery prose~~ — 5 beats written in `01-robin.toml`
+- ~~Voice rewrite~~ — 47 Robin scenes rewritten across 6 commits
+- ~~Adult scenes~~ — jake_apartment, work_marcus_closet, bar_stranger_night all explicit
+- ~~Inner voice rule~~ — hardened to "no inner voice at all," overrides prior rule
+- Voice rule feedback saved to memory (`feedback_no_inner_voice.md`)
 
-### After user writes:
-- Run `node tools/scene-pipeline.mjs --spec-file <spec>` to produce calibrated scene prose
-- Playtest the FemCreation discovery flow visually
-- Begin batch scene production through the pipeline
-
-### Remaining open gaps:
-1. ~~**Presets as pack data**~~ — DONE
-2. ~~**Simulator cadence**~~ — VERIFIED
-3. ~~**FemCreation scaffolding**~~ — DONE (awaiting prose)
-4. **Zero adult scenes** — game can't prove its premise
+### Remaining gaps:
+1. ~~**Discovery prose**~~ — DONE (5 beats)
+2. ~~**Scene prose**~~ — DONE (47 scenes rewritten)
+3. ~~**Adult scenes**~~ — DONE (3 explicit scenes)
+4. **Campus scenes** — 6 remaining (Camila, deprioritized)
 5. **Tech debt** — see `memory/project_tech_debt_audit.md`
+6. **tools/ directory** — deleted from working tree, moved to `../undone-tools/`. Git shows unstaged deletions. Needs cleanup (either commit the deletion or restore).
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)
