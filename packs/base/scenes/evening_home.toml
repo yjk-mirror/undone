@@ -26,7 +26,7 @@ You've got the time. You'll figure out what to do with it.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose     = "The couch is already where you end up. The tea is already on. The window is where you look next. The order of things has sorted itself out."
 
 # ── Player Actions ────────────────────────────────────────────────────

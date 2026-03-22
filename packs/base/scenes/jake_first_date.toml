@@ -22,7 +22,7 @@ The menu is in your hands. He's watching you read it when he thinks you're readi
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose     = "The menu is in your hands. The candle is lit. Jake is across the table."
 
 # ── Player Actions ─────────────────────────────────────────────────────

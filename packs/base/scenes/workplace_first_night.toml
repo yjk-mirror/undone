@@ -44,7 +44,7 @@ The list will get solved. Lists get solved.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 25"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 The floor is clean enough, and the city is out the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound turned too high. A siren moves through the neighborhood without urgency — just the city doing its thing.
 

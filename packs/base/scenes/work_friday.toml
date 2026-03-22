@@ -20,7 +20,7 @@ You've been here a month. The message sits there. Your finger is over the reply 
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose = """The Slack thread has three thumbs-up reactions already. The message is four minutes old."""
 
 # ── Player Actions ────────────────────────────────────────────────────

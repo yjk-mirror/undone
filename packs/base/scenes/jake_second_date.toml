@@ -40,7 +40,7 @@ He reaches over and wipes the drop of juice from your chin with his thumb. His t
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose     = "Jake's thumb is still resting against the inside of your wrist."
 
 # ── Player Actions ─────────────────────────────────────────────────────

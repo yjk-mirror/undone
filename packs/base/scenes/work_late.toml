@@ -18,7 +18,7 @@ The empty floor hums. Your reflection in the dark monitor across the aisle is a 
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
+style     = "observation"
 prose = """The overhead light above your desk is one of maybe four still running at full brightness. The rest of the floor is on half-power."""
 
 # ── Player Actions ────────────────────────────────────────────────────

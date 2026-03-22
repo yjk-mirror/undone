@@ -18,7 +18,7 @@ The basket handle sits differently in your hand — smaller grip, different angl
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "Produce section. The long way around the cart in the middle of the aisle, not through it. You didn't plan that route."
 
 # ── Player Actions ────────────────────────────────────────────────────

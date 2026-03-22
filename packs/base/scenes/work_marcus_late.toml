@@ -48,7 +48,7 @@ During the day this floor has eleven people and their noise. Right now it has tw
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "The floor is empty. Marcus's voice carries differently without the daytime noise."
 
 # ── Actions ────────────────────────────────────────────────────────────────────

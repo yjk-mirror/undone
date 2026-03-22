@@ -34,7 +34,7 @@ No one expects you anywhere. The water stain on the ceiling is shaped like a com
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
+style     = "observation"
 prose     = "Saturday. No alarm. The ceiling. The radiator clicking. That's the whole situation and there's nowhere to be."
 
 # ── Player Actions ────────────────────────────────────────────────────

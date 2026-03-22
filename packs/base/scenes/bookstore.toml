@@ -28,7 +28,7 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose     = """The clerk said miss. You're two shelves deeper into the store and still standing in the same spot."""
 
 # ── Player Actions ────────────────────────────────────────────────────

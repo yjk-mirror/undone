@@ -32,7 +32,7 @@ The fitting rooms are at the back. Fluorescent overhead. Three items over the li
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
+style     = "observation"
 prose     = """Three hangers over your arm. The fitting room at the back. The mirror already waiting."""
 
 # ── Player Actions ────────────────────────────────────────────────────

@@ -31,7 +31,7 @@ The laundromat hums. You go back to your book.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
+style     = "observation"
 prose     = """Laundry. 10 PM. Fluorescent light overhead and a man picking a machine two rows over."""
 
 # ── Player Actions ────────────────────────────────────────────────────

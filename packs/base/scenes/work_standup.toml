@@ -40,7 +40,7 @@ Marcus nods once. Kevin doesn't look up from his phone.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 Your elbows are in. You're two steps farther back than the geometry needs.
 """

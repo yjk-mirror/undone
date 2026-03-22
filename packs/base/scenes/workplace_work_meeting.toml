@@ -41,7 +41,7 @@ Marcus settles into the chair directly across from yours and opens his laptop wi
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 30"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 {% if w.hasTrait("ANALYTICAL") %}
 Your voice is pitched differently than the slides expect. The room will read it or it won't.

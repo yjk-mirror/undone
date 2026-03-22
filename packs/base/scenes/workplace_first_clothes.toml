@@ -36,7 +36,7 @@ The rack holds maybe forty options. You put your hands in your pockets.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 20"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 Dressing room. Door closed. Four options on the hook.
 
@@ -47,7 +47,7 @@ The second one is a different shape. Different band, different cup, different wh
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 25"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 The dressing room has a three-panel mirror and a fluorescent overhead. The angle catches your side profile whether you want it or not.
 

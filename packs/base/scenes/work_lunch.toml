@@ -46,7 +46,7 @@ You don't know the lunch patterns yet. You watch which clusters form and which d
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 40"
-style     = "inner_voice"
+style     = "observation"
 prose = "The chairs are rolling back. A few people already have their coats."
 
 # ── Player Actions ─────────────────────────────────────────────────────

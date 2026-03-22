@@ -28,7 +28,7 @@ He's looking directly at you. The machine clicks off behind you. He doesn't qual
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "The break room is quiet. Your hands are still on the mug. Marcus is waiting for an answer."
 
 # ── Player Actions ────────────────────────────────────────────────────

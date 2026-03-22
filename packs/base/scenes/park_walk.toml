@@ -18,7 +18,7 @@ Your stride is shorter than it expects to be. You catch yourself correcting path
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "Shorter stride than you set out with. Narrower track. A jogger came through and you gave way to the left without stopping."
 
 # ── Player Actions ────────────────────────────────────────────────────

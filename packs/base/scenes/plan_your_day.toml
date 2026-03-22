@@ -77,7 +77,7 @@ The apartment is quiet. Not unsettlingly quiet — the ordinary quiet of a space
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
 prose = "Same coffee two weeks running. Same brand, same shelf. You didn't look at anything else either time."
-style = "inner_voice"
+style = "observation"
 
 # ── Player Actions ────────────────────────────────────────────────────
 

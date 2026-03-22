@@ -52,7 +52,7 @@ Dan finishes the explanation and looks at you.
 
 [[thoughts]]
 condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
-style     = "inner_voice"
+style     = "observation"
 prose = "Ten years. A visitor badge on a lanyard. The handshake that adjusted on the way out."
 
 # ── Round 1: How to handle Dan ────────────────────────────────────────

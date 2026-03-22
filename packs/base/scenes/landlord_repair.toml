@@ -37,7 +37,7 @@ You're standing in the hallway cataloging the spatial dynamics. A man in your ba
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 30"
-style     = "inner_voice"
+style     = "observation"
 prose     = """His building. Your faucet. Your hip four inches from the door frame and no reason to move further back than that."""
 
 # ── Player Actions ────────────────────────────────────────────────────

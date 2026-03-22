@@ -22,7 +22,7 @@ His glass comes up. He looks at you over the rim.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "Two drinks deep. Marcus's forearm is resting on the back of the booth behind you."
 
 # ── Actions ──────────────────────────────────────────────────────────────────

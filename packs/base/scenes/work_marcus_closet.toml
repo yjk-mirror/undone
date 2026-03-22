@@ -24,7 +24,7 @@ The hallway light cuts across the floor between you.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 35"
-style = "inner_voice"
+style = "observation"
 prose = "The floor is empty. Just the two of you and the hallway light."
 
 # ── Actions ──────────────────────────────────────────────────────────────────

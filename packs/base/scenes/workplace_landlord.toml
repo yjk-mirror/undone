@@ -26,7 +26,7 @@ He looks at the photo. He looks at you. He looks at the photo again.
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 20"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 {% if w.hasTrait("ANALYTICAL") %}
 His gaze moves from the photo to your face to the signature line. He's not going to say it. He's doing the math and waiting for the numbers to tell him something.
