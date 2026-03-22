@@ -5,39 +5,33 @@ description = "Shopping for work clothes. The department store, the dressing roo
 
 [intro]
 prose = """
-The department store is a fifteen-minute walk — the highest-rated result for *bra fitting near me* that doesn't require a train. Close enough.
+Nine AM. The department store is mostly empty, the morning light cutting across the displays in long rectangles. You take the escalator to the second floor. Signs overhead: lingerie, foundations, intimates.
 
-Sunday morning. The store is half-empty, the good light from the tall windows hitting the displays. The escalator to the second floor. Signs for lingerie.
+The shirt you have on is a men's medium. The sleeves come past your knuckles. The jeans are belted twice and still sit wrong on your hips. You've been wearing variations of this for two days.
 
-The lingerie department is in the back, which you have already learned is always where it is, as if the store would prefer not to acknowledge it too directly. A sales associate with reading glasses on a chain and an expression of complete professional equilibrium looks up when you approach.
-
-"Hi. I need help with sizing."
-
-"Sure." She looks at you with the practiced clinical look, not the other kind, and names a section. "Starting there. Your measurements, or you haven't been fitted?"
-
-"Haven't been fitted."
-
-"Okay. I can do that. Two minutes."
+The lingerie department is in the back. A sales associate with reading glasses on a chain looks up from a display and holds a measuring tape.
 
 {% if w.hasTrait("SHY") %}
-The measurement. Standing very still. The associate is brisk, efficient, and utterly uninterested in making the moment larger than it is. Slight mortification anyway.
+The tape comes off, two numbers go on a card without comment. The associate's expression has the complete neutrality of someone who has done this ten thousand times. Your face goes hot anyway. You stand with your arms out and wait for it to be over.
 {% elif w.hasTrait("POSH") %}
-You submit to the measurement with the awareness that you are in a department store rather than somewhere with a fitting room that has natural light. You don't say this. It's not relevant.
+Two numbers on a card, then a rack at the back of the section. The store is fine. It is not somewhere you would have come before. You follow the associate past the displays.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-The measurement takes ninety seconds. You watch the associate write a number down. Same as you expected from last night's research. Good. Information is useful.
+Two numbers on a card. Ninety seconds. You look at the card. The number matches the one from last night's research.
 {% else %}
-Two minutes is approximately right. The associate writes something and says "okay" and leads you to a rack with the specific efficiency of someone who has been told a number and knows where the numbers live.
+Two numbers on a card, then a rack at the back of the section. The associate moves with the efficiency of someone who has been told a measurement and knows exactly where those measurements live.
 {% endif %}
 """
 
 [[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
-You find the department store. Nine AM. You are the first customer in the lingerie section.
+Nine AM. The department store is mostly empty, the morning light cutting across the displays in long rectangles. You take the escalator to the second floor. Signs overhead: lingerie, foundations, intimates.
 
-The associate who helps you has been doing this for approximately forever and does not make a single thing about it. She measures. She says a number. She says *follow me* and leads you to a rack of options with the efficiency of a professional who knows exactly where the numbers live.
+The shirt you have on is a men's medium. The sleeves come past your knuckles. The jeans are belted twice and still sit wrong on your hips. You've been wearing variations of this for two days.
 
-The rack of options. Neutral face. Hands in pockets because there's nothing else to do with them.
+The lingerie department is in the back. A sales associate with reading glasses on a chain looks up from a display and holds a measuring tape. She reads it, writes a number on a small card, and leads you to a rack without making it anything other than that.
+
+The rack holds maybe forty options. You put your hands in your pockets.
 """
 
 [[thoughts]]
@@ -46,18 +40,18 @@ style     = "inner_voice"
 prose = """
 Dressing room. Door closed. Four options on the hook.
 
-The first one. The clasp is in the back. Fingers find it on the second try. Something tightens and settles and you look down and — *oh.* That's what it does.
+The clasp goes in the back. Your fingers find it on the second try. Something tightens across your chest and the weight shifts — sitting differently now, held. You look down at your hands. They look small against the fabric.
 
-The second one is different. Different shape, different support. You didn't know there were different shapes. You are learning that there are different shapes.
+The second one is a different shape. Different band, different cup, different where the pressure lands. Four options, four shapes. There is apparently a whole vocabulary here.
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-The dressing room mirror is well-lit and angled in a way you have not seen yet. Fluorescent overhead, three-panel setup, nowhere to hide in it.
+The dressing room has a three-panel mirror and a fluorescent overhead. The angle catches your side profile whether you want it or not.
 
-Your collarbones. Your waist. The way the fabric sits across your chest. Two days ago you were on a plane and this body was still a series of logistics. Now it's in a department store dressing room and the light is very, very honest.
+Your collarbones sit differently than you expect. The bra band leaves a faint pink line across your ribs where it rested. The fabric of the blouse pulls slightly at the chest and hangs loose at the waist. In the left panel your hips make a shape that doesn't match the pants you came in wearing.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -68,11 +62,11 @@ label = "Get what you need, efficiently"
 detail = "Bras, underwear, basics. In and out. You have a list."
 allow_npc_actions = true
 prose = """
-You spend forty minutes and come out with three bras, a week of underwear, a pair of dress pants that need only minimal alteration, two work blouses, and a sweater. You pay. The total is more than you expected and exactly what you should have expected.
+Forty minutes. Three bras, a week of underwear, dress pants that fit close enough, two work blouses, a cardigan. The register total comes up higher than your estimate. You tap the card and don't do the math until you're outside.
 
-Outside the store, you check the list on your phone. The most urgent items are crossed off. You get coffee from the Dunkin' across the street instead of the independent place with the Sunday line and drink it on the walk back.
+The list on your phone. Most of the urgent line is checked off. There's a Dunkin' across the street with no line, and you get coffee there instead of the independent place on the corner with its Sunday crowd and take it on the walk back.
 
-Boxes Monday. Work Monday. You're ahead of schedule, approximately.
+The bags hit your knees with each step. Your new shoes have a heel, just enough to change the weight distribution, and the pavement feels different under them.
 """
 
   [[actions.effects]]
@@ -105,18 +99,16 @@ id    = "dwell_on_mirror"
 label = "Take a minute in the dressing room"
 detail = "The mirror. You've been avoiding this. You don't have to, particularly."
 prose = """
-You stay in the dressing room longer than you need to.
-
-The mirror is what it is: full length, well lit, impossible to negotiate with. The dress pants sit on your hips differently than any pants have sat before. The blouse buttons the wrong way. You fasten it anyway.
+The dressing room has a three-panel mirror and a hook with six options on it. The dress pants go on first. They sit on your hips differently than pants have sat before — lower, following a curve. The blouse buttons left over right. You fasten each button slowly, top to bottom.
 
 {% if w.hasTrait("OVERACTIVE_IMAGINATION") %}
-You think about Monday. You, in the office, in the dress pants and the work blouse. The manager's face when you say *I know, I wrote that spec.* You've practiced this face in your head so many times that you almost know what it looks like. You think you look competent. You hope you look competent. You decide to look competent regardless.
+You turn sideways in the left panel and the office is suddenly very present: the open-plan floor, the glass-walled conference room, the manager with the email responses that clock in at six words. The shoulder seam sits flush. The collar is flat. The blouse fits the way a Monday blouse should fit.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-You note what's true. You don't spend time on it that you don't have. You get dressed and take the practical items to the register.
+Shoulder seam sits flush. The pants break at the ankle. The blouse drapes right across the chest. You hang the rejects back on the hook and carry the rest out.
 {% else %}
-The person in the mirror looks like someone you might pass on the street without a second thought. Average height. Brown hair. Professional clothes that fit correctly. Ready for Monday. That is enough.
+The mirror shows the blouse's collar sitting flat, the pants hem landing just above the floor, the fabric smooth across both shoulders. You turn to check the side. The line is clean.
 
-You take what you need to the register.
+You carry the stack to the register.
 {% endif %}
 """
 
@@ -150,21 +142,21 @@ id    = "ask_for_help_outright"
 label = "Ask for full help"
 detail = "Tell her what you actually need: a workweek, not one bra."
 prose = """
-You stop pretending you have a plan and tell the associate the truth in the most practical version available.
+"I need enough for a first week at a new office," you tell the associate. "Basics, work clothes. I don't know where to start."
 
-"I need enough to get through a first week at a new office," you say. "Basics, work clothes, whatever I am least likely to get wrong."
+The measuring tape goes down on the counter. A notepad comes up.
 
-The associate nods like this is both normal and fixable. Which, apparently, it is.
+"What's the dress code? Do you have a color preference?"
 
-The next forty-five minutes are brisk and oddly calming. Options appear with the speed of someone solving a known class of problem. You answer yes, no, maybe, and step in and out of the dressing room while your sense of what counts as "basic" gets revised upward in real time.
+The next forty-five minutes run at the associate's pace. Blouses appear in sets of three — one to keep, one maybe, one back on the rack. Pants in two cuts. A blazer pulled from a rack one section over. You step in and out of the dressing room and answer yes and no and the selection adjusts accordingly.
 
 {% if w.hasTrait("SHY") %}
-Being handled this efficiently should be mortifying. Instead it feels like relief.
+A hand on your shoulder steers you into better dressing room light to check a seam. Your whole body goes rigid for a second, and then the moment's already past. The associate is looking at the shoulder line, not at you.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-Useful expertise is useful expertise. You stop arguing with that after the second blouse.
+By the third blouse you've stopped second-guessing the color choices and started just asking which one holds its shape after washing.
 {% endif %}
 
-You leave with more than you planned to buy and fewer things to worry about on Monday morning.
+You leave with a full bag and a smaller version of the problem than the one you walked in with.
 """
 
   [[actions.effects]]
@@ -197,17 +189,15 @@ id    = "buy_minimum_and_leave"
 label = "Buy the minimum and leave"
 detail = "One bra. One blouse. Enough to survive Monday."
 prose = """
-You make the smallest possible version of the problem.
-
-One bra that fits well enough. One blouse you do not hate. One backup pair of underwear. No experimentation. No standing under flattering or unflattering light for longer than necessary. Just enough to get through Monday and buy yourself time for the rest later.
+One bra, well-fitted enough. One blouse in a neutral color that drapes correctly across the chest. One backup pair of underwear. You take the three items to the register and pay before you can extend the list.
 
 {% if w.hasTrait("ANALYTICAL") %}
-This is not avoidance. It is scope control.
+The rest can wait until after Monday when you have a better read on the dress code. One data point is not enough to shop from.
 {% else %}
-It might be avoidance. It is also effective.
+The rest can wait. Three items solve the immediate problem. You step out into the Sunday street with a small bag and the rest of the afternoon free.
 {% endif %}
 
-You pay, leave, and do not look back at the fitting rooms. The relief is immediate, though not especially noble.
+The store's automatic doors close behind you. The street is bright and quiet.
 """
 
   [[actions.effects]]
@@ -243,15 +233,13 @@ label     = "A man in the aisle notices her"
 weight    = 6
 condition = "!scene.hasFlag('noticed')"
 prose = """
-You are comparing two options, same brand and different cut, when you become aware of a man at the edge of your peripheral vision.
-
-He's shopping, technically. He has a bag. He's looking at you. The two-second look, the held gaze that's slightly too long.
+You are holding two options — same brand, different cut — when a man stops near the end of the aisle. He has a bag over one shoulder. He is not shopping. He is looking at you with the particular quality of attention that has a duration.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-Something warm moves through your stomach before you've decided what to think about it. Your skin prickles. You don't turn toward him and you don't turn away and you stand very still until it passes.
+Your hands go still on the fabric. The back of your neck prickles. He holds it another second and then moves off toward the escalator.
 {% endif %}
 
-He moves on. The store continues at its Sunday pace. You pick the one on the left.
+He rounds the corner. The aisle goes quiet again. You put one blouse back on the rack and keep the other.
 """
 
   [[npc_actions.effects]]

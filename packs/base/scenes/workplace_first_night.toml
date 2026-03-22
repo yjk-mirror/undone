@@ -9,23 +9,21 @@ Unit 4B is empty.
 
 The boxes aren't here. The shipping company said Monday. The confirmation email is in the inbox. None of that changes the fact of an empty apartment, a carry-on bag, and a body that has been awake for thirty-three hours.
 
-The apartment is fine. Better than fine, actually: old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress. The radiator in the bedroom is not warm yet. Frank's wife said it takes a few minutes.
+The apartment is fine — old floors, good light, a kitchen with real counter space, a bedroom big enough for more than a mattress. The radiator in the bedroom is quiet and cold. Frank's wife said it takes a few minutes.
 
-Bedroom, kitchen, bathroom, living room. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously. The list on the phone is already growing.
+The phone has a list open. Furniture: Monday. Bedding: forgot. Towels: forgot. Food: obviously.
 
 {% if w.hasTrait("AMBITIOUS") %}
-The list is sorted in twenty minutes. One column, by priority. The shipping company has a confirmation text before the clock registers 11 PM.
+The list expands fast and gets sorted into a single column by priority before the clock hits eleven. The shipping company gets a confirmation text. The manager's welcome email gets a reply flagged for morning.
 {% elif w.hasTrait("DOWN_TO_EARTH") %}
-The list is practical. Floors have been slept on before. This is not the worst situation.
+The list stays short and practical. Floors have been slept on before. The essentials column is two items long.
 {% else %}
-The list gets long. Then *bra* appears between *food* and *towels*, and sits there.
+The list gets long. Then a new line appears between *food* and *towels* and sits there, concrete and immediate in a way the rest of the list isn't.
 {% endif %}
 
-Right. The bra problem.
+The bra from the airport gift shop has been doing the job it was never designed for since six this morning. It is not, in any meaningful sense, still doing that job.
 
-The day ran on forward momentum: airport, keys, landlord, deposit, the manageable fiction that logistics were the hard part. Under the shirt, a sports bra from the airport gift shop. It is not doing the job.
-
-*Right. Okay.*
+The day ran on forward momentum — airport, keys, landlord, deposit. The problem is that momentum has run out.
 """
 
 [[intro_variants]]
@@ -35,24 +33,22 @@ Unit 4B is empty.
 
 The boxes aren't here. The Monday window was confirmed. The confirmation is in the email.
 
-Bedroom, bathroom, kitchen, living room. The phone has a list growing on it. Furniture. Bedding. Food. Towels. Something's missing.
+Bedroom, bathroom, kitchen, living room. The phone has a list open. Furniture. Bedding. Food. Towels.
 
-*Bra*, and then nothing for a moment.
+The cursor blinks at the end of *towels*. There's something else. The list said *clothes*, generally, somewhere around the third week of planning, meaning Monday, meaning a vague gestural plan that hadn't extended to include the specific practical reality of tonight, this body, this sports bra from the airport gift shop that's been digging into the underside of both arms since the first layover.
 
-Right. The list said *clothes*, generally, meaning Monday, meaning a vague plan to deal with *clothes* that hadn't extended to include the specific practical reality of —
+The word goes on the list between *food* and *towels*. The note app autocorrects it, then uncorrects it, then gives up.
 
-*Bra* goes on the list. The word looks wrong in the note.
-
-*On the list. Lists get solved.*
+The list will get solved. Lists get solved.
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 25"
 style     = "inner_voice"
 prose = """
-The floor is clean enough, and the city is out the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound too high. A siren moves through the neighborhood at a speed that says *not an emergency, just the city*.
+The floor is clean enough, and the city is out the window. The building across the street has lit windows in a grid. Someone nearby is watching something with the sound turned too high. A siren moves through the neighborhood without urgency — just the city doing its thing.
 
-Your reflection in the dark glass is someone you are still learning to recognize. The proportions. The hair. The way your shoulders fall. A tilt of the head and the reflection tilts back, and for one second the distance between recognition and ownership feels measurable.
+The dark glass of the window gives back a reflection. Petite. Young-looking. Hair that still doesn't sit quite right. The hands visible at the hem of the shirt are small, the knuckles unfamiliar.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -62,11 +58,11 @@ id    = "order_food_sleep"
 label = "Order food and sleep"
 detail = "Food. Phone charging on the floor. Eight hours. Tomorrow is tomorrow."
 prose = """
-You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait, you sit on the floor with your back against the wall and reread the email from your new manager: parking you do not need, badge pickup, the name of the person who will meet you in the lobby, all the ordinary details of a life that somehow did not pause for any of this.
+You open the delivery app and order from the first Thai place with four stars and a fifteen-minute estimate. While you wait, you sit on the floor with your back against the wall and reread the email from your new manager: parking you don't need, badge pickup instructions, the name of the person meeting you in the lobby — all the ordinary infrastructure of a job that started without waiting for any of this.
 
-The food arrives. You eat on the floor. The radiator has warmed up.
+The food arrives in thirteen minutes. You eat on the floor. The radiator has warmed up.
 
-You charge your phone, roll your jacket into a pillow, and lie down on the floor of your bedroom. It's not comfortable. You're asleep in four minutes.
+You charge the phone, roll your jacket into a rough pillow, and lie down on the bedroom floor. It's not comfortable. You're out in four minutes.
 
 Tomorrow: shopping. The bra problem specifically. The rest of the list after that.
 """
@@ -103,16 +99,14 @@ detail = "How hard can it be. Open a browser. Figure it out."
 prose = """
 You open your phone and start searching.
 
-Forty minutes later you have learned that bra sizing is a system apparently designed by someone who found the metric system too merciful; that H-cup does not mean what you assumed it meant; that most department stores stop at DDD and then become theoretical; that specialty stores exist; that the specialty stores have names you are going to have to say out loud to a sales associate; and that you have, apparently, misunderstood underwire for your entire life.
+Forty minutes later: bra sizing is a system apparently designed by someone who found the metric system too merciful. H-cup does not mean what you assumed it meant. Most department stores stop at DDD and then become theoretical. Specialty stores exist. The specialty stores have names you are going to have to say out loud to a sales associate. Underwire, it turns out, is doing something specific and structural, and the airport gift shop sports bra is not.
 
 You put your phone down.
 
 {% if w.hasTrait("DOWN_TO_EARTH") %}
-You add *department store, early* to your list. You'll tell them what you need in factual terms and get what works. Sleep first.
+You add *department store, early* to the list. Numbers, measurements, practical terms — it's a solvable problem. You set the phone face-down and go to sleep.
 {% else %}
-The city is outside being the city. Someone is honking. A dog is barking. You sit on the floor of your empty apartment and think about H-cups, specialty stores, and the number of times in your life you walked past a lingerie department without granting it a second of thought.
-
-You add *specialty store??* to your list and go to sleep.
+Outside, someone is honking at someone else, and a dog is barking at the honking, and a siren is two blocks away deciding not to be dramatic about it. You add *specialty store — ask someone??* to the list, plug in the phone, and lie down on the floor.
 {% endif %}
 """
 
@@ -155,26 +149,30 @@ He picks up on the second ring. "Hey, where'd you end up landing?"
 "Classic." A pause. "You okay? You sound weird."
 
 {% if w.hasTrait("SHY") %}
-"I'm tired," you say. Which is true. You leave it there. He lets you.
+"Tired," you say.
+
+Which is true. You leave it there. He lets you.
 
 "Get some sleep," he says. "Text me when you're settled."
 
-"Yeah," you say. "Yeah."
+"Yeah."
 
-You hang up and hold the phone for a moment. You couldn't explain it even if you tried. You're not going to try.
+You hang up and hold the phone for a moment before setting it on the floor.
 {% else %}
-"Just tired," you say. "Long day."
+"Just tired. Long day."
 
 "Thirty-one hours or something, right? You're insane." He says it like it's a compliment.
 
-"Thirty-three now," you say, and somehow that's the funniest thing either of you have said all week. He laughs. You laugh. It doesn't explain anything. It doesn't need to.
+"Thirty-three now."
+
+He laughs. You laugh. It doesn't explain anything.
 
 "Go to sleep," he says. "Text when you're alive."
 
-"Yeah." You lean your head against the wall. "Good night."
+"Good night." You lean your head back against the wall.
 {% endif %}
 
-You plug your phone in on the floor beside you. The radiator ticks.
+You plug the phone in on the floor beside you. The radiator ticks.
 """
 
   [[actions.effects]]
@@ -203,21 +201,19 @@ id    = "unpack_and_stage_tomorrow"
 label = "Stage tomorrow anyway"
 detail = "Bathroom kit. Charger. One outfit. Pretend preparation is the same as control."
 prose = """
-You unzip the carry-on on the bedroom floor and start making small islands of order.
+You unzip the carry-on on the bedroom floor and start working through it.
 
-Toiletries in the bathroom. Charger by the outlet. Laptop on the kitchen counter. One blouse and one pair of underwear folded over the back of the chair because there is no closet system yet and tomorrow will arrive whether the apartment is ready or not.
+Toiletries in the bathroom cabinet. Charger by the outlet. Laptop on the kitchen counter. One blouse and one pair of underwear laid over the back of the chair — no closet system yet, but the clothes are out and accessible.
 
 {% if w.hasTrait("AMBITIOUS") %}
-This is not unpacking. This is triage with standards.
+The badge paperwork goes on top of the laptop. Shoes by the door. The carry-on gets repacked into a tight rectangle and pushed against the wall. Fifteen minutes, corner to corner.
 {% elif w.hasTrait("ANALYTICAL") %}
-The goal is not comfort. The goal is reducing decision count between waking up and getting out the door.
+Badge paperwork on the laptop, shoes by the door, phone charging beside the jacket. Each item positioned for tomorrow morning, not for comfort. The apartment doesn't feel settled, but the path from the bed to the door is clear.
 {% else %}
-It helps. Not much, but enough to feel the room stop fighting you for a minute.
+Badge paperwork goes on top of the laptop. Shoes by the door. It's not much, but the room stops feeling like a problem for a few minutes.
 {% endif %}
 
-You set your shoes by the door. Badge paperwork on top of the laptop. Painfully ordinary things. Reassuring because they are ordinary.
-
-The apartment is still empty when you finish. The difference is that now it looks like someone intends to wake up here on purpose.
+The apartment is still empty when you're done. The difference is that it looks like someone intends to wake up here on purpose.
 """
 
   [[actions.effects]]
