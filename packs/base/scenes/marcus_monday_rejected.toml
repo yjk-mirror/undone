@@ -1,0 +1,236 @@
+[scene]
+id          = "base::marcus_monday_rejected"
+pack        = "base"
+description = "Monday. The office. Marcus is at his desk. He doesn't look up when you walk past."
+
+[intro]
+prose = """
+Monday.
+
+Same elevator, same badge beep, same open floor plan.
+
+Marcus is at his desk. He doesn't look up when you walk past. Not a performance of not-looking — he's actually working. Posture the same as every other Monday. Shoulders the same. The angle of his head is different in a way you'd have to know what you were looking for to notice.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The room is the same room. His desk is where it's always been — thirty feet from yours, visible from the third chair in the standup ring. The office is the office. Something has been removed from it and the room doesn't know yet.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The elevator, the badge beep, the walk to your desk — all identical to last week, to the week before. The man thirty feet from your monitor has simply rearranged himself. Pulled back to the correct distance. The space where the other thing was is accurate now.
+{% else %}
+The choice was made at his apartment. The doorman, the lobby, the train. This is the morning after the choice. It has a temperature.
+{% endif %}
+
+Dan says good morning. Good morning back. Screen on. Slack messages. The week starts.
+
+The conference room door is down the hall. His apartment is somewhere else entirely.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 40"
+style     = "observation"
+prose     = "Same floor. Same desk. Same badge on the lanyard. The room is the same room."
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "work"
+label  = "Work"
+detail = "Professionalism. The mask holds. So does his."
+prose  = """
+You work.
+
+Slack cleared in order. Two PRs to review — Kevin's is fine with two comments, Amir's needs a revision. The standup at nine-fifteen. You say what you were working on and what you're working on today. Marcus says what he's working on. Both of you are looking at the same slide.
+
+{% if w.hasTrait("AMBITIOUS") %}
+In the closet there was a story: circumstances. Late, dark, judgment temporarily suspended, file and close. In his apartment you made a considered choice — picked up your jacket, walked to the door, took the train home. That's not a story you can tell. That's a decision.
+
+The open floor plan. Three people between your desks. The four years of work in this building that exist regardless of what he's doing with his shoulders this morning. The decision accounting comes out the same as it did on the train.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+Three meetings today. In two of them his comments are directed at the table, not at you specifically. In the standup he says your name once — "Robin, the Chen numbers, can you update the deck?" — and the sentence carries the weight of a sentence about numbers.
+
+At 10:23 a Slack message: *Updated timeline attached. Changes on slides 7 and 11.* Attachment. Business. You respond with business. Three messages. Nothing underneath it shows on either end.
+
+{% elif w.hasTrait("CONFIDENT") %}
+The morning does what mornings do. Standup runs long — Amir's deployment issue takes ten minutes — and Marcus is across the table and you're both looking at the board and the meeting ends and you go back to your desk.
+
+At 11:15 he sends a Slack about the Chen proposal. Clean handoff, relevant data. You respond. He responds. The thread closes.
+
+{% else %}
+The morning moves. Dan asks about a vendor call. You handle it. Marcus walks past to get coffee at 10:30 and you don't look up and then he's past and nothing happened because there was nothing to see.
+
+He sends a Slack at 11. Business. You respond. The exchange is clean.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The break room conversations. The particular angle from the third chair in the standup ring. The way certain meetings used to have an undercurrent. All of it absent and the absence is doing something specific to the air.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_REJECTION_MONDAY"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "break_room"
+label  = "Test the water"
+detail = "Coffee. He's there. She doesn't retreat and doesn't initiate."
+prose  = """
+Coffee. He's in the break room when you get there — back to the door, refilling his mug.
+
+He hears you come in. Turns.
+
+"Hey," he says.
+
+"Hey."
+
+That's the whole greeting. The mug goes to his hand. He steps to the side to give you the counter.
+
+{% if w.hasTrait("CONFIDENT") %}
+You reach past him for the handle. Two feet away. Close enough that in a different version of last week this would have a charge to it. It doesn't, exactly — or it does, but the charge has nowhere to go.
+
+You pour. He doesn't leave immediately. He's leaning against the counter, looking at his mug.
+
+"Monday," he says. Not a complaint. Just locating the day.
+
+"Monday," you say.
+
+He takes his mug and goes. Two words. The full exchange.
+
+{% elif w.hasTrait("SUBMISSIVE") %}
+You pour. He's still there — not blocking the door, not moving toward you. Just present in the same room. He's looking at the counter.
+
+The break room has always been where the undercurrent lived. The particular distance between you at the coffeemaker, the direction his questions came from. None of that is here now. The room is just a room with a coffeemaker and two colleagues using it.
+
+He takes his mug and leaves. The break room is the same size it was before.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+You pour. He's finishing up. His body language is correct — no edge, no performance. Professional distance, which is what you needed and what you chose.
+
+"Got a question on the Chen deck," he says. Not looking at you. "Can we do ten minutes after standup?"
+
+"Sure."
+
+"Good."
+
+He takes his mug. You take yours. The meeting happens at nine-fifteen and the question about the Chen deck is about the Chen deck.
+
+{% else %}
+You pour. He doesn't linger — coffee done, mug in hand, the standard nod of two colleagues who happened to use the same coffeemaker.
+
+He goes back to his desk. You stand in the break room for a moment with your mug.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+His apartment is not in this room. The break room is a room with a coffeemaker. That's been established.
+{% endif %}
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_REJECTION_MONDAY"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 5
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "find_him_late"
+label  = "Talk to him"
+detail = "Late. Empty floor. Not apologizing — acknowledging."
+prose  = """
+Late. Past six. Most of the floor is empty — monitors dark, chairs pushed in. Your laptop bag is on your desk. His light is still on.
+
+You take the long way out. Past his desk.
+
+He looks up.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Hey," you say. You stop.
+
+He closes his laptop halfway. "Hey."
+
+"His apartment was—" You stop. The sentence doesn't have an ending that helps. "I wanted to say I know what I did."
+
+He looks at you. He's not angry — that's clear. He's just looking at you the way he looks at something he's taken in and filed.
+
+"I know," he says. "The door was always yours to close."
+
+A beat.
+
+"Still is," he says.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+"The data on the Chen deck," you say. Which is not why you stopped.
+
+He nods. Opens his laptop back up. Pulls up the deck and angles it so you can see the numbers. You stand next to his chair and he talks through slides seven and eleven and his voice is the same voice from four hundred meetings and the numbers are real numbers and you respond to the numbers.
+
+Three minutes. You straighten up.
+
+"Good," you say.
+
+"Good," he says.
+
+You walk to the elevator. Behind you, his light is still on.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+"His apartment," you say — quietly, nobody left to hear. "I need you to know it wasn't—" You stop. "I needed to make a different call."
+
+He looks at you steadily. He gets it. He's not the kind of man who doesn't.
+
+"The work doesn't change," he says. One sentence. He means it both ways.
+
+"No," you say. "It doesn't."
+
+You take the elevator down. His light is still on when the doors close.
+
+{% else %}
+You stop at his desk. He looks up.
+
+"I should have said this earlier," you say. Meaning: the apartment. Meaning: what you did.
+
+He considers. Marcus always considers before answering something.
+
+"You knew what you were deciding," he says. Not an accusation. "So did I."
+
+"Yeah."
+
+"We're fine," he says. "I'm not going to make it something."
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The floor is empty. Just the two of you and the dark monitors. This is the same building.
+{% endif %}
+
+You nod. You pick up your bag. You go.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_REJECTION_MONDAY"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_TALKED"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true

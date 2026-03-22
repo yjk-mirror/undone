@@ -1,0 +1,198 @@
+[scene]
+id          = "base::bad_date"
+pack        = "base"
+description = "A restaurant downtown. He seemed fine on the app. The first red flag takes twenty minutes."
+
+[intro]
+prose = """
+The restaurant is his suggestion — mid-range Italian near the Financial District. Small tables, soft lighting, the kind of place designed for two people to lean in. He's already there when you arrive, and he stands up, which is something.
+
+Ryan. Late twenties. The photos were accurate: dark hair, decent jaw, a shirt that's trying slightly too hard. He smiles. He pulls your chair out.
+
+He orders a bottle of wine before you've sat down.
+
+"I took the liberty," he says. "You seemed like a red wine kind of person."
+
+The wine arrives. He pours your glass and his, and then he starts talking.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His hand when he reached for the wine bottle — the size of it, the wrist, the watch that costs more than a month's rent. He's broad across the shoulders. The table between you is not wide. The chair he pulled out for you put your back to the room.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The restaurant is the kind of place where the candlelight makes everything feel close whether or not you want it to. The table puts you near enough that you can hear him clearly over the dinner noise. He's telling you something about a work trip to Milan.
+{% else %}
+He's confident with the room in the way men like this are — comfortable, at ease, filling his side of the table without thinking about it. He's telling a story. You watch him tell it.
+{% endif %}
+"""
+
+# ── Actions ─────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stay_through_dinner"
+label  = "Stay through dinner"
+detail = "See where it goes."
+prose  = """
+The appetizers come. He ordered them too — "I took the liberty" again, which you file somewhere.
+
+The questions start after the first glass. "You must get a lot of attention," he says, leaning forward. It's framed as a compliment. It's a compliment the way a hand on your shoulder from a stranger is a handshake — technically contact, wrong temperature. You say something noncommittal. He doesn't notice you did.
+
+He talks about his last company. He talks about the deal he closed in Q4. He asks about your job and you answer and he's already waiting for the end of the sentence so he can talk about his job again. He doesn't ask a follow-up question.
+
+His ex comes up around the main course. Once to explain why he doesn't go to Brooklyn anymore. Once to explain something about loyalty. She was apparently difficult to understand. The word "crazy" doesn't appear but it's implied each time, a shape outlined by what's not said.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+The hand across the table comes after the second glass he pours without asking. He sets it over yours — flat, deliberate, pressure before warmth. When you shift slightly, his hand doesn't shift with you. It stays.
+
+You know the architecture of this. The forward lean. The eye contact calibrated to be slightly too long. The question about your body ("You work out, right?") delivered like an observation rather than an intrusion. He's running something and he doesn't know you can see all the load-bearing parts of it. That doesn't make it comfortable. It just makes it legible.
+{% elif w.hasTrait("ANALYTICAL") %}
+By the main course you have a working model. He ordered for you twice. The questions about his work outnumber the questions about yours three to one, and the ones about you have been about your appearance or your availability, not anything you've said. He mentions his ex for the third time — same framing, slightly different anecdote, same conclusion: she was the problem.
+
+His hand settles over yours when he's making a point. It's warm and it doesn't move when you make a small adjustment with your arm. You track it. You wait to see if he notices. He doesn't.
+{% elif w.hasTrait("SHY") %}
+You stay because leaving requires something you haven't assembled. He's between you and the door in a way that isn't physical — he's bought you a glass of wine, he's told you about his job, leaving now requires a statement you haven't found the words for. So you stay. The appetizer plate is a thing to look at when you need not to look at him.
+
+His hand crosses the table somewhere after the main course arrives. It covers yours and stays. You don't pull your hand away. You don't put your other hand over his. You wait for the moment to pass and it passes slowly.
+{% else %}
+The evening builds the way these evenings build — small things accumulating in a particular direction. He refills your glass without asking. He asks about your appearance in the language of a compliment. His hand on yours across the table is firm, settled, not asking. His ex comes up a third time.
+
+None of this is dramatic. It's the specific, familiar weight of a man who has decided what the evening is for and is not checking whether you agree.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The table is not wide. He's broad across it. When he leans forward to make a point, the distance between you drops and there's a beat where you're aware of the physics of this — his weight, his size, the way his hand on yours is not a gesture so much as a fact.
+{% endif %}
+
+He walks you out at the end. On the sidewalk, he moves toward you — you turn your head. His lips land on your cheek. He says, "I had a great time. We should do this again." He says it like it's settled.
+
+You say something that isn't yes, and then you're in a cab, and then you're not with him anymore.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAD_DATE"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 10
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "make_an_excuse"
+label  = "Make an excuse and leave"
+detail = "Between the appetizer and the main. Clean exit."
+prose  = """
+The appetizers arrive and he's mid-sentence about a project at work. You get your phone out.
+
+You look at it the way that means something came up. You hold it a moment longer than you need to, shaping the expression.
+
+"I'm so sorry," you say, and you sound sorry in the specific way of someone who is not sorry but has found the correct register. "Something at work — I have to handle this."
+
+{% if w.hasTrait("SHY") %}
+He looks at you. You look at the phone. The lie is thin enough to see through if he wants to, and for a moment you don't know if he will. He decides not to.
+
+"Of course," he says. "Happens to me all the time." He's generous about it, which makes it marginally worse — you've given him the ending where he was understanding and you were the flaky one. You put enough cash on the table for your share of the wine and your coat is already in your hands.
+
+Outside the air is cold and you breathe it. You're in a cab before he's processed that you've gone.
+{% elif w.hasTrait("ANALYTICAL") %}
+You identified the exit window four minutes into the appetizer course. There was a natural pause — him refilling his glass, you with an empty plate and a moment where neither of you was doing anything — and you used it.
+
+The excuse lands cleanly. He doesn't look suspicious, just mildly disappointed in the way of someone recalibrating an evening. "Hope everything's okay," he says. Genuine, probably. You say it'll be fine. You put money on the table. You leave.
+
+The street is cold. You walk half a block before you get in a cab. The cab is going in the direction you chose.
+{% else %}
+He looks up from his glass. He reads the phone, the expression, the setup. He makes a small decision about what kind of person to be about it.
+
+"Of course. Hope it's nothing serious." He means it, more or less. This version of you is a woman who had to leave for work reasons, not a woman who found the door. It's a cleaner exit than the truth.
+
+You leave enough on the table for the wine and your coat is already in your hands. The sidewalk outside is cold. A cab comes.
+{% endif %}
+
+The ride home: the city through the window, the driver not talking, the specific relief of being in a vehicle that's going somewhere you decided on. You're home in eight minutes.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAD_DATE"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_money"
+  amount = -20
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "tell_him"
+label     = "Tell him"
+detail    = "Name it. Leave."
+condition = "w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY') || w.getSkill('FEMININITY') >= 50"
+prose     = """
+He's in the middle of telling you something about his ex — the third or fourth time she's come up, same shape to the story, same unspoken conclusion — and you set your glass down.
+
+"This isn't working for me," you say. "I'm going to go."
+
+{% if w.hasTrait("CONFIDENT") %}
+You say it the way you'd tell someone their code has a structural problem — not cruel, just accurate. Across the table. While he's mid-sentence.
+
+He stops. There's a beat. His face moves through something — surprise, recalibration, the flicker of something underneath that's there for less than a second and then controlled. "I'm sorry you feel that way," he says.
+
+That phrase. You note it. It's a specific phrase.
+
+You put money on the table for your share of the wine — enough, not more — and you stand up and you get your coat and you walk to the door. The restaurant keeps going around you. The door opens out onto the sidewalk and the cold air and the city.
+{% elif w.hasTrait("BITCHY") %}
+He stops mid-sentence.
+
+You don't elaborate. You don't soften it. There's a card in your wallet and you put enough on the table and you get your coat off the chair back. He says something — "That's kind of abrupt, don't you think?" — and you're already not in the conversation.
+
+The door. The sidewalk. The cold. You're half a block away before you take a full breath.
+{% else %}
+He stops. He looks at you with the expression of a man trying to figure out if this is a test. It isn't a test.
+
+"I'm sorry you feel that way," he says. There's a pause. "Did I say something—"
+
+"No," you say. "It's just not a fit."
+
+You put money on the table and you get your coat and you leave. He's still sitting there when you reach the door. You don't look back at his face because you don't need to.
+{% endif %}
+
+{% if w.hasTrait("OBJECTIFYING") %}
+That flicker on his face — the split second before the controlled response — you've seen it before. From the other side of it, it registers differently. Not bigger, not smaller. Just differently.
+{% endif %}
+
+The sidewalk is cold. A cab pulls over when you raise your hand. You get in. The city moves past the window and you sit in it for a minute before you decide what you feel about what you just did.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAD_DATE"
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "BAD_DATE_DIRECT"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true

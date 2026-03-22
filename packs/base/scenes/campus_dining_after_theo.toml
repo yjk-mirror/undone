@@ -1,0 +1,273 @@
+[scene]
+id          = "base::campus_dining_after_theo"
+pack        = "base"
+description = "The dining hall. Tuesday lunch. Theo is two tables over with his friends. He hasn't seen you yet."
+
+[intro]
+prose = """
+The Ivy dining hall at noon on a Tuesday. Loud the way a room gets when a hundred and fifty people are eating at the same time — trays clattering, steam from the pizza station, the specific echo of a high ceiling with no carpet. Someone near the windows is laughing too loud, one of those laughs that carries.
+
+You're at the salad bar. Tray in hand, scanning for a seat.
+
+And then you see him.
+
+Theo. Two tables over, toward the middle of the room. He's with three friends you half-recognize from orientation — one of them you know is on his floor. He's eating. Talking. Laughing at something one of them said. His Gatorade is on the table next to his tray. Normal. Completely normal.
+
+He hasn't seen you yet.
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') < 20"
+prose = """
+The dining hall at noon on a Tuesday. Trays, voices, the steam from the pasta station, a hundred and fifty people doing what they do.
+
+You're at the salad bar when you locate him without deciding to.
+
+Theo. Two tables over. His forearm on the table, his hand around a Gatorade bottle. He's talking to three friends, laughing at something. His shoulders. The line of his jaw. Your body sends information before your brain has finished processing where you are.
+
+Warmth. Low. Immediate.
+
+A room full of people who don't know what your body knows.
+
+He hasn't seen you yet.
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') >= 20 && w.getSkill('FEMININITY') < 40"
+prose = """
+The dining hall. Noon on a Tuesday. You're at the salad bar, tray in hand, when you see him across the room.
+
+Theo. Two tables over. His friends around him, a conversation in progress, something someone said that made him laugh.
+
+The seeing has weight. He was in your bed — no, you were in his — a few days ago. Both of those facts exist in this room right now, in this loud, public, Tuesday room.
+
+He hasn't seen you yet.
+"""
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "go_to_him"
+label  = "Go to him"
+detail = "Cross the room. Sit down."
+prose  = """
+You go.
+
+Twenty feet of dining hall. Tray in hand, moving toward his table in a straight line.
+
+His friends see you first. One of them — the guy from his floor, you think — clocks you coming and says something to the group, and then Theo looks up.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Twenty feet. The room is full of people and anyone looking can see a girl crossing toward a guy's table. That's what it is. That's what it looks like. You keep walking.
+
+His face when he sees you: no performance, no rearranging. Just warmth. A small smile, unrehearsed.
+
+"Hey," he says.
+
+{% if w.hasTrait("CONFIDENT") %}
+You put your tray down next to his. "Hey." His friends make room — small shuffles, a bag moved, the adjustments people make when someone joins. He introduces you, easy, like this is a normal thing, which it is, you tell yourself, which it is.
+
+His forearm is on the table six inches from yours.
+{% elif w.hasTrait("OUTGOING") %}
+"Hey," you say back. His friend — the tall one — is already moving his bag. You sit down and the conversation doesn't stop, just incorporates you. Theo doesn't make it into a thing. That's the right call and you notice that he made it.
+
+His leg is three inches from yours under the table.
+{% else %}
+"Hey," you say.
+
+His friends are making polite space. Someone moves a bag. You sit. The conversation picks back up around you, the ordinary business of lunch, and you're in it now, in the middle of his Tuesday, and his voice when he talks to you is the same voice that said your name in a quiet room a few nights ago.
+{% endif %}
+
+{% elif w.hasTrait("CONFIDENT") %}
+His friends see you and then he looks up. Something in his face settles when he sees you — not relief exactly, just ease. The arrival of something expected.
+
+You put your tray down. "Room for one more?"
+
+His friend moves a bag. Theo gestures at the spot beside him. You sit.
+
+"Hey," he says. Quiet, just for you.
+
+"Hey," you say.
+
+He introduces you around the table. His friends are easy. The conversation resumes. You're in it.
+{% elif w.hasTrait("OUTGOING") %}
+You're good at this — at entering a table, at being the person who just shows up. His friends make room before you even ask. You're sitting before there's been an opportunity to hesitate.
+
+Theo grins at you. Not a surprised grin. Like he's glad.
+
+"You know Maya?" one of his friends asks, meaning someone at the table. You don't. You introduce yourself. The conversation folds you in. His shoulder is next to yours.
+{% else %}
+His face when he sees you is warm. No performance, no recalibration. Just: there you are.
+
+One of his friends moves a bag. You sit.
+
+"Hey," Theo says.
+
+"Hey."
+
+His voice has some of the morning in it, even at noon. You eat. His friends talk. You're at his table in the dining hall and the world hasn't ended.
+{% endif %}
+
+{% if w.getSkill('FEMININITY') < 20 %}
+His friends are talking about something — a professor, an assignment, something that happened in a class you're not in. Theo says something and everyone laughs and his shoulder moves when he laughs and you are extremely aware of where his shoulder is.
+
+You eat your salad. You contribute to the conversation twice. The second time he looks over at you when you say it and the look is just: there you are, paying attention. You hold that for the rest of the meal.
+{% elif w.getSkill('FEMININITY') < 40 %}
+The meal goes normally. His friends are fine — easy enough, no complications. Theo doesn't announce anything or make it into a thing. He just eats lunch with you at his table, which is what it is.
+
+When people start leaving he looks at you. Just looks, checking something. You look back. There it is.
+{% else %}
+Lunch. Normal. His friends, the dining hall noise, the ordinary Tuesday. He doesn't perform anything and neither do you and by the end of the meal the fact of you being there feels like a fact, not an announcement.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "DINING_AFTER_THEO"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+# ── Sit somewhere else ──────────────────────────────────────────────────
+
+[[actions]]
+id     = "sit_elsewhere"
+label  = "Sit somewhere else"
+detail = "Not next to him. Not far. Somewhere in between."
+prose  = """
+You find a table. Not next to his. Not across the room. The distance you land on is not an accident.
+
+{% if w.hasTrait("SHY") %}
+This is manageable. You have a seat and a tray and you don't have to do anything. He's there and you can see him and that's as much as you can hold right now.
+
+You eat. You don't look over. You do look over. You eat.
+{% elif w.hasTrait("HOMOPHOBIC") %}
+His table is visible from here. That's the problem and also the point. You can see his laugh — the way his shoulders move. His hands when he reaches for the Gatorade. His forearm. You know things about that forearm now and the knowing is sitting right there in this public room with you.
+
+You eat. You are watching him from two tables over and you know exactly what you're doing.
+{% else %}
+You sit. He's in your line of sight if you look up. You eat. You look up twice in the first five minutes and then settle into the meal.
+{% endif %}
+
+At some point he sees you.
+
+You're not watching when it happens — or you are, and you look away, and when you look back his eyes are already on you. A beat. The dining hall noise around you both, the distance between the tables.
+
+He raises his hand. Not a wave. Just a raised hand — I see you, I know you're there.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+The gesture across a public room. Simple. In front of everyone. Two people acknowledging each other.
+
+{% if w.hasTrait("SEXIST") %}
+You had a clear sense of how this worked. Who acknowledges whom, who crosses rooms, who raises a hand. The model you had assigned these things to specific positions. The model didn't hold.
+
+You raise your hand back.
+{% else %}
+You raise your hand back. That's all it is. That's all it is, and it has been sitting in your chest since the moment you did it.
+{% endif %}
+
+{% elif w.hasTrait("SEXIST") %}
+The small protocol of it. Who makes the gesture first. He did. You used to think the logic of these things was clear. The logic was apparently about something else.
+
+You raise your hand.
+
+{% else %}
+You raise your hand back.
+
+The meal continues. The dining hall continues. He finishes before you and on his way out he passes your table and stops for a second.
+
+"Hey," he says.
+
+"Hey," you say.
+
+He goes.
+{% endif %}
+
+{% if w.getSkill('FEMININITY') < 20 %}
+You finish eating. The dining hall does its thing around you. Trays, noise, the pizza station.
+
+His table is empty now. His Gatorade bottle is still on it. You look at it for a second and then you pick up your tray and go.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "DINING_AFTER_THEO"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+# ── Leave ───────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "leave"
+label  = "Leave"
+detail = "You can't be here right now."
+prose  = """
+You turn around.
+
+Not fast. Not dramatic. You just turn around and walk back the way you came, through the entrance, out into the corridor.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+It's not Theo. Theo is fine — Theo is just there with his friends eating lunch. It's the room. A room full of people who don't know anything, who might look over and see you looking at him, who might see him look back, who might put two things together and arrive at a third thing that is yours and nobody else's.
+
+The corridor is empty. Quieter. You walk.
+{% elif w.hasTrait("SHY") %}
+Too much. The room, the noise, him there with people around him. Too much at once. The salad bar line, the tray, having to cross that distance while he might or might not be looking. Not today.
+
+The corridor is better. Less to manage.
+{% else %}
+You just can't be in the same room with him eating Gatorade and laughing about homework. Not today. Maybe tomorrow. Not today.
+{% endif %}
+
+You eat somewhere else.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+The courtyard bench. Cold. You sit with your tray and eat and the campus goes on around you, its ordinary Tuesday. The dining hall is two buildings over. He doesn't know you were there.
+
+{% if w.getSkill('FEMININITY') < 20 %}
+His forearm on the table. His hand around the bottle. The warmth that landed before you finished finding him in the room.
+
+The salad is fine. The bench is cold. You eat.
+{% endif %}
+
+{% else %}
+The courtyard bench. The vending machine by your dorm. Somewhere that isn't there, which is the point, and also isn't particularly satisfying as a point.
+
+You eat. The afternoon is there when you're done.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "DINING_AFTER_THEO"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 8
+
+  [[actions.effects]]
+  type   = "change_anxiety"
+  amount = 5
+
+  [[actions.next]]
+  finish = true

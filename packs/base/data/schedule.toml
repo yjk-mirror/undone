@@ -178,6 +178,13 @@ consumes_time = true
   condition = "gd.week() >= 3 && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('GYM_CHANGING_ROOM')"
   once_only = true
 
+  # Bad date — universal
+  [[slot.events]]
+  scene     = "base::bad_date"
+  weight    = 4
+  condition = "gd.week() >= 4 && !gd.hasGameFlag('BAD_DATE')"
+  once_only = true
+
   # Jake domesticity — post-relationship
   [[slot.events]]
   scene     = "base::jake_stays_over"
@@ -320,6 +327,14 @@ consumes_time = true
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
+  # Marcus Monday after rejection
+  [[slot.events]]
+  scene     = "base::marcus_monday_rejected"
+  weight    = 0
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_REJECTED') && !gd.hasGameFlag('MARCUS_REJECTION_MONDAY')"
+  once_only = true
+  npc_role  = "ROLE_MARCUS"
+
 # ── Campus opening arc ────────────────────────────────────────────────
 
 [[slot]]
@@ -386,9 +401,10 @@ name = "campus_opening"
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
   once_only = true
 
+  # Dining hall after Theo — seeing him in public
   [[slot.events]]
-  scene     = "base::campus_theo_morning"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  scene     = "base::campus_dining_after_theo"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER')"
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER') && !gd.hasGameFlag('DINING_AFTER_THEO')"
   once_only = true
