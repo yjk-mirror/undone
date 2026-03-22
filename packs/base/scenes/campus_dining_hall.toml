@@ -5,13 +5,11 @@ description = "The dining hall. Social hierarchies, inverted. The shape of what 
 
 [intro]
 prose = """
-The Ivy dining hall is large enough that it has factions. You can see them from the entrance — the clustered tables, the particular density of certain groups, the territories that formed around the second week without any apparent announcement. In high school you knew exactly where you stood in this kind of map. You were good at rooms. You read the room and then put yourself correctly in it.
+The Ivy dining hall is large enough that it has factions. You can see them from the entrance — the clustered tables, the particular density of certain groups, the territories that formed around the second week without any apparent announcement. One table is all lacrosse gear and loud. One is laptops-out, no conversation. One is the table where everyone already knows each other from somewhere else, and you can tell because nobody is trying.
 
 A tray. The line. The woman behind you — a sophomore, maybe a junior, one of those people who carry themselves with the specific confidence of having survived a year of this — steps closer to point at the grain bowl and says, "Get the harissa, not the tahini, the tahini's been sitting out all morning." She says it like you know each other. Like helping is just a thing she does.
 
-The tip lands like a small kindness and a small lesson at the same time.
-
-The harissa. It's good. Tray in hand, the factions map stretching out ahead, the math happening on its own.
+The harissa. It's good. Tray in hand, the factions map stretching out ahead.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -25,7 +23,7 @@ You identify a table with space at the end — three people already there, talki
 
 He doesn't move it.
 
-You stand there for a second. In high school you were the one with the backpack on the seat — not to exclude anyone, but because spaces filled with the people you expected them to fill with, and everyone else was background. You knew you were doing it. You just didn't know what it looked like from out here.
+You stand there for a second.
 
 {% if w.hasTrait("CONFIDENT") %}
 "Is that seat taken?" you ask, meaning the backpack.
@@ -46,17 +44,17 @@ You finish the grain bowl. Get coffee. Sit.
 The dining hall noise is steady around you — trays, conversations, the scrape of chairs, someone across the room who laughs loud and specific, the kind of laugh that other people's tables hear. The world has its own life in here. You're just eating in it.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-You try to think through what you actually know versus what you assumed. In high school you understood the hierarchy because you were running the same operating system as everyone else in it — the rules were written in a language you spoke natively. This place is running a different OS. You keep submitting commands that don't work and getting outputs you didn't expect.
+You watch it from your table. Some guy three tables over performing a story for his whole group, timing his pauses. The sophomore with the harissa tip is halfway through her meal already, talking to two people she clearly knows. You spent forty-five seconds standing next to a backpack.
 
-You called your mom on Tuesday. Everything's great, you said. Classes are interesting. I'm making friends. Your mom said you sounded tired. You said you were fine, just adjusting. You are fine. You are adjusting. You just can't explain what you're adjusting *to*, because the explanation starts three weeks ago and you don't have the words and even if you did, this is not a conversation that happens over the phone on a Tuesday.
+You called your mom on Tuesday. Everything's great, you said. Classes are interesting. I'm making friends. Your mom said you sounded tired. You said you were fine, just adjusting. You are fine. You are adjusting.
 {% elif w.getSkill("FEMININITY") < 50 %}
-You've been cataloguing. Not deliberately — it's just happening. The woman in the lunch line. The backpack. The junior who held a door yesterday and then did a visible recalibration when you said thank you without the particular warmth he'd been expecting. All these small data points accumulating into a picture you don't have a frame for yet.
+The woman in the lunch line. The backpack. The junior who held a door yesterday and then did a visible recalibration when you said thank you without the particular warmth he'd been expecting. Small moments, each one nothing. You finish the grain bowl and they're still there, sitting behind your eyes.
 
-You called home this week. Your dad asked about your classes. Your mom asked if you were eating. You said yes to both. There was a thing you wanted to say, hovering right at the surface, and you said nothing. You don't know who you'd even explain it to.
+You called home this week. Your dad asked about your classes. Your mom asked if you were eating. You said yes to both. There was a thing you wanted to say and you said nothing. You don't know who you'd even explain it to.
 {% else %}
-You've been at this for a week and you've made a list, not on paper but in the back of your head, of things you were wrong about. The list is longer than you thought it would be. Not catastrophically longer. Just longer.
+A week in. The list of things you were wrong about is longer than you thought it would be. Not catastrophically longer. Just longer.
 
-You called your dad yesterday. He wanted to hear about your classes. You told him about your classes. He sounded proud in the way he always sounds proud, which is the thing you miss — being known well enough to be predicted. Here, nobody knows what to expect from you, and you don't know what to expect from yourself.
+You called your dad yesterday. He wanted to hear about your classes. You told him about your classes. He sounded proud. Same as always. You said you were good, and you are good, and when you hung up you sat with your phone in your hand for a minute before putting it down.
 {% endif %}
 
 You're not going to understand this place in a week. You know that. A week is enough to know the shape of what you don't know yet.

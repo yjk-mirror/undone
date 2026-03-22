@@ -11,24 +11,18 @@ It's after midnight now. Janette is asleep on her side of the room, one arm over
 
 You've been lying here for an hour.
 
-The problem is the dream. Not the one you're having — you haven't been asleep yet — but the one from the night before, and the night before that. You woke up last Tuesday knowing what you'd been dreaming and not being able to figure out what to do with the information. You'd been dreaming the way your body apparently dreams now, in the new grammar of this body, and you'd woken up with evidence of it and spent twenty minutes in the bathroom not thinking about it.
+The sheets are unfamiliar. The mattress is too soft in one spot and too hard in another. Sometime in the last few nights something started happening in your sleep, and the evidence of it has been there when you wake up — warmth that doesn't belong to the blanket, a tension low in your body that doesn't come from anxiety. You woke up last Tuesday with your heart going and your hands flat against your own stomach, and spent twenty minutes in the bathroom before going to class.
 
-You're thinking about it now.
-
-You trip over the pronouns in your own head and make yourself sit with the correction instead of rushing past it. The body is responding with a certainty you don't know how to explain, and the fact of that presses harder than the dorm mattress does.
-
-Outside, someone laughs loud enough that you hear it through the wall. College. It's college. You're at college.
+The laughing down the hall goes quiet. The building settles. Your body is still doing what your body is doing.
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 20"
 style     = "anxiety"
 prose = """
-The want is there — clear, physical, undeniable — and it's not happening tonight. Not with another person in the room. Not when the meaning of it is still an open question. Blanket up. Ceiling.
+There's warmth between your hips that has nothing to do with the blanket. You pull the covers up anyway. The ceiling is a rectangle of faint grey where light comes in around the curtains. You stare at it. The warmth doesn't go anywhere.
 
-The thing about shame is it doesn't argue. You can't reason with it. It just sits there saying *you know what this means* and you say *I don't know what it means* and it says *yes you do.*
-
-You don't. You're not going to. Not tonight.
+You roll onto your side. Janette's breathing is steady across the room. The ceiling is still there when you roll back.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -38,11 +32,9 @@ id    = "try_to_sleep"
 label = "Try to sleep"
 detail = "You're overthinking this. It's late. Sleep."
 prose = """
-You make yourself stop thinking about it with the force of will you've applied to everything else in your life, which is considerable, and eventually, sometime after 1 AM, you fall asleep.
+You make yourself stop moving, stop adjusting, stop paying attention to what your body is doing, and eventually — sometime after 1 AM — you go under.
 
-You dream. You wake up at 6:30 with the understanding that whatever you were trying not to think about, your body has a position on the question and is prepared to be clear about it.
-
-*Okay. File it. Move on.*
+You dream. You wake up at 6:30 and the sheets are warm in a way they weren't when you got into them.
 
 You get up and shower and tell yourself it will make more sense when you're less tired.
 """
@@ -66,7 +58,7 @@ detail = "You're not explaining anything. You just want to know someone's awake.
 prose = """
 You pick up your phone. It's 12:30, which is actually fine for the people you know from home, who are like that.
 
-You text Marcus — not *your* Marcus, you keep having to remember the new geography of pronouns, the old friend Marcus, Raul's friend Marcus — and say: *you up?*
+You text Marcus and say: *you up?*
 
 He responds in four seconds. *yeah, can't sleep either. college?*
 
@@ -74,18 +66,18 @@ He responds in four seconds. *yeah, can't sleep either. college?*
 
 *how's the room?*
 
-You think about this. *fine. weird. the usual.*
+You look at the dark ceiling. *fine. weird. the usual.*
 
 *lol fair.* A pause. Then: *you good?*
 
 {% if w.hasTrait("SHY") %}
-You type *yeah* and send it and then lie there holding the phone and wishing you could explain it, and don't.
+You type *yeah* and send it and then lie there holding the phone, and don't type anything else.
 {% else %}
-You type *getting there* and send it. Which is true. You think it's true.
+You type *getting there* and send it.
 
 *good*, he says. *get some sleep.*
 
-You put the phone face-down. You're not going to explain it. You can't explain it. But you texted someone and someone texted back, and that's not nothing.
+You put the phone face-down on the mattress. The screen goes dark. The room is quiet again.
 {% endif %}
 """
 
@@ -106,17 +98,15 @@ id    = "explore_it"
 label = "Stay with it. See what you actually think."
 detail = "You're alone. The lights are off. No one's watching. Figure out what this is."
 prose = """
-You lie in the dark for a while longer and let yourself think it through instead of away from.
+You lie on your back and stop trying to get away from it.
 
-*The old explanations don't help here*, you think, and then stop, because the thought doesn't go anywhere useful. The old explanations don't have much to say about the present situation.
+This afternoon, crossing the quad, there was a guy — dark jacket, coffee cup, heading somewhere — and something pulled in your chest the way things don't usually pull in your chest. You clocked it the way you'd clock a car accident. He was halfway across the green before the feeling caught up to itself.
 
-The present situation is: you're attracted to men. The present situation is: this arrived without your permission and with considerable force. The present situation is: you're lying in a dorm room at a prestigious university thinking about a boy you saw on the quad for three seconds this afternoon and cannot remember his face but can remember the specific way he held a coffee cup.
+The body has been keeping a record. It has been doing this for weeks, and the record is longer than you'd like it to be.
 
-*This is insane.*
+You stare at the ceiling for another hour. The building makes its sounds. Janette breathes. At some point the tension bleeds off into something closer to tired, and you go under.
 
-And then: *okay. but is it?*
-
-You don't fall asleep for another hour. When you do, you don't have the other dream. You have a regular dream, about something forgettable. In the morning you decide this is neither resolution nor progress, just information, and you have orientation at nine.
+In the morning there's orientation at nine.
 """
 
   [[actions.effects]]

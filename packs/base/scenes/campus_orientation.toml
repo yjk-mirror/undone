@@ -11,11 +11,9 @@ You're at a round table with seven other freshmen. The table has been given an i
 
 The people at your table go around. One person is nervous about the workload. One person is excited about the research opportunities. A guy two seats over — broad, easy smile, one of those people who are comfortable everywhere — says he's excited to "meet new people" and nervous about nothing, which gets a laugh, which he clocked and aimed for.
 
-When it gets to you: excitement about the coursework. Nerves about time management.
+The card gets to you. You say something. The table nods.
 
-The broad guy across the table — his name tag says ADAM — gives you the smile that you now know what to do with, which is to clock it and file it and decide later whether it has implications.
-
-It's the same smile you gave to women at parties. You know exactly what it's for. You know exactly how it reads from the other side now.
+The broad guy across the table — his name tag says ADAM — turns the smile at you. It lands where it lands.
 
 {% if w.hasTrait("SHY") %}
 Nobody asks follow-up questions. The card moves on. You're relieved.
@@ -31,26 +29,22 @@ condition = "w.getSkill('FEMININITY') < 15"
 prose = """
 Freshman orientation. The assigned table. The icebreaker card says *Share something.*
 
-Time management. The real answer is different but the real answer is not for this table.
+You say something about time management. The table nods.
 
-The guy two seats over — broad, easy smile — does the thing with the smile. You watch him do it. Watch it land in the room. You've been on the other side of that smile and you know exactly what it's encoding.
-
-*Watching this from the outside now.* And then: *No. From the other side.* That's different. That's the whole thing.
+The guy two seats over — broad, easy smile — does the thing with the smile. You watch him do it. Watch it move around the table. Watch it land on you.
 
 Orientation continues.
 """
 
 [[thoughts]]
 condition = "w.getSkill('FEMININITY') < 50"
-style     = "inner_voice"
+style     = "observation"
 prose = """
 At break you get coffee at the table in the back and a junior introduces himself and asks if you're enjoying orientation, and you say yes, and he recommends two clubs, and you nod, and he says *nice to meet you* and means it in the specific way that a junior means it to a freshman woman he thinks is attractive.
 
-You know what that means. You've done it. The specific warmth of it, the manufactured interest, the slight lean-in that says *I'm not hitting on you, I'm just engaged with what you're saying.*
+He holds the lean-in a beat too long before he moves on — not aggressive, just the slight extra weight of someone working at being engaging. You clock it. He doesn't notice that you do.
 
-You're standing on the other side of it. He hasn't done anything wrong — he's being perfectly nice. You're just seeing the blueprint now instead of the wall.
-
-No clear protocol for this information. It goes on the list.
+He drifts toward the next person. You refill your coffee.
 """
 
 # ── Player Actions ────────────────────────────────────────────────────
@@ -118,7 +112,7 @@ After the morning session Adam materializes next to you at the coffee table with
 You say something noncommittal. He says something about how he's pre-law anyway, which is why he's here, and the conversation drifts along without ever turning into much of anything.
 {% endif %}
 
-He wanders off toward someone else eventually. You watch him go and think: *six months ago I would have done exactly that.*
+He wanders off toward someone else eventually. You watch him go.
 """
 
   [[npc_actions.effects]]
