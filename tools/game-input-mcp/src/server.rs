@@ -337,7 +337,7 @@ impl GameInputServer {
     }
 
     #[tool(
-        description = "Start the game by running `cargo run --release` in the given working directory. When dev_mode is true it launches with `--dev --quick` so the dev panel and IPC are available immediately."
+        description = "Start the game by launching the pre-built release binary directly (no cargo rebuild). When dev_mode is true it launches with `--dev --quick` so the dev panel and IPC are available immediately. The binary must already exist at target/release/undone(.exe) — run `cargo build --release --bin undone` first if needed."
     )]
     async fn start_game(
         &self,
@@ -346,23 +346,45 @@ impl GameInputServer {
         let working_dir = params.0.working_dir.clone();
         let dev_mode = params.0.dev_mode;
 
-        let mut command = std::process::Command::new("cargo");
-        command.args(["run", "--release", "--bin", "undone"]);
+        let exe_name = format!("undone{}", std::env::consts::EXE_SUFFIX);
+        let binary_path = std::path::Path::new(&working_dir)
+            .join("target")
+            .join("release")
+            .join(&exe_name);
+
+        if !binary_path.exists() {
+            return Ok(CallToolResult::success(vec![Content::text(format!(
+                "Release binary not found at {}. Run `cargo build --release --bin undone` first.",
+                binary_path.display()
+            ))]));
+        }
+
+        let mut command = std::process::Command::new(&binary_path);
+        command.current_dir(&working_dir);
         if dev_mode {
-            command.args(["--", "--dev", "--quick"]);
+            command.args(["--dev", "--quick"]);
+        }
+
+        // On Windows, detach from console and create a new process group to avoid
+        // focus-stealing when the game window appears.
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
+            const DETACHED_PROCESS: u32 = 0x0000_0008;
+            command.creation_flags(CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS);
         }
 
         let child = command
-            .current_dir(&working_dir)
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
             .spawn()
-            .map_err(|e| McpError::internal_error(format!("failed to spawn cargo: {}", e), None))?;
+            .map_err(|e| McpError::internal_error(format!("failed to spawn game: {}", e), None))?;
 
         let pid = child.id();
 
         Ok(CallToolResult::success(vec![Content::text(format!(
-            "Game building and launching (cargo PID {}). The game window will appear once compilation finishes. Use is_game_running to check.",
+            "Game launched (PID {}). Use is_game_running to check status.",
             pid
         ))]))
     }
