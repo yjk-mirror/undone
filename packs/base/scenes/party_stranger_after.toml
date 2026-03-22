@@ -62,27 +62,111 @@ He gets you down one more flight, where the building's back entrance opens into 
 
 He kisses you again with one hand up under your top, thumb dragging over your nipple until your back arches off the wall.
 
-{% if w.getSkill("FEMININITY") < 25 %}
-The body gets there before the mind does. His hand between your legs and you're wet enough that the fact of it shocks you for half a second, then doesn't matter because he's feeling it too and looking at your face when he realizes.
-{% elif w.getSkill("FEMININITY") < 50 %}
-His fingers find you through your underwear first, the touch harder than you expected, carried by the afterburn of the party. You grab his shoulders to steady yourself and end up pulling him closer instead.
-{% else %}
-Your body is already ahead of the room you left behind. The hallway, the locked doors, the chance that someone could come through and not quite soon enough to matter — it all sharpens everything.
+{% if w.hasTrait("NIPPLE_GETTER") %}
+The sensation goes straight down — not gradually, not warmly, but hard and direct, like a wire pulled taut from his thumb to somewhere low in your body. Your back scrapes concrete. You make a sound that's too loud for the hallway and don't stop him.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come from it. Right there, before his hand goes anywhere else — his thumb, the rough scrape of the wall, the bass still bleeding through the ceiling. It hits without warning and the sound echoes off the concrete before you can do anything about it. He freezes, staring at you.
+
+{% if w.hasTrait("LIP_BITER") %}
+You bite down on your lip a second too late. The sound already happened.
 {% endif %}
 
-He hooks your underwear aside. His hand works you open. You kiss him to keep from making too much noise and fail at that almost immediately.
+You pull him back in before he can say anything.
+{% endif %}
+{% elif w.hasTrait("HAIR_TRIGGER") %}
+His thumb, the wall, the bass vibrating through the pipes above you. It's enough. You come before his hand goes anywhere lower and the sound you make isn't quiet. It echoes once off the concrete walls and dies, and for a second neither of you moves.
+
+{% if w.hasTrait("LIP_BITER") %}
+You press the back of your hand against your mouth a moment too late. The stairwell has already heard it.
+{% endif %}
+
+He looks at you. You pull him back.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His hand moves between your legs.
+
+{% if w.hasTrait("EASILY_WET") %}
+He stops. Not pulling back — stopping. His fingers still against the fabric of your underwear, soaked through already, and the evidence of it is right there on his hand. He doesn't say anything. He just looks at your face. You hold his gaze and don't look away, and after a second he exhales hard through his nose and keeps going.
+{% else %}
+The body gets there before the mind does. He's feeling it too and looking at your face when he realizes.
+{% endif %}
+{% elif w.getSkill("FEMININITY") < 50 %}
+His fingers find you through your underwear first, the touch harder than you expected, carried by the afterburn of the party.
+
+{% if w.hasTrait("EASILY_WET") %}
+He makes a low sound when he feels how wet you are. You grab his shoulders to steady yourself and end up pulling him closer instead.
+{% else %}
+You grab his shoulders to steady yourself and end up pulling him closer instead.
+{% endif %}
+{% else %}
+Your body is already ahead of the room you left behind. The hallway, the locked doors, the chance that someone could come through and not quite soon enough to matter — it all sharpens everything.
+
+{% if w.hasTrait("EASILY_WET") %}
+When his fingers find you, the evidence of how long you've been wet is right there. He laughs once, low and private, and the sound is worse than the dark.
+{% endif %}
+{% endif %}
+
+He hooks your underwear aside. His hand works you open.
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+You can hear your own breathing. The concrete stairwell has no soft surfaces — the sound just goes up the walls. If anyone stepped onto the landing above, there'd be no mistaking what was happening down here.
+{% endif %}
+
+{% if w.hasTrait("LIP_BITER") and not w.hasTrait("HAIR_TRIGGER") %}
+You bite your lip to stay quiet and it works for about thirty seconds.
+{% elif not w.hasTrait("LIP_BITER") %}
+You kiss him to keep from making too much noise and fail at that almost immediately.
+{% endif %}
 
 When he pushes into you, it's fast and direct and half-drunken in the way that still knows exactly what it's doing. Your heel catches against the concrete wall. His hand braces beside your head. The service hallway narrows to the place where your bodies meet and the heat keeps building.
 
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs lock around him. He makes a sound against your shoulder.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl hard inside your shoes. The heel of one foot scrapes the wall in short, involuntary drags.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush is already down your chest and throat. Even the ugly fluorescent light catches it.
+{% endif %}
+
 {% if w.hasTrait("OBJECTIFYING") %}
-You know what you must look like against the wall — skirt pushed up, his hand on your thigh, his mouth open against your throat — and the knowledge goes through you as hard as the thrust that follows it.
+You know what you must look like against the wall — skirt pushed up, his hand on your thigh, his mouth moving to your throat.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth opens against the side of your neck and your legs nearly give out. You grab his jacket and hold on. The wall keeps you upright. He feels it happen and does it again, slower, and this time you actually slide an inch before your heel catches concrete.
+{% else %}
+His mouth open against your throat — and the knowledge of how you look goes through you as hard as the thrust that follows it.
+{% endif %}
+{% elif w.hasTrait("SENSITIVE_NECK") %}
+His mouth finds your throat and that's when your legs go. Just — gone. You grab fistfuls of his jacket and hold on, your whole body leaning into the wall to keep standing. He notices and his mouth stays there.
 {% elif w.hasTrait("ROMANTIC") %}
 The concrete is cold. His mouth tastes like beer. The wanting has none of the usual dressing around it — just weight and heat and the locked doors at your back.
 {% elif w.hasTrait("AMBITIOUS") %}
 Work is nowhere in this hallway. The concrete is cold and his hands are warm and neither of those things has a consequence you're counting.
 {% endif %}
 
-Your orgasm hits fast, dragged out of you by the public residue still clinging to the whole thing. He feels it happen and swears softly against your neck. He comes a moment later with his forehead against your shoulder, breathing hard, still holding you pinned to the wall in a way that would be too much if you didn't want exactly that.
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches hard off the wall — not a lean, not a shift, the full curve of it, your shirt dragging up against the concrete with a faint hiss. He braces his arm higher to keep you from pulling away.
+{% endif %}
+
+{% if w.hasTrait("ORAL_FIXATION") %}
+You press your mouth against his shoulder and bite down when it gets loud. It helps. Barely.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+His weight has you against the concrete and you can't move — his arm at the wall beside your head, his body against yours, nothing to push off from. That's the part that tips the orgasm over the edge: not being able to go anywhere.
+{% endif %}
+
+Your orgasm hits{% if w.hasTrait("HAIR_TRIGGER") %} again{% endif %}, dragged out of you by the public residue still clinging to the whole thing. He feels it happen and swears softly against your neck. He comes a moment later with his forehead against your shoulder, breathing hard, still holding you pinned to the wall{% if w.hasTrait("SUBMISSIVE") %} — and that part, the not letting go, is the last thing your body needed{% else %} in a way that would be too much if you didn't want exactly that{% endif %}.
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+There's a dark stain on the concrete floor. Neither of you looks at it directly. He says nothing. You say nothing.
+{% endif %}
 
 For a few seconds neither of you moves. Then the building comes back: radiator hum, bass through pipes, somebody laughing faintly two floors up.
 

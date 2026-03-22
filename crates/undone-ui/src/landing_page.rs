@@ -31,7 +31,10 @@ fn try_load_entry(
             *game_state.borrow_mut() = Some(loaded_game);
             crate::reset_scene_ui_state(signals);
             signals.tab.set(AppTab::Game);
-            signals.phase.set(AppPhase::InGame);
+            // Defer phase transition — see char_creation::build_begin_button.
+            floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+                signals.phase.set(AppPhase::InGame);
+            });
             status_msg.set(format!("Loaded: {}", entry.name));
         }
         Err(err) => {

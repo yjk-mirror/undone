@@ -47,24 +47,88 @@ Your hand goes to his chest, heat through the fabric. You lean down and kiss him
 
 {% if w.hasTrait("CONFIDENT") %}
 You straddle him. Your skirt rides up your thighs. His hands slide under your shirt. You break the kiss long enough to nod toward the hall. "Bedroom." He stands, lifting you with him, your legs locked around his waist. Your back hits the wall in the hallway. You're directing, steering, a hand on his collar.
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth finds your neck in the hall and something goes out of your legs. You grip his collar harder. His lips move against the tendon there and your body goes slack against the wall — he's holding you up and he doesn't know why.
+{% endif %}
 {% elif w.hasTrait("FLIRTY") %}
 You roll your hips against him, feel the hard ridge of his cock through his jeans. He laughs low and his hands go under your skirt. He stands with you around him and walks you backward into the hall while you work the buttons of his shirt.
+{% if w.hasTrait("SENSITIVE_NECK") %}
+He bites your neck on the way down the hall — not hard, just his teeth and then his mouth — and the sound you make surprises both of you. He pauses. You say, "Don't stop."
+{% endif %}
 {% elif w.hasTrait("ANALYTICAL") %}
-You're noting: stubble, the heat through his shirt, the way your hips settle against his — and then his tongue is in your mouth and the rest of the catalogue drops. He stands with you around him and carries you down the hall. The wall against your back. His mouth on your neck.
+You're noting: stubble, the heat through his shirt, the way your hips settle against his — and then his tongue is in your mouth and the rest of the catalogue drops. He stands with you around him and carries you down the hall.
+{% if w.hasTrait("SENSITIVE_NECK") %}
+The wall against your back, his mouth on your neck — you'd catalogued him as average-height, no remarkable features, and then his lips drag up from your collarbone and the distinction collapses. Your nails go into his shoulders.
+{% else %}
+The wall against your back. His mouth on your neck.
+{% endif %}
 {% elif w.hasTrait("SHY") %}
 You kiss him. His hands on your waist feel huge. He pulls you onto his lap and you go still for a moment, then don't. He does all the moving from there — standing, carrying you, setting you down on your bed. You watch him from the pillows while he strips his shirt off.
+{% if w.hasTrait("LIP_BITER") %}
+Your bottom lip is between your teeth. You don't put it back.
+{% endif %}
 {% else %}
 He takes over once you're in his lap. Hands under your thighs, standing, walking you down the hall. He sets you on the bed. The comforter is cold against your back. He's above you, pulling his shirt off.
+{% if w.hasTrait("LIP_BITER") %}
+You're biting your lip watching him. He doesn't notice. You don't stop.
+{% endif %}
 {% endif %}
 
 He undresses you without ceremony. Shirt over your head, bra gone, skirt down to the floor. His jeans follow. His cock is hard, curved slightly to the left, a dark thatch at the base. He kneels between your legs.
 
+{% if w.hasTrait("NIPPLE_GETTER") %}
+Your nipples were already hard before his shirt hit the floor. He notices. His mouth goes there first and the sensation runs straight down through your belly, and when he lifts his head his eyes have a different quality than they did a minute ago.
+{% endif %}
+
 {% if w.getSkill("FEMININITY") < 25 %}
-His fingers touch you and your hips arch. You're wet — already, completely — and he can feel it, and your face does something you can't stop. He pushes into you. The fullness hits your spine. Your hands fly to his shoulders. He's inside you and the room narrows to the place where that's happening.
-{% elif w.getSkill("FEMININITY") < 50 %}
-You're wet. He slides two fingers in and you moan. When he lines up his cock and pushes, the stretch is a different stretch than a known person's — less careful, less anticipated. His weight, his smell, the particular rhythm he finds — all of it new. You wrap your legs around him. He fucks you deep, each thrust landing exactly where it lands.
+{% if w.hasTrait("EASILY_WET") %}
+His fingers touch you and you're soaked — completely, through your underwear, before his hands have done anything. He pulls his fingers back and looks at them. You don't say anything. He doesn't either.
+{% endif %}
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers touch you and your hips arch up off the bed. The orgasm hits fast, before he's even inside you — your hands go to his shoulders, your whole body rocks, and then you're lying there, breathing hard, and he's staring at you. He barely touched you.
 {% else %}
-You're wet. He enters you in one stroke. Your body takes him and you move with him, angling your hips, finding the rhythm. He's sweating, his chest against yours, the headboard knocking against the wall. You come before he does, a sound you don't suppress.
+His fingers touch you and your hips arch. You're wet — already, completely — and he can feel it, and your face does something you can't stop. He pushes into you. The fullness hits your spine. Your hands fly to his shoulders. He's inside you and the room narrows to the place where that's happening.
+{% endif %}
+{% if w.hasTrait("FLUSHER") %}
+Your chest is pink down to your sternum. He can see it in the lamp light. He doesn't comment.
+{% endif %}
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl against the back of his thigh. He keeps moving.
+{% endif %}
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the mattress when you come. He holds your hips down and keeps going.
+{% endif %}
+{% elif w.getSkill("FEMININITY") < 50 %}
+{% if w.hasTrait("EASILY_WET") %}
+You're wet before he reaches you — visibly, unmistakably. He slides two fingers in without any hesitation and you moan at the fullness before he's done anything else.
+{% else %}
+You're wet. He slides two fingers in and you moan.
+{% endif %}
+When he lines up his cock and pushes, the stretch is a different stretch than a known person's — less careful, less anticipated. His weight, his smell, the particular rhythm he finds — all of it new. You wrap your legs around him.
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing goes audible. He notices. His rhythm doesn't change — he just keeps going, watching your face.
+{% endif %}
+He fucks you deep, each thrust landing exactly where it lands.
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back comes off the mattress. He pins your hips down with both hands.
+{% endif %}
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes are curled tight against his calf.
+{% endif %}
+{% else %}
+{% if w.hasTrait("EASILY_WET") %}
+You're wet. He enters you in one stroke — no pause, no adjustment — and you take him without any difficulty. The sheet under you is already damp.
+{% else %}
+You're wet. He enters you in one stroke.
+{% endif %}
+Your body takes him and you move with him, angling your hips, finding the rhythm. He's sweating, his chest against yours, the headboard knocking against the wall.
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing is loud in the room. You don't quiet it.
+{% endif %}
+You come before he does, a sound you don't suppress.
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back bows hard off the mattress when it happens. He braces against the headboard.
+{% endif %}
 {% endif %}
 
 He comes with a grunt, his hips stuttering. He stays there for a few seconds, breathing. Then he rolls off.
@@ -72,9 +136,17 @@ He comes with a grunt, his hips stuttering. He stays there for a few seconds, br
 The space beside you is warm. He dresses in the dark — not quickly, not apologetically, just doing it. Kisses your forehead. The front door clicks shut. You lie in the quiet.
 
 {% if w.getSkill("FEMININITY") < 25 %}
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+Your legs are still parted. The sheet is soaked — really soaked, a dark patch spreading out from where you were. You stare at the ceiling. You'll deal with it. His cologne is still in the air.
+{% else %}
 Your legs are still parted. The sheets are damp. You stare at the ceiling. His cologne is still in the air.
+{% endif %}
 {% elif w.getSkill("FEMININITY") < 50 %}
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+The room is quiet. The sheets need to come off tonight — they're soaked through. You lie there until your breathing slows, then you strip them.
+{% else %}
 The room is quiet. The sheets smell different now. You lie there until your breathing slows.
+{% endif %}
 {% endif %}
 """
 
@@ -116,31 +188,88 @@ You stay where you are. Hands in your lap. You look at him.
 
 He watches you for a long moment. Then he stands and comes over. He kneels in front of your chair. His hands settle on your knees and push them apart. Not rough — just decided.
 
-His fingers slide up your thighs, under your skirt. He hooks your underwear to the side.
+{% if w.hasTrait("SUBMISSIVE") %}
+The directness of it — kneeling in front of you, just pushing your knees open — hits somewhere low and certain. Your hands go to the chair arms.
+{% endif %}
+
+His fingers slide up your thighs, under your skirt.
+
+{% if w.hasTrait("SENSITIVE_INNER_THIGHS") %}
+His palms slide up the inside of your thighs and you make a sound before his hands have reached anything. He pauses. His thumbs press in slightly — testing — and you grip the chair arms until your knuckles go white. He takes his time getting where he's going.
+{% endif %}
+
+He hooks your underwear to the side.
+
+{% if w.hasTrait("EASILY_WET") %}
+When he gets there, he stops. The fabric is soaked through. He can feel it before he's done anything. He looks up at you once, then his mouth closes over you.
+{% endif %}
 
 {% if w.hasTrait("CONFIDENT") %}
 You lean back and let him. When his mouth finds you, you let out a slow breath and put your hand in his hair. You guide the pace. He follows.
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs close around his head without deciding to. He presses them back open and keeps going.
+{% endif %}
 {% elif w.hasTrait("FLIRTY") %}
-You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them. You come against his face with your thighs clamped around his ears.
-{% elif w.hasTrait("ANALYTICAL") %}
-Living room floor. Your chair. That detail catches for half a second and then his tongue finds a rhythm and the clarity drops. The wet pressure of his mouth. The tension building low, tightening. You cry out and grip the arms of the chair.
-{% elif w.hasTrait("SHY") %}
-His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one. You come quietly, your legs shaking, and then he's standing up.
+You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them.
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs clamp around his ears when you come. He doesn't stop. You come against his face with your legs shaking.
 {% else %}
-His mouth is on you. Your head falls back. You moan into the empty apartment. When you come, his name isn't there — just the fact of it, sharp and immediate.
+You come against his face with your thighs clamped around his ears.
+{% endif %}
+{% elif w.hasTrait("ANALYTICAL") %}
+Living room floor. Your chair. That detail catches for half a second and then his tongue finds a rhythm and the clarity drops. The wet pressure of his mouth. The tension building low, tightening.
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing is loud in the room. You can hear it. It doesn't help you.
+{% endif %}
+You cry out and grip the arms of the chair.
+{% elif w.hasTrait("SHY") %}
+His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one.
+{% if w.hasTrait("LIP_BITER") %}
+Your lip is between your teeth. You bite down when you come.
+{% endif %}
+You come quietly, your legs shaking, and then he's standing up.
+{% else %}
+His mouth is on you. Your head falls back. You moan into the empty apartment.
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs clamp around his head. He holds them open.
+{% endif %}
+When you come, his name isn't there — just the fact of it, sharp and immediate.
 {% endif %}
 
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You're still catching your breath when he stands. It was fast — faster than you expected — and the orgasm is still working through you when he turns you around in the chair. His jeans are already open. You brace on the arm while he finds the angle.
+{% else %}
 He stands, jeans already open. He turns you around in the chair and you let him, bracing on the arm of it while he finds the angle.
+{% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-He pushes into you from behind. Each thrust rocks you forward, your hands sliding on the upholstery. The position is exposed. You grip the chair and take it. When he comes, he bites down on your shoulder — not hard, but enough to leave the memory.
+He pushes into you from behind. Each thrust rocks you forward, your hands sliding on the upholstery. The position is exposed. You grip the chair and take it.
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come again before he does — a second orgasm, harder than the first, your knuckles white on the chair arm. He doesn't slow down.
+{% endif %}
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches sharply when it hits. He puts a hand between your shoulder blades and presses you back down.
+{% endif %}
+When he comes, he bites down on your shoulder — not hard, but enough to leave the memory.
 {% elif w.getSkill("FEMININITY") < 50 %}
-He enters you and sets a hard, fast pace. The chair creaks. You push back against him, matching it. His hips stutter when he comes and you feel the heat of it.
+He enters you and sets a hard, fast pace. The chair creaks. You push back against him, matching it.
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+The second orgasm comes from the angle — different from the first, lower, slower to build and then sudden. You press your forehead to the chair arm and let it happen.
+{% endif %}
+His hips stutter when he comes and you feel the heat of it.
 {% else %}
-He fucks you over the chair arm. Raw, direct, no ceremony about it. He comes with a short groan. You feel it.
+He fucks you over the chair arm. Raw, direct, no ceremony about it.
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come again. He's surprised. You can feel it in the way he goes still for half a second, then keeps moving.
+{% endif %}
+He comes with a short groan. You feel it.
 {% endif %}
 
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+When he pulls out, the chair cushion is wet. Your inner thighs are wet. He looks at the chair and then at you and doesn't say anything. You don't say anything. His hand rests on your back for a second — not tender, just present. Then it's gone, and you hear him zipping up.
+{% else %}
 He pulls out. His hand rests on your back for a second — not tender, just present. Then it's gone, and you hear him zipping up.
+{% endif %}
 
 The front door opens and closes. You straighten. Your underwear is on the floor. Your legs are unsteady. You stand there, in the middle of your living room, and let them steady.
 """

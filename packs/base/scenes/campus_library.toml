@@ -76,6 +76,10 @@ When you go back to your problem set your cheeks are warm.
   type = "set_scene_flag"
   flag = "talked"
 
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MET_THEO"
+
   [[actions.next]]
   finish = true
 

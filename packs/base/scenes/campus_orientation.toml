@@ -120,4 +120,4 @@ He wanders off toward someone else eventually. You watch him go.
   flag = "adam_done"
 
   [[npc_actions.next]]
-  goto = "engage"
+  finish = true

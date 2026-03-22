@@ -415,7 +415,10 @@ fn surface_runtime_init_error(
     store_runtime_init_error(pre_state, message);
     *game_state.borrow_mut() = None;
     signals.tab.set(crate::AppTab::Game);
-    signals.phase.set(AppPhase::InGame);
+    // Defer phase transition — see build_begin_button comment.
+    floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+        signals.phase.set(AppPhase::InGame);
+    });
 }
 
 // ── BeforeCreation form signals ───────────────────────────────────────────────
@@ -2069,7 +2072,15 @@ fn build_begin_button(
                 Ok(gs) => {
                     *game_state.borrow_mut() = Some(gs);
                     signals.tab.set(crate::AppTab::Game);
-                    signals.phase.set(AppPhase::InGame);
+                    // Defer the InGame phase transition to the next frame.
+                    // Setting it synchronously inside on_click_stop causes a
+                    // floem reactive panic: the dyn_container rebuild enters
+                    // the InGame branch whose style closures call .get() on
+                    // signals, creating nested scopes inside the consumed
+                    // click-handler context.
+                    floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+                        signals.phase.set(AppPhase::InGame);
+                    });
                 }
                 Err(message) => {
                     surface_runtime_init_error(&pre_state, &game_state, signals, message);

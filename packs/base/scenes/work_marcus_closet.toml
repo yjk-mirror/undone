@@ -50,7 +50,15 @@ You turn back. The room is darker now — just the ambient glow through the blin
 
 When you reach him he doesn't say anything. His hand comes to your jaw, tilts your face up, and his mouth is on yours.
 
+{% if w.hasTrait("EASILY_WET") %}
+You're already wet. Before the kiss, before his hands anywhere near you — just his hand at your jaw and you're there. In a building where anyone could still be working late.
+{% endif %}
+
 Fast and direct. Like his questions. When he pulls back his forehead drops to yours. His breathing is even. Yours isn't.
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing is audible. In here it's obvious — ducts above, glass wall behind you, nothing to cover it. Marcus can hear it. He doesn't comment.
+{% endif %}
 
 "This is a problem," he says. Close enough you feel it more than hear it.
 
@@ -64,7 +72,19 @@ His forehead against yours. The building around you both, dark and quiet.
 
 His hands go to your hips and walk you back until the table edge is behind you. He lifts you onto it — the table is wide, solid, the right height — and steps between your knees. The conference room chair is behind him. City light through the blinds. The floor outside empty and dark.
 
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth goes to your neck — not asking, just there — and the workplace math drops out entirely. Whatever calculation was still running stops.
+{% endif %}
+
 Marcus works your skirt up — no wasted motion. When his fingers find the inside of your thigh you make a sound that wasn't a decision. He pauses and watches your face.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers haven't done much. That's not the issue. The issue is you come anyway — fast, sudden, not quiet. The sound carries off the glass wall. Marcus holds still and watches you until you're through it, and then he starts again like that was the beginning.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+When he opens your blouse he pauses. Your nipples are visible through the fabric before he touches them — he can see that. When he does touch them the response goes straight down. You hear yourself.
+{% endif %}
 
 {% if w.hasTrait("AMBITIOUS") %}
 Monday. The open floor plan. Four people between your desks.
@@ -78,9 +98,25 @@ There was a version of tonight where you stayed on the train. You can still see 
 
 His fingers move against you and your hips shift toward him without being asked and your hand finds his shoulder and holds on. He's thorough and unhurried, watching what makes you move, adjusting. The table is cold through your skirt. His hands are warm.
 
-When he gets his belt undone you pull him closer and he pushes into you and stills for a moment — forehead to yours, the way he pauses before answering something he wants to get right. Then he starts to move and it's steady and close and his jacket is rough against your palms and your back is on the table and the blinds are open and none of that has stopped either of you.
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs tighten around him. He registers it without breaking rhythm.
+{% endif %}
+
+When he gets his belt undone you pull him closer and he pushes into you and stills for a moment — forehead to yours, the way he pauses before answering something he wants to get right. Then he starts to move and it's steady and close and his jacket is rough against your palms and the blinds are open and none of that has stopped either of you.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the table. The folder slides an inch.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush on your chest is visible in the light coming through the blinds. City glow from two floors down. He can see all of it.
+{% endif %}
 
 He keeps his eyes on you. Not at the ceiling, not past you. On yours. His breathing changes and his rhythm does and you wrap your legs around him and he goes deeper and you hear yourself and the sound isn't quiet and the room is not soundproofed.
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl hard inside your shoes. Your heels press into the backs of his legs.
+{% endif %}
 
 He doesn't look away when he finishes. Neither do you.
 
@@ -128,7 +164,9 @@ detail = "He moves first. She doesn't stop him."
 prose  = """
 You stay where you are. The table edge is at the backs of your thighs. Marcus is still by the door. The hallway light frames him.
 
-{% if w.hasTrait("AMBITIOUS") %}
+{% if w.hasTrait("LIP_BITER") %}
+He pushes off the doorframe and your lip goes between your teeth before he's crossed half the room. He sees it. He doesn't slow down.
+{% elif w.hasTrait("AMBITIOUS") %}
 The Monday-morning math is running. You don't close it. You just stop adding to it.
 {% elif w.hasTrait("ANALYTICAL") %}
 You clocked the shift in his weight, the step off the doorframe. You've been reading his signals since the break room. This one is unambiguous.
@@ -142,7 +180,13 @@ He reaches back and closes the door without looking at it. The hallway light goe
 
 "I'm going to need you to tell me no," he says.
 
-{% if w.getSkill("FEMININITY") < 30 %}
+{% if w.hasTrait("PRAISE_KINK") %}
+The way he says it — direct, no softening, like he actually needs the information — lands somewhere below your sternum.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+His hand on your hip. That's all. And you're already wet — evidence he hasn't found yet. In a building where anyone could still be on the floor above.
+{% elif w.getSkill("FEMININITY") < 30 %}
 His hand on your hip. The hallway light gone. The building dark around you both.
 {% elif w.getSkill("FEMININITY") < 50 %}
 His hand on your hip. His eyes on yours.
@@ -150,9 +194,27 @@ His hand on your hip. His eyes on yours.
 
 You don't say no.
 
-Marcus tilts your face up and kisses you, and the hand on your hip walks you back to the table. He lifts you onto it — the conference table is the right height for a thing that was not on any agenda today. He steps between your knees and his jacket is rough under your hands and his mouth is on your neck and his fingers work your blouse open with a patience that has nothing to do with work.
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing has changed. Audible — the ductwork doesn't help and the floor is quiet. Marcus hears it. He tilts your face up and watches you for one second before he kisses you.
+{% else %}
+Marcus tilts your face up and kisses you.
+{% endif %}
 
+The hand on your hip walks you back to the table. He lifts you onto it — the conference table is the right height for a thing that was not on any agenda today. He steps between your knees and his jacket is rough under your hands and his mouth is on your neck and his fingers work your blouse open with a patience that has nothing to do with work.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth on your neck. The workplace math — Monday, the open floor plan, the people who sit between your desks — it doesn't dissolve, it just becomes irrelevant. His mouth is on your neck and that's all there is.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+When he gets your blouse open he pauses — one beat — looking at your chest in the city light through the blinds. Your nipples are already hard. Visible. He can see that before he touches you. When he does his hand is warm and certain and the sound you make goes straight down.
+{% else %}
 He finds your breast — warm, certain, no hesitation — and the sound you make is not quiet and the room is not soundproofed and the blinds are open and neither of you stops.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush on your chest is visible in the light from the blinds. City glow. He looks at you like he's taking inventory and none of it is accidental.
+{% endif %}
 
 {% if w.hasTrait("ANALYTICAL") %}
 The risk calculus is still available. It's just not load-bearing anymore.
@@ -160,9 +222,31 @@ The risk calculus is still available. It's just not load-bearing anymore.
 
 He takes his time — watching what makes you move, adjusting. When you pull at his belt his breathing changes. He pushes your underwear aside and his fingers are inside you and you pull him closer by the lapels and he goes harder and you hear yourself and the sound echoes off the glass wall.
 
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers and you come — fast, uncontrolled, louder than you meant. The echo off the glass is not subtle. Marcus stills and watches you until it passes. Then: "Okay," he says. One word.
+{% if w.hasTrait("PRAISE_KINK") %}
+His voice is the lowest you've ever heard it. Your hips move toward him before he's started again.
+{% endif %}
+He keeps going.
+{% elif w.hasTrait("PRAISE_KINK") %}
+When he gets you close his voice drops. One word — something direct, economical, the way he says everything. Your hips answer before you do.
+{% endif %}
+
 When he finally gets inside you he stills — forehead to yours, the way he pauses before answering something he wants to get right. Then he starts to move and it's deep and close and his jacket is still on and the blinds are open and none of it matters.
 
-He looks at you the whole time. His voice when he makes a sound is the lowest you've ever heard it.
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the table. His arm comes under you without breaking rhythm.
+{% endif %}
+
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs close around him. He goes deeper. You hear yourself.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl hard inside your shoes. You're losing track of the room.
+{% endif %}
+
+He looks at you the whole time. He doesn't close his eyes when he finishes.
 
 After: he tucks his shirt in. You pull your skirt back to where it belongs. The folder is still on the table. The floor outside is still empty.
 

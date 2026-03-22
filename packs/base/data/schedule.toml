@@ -347,3 +347,10 @@ name = "campus_opening"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
   once_only = true
+
+  [[slot.events]]
+  scene     = "base::campus_theo_night"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week'"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week' && !gd.hasGameFlag('THEO_INTIMATE')"
+  once_only = true

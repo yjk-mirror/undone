@@ -184,14 +184,14 @@ You lean in and kiss him. His hand comes up to the back of your head, threading 
 
 "Good morning," you say against his mouth.
 
-"It is now." The worst line. The worst delivery. You both laugh and then you're kissing again and the morning gets very simple.
+"It is now." The worst line. The worst delivery. You both laugh and then you're kissing again, and the morning gets very simple.
 
 {% elif w.hasTrait("CONFIDENT") %}
 "Coffee?" he asks.
 
 "Later."
 
-He reads it. His hand moves from the pillow to your hip and stays there, waiting. You move closer. The morning light is doing something to the sheets, to his arms, to the particular geometry of two bodies that already know each other.
+He reads it. His hand moves from the pillow to your hip and stays there. You move closer.
 
 "Yeah?" he says.
 
@@ -204,7 +204,7 @@ You trace his jaw. The stubble is rougher than last night. His eyes track you wi
 
 "I'm looking."
 
-He smiles. His arm comes around you and pulls you in and his chest is warm against yours.
+He smiles. His arm comes around you and pulls you in.
 
 {% else %}
 "Morning," you say.
@@ -215,11 +215,150 @@ His hand finds your waist under the sheet. Lighter than last night — a hello. 
 
 "Yeah."
 
-The morning fills with small things — his hand on your hip, the radiator clicking, the city doing its Saturday thing outside. Nothing requires analysis.
 {% endif %}
 
-{% if w.getSkill("FEMININITY") < 30 %}
-His chest against yours. His heartbeat under your ear, slow and steady. Yours faster. Both present.
+He already knows the answer to the question he hasn't asked yet. His hand moves — slow, warm, deliberate the way it wasn't quite the first time. This is different. Last night was discovery. This is the morning after discovery, which is its own thing.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You're still figuring out the geometry — the way your body fits against his, which angles work, where his weight lands and how you respond to it. But he's patient. He's not in a hurry. His hand traces from your hip up your side, unhurried, and he watches your face instead of looking away.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth finds the back of your neck. A slow press, then another. The warmth spreads down through your shoulders and into your chest and you make a sound you didn't decide to make. He notices. He doesn't comment. He does it again.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+You were already wet when you turned over. Before he touched you. The morning warmth, his body against yours while you slept — your body made its own decision while you were still half-asleep. When his hand moves between your thighs he finds out immediately.
+
+"Morning," he says, low. Different meaning now.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+He takes his time, which is why it doesn't take long. His fingers, slow and deliberate, and the orgasm arrives before you've fully decided to let it — a morning one, not the urgent clench of last night but something that rolls through you, warm and unhurried and inevitable. He keeps his hand where it is while it passes. Waits.
+
+"Okay?" he asks.
+
+You exhale. "Yeah."
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His arm was across your chest while you slept. Your nipples are already hard from the contact. When his hand moves up and cups your breast, the sensation is direct and immediate — a line from there to somewhere low and warm. You press into his hand.
+{% endif %}
+
+He moves, shifting his weight over you. His cock is hard against your hip, patient as the rest of him. He looks at you like he's checking — the same way he has been all morning, the same way he did last night. Making sure.
+
+You pull him closer. That's answer enough.
+
+The sex is slow. Slower than last night. His forearms on either side of your head, his hips rolling into yours without urgency, morning light on the sheets. His face close enough that you can feel his breath. He's not performing. Neither are you.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches against him. He reads it, adjusts the angle, and whatever he does with his hips from there makes the arching worse. He doesn't stop.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+"Good?" he asks, quiet, close to your ear.
+
+His voice rough with sleep. Something about it — the way he says it, unhurried, low — does something specific. Your body answers before you do.
+{% elif w.hasTrait("PRAISE_KINK") %}
+"Yeah," he says, against your neck. "Like that."
+
+The words go straight through you. Not the words themselves — the way he says them, certain, present, like he's been paying close attention and is pleased with what he sees. Your hips move against his without deciding to.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl against the sheets. He notices — his hand finds your ankle, his thumb pressing there once, grounding — and somehow that makes it worse in the best way.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush spreads up your chest. He sees it and his expression changes in a way you're starting to recognize.
+{% endif %}
+
+He finishes. You feel it. Then he rolls, pulling you against him, his arm across your waist again — the same position as when you woke up, except now you're both sweaty and breathing and the sheets are more tangled than they were.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+He doesn't stop at one. Morning sex with him is slow and recursive — the orgasm passes and he waits and then begins again, reading you as carefully as the first time, unhurried as someone with nowhere to be. By the time you're both finished the light in the room has shifted by at least an hour.
+{% endif %}
+
+{% elif w.getSkill("FEMININITY") < 50 %}
+His hand at your hip, his mouth at your collarbone. He's unhurried. He knows what he's doing now — not perfectly, not presumptuously, but with the particular confidence of someone who paid attention last night.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth moves to the back of your neck. Morning kisses, slow and warm, the stubble rough in a way that registers along your whole back. You press into it.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+"Already?" he says. Not surprised. Pleased.
+
+The warmth in his voice does something on top of what his hand is doing. You don't answer. He takes that as a yes.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His hand on your breast, thumb brushing across your nipple. The sensation runs down like a pulled thread. Your hand covers his to keep it there.
+{% endif %}
+
+{% if w.hasTrait("ORAL_FIXATION") or w.hasTrait("LIKES_ORAL_GIVING") %}
+You shift down the bed. He watches you with the particular stillness of someone choosing not to move. You take him in your mouth — slow, warm, a morning hello. His hand in your hair, loose, not directing. The sounds he makes are quieter than last night. More private.
+{% endif %}
+
+He moves over you eventually. His cock hard against the inside of your thigh. The pace is slower than last night, more deliberate — two people who already know the shape of this, finding it again without the urgency.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm finds you early, rolling through you while he's still unhurried. He keeps moving. You let it.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") or w.hasTrait("PRAISE_KINK") %}
+"There," he says. His voice low, certain. "There."
+
+His timing is almost unfair. You grip his shoulder.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl in the sheets. He finishes. You stay like that, tangled and sweaty, his arm back across your waist.
+{% endif %}
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+He doesn't stop. He already knows — last night taught him — and he uses it. The second one is slower to build and goes deeper when it arrives. By the end you're limp and warm and the morning is three-quarters gone.
+{% endif %}
+
+{% else %}
+He knows you better than he did last night. One morning and some things have shifted — where he puts his hands, what he reads in your breath, what he does and what he doesn't.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth at your neck. He learned this last night. He goes straight for it now.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+When he checks — his hand moving under the sheet — you're already there. He makes a small satisfied sound. You feel it against your shoulder.
+{% endif %}
+
+{% if w.hasTrait("ORAL_FIXATION") or w.hasTrait("LIKES_ORAL_GIVING") %}
+You go down on him first. The light is full morning now, the sheet pushed aside, and you take your time. His hand in your hair. His breathing tells you what you need to know. Eventually he pulls you back up. "Come here," he says. Low.
+{% endif %}
+
+The sex is easy in a way it couldn't be last night. Familiar without being routine. His hands on your hips knowing what they're doing, your body knowing what it wants. Both of you settled into it.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches. He follows it.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+Flush spreading across your chest. He watches it happen with an expression you're not going to analyze right now.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast and he knows you will and slows down on the other side to let you have it. Patient. Warm.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") or w.hasTrait("PRAISE_KINK") %}
+"Yeah," he says against your neck. "Good."
+
+His voice rough. You feel that in your whole chest.
+{% endif %}
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+He doesn't rush. Takes you through it twice, unhurried, the second one building slower and arriving harder. You're done before he is. He catches up. The sheets are a wreck.
+{% endif %}
+
+After, his arm back across your waist. His breathing evening out. The radiator clicking. Outside, the city doing its Saturday thing, and in here everything is quiet and warm and someone else's apartment.
 {% endif %}
 """
 
@@ -228,18 +367,27 @@ His chest against yours. His heartbeat under your ear, slow and steady. Yours fa
   flag = "JAKE_MORNING_AFTER"
 
   [[actions.effects]]
+  type = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type        = "add_sexual_activity"
+  npc         = "m"
+  activity    = "vaginal"
+
+  [[actions.effects]]
   type  = "add_npc_liking"
   npc   = "m"
-  delta = 2
+  delta = 3
 
   [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
-  amount = 3
+  amount = 4
 
   [[actions.effects]]
   type   = "change_stress"
-  amount = -4
+  amount = -5
 
   [[actions.next]]
   finish = true

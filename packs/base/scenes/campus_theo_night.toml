@@ -1,0 +1,334 @@
+[scene]
+id          = "base::campus_theo_night"
+pack        = "base"
+description = "Theo's dorm room. Late. The problem set is an excuse. The attraction arrived first and the recognition is coming."
+
+[intro]
+prose = """
+His dorm room is single — one of the few, which he mentioned once and you filed away without knowing why.
+
+The desk lamp is on. The overhead is off. His roommate's gone for the weekend; that's why you're here, nominally, because problem sets go better without a third person underfoot. His textbook is open to the right chapter. Your notebook is open to the wrong page. That was forty minutes ago.
+
+Now you're sitting on the edge of his bed and he's in the desk chair turned sideways toward you, and the problem set is more or less solved and neither of you has moved to leave.
+
+{% if w.hasTrait("OUTGOING") %}
+You're the one who suggested this. "Better than the library," you said, which was true and was also something else. His shoulder is three feet away.
+{% elif w.hasTrait("CONFIDENT") %}
+You asked if he had a quiet space. He offered the room. You said yes before you thought about it.
+{% else %}
+You ended up here the way things happen — one decision at a time, none of them large. Now the lamp is on and the overhead is off and the city is quiet outside the window.
+{% endif %}
+
+He says something about the next problem set, due Thursday. You say something back. The conversation is not about the problem set.
+"""
+
+[[intro_variants]]
+condition = "w.getSkill('FEMININITY') < 20"
+prose = """
+Theo's room. Single. Quiet. You've been here an hour and the problem set is done and you're still here.
+
+He's in the chair. You're on the edge of the bed. The distance between you is maybe four feet and it has been four feet for the last twenty minutes and your body is doing something with that four feet that your brain hasn't caught up with.
+
+His forearm is resting on the desk. You've looked at it three times. You don't know what that means yet.
+"""
+
+[[thoughts]]
+condition = "w.getSkill('FEMININITY') < 50"
+style     = "observation"
+prose = """
+The lamp catches the angle of his jaw. His hands when he reached across to point at your notes — the size of them against the page. Your notebook is still open where he touched it.
+
+Something below your ribs has been pulling toward him for the last twenty minutes. Warm and specific. You've had that feeling before, pointed at different people, and you know what it means.
+
+The knowing doesn't help.
+"""
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "kiss_him"
+label  = "Kiss him."
+detail = "You move first. That's what you do."
+prose  = """
+You lean forward and kiss him.
+
+He goes still for half a second — the pause of someone surprised — and then his hand comes up to your jaw and he kisses you back. Warm. Slower than you were. His thumb at your cheekbone.
+
+{% if w.hasTrait("SEXIST") %}
+You've been on this side of a kiss before. The other side. His hand on your face is the same motion you've made a hundred times, and from here it lands differently — the size of the hand, the specific way the weight of it settles, the fact that you're looking up at him slightly and the looking-up is new.
+
+He pulls back an inch. Looks at you. Stays there.
+{% elif w.hasTrait("CONFIDENT") %}
+He looks at you when you pull back. Something has shifted in the room and you both know it. His hand is still at your jaw.
+{% else %}
+The kiss ends and neither of you moves away. His eyes are very close.
+{% endif %}
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+He kisses you again, deeper, and his hands move to your hips and your body responds — warmth spreading up through your chest, your hips shifting toward him, the automatic pull — and the response arrives about three seconds before the recognition does.
+
+You're kissing a man. You wanted to. You moved first.
+
+You don't stop.
+{% else %}
+He kisses you again and his hands move to your hips. You lean into it.
+{% endif %}
+
+He says your name against your mouth. You pull him closer.
+
+{% if w.getSkill('FEMININITY') < 20 %}
+His hands travel up under the back of your shirt. The skin-on-skin lands as pure signal — his palms warm and large, your back arching toward them before you decide to move.
+
+He gets the shirt off. The bra takes him a moment — you feel him work through it — and then it's gone and his hands are on your chest and the sensation is something you've never felt from this side. Your nipples respond immediately, hardening under his palms, and you make a sound you didn't plan.
+
+He stills. Tries it again, deliberate. Watching your face.
+
+Your back arches. You grab his shoulder.
+
+He moves you back onto the bed. His weight settles over you and the weight is specific — his chest against yours, his hips between your thighs, his size relative to yours in a way that is just the fact of how bodies work and lands on you like new information.
+
+{% if w.hasTrait("SEXIST") %}
+He's looking at you the way you've looked at other people. The exact way. You know what's behind that expression because you've had it — the inventory, the attention, the particular focus. From this side, it makes your whole body flush.
+{% endif %}
+
+His hand moves between your legs. You're wet through the fabric and when his fingers find you there you pull in a breath and your hips push up into him.
+
+He pauses. Registers what he found. His attention sharpens.
+
+He moves the fabric aside. His fingers find you directly, and the sensation is raw and new and immediate — nothing you've felt before, nerve endings with no history, every touch arriving without context. Your thighs fall open. Your hand finds the back of his neck.
+
+He works you through it. The orgasm builds from somewhere low and unfamiliar, building past what you thought the ceiling was and still going, and when it hits your body goes somewhere you've never been — hips rolling, sounds coming out of you without permission, your back off the bed.
+
+He holds you through the aftershocks.
+
+Then he lines up. The tip of him at your entrance. He checks your face — actually looks — and you nod and he pushes inside.
+
+The fullness is nothing you had a reference for. He goes slow. You close your eyes. The pressure builds into something that is overwhelming and good simultaneously, and when he starts moving the sensation opens up further, wider, and you hold onto his shoulders and your body answers everything he does.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+At some point your brain is very quiet. There is Theo's weight and Theo's hands and what your body is doing and none of that cares about anything else.
+
+The orgasm when it comes is long and rolls through you in waves and you make sounds that echo in the small room, and afterward you lie there with his arm around you and you are wet and warm and thoroughly satisfied and the part of you that had something to say about men is still quiet.
+{% else %}
+When you come it rolls through you in waves, long and deep, and afterward the room comes back slowly. His arm around you. The lamp still on.
+{% endif %}
+
+{% elif w.getSkill('FEMININITY') < 50 %}
+His hands move under your shirt. The warmth there, his palms on your skin, your body leaning into him.
+
+He gets the shirt off. The bra. His hands on your chest — your nipples already hard — and the sensation goes straight down through you, low and immediate.
+
+{% if w.hasTrait("SEXIST") %}
+He's looking at you in the lamplight with that specific kind of attention — not thinking about anything else. You know exactly what that looks like from the outside. You've worn that expression. From here it pulls at something low in your belly and your breath shortens.
+{% endif %}
+
+He moves you back onto the bed. His hands know what they're doing. When he reaches between your legs you're already wet and his fingers moving there make your hips roll up, make a sound come out of you, make you reach for him.
+
+He works you to an orgasm with his hands — steadily, paying attention, watching your face — and the orgasm is wider than anything you've had before, rolling up through you and out through your whole body.
+
+Then he's inside you. The fullness, the pressure, the specific sensation of being entered — your body answers all of it. The rhythm settles. You hold onto him.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+There's a moment, somewhere in the middle, when your brain surfaces for a second. His body over yours, his hands, the sounds in the room. What this is.
+
+Your body keeps going. Your hips keep moving.
+
+The orgasm takes the thought with it.
+{% else %}
+When you come a second time he feels it and slows down, watching your face, staying with you until you stop shaking.
+{% endif %}
+
+Afterward, the lamp. His arm. The room settling back around you.
+{% else %}
+You know this body. He doesn't yet — but he's learning. His hands move with the attention of someone interested in the details.
+
+When he reaches between your legs you're wet and your hips roll up to meet him. He hears everything your body says. He takes his time.
+
+The orgasm comes the way they do now — from depth, rolling upward. He feels it and stays with you through it.
+
+Then he's inside you. His rhythm steady, his attention total. Your body knows what to do with this.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Sometime in the dark, his arm around you, you look at the ceiling and there's something you should be thinking about. The quiet is more comfortable than it should be. You let it be.
+{% else %}
+Afterward, the room comes back. His arm. The lamp still on in the corner.
+{% endif %}
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "THEO_INTIMATE"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
+  [[actions.next]]
+  finish = true
+
+# ── Let it happen ───────────────────────────────────────────────────────
+
+[[actions]]
+id     = "let_it_happen"
+label  = "Let it happen."
+detail = "He's looking at you like he's been deciding something. You're not stopping him."
+prose  = """
+He moves out of the chair and sits next to you on the bed. Close. His hand finds your knee.
+
+He looks at you. You don't move away.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+His hand slides up your thigh and your body responds before your brain files an opinion — heat moving up from where his hand is, your breath catching, your thighs parting slightly without any decision to part them. The wanting arrives first. The recognition of the wanting comes about three seconds later and lands somewhere between bewilderment and oh.
+
+You don't move his hand.
+{% elif w.hasTrait("OUTGOING") %}
+His hand moves and you make a sound you weren't planning to make and he looks at you — actually looks, like that's the most interesting thing in the room — and the look makes it worse.
+{% else %}
+His hand moves up your thigh, slow, checking your face. Your body leans toward him.
+{% endif %}
+
+He kisses you. One hand in your hair, the other still on your thigh. You close the remaining distance between you.
+
+{% if w.getSkill('FEMININITY') < 20 %}
+He gets your shirt off. His hands on your bare skin — back, sides, your chest — and every place he touches is new, no history there, just signal going straight from skin to somewhere deep and warm. When his hands reach your breasts you pull in a breath and your back arches.
+
+{% if w.hasTrait("SEXIST") %}
+He's looking at you in the lamplight with the specific kind of attention you've given other people. The open evaluation. Except from here it makes your skin flush and your nipples hard and you want him to keep looking.
+{% endif %}
+
+His mouth goes to your throat. The heat from it drops straight down through you, and the sound you make is unfamiliar in your own ears — high, soft, involuntary. He feels you respond. His mouth stays there.
+
+He moves you back onto the bed. His weight settles over you and the weight is new information — his size relative to yours, his hips between your thighs, the specific pressure of him against you — and your body pushes up toward all of it.
+
+His hand finds you between your legs. The fabric is already wet and his fingers pressing in through it pull a sound from you and your hips roll up, urgent, and he registers what he found. His attention changes.
+
+He moves the fabric aside. His fingers on you directly: the sensation raw and immediate, no reference for it, everything arriving at full strength. Your thighs fall open. Your hand grabs his wrist — not to stop him, to hold on.
+
+He works you through it slowly. The orgasm builds past anything you've hit before, crests, and when it breaks your body bows upward and you make sounds you've never made and your hands clench in the sheets.
+
+He watches your face the whole time.
+
+Then he lines up and enters you slowly. The fullness of it — the pressure, the stretch, the specific sensation of him moving inside you — your body answers all of it with sounds and movement and a warmth that is nothing like anything you had a word for.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Somewhere in there your brain surfaces for approximately two seconds. You are having sex with a man. You wanted this. You pulled him closer.
+
+Your hips keep moving. Your body answers him. The thought goes back under.
+
+When you come the second time it rolls through you long and deep and you hold onto his shoulders and your body keeps responding past the point where you thought it would stop.
+{% else %}
+When you come it rolls through you long and deep, wave after wave, and he holds you through it and keeps moving until you're done.
+{% endif %}
+
+Afterward. His arm around you. The lamp in the corner. The problem set on the desk.
+{% elif w.getSkill('FEMININITY') < 50 %}
+He takes his time. His hands move with the focus of someone interested in getting it right.
+
+When he reaches between your legs the wet is already there and his fingers moving through it make your hips roll up, make the breath go out of you, make you reach for him and pull him closer.
+
+He works you to an orgasm with his hands — patient, watching your face, adjusting when you react — and the orgasm when it comes is deep and wide and your thighs clamp around his hand.
+
+Then he's inside you. His weight. His rhythm. The sounds in the room.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Your body is doing what bodies do and it doesn't care what you thought about anything. His hands on your hips and your hips pushing up to meet him and the sounds coming out of you that you didn't plan.
+
+When you come it takes everything with it. Thought, context, all of it, for about thirty seconds of pure physical fact.
+{% else %}
+You come a second time, holding onto his shoulders, and afterward the room settles back around you.
+{% endif %}
+
+His arm. The quiet. The lamp still on.
+{% else %}
+His hands know what they're doing. You know what your body does with this.
+
+The orgasm when it comes is deep and steady. He holds you through it.
+
+When he enters you, the rhythm builds. Your body answers.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Later, lying in the dark, you do the math. You wanted him. You let it happen. You'd do it again.
+
+The quiet is more comfortable than it should be.
+{% else %}
+Afterward, the room comes back. Quiet. His arm warm against yours.
+{% endif %}
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "THEO_INTIMATE"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -3
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 3
+
+  [[actions.next]]
+  finish = true
+
+# ── Leave. Now. ─────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "leave_now"
+label  = "Leave. Now."
+detail = "You know what's about to happen. You need to not be here when it does."
+prose  = """
+You stand up. Your notes go into your bag. Your jacket is on the chair.
+
+{% if w.hasTrait("OUTGOING") %}
+"I have an early morning," you say, which is not a lie exactly. He looks at you — can see you — and nods like he understands what's happening, which he probably does.
+{% elif w.hasTrait("CONFIDENT") %}
+"I should go." You say it straight. He doesn't argue. He hands you your jacket from the chair.
+{% else %}
+"I should get going." You keep your voice even. He walks you to the door.
+{% endif %}
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+Out in the hallway, the fluorescent light is flat and cold and the wanting is still there. Warm. Specific. You wanted his hands on you. You left because of what you wanted, not despite it.
+
+The elevator takes a long time to arrive. You watch the numbers.
+{% else %}
+The hall is quiet. You walk back to your room. The warmth from the lamp takes a while to leave your skin.
+{% endif %}
+"""
+
+  [[actions.next]]
+  finish = true
