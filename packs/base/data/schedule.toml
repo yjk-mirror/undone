@@ -171,6 +171,21 @@ consumes_time = true
   weight    = 6
   condition = "gd.week() >= 3"
 
+  # Gym scene — transformation body-awareness
+  [[slot.events]]
+  scene     = "base::gym_changing_room"
+  weight    = 6
+  condition = "gd.week() >= 3 && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('GYM_CHANGING_ROOM')"
+  once_only = true
+
+  # Jake domesticity — post-relationship
+  [[slot.events]]
+  scene     = "base::jake_stays_over"
+  weight    = 5
+  condition = "gd.hasGameFlag('JAKE_MORNING_AFTER') && !gd.hasGameFlag('JAKE_STAYS_OVER')"
+  once_only = true
+  npc_role  = "ROLE_JAKE"
+
 # ── Workplace opening arc ────────────────────────────────────────────────
 
 [[slot]]
@@ -297,6 +312,14 @@ consumes_time = true
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
+  # Marcus escalation — his apartment
+  [[slot.events]]
+  scene     = "base::marcus_apartment"
+  weight    = 0
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_AFTERMATH') && !gd.hasGameFlag('MARCUS_APARTMENT') && !gd.hasGameFlag('MARCUS_REJECTED')"
+  once_only = true
+  npc_role  = "ROLE_MARCUS"
+
 # ── Campus opening arc ────────────────────────────────────────────────
 
 [[slot]]
@@ -353,4 +376,19 @@ name = "campus_opening"
   condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week'"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week' && !gd.hasGameFlag('THEO_INTIMATE')"
+  once_only = true
+
+  # Theo morning-after — Camila's aftermath
+  [[slot.events]]
+  scene     = "base::campus_theo_morning"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  once_only = true
+
+  [[slot.events]]
+  scene     = "base::campus_theo_morning"
+  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  weight    = 0
+  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
   once_only = true

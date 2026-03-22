@@ -1,0 +1,332 @@
+[scene]
+id          = "base::campus_theo_morning"
+pack        = "base"
+description = "Theo's dorm room. Early morning. The night is over and the morning makes it real."
+
+[intro]
+prose = """
+Gray light through the window. The campus outside is quiet but not silent — someone's alarm through the wall, footsteps in the corridor, the dull rhythm of a Sunday morning at the Ivy.
+
+Theo is asleep.
+
+His arm is across your middle. His forearm resting on your bare stomach, the weight of it solid and warm. His breathing is slow, steady, the breathing of someone who has no idea you're awake.
+
+{% if w.getSkill("FEMININITY") < 20 %}
+The hair on his forearm. His hand on your skin. You can feel your own heartbeat and you can feel his pulse where his wrist rests against you, and both of them are very loud in the quiet of this room.
+
+His body is pressed against your back. He's warmer than you expected. His arm is heavier than you expected. The sheets smell like him and like something you did in them and you have been awake for approximately three minutes and all of this has been very present for all three of those minutes.
+{% elif w.getSkill("FEMININITY") < 40 %}
+The sheets smell like sleep and like last night. He's warm behind you, his arm across you, his chest rising and falling. You've been awake a while. He hasn't moved.
+{% else %}
+The sheets are warm. His breathing is slow. His arm is heavy and that's just the fact of it.
+{% endif %}
+
+The alarm through the wall goes off and then stops. Footsteps in the corridor, someone moving past the door — the campus starting its Sunday, one dorm room at a time.
+
+Theo doesn't wake up.
+"""
+
+[[intro_variants]]
+condition = "w.hasTrait('HOMOPHOBIC') && w.getSkill('FEMININITY') < 40"
+prose = """
+Gray light. The window. Someone's alarm through the wall.
+
+Theo's arm is across your stomach. His forearm, the hair on it, his hand resting on your bare skin. His body is warm and solid behind you and the warmth is the first thing you registered when you woke up — before the room, before the light, before anything else. The warmth and the weight and the wanting to stay inside both of them.
+
+The wanting arrived first, before the room came into focus, before you remembered where you were.
+
+He's asleep. The corridor outside has footsteps in it. Sunday at the Ivy. His chest rises and falls against your back, slow, steady.
+
+You've been awake for a while. You haven't moved.
+"""
+
+[[thoughts]]
+condition = "w.hasTrait('HOMOPHOBIC')"
+style     = "observation"
+prose = """
+His arm across your stomach. The hair on it, darker near the wrist. His breathing against your back.
+
+The warmth of it. The not wanting to move.
+"""
+
+# ── Player Actions ─────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stay"
+label  = "Stay"
+detail = "His arm is there. The morning can wait."
+prose  = """
+You don't move.
+
+His arm stays where it is. The light shifts. The radiator under the window ticks once, twice. The campus moves outside without you.
+
+At some point the rhythm of his breathing changes — slower than sleep, less even. Then he moves. Shifts. His arm pulls you slightly closer, half-conscious, and then he goes still again with his chin near your shoulder.
+
+Then: "Hey."
+
+Voice rough with sleep. That particular quiet that exists at the back of a man's throat in the morning.
+
+{% if w.hasTrait("CONFIDENT") %}
+You turn to face him.
+
+He blinks. Looks at you. The first thing he sees is you in his bed in the morning and he doesn't look away. Neither do you.
+
+"Hi," you say.
+
+Something settles. Not a conversation — just the recognition of it. He's awake now and you're awake and the night was real and you're both looking at that fact at the same time.
+
+{% elif w.hasTrait("OUTGOING") %}
+"Hey," you say back, and your voice comes out more normal than you expected.
+
+He props himself up a little, looks at you, and grins. Loose. The grin of someone who is glad to see you in the morning, which is its own piece of information. "You're awake early," he says, which is not particularly true. You've been awake for half an hour.
+
+"You weren't," you say.
+
+"Still kind of not," he says.
+{% else %}
+"Hey," you say.
+
+He shifts. Looks at you. A beat of quiet where you both do the math of where you are and what that means.
+{% endif %}
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+He reaches over and moves a piece of your hair out of your face. Just the one gesture, not a big deal, and the warmth of it drops through your chest before you've decided how to feel about it.
+
+He says something about coffee. Whether you want some. An ordinary question on an ordinary morning, except this morning is not ordinary and you are in his bed and his hand was just on your face and the wanting to say yes is immediate and total.
+
+{% if w.hasTrait("SEXIST") %}
+This is the part you never thought about. After. The morning question. Who makes the coffee, who stays, who leaves. You had a model for this and the model had you in a different position in it and the model was wrong.
+
+He's waiting for your answer. The warmth in your chest is still there. You say yes.
+{% else %}
+He's watching your face while he waits. There's nothing calculating in it. He just wants to know if you want coffee.
+
+You say yes.
+{% endif %}
+
+He gets up to make it. You watch him cross the room and he knows you're watching and neither of you says anything about that.
+
+{% elif w.hasTrait("SEXIST") %}
+He asks if you want coffee. A practical question, easy, the morning-after protocol: who stays, who goes, who puts the kettle on. He's offering.
+
+You were the one with the understanding of how this went. You had a complete model of it. The model had someone else in your position.
+
+"Sure," you say.
+
+He gets up. You watch him move around his small room finding cups, finding coffee, the ordinary business of a morning, and it's ordinary and it isn't, and you stay in the sheets until there's a reason not to.
+{% else %}
+He asks about coffee. You say yes. He gets up.
+
+The morning is a morning. His room is his room. He moves around it finding what he needs and the quiet between you is easier than you would have expected.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 20 %}
+The sheets are cool where he was. You pull them around you. Sore in specific places — your hips, the inside of your thighs — and the soreness is its own kind of new information, physical evidence, your body keeping its own record.
+
+He comes back with coffee. Sets yours on the desk, the one beside the problem set you didn't finish last night. The problem set is still open to the page from three hours ago. That detail is almost funny.
+
+Almost.
+{% elif w.getSkill("FEMININITY") < 40 %}
+The sheets are warm where he was. His room, in daylight: the desk, the problem set still open, a sweatshirt on the back of the chair that is probably his. Small space. A person's whole life on one side of a twin bed.
+
+He comes back with coffee. "Milk's in there, I didn't know how you take it." Twelve hours in this room and he doesn't know how you take your coffee. You add milk. It's fine.
+{% else %}
+He comes back with coffee and sits on the edge of the bed. The morning is plain and present around you both. The problem set on his desk. A textbook he'll need today. Everything still there from before.
+
+You drink the coffee. It's decent. He makes decent coffee at seven in the morning and that's a piece of information about a person.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "THEO_MORNING_AFTER"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+# ── Slip out ────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "slip_out"
+label  = "Get dressed and go"
+detail = "While he's still asleep. The quad is empty. Almost."
+prose  = """
+You move slowly.
+
+Your clothes are on the floor — shirt, jeans, the bra he unhooked last night. You find them in the gray light without making noise. Theo's breathing stays even. He doesn't wake up.
+
+{% if w.getSkill("FEMININITY") < 20 %}
+Pulling the jeans on in someone else's room at seven in the morning. The shirt. The bra clasp takes a second — still not automatic — and you do it in the gray light without looking up. His problem set is open on the desk, the same page it was on last night.
+
+Last night's version of this room was different.
+{% endif %}
+
+Your shoes are by the door. You put them on standing up, hand against the doorframe for balance, and the doorframe is his doorframe and his room is quiet behind you and he is still asleep.
+
+You ease the door shut.
+
+The corridor: fluorescent light, Sunday-morning quiet, a pair of running shoes outside a door two rooms down. An RA bulletin board. A recycling bin with red cups around it from whatever happened last night one floor up.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+The stairs down. The lobby. The glass doors and then the cold air and the quad.
+
+The quad is mostly empty — a girl running laps on the path by the field, a groundskeeper with a leaf blower in the distance, the campus doing its early-morning things. You walk through it and the sun is low and pale and the cold comes through your shirt.
+
+You wanted him. You went there. You let it happen — no, that's wrong, you made it happen. You moved first.
+
+{% if w.hasTrait("SEXIST") %}
+You did the walk of shame. You have seen this in movies. The person crossing the quad in last night's clothes, moving fast. You knew exactly what that looked like and now you know what it feels like and the two pieces of information sit next to each other in a way that has no resolution yet.
+{% else %}
+The walk back is long enough to get cold. The wanting is still there, underneath the morning air. Not fading. Just present.
+{% endif %}
+
+You get back to your room. The door closes behind you. Sunday at the Ivy, and the day is starting.
+
+{% elif w.hasTrait("SEXIST") %}
+Across the quad alone in last night's clothes. The walk. You know what this looks like — you have seen it, have had opinions about it, have used it as a reference point. Now you are the reference point. Moving fast, cold, across the quad toward your dorm, and the shoes you're wearing are the same ones you put on yesterday to walk over there.
+
+You get back to your room. The heat in the hallway is better than the outside.
+{% else %}
+Across the quad. Cold. The campus quiet around you. Your room on the third floor, the door, the key. You're back.
+
+The morning is there. You just left a man sleeping in his bed in it.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 20 %}
+You sit on the edge of your own bed.
+
+Sore. Still a little warm from his sheets. Last night has your body keeping records you didn't ask it to keep.
+
+The problem set is still due Thursday.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "THEO_MORNING_AFTER"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 5
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+# ── Wake him up ─────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "wake_him"
+label  = "Wake him up"
+detail = "You're not going anywhere. Touch his shoulder."
+prose  = """
+You turn toward him.
+
+His shoulder is warm. You put your hand on it — light, just enough. His breathing shifts. A beat. Then his eyes open, finding the room first, then you.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+He's looking at you. You're looking at him. His name is in your mouth — you say it softly, just to say it, just to make it real.
+
+"Theo."
+
+A man's name said softly in the morning in his own bed. He blinks, still half-asleep, and says "yeah" in that rough-with-sleep way, like you've been doing this for years.
+
+{% if w.hasTrait("CONFIDENT") %}
+You hold his gaze. He doesn't look surprised to find you there. He just looks at you like this is what comes next, which you suppose it is, and the simplicity of that is its own kind of thing to sit with.
+{% else %}
+The warmth in your chest is still there. The wanting. It's been there since you woke up.
+
+Neither of you says anything for a second. He reaches up and covers your hand with his — the one you put on his shoulder — and just leaves it there.
+{% endif %}
+
+{% elif w.hasTrait("OUTGOING") %}
+He opens his eyes, focuses, and the first thing he does is smile. Not a big smile — just the small one, the real one, the one that happens before a person remembers to be anything.
+
+"You stayed," he says.
+
+"I stayed," you say.
+
+He stretches. A whole-body thing. "Okay," he says, like this is a position he's taking. "Okay, good."
+{% else %}
+He blinks. Takes you in. The corner of his mouth moves slightly — not quite a smile, just the recognition of you there.
+
+"Hi," he says.
+
+"Hi," you say.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 20 %}
+His hand moves in your hair. Just the once, slow, and then his arm settles around you and you're close enough to feel his chest and feel his heartbeat and the position is new in all the ways it is new.
+
+He says something about the dining hall opening at eight. Whether you want food. Practical, ordinary, morning-logistics.
+
+{% if w.hasTrait("SEXIST") %}
+The morning-after in his bed with his arm around you and him asking you what you want to eat. You had a complete idea of how this went. A model. You were not in this position in the model. The model didn't account for what it would feel like to have someone's arm around you in the morning and have it feel like the right place to be.
+
+"Yeah," you say. "Food sounds good."
+{% elif w.hasTrait("HOMOPHOBIC") %}
+The morning. His arm. Food at eight. Ordinary things. You said his name out loud and he said yeah like it was nothing and somehow that is the thing that is hardest to put down.
+
+"Yeah," you say. "Let's do that."
+{% else %}
+"Food sounds good," you say.
+
+He nods, his chin near your forehead. Neither of you moves immediately. There's time.
+{% endif %}
+
+{% elif w.getSkill("FEMININITY") < 40 %}
+He pulls you closer. Just the small shift, drawing you in, his arm settling around your shoulders. His warmth.
+
+You stay there. The morning outside the window — the campus, the light, the ordinary Sunday — does its thing while you stay put.
+
+Eventually: breakfast? He asks it like it's a practical question with an obvious answer.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+You said his name in the morning. You're in his arms and it's warm and comfortable and you want more coffee. Those are all present and real at the same time and none of them cancel the others out.
+
+"Yeah," you say. "Breakfast."
+{% else %}
+"Yeah," you say. "Breakfast."
+{% endif %}
+
+{% else %}
+He pulls you in. Easy, natural, like mornings with people in them are a thing he knows how to do. His arm around you.
+
+"Breakfast?" he says.
+
+"Breakfast," you say.
+
+The campus outside. The light through the curtains. His room with its problem set and its sweatshirt on the chair and the two of you in the middle of it, deciding on breakfast.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "THEO_MORNING_AFTER"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 3
+
+  [[actions.next]]
+  finish = true

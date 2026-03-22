@@ -1,0 +1,209 @@
+[scene]
+id          = "base::gym_changing_room"
+pack        = "base"
+description = "The gym near the office. Cardio was fine. The changing room is the part you weren't ready for."
+
+[intro]
+prose = """
+The gym is a chain place in the building next door. You've had the corporate membership since week one and today was finally the day. Forty minutes on the treadmill. The stride is different now — shorter, the hip movement different too — but the burn in your calves is the same burn. The mechanics transfer.
+
+The changing room is the part you weren't ready for.
+
+Long, tiled room. Rows of lockers, wooden benches, mirrors along one wall. The air smells of shampoo and chlorine from the pool down the hall and the sharp ammonia edge of someone's deodorant spray. Six or seven women in various stages of undress. A woman in her fifties with a towel around her waist blow-drying her hair, breasts swaying slightly as she angles the dryer. Two college-aged women laughing about a professor while one steps into jeans, balancing on one foot. A woman maybe thirty in just underwear scrolling her phone on the bench, completely still.
+
+Nobody is looking at you. Nobody is paying attention. That's the thing — the absolute casualness of it. The older woman lets her towel gap while she reaches for a hairbrush and doesn't check to see if anyone's watching. The girl in jeans stands fully naked to pull her shirt on and doesn't pause. It's a body. It's a room. They've been doing this since they were thirteen and the not-thinking-about-it shows.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The scale is off. The lockers come up to eye level. The bench, when you look at it, is lower than you expect. Your gym bag strap feels light in your small hands. The before-body would have moved through this room differently. Would have taken up more of it. Wouldn't have had to decide where to put itself.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You find an empty locker near the middle of the row. The combination spins the same way it always does. Muscle memory. But when you swing the door open, the metal surface reflects a woman back at you, face flushed from exercise, long hair damp at the temples. You look at your bag instead.
+{% else %}
+You find an empty locker. The room is warm and functional and full of people who are simply getting dressed. None of this is new, exactly. It just still takes a second.
+{% endif %}
+
+The woman on the bench gets up without covering herself and walks toward the showers. Her back is strong, shoulder blades moving under her skin. She doesn't look around.
+
+You're standing just inside the doorway with your bag on your shoulder.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id    = "use_stall"
+label = "Use a stall"
+detail = "There's a curtained one at the end of the row. Change alone."
+prose = """
+There's a curtained stall at the far end — the kind with a full-length curtain on a curved rod. You take it. Pull the curtain closed behind you. The space is maybe three feet wide. Yours.
+
+{% if w.hasTrait("SHY") %}
+You stand there for a second with your hands flat against the curtain behind you. This is manageable. This is a box. Nobody can see you in the box.
+
+The sports bra first. You reach back for the clasp. Your hands shake slightly — not fear exactly, more like the body running a little hot. The clasp comes undone and the bra comes off and the weight shifts dramatically the way it does, settling lower, and you press both palms to the wall for a moment because the relief of being unseen is more than you expected.
+
+Outside the curtain: the sound of the blow dryer cutting on and off. A locker opening. The two college women — something about office hours, one of them laughing. You can reconstruct the whole room from sound. You work out the bra logistics: left arm up, right arm through, clasp back. It takes two tries. You pull on your shirt. By the time you push the curtain back, you've been in there four minutes and it felt like twenty.
+{% elif w.hasTrait("ANALYTICAL") %}
+You pull the curtain and go still. The room becomes sound. The blow dryer — a diffuser nozzle from the pitch. One locker opening, then a second. The snap of a sports bra being unclipped and re-clipped. You map positions: older woman at the mirror, two women near the back wall, bench woman now standing. You're running the room's spatial logic behind the curtain, which is a strange way to change clothes but an effective one.
+
+The sports bra comes off. The weight shift — you've catalogued it by now, you know the mechanics. New bra goes on, clasp by feel, left arm first. You move through the sequence efficiently. You know exactly when the blow dryer is done — three minutes after you came in — and when the college women leave. By the time you pull the curtain back, you have a reasonable map of the room at the moment you exit it.
+{% else %}
+The curtain gives you four feet of wall and your own air. You change efficiently — sports bra off, the logistics of it automatic now, clean clothes on, bag zipped. Through the curtain: the ordinary sounds of women getting dressed. The blow dryer. A locker. Two women talking. A room full of people doing exactly what you just did.
+
+You pull the curtain back and step out. The room is lighter than it sounded.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "GYM_CHANGING_ROOM"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "just_change"
+label = "Just change"
+detail = "Find a locker. Do what everyone else is doing."
+allow_npc_actions = true
+prose = """
+You pick a locker near the middle — not the end, which feels like hiding, not the center, which feels like a stage. Bag on the bench. Combination. You move through the steps the way the woman three lockers down is moving through them. As if you've done this a thousand times.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+The old inventory fires before you tell it to. The woman at the mirror: narrow waist, full hips, stretch marks running diagonally across her thighs, completely ignored by their owner. The girl in the jeans: small breasts, strong shoulders, doesn't own a mirror apparently, in the good way. The bench woman: a caesarean scar below the bikini line, silver now, years old.
+
+Then your own: petite, huge-breasted, the sports bra leaving a pink band across your ribs when it comes off, the weight settling below it. The comparison runs both ways. You are in the inventory. You are being counted.
+{% elif w.hasTrait("DOWN_TO_EARTH") %}
+Shirt off. Bra off. The logistics of this one still require a specific order — left arm, right arm, lift — but you've got the sequence. New bra on. Clean shirt over. Jeans off, clean jeans on, the hip geometry requiring slightly more room than you give it at first but nothing that needs thinking about.
+
+Done in four minutes. Bag over shoulder. The woman next to you is still looking for something in her bag. You're already at the door.
+{% else %}
+The sports bra comes off and the weight drops. You swap out for your street clothes — shirt, jeans, the particular geometry of pulling jeans up over wider hips now familiar enough that you don't think about it. You find the right angles. You close the locker. It took maybe five minutes.
+
+The woman at the mirror is still working on her hair. The two younger women are still talking. The room is exactly what it was when you walked in, minus one more woman getting dressed.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You moved through it. You're dressed. You didn't look at anyone for more than a second and nobody looked at you and the room is still running its ordinary business. You grab your bag and move toward the door before you have to decide what to do next.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "GYM_CHANGING_ROOM"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id    = "take_shower"
+label = "Take a shower"
+detail = "Communal showers at the back. She's been sweating for forty minutes."
+allow_npc_actions = true
+prose = """
+You take the towel from your bag and the travel shampoo you packed on the same logic that finally got you here today, and you walk to the back.
+
+The showers are four stalls without curtains — open on one side, tiled on three. Steam. A woman in the far stall with conditioner in her hair, eyes closed, humming something. Nobody glances up when you come in.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+You strip off your workout clothes and step under the water. Hot. You adjust it down slightly.
+
+Here is the thing about standing naked in a women's shower: the room is full of bodies and nobody is performing anything. The woman to your left has hips that go wide at the top and a soft stomach, water running in the crease of it, and she is facing the shower head with the focused attention of someone rinsing conditioner. The woman at the far stall has a tan line from a strapless suit, white across her upper back, turning in the steam. Your body among them: petite, large-breasted, the water hitting your chest differently than you still expect sometimes.
+
+The old gaze tried to make inventory into something charged. The room refuses. These are just bodies. They are just getting clean.
+{% elif w.hasTrait("SHY") %}
+You face the tile. Hot water down your back, the back of your neck, the backs of your thighs. You can hear the other women — the close-by one humming, a distant conversation from the changing area, water on water. You don't look left or right.
+
+After a minute, the sounds stop meaning as much. Shampoo. Rinse. Conditioner. The order you've worked out. Your hands in your hair. The water runs clear. By the time you turn the handle off, six or seven minutes have passed and the room feels smaller in the useful way.
+{% elif w.hasTrait("ANALYTICAL") %}
+The body under the water. Your body. You run through it: chest weight, hip circumference, the unfamiliar soft inside of your thighs, the small hands. Not distress — inventory. This is what you have. This is what you work with. The information is useful.
+
+The woman with conditioner in her hair leaves without looking at you. Another comes in on your right and turns her shower on without ceremony. The room is procedural. You wash your hair. You finish.
+{% else %}
+Hot water, shampoo, rinse. Your hair takes longer than it used to — more of it, different weight. The woman at the far end finishes and leaves, and for a minute you have the showers mostly to yourself.
+
+Steam. The weight of water on your shoulders. The clean smell of it.
+
+You turn the water off and wrap your towel around yourself and walk back to your locker. You feel clean. The stress hasn't gone anywhere important, but it's a few degrees smaller.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+You reach for your towel and your hands are shaking a little and it's not from cold. The shower was fine. It was just a shower. You know that. You wrap the towel tighter and head back.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "GYM_CHANGING_ROOM"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 4
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -5
+
+  [[actions.next]]
+  finish = true
+
+# ── NPC Actions ────────────────────────────────────────────────────
+
+[[npc_actions]]
+id        = "older_woman_comment"
+label     = "The older woman at the mirror speaks"
+weight    = 8
+condition = "!scene.hasFlag('older_woman_spoken')"
+prose = """
+The older woman turns the blow dryer off. She catches your eye in the mirror.
+
+"First time at this gym?"
+
+You nod.
+
+"Thought so." She sets the dryer down and picks up a brush. Her tone is matter-of-fact, not unkind. "Took me a while too. We're all just trying to get dressed."
+
+She doesn't look for a response. The dryer comes back on.
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "older_woman_spoken"
+
+  [[npc_actions.effects]]
+  type   = "change_stress"
+  amount = -2
+
+  [[npc_actions.next]]
+  goto = "just_change"
+
+[[npc_actions]]
+id        = "college_women_glance"
+label     = "The two younger women notice her"
+weight    = 5
+condition = "!scene.hasFlag('women_glanced')"
+prose = """
+One of the college women stops mid-sentence. The other follows her gaze.
+
+A second, maybe two. Quick, involuntary — the assessment that runs before you decide to run it. Then they both look back at each other and the conversation picks up again, half a beat later than it dropped.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+The look is familiar. Evaluative — quick and without malice, the same inventory you used to run without calling it one.
+{% endif %}
+"""
+
+  [[npc_actions.effects]]
+  type = "set_scene_flag"
+  flag = "women_glanced"
+
+  [[npc_actions.next]]
+  goto = "just_change"

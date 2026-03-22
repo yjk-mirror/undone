@@ -1,0 +1,387 @@
+[scene]
+id          = "base::marcus_apartment"
+pack        = "base"
+description = "His apartment. A doorman building. She knew what she was doing when she said yes. The workplace alibi is gone."
+
+[intro]
+prose = """
+The doorman nodded at you both on the way in, which means he'll nod at you again on the way out. The elevator was quiet — marble walls, no music. His floor.
+
+His apartment is clean — a man who knew someone was coming. A bottle of red on the kitchen counter, two glasses already out. The bedroom door is visible from where you're standing. Open.
+
+The closet was dark and fast and you could tell yourself it was the circumstances. This is not the circumstances.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The apartment is better than yours. Better building, better furniture, better everything — and standing in it you're aware of your own size against his couch, his ceiling, his particular silence. Something warm and low has settled in your stomach and your hands are not entirely steady.
+{% elif w.getSkill("FEMININITY") < 50 %}
+Since his text you've run this room a dozen times in your head. The wine, the couch, the bedroom door. It landed nothing like you expected — quieter, more real. The wanting was easier to manage when it was hypothetical.
+{% else %}
+The apartment is a set piece and you knew it when you said yes. The wine is a formality. The bedroom door is the point.
+{% endif %}
+
+Marcus sets his keys on the counter. He doesn't open the wine immediately.
+
+He's looking at you.
+"""
+
+# ── Actions ──────────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "stay_for_the_wine"
+label  = "Stay for the wine"
+detail = "Let it be slow. The deliberateness is what makes this different from the closet."
+prose  = """
+You take off your jacket. Hang it over the chair by the door — which he watches you do. He opens the bottle. Pours two glasses. Crosses to where you've settled on the couch and hands you one before sitting down, not close enough to press anything, close enough to mean it.
+
+The wine is good. Of course it is.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You drink it and the career math runs underneath everything. The closet was a mistake — late night, bad judgment, file it and move on. This is a couch. His couch. A bottle he opened specifically. You're watching yourself make a different calculation and you're making it anyway.
+{% elif w.hasTrait("ANALYTICAL") %}
+You watch the seduction happen in real time. The distance on the couch — close enough, not crowding. The glass he poured while you were still standing. The way he angled his body when he sat. It's precise. Practiced, or natural — you're not sure which is worse for the analysis. The interesting part is that watching it doesn't make you want to stop.
+{% else %}
+You drink. He drinks. The apartment is quiet enough to hear the city two floors down. This is the part of the evening that's not the point, which means it's also entirely the point.
+{% endif %}
+
+He says something about the wine — the region, a trip he took once — and you say something back, and neither of you are talking about the wine. At some point his hand comes to rest on the cushion between you. Not on you. Near you.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+The distance between his hand and your leg is about two inches. You are extremely aware of those two inches. You don't close them. You wait. This is information about yourself.
+{% endif %}
+
+You put your glass down. He puts his glass down. He turns to look at you directly.
+
+"You don't have to be anywhere tonight?" he says.
+
+He's not asking about your schedule.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Monday is four days away. The open floor plan. Three people between your desks. The thing you've been building in that building for four years. You can see the full accounting from where you're sitting. You stay.
+{% elif w.hasTrait("CONFIDENT") %}
+"No," you say. You hold his eyes when you say it.
+{% else %}
+"No," you say.
+{% endif %}
+
+He sets his glass on the coffee table — deliberate, no rush — and closes the distance.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth goes to your neck first, not your mouth, and the workplace math drops out entirely. Whatever calculation was still running stops.
+{% endif %}
+
+The couch becomes the floor becomes the hallway to his bedroom and at some point the bedroom door is the one closing.
+
+His bedroom. His sheets — expensive ones, the kind that actually cost something. The room is quieter than anywhere in the office. He takes his time.
+
+{% if w.hasTrait("EASILY_WET") %}
+When his hand slides between your legs the evidence is already there, soaked through before he's done much of anything. He goes still for one beat. Then his attention sharpens and his pace slows, deliberate, like he's been handed something specific to work with.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+He gets your top off and pauses. Your nipples are hard and visible before he touches them — he can see it. He watches his own thumb cross over the left one, watching your face. The response goes straight down and you hear yourself.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+The apartment is quiet enough that your breathing fills it. He can hear it. He doesn't comment. He uses it to calibrate.
+{% endif %}
+
+{% if w.hasTrait("PRAISE_KINK") %}
+He says, close: "Good." Just that word. Direct, like his questions. It hits somewhere well below your sternum and your hips move toward him before you've decided to move them.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+He's barely started when you come — fast, embarrassingly fast, his fingers just finding the right place when the orgasm drops through you. Your sound is not quiet. The apartment swallows it.
+
+He goes still. His eyes are on your face. The expression is not surprise — it's that particular focused attention.
+
+"Good," he says. One word.
+
+{% if w.hasTrait("PRAISE_KINK") %}
+Your hips push up into nothing.
+{% endif %}
+
+He starts again. Same place. Like he's confirming what he learned.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+His bedroom, his terms — the shift is different from the closet. In the conference room you were equals who crossed a line. Here you're in his space and he's directing everything and the part of you that usually has an opinion about that has nothing to say.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His hands are bigger than they look at a conference table. Everything in this room is scaled to him. Your back against his sheets and his weight over you and the ceiling is higher than yours and none of this is abstract anymore.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The guilt is there. Present. Load-bearing in a way it wasn't in the dark of the conference room. His face is close enough to read and he can read yours and neither of you is pretending this is anything other than what it is.
+{% endif %}
+
+{% if w.hasTrait("LIKES_ORAL_GIVING") %}
+When he's on his back, the wanting to have him in your mouth is specific and immediate. You push him down and go lower. In his apartment, on his bed, looking up at him. His hand goes into your hair. He says nothing for a long moment, then says your name, and the way he says it puts weight on every letter.
+{% endif %}
+
+He keeps his eyes on you the whole time. Even at the end.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come twice. His sheets are going to need washing. He doesn't mention it.
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+The wet spot is significant. He just moves you to the dry side of the bed, smooth, no commentary.
+{% endif %}
+{% elif w.hasTrait("HEAVY_SQUIRTER") %}
+His sheets. Not the conference table. You register the wet underneath you and feel your face. He reaches over and moves you to the dry side without a word.
+{% endif %}
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off his bed and doesn't come back down until it's over.
+{% endif %}
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl into his sheets.
+{% endif %}
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs close around him. He registers it. Goes deeper.
+{% endif %}
+
+After: quiet. His ceiling. His lamp. The bottle still on the kitchen counter with one glass poured and one not.
+
+He doesn't say anything about Monday. Neither do you.
+
+{% if w.hasTrait("AMBITIOUS") %}
+You look at the ceiling and run the accounting again. It comes out the same as it did on the couch. You were going to do this. You did. That's something to know about yourself.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_APARTMENT"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "cut_to_it"
+label  = "Cut to it"
+detail = "She doesn't pretend. Neither does he."
+prose  = """
+You set the glass down before you've tasted it. Or you don't take it at all.
+
+{% if w.hasTrait("CONFIDENT") %}
+You cross the distance. His eyes follow you. He doesn't move back.
+
+"Skip the wine," you say.
+
+He sets his glass down.
+{% elif w.hasTrait("SUBMISSIVE") %}
+"Tell me what you want," you say.
+
+He looks at you for one moment — really looks, the focused attention from a meeting when someone has said something he needed to hear.
+
+Then he tells you.
+{% else %}
+Neither of you reaches for the glasses again. He steps toward you. You don't step back. That's the whole conversation.
+{% endif %}
+
+The bedroom in about thirty seconds.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His apartment is better than the conference room gave you information about. The bedroom is bigger than yours. His hands look different here — out of the office context, in the lamp-light, moving over you — and the body has already filed all of this before anything rational has caught up.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The closet was fast and dark. This is a lit room. He can see you. You can see him. The exposure is different and the wanting is the same.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+He gets his hand between your legs and finds you already soaked. No buildup required — just the apartment, the elevator, his voice in the kitchen. He takes note without comment and his fingers slide in properly and his pace picks up.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His mouth on your chest. Your nipples were already hard when you walked in and now his mouth is there and the sensation goes straight down and you hear yourself and his arm tightens around you.
+{% endif %}
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+He bites your neck — not the conference room gentleness, something more direct — and your whole body pulls toward him at once.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing goes loud in the quiet of his apartment. Louder than the conference room because the conference room had ducts, and this room has nothing. He can hear you. He uses it.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+He told you what he wanted. He's getting it. In his space, on his furniture, on his terms — and the part of you that usually keeps a hand on the steering wheel has let go and you're not reaching for it.
+{% if w.hasTrait("PRAISE_KINK") %}
+"Perfect," he says, at some point. The word does what it does and your body answers it.
+{% endif %}
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast — his fingers barely there before it arrives, sudden and total. He notices. His expression is that focused stillness again. He files it and starts over.
+{% if w.hasTrait("PRAISE_KINK") %}
+"Good," he says, quiet. Just the one word. Your hips are still moving.
+{% endif %}
+{% endif %}
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches hard off his mattress.
+{% endif %}
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl in the sheets.
+{% endif %}
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs tighten around him. He goes deeper without breaking rhythm.
+{% endif %}
+
+{% if w.hasTrait("LIKES_ORAL_GIVING") %}
+At some point you push him onto his back. He lets you. You go down and take your time with him — in his apartment, in his bed, looking up at him while he watches you with that particular focused expression. His hand finds your hair. He says nothing until he says your name.
+{% endif %}
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+{% if w.getSkill("FEMININITY") < 25 %}
+The second orgasm arrives before you've finished processing the first. Your body doesn't give you space between them. He keeps going.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The second one builds off the back of the first while he's still moving and you make a sound you've never made and hold on.
+{% else %}
+You come twice. His bed, his sheets, his expression when he looks at you — completely level even through all of it.
+{% endif %}
+{% endif %}
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+His sheets. He moves you to the dry side after, no commentary.
+{% endif %}
+
+He doesn't look away when he finishes. Same as the conference room. Same eyes.
+
+After: neither of you says anything for a while. The city is out there. His lamp. His ceiling.
+
+{% if w.hasTrait("AMBITIOUS") %}
+Monday is real. The open floor plan is real. The calculation has not changed. You knew what this was when you walked in.
+{% elif w.hasTrait("ANALYTICAL") %}
+There was a version of tonight where you stayed on the train. You could see it clearly on the way over. You can still see it from here.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_APARTMENT"
+
+  [[actions.effects]]
+  type  = "set_virgin"
+  value = false
+
+  [[actions.effects]]
+  type     = "add_sexual_activity"
+  npc      = "m"
+  activity = "vaginal"
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 3
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "leave"
+label  = "Get your jacket"
+detail = "She came. She saw the apartment. She sees what this is."
+prose  = """
+You accept the glass. You hold it.
+
+His apartment. The doorman. The bottle he opened. The bedroom door visible from where you're standing.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The closet was impulsive — that was the story you could tell. Circumstances. Bad judgment, extenuating, file it and close it. This is his couch. His wine. His particular version of patient. If you stay tonight, the closet becomes a beginning and not an ending.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've been running the full trajectory since his text. Closet to apartment to next time, because there would be a next time. You can see every branch from here with reasonable clarity. The one where you stay is not the one with the least cost.
+{% elif w.hasTrait("CONFIDENT") %}
+You see what this is. You knew walking in. The wine, the clean apartment, the open bedroom door.
+{% else %}
+The wine is good. The apartment is clean. He's looking at you the same look from the conference room, the hallway, the break room — every day since.
+
+Something in you has gone quiet.
+{% endif %}
+
+You set the glass on the counter — you barely touched it — and pick up your jacket from the chair.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Not tonight," you say. Not a question.
+{% elif w.hasTrait("AMBITIOUS") %}
+"I can't," you say. Not that it's impossible. That you won't.
+{% else %}
+"I should go," you say.
+{% endif %}
+
+Marcus doesn't argue. He doesn't try to close the distance. He watches you put your jacket on with his hands loose at his sides — not hurt, not pushing. Just watching.
+
+"Okay," he says.
+
+His hands stay at his sides.
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Your hands are warm. Your chest is tight. Your body registered the apartment and the wine and him in it — all of it is still right here, filing itself.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The wanting is still present. You're choosing what to do with it. That's information too.
+{% endif %}
+
+You walk to the door. He doesn't follow you to the elevator, which is the right call, which you note.
+
+The lobby. The doorman's nod — different now, reading something in the timing. The street. The air.
+
+{% if w.hasTrait("AMBITIOUS") %}
+On the train home you run the accounting again. It still comes out the same. That's actually reassuring.
+{% elif w.hasTrait("ANALYTICAL") %}
+On the train home: the branch you took. Its shape. Where it goes from here, which is not fixed yet.
+{% else %}
+On the train home, the city goes past the windows. His apartment somewhere behind you, getting further.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "MARCUS_REJECTED"
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = 5
+
+  [[actions.effects]]
+  type  = "add_arousal"
+  delta = 1
+
+  [[actions.next]]
+  finish = true

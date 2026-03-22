@@ -15,6 +15,30 @@ The evening is yours.
 """
 
 [[intro_variants]]
+condition = "gd.hasGameFlag('MARCUS_INTIMATE') && !gd.hasGameFlag('MARCUS_APARTMENT') && w.getSkill('FEMININITY') < 35"
+prose = """
+Seven in the evening. The apartment is quiet. Your apartment. Not the office. Not the conference room with the cold stripe of hallway light.
+
+The sofa. The phone. The particular silence of a place where you live alone and something has changed about who that person is.
+
+Your phone has three notifications and you haven't looked at any of them. One might be from him. The might is doing more work than the three notifications combined.
+
+The evening is yours. What that means has shifted.
+"""
+
+[[intro_variants]]
+condition = "(gd.hasGameFlag('JAKE_INTIMATE') || gd.hasGameFlag('BAR_STRANGER_SLEPT') || gd.hasGameFlag('PARTY_STRANGER_SLEPT')) && w.getSkill('FEMININITY') < 30"
+prose = """
+Seven in the evening. The apartment is quiet, and the quiet is a different shape now.
+
+A few weeks ago this was just silence — the hum of the building, the neighbor's TV, the specific emptiness of a place where one person lives. Now the quiet has texture. Your body remembers things the apartment doesn't know about — hands, weight, heat, the particular sound of breathing that isn't yours. The couch is the same couch. The window is the same window. The person sitting between them is someone who has done things.
+
+The phone is on the counter. The notifications are waiting.
+
+The evening is yours.
+"""
+
+[[intro_variants]]
 condition = "w.getSkill('FEMININITY') < 20"
 prose = """
 Seven in the evening and nobody expects anything. The apartment is yours for the night.
@@ -44,6 +68,9 @@ The apartment does its evening thing around you. Pipes, upstairs neighbor, the f
 Halfway through you find yourself working out the structure of the thing — the edit choices, the arc, what they're trying to do and whether it's working. You can't entirely turn it off. At some point this becomes thinking about something else entirely, which is fine. The screen is still there when you come back.
 {% elif w.hasTrait("ROMANTIC") %}
 There's a scene near the end that gets to you slightly more than you expected. Nothing dramatic. Just a moment that lands. You sit with it for a few seconds before the next thing starts.
+{% if gd.hasGameFlag("JAKE_INTIMATE") %}
+The couple on screen has the kind of morning you've started having. The recognition sits warm and low and you pull the blanket up a little higher.
+{% endif %}
 {% else %}
 It's a fine evening, and the notifications are answered at some point; you're not sure when.
 {% endif %}
@@ -107,6 +134,89 @@ You take your time because it's yours to take. No occasion, no audience — just
 You know what you like now. You know how to get there. An hour passes without being tracked. You look at yourself and decide it's good, and the evening continues from there.
 {% endif %}
 """
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "text_jake"
+label     = "Text Jake"
+detail    = "The phone. His name. The cursor."
+condition = "gd.hasGameFlag('JAKE_INTIMATE')"
+prose = """
+The phone. His name in the contacts. The cursor blinking in the empty text field.
+
+{% if w.hasTrait("SHY") %}
+You type something. Delete it. Type something else. Delete that too. The third attempt is three words and you stare at them for fifteen seconds before hitting send. The read receipt appears almost immediately and your stomach does something with that information.
+
+He types back. Four words. Easy, warm, like he was already thinking about texting you and you just got there first.
+
+{% elif w.hasTrait("FLIRTY") %}
+*Thinking about you.* Send. No overthinking, no drafts. The response takes forty seconds and it's longer than yours and warmer and by the time you've read it twice there's a grin on your face that the apartment doesn't need to know about.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+The calculus of texting first. You know the calculus. Who texts first, how quickly, how much, what it signals. The data says this is fine. The data says this is what people in relationships do. The data is correct, and the phone is still in your hand, and the cursor is still blinking, and the gap between knowing and doing is exactly one sent message wide.
+
+You send it. He answers. You put the phone down and pick it up again forty seconds later.
+
+{% else %}
+You send something short. Not flirty, not distant — just a check-in, the kind of text that says *I'm here and you were on my mind*.
+
+He responds before you've put the phone down. Something about his evening, a question about yours. The conversation is small and warm and takes up the next twenty minutes without either of you running out of things to say.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The phone goes on the nightstand eventually. The conversation trails off the way conversations do — not ended, just paused. His name is still on the screen when you turn over. The light from it makes a small blue rectangle on the ceiling.
+
+A man's name on your phone. On your nightstand. In your apartment. The ordinariness of it and the strangeness of it, side by side.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -8
+
+  [[actions.effects]]
+  type   = "add_npc_liking"
+  npc    = "ROLE_JAKE"
+  delta  = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "take_a_bath"
+label     = "Run a bath"
+detail    = "Hot water. Quiet. Just you."
+condition = "gd.hasGameFlag('JAKE_INTIMATE') || gd.hasGameFlag('MARCUS_INTIMATE') || gd.hasGameFlag('BAR_STRANGER_SLEPT')"
+prose = """
+The bath takes four minutes to fill and the bathroom fills with steam. The mirror fogs over. Good. You don't want the mirror right now.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The water is almost too hot. Your body slides in and the heat takes everything — the day, the office, the men, the mirror, all of it going soft and indistinct under the steam. Your breasts float. Your hair fans out in the water. The body in the bath is a body, and for a few minutes that's all it needs to be.
+
+Your hands rest on your thighs under the water. The skin is smooth. The knees are close together. The hips are wide enough that the tub fits differently than it used to. You breathe and the water moves.
+
+{% elif w.getSkill("FEMININITY") < 50 %}
+The heat settles in. Your shoulders drop. The apartment sounds come through the door — pipes, the building's particular language of ticks and creaks — and none of it requires anything from you.
+
+{% if w.hasTrait("ROMANTIC") %}
+The phone is in the other room and you left it there on purpose. The bath is just the bath. No screens, no notifications, no names. The water and the quiet and the woman in it.
+{% endif %}
+
+{% else %}
+The bath is an hour and a half and you don't apologize for any of it. Face mask, hair treatment, the works. The bathroom is warm and private and when you finally drain the tub and wrap yourself in a towel the world feels slightly more manageable.
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -15
 
   [[actions.effects]]
   type   = "skill_increase"

@@ -13,6 +13,17 @@ The apartment is the same apartment. One bedroom off Clement Ave, third floor, t
 The bathroom mirror catches you before you're ready — hair pressed flat on one side, face still soft with sleep. The face is yours. You know the face is yours. The quarter-second before that knowledge arrives is the part you're still getting used to.
 {% endif %}
 
+{% if gd.hasGameFlag("JAKE_INTIMATE") or gd.hasGameFlag("MARCUS_INTIMATE") or gd.hasGameFlag("BAR_STRANGER_SLEPT") or gd.hasGameFlag("PARTY_STRANGER_SLEPT") %}
+{% if w.getSkill("FEMININITY") < 30 %}
+The face in the mirror is a face someone has seen close up. Lips someone has kissed. Neck someone's mouth has been on. The body below it has been somewhere and done something and the knowledge of that sits in the reflection like a second person behind the glass.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The mirror is different now. Not the glass — the person in it. Something behind the eyes that wasn't there a few weeks ago. A body that knows things it didn't know before.
+{% endif %}
+{% if gd.hasGameFlag("JAKE_INTIMATE") and gd.hasGameFlag("MARCUS_INTIMATE") %}
+Two men. The thought arrives between the toothbrush and the faucet and you let the water run an extra second before spitting.
+{% endif %}
+{% endif %}
+
 Teeth. Face. The usual negotiation with hair.
 
 {% if w.hasTrait("POSH") %}
@@ -29,6 +40,14 @@ Whatever's clean, whatever fits the weather. It'll do.
 
 {% if w.getSkill("FEMININITY") < 30 %}
 Getting dressed is still a small negotiation. Not the mechanics — you've got those. But the number of decisions. The bra clasp is automatic now. Which top goes with which jacket is not.
+{% endif %}
+
+{% if gd.hasGameFlag("JAKE_INTIMATE") or gd.hasGameFlag("MARCUS_INTIMATE") or gd.hasGameFlag("BAR_STRANGER_SLEPT") %}
+{% if w.hasTrait("SULTRY") %}
+The underwear drawer has options now. Not all of them are for other people. Some of them are just for the mirror.
+{% elif w.getSkill("FEMININITY") < 35 %}
+The underwear decision takes longer than it should. Plain or the other ones. Nobody's going to see them. Probably. The *probably* is new.
+{% endif %}
 {% endif %}
 
 Through the window, the street is waking up. A guy in a Dunkin' apron smokes outside the service entrance. A woman pushes a stroller over a grate with the grim determination of someone who has done this before and will do it again. Somewhere below, a car alarm gives up on its own.
@@ -76,6 +95,10 @@ The Dunkin' on Fifth has a line, because the Dunkin' on Fifth always has a line.
 The guy behind you in line is standing close. Not inappropriately — just close. Your shoulders pull in before you've thought about it. Your bag shifts to the hip between you and him. Three inches of air that your body is already managing without being told to.
 {% endif %}
 
+{% if gd.hasGameFlag("JAKE_INTIMATE") %}
+Your phone buzzes in your pocket. Jake. *Morning.* One word. The warmth it puts in your chest is disproportionate to the word count.
+{% endif %}
+
 Coffee in hand. The day starts now.
 """
 
@@ -103,6 +126,10 @@ The lobby smells like the super's cigarettes and the cleaning product that's sup
 Coffee is a crutch. You've read the articles. The body wakes up on its own if you let it. By the time you hit the next block you're walking fast and you almost believe this.
 {% else %}
 By the second block, you regret it. By the third, you've stopped noticing. The city has a way of replacing one problem with the next before you've finished the first one.
+{% endif %}
+
+{% if gd.hasGameFlag("MARCUS_INTIMATE") and w.getSkill("FEMININITY") < 40 %}
+The office is closer now than it was a month ago. Not in blocks — in what happens when you get there. The elevator. The floor. His desk thirty feet from yours.
 {% endif %}
 """
 

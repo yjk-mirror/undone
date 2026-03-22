@@ -2,7 +2,9 @@
 
 ## Current State
 
-**Latest session (2026-03-22, third pass — adult content sprint + Camila playtest):** Deepened all 4 existing explicit scenes (jake_apartment, bar_stranger_night, work_marcus_closet, party_stranger_after) with Robin's 18 sexual response traits — HAIR_TRIGGER, NIPPLE_GETTER, SENSITIVE_NECK, EASILY_WET, SUBMISSIVE, PRAISE_KINK, MULTI_ORGASMIC, HEAVY_SQUIRTER, and 10 physical detail traits. Each trait produces structural physical changes (different pacing, different events), not adjective swaps. Deepened jake_morning_after "wake him up" action into explicit morning sex (sleepier, bodies that know each other, full trait integration). Created campus_theo_night — Camila's first sexual encounter with Theo, using HOMOPHOBIC (desire-before-shame) and SEXIST (male-gaze inversion) to produce a scene Robin couldn't have. Added MET_THEO flag to campus_library and schedule entry for campus_theo_night. Playtested Camila flow — playtester confirmed discovery beats strong (Beat 1 Scale + Beat 5 HOMOPHOBIC strongest), campus arc well-constructed, dining hall backpack moment "most emotionally potent thing in the arc", Theo night "genuinely hot." Fixed 2 bugs: (1) campus_orientation NPC action had `goto = "engage"` (action ID, not scene ID) → `finish = true`; (2) CRITICAL: "Begin Your Story" crashed the game — `phase.set(AppPhase::InGame)` inside `on_click_stop` caused floem reactive panic. Fixed by deferring with `exec_after(Duration::ZERO)` in 3 locations (char_creation begin, error surface, landing page load). **446 tests passing, 55 scenes, validate-pack clean.**
+**Latest session (2026-03-22, fourth pass — consequences sprint + 4 new scenes):** Added 4 new scenes: `marcus_apartment` (explicit — Marcus's second encounter, his apartment, deliberate not impulsive, full sexual response trait integration, AMBITIOUS/ANALYTICAL/SUBMISSIVE/PRAISE_KINK branching, "leave" action sets MARCUS_REJECTED flag for genuine consequence), `campus_theo_morning` (Camila wakes up in Theo's bed — HOMOPHOBIC/SEXIST register, three structurally different paths: stay/slip out/wake him, the morning-after that makes the night real), `gym_changing_room` (Robin in a women's locker room — NOT sexual, transformation body-awareness, OBJECTIFYING trait produces the strongest branching, NPC actions from other women, three vulnerability levels: stall/change/shower), `jake_stays_over` (Jake at Robin's apartment overnight — domesticity, his shoes by the door, the morning routine from the other side, ANALYTICAL/SHY/ROMANTIC/AMBITIOUS branching). Enhanced `morning_routine` with post-sexual-awakening intro texture (mirror after you've been with a man, underwear drawer decisions, Jake text, Marcus office awareness). Enhanced `evening_home` with 2 new intro_variants (post-Marcus evening, post-any-partner evening) + 2 new actions ("text Jake" with SHY/FLIRTY/ANALYTICAL branches, "run a bath" with FEMININITY-tiered body awareness). Added 4 schedule entries. Writing-reviewed all 4 new scenes, fixed Important findings (narrator thematic lines, "the way" overuse, NPC surgery specificity, "its own kind of X" tic). **59 scenes total. All tests passing. validate-pack clean.**
+
+**Previous session (2026-03-22, third pass — adult content sprint + Camila playtest):** Deepened all 4 existing explicit scenes (jake_apartment, bar_stranger_night, work_marcus_closet, party_stranger_after) with Robin's 18 sexual response traits — HAIR_TRIGGER, NIPPLE_GETTER, SENSITIVE_NECK, EASILY_WET, SUBMISSIVE, PRAISE_KINK, MULTI_ORGASMIC, HEAVY_SQUIRTER, and 10 physical detail traits. Each trait produces structural physical changes (different pacing, different events), not adjective swaps. Deepened jake_morning_after "wake him up" action into explicit morning sex (sleepier, bodies that know each other, full trait integration). Created campus_theo_night — Camila's first sexual encounter with Theo, using HOMOPHOBIC (desire-before-shame) and SEXIST (male-gaze inversion) to produce a scene Robin couldn't have. Added MET_THEO flag to campus_library and schedule entry for campus_theo_night. Playtested Camila flow — playtester confirmed discovery beats strong (Beat 1 Scale + Beat 5 HOMOPHOBIC strongest), campus arc well-constructed, dining hall backpack moment "most emotionally potent thing in the arc", Theo night "genuinely hot." Fixed 2 bugs: (1) campus_orientation NPC action had `goto = "engage"` (action ID, not scene ID) → `finish = true`; (2) CRITICAL: "Begin Your Story" crashed the game — `phase.set(AppPhase::InGame)` inside `on_click_stop` caused floem reactive panic. Fixed by deferring with `exec_after(Duration::ZERO)` in 3 locations (char_creation begin, error surface, landing page load). **446 tests passing, 55 scenes, validate-pack clean.**
 
 **Previous session (2026-03-22, second pass — tools, playtest, campus):** Restored tools/ from git, rebuilt all 5 MCP servers. Fixed start_game focus-steal: now launches pre-built binary directly with DETACHED_PROCESS+CREATE_NEW_PROCESS_GROUP flags instead of cargo run. Built game release binary. Playtested Robin opening flow (workplace_arrival through week 1) — playtester confirmed: discovery beats are "the best writing in the game", explicit scenes land, DM voice is consistent, ID checkpoint is best choice design. Fixed `style = "inner_voice"` → `"observation"` across all 29 non-archive scenes. Wrote Camila's 5 discovery beats (Scale→Body→Face→Name→Sexual, trait-branched: CONFIDENT/AMBITIOUS/OUTGOING/SEXIST/HOMOPHOBIC). Rewrote all 7 campus scenes in DM narrator voice (parallel scene-writer agents). **446 tests passing. validate-pack clean.**
 
@@ -36,7 +38,7 @@
 
 **Branch:** `master`
 **Verification (2026-03-12):** `cargo test -p undone-scene -p undone-ui -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo test --test validate_pack_simulation -- --nocapture`, and `cargo run --bin validate-pack` all passed on `master`. Fresh runtime launch against `target\debug\undone.exe --dev --quick` also passed and rendered the live workplace opening. `validate-pack` still reports only non-blocking pre-existing warnings in `campus_library`, `neighborhood_bar`, `shopping_mall`, and `work_marcus_drinks`, plus reachability warnings for exact-liking Marcus/Jake gates.
-**Scenes:** 55 total (47 Robin scenes + 7 campus scenes + 1 campus_theo_night, all in DM voice, 2026-03-22).
+**Scenes:** 59 total (47 Robin scenes + 4 new [marcus_apartment, gym_changing_room, jake_stays_over, campus_theo_morning] + 7 campus scenes + 1 campus_theo_night, all in DM voice, 2026-03-22).
 **Content focus:** CisMale→Woman only. AlwaysFemale, TransWoman, CisFemale all deprioritized.
 **Sprint 1 complete + reviewed:** "The Engine Works" — 208→219 tests. All engine bugs fixed, all arc scenes reachable.
 **Sprint 2 complete:** "FEMININITY Moves" — FEMININITY increments in all 7 workplace scenes (+20 total). plan_your_day rewritten. 219→220 tests.
@@ -54,38 +56,53 @@
 
 ## ⚡ Next Action
 
-**Adult content deepened. Char creation crash fixed. Camila playtested.**
+**59 scenes. 4 new scenes + 2 enhanced scenes. Consequence chains live.**
 
 ### 1. Verify char creation fix live
-The `exec_after` deferral needs a live test — launch the game, go through
+The `exec_after` deferral still needs a live test — launch the game, go through
 full character creation with Camila preset, click "Begin Your Story", confirm
-it transitions to InGame without crashing. Then play through discovery beats
-in the actual UI (they've never been seen live through the real flow).
+it transitions to InGame without crashing.
 
-### 2. Content expansion — next priorities
-- **Marcus workplace escalation** — a second sexual encounter beyond the closet.
-  After marcus_aftermath, gated on MARCUS_AFTERMATH. Different location (his
-  apartment? deliberate late-night return to the office?). Needs creative spec.
-- **Daily life consequence chains** — plan_your_day, evening_home, morning_routine
-  have weak-consequence choices. Actions should build toward meaningful states.
-- **Week 2+ content** — more scenes for the settled state after opening arc.
-- **Camila campus expansion** — Theo morning-after, study dates, the phone-call-home
-  after sleeping with a man (HOMOPHOBIC register).
+### 2. Playtest the new scenes
+- **marcus_apartment** — play Robin through the Marcus arc to his apartment.
+  Test both "stay for the wine" and "leave" paths.
+- **campus_theo_morning** — play Camila through Theo night → morning.
+  Verify the HOMOPHOBIC thoughts block feels right (was rewritten during review).
+- **gym_changing_room** — verify schedule fires after week 3 settled state.
+  Test all three vulnerability levels (stall/change/shower).
+- **jake_stays_over** — verify it fires after JAKE_MORNING_AFTER.
+- **morning_routine enhancements** — check the post-sexual mirror text fires
+  correctly after JAKE_INTIMATE or MARCUS_INTIMATE flags.
+- **evening_home enhancements** — check "text Jake" and "run a bath" appear
+  when gated flags are set.
 
-### 3. Tech debt
+### 3. Content expansion — next priorities
+- **Marcus rejection consequences** — MARCUS_REJECTED flag is set but nothing
+  reads it yet. Marcus's behavior should change if she left his apartment.
+- **Post-Theo campus life** — Camila after sleeping with Theo. The dining hall
+  when you see him. Study sessions with new subtext. Phone call home after
+  sleeping with a man (HOMOPHOBIC register).
+- **Jake relationship deepening** — text message scene has more to give. A
+  fight. A disagreement. The first time something goes wrong.
+- **A bad date scene** — not every encounter should be pleasant. Someone who
+  reads Robin wrong. The experience of being a woman on a bad date.
+- **plan_your_day consequences** — still has weak-consequence choices.
+
+### 4. Tech debt
 - See `memory/project_tech_debt_audit.md`
 - Transient layout regression (screenshot at 35% width) — needs investigation
 - "People Here" sidebar doesn't populate for Theo during campus_theo_night
+- Cross-scene "scale" observation appears in 3 scenes (marcus_apartment,
+  gym_changing_room, jake_stays_over) — one should own it, others need
+  different physical anchors
 
-### Completed this session:
-- tools/ restored, all 5 MCP servers rebuilt
-- start_game focus-steal fixed (binary launch + Windows creation flags)
-- Game release binary built, 446 tests passing
-- Robin opening flow playtested — strong report, no critical bugs
-- `style = "inner_voice"` → `"observation"` across all 29 active scenes
-- Camila's 5 discovery beats written
-- All 7 campus scenes rewritten in DM narrator voice
-- Stale screenshots cleaned, .serena/ added to .gitignore
+### Completed this session (consequences sprint):
+- 4 new scenes written (marcus_apartment, campus_theo_morning, gym_changing_room, jake_stays_over)
+- morning_routine enhanced with post-sexual intro texture
+- evening_home enhanced with 2 new intro_variants + 2 new actions (text_jake, take_a_bath)
+- 4 schedule entries added
+- Writing-reviewed and fixed Important findings across all 4 new scenes
+- 59 scenes total, validate-pack clean
 
 ### Resolved this session (conductor batch):
 - ~~Add test for SetAllNpcLiking~~ — Done (dedicated test in dev_ipc.rs)

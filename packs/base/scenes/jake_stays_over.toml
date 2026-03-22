@@ -1,0 +1,295 @@
+[scene]
+id          = "base::jake_stays_over"
+pack        = "base"
+description = "Your apartment. Morning. Jake is still here. His jacket on the chair. His phone on your nightstand."
+
+[intro]
+prose = """
+Your alarm didn't go off, or you turned it off, or Jake's arm made it impossible to care. The clock on your phone says 8:14. His phone is on your nightstand where it doesn't usually live.
+
+His jacket is on the chair. His shoes are by the door — Nikes, size eleven, parked next to yours.
+
+From the bathroom: the sound of water running. He found the towels without asking, which means he looked for them, which means he knows your apartment slightly better now than he did yesterday.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The sounds are his — the faucet, the particular way a man clears his throat when he thinks no one's listening. You know these sounds from the inside. The razor going. The faucet off, then on. His whole morning routine happening behind your bathroom door like you're an audience for a show you used to be in.
+
+His shoes are big. Size eleven next to yours and the ratio is something you keep trying not to do math on and keep doing math on anyway. His jacket on your chair is a bigger jacket than any jacket you own.
+
+The apartment has a man in it and the man has a morning routine.
+{% elif w.getSkill("FEMININITY") < 50 %}
+His jacket on your chair. His shoes your door. His morning sounds through the bathroom wall — the mundane arithmetic of another person using your space without it being strange.
+
+Almost not strange.
+{% else %}
+His jacket on the chair. His phone on the nightstand, still charging. The coffee machine on the counter, same as every morning except the shoes by the door.
+{% endif %}
+
+The bathroom faucet cuts off.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "make_coffee"
+label  = "Make coffee"
+detail = "Two mugs. He takes it black or he takes it something else. You'll find out."
+prose  = """
+You're in the kitchen — which is really a corner with a coffee machine and three feet of counter — when the bathroom door opens.
+
+He comes out with his hair damp and your smallest towel around his neck and he sees you at the machine and his face does the thing it does. "Hey." Like hey is the whole morning.
+
+"Hey. Coffee?"
+
+"Please."
+
+{% if w.hasTrait("DOWN_TO_EARTH") %}
+"Black?"
+
+"Black," he says. Like you passed a test.
+
+The kitchen is too small for two people. He ends up leaning against the counter six inches away while the machine runs, his shoulder near yours, not touching. He doesn't try to fill the silence. You don't either. The coffee drips. When it's done you hand him a mug and he wraps both hands around it, steam rising, and that's that. Two people in a kitchen. It's fine.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+"How do you take it?"
+
+"Black."
+
+He says it easy, no setup. You pour and hand it over and he takes it with one hand and reaches past you with the other for a glass of water — reflex, not asking — and his arm goes just over your shoulder, and the warmth of him registers along the side of your face before he's already back.
+
+"Sorry —"
+
+"It's fine."
+
+The kitchen is one person wide and he's been in it for eleven seconds and he already moves in it like he knows where things are. You file that somewhere. The coffee is fine.
+
+{% elif w.hasTrait("SHY") %}
+You're in a t-shirt and underwear and you didn't think about it until he came out of the bathroom and now you're thinking about it. The t-shirt covers enough. You stay at the machine with your back to him a beat longer than necessary.
+
+"Coffee?" Your voice is fine.
+
+"Yeah, please."
+
+You pour two mugs and hand him one and don't look at how he looks at you because that doesn't help. He takes the mug and leans against the counter and watches the window instead of looking at you, which is either tact or coincidence, and you drink your coffee at the window across from him and the morning figures itself out.
+
+{% elif w.hasTrait("ROMANTIC") %}
+"Black or cream?"
+
+He considers it like it's a real question. "Cream. No sugar."
+
+So now you know that. You file it. You make it and hand it over and he takes the mug and looks at the kitchen — the chip in the counter, the curtain rod that's a little too short for the window, the street outside — and there's something in his face like he's taking the apartment in properly for the first time. Claiming context.
+
+"It's small," you say.
+
+"It's good." He says it like he means the apartment and also like he means this whole thing, the mug and the morning and the towel around his neck, and you drink your coffee at the window while he drinks his at the counter and the city makes its usual case for itself outside.
+
+{% else %}
+"Black?"
+
+"Cream, actually."
+
+You add cream. Hand it over. He holds it in both hands and leans against the counter and you stand at the window and you both drink and nobody does anything about the comfortable silence.
+
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 30 %}
+He takes up space in the kitchen. Not rudely — just the way a bigger person takes up space in a small room, automatically, without thinking about it. His shoulders in your hallway. His hands on your mug. The scale of him in your apartment is something you're sitting with.
+{% endif %}
+
+His mug has the chip in the rim. He didn't notice or noticed and doesn't care. Either way he keeps drinking.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_STAYS_OVER"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 2
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "stay_in_bed"
+label  = "Stay in bed"
+detail = "He's almost up. You reach for him. Just ten more minutes."
+prose  = """
+He's sitting on the edge of the bed, reaching for his phone, and you put your hand on his back.
+
+He stops.
+
+"Ten minutes," you say.
+
+He looks over his shoulder at you. Then he puts the phone back on the nightstand and lies back down, and his arm finds you automatically, and the warmth of him settles over the morning like weather.
+
+{% if w.hasTrait("ROMANTIC") %}
+Your face against his chest. His heartbeat against your ear — slow, steady, the specific rhythm of someone not worried about anywhere else right now. The light through the curtain is doing something good to the wall.
+
+He doesn't say anything for a long time. Then: "What's this street like in summer?"
+
+"Loud," you say. "The bar on the corner does karaoke."
+
+"Terrible or great?"
+
+"Both."
+
+His chest moves with that. The ten minutes go somewhere neither of you is counting.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+His arm is a particular weight across your ribs. His breathing is slower than yours — you notice because you're counting, not on purpose, just because you're awake and he's close and this is the kind of data you collect. His heartbeat is unhurried. He has no immediate plans.
+
+He says, eventually: "You're awake."
+
+"Yes."
+
+"For how long?"
+
+"A while."
+
+He makes a sound that isn't quite a laugh. His arm tightens once — brief, a hello — and then stays. You stop counting.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+The ten minutes become a problem. You know this when you agree to them.
+
+His arm across your waist. His breathing, slow. The ceiling with the slightly uneven plaster near the window. You're running the morning logistics: who showers first, whether the walk to the subway works, whether arriving at the same time is a thing you've talked about yet.
+
+He says, "You're thinking."
+
+"I'm always thinking."
+
+"About work?"
+
+"About the shower schedule."
+
+He's quiet. Then: "I can go first."
+
+"Five more minutes."
+
+He stays. You let the logistics go for five minutes. They'll still be there.
+
+{% elif w.hasTrait("SHY") %}
+His arm settles around you and you're still, the way you go still when something is good and you don't want to do anything that might change it. His chin rests somewhere above your head. He's the right height for this, which is a thought you let go.
+
+He doesn't say anything. Neither do you. The ten minutes are quiet.
+
+When he eventually shifts — not leaving, just adjusting — his hand moves briefly up your back and settles. A small specific pressure between your shoulder blades. It stays there through the rest of the ten minutes and it's fine. It's very fine.
+
+{% else %}
+He lies back down and you're in the arrangement from before — his arm across your waist, the side of your face against his shoulder. The morning keeps moving outside. In here it's slower.
+
+He says, "You set an alarm?"
+
+"I turned it off."
+
+"Okay."
+
+Neither of you looks at a phone. The ten minutes happen.
+
+{% endif %}
+
+Eventually you both get up. The morning wins, like it always does. But the ten minutes happened and they're in the morning now and can't be taken back out of it.
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_STAYS_OVER"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 3
+
+  [[actions.effects]]
+  type   = "change_stress"
+  amount = -10
+
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 2
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "shower_first"
+label  = "Shower first"
+detail = "Your apartment. Your bathroom. Your ten minutes before the day starts."
+prose  = """
+"I'm grabbing the shower," you call toward the bathroom.
+
+"Go ahead." Through the door — he's already heard you, already adjusting.
+
+{% if w.hasTrait("SHY") %}
+You lock the door. Not because you think he'll open it — because the lock is there and the lock means this is private, and private means the mirror is just you and the mirror without any variable of being watched. You take your time with it.
+
+The face in the mirror is morning-soft. Hair flat on one side. Mascara that didn't entirely come off last night, under the eye where it always settles. You stand there long enough to let the steam clear it and get dressed and come out on your own terms.
+
+He's sitting on the edge of the bed when you come out. Phones in his hands, but he looks up.
+
+"All yours," you say.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+Eleven minutes — you've timed this routine and eleven is the floor. Out in eleven, dressed in five, and the problem becomes whether you arrive at the office at the same time. You've thought about this on the walk in.
+
+He's in the kitchen when you come out, phone on the counter, scrolling something. He looks up.
+
+"I can walk ahead," you say.
+
+He reads it. "Or I could take the 22."
+
+"The 22 is slower."
+
+"That's kind of the point."
+
+It lands. You drink the coffee he made while you were in the shower — black, which is wrong, but it's hot — and sort out the logistics like two adults and nobody has to pretend the subway thing isn't a thing.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+The bathroom is yours again. His shaving kit is on the edge of the sink — he brought it, which means he planned, which means he planned to stay before he asked, which is information. You look at it for a second. Then you get in the shower.
+
+The logistics of two people leaving one apartment for the same office take four minutes to solve in the hot water. You work out the shower order, the subway timing, the gap between arrivals. By the time you're dressed you have a plan and the plan is workable.
+
+He's in the kitchen. "Coffee?" he asks.
+
+"Made one."
+
+He looks at the machine. "You made two."
+
+"Faster," you say, and hand him one.
+
+{% else %}
+Your bathroom, your mirror, your usual ten minutes. The only difference is that there's a shaving kit on the edge of the sink that isn't yours, and through the door you can hear him in the kitchen doing something with the coffee machine.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+You look at the shaving kit for a second. The razor is a men's razor — the actual kind, not the ones with the pink handle and the two-blade head that show up in drugstore displays under WOMEN'S. You know what that razor is from the inside. You put your own things away and get in the shower.
+{% endif %}
+
+When you come out he's made coffee. Black, which is wrong, but he used the machine like he's used it before and he got the amount right.
+
+"The 22 goes closer," he says, before you've asked. He looked it up. "I can take it."
+
+"I'll walk to the stop with you."
+
+He nods. The morning becomes logistics, which is its own kind of comfortable.
+
+{% endif %}
+"""
+
+  [[actions.effects]]
+  type = "set_game_flag"
+  flag = "JAKE_STAYS_OVER"
+
+  [[actions.effects]]
+  type   = "skill_increase"
+  skill  = "FEMININITY"
+  amount = 1
+
+  [[actions.next]]
+  finish = true
