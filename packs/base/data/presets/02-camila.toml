@@ -56,3 +56,198 @@ traits = [
 
 [game]
 starting_flags = ["ROUTE_CAMPUS"]
+
+# ── Discovery beats (FemCreation interactive flow) ───────────────────────
+#
+# Each [[discovery]] beat shows minijinja prose (same syntax as scene
+# prose — w.hasTrait(), w.getSkill(), etc.) and reveals attribute groups.
+# Trait branches determine the reaction — no player choices during
+# discovery. The character's traits ARE the reaction.
+#
+# reveals: "scale" | "body" | "face" | "name" | "sexual" | "begin"
+
+[[discovery]]
+reveals = ["scale"]
+prose = """\
+The window shade is down. The plane is dim — cabin lights at that \
+in-between setting for the overnight stretch. Your neck is stiff from \
+sleeping against the headrest, and when you shift, the seat belt pulls \
+tight across your hips.
+
+Not where your hips were. Lower. Wider. The belt is snug where it was \
+loose before takeoff, pressing into curves that weren't there when you \
+boarded.
+
+Your hands are on the armrests. The fingers are slimmer. Your class \
+ring — the one from St. Michael's, worn on your index finger since \
+junior year — hangs loose enough to slide off if you tilt your hand.
+
+{% if w.hasTrait("CONFIDENT") %}
+You flex your fingers. Grip the armrest. The grip is weaker but the \
+armrest is where it should be. You look down at your lap — the belt, \
+the hips, the way your thighs sit differently in the seat — and take \
+stock of it directly.
+
+Something is wrong. You don't know what yet.
+{% elif w.hasTrait("AMBITIOUS") %}
+You look at your hands, then the belt, then your feet. Your sneakers \
+are loose — not falling off, but the fit has shifted, the way a \
+borrowed shoe feels. Belt too low. Ring too loose. Shoes too big. Each \
+item a data point. The pattern is clear before you've finished the \
+inventory.
+
+Your jaw tightens. You look at the seat back in front of you and start \
+counting what you know.
+{% else %}
+You pull the ring off and hold it between two fingers. It's heavy for \
+how small your hand looks holding it. The overhead bin is directly \
+above you and the scale of it has changed — higher up, farther away.
+
+The person in the aisle seat is asleep. Nobody is watching. You put \
+the ring in your pocket and sit with your hands in your lap.
+{% endif %}
+"""
+
+[[discovery]]
+reveals = ["body"]
+prose = """\
+There's weight on your chest. Not pain — pressure. Soft and heavy and \
+pulling forward when you lean. The seat back was pressing it flat while \
+you slept, and now that you've shifted forward, gravity takes it. Your \
+shirt is tight across the front in a way it wasn't when you boarded.
+
+You reach up. Your hand meets fabric stretched over a shape that \
+doesn't belong. Full, warm, shifting when you move. The seat belt had \
+been pressing against it.
+
+Hair on your shoulder. Dark brown, thick, falling to your collarbone. \
+You push it back and it slides forward again.
+
+{% if w.hasTrait("SEXIST") %}
+The shape under your shirt is something you've seen on other people. \
+Full. The kind that makes fabric stretch. You've clocked it across \
+hallways and parties and group chats without a second thought.
+
+From this side, it's warm and heavy and slightly sore from the seat \
+belt. You push the hair back again and it stays this time.
+{% else %}
+You sit with your hands flat on your thighs and breathe. The weight \
+on your chest moves when you breathe — rises, settles, rises.
+
+The cabin is quiet. The hum of the engines. The whisper of the air \
+vent above your head. You look at the seat back in front of you and \
+wait for the rest of it.
+{% endif %}
+"""
+
+[[discovery]]
+reveals = ["face"]
+prose = """\
+You need to see. The window shade is down — you lift it an inch. \
+Outside is dark, just the navigation light on the wingtip blinking \
+red against nothing.
+
+The window glass catches the reflection.
+
+A girl is sitting in your seat. Latina. Your age, maybe younger. Dark \
+brown hair to her shoulders, dark eyes, olive skin. The kind of face \
+that gets looked at in hallways.
+
+{% if w.hasTrait("SEXIST") %}
+The evaluation runs before you can stop it — face, body, overall. \
+The same scan you've run across gyms and hallways and parties without \
+thinking about it.
+
+You raise your hand. She raises hers. You touch your cheek. She \
+touches hers.
+
+The shade drops.
+{% elif w.hasTrait("CONFIDENT") %}
+You look at the face in the glass. Not your face — but specific. \
+Particular. A real person looking back. You raise a hand. She raises \
+hers.
+
+You hold eye contact with your own reflection for a long moment. Then \
+you let the shade drop.
+{% else %}
+You raise your hand slowly. The girl in the window raises hers. Your \
+fingertips press the glass and hers press back, cold against cold, and \
+the fingers in the reflection are smaller than the ones you remember.
+
+Your eyes are the same color. Dark brown. That's the only thing you \
+recognize.
+
+The shade drops.
+{% endif %}
+"""
+
+[[discovery]]
+reveals = ["name"]
+prose = """\
+A flight attendant comes through with her tablet, working row by row. \
+She stops at yours.
+
+"Miss? Camila?" She checks the screen. "We'll be starting our descent \
+in about twenty minutes. Can I get you anything?"
+
+She's looking at you the way flight attendants look at teenagers \
+traveling alone — not suspicious, just attentive. Checking.
+
+{% if w.hasTrait("CONFIDENT") %}
+"I'm fine." The voice that comes out isn't yours — lighter, higher — \
+but it holds steady. She nods and marks the tablet and moves on.
+
+Camila. The enrollment paperwork. The name on the forms.
+{% elif w.hasTrait("OUTGOING") %}
+"I'm good, thanks." The words come automatically — the reflex of \
+someone who's always had a response ready. The voice is different. \
+Higher, softer. But the reflex is the same.
+
+She smiles and moves on. Two words that sounded like someone else, \
+and she didn't notice.
+{% else %}
+A nod. Small. She marks something on the tablet and moves to the \
+next row.
+
+The boarding pass in the seat pocket says CAMILA. You take it out, \
+look at it, put it back.
+{% endif %}
+"""
+
+[[discovery]]
+reveals = ["sexual", "begin"]
+prose = """\
+Descent announcements. Tray tables up, seat backs forward. The cabin \
+lights come on full and the plane hums with the energy of arrival — \
+people shifting, reaching for bags, phones coming out even though \
+they won't have signal yet.
+
+You shift in the seat to adjust, and something below the waist is \
+wrong. Not pain. Absence — the weight that was always there, gone. \
+In its place, softness and warmth pressed against the seat.
+
+{% if w.hasTrait("HOMOPHOBIC") %}
+The awareness arrives and with it a second awareness that you push \
+away before it forms. Your thighs press together — involuntary — and \
+the sensation that follows makes you sit very still.
+
+Below the clouds, the city. Lights in a grid, a dark band of river. \
+Somewhere down there, the Ivy. A dorm room. A life that starts in \
+twenty minutes.
+{% elif w.hasTrait("CONFIDENT") %}
+You note it. The absence, the softness, the warmth. Your body has \
+changed in ways that will need accounting for. Not now. The plane is \
+landing and there are things to do.
+
+Below the clouds, the city spreads out — lights in a grid, the dark \
+band of a river cutting through. Somewhere down there, the Ivy.
+{% else %}
+You sit with it for a moment. The absence and the presence. The way \
+the seat feels different underneath you. Something shifts when you \
+move and you hold still until the sensation settles.
+
+The city is below. Lights in a grid, the dark band of a river. \
+Somewhere down there, the Ivy. A dorm room. A roommate you haven't \
+met.
+{% endif %}
+"""
