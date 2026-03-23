@@ -113,33 +113,8 @@ pub fn audit_scene_text(file_path: &str, scene_text: &str) -> Vec<ProseFinding> 
     let mut findings = Vec::new();
 
     for (index, line) in scene_text.lines().enumerate() {
-        let trimmed = line.trim_start();
         let lowercase = line.to_ascii_lowercase();
 
-        let inline_prose_starts_with_third_person = trimmed
-            .strip_prefix("prose")
-            .and_then(|rest| rest.split_once('"'))
-            .is_some_and(|(_, prose_start)| {
-                prose_start.starts_with("She ")
-                    || prose_start.starts_with("She's")
-                    || prose_start.starts_with("She'd")
-                    || prose_start.starts_with("She'll")
-            });
-
-        if trimmed.starts_with("She ")
-            || trimmed.starts_with("She's")
-            || trimmed.starts_with("She'd")
-            || trimmed.starts_with("She'll")
-            || inline_prose_starts_with_third_person
-        {
-            findings.push(ProseFinding {
-                file_path: file_path.to_string(),
-                kind: "third_person_player_narration".to_string(),
-                line: Some(index + 1),
-                message: "player-facing prose should stay in second-person present tense"
-                    .to_string(),
-            });
-        }
         if lowercase.contains("alwaysfemale(") {
             findings.push(ProseFinding {
                 file_path: file_path.to_string(),
@@ -274,9 +249,9 @@ fn audit_intro_agency(file_path: &str, scene_text: &str) -> Vec<ProseFinding> {
 /// Pattern 2: `You say/tell/ask` at sentence boundary — player speech verbs.
 fn detect_player_speech(line: &str) -> bool {
     // Pattern 1: line starts with quoted text, closing quote followed by " You "
-    if line.starts_with('"') {
-        if let Some(close_offset) = line[1..].find('"') {
-            let after_close = &line[close_offset + 2..];
+    if let Some(stripped) = line.strip_prefix('"') {
+        if let Some(close_offset) = stripped.find('"') {
+            let after_close = &stripped[close_offset + 1..];
             let after_trimmed = after_close.trim_start();
             if after_trimmed.starts_with("You ") {
                 return true;

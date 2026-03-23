@@ -209,7 +209,7 @@ pub fn resolve_starting_traits(
     }
 }
 
-fn preset_by_idx<'a>(registry: &'a PackRegistry, idx: Option<u8>) -> Option<&'a PresetData> {
+fn preset_by_idx(registry: &PackRegistry, idx: Option<u8>) -> Option<&PresetData> {
     idx.and_then(|i| registry.presets().get(i as usize))
 }
 

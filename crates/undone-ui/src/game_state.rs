@@ -210,6 +210,12 @@ pub fn load_runtime_content(packs_dir: &Path) -> Result<LoadedRuntimeContent, St
 }
 
 /// Create a world from character creation config and build the full `GameState`.
+///
+/// # Panics
+///
+/// Panics if the base pack is corrupted or missing required traits/skills (e.g.
+/// FEMININITY skill, origin traits). This is a fatal startup error — if the pack
+/// loaded successfully but game creation fails, the pack data is inconsistent.
 pub fn start_game(pre: PreGameState, config: CharCreationConfig, dev_mode: bool) -> GameState {
     start_game_checked(pre, config, dev_mode).unwrap_or_else(|message| panic!("{message}"))
 }

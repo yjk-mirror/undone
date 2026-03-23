@@ -75,7 +75,7 @@ The office quiets out over the next forty minutes as people leave. By 5:30 it's 
 id        = "go_with_marcus"
 label     = "Walk over with Marcus"
 detail    = "He's going anyway. You end up leaving at the same time."
-condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLiking('ROLE_MARCUS') == 'Ok'"
+condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok')"
 prose     = """
 Marcus mentions he's going in the way people mention things when they're not inviting you but aren't not inviting you either — it's information, offered without expectation. You end up leaving the building at the same time because that's how it works when two people reach the elevator at 4:52.
 

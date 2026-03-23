@@ -747,7 +747,15 @@ impl SceneEngine {
         // Clone data we need before borrowing mutably
         let (prose, effects, next_branches): (String, Vec<_>, Vec<_>) = {
             let frame = self.stack.last().expect("engine stack must not be empty");
-            let na = &frame.def.npc_actions[idx];
+            let Some(na) = frame.def.npc_actions.get(idx) else {
+                log::error!(
+                    "NPC action index {} out of bounds (len {}) in scene '{}'",
+                    idx,
+                    frame.def.npc_actions.len(),
+                    frame.def.id
+                );
+                return;
+            };
             (na.prose.clone(), na.effects.clone(), na.next.clone())
         };
 

@@ -203,6 +203,32 @@ enum EvalValue {
     Bool(bool),
 }
 
+fn parse_liking_level(s: &str) -> Option<undone_domain::LikingLevel> {
+    match s {
+        "Neutral" => Some(undone_domain::LikingLevel::Neutral),
+        "Ok" => Some(undone_domain::LikingLevel::Ok),
+        "Like" => Some(undone_domain::LikingLevel::Like),
+        "Close" => Some(undone_domain::LikingLevel::Close),
+        _ => None,
+    }
+}
+
+fn find_npc_liking_by_role(role: &str, world: &World) -> undone_domain::LikingLevel {
+    world
+        .male_npcs
+        .values()
+        .find(|npc| npc.core.roles.contains(role))
+        .map(|npc| npc.core.pc_liking)
+        .or_else(|| {
+            world
+                .female_npcs
+                .values()
+                .find(|npc| npc.core.roles.contains(role))
+                .map(|npc| npc.core.pc_liking)
+        })
+        .unwrap_or(undone_domain::LikingLevel::Neutral)
+}
+
 enum ResolvedRoleNpc<'a> {
     Male(&'a undone_domain::MaleNpc),
     Female(&'a undone_domain::FemaleNpc),
@@ -435,6 +461,14 @@ pub(crate) fn eval_call_bool(
             "arcStarted" => {
                 let arc_id = str_arg(0)?;
                 Ok(world.game_data.arc_state(arc_id).is_some())
+            }
+            "npcLikingAtLeast" => {
+                let role = str_arg(0)?;
+                let threshold_str = str_arg(1)?;
+                let threshold = parse_liking_level(threshold_str)
+                    .ok_or_else(|| EvalError::BadArg("npcLikingAtLeast".into()))?;
+                let liking = find_npc_liking_by_role(role, world);
+                Ok(liking >= threshold)
             }
             _ => Err(EvalError::UnknownMethod {
                 receiver: "gd".into(),
@@ -1390,6 +1424,73 @@ mod tests {
         // No NPC with ROLE_NOBODY exists — should return "Neutral"
         let expr = parse("gd.npcLiking('ROLE_NOBODY') == 'Neutral'").unwrap();
         assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_npcLikingAtLeast_works_for_exact_and_above() {
+        let mut world = make_world();
+        let mut reg = undone_packs::PackRegistry::new();
+        let ctx = SceneCtx::new();
+        let personality = reg.intern_personality("ROMANTIC");
+        let male = undone_domain::MaleNpc {
+            core: undone_domain::NpcCore {
+                name: "Dan".into(),
+                age: undone_domain::Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Acquaintance,
+                pc_liking: LikingLevel::Like,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Attracted,
+                npc_attraction: AttractionLevel::Ok,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                roles: HashSet::from(["ROLE_TEST".to_string()]),
+                contactable: false,
+                arousal: undone_domain::ArousalLevel::Comfort,
+                alcohol: undone_domain::AlcoholLevel::Sober,
+            },
+            figure: undone_domain::MaleFigure::Average,
+            clothing: undone_domain::MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        world.male_npcs.insert(male);
+
+        // At "Like" — should pass for Ok, Like; fail for Close
+        let at_least_ok = parse("gd.npcLikingAtLeast('ROLE_TEST', 'Ok')").unwrap();
+        assert!(eval(&at_least_ok, &world, &ctx, &reg).unwrap());
+
+        let at_least_like = parse("gd.npcLikingAtLeast('ROLE_TEST', 'Like')").unwrap();
+        assert!(eval(&at_least_like, &world, &ctx, &reg).unwrap());
+
+        let at_least_close = parse("gd.npcLikingAtLeast('ROLE_TEST', 'Close')").unwrap();
+        assert!(!eval(&at_least_close, &world, &ctx, &reg).unwrap());
+
+        let at_least_neutral = parse("gd.npcLikingAtLeast('ROLE_TEST', 'Neutral')").unwrap();
+        assert!(eval(&at_least_neutral, &world, &ctx, &reg).unwrap());
+    }
+
+    #[test]
+    fn gd_npcLikingAtLeast_returns_true_for_neutral_when_role_not_found() {
+        let world = make_world();
+        let reg = undone_packs::PackRegistry::new();
+        let ctx = SceneCtx::new();
+        // No NPC with ROLE_NOBODY — defaults to Neutral, which is >= Neutral
+        let expr = parse("gd.npcLikingAtLeast('ROLE_NOBODY', 'Neutral')").unwrap();
+        assert!(eval(&expr, &world, &ctx, &reg).unwrap());
+        // But not >= Ok
+        let expr2 = parse("gd.npcLikingAtLeast('ROLE_NOBODY', 'Ok')").unwrap();
+        assert!(!eval(&expr2, &world, &ctx, &reg).unwrap());
     }
 
     #[test]

@@ -239,6 +239,7 @@ fn start_global_scene(
     ))
 }
 
+#[allow(clippy::too_many_arguments)]
 fn start_slot_scene(
     scheduler: &Scheduler,
     registry: &PackRegistry,

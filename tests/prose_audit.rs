@@ -46,14 +46,15 @@ fn invalid_prose_pack_dir() -> PathBuf {
 }
 
 #[test]
-fn prose_audit_flags_third_person_player_narration() {
+fn prose_audit_does_not_flag_npc_she_as_third_person() {
+    // "She" at line start is an NPC reference, not third-person player narration.
     let scene = r#"[scene]
 id = "test::scene"
 [intro]
 prose = "She walks into the room.""#;
 
     let findings = undone::validate_pack::audit_scene_text("test.toml", scene);
-    assert!(findings
+    assert!(!findings
         .iter()
         .any(|finding| finding.kind == "third_person_player_narration"));
 }
@@ -255,14 +256,6 @@ fn campus_cluster_has_no_third_person_or_unnecessary_guard_findings() {
     let report = undone::validate_pack::validate_repo_scenes_for_tests().expect("audit");
 
     assert!(!report.has_finding(
-        "packs/base/scenes/campus_arrival.toml",
-        "third_person_player_narration"
-    ));
-    assert!(!report.has_finding(
-        "packs/base/scenes/campus_call_home.toml",
-        "third_person_player_narration"
-    ));
-    assert!(!report.has_finding(
         "packs/base/scenes/campus_dorm.toml",
         "unnecessary_always_female_guard"
     ));
@@ -306,7 +299,6 @@ fn player_agency_audit_report() {
 // Player agency findings (player_speech_in_intro, player_action_in_intro)
 // are expected to exist until Phase 2 rewrites land.
 const PROSE_QUALITY_KINDS: &[&str] = &[
-    "third_person_player_narration",
     "unnecessary_always_female_guard",
     "filler_action",
     "meta_analysis",

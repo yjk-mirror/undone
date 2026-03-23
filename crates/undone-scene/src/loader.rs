@@ -525,6 +525,10 @@ fn validate_call_signature(
                 return expect_args(call, &[ArgType::Str], scene_id, expr_str);
             }
 
+            if method == "npcLikingAtLeast" {
+                return expect_args(call, &[ArgType::Str, ArgType::Str], scene_id, expr_str);
+            }
+
             Err(bad_condition(
                 scene_id,
                 expr_str,

@@ -453,7 +453,7 @@ All `condition`, `trigger`, and `if` fields use the custom expression parser.
 | Object | Key methods |
 |--------|-------------|
 | `w.` | `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()`, plus all physical attribute accessors (`getHeight()`, `getFigure()`, `getBreasts()`, etc.) and before-life accessors (`beforeHeight()`, `beforeFigure()`, etc.) — see [Physical Attribute Accessors](#physical-attribute-accessors) above |
-| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE")` |
+| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE")`, `npcLikingAtLeast("ROLE", "LEVEL")` |
 | `scene.` | `hasFlag("FLAG")` |
 | `m.` | `hasTrait("ID")`, `isPartner()`, `isFriend()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag("FLAG")`, `hasRole("ROLE")`, `hadOrgasm()` (male NPC receiver) |
 | `f.` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")` (female NPC receiver) |

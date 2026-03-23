@@ -56,7 +56,7 @@ Your face is warm for the next half-block. The coffee is still good.
 id        = "sit_near_him"
 label     = "Take the table next to his"
 detail    = "You've already met. This isn't a thing."
-condition = "gd.npcLiking('ROLE_JAKE') == 'Ok'"
+condition = "gd.npcLikingAtLeast('ROLE_JAKE', 'Ok')"
 prose = """
 You take the table next to his — the one by the window, which happens to also be the good table — and open your own laptop.
 
