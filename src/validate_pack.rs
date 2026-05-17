@@ -484,6 +484,16 @@ fn collect_scene_files(scene_dir: &Path, scene_files: &mut Vec<PathBuf>) {
     for entry in entries.flatten() {
         let path = entry.path();
         if entry.file_type().map(|kind| kind.is_dir()).unwrap_or(false) {
+            // Skip underscore-prefixed dirs (`_archive`, etc.). The runtime
+            // loader is non-recursive — these files are banked, not shipped,
+            // and auditing them produces dead warnings.
+            let leading_underscore = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.starts_with('_'));
+            if leading_underscore {
+                continue;
+            }
             collect_scene_files(&path, scene_files);
         } else if path
             .extension()
