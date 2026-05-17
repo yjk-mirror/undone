@@ -151,10 +151,6 @@ You stand outside for one full second with your bag, your keys, and the cold air
 """
 
   [[actions.effects]]
-  type = "set_game_flag"
-  flag = "ROUTE_WORKPLACE"
-
-  [[actions.effects]]
   type     = "advance_arc"
   arc      = "base::workplace_opening"
   to_state = "arrived"
@@ -199,10 +195,6 @@ You stand there for a second with your bag and your keys and the cold air of a c
   [[actions.effects]]
   type   = "change_money"
   amount = -40
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "ROUTE_WORKPLACE"
 
   [[actions.effects]]
   type     = "advance_arc"

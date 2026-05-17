@@ -80,6 +80,16 @@ When you go back to your problem set your cheeks are warm.
   type = "set_game_flag"
   flag = "MET_THEO"
 
+  [[actions.effects]]
+  type  = "add_npc_liking"
+  npc   = "m"
+  delta = 1
+
+  [[actions.effects]]
+  type = "set_npc_role"
+  npc  = "m"
+  role = "ROLE_THEO"
+
   [[actions.next]]
   finish = true
 

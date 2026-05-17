@@ -391,6 +391,7 @@ name = "campus_opening"
   condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week'"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week' && !gd.hasGameFlag('THEO_INTIMATE')"
+  npc_role  = "ROLE_THEO"
   once_only = true
 
   # Theo morning-after — Camila's aftermath
@@ -399,6 +400,7 @@ name = "campus_opening"
   condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE')"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  npc_role  = "ROLE_THEO"
   once_only = true
 
   # Dining hall after Theo — seeing him in public
@@ -407,4 +409,5 @@ name = "campus_opening"
   condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER')"
   weight    = 0
   trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER') && !gd.hasGameFlag('DINING_AFTER_THEO')"
+  npc_role  = "ROLE_THEO"
   once_only = true
