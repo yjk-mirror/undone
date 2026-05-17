@@ -1,6 +1,10 @@
 use floem::peniko::Color;
 use std::path::PathBuf;
 
+/// UI chrome font (buttons, status strips, save list rows, etc.).
+/// Distinct from `UserPrefs::font_family`, which is the story-prose font.
+pub const UI_FONT_FAMILY: &str = "system-ui, -apple-system, sans-serif";
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ThemeMode {
     Light,

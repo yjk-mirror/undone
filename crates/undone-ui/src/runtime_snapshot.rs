@@ -221,11 +221,12 @@ mod tests {
     use std::path::PathBuf;
     use std::sync::Arc;
     use undone_domain::{
-        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
-        NpcCore, PersonalityId, RelationshipStatus,
+        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, NpcCore, PersonalityId,
+        RelationshipStatus,
     };
     use undone_scene::engine::{ActionView, EngineCommand};
     use undone_scene::{Action, EffectDef, NpcAction, SceneDefinition, SceneEngine, SceneNpcRef};
+    use undone_world::test_helpers::make_test_male_npc;
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -246,39 +247,12 @@ mod tests {
         start_game(pre, config, true)
     }
 
-    fn test_male_npc(personality: PersonalityId) -> MaleNpc {
-        MaleNpc {
-            core: NpcCore {
-                name: "Jake".into(),
-                age: Age::MidLateTwenties,
-                race: "white".into(),
-                eye_colour: "blue".into(),
-                hair_colour: "brown".into(),
-                personality,
-                traits: HashSet::new(),
-                relationship: RelationshipStatus::Acquaintance,
-                pc_liking: LikingLevel::Like,
-                npc_liking: LikingLevel::Neutral,
-                pc_love: LoveLevel::None,
-                npc_love: LoveLevel::None,
-                pc_attraction: AttractionLevel::Attracted,
-                npc_attraction: AttractionLevel::Unattracted,
-                behaviour: Behaviour::Neutral,
-                relationship_flags: HashSet::new(),
-                sexual_activities: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                knowledge: 0,
-                contactable: true,
-                arousal: undone_domain::ArousalLevel::Comfort,
-                alcohol: undone_domain::AlcoholLevel::Sober,
-                roles: HashSet::new(),
-            },
-            figure: MaleFigure::Average,
-            clothing: MaleClothing::default(),
-            had_orgasm: false,
-            has_baby_with_pc: false,
-        }
+    fn test_male_npc(personality: PersonalityId) -> undone_domain::MaleNpc {
+        let mut npc = make_test_male_npc(personality);
+        npc.core.relationship = RelationshipStatus::Acquaintance;
+        npc.core.pc_liking = LikingLevel::Like;
+        npc.core.pc_attraction = AttractionLevel::Attracted;
+        npc
     }
 
     #[test]

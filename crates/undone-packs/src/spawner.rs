@@ -88,10 +88,8 @@ pub fn spawn_npcs<R: Rng>(
     }
     personality_ids.shuffle(rng);
 
-    // Collect NPC trait IDs from registry (snapshot, not borrowed later)
+    // Snapshot registry data — the spawn loop borrows registry mutably.
     let npc_trait_ids: Vec<NpcTraitId> = registry.npc_trait_ids();
-
-    // Snapshot name lists before mutable registry calls in the loop
     let male_names = registry.male_names().to_vec();
     let female_names = registry.female_names().to_vec();
 

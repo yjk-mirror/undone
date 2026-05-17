@@ -7,7 +7,7 @@ use std::rc::Rc;
 
 use crate::game_state::{load_game_state_from_save, GameState, PreGameState};
 use crate::saves_panel::{list_saves, SaveEntry};
-use crate::theme::ThemeColors;
+use crate::theme::{ThemeColors, UI_FONT_FAMILY};
 use crate::{AppPhase, AppSignals, AppTab};
 
 fn try_load_entry(
@@ -103,7 +103,7 @@ pub fn landing_view(
     let status = label(move || status_msg.get()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(13.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink_ghost)
             .min_height(18.0)
             .margin_top(10.0)
@@ -119,7 +119,7 @@ pub fn landing_view(
                 .style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                     s.font_size(14.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                         .color(colors.ink_ghost)
                 })
                 .into_any()
@@ -172,13 +172,13 @@ pub fn landing_view(
                         let name = label(move || entry.name.clone()).style(move |s| {
                             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                             s.font_size(14.0)
-                                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                                .font_family(UI_FONT_FAMILY.to_string())
                                 .color(colors.ink)
                         });
                         let modified = label(move || entry.modified.clone()).style(move |s| {
                             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                             s.font_size(12.0)
-                                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                                .font_family(UI_FONT_FAMILY.to_string())
                                 .color(colors.ink_dim)
                         });
 
@@ -220,7 +220,7 @@ pub fn landing_view(
             s.font_size(34.0)
                 .font_weight(floem::text::Weight::LIGHT)
                 .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         label(|| {
             "Choose how you want to start: begin a new life, continue where you left off, or load a specific save."
@@ -232,7 +232,7 @@ pub fn landing_view(
                 .font_size(15.0)
                 .line_height(1.45)
                 .color(colors.ink_dim)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         h_stack((new_game_btn, continue_btn, load_btn, settings_btn)).style(|s| {
             s.gap(12.0)
@@ -261,7 +261,7 @@ fn primary_btn_style(s: floem::style::Style, signals: AppSignals) -> floem::styl
     s.padding_horiz(20.0)
         .padding_vert(10.0)
         .font_size(15.0)
-        .font_family("system-ui, -apple-system, sans-serif".to_string())
+        .font_family(UI_FONT_FAMILY.to_string())
         .border(1.5)
         .border_radius(6.0)
         .border_color(colors.lamp)
@@ -280,7 +280,7 @@ fn primary_btn_style(s: floem::style::Style, signals: AppSignals) -> floem::styl
 fn small_btn_style(s: floem::style::Style, signals: AppSignals) -> floem::style::Style {
     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
     s.font_size(12.0)
-        .font_family("system-ui, -apple-system, sans-serif".to_string())
+        .font_family(UI_FONT_FAMILY.to_string())
         .padding_horiz(10.0)
         .padding_vert(5.0)
         .border(1.0)

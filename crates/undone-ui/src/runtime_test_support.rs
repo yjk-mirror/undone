@@ -11,11 +11,8 @@ mod tests {
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::time::{SystemTime, UNIX_EPOCH};
-    use undone_domain::{
-        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
-        NpcCore, PersonalityId, RelationshipStatus,
-    };
     use undone_scene::types::SceneDefinition;
+    use undone_world::test_helpers::make_test_male_npc;
     struct RuntimeHarness {
         gs: GameState,
         signals: AppSignals,
@@ -117,41 +114,6 @@ mod tests {
         .unwrap();
 
         fixture_packs_dir
-    }
-
-    fn test_male_npc(personality: PersonalityId) -> MaleNpc {
-        MaleNpc {
-            core: NpcCore {
-                name: "Jake".into(),
-                age: Age::MidLateTwenties,
-                race: "white".into(),
-                eye_colour: "blue".into(),
-                hair_colour: "brown".into(),
-                personality,
-                traits: HashSet::new(),
-                relationship: RelationshipStatus::Stranger,
-                pc_liking: LikingLevel::Neutral,
-                npc_liking: LikingLevel::Neutral,
-                pc_love: LoveLevel::None,
-                npc_love: LoveLevel::None,
-                pc_attraction: AttractionLevel::Unattracted,
-                npc_attraction: AttractionLevel::Unattracted,
-                behaviour: Behaviour::Neutral,
-                relationship_flags: HashSet::new(),
-                sexual_activities: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                knowledge: 0,
-                contactable: true,
-                arousal: undone_domain::ArousalLevel::Comfort,
-                alcohol: undone_domain::AlcoholLevel::Sober,
-                roles: HashSet::new(),
-            },
-            figure: MaleFigure::Average,
-            clothing: MaleClothing::default(),
-            had_orgasm: false,
-            has_baby_with_pc: false,
-        }
     }
 
     fn play_until_continue_with_last_action(
@@ -557,7 +519,7 @@ mod tests {
         let mut registry = undone_packs::PackRegistry::new();
         let personality = registry.intern_personality("ROMANTIC");
         let mut world = undone_world::test_helpers::make_test_world();
-        world.male_npcs.insert(test_male_npc(personality));
+        world.male_npcs.insert(make_test_male_npc(personality));
         let mut gs = GameState {
             world,
             registry,

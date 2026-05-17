@@ -153,10 +153,10 @@ undone/
 cd tools && cargo build --release
 ```
 
-Binaries land in `tools/target/release/`. The `.mcp.json` at the repo root launches
-them via `bash tools/mcp-launcher.sh <name>` which uses `exec` to replace the shell
-process with the Rust binary (zero wrapper overhead). No node.js dependency for MCP.
-The game workspace and the devtools workspace share nothing at the Cargo level.
+Binaries land in `tools/target/release/`. The `.mcp.json` at the repo root invokes
+them directly (Windows `.exe` paths) — there's a `tools/mcp-launcher.sh` cross-platform
+wrapper for non-Windows use, but the checked-in config uses direct paths. The game
+workspace and the devtools workspace share nothing at the Cargo level.
 
 ## Design Philosophy
 
@@ -362,10 +362,8 @@ The rust MCP server provides a long-lived rust-analyzer instance for
 | Rename a symbol | `mcp__rust__rename_symbol` | Real LSP |
 | Build / test / release | `cargo test` / `cargo build --release` via Bash | No MCP equivalent |
 
-> **Do NOT use** `mcp__rust__get_diagnostics` or `mcp__rust__run_cargo_check` —
-> they are stubs that return placeholder strings. Use `cargo check` via Bash instead.
-> `mcp__rust__format_code` sends an LSP request but does not apply edits to disk —
-> use `cargo fmt` via Bash instead.
+The server exposes only those four navigation tools — everything else (diagnostics,
+formatting, code generation, refactoring beyond rename) goes through `cargo` and direct edits.
 
 **Minijinja** (use after writing any `.j2` template):
 

@@ -1,7 +1,7 @@
 use floem::peniko::Color;
 use floem::prelude::*;
 
-use crate::theme::{save_prefs, NumberKeyMode, ThemeColors, ThemeMode};
+use crate::theme::{save_prefs, NumberKeyMode, ThemeColors, ThemeMode, UI_FONT_FAMILY};
 use crate::AppSignals;
 
 pub fn settings_view(signals: AppSignals) -> impl View {
@@ -38,7 +38,7 @@ fn settings_section_label(text: &'static str, signals: AppSignals) -> impl View 
     label(move || text.to_string()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(12.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink_ghost)
             .margin_top(16.0)
             .margin_bottom(4.0)
@@ -62,7 +62,7 @@ fn theme_row(signals: AppSignals) -> impl View {
                     .border(1.0)
                     .border_radius(4.0)
                     .font_size(14.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
                     .cursor(floem::style::CursorStyle::Pointer)
                     .border_color(if active { colors.lamp } else { colors.seam })
                     .color(if active { colors.lamp } else { colors.ink })
@@ -106,7 +106,7 @@ fn font_size_row(signals: AppSignals) -> impl View {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.width(40.0)
                 .font_size(15.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .color(colors.ink)
                 .items_center()
                 .justify_center()
@@ -142,7 +142,7 @@ fn line_height_row(signals: AppSignals) -> impl View {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.width(40.0)
                 .font_size(15.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .color(colors.ink)
                 .items_center()
                 .justify_center()
@@ -169,7 +169,7 @@ fn number_key_mode_row(signals: AppSignals) -> impl View {
                     .border(1.0)
                     .border_radius(4.0)
                     .font_size(14.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
                     .cursor(floem::style::CursorStyle::Pointer)
                     .border_color(if active { colors.lamp } else { colors.seam })
                     .color(if active { colors.lamp } else { colors.ink })
@@ -204,7 +204,7 @@ fn stepper_button(
                 .border(1.0)
                 .border_radius(4.0)
                 .font_size(16.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .border_color(colors.seam)
                 .color(colors.ink)
                 .cursor(floem::style::CursorStyle::Pointer)

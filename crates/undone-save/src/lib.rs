@@ -133,7 +133,6 @@ pub fn load_game(path: &Path, registry: &mut PackRegistry) -> Result<World, Save
         source: e,
     })?;
 
-    // Parse to a raw Value first so we can inspect the version and migrate if needed.
     let mut raw: serde_json::Value = serde_json::from_str(&json)?;
 
     let version = raw
@@ -247,7 +246,6 @@ fn migrate_v1_to_v2(mut save_json: serde_json::Value) -> serde_json::Value {
 /// clarity and to keep the raw JSON valid before any further processing.
 fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
     if let Some(player) = save_json.get_mut("world").and_then(|w| w.get_mut("player")) {
-        // Extract old flat fields before mutating the object.
         let before_race = player
             .get("before_race")
             .and_then(|v| v.as_str())
@@ -264,7 +262,6 @@ fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
             .and_then(|v| v.as_u64())
             .unwrap_or(25);
 
-        // Map numeric age to Age enum string.
         let before_age = match before_age_num {
             0..=19 => "LateTeen",
             20..=22 => "EarlyTwenties",
@@ -276,7 +273,6 @@ fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
             _ => "Old",
         };
 
-        // Use name_masc for the before identity name.
         let before_name = player
             .get("name_masc")
             .and_then(|v| v.as_str())
@@ -314,11 +310,9 @@ fn migrate_v2_to_v3(mut save_json: serde_json::Value) -> serde_json::Value {
         };
 
         if let Some(obj) = player.as_object_mut() {
-            // Remove the three flat v2 fields.
             obj.remove("before_age");
             obj.remove("before_race");
             obj.remove("before_sexuality");
-            // Insert the new nested before field.
             obj.insert("before".into(), before);
         }
     }
@@ -449,27 +443,19 @@ fn migrate_v4_to_v5(mut save_json: serde_json::Value) -> serde_json::Value {
 
     if let Some(player) = save_json.get_mut("world").and_then(|w| w.get_mut("player")) {
         if let Some(obj) = player.as_object_mut() {
-            // Remap BreastSize variants
             if let Some(breasts) = obj.get_mut("breasts") {
                 remap_breast_size(breasts);
             }
-
-            // Remap PlayerFigure variants
             if let Some(figure) = obj.get_mut("figure") {
                 remap_figure(figure);
             }
-
-            // Migrate String eye_colour → enum variant
             if let Some(eye) = obj.get_mut("eye_colour") {
                 migrate_eye_colour_string(eye);
             }
-
-            // Migrate String hair_colour → enum variant
             if let Some(hair) = obj.get_mut("hair_colour") {
                 migrate_hair_colour_string(hair);
             }
-
-            // Insert new fields with defaults (only if absent)
+            // New v5 fields default-inserted when absent.
             let defaults = [
                 ("height", "Average"),
                 ("hair_length", "Shoulder"),

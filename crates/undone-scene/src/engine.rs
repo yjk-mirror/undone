@@ -451,7 +451,6 @@ impl SceneEngine {
         ctx.active_female = active_female;
         ctx.role_bindings = role_bindings;
 
-        // Select intro prose: use first passing variant, fall back to base intro
         let intro_prose = Self::select_intro_prose(
             &def.intro_variants,
             &def.intro_prose,
@@ -462,13 +461,11 @@ impl SceneEngine {
             &mut self.events,
         );
 
-        // Render intro prose
         match render_prose(intro_prose, world, &ctx, registry) {
             Ok(prose) => self.events.push_back(EngineEvent::ProseAdded(prose)),
             Err(e) => Self::emit_template_error(&mut self.events, &def.id, "intro prose", &e),
         }
 
-        // Render intro thoughts
         Self::render_thoughts(
             &def.intro_thoughts,
             world,
@@ -500,7 +497,6 @@ impl SceneEngine {
     }
 
     fn choose_action(&mut self, action_id: String, world: &mut World, registry: &PackRegistry) {
-        // Find action in current frame
         let frame = match self.stack.last() {
             Some(f) => f,
             None => return,
@@ -531,7 +527,6 @@ impl SceneEngine {
 
         let allow_npc = action.allow_npc_actions;
 
-        // Render action prose (if non-empty)
         if !action.prose.is_empty() {
             let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&action.prose, world, &frame.ctx, registry) {
@@ -545,7 +540,6 @@ impl SceneEngine {
             }
         }
 
-        // Render action thoughts (after prose, before effects)
         {
             let frame = self.stack.last().expect("engine stack must not be empty");
             let thoughts = action.thoughts.clone();
@@ -560,7 +554,6 @@ impl SceneEngine {
             );
         }
 
-        // Apply effects
         let effect_errors: Vec<String> = {
             let frame = self
                 .stack
@@ -580,12 +573,10 @@ impl SceneEngine {
             self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
 
-        // Run NPC actions if allowed
         if allow_npc {
             self.run_npc_actions(world, registry);
         }
 
-        // Evaluate next branches
         let next_branches = action.next.clone();
         self.evaluate_next(next_branches, world, registry);
     }
@@ -690,7 +681,6 @@ impl SceneEngine {
     }
 
     fn run_npc_actions(&mut self, world: &mut World, registry: &PackRegistry) {
-        // Collect eligible NPC actions (condition passes) with their weights
         let npc_actions: Vec<(usize, u32)> = {
             let frame = self.stack.last().expect("engine stack must not be empty");
             frame
@@ -724,7 +714,6 @@ impl SceneEngine {
             return;
         }
 
-        // Weighted random selection
         let total_weight: u32 = npc_actions.iter().map(|(_, w)| w).sum();
         if total_weight == 0 {
             return;
@@ -744,7 +733,6 @@ impl SceneEngine {
 
         let Some(idx) = selected_idx else { return };
 
-        // Clone data we need before borrowing mutably
         let (prose, effects, next_branches): (String, Vec<_>, Vec<_>) = {
             let frame = self.stack.last().expect("engine stack must not be empty");
             let Some(na) = frame.def.npc_actions.get(idx) else {
@@ -759,7 +747,6 @@ impl SceneEngine {
             (na.prose.clone(), na.effects.clone(), na.next.clone())
         };
 
-        // Render NPC prose
         if !prose.is_empty() {
             let frame = self.stack.last().expect("engine stack must not be empty");
             match render_prose(&prose, world, &frame.ctx, registry) {
@@ -773,7 +760,6 @@ impl SceneEngine {
             }
         }
 
-        // Apply NPC action effects
         let npc_effect_errors: Vec<String> = {
             let frame = self
                 .stack
@@ -793,7 +779,6 @@ impl SceneEngine {
             self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
 
-        // Evaluate NPC action next branches (if any)
         if !next_branches.is_empty() {
             self.evaluate_next(next_branches, world, registry);
         }
@@ -801,7 +786,6 @@ impl SceneEngine {
 
     fn evaluate_next(&mut self, branches: Vec<NextBranch>, world: &World, registry: &PackRegistry) {
         if branches.is_empty() {
-            // No next branches — re-emit actions (loop)
             self.emit_actions(world, registry);
             return;
         }
@@ -850,7 +834,6 @@ impl SceneEngine {
             }
         }
 
-        // No branch matched — re-emit actions
         self.emit_actions(world, registry);
     }
 }

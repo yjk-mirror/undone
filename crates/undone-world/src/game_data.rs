@@ -60,13 +60,12 @@ impl GameData {
                 false
             }
             None => {
-                // Day is over — advance to next day
                 self.time_slot = TimeSlot::Morning;
                 self.day += 1;
                 if self.day > 6 {
                     self.day = 0;
                     self.week += 1;
-                    true // week rolled over
+                    true
                 } else {
                     false
                 }

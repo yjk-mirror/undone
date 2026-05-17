@@ -211,7 +211,6 @@ mod integration_tests {
         use rand::rngs::SmallRng;
         use rand::SeedableRng;
 
-        // Load packs + schedule + scenes
         let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
         let scheduler = load_schedule(&metas, &registry).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
@@ -256,7 +255,6 @@ mod integration_tests {
                 &registry,
             );
 
-            // Play through the scene until SceneFinished
             for _ in 0..10 {
                 let events = engine.drain();
 

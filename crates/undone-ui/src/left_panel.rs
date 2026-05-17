@@ -5,8 +5,7 @@ use crate::layout::{
 };
 use crate::runtime_controller::RuntimeController;
 use crate::signal_utils::get_or_default;
-use crate::theme::NumberKeyMode;
-use crate::theme::ThemeColors;
+use crate::theme::{NumberKeyMode, ThemeColors, UI_FONT_FAMILY};
 use crate::AppSignals;
 use floem::event::{Event, EventListener};
 use floem::keyboard::{Key, NamedKey};
@@ -437,7 +436,7 @@ pub fn story_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
             .padding_horiz(24.0)
             .padding_vert(10.0)
             .font_size(14.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink_ghost)
             .background(colors.page)
             .hover(move |s| s.background(colors.page))
@@ -498,7 +497,7 @@ fn continue_button(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 .border_color(colors.seam)
                 .color(colors.ink)
                 .font_size(15.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .cursor(floem::style::CursorStyle::Pointer)
                 .hover(|s| s.background(colors.lamp_glow).border_color(colors.lamp))
         });
@@ -561,13 +560,13 @@ fn choices_bar(
                     s.padding_right(8.0)
                         .color(ink)
                         .font_size(15.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                 }),
                 label(move || label_text.clone()).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                     s.color(colors.ink)
                         .font_size(15.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                 }),
             ))
             .keyboard_navigable()

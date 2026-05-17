@@ -16,7 +16,7 @@ use undone_packs::{char_creation::CharCreationConfig, PackRegistry, PresetData};
 use undone_scene::scheduler::Scheduler;
 
 use crate::game_state::{build_throwaway_game_state, start_game_checked, GameState, PreGameState};
-use crate::theme::ThemeColors;
+use crate::theme::{ThemeColors, UI_FONT_FAMILY};
 use crate::{AppPhase, AppSignals, PartialCharState};
 
 // ── Preset character data ─────────────────────────────────────────────────────
@@ -1172,7 +1172,7 @@ fn heading(title: &'static str, signals: AppSignals) -> impl View {
             .font_weight(floem::text::Weight::LIGHT)
             .color(colors.ink)
             .margin_bottom(32.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -1241,7 +1241,7 @@ fn section_your_past(
                             .font_size(14.0)
                             .color(colors.ink_dim)
                             .items_center()
-                            .font_family("system-ui, -apple-system, sans-serif".to_string())
+                            .font_family(UI_FONT_FAMILY.to_string())
                     }),
                     text_input(form.before_name)
                         .placeholder(hint)
@@ -1256,7 +1256,7 @@ fn section_your_past(
                                 .border(1.0)
                                 .border_color(colors.seam)
                                 .border_radius(4.0)
-                                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                                .font_family(UI_FONT_FAMILY.to_string())
                         }),
                     label(|| "Rand".to_string())
                         .keyboard_navigable()
@@ -1453,7 +1453,7 @@ fn section_content_prefs(signals: AppSignals, form: BeforeFormSignals) -> impl V
                 .font_size(14.0)
                 .color(colors.ink)
                 .margin_bottom(10.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         Checkbox::labeled_rw(form.likes_rough, || "I enjoy rougher content".to_string()).style(
             move |s| {
@@ -1462,7 +1462,7 @@ fn section_content_prefs(signals: AppSignals, form: BeforeFormSignals) -> impl V
                     .gap(8.0)
                     .font_size(14.0)
                     .color(colors.ink)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             },
         ),
     ))
@@ -1576,7 +1576,7 @@ fn section_preset_detail(signals: AppSignals, preset: &PresetData) -> impl View 
             s.font_size(14.0)
                 .color(colors.ink)
                 .margin_bottom(20.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         read_only_row("Name", name, signals),
         read_only_row("Age", age, signals),
@@ -1887,7 +1887,7 @@ fn build_next_button(
                 .padding_horiz(40.0)
                 .padding_vert(16.0)
                 .font_size(16.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .border(1.5)
                 .border_color(colors.lamp)
                 .border_radius(6.0)
@@ -2093,7 +2093,7 @@ fn build_begin_button(
                 .padding_horiz(40.0)
                 .padding_vert(16.0)
                 .font_size(16.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .border(1.5)
                 .border_color(colors.lamp)
                 .border_radius(6.0)
@@ -2114,7 +2114,7 @@ fn section_title(title: &'static str, signals: AppSignals) -> impl View {
             .font_weight(floem::text::Weight::SEMIBOLD)
             .color(colors.ink_ghost)
             .margin_bottom(16.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -2124,7 +2124,7 @@ fn hint_label(text: &'static str, signals: AppSignals) -> impl View {
         s.font_size(13.0)
             .color(colors.ink_dim)
             .margin_bottom(12.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -2136,7 +2136,7 @@ fn form_row(label_text: &'static str, signals: AppSignals, input: impl IntoView)
                 .font_size(14.0)
                 .color(colors.ink_dim)
                 .items_center()
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         input.into_view(),
     ))
@@ -2152,7 +2152,7 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
                 .font_size(14.0)
                 .color(colors.ink_dim)
                 .items_center()
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         label(move || value.clone()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
@@ -2162,7 +2162,7 @@ fn read_only_row(label_text: &'static str, value: String, signals: AppSignals) -
                 .flex_shrink(1.0)
                 .max_width(400.0)
                 .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
     ))
     .style(|s| s.items_start().margin_bottom(12.0).max_width(600.0))
@@ -2194,7 +2194,7 @@ fn trait_chips(label_text: &'static str, traits: Vec<String>, signals: AppSignal
                     .border_color(colors.seam)
                     .color(colors.ink_ghost)
                     .font_size(12.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             })
         },
     )
@@ -2211,7 +2211,7 @@ fn trait_chips(label_text: &'static str, traits: Vec<String>, signals: AppSignal
                 .width(180.0)
                 .font_size(14.0)
                 .color(colors.ink_dim)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         chips,
     ))
@@ -2225,7 +2225,7 @@ fn trait_checkbox(name: &'static str, sig: RwSignal<bool>, signals: AppSignals) 
             .gap(6.0)
             .font_size(14.0)
             .color(colors.ink)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -2263,14 +2263,14 @@ fn radio_opt(
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
                 .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         label(move || subtitle.to_string()).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(12.0)
                 .color(colors.ink_dim)
                 .margin_top(2.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
     ));
     h_stack((indicator, text_col))
@@ -2304,7 +2304,7 @@ fn race_picker(selection: RwSignal<String>, races: Vec<String>, signals: AppSign
                         .border(1.0)
                         .border_radius(4.0)
                         .font_size(14.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                         .cursor(floem::style::CursorStyle::Pointer)
                         .border_color(if selected { colors.lamp } else { colors.seam })
                         .color(if selected { colors.lamp } else { colors.ink })
@@ -2344,7 +2344,7 @@ fn themed_item<T: std::fmt::Display + 'static>(
                     .padding_horiz(10.0)
                     .padding_vert(6.0)
                     .font_size(14.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             })
             .into_any()
     }
@@ -2364,7 +2364,7 @@ fn themed_trigger<T: std::fmt::Display + 'static>(
                 style
                     .color(colors.ink)
                     .font_size(14.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             })
             .into_any()
     }
@@ -2383,7 +2383,7 @@ fn field_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::st
             .border(1.0)
             .border_color(colors.seam)
             .border_radius(4.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     }
 }
 

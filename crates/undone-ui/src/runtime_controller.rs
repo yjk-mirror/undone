@@ -241,18 +241,15 @@ mod tests {
     use crate::NpcSnapshot;
     use lasso::Key;
     use rand::{rngs::SmallRng, SeedableRng};
-    use std::collections::{HashMap, HashSet};
+    use std::collections::HashMap;
     use std::path::PathBuf;
     use std::sync::Arc;
-    use undone_domain::{
-        Age, AttractionLevel, Behaviour, LikingLevel, LoveLevel, MaleClothing, MaleFigure, MaleNpc,
-        NpcCore, PersonalityId, RelationshipStatus, SkillId,
-    };
+    use undone_domain::{AttractionLevel, LikingLevel, RelationshipStatus, SkillId};
     use undone_packs::PackRegistry;
     use undone_scene::engine::{ActionView, SceneEngine};
     use undone_scene::scheduler::Scheduler;
     use undone_scene::types::{Action, NextBranch, SceneDefinition};
-    use undone_world::test_helpers::make_test_world as test_world;
+    use undone_world::test_helpers::{make_test_male_npc, make_test_world as test_world};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -281,41 +278,6 @@ mod tests {
             .collect()
     }
 
-    fn test_male_npc(personality: PersonalityId) -> MaleNpc {
-        MaleNpc {
-            core: NpcCore {
-                name: "Jake".into(),
-                age: Age::MidLateTwenties,
-                race: "white".into(),
-                eye_colour: "blue".into(),
-                hair_colour: "brown".into(),
-                personality,
-                traits: HashSet::new(),
-                relationship: RelationshipStatus::Stranger,
-                pc_liking: LikingLevel::Neutral,
-                npc_liking: LikingLevel::Neutral,
-                pc_love: LoveLevel::None,
-                npc_love: LoveLevel::None,
-                pc_attraction: AttractionLevel::Unattracted,
-                npc_attraction: AttractionLevel::Unattracted,
-                behaviour: Behaviour::Neutral,
-                relationship_flags: HashSet::new(),
-                sexual_activities: HashSet::new(),
-                custom_flags: HashMap::new(),
-                custom_ints: HashMap::new(),
-                knowledge: 0,
-                contactable: true,
-                arousal: undone_domain::ArousalLevel::Comfort,
-                alcohol: undone_domain::AlcoholLevel::Sober,
-                roles: HashSet::new(),
-            },
-            figure: MaleFigure::Average,
-            clothing: MaleClothing::default(),
-            had_orgasm: false,
-            has_baby_with_pc: false,
-        }
-    }
-
     fn custom_game_state(scene: SceneDefinition) -> GameState {
         let mut scenes = HashMap::new();
         scenes.insert(scene.id.clone(), Arc::new(scene));
@@ -323,7 +285,7 @@ mod tests {
         let mut registry = PackRegistry::new();
         let personality = registry.intern_personality("ROMANTIC");
         let mut world = test_world();
-        world.male_npcs.insert(test_male_npc(personality));
+        world.male_npcs.insert(make_test_male_npc(personality));
 
         GameState {
             world,

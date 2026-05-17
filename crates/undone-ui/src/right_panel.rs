@@ -1,5 +1,5 @@
 use crate::layout::sidebar_width_for_window;
-use crate::theme::{ThemeColors, ThemeMode};
+use crate::theme::{ThemeColors, ThemeMode, UI_FONT_FAMILY};
 use crate::{AppSignals, NpcSnapshot, PlayerSnapshot};
 use floem::peniko::Color;
 use floem::prelude::*;
@@ -36,13 +36,13 @@ fn stat_row(
             s.flex_grow(1.0)
                 .color(colors.ink_ghost)
                 .font_size(12.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         label(value_fn).style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(13.0)
                 .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
     ))
     .style(|s| s.height(28.0).items_center())
@@ -56,7 +56,7 @@ fn stats_panel(player: RwSignal<PlayerSnapshot>, signals: AppSignals) -> impl Vi
                 .font_weight(floem::text::Weight::LIGHT)
                 .color(colors.ink)
                 .margin_bottom(16.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         stat_row(
             "Femininity",
@@ -77,7 +77,7 @@ fn people_panel(active_npc: RwSignal<Option<NpcSnapshot>>, signals: AppSignals) 
     let title = label(|| "People Here".to_string()).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(12.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink_ghost)
             .margin_bottom(8.0)
     });
@@ -103,35 +103,35 @@ fn people_panel(active_npc: RwSignal<Option<NpcSnapshot>>, signals: AppSignals) 
                 s.font_size(15.0)
                     .font_weight(floem::text::Weight::MEDIUM)
                     .color(colors.ink)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
             label(move || format!("{} - {}", age, personality)).style(move |s| {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 s.font_size(12.0)
                     .color(colors.ink_dim)
                     .margin_top(2.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
             label(move || format!("Relationship: {}", relationship)).style(move |s| {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 s.font_size(12.0)
                     .color(colors.ink_dim)
                     .margin_top(8.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
             label(move || format!("Liking: {}", liking)).style(move |s| {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 s.font_size(12.0)
                     .color(colors.ink_dim)
                     .margin_top(2.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
             label(move || format!("Attraction: {}", attraction)).style(move |s| {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 s.font_size(12.0)
                     .color(colors.ink_dim)
                     .margin_top(2.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
         ))
         .style(move |s| {
@@ -161,7 +161,7 @@ fn people_empty_state(signals: AppSignals) -> impl View {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(12.0)
             .color(colors.ink_ghost)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -202,7 +202,7 @@ fn mode_toggle(signals: AppSignals) -> impl View {
                     .border(1.0)
                     .border_radius(4.0)
                     .margin_right(6.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
                     .border_color(if is_active { colors.lamp } else { colors.seam })
                     .color(if is_active {
                         colors.lamp

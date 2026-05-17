@@ -10,7 +10,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::game_state::{load_world_from_save, GameState};
 use crate::runtime_controller::RuntimeController;
 use crate::signal_utils::get_or_default;
-use crate::theme::ThemeColors;
+use crate::theme::{ThemeColors, UI_FONT_FAMILY};
 use crate::AppSignals;
 
 // ---------------------------------------------------------------------------
@@ -147,7 +147,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
         .style(move |s| {
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.font_size(14.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .padding_horiz(20.0)
                 .padding_vert(10.0)
                 .border(1.0)
@@ -173,7 +173,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
     let status_strip = label(move || get_or_default(status_msg)).style(move |s| {
         let colors = ThemeColors::from_mode(signals.prefs.get().mode);
         s.font_size(13.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink_ghost)
             .min_height(20.0)
             .margin_top(6.0)
@@ -240,14 +240,14 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 let name_label = label(move || name_display.clone()).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                     s.font_size(14.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                         .color(colors.ink)
                 });
 
                 let modified_label = label(move || modified_display.clone()).style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                     s.font_size(12.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                         .color(colors.ink_dim)
                         .margin_top(2.0)
                 });
@@ -274,7 +274,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
                 .style(move |s| {
                     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                     s.font_size(14.0)
-                        .font_family("system-ui, -apple-system, sans-serif".to_string())
+                        .font_family(UI_FONT_FAMILY.to_string())
                         .color(colors.ink_ghost)
                         .margin_top(16.0)
                 })
@@ -317,7 +317,7 @@ pub fn saves_panel(signals: AppSignals, state: Rc<RefCell<GameState>>) -> impl V
 fn small_action_btn_style(s: floem::style::Style, signals: AppSignals) -> floem::style::Style {
     let colors = ThemeColors::from_mode(signals.prefs.get().mode);
     s.font_size(12.0)
-        .font_family("system-ui, -apple-system, sans-serif".to_string())
+        .font_family(UI_FONT_FAMILY.to_string())
         .padding_horiz(12.0)
         .padding_vert(5.0)
         .border(1.0)

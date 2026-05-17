@@ -435,7 +435,6 @@ pub fn render_prose(
     ctx: &SceneCtx,
     registry: &PackRegistry,
 ) -> Result<String, minijinja::Error> {
-    // Pre-resolve trait IDs to strings
     let trait_strings: HashSet<String> = world
         .player
         .traits
@@ -443,7 +442,6 @@ pub fn render_prose(
         .map(|&tid| registry.trait_id_to_str(tid).to_string())
         .collect();
 
-    // Pre-resolve skill IDs to (string → effective value) map
     let skills: HashMap<String, i32> = world
         .player
         .skills
@@ -456,7 +454,6 @@ pub fn render_prose(
 
     let p = &world.player;
 
-    // Extract before-life attribute strings
     let (bh, bhc, bec, bst, bps, bf, bn, bv) = match &p.before {
         Some(b) => (
             format!("{:?}", b.height),
@@ -480,7 +477,6 @@ pub fn render_prose(
         ),
     };
 
-    // Compute active display name from femininity skill
     let active_name = match registry.femininity_skill() {
         Ok(femininity_id) => p.active_name(femininity_id).to_string(),
         Err(err) => {

@@ -1,11 +1,12 @@
 use slotmap::SlotMap;
 use std::collections::{HashMap, HashSet};
 use undone_domain::{
-    Age, AlcoholLevel, Appearance, ArousalLevel, BeforeIdentity, BeforeSexuality, BeforeVoice,
-    BoundedStat, BreastSize, ButtSize, ClitSensitivity, Complexion, EyeColour, HairColour,
-    HairLength, Height, InnerLabiaSize, LipShape, MaleFigure, NaturalPubicHair, NippleSensitivity,
-    PcOrigin, PenisSize, Player, PlayerFigure, PubicHairStyle, SkinTone, WaistSize,
-    WetnessBaseline,
+    Age, AlcoholLevel, Appearance, ArousalLevel, AttractionLevel, BeforeIdentity, BeforeSexuality,
+    BeforeVoice, Behaviour, BoundedStat, BreastSize, ButtSize, ClitSensitivity, Complexion,
+    EyeColour, HairColour, HairLength, Height, InnerLabiaSize, LikingLevel, LipShape, LoveLevel,
+    MaleClothing, MaleFigure, MaleNpc, NaturalPubicHair, NippleSensitivity, NpcCore, PcOrigin,
+    PenisSize, PersonalityId, Player, PlayerFigure, PubicHairStyle, RelationshipStatus, SkinTone,
+    WaistSize, WetnessBaseline,
 };
 
 use crate::{GameData, World};
@@ -73,5 +74,42 @@ pub fn make_test_world() -> World {
         male_npcs: SlotMap::with_key(),
         female_npcs: SlotMap::with_key(),
         game_data: GameData::default(),
+    }
+}
+
+/// Canonical test male NPC ("Jake", stranger to the player).
+/// Tests that need different relationship/liking/attraction should mutate the result.
+pub fn make_test_male_npc(personality: PersonalityId) -> MaleNpc {
+    MaleNpc {
+        core: NpcCore {
+            name: "Jake".into(),
+            age: Age::MidLateTwenties,
+            race: "white".into(),
+            eye_colour: "blue".into(),
+            hair_colour: "brown".into(),
+            personality,
+            traits: HashSet::new(),
+            relationship: RelationshipStatus::Stranger,
+            pc_liking: LikingLevel::Neutral,
+            npc_liking: LikingLevel::Neutral,
+            pc_love: LoveLevel::None,
+            npc_love: LoveLevel::None,
+            pc_attraction: AttractionLevel::Unattracted,
+            npc_attraction: AttractionLevel::Unattracted,
+            behaviour: Behaviour::Neutral,
+            relationship_flags: HashSet::new(),
+            sexual_activities: HashSet::new(),
+            custom_flags: HashMap::new(),
+            custom_ints: HashMap::new(),
+            knowledge: 0,
+            contactable: true,
+            arousal: ArousalLevel::Comfort,
+            alcohol: AlcoholLevel::Sober,
+            roles: HashSet::new(),
+        },
+        figure: MaleFigure::Average,
+        clothing: MaleClothing::default(),
+        had_orgasm: false,
+        has_baby_with_pc: false,
     }
 }

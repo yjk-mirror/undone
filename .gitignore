@@ -7,6 +7,8 @@ Thumbs.db
 .env
 opencode.json
 .serena/
+.desloppify/
+scorecard.png
 tmp/
 /.worktrees/
 

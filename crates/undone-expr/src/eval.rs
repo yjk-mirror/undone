@@ -166,7 +166,6 @@ fn eval_to_value(
             Value::Bool(b) => EvalValue::Bool(*b),
         }),
         Expr::Call(call) => {
-            // Try to eval as int, then string, then bool
             if let Ok(n) = eval_call_int(call, world, ctx, registry) {
                 return Ok(EvalValue::Int(n));
             }
@@ -318,7 +317,6 @@ pub(crate) fn eval_call_bool(
                     Some(Value::Int(n)) => *n as i32,
                     _ => return Err(EvalError::BadArg("checkSkillRed".into())),
                 };
-                // If already permanently failed, block immediately.
                 let scene_id = ctx.scene_id.as_deref().unwrap_or("unknown");
                 if world.game_data.has_failed_red_check(scene_id, skill_id_str) {
                     return Ok(false);
@@ -1165,7 +1163,6 @@ mod tests {
                 modifier: 0,
             },
         );
-        // Record permanent failure
         world.game_data.fail_red_check("my_scene", "CHARM");
         let mut ctx = SceneCtx::new();
         ctx.scene_id = Some("my_scene".to_string());

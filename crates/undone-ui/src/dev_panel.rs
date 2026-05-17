@@ -10,7 +10,7 @@ use crate::game_state::GameState;
 use crate::layout::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use crate::runtime_snapshot::RuntimeSnapshot;
 use crate::signal_utils::get_or_default;
-use crate::theme::ThemeColors;
+use crate::theme::{ThemeColors, UI_FONT_FAMILY};
 use crate::AppSignals;
 
 const WINDOW_SIZE_PRESETS: [(f64, f64); 3] = [(1200.0, 800.0), (1400.0, 900.0), (1800.0, 1000.0)];
@@ -136,9 +136,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                                         .border_bottom(1.0)
                                         .border_color(colors.seam)
                                         .color(colors.ink)
-                                        .font_family(
-                                            "system-ui, -apple-system, sans-serif".to_string(),
-                                        )
+                                        .font_family(UI_FONT_FAMILY.to_string())
                                         .hover(|s| s.background(colors.lamp_glow))
                                 })
                         }
@@ -210,7 +208,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                             .border_radius(4.0)
                             .color(colors.ink_dim)
                             .font_size(12.0)
-                            .font_family("system-ui, -apple-system, sans-serif".to_string())
+                            .font_family(UI_FONT_FAMILY.to_string())
                     })
                 },
             )
@@ -255,7 +253,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
                 let colors = ThemeColors::from_mode(signals.prefs.get().mode);
                 s.color(colors.ink_dim)
                     .font_size(13.0)
-                    .font_family("system-ui, -apple-system, sans-serif".to_string())
+                    .font_family(UI_FONT_FAMILY.to_string())
             }),
             h_stack((
                 text_input(ctx.window_width)
@@ -349,7 +347,7 @@ pub fn dev_panel(signals: AppSignals, gs: Rc<RefCell<GameState>>) -> impl View {
             s.min_height(18.0)
                 .font_size(13.0)
                 .color(colors.ink_dim)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         scene_section,
         stats_section,
@@ -418,7 +416,7 @@ fn stat_editor_row(
             let colors = ThemeColors::from_mode(signals.prefs.get().mode);
             s.width(100.0)
                 .color(colors.ink_dim)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         text_input(input).style(input_style(signals)),
         action_button("Apply", signals, move || {
@@ -441,7 +439,7 @@ fn section_card(title: &'static str, content: impl IntoView, signals: AppSignals
             s.font_size(14.0)
                 .font_weight(floem::text::Weight::SEMIBOLD)
                 .color(colors.ink)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
         }),
         content.into_view(),
     ))
@@ -463,7 +461,7 @@ fn heading(text: &'static str, signals: AppSignals) -> impl View {
         s.font_size(22.0)
             .font_weight(floem::text::Weight::LIGHT)
             .color(colors.ink)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
     })
 }
 
@@ -474,7 +472,7 @@ fn input_style(signals: AppSignals) -> impl Fn(floem::style::Style) -> floem::st
             .min_width(180.0)
             .padding_horiz(10.0)
             .font_size(14.0)
-            .font_family("system-ui, -apple-system, sans-serif".to_string())
+            .font_family(UI_FONT_FAMILY.to_string())
             .color(colors.ink)
             .background(colors.page)
             .border(1.0)
@@ -504,7 +502,7 @@ fn action_button_owned(
             s.padding_horiz(12.0)
                 .padding_vert(8.0)
                 .font_size(13.0)
-                .font_family("system-ui, -apple-system, sans-serif".to_string())
+                .font_family(UI_FONT_FAMILY.to_string())
                 .border(1.0)
                 .border_color(colors.seam)
                 .border_radius(4.0)
