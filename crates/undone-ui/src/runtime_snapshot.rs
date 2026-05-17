@@ -360,6 +360,7 @@ mod tests {
         let female_key = gs.world.female_npcs.insert(undone_domain::FemaleNpc {
             core: NpcCore {
                 name: "Mia".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),
@@ -445,6 +446,7 @@ mod tests {
         let female_key = gs.world.female_npcs.insert(undone_domain::FemaleNpc {
             core: NpcCore {
                 name: "Mia".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),

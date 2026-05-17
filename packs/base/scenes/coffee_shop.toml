@@ -156,6 +156,11 @@ His hand is warm and your fingers disappear in his grip for a second before he l
   role = "ROLE_JAKE"
 
   [[actions.effects]]
+  type = "set_npc_name"
+  npc  = "m"
+  name = "Jake"
+
+  [[actions.effects]]
   type = "set_game_flag"
   flag = "COFFEE_SHOP_VISITED"
 

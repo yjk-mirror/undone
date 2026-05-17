@@ -385,6 +385,16 @@ pub fn apply_effect(
                 npc_data.core.roles.insert(role.clone());
             }
         },
+        EffectDef::SetNpcName { npc, name } => match resolve_npc_ref(npc, ctx)? {
+            NpcRef::Male(key) => {
+                let npc_data = world.male_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.display_name = Some(name.clone());
+            }
+            NpcRef::Female(key) => {
+                let npc_data = world.female_npc_mut(key).ok_or(EffectError::NpcNotFound)?;
+                npc_data.core.display_name = Some(name.clone());
+            }
+        },
         EffectDef::FailRedCheck { skill } => {
             let scene_id = ctx.scene_id.as_deref().unwrap_or("unknown");
             world.game_data.fail_red_check(scene_id, skill);
@@ -444,6 +454,7 @@ mod tests {
         FemaleNpc {
             core: NpcCore {
                 name: "Fiona".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),
@@ -485,6 +496,7 @@ mod tests {
         MaleNpc {
             core: NpcCore {
                 name: "Test".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -1070,6 +1082,49 @@ mod tests {
         apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
         let npc_data = world.female_npcs.get(key).unwrap();
         assert!(npc_data.core.roles.contains("ROLE_LANDLORD"));
+    }
+
+    #[test]
+    fn set_npc_name_overrides_display_name_but_preserves_spawn_name() {
+        let mut world = make_world();
+        let npc = make_male_npc();
+        let key = world.male_npcs.insert(npc);
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        ctx.scene_id = Some("test::scene".into());
+        let registry = PackRegistry::new();
+
+        let effect = EffectDef::SetNpcName {
+            npc: "m".into(),
+            name: "Jake".into(),
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+
+        let npc_data = world.male_npcs.get(key).unwrap();
+        assert_eq!(npc_data.core.display_name.as_deref(), Some("Jake"));
+        assert_eq!(npc_data.core.name, "Test", "spawn name must be preserved");
+        assert_eq!(npc_data.core.effective_name(), "Jake");
+    }
+
+    #[test]
+    fn set_npc_name_works_for_female_via_role_binding() {
+        let mut world = make_world();
+        let npc = make_female_npc();
+        let key = world.female_npcs.insert(npc);
+        let mut ctx = SceneCtx::new();
+        ctx.role_bindings
+            .insert("ROLE_RA".to_string(), SceneNpcRef::Female(key));
+        ctx.scene_id = Some("test::scene".into());
+        let registry = PackRegistry::new();
+
+        let effect = EffectDef::SetNpcName {
+            npc: "ROLE_RA".into(),
+            name: "Priya".into(),
+        };
+        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+
+        let npc_data = world.female_npcs.get(key).unwrap();
+        assert_eq!(npc_data.core.effective_name(), "Priya");
     }
 
     #[test]

@@ -199,6 +199,7 @@ fn make_core(
 ) -> NpcCore {
     NpcCore {
         name,
+        display_name: None,
         age,
         race,
         eye_colour,

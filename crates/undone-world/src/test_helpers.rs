@@ -83,6 +83,7 @@ pub fn make_test_male_npc(personality: PersonalityId) -> MaleNpc {
     MaleNpc {
         core: NpcCore {
             name: "Jake".into(),
+            display_name: None,
             age: Age::MidLateTwenties,
             race: "white".into(),
             eye_colour: "blue".into(),

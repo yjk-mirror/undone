@@ -1432,6 +1432,7 @@ mod tests {
         let male = undone_domain::MaleNpc {
             core: undone_domain::NpcCore {
                 name: "Dan".into(),
+                display_name: None,
                 age: undone_domain::Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -1498,6 +1499,7 @@ mod tests {
         let male = undone_domain::MaleNpc {
             core: undone_domain::NpcCore {
                 name: "Dan".into(),
+                display_name: None,
                 age: undone_domain::Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -1543,6 +1545,7 @@ mod tests {
         let male = undone_domain::MaleNpc {
             core: undone_domain::NpcCore {
                 name: "Dan".into(),
+                display_name: None,
                 age: undone_domain::Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),

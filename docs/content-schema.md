@@ -328,6 +328,7 @@ Tagged by `type`:
 | `set_contactable` | `npc, value: bool` | Mark an NPC as contactable (or not) |
 | `add_sexual_activity` | `npc, activity` | Record a sexual activity with an NPC |
 | `set_npc_role` | `npc, role` | Add a named role tag to an NPC so later scenes, schedule checks, and lookups can resolve them |
+| `set_npc_name` | `npc, name` | Override the NPC's display name (UI sidebar, prose). The random spawn name on `core.name` is preserved. Pair with `set_npc_role` on first-meeting scenes so the player sees the story name ("Jake") instead of the random spawn name ("Brian"). |
 
 For every NPC-targeted effect above, `npc` may be:
 

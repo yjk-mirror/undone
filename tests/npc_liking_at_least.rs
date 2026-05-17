@@ -36,6 +36,7 @@ fn male_npc_with_role_and_liking(
     undone_domain::MaleNpc {
         core: undone_domain::NpcCore {
             name: name.into(),
+            display_name: None,
             age: undone_domain::Age::Thirties,
             race: "white".into(),
             eye_colour: "grey".into(),
@@ -78,6 +79,7 @@ fn female_npc_with_role_and_liking(
     undone_domain::FemaleNpc {
         core: undone_domain::NpcCore {
             name: name.into(),
+            display_name: None,
             age: undone_domain::Age::EarlyTwenties,
             race: "white".into(),
             eye_colour: "green".into(),

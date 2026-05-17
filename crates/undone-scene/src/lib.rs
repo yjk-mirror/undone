@@ -52,6 +52,7 @@ mod integration_tests {
         MaleNpc {
             core: NpcCore {
                 name: "Stranger".into(),
+                display_name: None,
                 age: Age::Thirties,
                 race: "white".into(),
                 eye_colour: "grey".into(),

@@ -87,7 +87,7 @@ pub struct NpcActivatedData {
 impl NpcActivatedData {
     pub fn from_npc(npc: &undone_domain::NpcCore, registry: &PackRegistry) -> Self {
         Self {
-            name: npc.name.clone(),
+            name: npc.effective_name().to_string(),
             age: npc.age,
             personality: registry.personality_name(npc.personality).to_owned(),
             relationship: npc.relationship.clone(),
@@ -939,6 +939,7 @@ mod tests {
         let male_key = world.male_npcs.insert(MaleNpc {
             core: NpcCore {
                 name: "Dan".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -971,6 +972,7 @@ mod tests {
         let female_key = world.female_npcs.insert(FemaleNpc {
             core: NpcCore {
                 name: "Mia".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),
@@ -1185,6 +1187,7 @@ mod tests {
         let npc = MaleNpc {
             core: NpcCore {
                 name: "Jake".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -1231,6 +1234,100 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, EngineEvent::NpcActivated(Some(_)))),
             "expected NpcActivated event with data"
+        );
+    }
+
+    #[test]
+    fn npc_activated_uses_display_name_when_set() {
+        // Regression guard: the People Here sidebar reads from NpcActivatedData.name.
+        // After a first-meeting scene tags a roled NPC with set_npc_name, the
+        // sidebar must show the story name ("Jake") instead of the random
+        // spawn name ("Brian"). Without this, the sidebar shows whichever
+        // random name the spawner chose and the story binding is invisible
+        // to the player.
+        use crate::{apply_effect, SceneCtx};
+
+        let scene = make_simple_scene();
+        let mut engine = make_engine_with(scene);
+        let mut world = make_world();
+        let mut registry = undone_packs::PackRegistry::new();
+        let personality_id = registry.intern_personality("ROMANTIC");
+
+        let npc = MaleNpc {
+            core: NpcCore {
+                name: "Brian".into(),
+                display_name: None,
+                age: Age::MidLateTwenties,
+                race: "white".into(),
+                eye_colour: "blue".into(),
+                hair_colour: "brown".into(),
+                personality: personality_id,
+                traits: HashSet::new(),
+                relationship: RelationshipStatus::Stranger,
+                pc_liking: LikingLevel::Neutral,
+                npc_liking: LikingLevel::Neutral,
+                pc_love: LoveLevel::None,
+                npc_love: LoveLevel::None,
+                pc_attraction: AttractionLevel::Unattracted,
+                npc_attraction: AttractionLevel::Unattracted,
+                behaviour: Behaviour::Neutral,
+                relationship_flags: HashSet::new(),
+                sexual_activities: HashSet::new(),
+                custom_flags: HashMap::new(),
+                custom_ints: HashMap::new(),
+                knowledge: 0,
+                contactable: true,
+                arousal: ArousalLevel::Comfort,
+                alcohol: AlcoholLevel::Sober,
+                roles: HashSet::new(),
+            },
+            figure: MaleFigure::Average,
+            clothing: MaleClothing::default(),
+            had_orgasm: false,
+            has_baby_with_pc: false,
+        };
+        let key = world.male_npcs.insert(npc);
+
+        // Apply set_npc_name through the public effect path, like a scene
+        // action would. Requires an active_male in the ctx.
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        apply_effect(
+            &EffectDef::SetNpcName {
+                npc: "m".into(),
+                name: "Jake".into(),
+            },
+            &mut world,
+            &mut ctx,
+            &registry,
+        )
+        .expect("set_npc_name must succeed with active male");
+
+        // Now drive the engine the way the runtime would: start a scene, bind
+        // the male as active, and pull the NpcActivated event.
+        engine.send(
+            EngineCommand::StartScene("test::simple".into()),
+            &mut world,
+            &registry,
+        );
+        engine.drain();
+        engine.send(EngineCommand::SetActiveMale(key), &mut world, &registry);
+        let events = engine.drain();
+
+        let activated = events
+            .iter()
+            .find_map(|e| match e {
+                EngineEvent::NpcActivated(Some(data)) => Some(data),
+                _ => None,
+            })
+            .expect("expected NpcActivated event after SetActiveMale");
+        assert_eq!(
+            activated.name, "Jake",
+            "sidebar must read the story name, not the spawn name"
+        );
+        assert_eq!(
+            world.male_npcs[key].core.name, "Brian",
+            "underlying spawn name must be preserved"
         );
     }
 

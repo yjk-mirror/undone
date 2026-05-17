@@ -221,6 +221,15 @@ pub enum EffectDef {
         npc: String,
         role: String,
     },
+    /// Override the NPC's display name (UI sidebar, prose templates that read
+    /// the active name). The spawn name on `core.name` is preserved. Used to
+    /// bind a story name like "Jake" or "Theo" to a randomly-spawned NPC
+    /// after a first-meeting scene.
+    SetNpcName {
+        /// "m", "f", or a role bound in SceneCtx.role_bindings
+        npc: String,
+        name: String,
+    },
     FailRedCheck {
         skill: String,
     },
@@ -263,6 +272,7 @@ impl EffectDef {
                 | Self::AdvanceTime { .. }
                 | Self::AdvanceArc { .. }
                 | Self::SetNpcRole { .. }
+                | Self::SetNpcName { .. }
                 | Self::FailRedCheck { .. }
         )
     }

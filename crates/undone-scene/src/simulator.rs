@@ -361,6 +361,7 @@ mod tests {
         MaleNpc {
             core: NpcCore {
                 name: "Marcus".into(),
+                display_name: None,
                 age: Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),

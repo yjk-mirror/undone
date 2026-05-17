@@ -556,7 +556,7 @@ pub fn render_prose(
         .and_then(|key| world.male_npc(key))
         .map(|npc| {
             Value::from_object(NpcCtx {
-                name: npc.core.name.clone(),
+                name: npc.core.effective_name().to_string(),
                 relationship: npc.core.relationship.clone(),
                 pc_liking: npc.core.pc_liking,
                 pc_love: npc.core.pc_love,
@@ -576,7 +576,7 @@ pub fn render_prose(
         .and_then(|key| world.female_npc(key))
         .map(|npc| {
             Value::from_object(NpcCtx {
-                name: npc.core.name.clone(),
+                name: npc.core.effective_name().to_string(),
                 relationship: npc.core.relationship.clone(),
                 pc_liking: npc.core.pc_liking,
                 pc_love: npc.core.pc_love,
@@ -596,7 +596,7 @@ pub fn render_prose(
         for (role, npc_ref) in &ctx.role_bindings {
             let npc_ctx = match npc_ref {
                 SceneNpcRef::Male(key) => world.male_npc(*key).map(|npc| NpcCtx {
-                    name: npc.core.name.clone(),
+                    name: npc.core.effective_name().to_string(),
                     relationship: npc.core.relationship.clone(),
                     pc_liking: npc.core.pc_liking,
                     pc_love: npc.core.pc_love,
@@ -610,7 +610,7 @@ pub fn render_prose(
                     had_orgasm: npc.had_orgasm,
                 }),
                 SceneNpcRef::Female(key) => world.female_npc(*key).map(|npc| NpcCtx {
-                    name: npc.core.name.clone(),
+                    name: npc.core.effective_name().to_string(),
                     relationship: npc.core.relationship.clone(),
                     pc_liking: npc.core.pc_liking,
                     pc_love: npc.core.pc_love,
@@ -855,6 +855,7 @@ mod tests {
         let male = undone_domain::MaleNpc {
             core: undone_domain::NpcCore {
                 name: "Dan".into(),
+                display_name: None,
                 age: undone_domain::Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "blue".into(),
@@ -887,6 +888,7 @@ mod tests {
         let female = undone_domain::FemaleNpc {
             core: undone_domain::NpcCore {
                 name: "Mia".into(),
+                display_name: None,
                 age: undone_domain::Age::MidLateTwenties,
                 race: "white".into(),
                 eye_colour: "green".into(),

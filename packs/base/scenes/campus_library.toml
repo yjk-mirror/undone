@@ -90,6 +90,11 @@ When you go back to your problem set your cheeks are warm.
   npc  = "m"
   role = "ROLE_THEO"
 
+  [[actions.effects]]
+  type = "set_npc_name"
+  npc  = "m"
+  name = "Theo"
+
   [[actions.next]]
   finish = true
 

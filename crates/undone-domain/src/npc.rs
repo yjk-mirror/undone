@@ -9,6 +9,12 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NpcCore {
     pub name: String,
+    /// Story name to display in UI when the NPC has been bound to a story role
+    /// (Jake, Marcus, Theo, etc.). `None` falls back to `name`, the random
+    /// spawn name. Set via the `set_npc_name` effect. Decoupled from
+    /// `roles` so a scene can rename without assigning a role and vice versa.
+    #[serde(default)]
+    pub display_name: Option<String>,
     pub age: Age,
     pub race: String,
     pub eye_colour: String,
@@ -44,6 +50,13 @@ pub struct NpcCore {
 impl NpcCore {
     pub fn has_trait(&self, id: NpcTraitId) -> bool {
         self.traits.contains(&id)
+    }
+
+    /// Story name if set via `set_npc_name` (e.g. "Jake"), else the random
+    /// spawn name on `name`. UI and prose templates should always read through
+    /// this so a roled NPC consistently appears under their story name.
+    pub fn effective_name(&self) -> &str {
+        self.display_name.as_deref().unwrap_or(&self.name)
     }
 
     pub fn is_partner(&self) -> bool {

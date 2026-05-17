@@ -6,7 +6,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 /// Increment this whenever the save format changes in a breaking way.
-pub const SAVE_VERSION: u32 = 5;
+pub const SAVE_VERSION: u32 = 6;
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -146,15 +146,21 @@ pub fn load_game(path: &Path, registry: &mut PackRegistry) -> Result<World, Save
         raw = migrate_v2_to_v3(raw);
         raw = migrate_v3_to_v4(raw);
         raw = migrate_v4_to_v5(raw);
+        raw = migrate_v5_to_v6(raw);
     } else if version == 2 {
         raw = migrate_v2_to_v3(raw);
         raw = migrate_v3_to_v4(raw);
         raw = migrate_v4_to_v5(raw);
+        raw = migrate_v5_to_v6(raw);
     } else if version == 3 {
         raw = migrate_v3_to_v4(raw);
         raw = migrate_v4_to_v5(raw);
+        raw = migrate_v5_to_v6(raw);
     } else if version == 4 {
         raw = migrate_v4_to_v5(raw);
+        raw = migrate_v5_to_v6(raw);
+    } else if version == 5 {
+        raw = migrate_v5_to_v6(raw);
     } else if version != SAVE_VERSION {
         return Err(SaveError::VersionMismatch {
             saved: version,
@@ -498,6 +504,14 @@ fn migrate_v4_to_v5(mut save_json: serde_json::Value) -> serde_json::Value {
         }
     }
 
+    save_json
+}
+
+/// v5 → v6: adds `NpcCore.display_name: Option<String>`. The field is
+/// `#[serde(default)]` so missing fields deserialize as `None` — this
+/// migration is a no-op in terms of JSON shape and only exists to advance the
+/// version stamp so old saves and new code agree on the on-disk format.
+fn migrate_v5_to_v6(save_json: serde_json::Value) -> serde_json::Value {
     save_json
 }
 

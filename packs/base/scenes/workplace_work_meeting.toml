@@ -128,6 +128,11 @@ Carter catches you in the doorway on the way out. "Great work." He means it. Bac
   role = "ROLE_MARCUS"
 
   [[actions.effects]]
+  type = "set_npc_name"
+  npc  = "m"
+  name = "Marcus"
+
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 3
@@ -191,6 +196,11 @@ You fill your water bottle. The glass wall gives back a reflection — laptop un
   role = "ROLE_MARCUS"
 
   [[actions.effects]]
+  type = "set_npc_name"
+  npc  = "m"
+  name = "Marcus"
+
+  [[actions.effects]]
   type   = "skill_increase"
   skill  = "FEMININITY"
   amount = 3
@@ -250,6 +260,11 @@ You walk back to your desk. Your hands are warm from where you gripped the lapto
   type = "set_npc_role"
   npc  = "m"
   role = "ROLE_MARCUS"
+
+  [[actions.effects]]
+  type = "set_npc_name"
+  npc  = "m"
+  name = "Marcus"
 
   [[actions.effects]]
   type   = "skill_increase"
