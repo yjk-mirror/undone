@@ -2,7 +2,21 @@
 
 ## Current State
 
-**Latest session (2026-03-22, fourth pass — consequences sprint, 7 new scenes):** Two batches. Batch 1 (4 scenes): `marcus_apartment` (explicit — Marcus's second encounter, deliberate, full sexual response traits, MARCUS_REJECTED flag for "leave"), `campus_theo_morning` (Camila wakes in Theo's bed — HOMOPHOBIC morning-after), `gym_changing_room` (Robin in women's locker room — OBJECTIFYING branching strongest), `jake_stays_over` (domesticity — Jake's morning routine in Robin's apartment). Enhanced `morning_routine` and `evening_home` with post-sexual texture (mirror after sex, underwear decisions, Jake text, bath scene, Marcus office awareness). Batch 2 (3 scenes): `marcus_monday_rejected` (consequence — Marcus's professional distance after Robin left his apartment), `bad_date` (Ryan from the app — three exit strategies, OBJECTIFYING reads the script he's running), `campus_dining_after_theo` (Camila sees Theo in public — HOMOPHOBIC visibility of desire). Writing-reviewed batch 1, fixed Important findings. **62 scenes total. All tests passing. validate-pack clean.**
+**Latest session (2026-05-17, cleanup + feedback triage + display-name feature):** Audited every open feedback item against actual code. Most engineering-audit Criticals/Importants were already resolved silently; remaining open items mostly content-side or low-leverage. 7 commits:
+1. Finalized in-progress cleanup pass: pruned 9 dead rust-mcp stub tools (~1500 LOC), extracted `UI_FONT_FAMILY` constant, deduplicated `make_test_male_npc` test helper, dropped unused `anyhow`/`slotmap` deps.
+2. Fixed ROLE_THEO NPC routing through the scheduler (`npc_role` was missing on the three Theo schedule entries); also dropped the redundant `set_game_flag ROUTE_*` writes in arrival scenes (audit I18).
+3. Fixed `ThoughtAdded`/`ErrorOccurred` scrolling to bottom on the first event of a new scene — should respect the new-scene-top invariant the way `ProseAdded` already did (audit I8).
+4. `validate-pack` now skips underscore-prefixed scene subdirs (matches the runtime loader's effective scope; drops two dead lint warnings from `_archive/`).
+5. **Feature: `SetNpcName` effect + `NpcCore.display_name`** — root-cause fix for "sidebar shows random spawn name (Brian) instead of the story name (Jake)". `NpcCore` gained an `Option<String>` display name with `effective_name()` accessor; new `set_npc_name` effect writes it; `NpcActivatedData::from_npc` and the prose `getName` accessors all read through `effective_name()`. Decoupled from `set_npc_role` so a scene can rename without rebinding and vice versa. Save format bumped v5 → v6 (no-op JSON shape, `#[serde(default)]` on the field). Wired into `coffee_shop` (Jake), `workplace_work_meeting` (Marcus), `campus_library` (Theo).
+6. Independent acceptance suite for `SetNpcName`: 27 tests via `ops:test-author`, all passing, each with a `// BREAKS IF` comment naming the user-visible behavior it guards.
+
+**Playtester confirmed live:** scheduler-driven `coffee_shop` at week 2 fires `set_npc_role` + `set_npc_name`; spawn-name "Derek" becomes display-name "Jake"; the People Here sidebar reads "Jake" in the next scene (`plan_your_day`).
+
+**Workspace state:** 498 tests passing (was 470), `validate-pack` clean (one pre-existing content nit: "check your phone" in `work_marcus_drinks` line 55), save format at v6.
+
+**Audit triage outcome:** of the ~45 engineering-audit findings, 8/8 Criticals were resolved before this session, ~14/19 Importants resolved, the rest are either intentional (unused future-hook stats), low-leverage (FEMININITY string lookup), or content work (post-arc void, specific scene rewrites). The HANDOFF's prior "People Here doesn't populate for Theo" complaint was a class-level engine gap that also affected Jake and Marcus; root cause was the missing display-name mechanism, now fixed.
+
+**Previous session (2026-03-22, fourth pass — consequences sprint, 7 new scenes):** Two batches. Batch 1 (4 scenes): `marcus_apartment` (explicit — Marcus's second encounter, deliberate, full sexual response traits, MARCUS_REJECTED flag for "leave"), `campus_theo_morning` (Camila wakes in Theo's bed — HOMOPHOBIC morning-after), `gym_changing_room` (Robin in women's locker room — OBJECTIFYING branching strongest), `jake_stays_over` (domesticity — Jake's morning routine in Robin's apartment). Enhanced `morning_routine` and `evening_home` with post-sexual texture (mirror after sex, underwear decisions, Jake text, bath scene, Marcus office awareness). Batch 2 (3 scenes): `marcus_monday_rejected` (consequence — Marcus's professional distance after Robin left his apartment), `bad_date` (Ryan from the app — three exit strategies, OBJECTIFYING reads the script he's running), `campus_dining_after_theo` (Camila sees Theo in public — HOMOPHOBIC visibility of desire). Writing-reviewed batch 1, fixed Important findings. **62 scenes total. All tests passing. validate-pack clean.**
 
 **Previous session (2026-03-22, third pass — adult content sprint + Camila playtest):** Deepened all 4 existing explicit scenes (jake_apartment, bar_stranger_night, work_marcus_closet, party_stranger_after) with Robin's 18 sexual response traits — HAIR_TRIGGER, NIPPLE_GETTER, SENSITIVE_NECK, EASILY_WET, SUBMISSIVE, PRAISE_KINK, MULTI_ORGASMIC, HEAVY_SQUIRTER, and 10 physical detail traits. Each trait produces structural physical changes (different pacing, different events), not adjective swaps. Deepened jake_morning_after "wake him up" action into explicit morning sex (sleepier, bodies that know each other, full trait integration). Created campus_theo_night — Camila's first sexual encounter with Theo, using HOMOPHOBIC (desire-before-shame) and SEXIST (male-gaze inversion) to produce a scene Robin couldn't have. Added MET_THEO flag to campus_library and schedule entry for campus_theo_night. Playtested Camila flow — playtester confirmed discovery beats strong (Beat 1 Scale + Beat 5 HOMOPHOBIC strongest), campus arc well-constructed, dining hall backpack moment "most emotionally potent thing in the arc", Theo night "genuinely hot." Fixed 2 bugs: (1) campus_orientation NPC action had `goto = "engage"` (action ID, not scene ID) → `finish = true`; (2) CRITICAL: "Begin Your Story" crashed the game — `phase.set(AppPhase::InGame)` inside `on_click_stop` caused floem reactive panic. Fixed by deferring with `exec_after(Duration::ZERO)` in 3 locations (char_creation begin, error surface, landing page load). **446 tests passing, 55 scenes, validate-pack clean.**
 
@@ -56,43 +70,55 @@
 
 ## ⚡ Next Action
 
-**59 scenes. 4 new scenes + 2 enhanced scenes. Consequence chains live.**
+**62 scenes. 498 tests passing. Sidebar shows story names. Save format v6.**
 
-### 1. Verify char creation fix live
-The `exec_after` deferral still needs a live test — launch the game, go through
-full character creation with Camila preset, click "Begin Your Story", confirm
-it transitions to InGame without crashing.
+Pick one of these — each is independently scoped:
 
-### 2. Playtest the new scenes
-- **marcus_apartment** — play Robin through the Marcus arc to his apartment.
-  Test both "stay for the wine" and "leave" paths.
-- **campus_theo_morning** — play Camila through Theo night → morning.
-  Verify the HOMOPHOBIC thoughts block feels right (was rewritten during review).
-- **gym_changing_room** — verify schedule fires after week 3 settled state.
-  Test all three vulnerability levels (stall/change/shower).
-- **jake_stays_over** — verify it fires after JAKE_MORNING_AFTER.
-- **morning_routine enhancements** — check the post-sexual mirror text fires
-  correctly after JAKE_INTIMATE or MARCUS_INTIMATE flags.
-- **evening_home enhancements** — check "text Jake" and "run a bath" appear
-  when gated flags are set.
-
-### 3. Content expansion — next priorities
+### A. Content expansion (writer-led)
 - **Post-Theo campus life** — study sessions with new subtext, phone call
-  home after sleeping with a man (HOMOPHOBIC register)
+  home after sleeping with a man (HOMOPHOBIC register).
+- **Marcus continued arc** — after `MARCUS_APARTMENT`, what's the relationship?
+  Regular thing? Office complication? After `MARCUS_TALKED`, does respect evolve?
 - **Jake relationship deepening** — a fight, a disagreement, the first time
-  something goes wrong
-- **Marcus continued arc** — after MARCUS_APARTMENT, what's the relationship?
-  Regular thing? Office complication? After MARCUS_TALKED, does respect evolve?
-- **plan_your_day consequences** — still has weak-consequence choices
-- **Stranger re-encounters** — the bar stranger again, the party stranger again
+  something goes wrong.
+- **`plan_your_day` consequences** — choices still have weak consequences.
+- **Stranger re-encounters** — the bar stranger again, the party stranger again.
+- **"Scale" cross-scene repetition** — `marcus_apartment`, `gym_changing_room`,
+  `jake_stays_over` all use a "scale of him vs you" observation as the
+  physical anchor. One should own it; the other two need different anchors.
 
-### 4. Tech debt
-- See `memory/project_tech_debt_audit.md`
-- Transient layout regression (screenshot at 35% width) — needs investigation
-- "People Here" sidebar doesn't populate for Theo during campus_theo_night
-- Cross-scene "scale" observation appears in 3 scenes (marcus_apartment,
-  gym_changing_room, jake_stays_over) — one should own it, others need
-  different physical anchors
+Use `scene-writer` agent for drafts, `writing-reviewer` for the pass.
+
+### B. Tech debt — small engineering
+- **Cache `FEMININITY` SkillId in `GameState`** (audit I11) — eliminates 4 hot
+  string lookups per snapshot. Low leverage but trivial.
+- **UI test coverage for `process_events` / paragraph cap / `AppPhase`
+  transitions** (audit I13) — the harness exists; only the tests are missing.
+- **`work_marcus_drinks` line 55 "check your phone"** — last remaining
+  validate-pack `filler_action` warning. One-line rewrite.
+
+### C. Tech debt — bigger refactors (not session-end work)
+- **`char_creation.rs` is 2636 LOC.** Form sections, signal plumbing,
+  preset rendering, and trait pickers could each move to their own module.
+- **`engine.rs` is ~1860 LOC.** The test module is a large chunk; the
+  production code is also doing scene start / action dispatch / NPC binding /
+  next-evaluation / NPC actions in one file.
+- **20 desloppify subjective dimensions** are still unscored.
+
+### D. Open verifications
+- **35% width transient layout regression** — flagged in a prior session
+  with no repro details. Needs a playtester run to reproduce before any code
+  touches it.
+- **Marcus content live-test** — `marcus_apartment`, `marcus_monday_rejected`
+  flow has never been playtested end-to-end.
+
+### Resolved this session
+- ✅ ROLE_THEO routing through scheduler (commit `cffd7e0`)
+- ✅ Sidebar shows story names — `SetNpcName` effect (commit `71bfc49` + tests `cf2b626`)
+- ✅ ThoughtAdded/ErrorOccurred new-scene-top invariant (commit `f97375b`)
+- ✅ validate-pack lint noise from `_archive/` (commit `3555908`)
+- ✅ Rust-mcp dead stubs + UI font constant + test-helper dedup (commit `db0921a`)
+- ✅ Redundant `set_game_flag ROUTE_*` in arrival scenes (audit I18, in `cffd7e0`)
 
 ### Completed this session (consequences sprint):
 - 7 new scenes written in 2 batches:
@@ -331,6 +357,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-05-17 | Cleanup + feedback triage + display-name feature. Audited every open audit/HANDOFF feedback item against actual code — most engineering Criticals/Importants resolved silently in prior sessions. 7 commits: (1) finalized the in-progress cleanup pass — pruned 9 dead rust-mcp stub tools (~1500 LOC), `UI_FONT_FAMILY` constant, deduped `make_test_male_npc`, dropped unused `anyhow`/`slotmap`. (2) Fixed `ROLE_THEO` scheduler routing (npc_role missing on Theo schedule entries) + dropped redundant `set_game_flag ROUTE_*` in arrival scenes (audit I18). (3) Fixed `ThoughtAdded`/`ErrorOccurred` scroll-to-bottom violating the new-scene-top invariant (audit I8). (4) `validate-pack` now skips underscore-prefixed scene subdirs. (5) **Feature**: `NpcCore.display_name` + `SetNpcName` effect — root-cause fix for sidebar showing random spawn names instead of story names. Decoupled from `set_npc_role`; save v5→v6 (no-op JSON, `#[serde(default)]`); wired into `coffee_shop`/`workplace_work_meeting`/`campus_library`. (6) Independent acceptance suite via `ops:test-author`: 27 tests, each with `// BREAKS IF` comment. (7) Playtester verified live on scheduler-driven `coffee_shop` at week 2 — sidebar reads "Jake". 470 → 498 tests passing; validate-pack clean. |
 | 2026-03-12 | Engineering + creative cleanup. Implemented `docs/plans/2026-03-12-engineering-creative-cleanup.md`: shared UI runtime bootstrap, recoverable startup/content-contract errors, reusable `validate-pack` library API, prose-audit coverage, targeted campus-scene POV/register cleanup, and filler/fine-test cleanup for core scenes. Post-implementation audit found one live-flow bug (init failures stayed in landing flow); fixed by forcing visible error-phase startup when `pre.init_error` exists. Verification: `cargo fmt`, `cargo test -p undone-ui --lib`, `cargo test --test validate_pack_simulation -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo run --bin validate-pack`, plus fresh `cargo run --bin undone -- --dev --quick` runtime launch. Non-blocking repo-wide prose warnings remain outside the touched slice. |
 | 2026-03-09 | Playable-game fixes + audit. Implemented plan `docs/plans/2026-03-09-playable-game-fixes.md` (6 tasks). (1) Action prose invisible on scene transitions — added `awaiting_continue` signal + Continue button; player now sees action prose before next scene loads. (2) Scheduler burying NPC intros — converted `coffee_shop` and `neighborhood_bar` from random-weighted to deterministic triggers at weeks 2/3; `morning_routine` weight 15→10. (3) AROUSAL never moving — wired `add_arousal` effects into 8 charged/explicit scenes (jake_apartment, work_marcus_closet, bar_stranger_night, jake_second_date, work_marcus_drinks, bar_closing_time, jake_first_date, weekend_morning). (4) FemCreation zero prose — added brief framing paragraph. (5) Plane scene thin — elaborated with career identity beats, gate normality, and "last version of you" close. (6) Runtime playtested all changes. Code-reviewed, acceptance-tested. Post-merge audit: fixed Continue-into-dead-end (scheduler exhaustion shows message instead of stale UI) and key consumption during awaiting state. 289 tests, 0 failures. |
 | 2026-03-08 cont.6 | Opus audit of Sonnet's dev tooling work. Deep audit via 5 parallel agents (IPC, reachability/simulator, BoundedStat, MCP server, main/UI integration). All code production-quality. Four fixes: (1) simulator picks per time slot not per week — `weekend_morning` now correctly appears, avg/run 28× more accurate; (2) dev panel `DevContext` struct eliminates 7-param pollution across 10+ call sites (net -70 lines); (3) "All NPC → Close" button routed through new `SetAllNpcLiking` IPC command instead of direct mutation; (4) engine design doc lists all 8 IPC commands (was 5). 287 tests, 0 failures, 0 warnings. |
