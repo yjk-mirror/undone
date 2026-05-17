@@ -7,6 +7,9 @@ pub mod simulator;
 pub mod template_ctx;
 pub mod types;
 
+#[cfg(test)]
+mod set_npc_name_tests;
+
 pub use effects::{apply_effect, EffectError};
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
 pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
