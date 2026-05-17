@@ -574,6 +574,23 @@ fn append_story_paragraph(story: &mut String, text: &str) {
     trim_story_paragraphs(story);
 }
 
+/// Delay the scroll-to-bottom by one frame. The scroll_to effect uses
+/// update_state_deferred which fires after layout in the same frame — but the
+/// content rebuild (from the story signal) may not have its new taffy size
+/// computed yet in that same layout pass. Deferring to the next frame via
+/// exec_after ensures layout has fully settled with the new content. The epoch
+/// guard prevents a stale scroll bump from firing after the scene has reset.
+fn schedule_scroll_to_bottom(signals: AppSignals) {
+    let sg = signals.scroll_gen;
+    let scene_epoch = signals.scene_epoch;
+    let expected_epoch = scene_epoch.get_untracked();
+    floem::action::exec_after(std::time::Duration::ZERO, move |_| {
+        if scene_epoch.get_untracked() == expected_epoch {
+            sg.update(|n| *n += 1);
+        }
+    });
+}
+
 /// Process engine events, updating signals. Returns `true` if `SceneFinished` was among them.
 pub fn process_events(
     events: Vec<EngineEvent>,
@@ -593,20 +610,7 @@ pub fn process_events(
                     append_story_paragraph(s, &text);
                 });
                 if should_scroll {
-                    // Delay the scroll-to-bottom by one frame. The scroll_to
-                    // effect uses update_state_deferred which fires after layout
-                    // in the same frame — but the content rebuild (from the story
-                    // signal) may not have its new taffy size computed yet in that
-                    // same layout pass. Deferring to the next frame via exec_after
-                    // ensures layout has fully settled with the new content.
-                    let sg = signals.scroll_gen;
-                    let scene_epoch = signals.scene_epoch;
-                    let expected_epoch = scene_epoch.get_untracked();
-                    floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                        if scene_epoch.get_untracked() == expected_epoch {
-                            sg.update(|n| *n += 1);
-                        }
-                    });
+                    schedule_scroll_to_bottom(signals);
                 }
             }
             EngineEvent::ActionsAvailable(actions) => {
@@ -640,34 +644,26 @@ pub fn process_events(
             EngineEvent::ThoughtAdded { text, .. } => {
                 // Thoughts append to the story text. Style differentiation (italic,
                 // anxiety register, etc.) is deferred to the UI design session.
+                let should_scroll = !signals.story.get_untracked().is_empty();
                 signals.story.update(|s| {
                     append_story_paragraph(s, &text);
                 });
-                let sg = signals.scroll_gen;
-                let scene_epoch = signals.scene_epoch;
-                let expected_epoch = scene_epoch.get_untracked();
-                floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                    if scene_epoch.get_untracked() == expected_epoch {
-                        sg.update(|n| *n += 1);
-                    }
-                });
+                if should_scroll {
+                    schedule_scroll_to_bottom(signals);
+                }
             }
             EngineEvent::SlotRequested(_slot) => {
                 // Slot routing is handled by the caller (left_panel dispatch);
                 // the UI event processor ignores it here.
             }
             EngineEvent::ErrorOccurred(msg) => {
+                let should_scroll = !signals.story.get_untracked().is_empty();
                 signals.story.update(|s| {
                     append_story_paragraph(s, &format!("[Scene error: {}]", msg));
                 });
-                let sg = signals.scroll_gen;
-                let scene_epoch = signals.scene_epoch;
-                let expected_epoch = scene_epoch.get_untracked();
-                floem::action::exec_after(std::time::Duration::ZERO, move |_| {
-                    if scene_epoch.get_untracked() == expected_epoch {
-                        sg.update(|n| *n += 1);
-                    }
-                });
+                if should_scroll {
+                    schedule_scroll_to_bottom(signals);
+                }
             }
         }
     }
