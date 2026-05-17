@@ -12,7 +12,7 @@ His apartment is clean — a man who knew someone was coming. A bottle of red on
 The closet was dark and fast and you could tell yourself it was the circumstances. This is not the circumstances.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-The apartment is better than yours. Better building, better furniture, better everything — and standing in it you're aware of your own size against his couch, his ceiling, his particular silence. Something warm and low has settled in your stomach and your hands are not entirely steady.
+The apartment is better than yours. Better building, better furniture, better everything — and standing in it you're aware of the doorman who saw you both in, the elevator that knew his floor, the bedroom door he hasn't had to point to. Nothing about the evening is anonymous. Something warm and low has settled in your stomach and your hands are not entirely steady.
 {% elif w.getSkill("FEMININITY") < 50 %}
 Since his text you've run this room a dozen times in your head. The wine, the couch, the bedroom door. It landed nothing like you expected — quieter, more real. The wanting was easier to manage when it was hypothetical.
 {% else %}
@@ -108,7 +108,7 @@ His bedroom, his terms — the shift is different from the closet. In the confer
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 25 %}
-His hands are bigger than they look at a conference table. Everything in this room is scaled to him. Your back against his sheets and his weight over you and the ceiling is higher than yours and none of this is abstract anymore.
+The closet had no light. This room has one — a lamp by the bed, low and warm, leaving nothing in shadow. His face is close enough to read every adjustment in yours and he's not looking away from it. Whatever you do, he sees you do. None of this is abstract anymore.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The guilt is there. Present. Load-bearing in a way it wasn't in the dark of the conference room. His face is close enough to read and he can read yours and neither of you is pretending this is anything other than what it is.
 {% endif %}
@@ -207,7 +207,7 @@ Neither of you reaches for the glasses again. He steps toward you. You don't ste
 The bedroom in about thirty seconds.
 
 {% if w.getSkill("FEMININITY") < 25 %}
-His apartment is better than the conference room gave you information about. The bedroom is bigger than yours. His hands look different here — out of the office context, in the lamp-light, moving over you — and the body has already filed all of this before anything rational has caught up.
+His apartment fills in what the conference room didn't have time for. The bedroom has a lamp on. The closet didn't have a lamp. His hands look different in light — out of the office context, in lit air, moving over you while he watches — and the body has already filed all of this before anything rational has caught up.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The closet was fast and dark. This is a lit room. He can see you. You can see him. The exposure is different and the wanting is the same.
 {% endif %}

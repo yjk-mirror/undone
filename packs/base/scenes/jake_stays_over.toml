@@ -14,7 +14,7 @@ From the bathroom: the sound of water running. He found the towels without askin
 {% if w.getSkill("FEMININITY") < 30 %}
 The sounds are his — the faucet, the particular way a man clears his throat when he thinks no one's listening. You know these sounds from the inside. The razor going. The faucet off, then on. His whole morning routine happening behind your bathroom door like you're an audience for a show you used to be in.
 
-His shoes are big. Size eleven next to yours and the ratio is something you keep trying not to do math on and keep doing math on anyway. His jacket on your chair is a bigger jacket than any jacket you own.
+His jacket is on the chair where your jacket usually goes. His phone on the nightstand he found without asking. The bathroom cabinet stayed closed but you can hear him locating things in it — a drawer opening, closing, another opening — quietly enough that he's not trying to be heard.
 
 The apartment has a man in it and the man has a morning routine.
 {% elif w.getSkill("FEMININITY") < 50 %}
@@ -93,7 +93,7 @@ You add cream. Hand it over. He holds it in both hands and leans against the cou
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 30 %}
-He takes up space in the kitchen. Not rudely — just the way a bigger person takes up space in a small room, automatically, without thinking about it. His shoulders in your hallway. His hands on your mug. The scale of him in your apartment is something you're sitting with.
+He moves in your kitchen the careful way you move in someone else's. Notices the chip in the mug. Apologizes when his reach for the water cuts past your shoulder. Leans against the counter at an angle that keeps him out of your way without making a point of it. He's not assuming anything yet. He's also not leaving.
 {% endif %}
 
 His mug has the chip in the rim. He didn't notice or noticed and doesn't care. Either way he keeps drinking.
