@@ -14,5 +14,4 @@ pub mod read_api;
 pub mod write_api;
 
 pub use compiled::{CompiledScript, ScriptError};
-// `pub use engine::{build_engines, ScriptEngines};` is added in Task 3 once those
-// items exist.
+pub use engine::{build_engines, ScriptEngines};
