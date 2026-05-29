@@ -2,7 +2,38 @@
 
 ## Current State
 
-**Latest session (2026-05-17, prose surgery — scale-anchor repetition):** Three scenes (`gym_changing_room`, `marcus_apartment`, `jake_stays_over`) all used the "scale of him vs you" body-observation as their FEMININITY-gated anchor. `gym_changing_room` owns it structurally (women's-only locker room — scale-against-the-space *is* the scene), so the other two were re-anchored on the registers each is actually built around:
+**Latest session (2026-05-29, Rhai+fragment architecture design + Phase 0 pacing fix shipped):**
+Full brainstorming pass on the Rhai-scripting + Disco-Elysium fragment-engine pivot. Two design
+artifacts committed: `docs/plans/2026-05-29-rhai-fragment-architecture-design.md` (approved spec,
+5 phases) and `docs/plans/2026-05-29-phase0-pacing-fix.md` (Phase 0 plan). Key reframe from the
+design-research pass: the DE check mechanic ALREADY EXISTS (`checkSkill`/`checkSkillRed` + roll
+math + `red_check_failures` + `FailRedCheck` in eval.rs/effects.rs), and the fragment model is a
+unification of the existing intro_variants/thoughts/actions/npc_actions primitives — so the pivot
+is far smaller than it looked. Decisions locked: Rhai replaces BOTH undone-expr AND the EffectDef
+enum; effects = constrained call-list; checks use a fluid COMPOSURE stat (giving in lowers it →
+harder to resist next time); 62 scenes NOT migrated (compatibility path); save-scum prevention
+deferred.
+
+**Phase 0 (adult-content pacing fix) SHIPPED to master.** Resolved open question O5 by reading
+`scheduler.rs` `pick_next`: triggers fire BEFORE the weighted pool, scanning slots ALPHABETICALLY
+(`free_time` < `workplace_opening`). So `coffee_shop`'s old `week>=2` floor was load-bearing — it
+kept the romance chain from hijacking the opening arc. Fix: re-anchored `coffee_shop` and
+`bar_closing_time` on `arcState('base::workplace_opening') == 'settled'` (ordering-safe, calendar-
+free) and stripped `gd.week()>=N` floors from the Jake liking-builders + `jake_first_date`/
+`jake_second_date`/`jake_apartment` triggers (the story-flag chain already enforces order). Added
+2 scheduler regression tests (opening-arc precedence + calendar-free reachability); undone-scene
+suite 166→168, all green; validate-pack clean (62 scenes). **Playtester acceptance: first explicit
+content now reachable Day 1 (was week 4+, ~27-day reduction), opening arc order intact, no bugs.**
+Commits: `8b65cb2` (schedule), `85196d0` (tests), plus the two doc commits.
+
+**Content follow-up flagged (not a blocker):** `jake_apartment` intro says "The wanting has been
+there for weeks" — reads oddly now that the scene is reachable in ~1 day. Re-anchor that line for
+the faster pacing in a future content pass.
+
+**Next:** Phase 1 (Rhai foundation) implementation plan being authored. Phase 2 (vertical-slice
+explicit scene) is blocked on a creative scene spec from the user (rules 1 & 11).
+
+**Previous session (2026-05-17, prose surgery — scale-anchor repetition):** Three scenes (`gym_changing_room`, `marcus_apartment`, `jake_stays_over`) all used the "scale of him vs you" body-observation as their FEMININITY-gated anchor. `gym_changing_room` owns it structurally (women's-only locker room — scale-against-the-space *is* the scene), so the other two were re-anchored on the registers each is actually built around:
 - `marcus_apartment`: visibility / deliberateness / lit-room (doorman saw her, elevator knew his floor, lamp on vs. the dark closet, he keeps his eyes on her). Three FEMININITY<25 branches edited.
 - `jake_stays_over`: territorial integration (his jacket on her chair, his phone on her nightstand, quiet drawer-sounds; in the kitchen he moves the careful way you move in someone else's). Two FEMININITY<30 branches edited.
 
