@@ -3,6 +3,7 @@ pub mod engine;
 pub mod loader;
 pub mod reachability;
 pub mod scheduler;
+pub mod script;
 pub mod simulator;
 pub mod template_ctx;
 pub mod types;
