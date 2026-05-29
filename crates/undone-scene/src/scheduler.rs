@@ -702,6 +702,68 @@ mod tests {
         assert!(!result.consumes_time);
     }
 
+    // ── Phase 0 pacing-fix guards (design 2026-05-29 §7) ──────────────────
+    // These load the REAL base schedule so they exercise the actual edited
+    // triggers. They protect two invariants the pacing fix depends on:
+    //   1. The free_time romance entry (coffee_shop) must NOT pre-empt the
+    //      opening arc — even though `free_time` sorts before `workplace_opening`
+    //      alphabetically in the trigger scan, coffee_shop is gated on
+    //      arcState=='settled' so it stays inert during the opening arc.
+    //   2. jake_apartment (first explicit scene) must be reachable on the
+    //      story-flag chain ALONE, with no calendar advance — proving the old
+    //      `gd.week() >= 4` floor is gone.
+
+    #[test]
+    fn opening_arc_fires_before_romance_when_not_settled() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+
+        let mut world = make_world();
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        // Fresh game: no arc state yet, week 0.
+        let mut rng = SmallRng::seed_from_u64(7);
+
+        let pick = scheduler
+            .pick_next(&world, &registry, &mut rng)
+            .expect("a pick at game start");
+        assert_ne!(
+            pick.scene_id, "base::coffee_shop",
+            "coffee_shop must not pre-empt the opening arc before settled"
+        );
+        assert_eq!(
+            pick.scene_id, "base::workplace_arrival",
+            "the opening-arc trigger should win at game start"
+        );
+    }
+
+    #[test]
+    fn jake_apartment_reachable_without_advancing_weeks() {
+        let (registry, metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scheduler = load_schedule(&metas, &registry).unwrap();
+
+        let mut world = make_world();
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        world
+            .game_data
+            .advance_arc("base::workplace_opening", "settled");
+        // coffee_shop already happened — otherwise its (now settled-gated)
+        // trigger would fire first in free_time source order.
+        world.game_data.set_flag("ONCE_base::coffee_shop");
+        world.game_data.set_flag("MET_JAKE");
+        world.game_data.set_flag("JAKE_FIRST_DATE");
+        world.game_data.set_flag("JAKE_SECOND_DATE");
+        // Deliberately leave week at 0 — the old gate was `gd.week() >= 4`.
+        let mut rng = SmallRng::seed_from_u64(7);
+
+        let pick = scheduler
+            .pick_next(&world, &registry, &mut rng)
+            .expect("a pick");
+        assert_eq!(
+            pick.scene_id, "base::jake_apartment",
+            "jake_apartment trigger should fire on the flag chain alone, no calendar gate"
+        );
+    }
+
     #[test]
     fn load_schedule_rejects_invalid_condition_ids() {
         let pack_dir = temp_test_dir("scheduler_invalid_condition");
