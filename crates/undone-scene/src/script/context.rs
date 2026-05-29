@@ -116,25 +116,19 @@ pub(crate) fn with_read_ctx<R>(
     f(world, registry, ctx)
 }
 
+/// Candidate A (rejected) — pointer carried inside the scope-injected handle.
+/// Kept only so the bench in `engine::tests::spike_binding` can compare it.
 #[cfg(test)]
-mod spike_candidate_a {
-    //! Candidate A (rejected) — pointer carried inside the scope-injected handle.
-    //! Kept only so the bench in `engine::tests::spike_binding` can compare it.
-    use undone_world::World;
-
-    #[derive(Clone)]
-    pub(crate) struct GdA {
-        pub(crate) world: *const World,
-    }
-
-    impl GdA {
-        pub(crate) fn week(&mut self) -> i64 {
-            // SAFETY: spike-only; the pointer comes from a `&World` that outlives
-            // the single eval call in the bench.
-            unsafe { (*self.world).game_data.week as i64 }
-        }
-    }
+#[derive(Clone)]
+pub(crate) struct GdA {
+    pub(crate) world: *const World,
 }
 
 #[cfg(test)]
-pub(crate) use spike_candidate_a::GdA;
+impl GdA {
+    pub(crate) fn week(&mut self) -> i64 {
+        // SAFETY: spike-only; the pointer comes from a `&World` that outlives the
+        // single eval call in the bench.
+        unsafe { (*self.world).game_data.week as i64 }
+    }
+}
