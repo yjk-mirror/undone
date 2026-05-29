@@ -11,7 +11,8 @@ pub mod compiled;
 pub mod context;
 pub mod engine;
 pub mod read_api;
+pub mod validate;
 pub mod write_api;
 
-pub use compiled::{CompiledScript, ScriptError};
+pub use compiled::{compile_condition, compile_effect, CompiledScript, ScriptError};
 pub use engine::{build_engines, ScriptEngines};
