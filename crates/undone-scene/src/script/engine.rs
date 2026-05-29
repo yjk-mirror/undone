@@ -259,6 +259,84 @@ mod tests {
         assert!(got, "SHY + FEMININITY 12 (<15) should be true");
     }
 
+    /// Smoke-test the fanned-out read receivers (gd / m / role / scene) end to
+    /// end through `eval_bool` / `eval_string`, confirming the ports evaluate
+    /// (not just compile).
+    #[test]
+    fn rhai_receivers_smoke() {
+        use std::sync::Arc;
+
+        use crate::script::compiled::CompiledScript;
+        use undone_expr::{SceneCtx, SceneNpcRef};
+        use undone_world::test_helpers::make_test_male_npc;
+
+        let engines = super::build_engines();
+        let mut reg = undone_packs::PackRegistry::new();
+        let personality = reg.intern_personality("ROMANTIC");
+
+        let mut world = make_test_world();
+        world.game_data.set_flag("ROUTE_WORKPLACE");
+        let mut male = make_test_male_npc(personality);
+        male.core
+            .relationship_flags
+            .insert("introduced".to_string());
+        male.core.roles.insert("ROLE_LEAD".to_string());
+        let key = world.male_npcs.insert(male);
+
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        ctx.bind_role("ROLE_LEAD", SceneNpcRef::Male(key));
+        ctx.set_flag("offered_umbrella");
+
+        let check_bool = |src: &str, world: &_, ctx: &_, reg: &_| -> bool {
+            let ast = engines
+                .cond
+                .compile_with_scope(&super::read_scope(), src)
+                .unwrap();
+            let script = CompiledScript {
+                ast: Arc::new(ast),
+                source: src.into(),
+            };
+            super::eval_bool(&script, &engines.cond, world, ctx, reg).unwrap()
+        };
+
+        assert!(check_bool(
+            r#"gd.hasGameFlag("ROUTE_WORKPLACE")"#,
+            &world,
+            &ctx,
+            &reg
+        ));
+        assert!(check_bool("gd.isWeekday()", &world, &ctx, &reg));
+        assert!(!check_bool("gd.week() > 0", &world, &ctx, &reg));
+        assert!(check_bool(
+            r#"scene.hasFlag("offered_umbrella")"#,
+            &world,
+            &ctx,
+            &reg
+        ));
+        assert!(check_bool("m.isContactable()", &world, &ctx, &reg));
+        assert!(check_bool(r#"m.hasFlag("introduced")"#, &world, &ctx, &reg));
+        assert!(check_bool(
+            r#"role.hasRole("ROLE_LEAD", "ROLE_LEAD")"#,
+            &world,
+            &ctx,
+            &reg
+        ));
+
+        // role.getName returns a String
+        let src = r#"role.getName("ROLE_LEAD")"#;
+        let ast = engines
+            .cond
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+        let name = super::eval_string(&script, &engines.cond, &world, &ctx, &reg).unwrap();
+        assert_eq!(name, "Jake");
+    }
+
     /// The read/write split: a mutating call resolves on the effect engine but
     /// not on the condition engine. Note Rhai resolves functions at *runtime*,
     /// so this is an EVAL-time difference, not a `compile()` difference — which
