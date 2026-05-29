@@ -56,9 +56,7 @@ The glass sits differently in your hand. Wider than your grip wants it to be. Yo
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "has_drink"
+  effect = 'scene.setFlag("has_drink");'
 
 [[actions]]
 id        = "sit_and_settle"
@@ -79,9 +77,7 @@ You read the room: three groups, one solo, one bartender running the place alone
 After a minute, you flag her down and order. She pours it. The glass is cold. The evening has started.
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "has_drink"
+  effect = 'scene.setFlag("has_drink");'
 
 # ── Round 2: You have a drink ────────────────────────────────────────
 
@@ -120,14 +116,7 @@ You learn more about this neighborhood in forty-five minutes of bar talk than yo
 You don't know her name by the end of it and she doesn't know yours, which feels right. You leave a good tip and walk the two blocks home. The apartment is quieter than when you left, and easier to be in.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-10);'
 
   [[actions.next]]
   finish = true
@@ -147,9 +136,7 @@ The cold hits you outside. Two blocks. The apartment is dark and quiet and yours
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -193,14 +180,7 @@ You walk home. The air is cold and the drink is warm in your chest and the eveni
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.skillIncrease("FEMININITY", 3); w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -231,14 +211,7 @@ The rest of the evening is yours. The bartender pours you another when you're re
 The walk home is two blocks and the cold feels good.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-10);'
 
   [[actions.next]]
   finish = true
@@ -263,6 +236,4 @@ It takes him a beat to commit to the ask — the kind of beat you might not noti
 He's looking at you. He's waiting.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "drink_offered"
+  effect = 'scene.setFlag("drink_offered");'

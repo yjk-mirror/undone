@@ -72,28 +72,7 @@ You talk through it for ten minutes. He explains the lemma. You already knew the
 When you go back to your problem set your cheeks are warm.
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "talked"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_THEO"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_npc_role"
-  npc  = "m"
-  role = "ROLE_THEO"
-
-  [[actions.effects]]
-  type = "set_npc_name"
-  npc  = "m"
-  name = "Theo"
+  effect = 'scene.setFlag("talked"); gd.setGameFlag("MET_THEO"); npc("m").addLiking(1); npc("m").setRole("ROLE_THEO"); npc("m").setName("Theo");'
 
   [[actions.next]]
   finish = true
@@ -113,9 +92,7 @@ He looks back at his work. You look back at yours.
 One second. You were fine before it.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "noticed"
+  effect = 'scene.setFlag("noticed");'
 
   [[npc_actions.next]]
   goto = "keep_working"

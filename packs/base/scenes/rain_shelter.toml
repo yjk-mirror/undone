@@ -61,9 +61,7 @@ You hunch your shoulders and step back into it. The rain is cold and immediate.
 By the time you reach your building, you're soaked through. Your shoes leave prints across the lobby floor.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
+  effect = 'w.changeStress(3);'
 
   [[actions.next]]
   finish = true
@@ -91,14 +89,7 @@ He's close enough that you can feel warmth coming off his arm. The top of your h
 "I'm David," he says. Not a question. Just information.
 """
 
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "RAIN_SHELTER_MET"
+  effect = 'npc("m").addLiking(1); gd.setGameFlag("RAIN_SHELTER_MET");'
 
   [[actions.next]]
   finish = true
@@ -120,9 +111,7 @@ prose     = """
 The rain fills the silence. Eventually it eases to something survivable and you walk the three blocks home with wet shoes and dry pride.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "RAIN_SHELTER_MET"
+  effect = 'gd.setGameFlag("RAIN_SHELTER_MET");'
 
   [[actions.next]]
   finish = true
@@ -145,9 +134,7 @@ It takes him a beat to commit to the ask.
 {% endif %}
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "umbrella_offered"
+  effect = 'scene.setFlag("umbrella_offered");'
 
 [[npc_actions]]
 id        = "small_talk"

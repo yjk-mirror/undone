@@ -1,8 +1,10 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use crate::script::CompiledScript;
-use crate::types::{EffectDef, SceneDefinition};
+use crate::script::{
+    source_advance_arcs, source_has_liking_overshoot, source_set_game_flags, CompiledScript,
+};
+use crate::types::SceneDefinition;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReachabilityWarning {
@@ -36,32 +38,26 @@ fn collect_effect_facts(scenes: &HashMap<String, Arc<SceneDefinition>>) -> Effec
     let mut facts = EffectFacts::default();
 
     for scene in scenes.values() {
-        for effect in scene
+        let effect_sources = scene
             .actions
             .iter()
-            .flat_map(|action| action.effects.iter())
-            .chain(
-                scene
-                    .npc_actions
-                    .iter()
-                    .flat_map(|action| action.effects.iter()),
-            )
-        {
-            match effect {
-                EffectDef::SetGameFlag { flag } => {
-                    facts.set_game_flags.insert(flag.clone());
-                }
-                EffectDef::AdvanceArc { arc, to_state } => {
-                    facts
-                        .reachable_arc_states
-                        .entry(arc.clone())
-                        .or_default()
-                        .insert(to_state.clone());
-                }
-                EffectDef::AddNpcLiking { delta, .. } if delta.abs() > 1 => {
-                    facts.npc_liking_can_overshoot = true;
-                }
-                _ => {}
+            .filter_map(|a| a.effect.as_ref())
+            .chain(scene.npc_actions.iter().filter_map(|a| a.effect.as_ref()))
+            .map(|script| script.source.as_str());
+
+        for src in effect_sources {
+            for flag in source_set_game_flags(src) {
+                facts.set_game_flags.insert(flag);
+            }
+            for (arc, state) in source_advance_arcs(src) {
+                facts
+                    .reachable_arc_states
+                    .entry(arc)
+                    .or_default()
+                    .insert(state);
+            }
+            if source_has_liking_overshoot(src) {
+                facts.npc_liking_can_overshoot = true;
             }
         }
     }
@@ -236,7 +232,10 @@ mod tests {
         crate::script::compile_condition(src, &undone_packs::PackRegistry::new(), "test").unwrap()
     }
 
-    fn scene_with_effect(effect: EffectDef) -> Arc<SceneDefinition> {
+    fn scene_with_effect(effect_src: &str) -> Arc<SceneDefinition> {
+        let effect =
+            crate::script::compile_effect(effect_src, &undone_packs::PackRegistry::new(), "test")
+                .unwrap();
         Arc::new(SceneDefinition {
             id: "test::scene".into(),
             pack: "test".into(),
@@ -250,7 +249,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![effect],
+                effect: Some(effect),
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,
@@ -299,9 +298,7 @@ mod tests {
     fn flag_required_and_set_by_effect_passes() {
         let scenes = HashMap::from([(
             "test::scene".to_string(),
-            scene_with_effect(EffectDef::SetGameFlag {
-                flag: "JAKE_MET".into(),
-            }),
+            scene_with_effect(r#"gd.setGameFlag("JAKE_MET");"#),
         )]);
 
         let warnings = check_reachability(
@@ -319,10 +316,7 @@ mod tests {
     fn exact_equality_liking_check_warns_when_overshoot_possible() {
         let scenes = HashMap::from([(
             "test::scene".to_string(),
-            scene_with_effect(EffectDef::AddNpcLiking {
-                npc: "m".into(),
-                delta: 2,
-            }),
+            scene_with_effect(r#"npc("m").addLiking(2);"#),
         )]);
 
         let warnings = check_reachability(

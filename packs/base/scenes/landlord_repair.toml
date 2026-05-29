@@ -85,14 +85,7 @@ He lets himself out. The door clicks. The apartment settles. The faucet, when yo
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_REPAIR"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("LANDLORD_REPAIR"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -125,18 +118,7 @@ He comes out ten minutes later. "Done," he says. You hand him the coffee. He tak
 The faucet, when you check, is silent.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_REPAIR"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'gd.setGameFlag("LANDLORD_REPAIR"); w.skillIncrease("FEMININITY", 1); w.changeStress(-1);'
 
   [[actions.next]]
   finish = true
@@ -182,18 +164,7 @@ The repair takes five minutes with two people. He packs the toolbox. Runs the ta
 "Well," he says. "That was efficient." He sounds almost disappointed — like he'd been looking forward to the full diagnostic. He lets himself out.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_REPAIR"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'gd.setGameFlag("LANDLORD_REPAIR"); w.skillIncrease("FEMININITY", 2); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true

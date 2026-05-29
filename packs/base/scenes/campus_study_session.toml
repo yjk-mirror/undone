@@ -116,13 +116,7 @@ You pack up and go.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STUDY_SESSION_DONE"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
+  effect = 'gd.setGameFlag("STUDY_SESSION_DONE"); w.changeStress(3);'
 
   [[actions.next]]
   finish = true

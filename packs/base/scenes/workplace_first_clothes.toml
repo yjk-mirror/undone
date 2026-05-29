@@ -69,27 +69,7 @@ The list on your phone. Most of the urgent line is checked off. There's a Dunkin
 The bags hit your knees with each step. Your new shoes have a heel, just enough to change the weight distribution, and the pavement feels different under them.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -180
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -4
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_CLOTHES_FUNCTIONAL"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "clothes_done"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
+  effect = 'w.changeMoney(-180); w.changeStress(-4); gd.setGameFlag("FIRST_CLOTHES_FUNCTIONAL"); gd.advanceArc("base::workplace_opening", "clothes_done"); w.skillIncrease("FEMININITY", 5);'
 
   [[actions.next]]
   finish = true
@@ -112,27 +92,7 @@ You carry the stack to the register.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -180
-
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = 2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_CLOTHES_MIRROR"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "clothes_done"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
+  effect = 'w.changeMoney(-180); w.changeAnxiety(2); gd.setGameFlag("FIRST_CLOTHES_MIRROR"); gd.advanceArc("base::workplace_opening", "clothes_done"); w.skillIncrease("FEMININITY", 5);'
 
   [[actions.next]]
   finish = true
@@ -159,27 +119,7 @@ By the third blouse you've stopped second-guessing the color choices and started
 You leave with a full bag and a smaller version of the problem than the one you walked in with.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -240
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_CLOTHES_ASKED_HELP"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "clothes_done"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 6
+  effect = 'w.changeMoney(-240); w.changeStress(-5); gd.setGameFlag("FIRST_CLOTHES_ASKED_HELP"); gd.advanceArc("base::workplace_opening", "clothes_done"); w.skillIncrease("FEMININITY", 6);'
 
   [[actions.next]]
   finish = true
@@ -200,27 +140,7 @@ The rest can wait. Three items solve the immediate problem. You step out into th
 The store's automatic doors close behind you. The street is bright and quiet.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -95
-
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_CLOTHES_MINIMUM"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "clothes_done"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'w.changeMoney(-95); w.changeAnxiety(-1); gd.setGameFlag("FIRST_CLOTHES_MINIMUM"); gd.advanceArc("base::workplace_opening", "clothes_done"); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -242,9 +162,7 @@ Your hands go still on the fabric. The back of your neck prickles. He holds it a
 He rounds the corner. The aisle goes quiet again. You put one blouse back on the rack and keep the other.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "noticed"
+  effect = 'scene.setFlag("noticed");'
 
   [[npc_actions.next]]
   goto = "get_basics"

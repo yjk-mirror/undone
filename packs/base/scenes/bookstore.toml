@@ -51,14 +51,7 @@ The clerk says "have a good day" without looking up from making change. You say 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -15
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeMoney(-15);'
 
   [[actions.next]]
   finish = true
@@ -75,14 +68,7 @@ Nobody asks if you need help. The man in the history section leaves without ackn
 You leave an hour later without having bought anything, which was always the plan.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -128,18 +114,7 @@ Two people in a bookstore with opinions about journalism. It went fine.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -15
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BOOKSTORE_VISITED"
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeMoney(-15); gd.setGameFlag("BOOKSTORE_VISITED");'
 
   [[actions.next]]
   finish = true

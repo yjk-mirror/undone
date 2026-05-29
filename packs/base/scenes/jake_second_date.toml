@@ -75,27 +75,7 @@ You break it before he does. The afternoon is still there around you, the market
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_SECOND_DATE"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_KISSED"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_SECOND_DATE"); gd.setGameFlag("JAKE_KISSED"); w.skillIncrease("FEMININITY", 3); npc("m").addLiking(2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -132,27 +112,7 @@ He's still close. The city keeps going around you.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_SECOND_DATE"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_KISSED"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_SECOND_DATE"); gd.setGameFlag("JAKE_KISSED"); w.skillIncrease("FEMININITY", 3); npc("m").addLiking(2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -187,19 +147,7 @@ Maybe next time.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_SECOND_DATE"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
+  effect = 'gd.setGameFlag("JAKE_SECOND_DATE"); w.skillIncrease("FEMININITY", 3); npc("m").addLiking(2);'
 
   [[actions.next]]
   finish = true

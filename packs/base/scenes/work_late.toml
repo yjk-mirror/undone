@@ -39,14 +39,7 @@ On the way out you pass a dark stretch of desks and a bathroom with a motion sen
 The night air outside is cold and clean, a significant improvement over the recycled late-office air you've been breathing for the last two hours.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-10);'
 
   [[actions.next]]
   finish = true
@@ -93,19 +86,7 @@ He looks up. "Users."
 Two people in a half-empty office past six on a Thursday, talking about database constraints. He goes back to his screen. You go to the elevator.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LATE_OFFICE_MARCUS"
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1); gd.setGameFlag("LATE_OFFICE_MARCUS");'
 
   [[actions.next]]
   finish = true

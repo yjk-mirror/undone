@@ -8,8 +8,8 @@ use thiserror::Error;
 use undone_packs::PackRegistry;
 
 use crate::types::{
-    Action, ActionDef, EffectDef, NarratorVariant, NarratorVariantDef, NextBranch, NextBranchDef,
-    NpcAction, NpcActionDef, SceneDefinition, SceneToml, Thought, ThoughtDef,
+    Action, ActionDef, NarratorVariant, NarratorVariantDef, NextBranch, NextBranchDef, NpcAction,
+    NpcActionDef, SceneDefinition, SceneToml, Thought, ThoughtDef,
 };
 
 #[derive(Debug, Error)]
@@ -324,8 +324,7 @@ fn resolve_action(
         next.push(resolve_next_branch(nb, registry, scene_id)?);
     }
 
-    // Validate effects at load time
-    validate_effects(&raw.effects, registry, scene_id)?;
+    let effect = compile_effect_checked(raw.effect.as_deref(), registry, scene_id)?;
 
     let mut thoughts = Vec::with_capacity(raw.thoughts.len());
     for t in raw.thoughts {
@@ -339,10 +338,23 @@ fn resolve_action(
         condition,
         prose: raw.prose,
         allow_npc_actions: raw.allow_npc_actions,
-        effects: raw.effects,
+        effect,
         next,
         thoughts,
     })
+}
+
+/// Compile an effect call-list string through the load-time gate.
+fn compile_effect_checked(
+    src: Option<&str>,
+    registry: &PackRegistry,
+    scene_id: &str,
+) -> Result<Option<crate::script::CompiledScript>, SceneLoadError> {
+    src.map(|s| {
+        crate::script::compile_effect(s, registry, scene_id)
+            .map_err(|e| map_script_error(e, scene_id, s))
+    })
+    .transpose()
 }
 
 fn resolve_npc_action(
@@ -356,7 +368,7 @@ fn resolve_npc_action(
         .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
-    validate_effects(&raw.effects, registry, scene_id)?;
+    let effect = compile_effect_checked(raw.effect.as_deref(), registry, scene_id)?;
 
     let next = raw
         .next
@@ -369,7 +381,7 @@ fn resolve_npc_action(
         condition,
         prose: raw.prose,
         weight: raw.weight,
-        effects: raw.effects,
+        effect,
         next,
     })
 }
@@ -393,77 +405,6 @@ fn resolve_next_branch(
     })
 }
 
-/// Validate effect IDs against the registry at load time.
-fn validate_effects(
-    effects: &[EffectDef],
-    registry: &PackRegistry,
-    scene_id: &str,
-) -> Result<(), SceneLoadError> {
-    for effect in effects {
-        match effect {
-            EffectDef::AddTrait { trait_id } | EffectDef::RemoveTrait { trait_id } => {
-                registry
-                    .resolve_trait(trait_id)
-                    .map_err(|_| SceneLoadError::UnknownTrait {
-                        scene_id: scene_id.to_string(),
-                        id: trait_id.clone(),
-                    })?;
-            }
-            EffectDef::AddNpcTrait { trait_id, .. } => {
-                registry
-                    .resolve_npc_trait(trait_id)
-                    .map_err(|_| SceneLoadError::UnknownTrait {
-                        scene_id: scene_id.to_string(),
-                        id: trait_id.clone(),
-                    })?;
-            }
-            EffectDef::SkillIncrease { skill, .. } => {
-                registry
-                    .resolve_skill(skill)
-                    .map_err(|_| SceneLoadError::UnknownSkill {
-                        scene_id: scene_id.to_string(),
-                        id: skill.clone(),
-                    })?;
-            }
-            EffectDef::AddStat { stat, .. } | EffectDef::SetStat { stat, .. } => {
-                if !registry.is_registered_stat(stat) {
-                    return Err(SceneLoadError::UnknownStat {
-                        scene_id: scene_id.to_string(),
-                        id: stat.clone(),
-                    });
-                }
-            }
-            EffectDef::FailRedCheck { skill } => {
-                registry
-                    .resolve_skill(skill)
-                    .map_err(|_| SceneLoadError::UnknownSkill {
-                        scene_id: scene_id.to_string(),
-                        id: skill.clone(),
-                    })?;
-            }
-            EffectDef::AdvanceArc { arc, to_state } => {
-                let arc_def = registry
-                    .get_arc(arc)
-                    .ok_or_else(|| SceneLoadError::UnknownArc {
-                        scene_id: scene_id.to_string(),
-                        id: arc.clone(),
-                    })?;
-                if !arc_def.states.contains(to_state) {
-                    return Err(SceneLoadError::UnknownArcState {
-                        scene_id: scene_id.to_string(),
-                        arc: arc.clone(),
-                        state: to_state.clone(),
-                    });
-                }
-            }
-            _ => {}
-        }
-    }
-    Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// Tests
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
@@ -536,7 +477,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::nonexistent".into()),
@@ -573,7 +514,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::b".into()),
@@ -678,56 +619,6 @@ condition = "true"
         );
 
         std::fs::remove_dir_all(dir).unwrap();
-    }
-
-    fn make_registry_with_stat(stat_id: &str) -> undone_packs::PackRegistry {
-        let mut reg = undone_packs::PackRegistry::new();
-        reg.register_stats(vec![undone_packs::data::StatDef {
-            id: stat_id.into(),
-            name: stat_id.into(),
-            description: "test stat".into(),
-        }]);
-        reg
-    }
-
-    #[test]
-    fn validate_effects_rejects_unknown_stat_in_add_stat() {
-        let registry = undone_packs::PackRegistry::new(); // no stats registered
-        let effects = vec![crate::types::EffectDef::AddStat {
-            stat: "NONEXISTENT_STAT".into(),
-            amount: 1,
-        }];
-        let result = validate_effects(&effects, &registry, "test::scene");
-        assert!(
-            matches!(result, Err(SceneLoadError::UnknownStat { .. })),
-            "expected UnknownStat error, got: {:?}",
-            result
-        );
-    }
-
-    #[test]
-    fn validate_effects_accepts_known_stat_in_add_stat() {
-        let registry = make_registry_with_stat("TIMES_KISSED");
-        let effects = vec![crate::types::EffectDef::AddStat {
-            stat: "TIMES_KISSED".into(),
-            amount: 1,
-        }];
-        let result = validate_effects(&effects, &registry, "test::scene");
-        assert!(result.is_ok(), "known stat should pass validation");
-    }
-
-    #[test]
-    fn validate_effects_rejects_unknown_skill_in_fail_red_check() {
-        let registry = undone_packs::PackRegistry::new(); // no skills registered
-        let effects = vec![crate::types::EffectDef::FailRedCheck {
-            skill: "NONEXISTENT_SKILL".into(),
-        }];
-        let result = validate_effects(&effects, &registry, "test::scene");
-        assert!(
-            matches!(result, Err(SceneLoadError::UnknownSkill { .. })),
-            "expected UnknownSkill error, got: {:?}",
-            result
-        );
     }
 
     #[test]

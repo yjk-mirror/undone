@@ -57,27 +57,7 @@ When you check your phone it's past nine. The couple is gone. The four with the 
 Marcus walks you to the subway. Cold after the warmth of the bar. At the entrance he says, "Next week." Not a question. You go down the steps.
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_DRINKS"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_DRINKS"); w.skillIncrease("FEMININITY", 2); w.changeAlcohol(1); npc("m").addLiking(2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -106,23 +86,7 @@ On the train, the warmth from the bar takes a while to leave.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_DRINKS"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_DRINKS"); w.skillIncrease("FEMININITY", 2); w.changeAlcohol(1); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -149,23 +113,7 @@ Marcus looks at you differently after. "That tracks," he says. Like that covers 
 At some point you both notice it's late. Outside he says, "We should do this again." He means the conversation. He might mean the rest of it too.
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_DRINKS"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
+  effect = 'gd.setGameFlag("MARCUS_DRINKS"); w.skillIncrease("FEMININITY", 2); w.changeAlcohol(1); npc("m").addLiking(3);'
 
   [[actions.next]]
   finish = true
@@ -207,31 +155,7 @@ His thumb moves once across the back of your hand.
 You leave separately. On the subway platform you stand in the warmth underground and the train comes.
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_DRINKS"
-
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_TOUCHED"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_DRINKS"); gd.setGameFlag("MARCUS_TOUCHED"); w.skillIncrease("FEMININITY", 2); w.changeAlcohol(1); npc("m").addLiking(2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true

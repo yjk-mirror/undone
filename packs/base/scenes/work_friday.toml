@@ -42,10 +42,7 @@ You go. Corrigan's is a block from the office, the kind of bar that does a good 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -64,9 +61,7 @@ The office quiets. You close the Slack thread.
 The office quiets out over the next forty minutes as people leave. By 5:30 it's down to the people who are either on deadline or have nowhere to be. You finish what you're working on, pack up, and head out into the tail end of a Friday evening.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -86,19 +81,7 @@ Corrigan's is already half-full. You find space at the bar. The conversation sta
 You leave at eight. He says "good talk" on the way out, which from Marcus is roughly equivalent to enthusiasm.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "DRINKS_WITH_MARCUS"
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1); gd.setGameFlag("DRINKS_WITH_MARCUS");'
 
   [[actions.next]]
   finish = true

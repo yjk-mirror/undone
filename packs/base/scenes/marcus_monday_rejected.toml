@@ -66,18 +66,7 @@ The break room conversations. The particular angle from the third chair in the s
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_REJECTION_MONDAY"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
+  effect = 'gd.setGameFlag("MARCUS_REJECTION_MONDAY"); w.skillIncrease("FEMININITY", 1); w.changeStress(3);'
 
   [[actions.next]]
   finish = true
@@ -137,13 +126,7 @@ His apartment is not in this room. The break room is a room with a coffeemaker. 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_REJECTION_MONDAY"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 5
+  effect = 'gd.setGameFlag("MARCUS_REJECTION_MONDAY"); w.changeStress(5);'
 
   [[actions.next]]
   finish = true
@@ -219,18 +202,7 @@ You nod. You pick up your bag. You go.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_REJECTION_MONDAY"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_TALKED"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_REJECTION_MONDAY"); gd.setGameFlag("MARCUS_TALKED"); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true

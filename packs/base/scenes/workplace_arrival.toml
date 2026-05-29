@@ -74,13 +74,7 @@ He looks at the card. Looks at you. Looks at the line building behind you and de
 He waves you through.
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "id_done"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_ID_PREEMPTED"
+  effect = 'scene.setFlag("id_done"); gd.setGameFlag("OPENING_ID_PREEMPTED");'
 
 [[actions]]
 id        = "id_wait"
@@ -103,13 +97,7 @@ The line behind you is growing. Someone shifts their weight. The guard opens his
 He studies the card one more time. Waves you through.
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "id_done"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_ID_WAITED_OUT"
+  effect = 'scene.setFlag("id_done"); gd.setGameFlag("OPENING_ID_WAITED_OUT");'
 
 # ── Round 2: Transport ────────────────────────────────────────────────
 
@@ -150,15 +138,7 @@ You stand outside for one full second with your bag, your keys, and the cold air
 {% endif %}
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "arrived"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.advanceArc("base::workplace_opening", "arrived"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -192,19 +172,7 @@ You stand there for a second with your bag and your keys and the cold air of a c
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -40
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "arrived"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeMoney(-40); gd.advanceArc("base::workplace_opening", "arrived"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true

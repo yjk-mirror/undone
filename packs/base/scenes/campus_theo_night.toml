@@ -156,31 +156,7 @@ Afterward, the room comes back. His arm. The lamp still on in the corner.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "THEO_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("THEO_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); w.skillIncrease("FEMININITY", 5); w.changeStress(-3); w.addArousal(3);'
 
   [[actions.next]]
   finish = true
@@ -275,31 +251,7 @@ Afterward, the room comes back. Quiet. His arm warm against yours.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "THEO_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("THEO_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); w.skillIncrease("FEMININITY", 5); w.changeStress(-3); w.addArousal(3);'
 
   [[actions.next]]
   finish = true

@@ -34,18 +34,7 @@ The hallway is narrow and the light is bad and none of that changed what the mir
 The street is loud. You head for the train.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_CALLBACK_MIRROR_AFTERGLOW"
-
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'gd.setGameFlag("OPENING_CALLBACK_MIRROR_AFTERGLOW"); w.changeAnxiety(-1); w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true

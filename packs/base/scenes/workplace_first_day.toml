@@ -78,13 +78,7 @@ Matt, from the standup, glances your way four times in the next hour. Not at you
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "dan_done"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_ASSERTED_STATUS"
+  effect = 'scene.setFlag("dan_done"); gd.setGameFlag("FIRST_DAY_ASSERTED_STATUS");'
 
 [[actions]]
 id        = "let_it_go"
@@ -111,13 +105,7 @@ Matt glances your direction twice before lunch. Quick and automatic, same as the
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "dan_done"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_DEFERRED_STATUS"
+  effect = 'scene.setFlag("dan_done"); gd.setGameFlag("FIRST_DAY_DEFERRED_STATUS");'
 
 [[actions]]
 id        = "redirect_to_work"
@@ -140,13 +128,7 @@ Dan asks a clarifying question. You answer it. He asks another. By the end he's 
 When Dan goes back to his desk, he sends you a Slack message three minutes later with a follow-up question about the timing window.
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "dan_done"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_REDIRECTED_STATUS"
+  effect = 'scene.setFlag("dan_done"); gd.setGameFlag("FIRST_DAY_REDIRECTED_STATUS");'
 
 # ── Round 2: Lunch ────────────────────────────────────────────────────
 
@@ -173,23 +155,7 @@ The team comes back and the afternoon starts. By four you're two tickets ahead o
 By five you've pushed two more commits. Nobody has asked how old you are since this morning.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "working"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_LUNCH_DESK"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STARTED_JOB"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.advanceArc("base::workplace_opening", "working"); gd.setGameFlag("FIRST_DAY_LUNCH_DESK"); gd.setGameFlag("STARTED_JOB"); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -221,23 +187,7 @@ Walking back, someone holds the door. Automatic, not deliberate. You go through.
 The afternoon is code. By five you've pushed your first commit.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "working"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_LUNCH_GROUP"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STARTED_JOB"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.advanceArc("base::workplace_opening", "working"); gd.setGameFlag("FIRST_DAY_LUNCH_GROUP"); gd.setGameFlag("STARTED_JOB"); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -263,23 +213,7 @@ You eat. You watch the city do its lunch-hour thing. Delivery bikes, suits, a gu
 The afternoon is code. By five you've pushed your first commit and the tests are green.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "working"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_DAY_LUNCH_ALONE"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "STARTED_JOB"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.advanceArc("base::workplace_opening", "working"); gd.setGameFlag("FIRST_DAY_LUNCH_ALONE"); gd.setGameFlag("STARTED_JOB"); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true

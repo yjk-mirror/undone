@@ -51,27 +51,7 @@ He does most of the talking at first — not dominating, just comfortable with i
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_FIRST_DATE"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_FIRST_DATE"); npc("m").addLiking(1); w.skillIncrease("FEMININITY", 3); w.changeStress(-2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -104,27 +84,7 @@ At some point he leans in to explain a thing, elbows on the table, close enough 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_FIRST_DATE"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_FIRST_DATE"); npc("m").addLiking(2); w.skillIncrease("FEMININITY", 3); w.changeStress(-2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -164,27 +124,7 @@ Your pulse is up. The candle does nothing about it.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_FIRST_DATE"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_FIRST_DATE"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 3); w.changeStress(-2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -215,9 +155,7 @@ The block is quiet. You could go back. You don't.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 1
+  effect = 'w.changeStress(1);'
 
   [[actions.next]]
   finish = true

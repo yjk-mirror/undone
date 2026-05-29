@@ -35,10 +35,7 @@ The nod arrives and goes. His eyes stayed on yours for exactly one beat — noth
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -61,14 +58,7 @@ The sun works its way across. You track it without meaning to — the warmth on 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(-10);'
 
   [[actions.next]]
   finish = true
@@ -88,15 +78,7 @@ The dog decides you're worth investigating and that resolves the question of wha
 He's walking the whole loop, it turns out. So are you. The conversation that happens over the next twenty minutes is the kind that happens when two people are going the same direction and there's no particular reason to stop it. He doesn't make the meeting into anything — just talks, lets the dog set the pace, occasionally tells the dog to leave it. The dog does not leave it.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true

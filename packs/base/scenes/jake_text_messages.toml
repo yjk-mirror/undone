@@ -103,19 +103,7 @@ The phone is small in your hands. His name at the top of the screen. Your hips a
 {% endif %}
 """
 
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'npc("m").addLiking(1); w.skillIncrease("FEMININITY", 1); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true
@@ -168,15 +156,7 @@ Light is easier. You're smiling at a screen in the dark.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'npc("m").addLiking(1); w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -209,10 +189,7 @@ The phone glows once more — a follow-up. You don't read it. You put it face-do
 In the morning there's a second message: *No rush.*
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true

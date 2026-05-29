@@ -106,23 +106,7 @@ The light switch corrected before it completed. That's the whole of it.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "settled"
-
-  [[actions.effects]]
-  type  = "advance_time"
-  slots = 28
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.advanceArc("base::workplace_opening", "settled"); gd.advanceTime(28); w.changeStress(-3); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -155,23 +139,7 @@ The water cools and you add more hot and the pipes groan and somewhere in the bu
 You get out when the water is lukewarm. Towel. The fogged mirror clears in streaks. You go to the kitchen and order from the Thai place.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "settled"
-
-  [[actions.effects]]
-  type  = "advance_time"
-  slots = 28
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
+  effect = 'gd.advanceArc("base::workplace_opening", "settled"); gd.advanceTime(28); w.changeStress(-5); w.skillIncrease("FEMININITY", 4);'
 
   [[actions.next]]
   finish = true
@@ -214,23 +182,7 @@ The food arrives. You eat on the couch with the TV on something you don't follow
 {% endif %}
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "settled"
-
-  [[actions.effects]]
-  type  = "advance_time"
-  slots = 28
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.advanceArc("base::workplace_opening", "settled"); gd.advanceTime(28); w.changeStress(-2); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true

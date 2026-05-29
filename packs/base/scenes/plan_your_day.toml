@@ -100,9 +100,7 @@ prose = """
 You check the list and put the phone back in your pocket. Three stops, maybe four: the dry-cleaners, CVS, the thing at the bank that's been sitting there since Monday. None of it is interesting, and none of it gets shorter on its own.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -20
+  effect = 'w.changeMoney(-20);'
 
   [[actions.next]]
   slot = "free_time"
@@ -118,9 +116,7 @@ You sit down with the laptop. The work is familiar in the way that work gets fam
 An hour passes faster than expected. Something gets done — not everything, but something specific and completable, and you close the laptop when it's done with the window already gone dark and the city doing its evening thing outside.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'w.changeStress(-1);'
 
   [[actions.next]]
   finish = true
@@ -139,13 +135,7 @@ You don't go anywhere. The apartment is fine. You make tea or order food — one
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
-
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -1
+  effect = 'w.changeStress(-2); w.changeAnxiety(-1);'
 
   [[actions.next]]
   finish = true

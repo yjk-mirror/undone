@@ -39,14 +39,7 @@ You dream. You wake up at 6:30 and the sheets are warm in a way they weren't whe
 You get up and shower and tell yourself it will make more sense when you're less tired.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "orientation"
+  effect = 'w.changeStress(-3); gd.advanceArc("base::campus_opening", "orientation");'
 
   [[actions.next]]
   finish = true
@@ -81,14 +74,7 @@ You put the phone face-down on the mattress. The screen goes dark. The room is q
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -2
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "orientation"
+  effect = 'w.changeAnxiety(-2); gd.advanceArc("base::campus_opening", "orientation");'
 
   [[actions.next]]
   finish = true
@@ -109,14 +95,7 @@ You stare at the ceiling for another hour. The building makes its sounds. Janett
 In the morning there's orientation at nine.
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = 4
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "orientation"
+  effect = 'w.changeAnxiety(4); gd.advanceArc("base::campus_opening", "orientation");'
 
   [[actions.next]]
   finish = true

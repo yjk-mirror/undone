@@ -42,19 +42,7 @@ Four messages. Two updated positions. The spec is better and the thread is close
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "REVIEWED_MARCUS_SPEC"
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1); gd.setGameFlag("REVIEWED_MARCUS_SPEC");'
 
   [[actions.next]]
   finish = true
@@ -73,15 +61,7 @@ You scroll back to your own work. The section seven problem sits in the back of 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -98,9 +78,7 @@ He responds: "Fair."
 That's it. No friction, no follow-up. You close the notification.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "DECLINED_MARCUS_SPEC"
+  effect = 'gd.setGameFlag("DECLINED_MARCUS_SPEC");'
 
   [[actions.next]]
   finish = true

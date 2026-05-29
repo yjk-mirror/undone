@@ -147,36 +147,7 @@ You look at the ceiling and run the accounting again. It comes out the same as i
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_APARTMENT"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 2
+  effect = 'gd.setGameFlag("MARCUS_APARTMENT"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); w.skillIncrease("FEMININITY", 3); w.changeStress(3); w.addArousal(2);'
 
   [[actions.next]]
   finish = true
@@ -281,36 +252,7 @@ There was a version of tonight where you stayed on the train. You could see it c
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_APARTMENT"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 2
+  effect = 'gd.setGameFlag("MARCUS_APARTMENT"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); w.skillIncrease("FEMININITY", 2); w.changeStress(3); w.addArousal(2);'
 
   [[actions.next]]
   finish = true
@@ -371,17 +313,7 @@ On the train home, the city goes past the windows. His apartment somewhere behin
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_REJECTED"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 5
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_REJECTED"); w.changeStress(5); w.addArousal(1);'
 
   [[actions.next]]
   finish = true

@@ -137,19 +137,7 @@ You drink the coffee. It's decent. He makes decent coffee at seven in the mornin
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "THEO_MORNING_AFTER"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
+  effect = 'gd.setGameFlag("THEO_MORNING_AFTER"); w.skillIncrease("FEMININITY", 3); npc("m").addLiking(2);'
 
   [[actions.next]]
   finish = true
@@ -211,18 +199,7 @@ The problem set is still due Thursday.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "THEO_MORNING_AFTER"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("THEO_MORNING_AFTER"); w.changeStress(5); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -314,19 +291,7 @@ The campus outside. The light through the curtains. His room with its problem se
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "THEO_MORNING_AFTER"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
+  effect = 'gd.setGameFlag("THEO_MORNING_AFTER"); w.skillIncrease("FEMININITY", 4); npc("m").addLiking(3);'
 
   [[actions.next]]
   finish = true

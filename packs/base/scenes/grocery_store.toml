@@ -40,10 +40,7 @@ You moved before he asked. The angle of his reach, the space to clear — your b
 The list is done in twenty minutes. That's the correct number of minutes for this list.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -61,14 +58,7 @@ A woman in the next aisle asks if you know whether the store stocks miso paste. 
 The whole thing takes fifteen seconds, and it turns out knowing where the miso is, and knowing you know, is its own minor satisfaction.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -88,10 +78,7 @@ She says it to everyone. You take your bags and go. The automatic doors open and
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true

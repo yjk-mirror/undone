@@ -102,13 +102,7 @@ Your phone buzzes in your pocket. Jake. *Morning.* One word. The warmth it puts 
 Coffee in hand. The day starts now.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'w.changeMoney(-5); w.changeStress(-1);'
 
   [[actions.next]]
   finish = true
@@ -133,9 +127,7 @@ The office is closer now than it was a month ago. Not in blocks — in what happ
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 1
+  effect = 'w.changeStress(1);'
 
   [[actions.next]]
   finish = true

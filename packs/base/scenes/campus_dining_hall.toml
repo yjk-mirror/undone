@@ -62,10 +62,7 @@ You're not going to understand this place in a week. You know that. A week is en
 You finish the coffee, drop the tray, and walk back to the dorm.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "first_week"
+  effect = 'gd.advanceArc("base::campus_opening", "first_week");'
 
   [[actions.next]]
   finish = true

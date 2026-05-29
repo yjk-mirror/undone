@@ -65,9 +65,7 @@ The open floor empties out around you. A few others stay too — one guy has hea
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -86,10 +84,7 @@ Nobody looks at you eating alone. The sandwich place doesn't care. The sidewalk 
 You finish your sandwich and get back before 1:00.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -113,14 +108,7 @@ The conversation is about a project you're tangentially connected to. You nod at
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 5
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(5);'
 
   [[actions.next]]
   finish = true
@@ -144,19 +132,7 @@ The walk back to the elevator is quiet. He holds the door without thinking about
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LUNCH_WITH_MARCUS"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 2); gd.setGameFlag("LUNCH_WITH_MARCUS"); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true

@@ -150,31 +150,7 @@ The room is quiet. The sheets smell different now. You lie there until your brea
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAR_STRANGER_SLEPT"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("BAR_STRANGER_SLEPT"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); w.skillIncrease("FEMININITY", 4); w.changeStress(-3); w.addArousal(3);'
 
   [[actions.next]]
   finish = true
@@ -274,31 +250,7 @@ He pulls out. His hand rests on your back for a second — not tender, just pres
 The front door opens and closes. You straighten. Your underwear is on the floor. Your legs are unsteady. You stand there, in the middle of your living room, and let them steady.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAR_STRANGER_SLEPT"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("BAR_STRANGER_SLEPT"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); w.skillIncrease("FEMININITY", 4); w.changeStress(-3); w.addArousal(3);'
 
   [[actions.next]]
   finish = true
@@ -341,18 +293,7 @@ The lamp is still on. You turn it off. In the dark, the apartment is just an apa
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-1); w.addArousal(1);'
 
   [[actions.next]]
   finish = true

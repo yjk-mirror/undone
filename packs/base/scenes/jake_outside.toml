@@ -36,19 +36,7 @@ It finds its own shape. He does most of the moving — not dominantly, just the 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_JAKE_OUTSIDE"
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1); gd.setGameFlag("MET_JAKE_OUTSIDE");'
 
   [[actions.next]]
   finish = true
@@ -61,9 +49,7 @@ prose  = """
 You catch his eye, give the nod-and-wave that covers "I know you, I'm busy, this is fine." He returns it without complication — "hey" — and keeps moving. You both do. The street closes back around you, already onto the next thing.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_JAKE_OUTSIDE"
+  effect = 'gd.setGameFlag("MET_JAKE_OUTSIDE");'
 
   [[actions.next]]
   finish = true
@@ -89,23 +75,7 @@ He says "okay," and it's already decided. You both keep moving in your separate 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_JAKE_OUTSIDE"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_COFFEE_PLANNED"
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1); gd.setGameFlag("MET_JAKE_OUTSIDE"); gd.setGameFlag("JAKE_COFFEE_PLANNED");'
 
   [[actions.next]]
   finish = true

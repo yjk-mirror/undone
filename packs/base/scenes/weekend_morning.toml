@@ -67,18 +67,7 @@ Your hand rests on your stomach. The flat plane of it, the softness of the skin 
 Eventually the bladder wins and you get up.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-3); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -111,18 +100,7 @@ The mirror clears and she's there. Wet hair, flushed skin, the particular look o
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -4
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 3); w.changeStress(-4); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -155,18 +133,7 @@ You walk until the coffee is gone and then you walk some more. The neighborhood 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -8
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'w.changeMoney(-8); w.skillIncrease("FEMININITY", 2); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true

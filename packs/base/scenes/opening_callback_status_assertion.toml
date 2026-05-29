@@ -36,13 +36,7 @@ You set the phone face-down and pull the open ticket back up on the screen.
 Outside the window a bus goes by. The office chat keeps ticking.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_CALLBACK_STATUS_ASSERTION"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'gd.setGameFlag("OPENING_CALLBACK_STATUS_ASSERTION"); w.changeStress(-1);'
 
   [[actions.next]]
   finish = true

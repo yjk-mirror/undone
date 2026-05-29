@@ -68,14 +68,7 @@ He nods when you leave. You nod back. Two blocks home with the bag warm against 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true
@@ -123,14 +116,7 @@ His height. The way he leans against the machine with his arms crossed. His voic
 "Good night," he says outside. "Good night," you say. He goes left. You go right. The laundry bag is warm against your hip. The cold hits fast.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-3);'
 
   [[actions.next]]
   finish = true
@@ -186,14 +172,7 @@ The fluorescent light is unforgiving. Your laundry is between you. The warmth of
 Outside, the cold is immediate. "See you around," he says. "Maybe," you say. The laundry bag is warm against your hip the whole way home.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true

@@ -34,10 +34,7 @@ Kevin's gaze passed over you and kept going. Nothing in it. Nothing behind it. J
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -58,10 +55,7 @@ You don't slow down. They're still talking when you round the corner. The corrid
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -81,15 +75,7 @@ Marcus is coming the other way carrying a stack of printouts that would be reaso
 He makes a small sound that might be agreement and keeps walking, printouts and all. The stack bobs slightly as he turns the corner.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true

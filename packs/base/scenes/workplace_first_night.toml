@@ -67,27 +67,7 @@ You charge the phone, roll your jacket into a rough pillow, and lie down on the 
 Tomorrow: shopping. The bra problem specifically. The rest of the list after that.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -18
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_NIGHT_CRASHED"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "week_one"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeStress(-5); w.changeMoney(-18); gd.setGameFlag("FIRST_NIGHT_CRASHED"); gd.advanceArc("base::workplace_opening", "week_one"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -110,23 +90,7 @@ Outside, someone is honking at someone else, and a dog is barking at the honking
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = 3
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_NIGHT_RESEARCHED"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "week_one"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeAnxiety(3); gd.setGameFlag("FIRST_NIGHT_RESEARCHED"); gd.advanceArc("base::workplace_opening", "week_one"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -175,23 +139,7 @@ He laughs. You laugh. It doesn't explain anything.
 You plug the phone in on the floor beside you. The radiator ticks.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -3
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_NIGHT_CALLED_BACK_HOME"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "week_one"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeStress(-3); gd.setGameFlag("FIRST_NIGHT_CALLED_BACK_HOME"); gd.advanceArc("base::workplace_opening", "week_one"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -216,23 +164,7 @@ Badge paperwork goes on top of the laptop. Shoes by the door. It's not much, but
 The apartment is still empty when you're done. The difference is that it looks like someone intends to wake up here on purpose.
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "FIRST_NIGHT_STAGED_TOMORROW"
-
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::workplace_opening"
-  to_state = "week_one"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeAnxiety(-2); gd.setGameFlag("FIRST_NIGHT_STAGED_TOMORROW"); gd.advanceArc("base::workplace_opening", "week_one"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true

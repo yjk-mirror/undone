@@ -85,14 +85,7 @@ You pack up without making it a production. He looks up. "Night," he says, and g
 You get in the elevator. The lobby is empty. The cold outside hits fast.
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_LATE_NIGHT"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("MARCUS_LATE_NIGHT"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -155,19 +148,7 @@ You finish the tests in another twenty minutes. He's still there when you pack u
 The lobby is empty. You walk to the subway and sit with your bag on your lap and look at nothing.
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_LATE_NIGHT"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
+  effect = 'gd.setGameFlag("MARCUS_LATE_NIGHT"); w.skillIncrease("FEMININITY", 2); npc("m").addLiking(2);'
 
   [[actions.next]]
   finish = true
@@ -202,14 +183,7 @@ The building is two blocks behind you. His light was still on on the fourth floo
 {% endif %}
 """
 
-  [[actions.effects]]
-  type  = "set_game_flag"
-  flag  = "MARCUS_LATE_NIGHT"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("MARCUS_LATE_NIGHT"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true

@@ -233,45 +233,7 @@ He takes his time. So do you.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type = "set_relationship"
-  npc  = "m"
-  status = "Partner"
-
-  [[actions.effects]]
-  type = "set_player_partner"
-  npc  = "m"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("JAKE_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").setRelationship("Partner"); w.setPartner("m"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 5); w.changeStress(-5); w.addArousal(3);'
 
   [[actions.next]]
   finish = true
@@ -408,45 +370,7 @@ You find his shoulder with your mouth and bite it when you come.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type = "set_relationship"
-  npc  = "m"
-  status = "Partner"
-
-  [[actions.effects]]
-  type = "set_player_partner"
-  npc  = "m"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("JAKE_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").setRelationship("Partner"); w.setPartner("m"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 5); w.changeStress(-5); w.addArousal(3);'
 
   [[actions.next]]
   finish = true
@@ -487,18 +411,7 @@ The lamp puts yellow light on the wall. The city is out there. Neither of you is
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.changeStress(1); w.skillIncrease("FEMININITY", 2); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -651,45 +564,7 @@ It builds until it breaks and after you lie with your leg thrown over his and th
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type = "set_relationship"
-  npc  = "m"
-  status = "Partner"
-
-  [[actions.effects]]
-  type = "set_player_partner"
-  npc  = "m"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 3
+  effect = 'gd.setGameFlag("JAKE_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").setRelationship("Partner"); w.setPartner("m"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 5); w.changeStress(-5); w.addArousal(3);'
 
   [[actions.next]]
   finish = true

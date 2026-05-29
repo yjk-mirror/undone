@@ -70,18 +70,7 @@ The key is warm from sitting on the hook. Small and brass in your palm.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_LANDLORD"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_WAITED_HIM_OUT"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("MET_LANDLORD"); gd.setGameFlag("LANDLORD_WAITED_HIM_OUT"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -110,18 +99,7 @@ Three flights. The banister is cold. You take it two steps at a time until the s
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_LANDLORD"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_EXPLAINED_BRIEFLY"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("MET_LANDLORD"); gd.setGameFlag("LANDLORD_EXPLAINED_BRIEFLY"); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -152,22 +130,7 @@ He hands you the key — Unit 4B, third floor, no elevator — and runs through 
 You thank him and take the stairs.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_LANDLORD"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "LANDLORD_KEPT_TRANSACTIONAL"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("MET_LANDLORD"); gd.setGameFlag("LANDLORD_KEPT_TRANSACTIONAL"); w.changeStress(-1); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -189,18 +152,7 @@ He tilts his head toward the ceiling. "Bedroom radiator takes a minute to get go
 He closes the folder. Pulls a key off a hook by the door — unit 4B, brass, the number worn down from years of handling. Third floor, no elevator.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "frank_called"
-
-  [[npc_actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_LANDLORD"
-
-  [[npc_actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'scene.setFlag("frank_called"); gd.setGameFlag("MET_LANDLORD"); w.skillIncrease("FEMININITY", 2);'
 
   [[npc_actions.next]]
   finish = true

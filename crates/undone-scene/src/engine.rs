@@ -10,8 +10,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 use crate::{
-    effects::apply_effect,
-    script::{eval_bool, CompiledScript},
+    script::{apply_effect_script, eval_bool, CompiledScript},
     template_ctx::render_prose,
     types::{Action, NarratorVariant, NextBranch, SceneDefinition, Thought},
 };
@@ -560,16 +559,14 @@ impl SceneEngine {
                 .stack
                 .last_mut()
                 .expect("engine stack must not be empty");
-            let mut errors = Vec::new();
-            for effect in &action.effects {
-                if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
-                    let msg = format!("[scene-engine] effect error: {e}");
-                    log::warn!("{msg}");
-                    errors.push(msg);
-                }
+            match &action.effect {
+                Some(script) => apply_effect_script(script, world, &mut frame.ctx, registry),
+                None => Vec::new(),
             }
-            errors
         };
+        for msg in &effect_errors {
+            log::warn!("{msg}");
+        }
         for msg in effect_errors {
             self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
@@ -734,7 +731,7 @@ impl SceneEngine {
 
         let Some(idx) = selected_idx else { return };
 
-        let (prose, effects, next_branches): (String, Vec<_>, Vec<_>) = {
+        let (prose, effect, next_branches): (String, Option<_>, Vec<_>) = {
             let frame = self.stack.last().expect("engine stack must not be empty");
             let Some(na) = frame.def.npc_actions.get(idx) else {
                 log::error!(
@@ -745,7 +742,7 @@ impl SceneEngine {
                 );
                 return;
             };
-            (na.prose.clone(), na.effects.clone(), na.next.clone())
+            (na.prose.clone(), na.effect.clone(), na.next.clone())
         };
 
         if !prose.is_empty() {
@@ -766,16 +763,14 @@ impl SceneEngine {
                 .stack
                 .last_mut()
                 .expect("engine stack must not be empty");
-            let mut errors = Vec::new();
-            for effect in &effects {
-                if let Err(e) = apply_effect(effect, world, &mut frame.ctx, registry) {
-                    let msg = format!("[scene-engine] npc effect error: {e}");
-                    log::warn!("{msg}");
-                    errors.push(msg);
-                }
+            match &effect {
+                Some(script) => apply_effect_script(script, world, &mut frame.ctx, registry),
+                None => Vec::new(),
             }
-            errors
         };
+        for msg in &npc_effect_errors {
+            log::warn!("{msg}");
+        }
         for msg in npc_effect_errors {
             self.events.push_back(EngineEvent::ErrorOccurred(msg));
         }
@@ -854,8 +849,13 @@ mod tests {
     use undone_domain::*;
 
     use super::*;
-    use crate::types::{EffectDef, SceneDefinition, Thought};
+    use crate::types::{SceneDefinition, Thought};
     use undone_world::test_helpers::make_test_world as make_world;
+
+    /// Compile an effect call-list for tests (empty registry — flag/scene/npc only).
+    fn eff(src: &str) -> CompiledScript {
+        crate::script::compile_effect(src, &PackRegistry::new(), "test").unwrap()
+    }
 
     fn make_simple_scene() -> SceneDefinition {
         SceneDefinition {
@@ -872,7 +872,7 @@ mod tests {
                     condition: None,
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![],
+                    effect: None,
                     next: vec![],
                     thoughts: vec![],
                 },
@@ -883,7 +883,7 @@ mod tests {
                     condition: None,
                     prose: "You leave.".into(),
                     allow_npc_actions: false,
-                    effects: vec![EffectDef::ChangeStress { amount: -1 }],
+                    effect: Some(eff("w.changeStress(-1);")),
                     next: vec![NextBranch {
                         condition: None,
                         goto: None,
@@ -1134,7 +1134,7 @@ mod tests {
                     condition: None,
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![],
+                    effect: None,
                     next: vec![],
                     thoughts: vec![],
                 },
@@ -1145,7 +1145,7 @@ mod tests {
                     condition: Some(cond_expr),
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![],
+                    effect: None,
                     next: vec![],
                     thoughts: vec![],
                 },
@@ -1249,7 +1249,8 @@ mod tests {
         // spawn name ("Brian"). Without this, the sidebar shows whichever
         // random name the spawner chose and the story binding is invisible
         // to the player.
-        use crate::{apply_effect, SceneCtx};
+        use crate::script::apply_effect_script;
+        use crate::SceneCtx;
 
         let scene = make_simple_scene();
         let mut engine = make_engine_with(scene);
@@ -1296,16 +1297,13 @@ mod tests {
         // action would. Requires an active_male in the ctx.
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(key);
-        apply_effect(
-            &EffectDef::SetNpcName {
-                npc: "m".into(),
-                name: "Jake".into(),
-            },
+        let errors = apply_effect_script(
+            &eff(r#"npc("m").setName("Jake");"#),
             &mut world,
             &mut ctx,
             &registry,
-        )
-        .expect("set_npc_name must succeed with active male");
+        );
+        assert!(errors.is_empty(), "set_npc_name must succeed: {errors:?}");
 
         // Now drive the engine the way the runtime would: start a scene, bind
         // the male as active, and pull the NpcActivated event.
@@ -1379,7 +1377,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: Some("test::b".into()),
@@ -1403,7 +1401,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![],
                 thoughts: vec![],
             }],
@@ -1548,7 +1546,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,
@@ -1650,7 +1648,7 @@ mod tests {
                 condition: None,
                 prose: "You make a decision.".into(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,
@@ -1692,8 +1690,9 @@ mod tests {
 
     #[test]
     fn effect_error_emits_error_occurred_event() {
-        // A scene with AddNpcLiking but no active male NPC — apply_effect returns an error.
-        // The engine must emit ErrorOccurred rather than silently eprintln.
+        // An effect targeting an unbound npc ref ("male" is not "m"/"f"/a bound
+        // role) — the mutator records an error. The engine must emit ErrorOccurred
+        // rather than silently eprintln.
         let scene = SceneDefinition {
             id: "test::effect_error".into(),
             pack: "test".into(),
@@ -1707,10 +1706,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![EffectDef::AddNpcLiking {
-                    npc: "male".into(),
-                    delta: 1,
-                }],
+                effect: Some(eff(r#"npc("male").addLiking(1);"#)),
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,
@@ -1768,7 +1764,7 @@ mod tests {
                     condition: None,
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![],
+                    effect: None,
                     next: vec![],
                     thoughts: vec![],
                 },
@@ -1779,7 +1775,7 @@ mod tests {
                     condition: Some(cond),
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![],
+                    effect: None,
                     next: vec![],
                     thoughts: vec![],
                 },

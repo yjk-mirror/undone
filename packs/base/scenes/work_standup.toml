@@ -67,10 +67,7 @@ The circle moves on to Kevin's update, which takes four minutes and involves a d
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -91,10 +88,7 @@ Kevin's update runs four minutes. You listen to the first ninety seconds and the
 The circle closes. Nine-eighteen. Everyone disperses back to their desks.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -113,19 +107,7 @@ The exchange lands correctly. Kevin has gone back to his phone. Carter writes so
 "Okay," you say. "I'll message Devin." And you mean it, because Marcus just saved you two days of waiting on a ticket that was going nowhere.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_DIALOGUE_1"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 2); gd.setGameFlag("MARCUS_DIALOGUE_1"); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true

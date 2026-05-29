@@ -68,18 +68,7 @@ You flush. Wash your hands. Go back to your desk.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_AFTERMATH"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 2
+  effect = 'gd.setGameFlag("MARCUS_AFTERMATH"); w.skillIncrease("FEMININITY", 2); w.changeStress(2);'
 
   [[actions.next]]
   finish = true
@@ -151,23 +140,7 @@ Three feet away from him in the kitchen. He smells the same as he did Friday. Yo
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_AFTERMATH"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'gd.setGameFlag("MARCUS_AFTERMATH"); npc("m").addLiking(1); w.skillIncrease("FEMININITY", 2); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true
@@ -205,18 +178,7 @@ You get through Monday.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_AFTERMATH"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
+  effect = 'gd.setGameFlag("MARCUS_AFTERMATH"); w.skillIncrease("FEMININITY", 2); w.changeStress(3);'
 
   [[actions.next]]
   finish = true

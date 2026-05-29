@@ -62,10 +62,7 @@ By four you're back in the dorm with a folder of pamphlets and a slightly better
 Janette is in the room, already complaining cheerfully about the icebreaker cards. You drop your bag. You agree that the icebreaker cards were bad. Janette laughs. This is a fine basis for a living situation.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "dorm_life"
+  effect = 'gd.advanceArc("base::campus_opening", "dorm_life");'
 
   [[actions.next]]
   finish = true
@@ -84,10 +81,7 @@ A group of guys playing Frisbee on the far side of the quad. You watch for a sec
 One of them looks over. You don't slow down.
 """
 
-  [[actions.effects]]
-  type     = "advance_arc"
-  arc      = "base::campus_opening"
-  to_state = "dorm_life"
+  effect = 'gd.advanceArc("base::campus_opening", "dorm_life");'
 
   [[actions.next]]
   finish = true
@@ -115,9 +109,7 @@ You say something noncommittal. He says something about how he's pre-law anyway,
 He wanders off toward someone else eventually. You watch him go.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "adam_done"
+  effect = 'scene.setFlag("adam_done");'
 
   [[npc_actions.next]]
   finish = true

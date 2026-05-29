@@ -99,19 +99,7 @@ He moves in your kitchen the careful way you move in someone else's. Notices the
 His mug has the chip in the rim. He didn't notice or noticed and doesn't care. Either way he keeps drinking.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_STAYS_OVER"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'gd.setGameFlag("JAKE_STAYS_OVER"); w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -197,23 +185,7 @@ Neither of you looks at a phone. The ten minutes happen.
 Eventually you both get up. The morning wins, like it always does. But the ten minutes happened and they're in the morning now and can't be taken back out of it.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_STAYS_OVER"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
+  effect = 'gd.setGameFlag("JAKE_STAYS_OVER"); w.skillIncrease("FEMININITY", 3); w.changeStress(-10); npc("m").addLiking(2);'
 
   [[actions.next]]
   finish = true
@@ -282,14 +254,7 @@ He nods. The morning becomes logistics, which is its own kind of comfortable.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "JAKE_STAYS_OVER"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'gd.setGameFlag("JAKE_STAYS_OVER"); w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true

@@ -76,14 +76,7 @@ It's a fine evening, and the notifications are answered at some point; you're no
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -10
+  effect = 'w.skillIncrease("FEMININITY", 1); w.changeStress(-10);'
 
   [[actions.next]]
   finish = true
@@ -104,9 +97,7 @@ You lose track of time in the way that means you were actually present for it. B
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -15
+  effect = 'w.changeStress(-15);'
 
   [[actions.next]]
   finish = true
@@ -135,10 +126,7 @@ You know what you like now. You know how to get there. An hour passes without be
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -177,14 +165,7 @@ A man's name on your phone. On your nightstand. In your apartment. The ordinarin
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -8
-
-  [[actions.effects]]
-  type   = "add_npc_liking"
-  npc    = "ROLE_JAKE"
-  delta  = 1
+  effect = 'w.changeStress(-8); npc("ROLE_JAKE").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -214,14 +195,7 @@ The bath is an hour and a half and you don't apologize for any of it. Face mask,
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -15
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'w.changeStress(-15); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true

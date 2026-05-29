@@ -4,17 +4,17 @@
 /// criteria from the spec without reference to the implementer's reasoning.
 ///
 /// Acceptance criteria being tested:
-///   1. TOML `type = "set_npc_name"` deserializes to `EffectDef::SetNpcName`.
+///   1. TOML `effect = 'npc("m").setName("Jake");'` compiles to a Rhai `setName` call.
 ///   2. After the effect runs, the NPC's display name is visible in:
 ///      a. `NpcCore::effective_name()`
 ///      b. `NpcActivatedData::from_npc()` (sidebar path)
 ///      c. `m.getName()` / `f.getName()` in prose templates
 ///      d. `role.getName("ROLE_X")` in prose templates
 ///   3. The original spawn name (`core.name`) is NOT destroyed.
-///   4. `set_npc_name` and `set_npc_role` are independent.
+///   4. `setName` and `setRole` are independent.
 ///   5. Save/load round-trip preserves `display_name`; old saves (missing field) load cleanly.
 ///   6. Invalid NPC references return errors, not panics.
-///   7. The three canonical pack scenes contain `set_npc_name` effects.
+///   7. The three canonical pack scenes contain `setName` effects.
 
 #[cfg(test)]
 mod set_npc_name_acceptance_tests {
@@ -30,10 +30,10 @@ mod set_npc_name_acceptance_tests {
     use undone_packs::PackRegistry;
     use undone_world::test_helpers::make_test_world;
 
-    use crate::effects::{apply_effect, EffectError};
     use crate::engine::NpcActivatedData;
+    use crate::script::apply_effect_script;
     use crate::template_ctx::render_prose;
-    use crate::types::{EffectDef, SceneToml};
+    use crate::types::SceneToml;
 
     // -----------------------------------------------------------------------
     // Helpers
@@ -92,9 +92,9 @@ mod set_npc_name_acceptance_tests {
     // CRITERION 1 — TOML deserialization
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: `type = "set_npc_name"` in TOML fails to deserialize (typo in variant
-    /// name, missing field, wrong serde tag), causing pack loading to crash or silently
-    /// skip the effect so NPCs are never renamed.
+    /// BREAKS IF: `effect = 'npc("m").setName("Jake");'` in TOML fails to deserialize
+    /// (wrong field name, parse error), causing pack loading to crash or silently skip
+    /// the effect so NPCs are never renamed.
     #[test]
     fn toml_set_npc_name_deserializes_correctly() {
         let toml = r#"
@@ -109,33 +109,28 @@ prose = "It begins."
 [[actions]]
 id = "meet"
 label = "Meet"
-
-  [[actions.effects]]
-  type = "set_npc_name"
-  npc  = "m"
-  name = "Jake"
+effect = 'npc("m").setName("Jake");'
 "#;
         let raw: SceneToml = toml::from_str(toml)
-            .expect("TOML with type = \"set_npc_name\" should deserialize without error");
+            .expect("TOML with a setName effect string should deserialize without error");
 
         let meet = raw.actions.iter().find(|a| a.id == "meet").unwrap();
-        assert_eq!(
-            meet.effects.len(),
-            1,
-            "action should have exactly one effect"
+        let effect = meet
+            .effect
+            .as_deref()
+            .expect("action should have an effect string");
+        assert!(
+            effect.contains(r#"setName("Jake")"#),
+            "effect must contain setName(\"Jake\"); got: {effect}"
         );
-
-        match &meet.effects[0] {
-            EffectDef::SetNpcName { npc, name } => {
-                assert_eq!(npc, "m", "npc field should be 'm'");
-                assert_eq!(name, "Jake", "name field should be 'Jake'");
-            }
-            other => panic!("expected SetNpcName, got {:?}", other),
-        }
+        assert!(
+            effect.contains(r#"npc("m")"#),
+            "effect must target npc(\"m\"); got: {effect}"
+        );
     }
 
-    /// BREAKS IF: the `set_npc_name` TOML variant requires fields in a specific order or
-    /// has a case-sensitive mismatch, causing deserialization to fail on real pack content.
+    /// BREAKS IF: a setName effect targeting a role reference fails to deserialize on real
+    /// pack content (parse error on the role-named npc argument).
     #[test]
     fn toml_set_npc_name_with_role_ref_deserializes() {
         let toml = r#"
@@ -150,21 +145,13 @@ prose = "It begins."
 [[actions]]
 id = "meet"
 label = "Meet"
-
-  [[actions.effects]]
-  type = "set_npc_name"
-  npc  = "ROLE_THEO"
-  name = "Theo"
+effect = 'npc("ROLE_THEO").setName("Theo");'
 "#;
         let raw: SceneToml = toml::from_str(toml).unwrap();
         let meet = raw.actions.iter().find(|a| a.id == "meet").unwrap();
-        match &meet.effects[0] {
-            EffectDef::SetNpcName { npc, name } => {
-                assert_eq!(npc, "ROLE_THEO");
-                assert_eq!(name, "Theo");
-            }
-            other => panic!("expected SetNpcName, got {:?}", other),
-        }
+        let effect = meet.effect.as_deref().unwrap();
+        assert!(effect.contains(r#"npc("ROLE_THEO")"#));
+        assert!(effect.contains(r#"setName("Theo")"#));
     }
 
     // -----------------------------------------------------------------------
@@ -352,7 +339,7 @@ label = "Meet"
     // CRITERION 3 — spawn name preserved
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: `apply_effect` for SetNpcName overwrites `core.name` instead of
+    /// BREAKS IF: the `setName` effect overwrites `core.name` instead of
     /// `display_name`, destroying the spawn name permanently.
     #[test]
     fn set_npc_name_effect_preserves_spawn_name() {
@@ -364,11 +351,14 @@ label = "Meet"
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
 
-        let effect = EffectDef::SetNpcName {
-            npc: "m".into(),
-            name: "Jake".into(),
-        };
-        apply_effect(&effect, &mut world, &mut ctx, &registry).unwrap();
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("m").setName("Jake");"#, &registry, "test")
+                .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         let npc = &world.male_npcs[npc_key];
         assert_eq!(
@@ -387,7 +377,7 @@ label = "Meet"
     // CRITERION 4 — independence from set_npc_role
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: `set_npc_role` implicitly sets `display_name`, violating independence.
+    /// BREAKS IF: `setRole` implicitly sets `display_name`, violating independence.
     /// The role assignment should not trigger any rename side-effect.
     #[test]
     fn set_npc_role_does_not_set_display_name() {
@@ -399,11 +389,14 @@ label = "Meet"
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
 
-        let role_effect = EffectDef::SetNpcRole {
-            npc: "m".into(),
-            role: "ROLE_JAKE".into(),
-        };
-        apply_effect(&role_effect, &mut world, &mut ctx, &registry).unwrap();
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("m").setRole("ROLE_JAKE");"#, &registry, "test")
+                .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         let npc = &world.male_npcs[npc_key];
         assert!(
@@ -421,7 +414,7 @@ label = "Meet"
         );
     }
 
-    /// BREAKS IF: `set_npc_name` implicitly sets a role on the NPC, violating independence.
+    /// BREAKS IF: `setName` implicitly sets a role on the NPC, violating independence.
     #[test]
     fn set_npc_name_does_not_set_npc_role() {
         let mut world = make_test_world();
@@ -432,11 +425,14 @@ label = "Meet"
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
 
-        let name_effect = EffectDef::SetNpcName {
-            npc: "m".into(),
-            name: "Marcus".into(),
-        };
-        apply_effect(&name_effect, &mut world, &mut ctx, &registry).unwrap();
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("m").setName("Marcus");"#, &registry, "test")
+                .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         let npc = &world.male_npcs[npc_key];
         assert!(
@@ -458,26 +454,18 @@ label = "Meet"
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
 
-        apply_effect(
-            &EffectDef::SetNpcRole {
-                npc: "m".into(),
-                role: "ROLE_JAKE".into(),
-            },
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(
+                r#"npc("m").setRole("ROLE_JAKE"); npc("m").setName("Jake");"#,
+                &registry,
+                "test",
+            )
+            .unwrap(),
             &mut world,
             &mut ctx,
             &registry,
-        )
-        .unwrap();
-        apply_effect(
-            &EffectDef::SetNpcName {
-                npc: "m".into(),
-                name: "Jake".into(),
-            },
-            &mut world,
-            &mut ctx,
-            &registry,
-        )
-        .unwrap();
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         let npc = &world.male_npcs[npc_key];
         assert!(npc.core.roles.contains("ROLE_JAKE"), "role must be set");
@@ -600,11 +588,11 @@ label = "Meet"
     }
 
     // -----------------------------------------------------------------------
-    // CRITERION 6 — error cases (no panics, proper error variants)
+    // CRITERION 6 — error cases (no panics, errors reported via Vec<String>)
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: `apply_effect` panics (e.g. unwraps on None) when no active male
-    /// NPC is set, instead of returning `EffectError::NoActiveMale`.
+    /// BREAKS IF: applying a setName effect panics (e.g. unwraps on None) when no active
+    /// male NPC is set, instead of reporting a non-empty error list.
     #[test]
     fn set_npc_name_returns_error_when_no_active_male() {
         let mut world = make_test_world();
@@ -612,24 +600,21 @@ label = "Meet"
         // active_male intentionally left None
         let registry = PackRegistry::new();
 
-        let effect = EffectDef::SetNpcName {
-            npc: "m".into(),
-            name: "Jake".into(),
-        };
-        let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("m").setName("Jake");"#, &registry, "test")
+                .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
 
         assert!(
-            result.is_err(),
-            "must return Err when no active male NPC is set"
-        );
-        assert!(
-            matches!(result, Err(EffectError::NoActiveMale)),
-            "error must be NoActiveMale, got: {:?}",
-            result
+            !errs.is_empty(),
+            "must report an error when no active male NPC is set, got: {errs:?}"
         );
     }
 
-    /// BREAKS IF: `apply_effect` panics when no active female NPC is set.
+    /// BREAKS IF: applying a setName effect panics when no active female NPC is set.
     #[test]
     fn set_npc_name_returns_error_when_no_active_female() {
         let mut world = make_test_world();
@@ -637,25 +622,22 @@ label = "Meet"
         // active_female intentionally left None
         let registry = PackRegistry::new();
 
-        let effect = EffectDef::SetNpcName {
-            npc: "f".into(),
-            name: "Priya".into(),
-        };
-        let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("f").setName("Priya");"#, &registry, "test")
+                .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
 
         assert!(
-            result.is_err(),
-            "must return Err when no active female NPC is set"
-        );
-        assert!(
-            matches!(result, Err(EffectError::NoActiveFemale)),
-            "error must be NoActiveFemale, got: {:?}",
-            result
+            !errs.is_empty(),
+            "must report an error when no active female NPC is set, got: {errs:?}"
         );
     }
 
-    /// BREAKS IF: `apply_effect` panics or returns a generic error when a role reference
-    /// cannot be resolved (e.g. role was never bound in this scene context).
+    /// BREAKS IF: applying a setName effect panics or silently succeeds when a role
+    /// reference cannot be resolved (e.g. role was never bound in this scene context).
     #[test]
     fn set_npc_name_returns_error_for_unbound_role() {
         let mut world = make_test_world();
@@ -663,20 +645,21 @@ label = "Meet"
         // No role binding for ROLE_GHOST
         let registry = PackRegistry::new();
 
-        let effect = EffectDef::SetNpcName {
-            npc: "ROLE_GHOST".into(),
-            name: "Ghost".into(),
-        };
-        let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(
+                r#"npc("ROLE_GHOST").setName("Ghost");"#,
+                &registry,
+                "test",
+            )
+            .unwrap(),
+            &mut world,
+            &mut ctx,
+            &registry,
+        );
 
         assert!(
-            result.is_err(),
-            "must return Err for an unbound role reference"
-        );
-        assert!(
-            matches!(result, Err(EffectError::BadNpcRef(_))),
-            "error must be BadNpcRef for unknown role, got: {:?}",
-            result
+            !errs.is_empty(),
+            "must report an error for an unbound role reference, got: {errs:?}"
         );
     }
 
@@ -684,7 +667,7 @@ label = "Meet"
     // CRITERION 7 — pack content: canonical first-meeting scenes
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: coffee_shop.toml does not contain a `set_npc_name` effect for "Jake",
+    /// BREAKS IF: coffee_shop.toml does not contain a `setName` effect for "Jake",
     /// meaning Jake's name is never bound to his NPC record in the sidebar/prose.
     #[test]
     fn coffee_shop_scene_contains_set_npc_name_for_jake() {
@@ -702,18 +685,18 @@ label = "Meet"
         let has_jake_rename = scene
             .actions
             .iter()
-            .flat_map(|a| a.effects.iter())
-            .chain(scene.npc_actions.iter().flat_map(|a| a.effects.iter()))
-            .any(|e| matches!(e, EffectDef::SetNpcName { name, .. } if name == "Jake"));
+            .filter_map(|a| a.effect.as_ref())
+            .chain(scene.npc_actions.iter().filter_map(|a| a.effect.as_ref()))
+            .any(|e| e.source.contains(r#"setName("Jake")"#));
 
         assert!(
             has_jake_rename,
-            "coffee_shop scene must contain a set_npc_name effect with name = 'Jake'; \
+            "coffee_shop scene must contain a setName(\"Jake\") effect; \
              without it the sidebar shows the spawn name after first meeting"
         );
     }
 
-    /// BREAKS IF: workplace_work_meeting.toml does not contain a `set_npc_name` effect
+    /// BREAKS IF: workplace_work_meeting.toml does not contain a `setName` effect
     /// for "Marcus", meaning Marcus's name is never bound to his NPC record.
     #[test]
     fn workplace_work_meeting_scene_contains_set_npc_name_for_marcus() {
@@ -731,17 +714,17 @@ label = "Meet"
         let has_marcus_rename = scene
             .actions
             .iter()
-            .flat_map(|a| a.effects.iter())
-            .chain(scene.npc_actions.iter().flat_map(|a| a.effects.iter()))
-            .any(|e| matches!(e, EffectDef::SetNpcName { name, .. } if name == "Marcus"));
+            .filter_map(|a| a.effect.as_ref())
+            .chain(scene.npc_actions.iter().filter_map(|a| a.effect.as_ref()))
+            .any(|e| e.source.contains(r#"setName("Marcus")"#));
 
         assert!(
             has_marcus_rename,
-            "workplace_work_meeting scene must contain a set_npc_name effect with name = 'Marcus'"
+            "workplace_work_meeting scene must contain a setName(\"Marcus\") effect"
         );
     }
 
-    /// BREAKS IF: campus_library.toml does not contain a `set_npc_name` effect for "Theo".
+    /// BREAKS IF: campus_library.toml does not contain a `setName` effect for "Theo".
     #[test]
     fn campus_library_scene_contains_set_npc_name_for_theo() {
         use crate::loader::load_scenes;
@@ -758,42 +741,23 @@ label = "Meet"
         let has_theo_rename = scene
             .actions
             .iter()
-            .flat_map(|a| a.effects.iter())
-            .chain(scene.npc_actions.iter().flat_map(|a| a.effects.iter()))
-            .any(|e| matches!(e, EffectDef::SetNpcName { name, .. } if name == "Theo"));
+            .filter_map(|a| a.effect.as_ref())
+            .chain(scene.npc_actions.iter().filter_map(|a| a.effect.as_ref()))
+            .any(|e| e.source.contains(r#"setName("Theo")"#));
 
         assert!(
             has_theo_rename,
-            "campus_library scene must contain a set_npc_name effect with name = 'Theo'"
+            "campus_library scene must contain a setName(\"Theo\") effect"
         );
     }
 
     // -----------------------------------------------------------------------
-    // Additional wiring check: effect mutates_persistent_world()
-    // -----------------------------------------------------------------------
-
-    /// BREAKS IF: `SetNpcName` is omitted from `mutates_persistent_world()`, causing
-    /// the scheduler/simulator to treat name overrides as non-persistent and not
-    /// considering them in world mutation tracking.
-    #[test]
-    fn set_npc_name_is_flagged_as_persistent_world_mutation() {
-        let effect = EffectDef::SetNpcName {
-            npc: "m".into(),
-            name: "Jake".into(),
-        };
-        assert!(
-            effect.mutates_persistent_world(),
-            "SetNpcName must be flagged as a persistent world mutation"
-        );
-    }
-
-    // -----------------------------------------------------------------------
-    // Additional wiring: apply_effect actually sets display_name on world state
+    // Additional wiring: apply_effect_script actually sets display_name on world state
     // (not just reading from ctx or some transient buffer)
     // -----------------------------------------------------------------------
 
-    /// BREAKS IF: apply_effect sets display_name on a copy rather than the live world,
-    /// so the NPC in world.male_npcs still has display_name = None after the effect.
+    /// BREAKS IF: the setName effect sets display_name on a copy rather than the live
+    /// world, so the NPC in world.male_npcs still has display_name = None after the effect.
     #[test]
     fn apply_effect_set_npc_name_mutates_world_not_a_copy() {
         let mut world = make_test_world();
@@ -804,22 +768,20 @@ label = "Meet"
         ctx.active_male = Some(key);
         let registry = PackRegistry::new();
 
-        apply_effect(
-            &EffectDef::SetNpcName {
-                npc: "m".into(),
-                name: "Jake".into(),
-            },
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("m").setName("Jake");"#, &registry, "test")
+                .unwrap(),
             &mut world,
             &mut ctx,
             &registry,
-        )
-        .unwrap();
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         // Re-read from world to confirm the live world was mutated, not a temporary
         assert_eq!(
             world.male_npcs[key].core.display_name.as_deref(),
             Some("Jake"),
-            "world.male_npcs[key].core.display_name must be 'Jake' after apply_effect"
+            "world.male_npcs[key].core.display_name must be 'Jake' after the setName effect"
         );
     }
 
@@ -870,16 +832,14 @@ label = "Meet"
         ctx.active_female = Some(key);
         let registry = PackRegistry::new();
 
-        apply_effect(
-            &EffectDef::SetNpcName {
-                npc: "f".into(),
-                name: "Priya".into(),
-            },
+        let errs = apply_effect_script(
+            &crate::script::compile_effect(r#"npc("f").setName("Priya");"#, &registry, "test")
+                .unwrap(),
             &mut world,
             &mut ctx,
             &registry,
-        )
-        .unwrap();
+        );
+        assert!(errs.is_empty(), "{errs:?}");
 
         assert_eq!(
             world.female_npcs[key].core.display_name.as_deref(),

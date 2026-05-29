@@ -61,14 +61,7 @@ You've walked this two-block stretch a hundred times. Your legs feel shorter on 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'w.skillIncrease("FEMININITY", 2); w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -103,22 +96,7 @@ Walking beside him, the difference in your strides is immediate. His is longer. 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAR_STRANGER_WALKED"
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 3); w.changeStress(-5); gd.setGameFlag("BAR_STRANGER_WALKED"); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -148,22 +126,7 @@ Your hand is steady on the bottle. His jacket is on your couch. The apartment fe
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_alcohol"
-  delta  = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAR_STRANGER_INVITED"
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 3); w.changeAlcohol(1); gd.setGameFlag("BAR_STRANGER_INVITED"); w.addArousal(1);'
 
   [[actions.next]]
   finish = true
@@ -194,14 +157,7 @@ Inside, the apartment is quiet. You pour a glass of water and drink it standing 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAR_STRANGER_MET"
+  effect = 'w.skillIncrease("FEMININITY", 2); gd.setGameFlag("BAR_STRANGER_MET");'
 
   [[actions.next]]
   finish = true

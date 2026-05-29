@@ -69,18 +69,7 @@ It fits. The woman in the mirror looks fine. Not striking. Not terrible. The dre
 You take it off. Put your clothes back on. Pick up the hanger.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -40
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'w.changeMoney(-40); w.skillIncrease("FEMININITY", 3); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true
@@ -107,18 +96,7 @@ The jeans fit differently. The rise, the way they sit on your hips. The mirror s
 You pay. The bag is heavier than you expected. You head out.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -60
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'w.changeMoney(-60); w.skillIncrease("FEMININITY", 2); w.changeStress(-1);'
 
   [[actions.next]]
   finish = true
@@ -157,18 +135,7 @@ Every "try this with a belt" comes through the curtain. She's professional. She'
 You leave with a bag and the saleswoman's card and the particular feeling of having been helped by someone good at their job.
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -80
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'w.changeMoney(-80); w.skillIncrease("FEMININITY", 3); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true

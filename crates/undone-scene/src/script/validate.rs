@@ -747,6 +747,48 @@ pub fn source_references_game_flag(src: &str, flag: &str) -> bool {
     })
 }
 
+/// All `gd.setGameFlag("X")` flag args in an effect source (reachability facts).
+pub fn source_set_game_flags(src: &str) -> Vec<String> {
+    let Ok(toks) = tokenize(src) else {
+        return Vec::new();
+    };
+    extract_calls(&toks)
+        .iter()
+        .filter(|c| c.method == "setGameFlag")
+        .filter_map(|c| match c.args.first() {
+            Some(Arg::Str(s)) => Some(s.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+/// All `gd.advanceArc("ARC", "STATE")` pairs in an effect source.
+pub fn source_advance_arcs(src: &str) -> Vec<(String, String)> {
+    let Ok(toks) = tokenize(src) else {
+        return Vec::new();
+    };
+    extract_calls(&toks)
+        .iter()
+        .filter(|c| c.method == "advanceArc")
+        .filter_map(|c| match (c.args.first(), c.args.get(1)) {
+            (Some(Arg::Str(a)), Some(Arg::Str(s))) => Some((a.clone(), s.clone())),
+            _ => None,
+        })
+        .collect()
+}
+
+/// True if any `npc(...).addLiking(N)` in the effect source has `|N| > 1`
+/// (an overshoot that could skip an exact npc-liking equality gate).
+pub fn source_has_liking_overshoot(src: &str) -> bool {
+    let Ok(toks) = tokenize(src) else {
+        return false;
+    };
+    extract_calls(&toks).iter().any(|c| {
+        c.method == "addLiking"
+            && matches!(c.args.first(), Some(Arg::Int(n)) if n.unsigned_abs() > 1)
+    })
+}
+
 /// True if the effect source mutates persistent world state — i.e. contains any
 /// effect call OTHER than the scene-local `scene.setFlag`/`scene.removeFlag`
 /// (and the `npc(ref)` constructor, which on its own mutates nothing).

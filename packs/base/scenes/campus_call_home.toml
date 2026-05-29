@@ -103,13 +103,7 @@ You hang up. The phone sits in your hands.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = 5
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "CALL_HOME_DONE"
+  effect = 'w.changeAnxiety(5); gd.setGameFlag("CALL_HOME_DONE");'
 
   [[actions.next]]
   finish = true
@@ -126,13 +120,7 @@ Diego will be fine. He's always fine. He'll text a few more times, then less, th
 You pick up your textbook. You have a problem set due Friday.
 """
 
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "CALL_HOME_DONE"
+  effect = 'w.changeStress(3); gd.setGameFlag("CALL_HOME_DONE");'
 
   [[actions.next]]
   finish = true
@@ -153,13 +141,7 @@ You type: *I will.*
 You put the phone in your bag. Not *who are you* or *that's weird*. Just *thanks.* Diego replied like that was a normal thing to receive.
 """
 
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = -2
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "CALL_HOME_DONE"
+  effect = 'w.changeAnxiety(-2); gd.setGameFlag("CALL_HOME_DONE");'
 
   [[actions.next]]
   finish = true

@@ -67,14 +67,7 @@ The line moves.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_scene_flag"
-  flag = "talked"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'scene.setFlag("talked"); npc("m").addLiking(1);'
 
 [[actions]]
 id        = "order_and_leave"
@@ -101,13 +94,7 @@ You push through the door. The cold comes back. The coffee is already cooling.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -5
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "COFFEE_SHOP_VISITED"
+  effect = 'w.changeMoney(-5); gd.setGameFlag("COFFEE_SHOP_VISITED");'
 
   [[actions.next]]
   finish = true
@@ -137,32 +124,7 @@ His hand is warm and your fingers disappear in his grip for a second before he l
 {% endif %}
 """
 
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -5
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MET_JAKE"
-
-  [[actions.effects]]
-  type = "set_npc_role"
-  npc  = "m"
-  role = "ROLE_JAKE"
-
-  [[actions.effects]]
-  type = "set_npc_name"
-  npc  = "m"
-  name = "Jake"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "COFFEE_SHOP_VISITED"
+  effect = 'npc("m").addLiking(1); w.changeMoney(-5); gd.setGameFlag("MET_JAKE"); npc("m").setRole("ROLE_JAKE"); npc("m").setName("Jake"); gd.setGameFlag("COFFEE_SHOP_VISITED");'
 
   [[actions.next]]
   finish = true
@@ -179,9 +141,7 @@ The line moves. He steps up to the counter and orders without hesitation — med
 He steps aside to wait, and now it's your turn.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "reached_counter"
+  effect = 'scene.setFlag("reached_counter");'
 
 [[npc_actions]]
 id        = "he_chats"
@@ -199,9 +159,7 @@ He says it with the careful lightness of someone who has made a small decision. 
 {% endif %}
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "invited"
+  effect = 'scene.setFlag("invited");'
 
 [[npc_actions]]
 id        = "background_noise"

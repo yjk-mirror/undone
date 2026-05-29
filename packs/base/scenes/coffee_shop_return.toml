@@ -39,15 +39,7 @@ Your face is warm for the next half-block. The coffee is still good.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -69,19 +61,7 @@ The work sits between you for forty minutes, the conversation picking up and goi
 You tell him probably.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "COFFEE_SHOP_SECOND_VISIT"
+  effect = 'w.skillIncrease("FEMININITY", 1); npc("m").addLiking(1); gd.setGameFlag("COFFEE_SHOP_SECOND_VISIT");'
 
   [[actions.next]]
   finish = true

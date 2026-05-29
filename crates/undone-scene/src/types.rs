@@ -61,8 +61,9 @@ pub struct ActionDef {
     pub prose: String,
     #[serde(default)]
     pub allow_npc_actions: bool,
+    /// Rhai effect call-list, e.g. `effect = 'w.addArousal(1); gd.setGameFlag("X");'`.
     #[serde(default)]
-    pub effects: Vec<EffectDef>,
+    pub effect: Option<String>,
     #[serde(default)]
     pub next: Vec<NextBranchDef>,
     /// Thoughts fired after the action prose is displayed.
@@ -78,8 +79,9 @@ pub struct NpcActionDef {
     pub prose: String,
     #[serde(default = "default_weight")]
     pub weight: u32,
+    /// Rhai effect call-list (see [`ActionDef::effect`]).
     #[serde(default)]
-    pub effects: Vec<EffectDef>,
+    pub effect: Option<String>,
     #[serde(default)]
     pub next: Vec<NextBranchDef>,
 }
@@ -96,186 +98,6 @@ pub struct NextBranchDef {
     pub slot: Option<String>,
     #[serde(default)]
     pub finish: bool,
-}
-
-/// Typed effect, deserialised from `type = "..."` tagged TOML.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum EffectDef {
-    ChangeStress {
-        amount: i32,
-    },
-    ChangeMoney {
-        amount: i32,
-    },
-    ChangeAnxiety {
-        amount: i32,
-    },
-    SetSceneFlag {
-        flag: String,
-    },
-    RemoveSceneFlag {
-        flag: String,
-    },
-    SetGameFlag {
-        flag: String,
-    },
-    RemoveGameFlag {
-        flag: String,
-    },
-    AddStat {
-        stat: String,
-        amount: i32,
-    },
-    SetStat {
-        stat: String,
-        value: i32,
-    },
-    SkillIncrease {
-        skill: String,
-        amount: i32,
-    },
-    AddTrait {
-        trait_id: String,
-    },
-    RemoveTrait {
-        trait_id: String,
-    },
-    AddArousal {
-        delta: i8,
-    },
-    AddNpcLiking {
-        npc: String,
-        delta: i8,
-    },
-    AddNpcLove {
-        npc: String,
-        delta: i8,
-    },
-    AddWLiking {
-        npc: String,
-        delta: i8,
-    },
-    SetNpcFlag {
-        npc: String,
-        flag: String,
-    },
-    AddNpcTrait {
-        npc: String,
-        trait_id: String,
-    },
-    Transition {
-        target: String,
-    },
-    AddStuff {
-        item: String,
-    },
-    RemoveStuff {
-        item: String,
-    },
-    SetRelationship {
-        npc: String,
-        status: String,
-    },
-    SetNpcAttraction {
-        npc: String,
-        delta: i8,
-    },
-    SetNpcBehaviour {
-        npc: String,
-        behaviour: String,
-    },
-    SetContactable {
-        npc: String,
-        value: bool,
-    },
-    AddSexualActivity {
-        npc: String,
-        activity: String,
-    },
-    SetPlayerPartner {
-        npc: String,
-    },
-    AddPlayerFriend {
-        npc: String,
-    },
-    SetJobTitle {
-        title: String,
-    },
-    ChangeAlcohol {
-        delta: i8,
-    },
-    SetVirgin {
-        value: bool,
-        virgin_type: Option<String>,
-    },
-    AdvanceTime {
-        slots: u32,
-    },
-    AdvanceArc {
-        arc: String,
-        to_state: String,
-    },
-    SetNpcRole {
-        /// "m", "f", or a role bound in SceneCtx.role_bindings
-        npc: String,
-        role: String,
-    },
-    /// Override the NPC's display name (UI sidebar, prose templates that read
-    /// the active name). The spawn name on `core.name` is preserved. Used to
-    /// bind a story name like "Jake" or "Theo" to a randomly-spawned NPC
-    /// after a first-meeting scene.
-    SetNpcName {
-        /// "m", "f", or a role bound in SceneCtx.role_bindings
-        npc: String,
-        name: String,
-    },
-    FailRedCheck {
-        skill: String,
-    },
-}
-
-impl EffectDef {
-    /// Returns true when the effect mutates persistent world state rather than
-    /// only the current scene frame or immediate control flow.
-    pub fn mutates_persistent_world(&self) -> bool {
-        matches!(
-            self,
-            Self::ChangeStress { .. }
-                | Self::ChangeMoney { .. }
-                | Self::ChangeAnxiety { .. }
-                | Self::SetGameFlag { .. }
-                | Self::RemoveGameFlag { .. }
-                | Self::AddStat { .. }
-                | Self::SetStat { .. }
-                | Self::SkillIncrease { .. }
-                | Self::AddTrait { .. }
-                | Self::RemoveTrait { .. }
-                | Self::AddArousal { .. }
-                | Self::AddNpcLiking { .. }
-                | Self::AddNpcLove { .. }
-                | Self::AddWLiking { .. }
-                | Self::SetNpcFlag { .. }
-                | Self::AddNpcTrait { .. }
-                | Self::AddStuff { .. }
-                | Self::RemoveStuff { .. }
-                | Self::SetRelationship { .. }
-                | Self::SetNpcAttraction { .. }
-                | Self::SetNpcBehaviour { .. }
-                | Self::SetContactable { .. }
-                | Self::AddSexualActivity { .. }
-                | Self::SetPlayerPartner { .. }
-                | Self::AddPlayerFriend { .. }
-                | Self::SetJobTitle { .. }
-                | Self::ChangeAlcohol { .. }
-                | Self::SetVirgin { .. }
-                | Self::AdvanceTime { .. }
-                | Self::AdvanceArc { .. }
-                | Self::SetNpcRole { .. }
-                | Self::SetNpcName { .. }
-                | Self::FailRedCheck { .. }
-        )
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -308,7 +130,8 @@ pub struct Action {
     pub condition: Option<CompiledScript>,
     pub prose: String,
     pub allow_npc_actions: bool,
-    pub effects: Vec<EffectDef>,
+    /// Compiled effect call-list (applied via `apply_effect_script`).
+    pub effect: Option<CompiledScript>,
     pub next: Vec<NextBranch>,
     /// Thoughts displayed after the action prose.
     pub thoughts: Vec<Thought>,
@@ -328,7 +151,8 @@ pub struct NpcAction {
     pub condition: Option<CompiledScript>,
     pub prose: String,
     pub weight: u32,
-    pub effects: Vec<EffectDef>,
+    /// Compiled effect call-list (applied via `apply_effect_script`).
+    pub effect: Option<CompiledScript>,
     pub next: Vec<NextBranch>,
 }
 
@@ -348,17 +172,18 @@ pub struct SceneDefinition {
 
 impl SceneDefinition {
     /// Returns true when any player or NPC action in the scene can mutate
-    /// persistent world state.
+    /// persistent world state. Scans the compiled effect call-lists' source for
+    /// any non-scene-local mutator (reconstructs the legacy `EffectDef` walk).
     pub fn has_persistent_world_mutation(&self) -> bool {
         self.actions
             .iter()
-            .flat_map(|action| action.effects.iter())
+            .filter_map(|action| action.effect.as_ref())
             .chain(
                 self.npc_actions
                     .iter()
-                    .flat_map(|action| action.effects.iter()),
+                    .filter_map(|action| action.effect.as_ref()),
             )
-            .any(EffectDef::mutates_persistent_world)
+            .any(|script| crate::script::source_has_persistent_mutation(&script.source))
     }
 }
 
@@ -387,12 +212,9 @@ detail = "Just wait."
 [[actions]]
 id = "leave"
 label = "Leave"
-condition = "!scene.hasFlag('blocked')"
+condition = '!scene.hasFlag("blocked")'
 prose = "You leave."
-
-  [[actions.effects]]
-  type = "change_stress"
-  amount = -1
+effect = "w.changeStress(-1);"
 
   [[actions.next]]
   finish = true
@@ -406,14 +228,10 @@ prose = "You leave."
     }
 
     #[test]
-    fn parses_action_effects() {
+    fn parses_action_effect() {
         let raw: SceneToml = toml::from_str(MINIMAL_SCENE).unwrap();
         let leave = raw.actions.iter().find(|a| a.id == "leave").unwrap();
-        assert_eq!(leave.effects.len(), 1);
-        assert!(matches!(
-            leave.effects[0],
-            EffectDef::ChangeStress { amount: -1 }
-        ));
+        assert_eq!(leave.effect.as_deref(), Some("w.changeStress(-1);"));
     }
 
     #[test]
@@ -431,30 +249,9 @@ prose = "You leave."
         assert!(wait.next.is_empty());
     }
 
-    #[test]
-    fn persistent_world_mutation_excludes_scene_local_and_navigation_effects() {
-        assert!(EffectDef::ChangeStress { amount: 1 }.mutates_persistent_world());
-        assert!(EffectDef::SetGameFlag {
-            flag: "SEEN".into()
-        }
-        .mutates_persistent_world());
-        assert!(EffectDef::SetNpcRole {
-            npc: "m".into(),
-            role: "ROLE_TEST".into(),
-        }
-        .mutates_persistent_world());
-        assert!(!EffectDef::SetSceneFlag {
-            flag: "local".into()
-        }
-        .mutates_persistent_world());
-        assert!(!EffectDef::RemoveSceneFlag {
-            flag: "local".into()
-        }
-        .mutates_persistent_world());
-        assert!(!EffectDef::Transition {
-            target: "base::next".into()
-        }
-        .mutates_persistent_world());
+    /// Build a compiled effect for tests (empty registry — flags/scene only).
+    fn effect(src: &str) -> CompiledScript {
+        crate::script::compile_effect(src, &undone_packs::PackRegistry::new(), "test").unwrap()
     }
 
     #[test]
@@ -472,9 +269,8 @@ prose = "You leave."
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![EffectDef::SetSceneFlag {
-                    flag: "local".into(),
-                }],
+                // scene-local only — not persistent on its own
+                effect: Some(effect(r#"scene.setFlag("local");"#)),
                 next: vec![],
                 thoughts: vec![],
             }],
@@ -483,10 +279,8 @@ prose = "You leave."
                 condition: None,
                 prose: String::new(),
                 weight: 1,
-                effects: vec![EffectDef::AddNpcLiking {
-                    npc: "male".into(),
-                    delta: 1,
-                }],
+                // persistent NPC mutation
+                effect: Some(effect(r#"npc("m").addLiking(1);"#)),
                 next: vec![],
             }],
         };
@@ -509,14 +303,7 @@ prose = "You leave."
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![
-                    EffectDef::SetSceneFlag {
-                        flag: "local".into(),
-                    },
-                    EffectDef::Transition {
-                        target: "base::next".into(),
-                    },
-                ],
+                effect: Some(effect(r#"scene.setFlag("local");"#)),
                 next: vec![],
                 thoughts: vec![],
             }],

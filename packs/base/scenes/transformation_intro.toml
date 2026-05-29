@@ -92,9 +92,7 @@ Your seatmate gives the conversation one polite opening and lets it go when you 
 Somewhere over Ohio, you fall asleep.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "TRANSFORMATION_WITNESSED"
+  effect = 'gd.setGameFlag("TRANSFORMATION_WITNESSED");'
 
   [[actions.next]]
   finish = true

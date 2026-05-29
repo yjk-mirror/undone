@@ -51,15 +51,7 @@ Marcus nods. "Yeah," he says, and gets his coffee.
 You take your cup back to your desk. The exchange took maybe a minute.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1);'
 
   [[actions.next]]
   finish = true
@@ -99,19 +91,7 @@ Neither is the risk section. You had the risk section. He had the other two.
 You take your coffee back to your desk.
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 1
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_REAL_CONVERSATION"
+  effect = 'w.skillIncrease("FEMININITY", 2); npc("m").addLiking(1); gd.setGameFlag("MARCUS_REAL_CONVERSATION");'
 
   [[actions.next]]
   finish = true

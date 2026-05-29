@@ -359,7 +359,7 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![],
+                effect: None,
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,

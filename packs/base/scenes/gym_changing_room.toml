@@ -52,14 +52,7 @@ You pull the curtain back and step out. The room is lighter than it sounded.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "GYM_CHANGING_ROOM"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'gd.setGameFlag("GYM_CHANGING_ROOM"); w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -91,14 +84,7 @@ You moved through it. You're dressed. You didn't look at anyone for more than a 
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "GYM_CHANGING_ROOM"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.setGameFlag("GYM_CHANGING_ROOM"); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -140,18 +126,7 @@ You reach for your towel and your hands are shaking a little and it's not from c
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "GYM_CHANGING_ROOM"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -5
+  effect = 'gd.setGameFlag("GYM_CHANGING_ROOM"); w.skillIncrease("FEMININITY", 4); w.changeStress(-5);'
 
   [[actions.next]]
   finish = true
@@ -175,13 +150,7 @@ You nod.
 She doesn't look for a response. The dryer comes back on.
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "older_woman_spoken"
-
-  [[npc_actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'scene.setFlag("older_woman_spoken"); w.changeStress(-2);'
 
   [[npc_actions.next]]
   finish = true
@@ -201,9 +170,7 @@ The look is familiar. Evaluative — quick and without malice.
 {% endif %}
 """
 
-  [[npc_actions.effects]]
-  type = "set_scene_flag"
-  flag = "women_glanced"
+  effect = 'scene.setFlag("women_glanced");'
 
   [[npc_actions.next]]
   finish = true

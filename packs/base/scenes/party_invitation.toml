@@ -86,18 +86,7 @@ The kitchen counter is the right height to rest your arms on. The living room ha
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "PARTY_ATTENDED"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
+  effect = 'gd.setGameFlag("PARTY_ATTENDED"); w.skillIncrease("FEMININITY", 2); w.changeStress(-1);'
 
   [[actions.next]]
   finish = true
@@ -140,22 +129,7 @@ You're dancing. The bass is in your ribs and your hips are doing something and n
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "PARTY_ATTENDED"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "PARTY_DANCED"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
+  effect = 'gd.setGameFlag("PARTY_ATTENDED"); gd.setGameFlag("PARTY_DANCED"); w.skillIncrease("FEMININITY", 3); w.changeAlcohol(1);'
 
   [[actions.next]]
   finish = true
@@ -222,22 +196,7 @@ The party is muffled behind the glass. Out here you can think. His attention is 
 You stay until the cold wins.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "PARTY_ATTENDED"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "PARTY_STRANGER_OUTSIDE"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
-
-  [[actions.effects]]
-  type  = "change_alcohol"
-  delta = 1
+  effect = 'gd.setGameFlag("PARTY_ATTENDED"); gd.setGameFlag("PARTY_STRANGER_OUTSIDE"); w.skillIncrease("FEMININITY", 3); w.changeAlcohol(1);'
 
   [[actions.next]]
   finish = true
@@ -268,10 +227,7 @@ The walk home is fifteen minutes. You don't fill it with anything. You let it be
 {% endif %}
 """
 
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true

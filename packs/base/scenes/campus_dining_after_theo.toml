@@ -121,19 +121,7 @@ Lunch. Normal. His friends, the dining hall noise, the ordinary Tuesday. He does
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "DINING_AFTER_THEO"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 2
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.setGameFlag("DINING_AFTER_THEO"); npc("m").addLiking(2); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true
@@ -200,18 +188,7 @@ His table is empty now. His Gatorade bottle is still on it. You look at it for a
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "DINING_AFTER_THEO"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 1
+  effect = 'gd.setGameFlag("DINING_AFTER_THEO"); w.changeStress(3); w.skillIncrease("FEMININITY", 1);'
 
   [[actions.next]]
   finish = true
@@ -257,17 +234,7 @@ You eat. The afternoon is there when you're done.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "DINING_AFTER_THEO"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 8
-
-  [[actions.effects]]
-  type   = "change_anxiety"
-  amount = 5
+  effect = 'gd.setGameFlag("DINING_AFTER_THEO"); w.changeStress(8); w.changeAnxiety(5);'
 
   [[actions.next]]
   finish = true

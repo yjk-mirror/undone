@@ -30,9 +30,7 @@ prose  = """
 The door swings shut. The street is cold and loud and does not ask you anything.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_CALLBACK_TRANSACTIONAL_DEFENSE"
+  effect = 'gd.setGameFlag("OPENING_CALLBACK_TRANSACTIONAL_DEFENSE");'
 
   [[actions.next]]
   finish = true

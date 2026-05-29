@@ -36,13 +36,7 @@ You set the keys on the counter and leave the overhead light off.
 The radiator ticks once and settles. The window goes dark as the alley lamp flicks on.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "OPENING_CALLBACK_FIRST_WEEK_SOLITUDE"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -2
+  effect = 'gd.setGameFlag("OPENING_CALLBACK_FIRST_WEEK_SOLITUDE"); w.changeStress(-2);'
 
   [[actions.next]]
   finish = true

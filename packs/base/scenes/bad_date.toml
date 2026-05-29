@@ -66,18 +66,7 @@ He walks you out at the end. On the sidewalk, he moves toward you — you turn y
 You say something that isn't yes, and then you're in a cab, and then you're not with him anymore.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAD_DATE"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 10
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("BAD_DATE"); w.changeStress(10); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -116,22 +105,7 @@ You leave enough on the table for the wine and your coat is already in your hand
 The ride home: the city through the window, the driver not talking, the specific relief of being in a vehicle that's going somewhere you decided on. You're home in eight minutes.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAD_DATE"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 5
-
-  [[actions.effects]]
-  type   = "change_money"
-  amount = -20
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
+  effect = 'gd.setGameFlag("BAD_DATE"); w.changeStress(5); w.changeMoney(-20); w.skillIncrease("FEMININITY", 2);'
 
   [[actions.next]]
   finish = true
@@ -177,22 +151,7 @@ That flicker on his face — the split second before the controlled response —
 The sidewalk is cold. A cab pulls over when you raise your hand. You get in. The city moves past the window and you sit in it for a minute before you decide what you feel about what you just did.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAD_DATE"
-
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "BAD_DATE_DIRECT"
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 3
+  effect = 'gd.setGameFlag("BAD_DATE"); gd.setGameFlag("BAD_DATE_DIRECT"); w.changeStress(3); w.skillIncrease("FEMININITY", 3);'
 
   [[actions.next]]
   finish = true

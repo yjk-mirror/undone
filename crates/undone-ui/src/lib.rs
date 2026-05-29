@@ -694,7 +694,7 @@ mod tests {
     use undone_domain::*;
     use undone_packs::PackRegistry;
     use undone_scene::engine::{EngineCommand, SceneEngine};
-    use undone_scene::types::{Action, EffectDef, NextBranch, SceneDefinition};
+    use undone_scene::types::{Action, NextBranch, SceneDefinition};
     use undone_world::test_helpers::make_test_world as test_world;
 
     fn test_male_npc(personality: PersonalityId) -> MaleNpc {
@@ -900,10 +900,14 @@ mod tests {
                 condition: None,
                 prose: String::new(),
                 allow_npc_actions: false,
-                effects: vec![EffectDef::AddNpcLiking {
-                    npc: "m".into(),
-                    delta: 1,
-                }],
+                effect: Some(
+                    undone_scene::compile_effect(
+                        r#"npc("m").addLiking(1);"#,
+                        &undone_packs::PackRegistry::new(),
+                        "test",
+                    )
+                    .unwrap(),
+                ),
                 next: vec![NextBranch {
                     condition: None,
                     goto: None,

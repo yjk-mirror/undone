@@ -225,7 +225,7 @@ mod tests {
         RelationshipStatus,
     };
     use undone_scene::engine::{ActionView, EngineCommand};
-    use undone_scene::{Action, EffectDef, NpcAction, SceneDefinition, SceneEngine, SceneNpcRef};
+    use undone_scene::{Action, NpcAction, SceneDefinition, SceneEngine, SceneNpcRef};
     use undone_world::test_helpers::make_test_male_npc;
 
     fn packs_dir() -> PathBuf {
@@ -498,10 +498,14 @@ mod tests {
                     condition: None,
                     prose: String::new(),
                     allow_npc_actions: false,
-                    effects: vec![EffectDef::AddNpcLiking {
-                        npc: "ROLE_TEAM_LEAD".into(),
-                        delta: 1,
-                    }],
+                    effect: Some(
+                        undone_scene::compile_effect(
+                            r#"npc("ROLE_TEAM_LEAD").addLiking(1);"#,
+                            &undone_packs::PackRegistry::new(),
+                            "test",
+                        )
+                        .unwrap(),
+                    ),
                     next: vec![],
                     thoughts: vec![],
                 }],

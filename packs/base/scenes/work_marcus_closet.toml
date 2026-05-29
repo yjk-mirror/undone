@@ -123,36 +123,7 @@ He doesn't look away when he finishes. Neither do you.
 After: the conference room. The folder still on the table. The floor still empty. Marcus tucks his shirt in. You pull your skirt back to where it belongs. Neither of you says anything about Monday.
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 2
+  effect = 'gd.setGameFlag("MARCUS_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 4); w.changeStress(2); w.addArousal(2);'
 
   [[actions.next]]
   finish = true
@@ -255,36 +226,7 @@ His hand. The door. The table. The sound of his breath. All of it still right he
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_INTIMATE"
-
-  [[actions.effects]]
-  type  = "set_virgin"
-  value = false
-
-  [[actions.effects]]
-  type     = "add_sexual_activity"
-  npc      = "m"
-  activity = "vaginal"
-
-  [[actions.effects]]
-  type  = "add_npc_liking"
-  npc   = "m"
-  delta = 3
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 4
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = 2
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 2
+  effect = 'gd.setGameFlag("MARCUS_INTIMATE"); w.setVirgin(false); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 4); w.changeStress(2); w.addArousal(2);'
 
   [[actions.next]]
   finish = true
@@ -329,22 +271,7 @@ On the train home you run the calculation again. It comes out the same.
 {% endif %}
 """
 
-  [[actions.effects]]
-  type = "set_game_flag"
-  flag = "MARCUS_ALMOST"
-
-  [[actions.effects]]
-  type   = "skill_increase"
-  skill  = "FEMININITY"
-  amount = 2
-
-  [[actions.effects]]
-  type   = "change_stress"
-  amount = -1
-
-  [[actions.effects]]
-  type  = "add_arousal"
-  delta = 1
+  effect = 'gd.setGameFlag("MARCUS_ALMOST"); w.skillIncrease("FEMININITY", 2); w.changeStress(-1); w.addArousal(1);'
 
   [[actions.next]]
   finish = true

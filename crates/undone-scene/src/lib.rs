@@ -11,13 +11,14 @@ pub mod types;
 #[cfg(test)]
 mod set_npc_name_tests;
 
-pub use effects::{apply_effect, EffectError};
+pub use effects::EffectError;
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
 pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
 pub use scheduler::{
     load_schedule, validate_entry_scene_references, PickResult, Scheduler, SchedulerError,
 };
-pub use types::{Action, EffectDef, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
+pub use script::{apply_effect_script, compile_condition, compile_effect, CompiledScript};
+pub use types::{Action, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
 pub use undone_expr::{SceneCtx, SceneNpcRef};
 
 #[cfg(test)]
@@ -33,7 +34,6 @@ mod integration_tests {
 
     use crate::engine::{EngineCommand, EngineEvent, SceneEngine};
     use crate::loader::load_scenes;
-    use crate::EffectDef;
     use undone_world::test_helpers::make_test_world;
 
     fn packs_dir() -> PathBuf {
@@ -553,19 +553,21 @@ mod integration_tests {
             .iter()
             .find(|action| action.id == "wait_him_out")
             .unwrap()
-            .effects
-            .contains(&EffectDef::SetGameFlag {
-                flag: "LANDLORD_WAITED_HIM_OUT".into(),
-            }));
+            .effect
+            .as_ref()
+            .is_some_and(|s| s
+                .source
+                .contains(r#"setGameFlag("LANDLORD_WAITED_HIM_OUT")"#)));
         assert!(landlord
             .actions
             .iter()
             .find(|action| action.id == "explain_briefly")
             .unwrap()
-            .effects
-            .contains(&EffectDef::SetGameFlag {
-                flag: "LANDLORD_EXPLAINED_BRIEFLY".into(),
-            }));
+            .effect
+            .as_ref()
+            .is_some_and(|s| s
+                .source
+                .contains(r#"setGameFlag("LANDLORD_EXPLAINED_BRIEFLY")"#)));
 
         let first_night = &scenes["base::workplace_first_night"];
         let first_night_actions: Vec<&str> = first_night
@@ -579,10 +581,9 @@ mod integration_tests {
             .iter()
             .find(|action| action.id == "order_food_sleep")
             .unwrap()
-            .effects
-            .contains(&EffectDef::SetGameFlag {
-                flag: "FIRST_NIGHT_CRASHED".into(),
-            }));
+            .effect
+            .as_ref()
+            .is_some_and(|s| s.source.contains(r#"setGameFlag("FIRST_NIGHT_CRASHED")"#)));
 
         let first_clothes = &scenes["base::workplace_first_clothes"];
         let first_clothes_actions: Vec<&str> = first_clothes
@@ -605,19 +606,19 @@ mod integration_tests {
             .iter()
             .find(|action| action.id == "assert_expertise")
             .unwrap()
-            .effects
-            .contains(&EffectDef::SetGameFlag {
-                flag: "FIRST_DAY_ASSERTED_STATUS".into(),
-            }));
+            .effect
+            .as_ref()
+            .is_some_and(|s| s
+                .source
+                .contains(r#"setGameFlag("FIRST_DAY_ASSERTED_STATUS")"#)));
         assert!(first_day
             .actions
             .iter()
             .find(|action| action.id == "lunch_with_group")
             .unwrap()
-            .effects
-            .contains(&EffectDef::SetGameFlag {
-                flag: "FIRST_DAY_LUNCH_GROUP".into(),
-            }));
+            .effect
+            .as_ref()
+            .is_some_and(|s| s.source.contains(r#"setGameFlag("FIRST_DAY_LUNCH_GROUP")"#)));
 
         assert!(scenes.contains_key("base::opening_callback_status_assertion"));
         assert!(scenes.contains_key("base::opening_callback_mirror_afterglow"));
