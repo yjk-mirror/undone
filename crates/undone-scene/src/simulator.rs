@@ -452,7 +452,10 @@ mod tests {
                 },
                 crate::scheduler::ScheduleEvent {
                     scene: "test::never".into(),
-                    condition: Some(undone_expr::parse("false").unwrap()),
+                    condition: Some(
+                        crate::script::compile_condition("false", &PackRegistry::new(), "test")
+                            .unwrap(),
+                    ),
                     weight: 10,
                     once_only: false,
                     trigger: None,

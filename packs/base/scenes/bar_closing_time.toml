@@ -31,7 +31,7 @@ The cold hits you. His footsteps start behind you on the pavement.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 30"
+condition = 'w.getSkill("FEMININITY") < 30'
 style     = "observation"
 prose     = "Two blocks. His stride is already longer than yours."
 
@@ -127,7 +127,7 @@ Walking beside him, the difference in your strides is immediate. His is longer. 
 id        = "invite_him_in"
 label     = "\"Want to come in for a drink?\""
 detail    = "One more. Your place."
-condition = "w.hasTrait('CONFIDENT') || w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 35"
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("FLIRTY") || w.getSkill("FEMININITY") > 35'
 prose = """
 At your building, you stop and turn.
 

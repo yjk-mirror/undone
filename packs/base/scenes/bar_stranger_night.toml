@@ -24,12 +24,12 @@ The room is yours, but he's in it now. He's waiting.
 """
 
 [[thoughts]]
-condition = "w.hasTrait('ANALYTICAL')"
+condition = 'w.hasTrait("ANALYTICAL")'
 style     = "observation"
 prose     = "Two empty glasses. His jacket still on the arm of the couch. The silence has a shape."
 
 [[thoughts]]
-condition = "w.hasTrait('SHY') && w.getSkill('FEMININITY') > 30"
+condition = 'w.hasTrait("SHY") && w.getSkill("FEMININITY") > 30'
 style     = "observation"
 prose     = "Three feet of floor between your chair and the couch."
 
@@ -39,7 +39,7 @@ prose     = "Three feet of floor between your chair and the couch."
 id        = "pull_him_close"
 label     = "Pull him close."
 detail    = "Your hand on his shirt. Your mouth on his."
-condition = "!w.hasTrait('SHY') || w.getSkill('FEMININITY') > 30"
+condition = '!w.hasTrait("SHY") || w.getSkill("FEMININITY") > 30'
 prose = """
 You stand up. The floorboards creak once. He watches you cross the three feet.
 

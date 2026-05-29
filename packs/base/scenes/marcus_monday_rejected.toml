@@ -25,7 +25,7 @@ The conference room door is down the hall. His apartment is somewhere else entir
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose     = "Same floor. Same desk. Same badge on the lanyard. The room is the same room."
 

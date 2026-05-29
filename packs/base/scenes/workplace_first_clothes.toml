@@ -23,7 +23,7 @@ Two numbers on a card, then a rack at the back of the section. The associate mov
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Nine AM. The department store is mostly empty, the morning light cutting across the displays in long rectangles. You take the escalator to the second floor. Signs overhead: lingerie, foundations, intimates.
 
@@ -35,7 +35,7 @@ The rack holds maybe forty options. You put your hands in your pockets.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 style     = "observation"
 prose = """
 Dressing room. Door closed. Four options on the hook.
@@ -46,7 +46,7 @@ The second one is a different shape. Different band, different cup, different wh
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 25"
+condition = 'w.getSkill("FEMININITY") < 25'
 style     = "observation"
 prose = """
 The dressing room has a three-panel mirror and a fluorescent overhead. The angle catches your side profile whether you want it or not.
@@ -231,7 +231,7 @@ The store's automatic doors close behind you. The street is bright and quiet.
 id        = "shopper_notices"
 label     = "A man in the aisle notices her"
 weight    = 6
-condition = "!scene.hasFlag('noticed')"
+condition = '!scene.hasFlag("noticed")'
 prose = """
 You are holding two options — same brand, different cut — when a man stops near the end of the aisle. He has a bag over one shoulder. He is not shopping. He is looking at you with the particular quality of attention that has a duration.
 

@@ -27,7 +27,7 @@ Dan is at his desk. He says good morning. Good morning back. Screen on. Slack ha
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose     = "Same floor. Same desk. Same badge on the lanyard."
 

@@ -40,7 +40,7 @@ Marcus settles into the chair directly across from yours and opens his laptop wi
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 30"
+condition = 'w.getSkill("FEMININITY") < 30'
 style     = "observation"
 prose = """
 {% if w.hasTrait("ANALYTICAL") %}
@@ -217,7 +217,7 @@ You fill your water bottle. The glass wall gives back a reflection — laptop un
 id        = "correct_him"
 label     = "Cut him off"
 detail    = "He's wrong. You designed this. Say so."
-condition = "w.hasTrait('CONFIDENT') || w.hasTrait('ANALYTICAL')"
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("ANALYTICAL")'
 prose     = """
 The first fifteen slides go without interruption. Carter writes things down. Devin nods. Marcus reads.
 

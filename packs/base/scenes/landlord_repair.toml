@@ -24,7 +24,7 @@ You're in the kitchen making coffee because making coffee is something to do whi
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('ANALYTICAL')"
+condition = 'w.hasTrait("ANALYTICAL")'
 prose = """
 He called yesterday. The faucet — you'd mentioned it, he said Saturday around two. He's here at 1:47.
 
@@ -36,7 +36,7 @@ You're standing in the hallway cataloging the spatial dynamics. A man in your ba
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 30"
+condition = 'w.getSkill("FEMININITY") < 30'
 style     = "observation"
 prose     = """His building. Your faucet. Your hip four inches from the door frame and no reason to move further back than that."""
 
@@ -145,7 +145,7 @@ The faucet, when you check, is silent.
 id        = "help"
 label     = "Help him"
 detail    = "You know plumbing. The wrench is the same regardless."
-condition = "w.hasTrait('CONFIDENT') || w.hasTrait('ANALYTICAL') || w.hasTrait('DOWN_TO_EARTH')"
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("ANALYTICAL") || w.hasTrait("DOWN_TO_EARTH")'
 prose     = """
 "It's the washer," you say from the doorway.
 

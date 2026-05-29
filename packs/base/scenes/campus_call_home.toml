@@ -41,7 +41,7 @@ The call ends.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 15"
+condition = 'w.getSkill("FEMININITY") < 15'
 prose = """
 Diego calls on Wednesday.
 
@@ -59,7 +59,7 @@ The line goes dead. Phone on the desk. Screen going dark.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 50"
+condition = 'w.getSkill("FEMININITY") < 50'
 style     = "observation"
 prose = """
 The call is over. The phone sits on the desk face-up, Diego's name still on the recent list.

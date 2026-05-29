@@ -11,7 +11,7 @@ He smiles. The easy one, no calculation in it. "Hey."
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Lexington Ave, a Tuesday afternoon. Jake, coming the other way with a grocery bag. At the coffee shop he was sitting down, at a table, across a counter. Here on the sidewalk he's taller than you clocked — the bag has his arm out at an angle, forearm visible below the sleeve. Your eyes are there before you're looking at his face.
 
@@ -72,7 +72,7 @@ You catch his eye, give the nod-and-wave that covers "I know you, I'm busy, this
 id        = "he_suggests_coffee"
 label     = "He mentions the coffee shop"
 detail    = "Not quite an invitation. You pick up the thread anyway."
-condition = "gd.npcLikingAtLeast('ROLE_JAKE', 'Like')"
+condition = 'gd.npcLikingAtLeast("ROLE_JAKE", "Like")'
 prose     = """
 You've been talking for a few minutes when he mentions the coffee shop — not as an invitation, just as a thing. "I keep meaning to go back." He's looking at his phone now, checking something, which is either multitasking or diffidence.
 

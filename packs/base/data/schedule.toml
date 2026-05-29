@@ -19,7 +19,7 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::coffee_shop"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('ONCE_base::coffee_shop')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("ONCE_base::coffee_shop")'
   once_only = true
 
   [[slot.events]]
@@ -31,25 +31,25 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::opening_callback_status_assertion"
   weight    = 0
-  trigger   = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_STATUS_ASSERTION') && (gd.hasGameFlag('FIRST_DAY_ASSERTED_STATUS') || gd.hasGameFlag('FIRST_DAY_REDIRECTED_STATUS'))"
+  trigger = 'gd.week() >= 2 && gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("OPENING_CALLBACK_STATUS_ASSERTION") && (gd.hasGameFlag("FIRST_DAY_ASSERTED_STATUS") || gd.hasGameFlag("FIRST_DAY_REDIRECTED_STATUS"))'
   once_only = true
 
   [[slot.events]]
   scene     = "base::opening_callback_mirror_afterglow"
   weight    = 6
-  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_MIRROR_AFTERGLOW') && (gd.hasGameFlag('FIRST_CLOTHES_MIRROR') || gd.hasGameFlag('FIRST_CLOTHES_ASKED_HELP') || gd.hasGameFlag('FIRST_CLOTHES_FUNCTIONAL'))"
+  condition = 'gd.week() >= 2 && gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("OPENING_CALLBACK_MIRROR_AFTERGLOW") && (gd.hasGameFlag("FIRST_CLOTHES_MIRROR") || gd.hasGameFlag("FIRST_CLOTHES_ASKED_HELP") || gd.hasGameFlag("FIRST_CLOTHES_FUNCTIONAL"))'
   once_only = true
 
   [[slot.events]]
   scene     = "base::opening_callback_first_week_solitude"
   weight    = 6
-  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_FIRST_WEEK_SOLITUDE') && (gd.hasGameFlag('FIRST_NIGHT_CRASHED') || gd.hasGameFlag('FIRST_NIGHT_RESEARCHED') || gd.hasGameFlag('FIRST_NIGHT_STAGED_TOMORROW'))"
+  condition = 'gd.week() >= 2 && gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("OPENING_CALLBACK_FIRST_WEEK_SOLITUDE") && (gd.hasGameFlag("FIRST_NIGHT_CRASHED") || gd.hasGameFlag("FIRST_NIGHT_RESEARCHED") || gd.hasGameFlag("FIRST_NIGHT_STAGED_TOMORROW"))'
   once_only = true
 
   [[slot.events]]
   scene     = "base::opening_callback_transactional_defense"
   weight    = 5
-  condition = "gd.week() >= 2 && gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('OPENING_CALLBACK_TRANSACTIONAL_DEFENSE') && gd.hasGameFlag('LANDLORD_KEPT_TRANSACTIONAL')"
+  condition = 'gd.week() >= 2 && gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("OPENING_CALLBACK_TRANSACTIONAL_DEFENSE") && gd.hasGameFlag("LANDLORD_KEPT_TRANSACTIONAL")'
   once_only = true
 
   [[slot.events]]
@@ -75,54 +75,54 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::neighborhood_bar"
   weight    = 0
-  trigger   = "gd.week() >= 3 && !gd.hasGameFlag('ONCE_base::neighborhood_bar')"
+  trigger = 'gd.week() >= 3 && !gd.hasGameFlag("ONCE_base::neighborhood_bar")'
   once_only = true
 
   # Jake follow-up scenes — gated by having met Jake at the coffee shop
   [[slot.events]]
   scene     = "base::coffee_shop_return"
   weight    = 9
-  condition = "gd.hasGameFlag('MET_JAKE')"
+  condition = 'gd.hasGameFlag("MET_JAKE")'
 
   [[slot.events]]
   scene     = "base::jake_outside"
   weight    = 7
-  condition = "gd.hasGameFlag('MET_JAKE')"
+  condition = 'gd.hasGameFlag("MET_JAKE")'
   npc_role  = "ROLE_JAKE"
 
   # Jake romance arc — gated by progressive flags
   [[slot.events]]
   scene     = "base::jake_first_date"
   weight    = 0
-  trigger   = "gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && gd.npcLikingAtLeast('ROLE_JAKE', 'Like')"
+  trigger = 'gd.hasGameFlag("MET_JAKE") && !gd.hasGameFlag("JAKE_FIRST_DATE") && gd.npcLikingAtLeast("ROLE_JAKE", "Like")'
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_second_date"
   weight    = 0
-  trigger   = "gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
+  trigger = 'gd.hasGameFlag("JAKE_FIRST_DATE") && !gd.hasGameFlag("JAKE_SECOND_DATE")'
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_apartment"
   weight    = 0
-  trigger   = "gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
+  trigger = 'gd.hasGameFlag("JAKE_SECOND_DATE") && !gd.hasGameFlag("JAKE_INTIMATE")'
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_morning_after"
   weight    = 0
-  trigger   = "gd.hasGameFlag('JAKE_INTIMATE') && !gd.hasGameFlag('JAKE_MORNING_AFTER')"
+  trigger = 'gd.hasGameFlag("JAKE_INTIMATE") && !gd.hasGameFlag("JAKE_MORNING_AFTER")'
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_text_messages"
   weight    = 5
-  condition = "gd.hasGameFlag('JAKE_INTIMATE')"
+  condition = 'gd.hasGameFlag("JAKE_INTIMATE")'
   npc_role  = "ROLE_JAKE"
 
   # New universal scenes
@@ -139,14 +139,14 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::landlord_repair"
   weight    = 5
-  condition = "gd.week() >= 3 && gd.hasGameFlag('MET_LANDLORD') && !gd.hasGameFlag('LANDLORD_REPAIR')"
+  condition = 'gd.week() >= 3 && gd.hasGameFlag("MET_LANDLORD") && !gd.hasGameFlag("LANDLORD_REPAIR")'
   once_only = true
 
   # Stranger encounters
   [[slot.events]]
   scene     = "base::bar_closing_time"
   weight    = 12
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('BAR_STRANGER_INVITED')"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("BAR_STRANGER_INVITED")'
 
   [[slot.events]]
   scene     = "base::party_invitation"
@@ -157,13 +157,13 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::bar_stranger_night"
   weight    = 0
-  trigger   = "gd.hasGameFlag('BAR_STRANGER_INVITED') && !gd.hasGameFlag('BAR_STRANGER_SLEPT')"
+  trigger = 'gd.hasGameFlag("BAR_STRANGER_INVITED") && !gd.hasGameFlag("BAR_STRANGER_SLEPT")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::party_stranger_after"
   weight    = 0
-  trigger   = "gd.week() >= 4 && gd.hasGameFlag('PARTY_STRANGER_OUTSIDE') && !gd.hasGameFlag('PARTY_STRANGER_SLEPT')"
+  trigger = 'gd.week() >= 4 && gd.hasGameFlag("PARTY_STRANGER_OUTSIDE") && !gd.hasGameFlag("PARTY_STRANGER_SLEPT")'
   once_only = true
 
   [[slot.events]]
@@ -175,21 +175,21 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::gym_changing_room"
   weight    = 6
-  condition = "gd.week() >= 3 && gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('GYM_CHANGING_ROOM')"
+  condition = 'gd.week() >= 3 && gd.arcState("base::workplace_opening") == "settled" && !gd.hasGameFlag("GYM_CHANGING_ROOM")'
   once_only = true
 
   # Bad date — universal
   [[slot.events]]
   scene     = "base::bad_date"
   weight    = 4
-  condition = "gd.week() >= 4 && !gd.hasGameFlag('BAD_DATE')"
+  condition = 'gd.week() >= 4 && !gd.hasGameFlag("BAD_DATE")'
   once_only = true
 
   # Jake domesticity — post-relationship
   [[slot.events]]
   scene     = "base::jake_stays_over"
   weight    = 5
-  condition = "gd.hasGameFlag('JAKE_MORNING_AFTER') && !gd.hasGameFlag('JAKE_STAYS_OVER')"
+  condition = 'gd.hasGameFlag("JAKE_MORNING_AFTER") && !gd.hasGameFlag("JAKE_STAYS_OVER")'
   once_only = true
   npc_role  = "ROLE_JAKE"
 
@@ -200,51 +200,51 @@ name = "workplace_opening"
 
   [[slot.events]]
   scene     = "base::workplace_arrival"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE')"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE')"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_landlord"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived' && !gd.hasGameFlag('MET_LANDLORD')"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "arrived" && !gd.hasGameFlag("MET_LANDLORD")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived' && !gd.hasGameFlag('MET_LANDLORD')"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "arrived" && !gd.hasGameFlag("MET_LANDLORD")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_first_night"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived'"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "arrived"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'arrived'"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "arrived"'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_first_clothes"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "week_one"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'week_one'"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "week_one"'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_first_day"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'clothes_done'"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "clothes_done"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'clothes_done'"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "clothes_done"'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_work_meeting"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "working" && !gd.hasGameFlag("FIRST_MEETING_DONE")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && !gd.hasGameFlag('FIRST_MEETING_DONE')"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "working" && !gd.hasGameFlag("FIRST_MEETING_DONE")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::workplace_evening"
-  condition = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working'"
+  condition = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "working"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_WORKPLACE') && gd.arcState('base::workplace_opening') == 'working' && gd.hasGameFlag('FIRST_MEETING_DONE')"
+  trigger = 'gd.hasGameFlag("ROUTE_WORKPLACE") && gd.arcState("base::workplace_opening") == "working" && gd.hasGameFlag("FIRST_MEETING_DONE")'
   once_only = true
 
 # ── Work slot (post-arc, settled state) ──────────────────────────────
@@ -256,66 +256,66 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::work_standup"
   weight    = 10
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.isWeekday()"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.isWeekday()'
 
   [[slot.events]]
   scene     = "base::work_lunch"
   weight    = 10
-  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+  condition = 'gd.arcState("base::workplace_opening") == "settled"'
 
   [[slot.events]]
   scene     = "base::work_late"
   weight    = 8
-  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+  condition = 'gd.arcState("base::workplace_opening") == "settled"'
 
   [[slot.events]]
   scene     = "base::work_corridor"
   weight    = 12
-  condition = "gd.arcState('base::workplace_opening') == 'settled'"
+  condition = 'gd.arcState("base::workplace_opening") == "settled"'
 
   [[slot.events]]
   scene     = "base::work_friday"
   weight    = 8
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.isWeekday()"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.isWeekday()'
 
   # Marcus follow-up scenes — gated by having had the work meeting
   [[slot.events]]
   scene     = "base::work_marcus_coffee"
   weight    = 9
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE')"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("FIRST_MEETING_DONE")'
   npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_favor"
   weight    = 7
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok')"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("FIRST_MEETING_DONE") && gd.npcLikingAtLeast("ROLE_MARCUS", "Ok")'
   npc_role  = "ROLE_MARCUS"
 
   # Marcus tension arc — escalation scenes
   [[slot.events]]
   scene     = "base::work_marcus_late"
   weight    = 8
-  condition = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok')"
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("FIRST_MEETING_DONE") && gd.npcLikingAtLeast("ROLE_MARCUS", "Ok")'
   npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_drinks"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_LATE_NIGHT') && !gd.hasGameFlag('MARCUS_DRINKS') && gd.npcLikingAtLeast('ROLE_MARCUS', 'Like')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_LATE_NIGHT") && !gd.hasGameFlag("MARCUS_DRINKS") && gd.npcLikingAtLeast("ROLE_MARCUS", "Like")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_closet"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_DRINKS') && !gd.hasGameFlag('MARCUS_INTIMATE')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_DRINKS") && !gd.hasGameFlag("MARCUS_INTIMATE")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
   [[slot.events]]
   scene     = "base::work_marcus_aftermath"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_INTIMATE') && !gd.hasGameFlag('MARCUS_AFTERMATH')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_INTIMATE") && !gd.hasGameFlag("MARCUS_AFTERMATH")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
@@ -323,7 +323,7 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::marcus_apartment"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_AFTERMATH') && !gd.hasGameFlag('MARCUS_APARTMENT') && !gd.hasGameFlag('MARCUS_REJECTED')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_AFTERMATH") && !gd.hasGameFlag("MARCUS_APARTMENT") && !gd.hasGameFlag("MARCUS_REJECTED")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
@@ -331,7 +331,7 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::marcus_monday_rejected"
   weight    = 0
-  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && gd.hasGameFlag('MARCUS_REJECTED') && !gd.hasGameFlag('MARCUS_REJECTION_MONDAY')"
+  trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_REJECTED") && !gd.hasGameFlag("MARCUS_REJECTION_MONDAY")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
 
@@ -342,72 +342,72 @@ name = "campus_opening"
 
   [[slot.events]]
   scene     = "base::campus_arrival"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS')"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_dorm"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'arrived'"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "arrived"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'arrived'"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "arrived"'
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_orientation"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'orientation'"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "orientation"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'orientation'"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "orientation"'
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_library"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life'"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "dorm_life"'
   weight    = 10
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_call_home"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && !gd.hasGameFlag('CALL_HOME_DONE')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "dorm_life" && !gd.hasGameFlag("CALL_HOME_DONE")'
   weight    = 8
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_study_session"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && !gd.hasGameFlag('STUDY_SESSION_DONE')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "dorm_life" && !gd.hasGameFlag("STUDY_SESSION_DONE")'
   weight    = 10
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_dining_hall"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "dorm_life" && gd.hasGameFlag("STUDY_SESSION_DONE")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.arcState('base::campus_opening') == 'dorm_life' && gd.hasGameFlag('STUDY_SESSION_DONE')"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.arcState("base::campus_opening") == "dorm_life" && gd.hasGameFlag("STUDY_SESSION_DONE")'
   once_only = true
 
   [[slot.events]]
   scene     = "base::campus_theo_night"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week'"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("MET_THEO") && gd.arcState("base::campus_opening") == "first_week"'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('MET_THEO') && gd.arcState('base::campus_opening') == 'first_week' && !gd.hasGameFlag('THEO_INTIMATE')"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("MET_THEO") && gd.arcState("base::campus_opening") == "first_week" && !gd.hasGameFlag("THEO_INTIMATE")'
   npc_role  = "ROLE_THEO"
   once_only = true
 
   # Theo morning-after — Camila's aftermath
   [[slot.events]]
   scene     = "base::campus_theo_morning"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("THEO_INTIMATE")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_INTIMATE') && !gd.hasGameFlag('THEO_MORNING_AFTER')"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("THEO_INTIMATE") && !gd.hasGameFlag("THEO_MORNING_AFTER")'
   npc_role  = "ROLE_THEO"
   once_only = true
 
   # Dining hall after Theo — seeing him in public
   [[slot.events]]
   scene     = "base::campus_dining_after_theo"
-  condition = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER')"
+  condition = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("THEO_MORNING_AFTER")'
   weight    = 0
-  trigger   = "gd.hasGameFlag('ROUTE_CAMPUS') && gd.hasGameFlag('THEO_MORNING_AFTER') && !gd.hasGameFlag('DINING_AFTER_THEO')"
+  trigger = 'gd.hasGameFlag("ROUTE_CAMPUS") && gd.hasGameFlag("THEO_MORNING_AFTER") && !gd.hasGameFlag("DINING_AFTER_THEO")'
   npc_role  = "ROLE_THEO"
   once_only = true

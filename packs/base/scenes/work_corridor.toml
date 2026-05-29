@@ -11,7 +11,7 @@ You're heading for the water refill station, or back from a meeting, or somewher
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The corridor between engineering and the kitchen is narrow enough that two people walking in opposite directions have to make a small decision about who yields. You hold your line for a half-step too long and then shift right. The guy from platform doesn't notice the correction. Your shoulder pulled in before your brain gave the order.
 
@@ -70,7 +70,7 @@ You don't slow down. They're still talking when you round the corner. The corrid
 id        = "small_talk_wins"
 label     = "Marcus, arms full of printouts"
 detail    = "Six seconds. He keeps moving."
-condition = "gd.hasGameFlag('FIRST_MEETING_DONE')"
+condition = 'gd.hasGameFlag("FIRST_MEETING_DONE")'
 prose     = """
 Marcus is coming the other way carrying a stack of printouts that would be reasonable if he were presenting to a full boardroom, and is slightly absurd for a Tuesday afternoon in a building with adequate screens. He sees you see them.
 

@@ -1,8 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use undone_expr::{Call, Expr, Receiver, Value};
-
+use crate::script::CompiledScript;
 use crate::types::{EffectDef, SceneDefinition};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -19,15 +18,15 @@ struct EffectFacts {
 }
 
 pub fn check_reachability(
-    schedule_conditions: &[(String, Expr)],
+    schedule_conditions: &[(String, CompiledScript)],
     scenes: &HashMap<String, Arc<SceneDefinition>>,
 ) -> Vec<ReachabilityWarning> {
     let facts = collect_effect_facts(scenes);
     let mut warnings = Vec::new();
     let mut seen = HashSet::new();
 
-    for (context, expr) in schedule_conditions {
-        inspect_expr(expr, context, &facts, &mut warnings, &mut seen, false);
+    for (context, script) in schedule_conditions {
+        inspect_source(&script.source, context, &facts, &mut warnings, &mut seen);
     }
 
     warnings
@@ -70,73 +69,35 @@ fn collect_effect_facts(scenes: &HashMap<String, Arc<SceneDefinition>>) -> Effec
     facts
 }
 
-fn inspect_expr(
-    expr: &Expr,
-    context: &str,
-    facts: &EffectFacts,
-    warnings: &mut Vec<ReachabilityWarning>,
-    seen: &mut HashSet<(String, String)>,
-    negated: bool,
-) {
-    match expr {
-        // When negated, a hasGameFlag check means "absence is intended" — skip the warning.
-        Expr::Call(call) if !negated => inspect_call(call, context, facts, warnings, seen),
-        Expr::Call(_) => {}
-        Expr::Not(inner) => inspect_expr(inner, context, facts, warnings, seen, !negated),
-        Expr::And(left, right)
-        | Expr::Or(left, right)
-        | Expr::Ne(left, right)
-        | Expr::Lt(left, right)
-        | Expr::Gt(left, right)
-        | Expr::Le(left, right)
-        | Expr::Ge(left, right) => {
-            inspect_expr(left, context, facts, warnings, seen, negated);
-            inspect_expr(right, context, facts, warnings, seen, negated);
-        }
-        Expr::Eq(left, right) => {
-            inspect_expr(left, context, facts, warnings, seen, negated);
-            inspect_expr(right, context, facts, warnings, seen, negated);
-            inspect_arc_state_eq(left, right, context, facts, warnings, seen);
-            inspect_npc_liking_eq(left, right, context, facts, warnings, seen);
-        }
-        Expr::Lit(_) => {}
-    }
-}
-
-fn inspect_call(
-    call: &Call,
+/// Scan a compiled condition's source for the three reachability patterns. This
+/// reconstructs the legacy `Expr` walk over the authored Rhai source — sound
+/// because flag / arc / liking args are string literals (the design's rule).
+fn inspect_source(
+    src: &str,
     context: &str,
     facts: &EffectFacts,
     warnings: &mut Vec<ReachabilityWarning>,
     seen: &mut HashSet<(String, String)>,
 ) {
-    if call.receiver == Receiver::GameData && call.method == "hasGameFlag" {
-        if let Some(Value::Str(flag)) = call.args.first() {
-            if !facts.set_game_flags.contains(flag) {
-                push_warning(
-                    context,
-                    format!("game flag '{flag}' is required but no scene effect sets it"),
-                    warnings,
-                    seen,
-                );
-            }
+    // hasGameFlag("X") — warn if no scene sets X. A negated check (`!gd.hasGameFlag`)
+    // means "absence is intended", so skip it.
+    for (flag, negated) in find_hasgameflag(src) {
+        if !negated && !facts.set_game_flags.contains(&flag) {
+            push_warning(
+                context,
+                format!("game flag '{flag}' is required but no scene effect sets it"),
+                warnings,
+                seen,
+            );
         }
     }
-}
 
-fn inspect_arc_state_eq(
-    left: &Expr,
-    right: &Expr,
-    context: &str,
-    facts: &EffectFacts,
-    warnings: &mut Vec<ReachabilityWarning>,
-    seen: &mut HashSet<(String, String)>,
-) {
-    if let Some((arc, state)) = extract_arc_state_eq(left, right) {
+    // arcState("ARC") == "STATE" — warn if no scene advances ARC to STATE.
+    for (arc, state) in find_eq_call(src, "arcState") {
         let reachable = facts
             .reachable_arc_states
-            .get(arc)
-            .is_some_and(|states| states.contains(state));
+            .get(&arc)
+            .is_some_and(|states| states.contains(&state));
         if !reachable {
             push_warning(
                 context,
@@ -146,87 +107,105 @@ fn inspect_arc_state_eq(
             );
         }
     }
-}
 
-fn inspect_npc_liking_eq(
-    left: &Expr,
-    right: &Expr,
-    context: &str,
-    facts: &EffectFacts,
-    warnings: &mut Vec<ReachabilityWarning>,
-    seen: &mut HashSet<(String, String)>,
-) {
-    if !facts.npc_liking_can_overshoot {
-        return;
-    }
-
-    if let Some((role, level)) = extract_npc_liking_eq(left, right) {
-        push_warning(
-            context,
-            format!("exact npc liking check '{role} == {level}' may be skipped by AddNpcLiking deltas larger than 1"),
-            warnings,
-            seen,
-        );
-    }
-}
-
-fn extract_arc_state_eq<'a>(left: &'a Expr, right: &'a Expr) -> Option<(&'a str, &'a str)> {
-    match (extract_arc_state_call(left), extract_string_lit(right)) {
-        (Some(arc), Some(state)) => Some((arc, state)),
-        _ => match (extract_arc_state_call(right), extract_string_lit(left)) {
-            (Some(arc), Some(state)) => Some((arc, state)),
-            _ => None,
-        },
-    }
-}
-
-fn extract_npc_liking_eq<'a>(left: &'a Expr, right: &'a Expr) -> Option<(&'a str, &'a str)> {
-    match (extract_npc_liking_call(left), extract_string_lit(right)) {
-        (Some(role), Some(level)) => Some((role, level)),
-        _ => match (extract_npc_liking_call(right), extract_string_lit(left)) {
-            (Some(role), Some(level)) => Some((role, level)),
-            _ => None,
-        },
-    }
-}
-
-fn extract_arc_state_call(expr: &Expr) -> Option<&str> {
-    match expr {
-        Expr::Call(call)
-            if call.receiver == Receiver::GameData
-                && call.method == "arcState"
-                && matches!(call.args.first(), Some(Value::Str(_))) =>
-        {
-            match call.args.first() {
-                Some(Value::Str(arc)) => Some(arc.as_str()),
-                _ => None,
-            }
+    // npcLiking("ROLE") == "LEVEL" — warn if an AddNpcLiking delta > 1 can overshoot it.
+    if facts.npc_liking_can_overshoot {
+        for (role, level) in find_eq_call(src, "npcLiking") {
+            push_warning(
+                context,
+                format!("exact npc liking check '{role} == {level}' may be skipped by AddNpcLiking deltas larger than 1"),
+                warnings,
+                seen,
+            );
         }
-        _ => None,
     }
 }
 
-fn extract_npc_liking_call(expr: &Expr) -> Option<&str> {
-    match expr {
-        Expr::Call(call)
-            if call.receiver == Receiver::GameData
-                && call.method == "npcLiking"
-                && matches!(call.args.first(), Some(Value::Str(_))) =>
-        {
-            match call.args.first() {
-                Some(Value::Str(role)) => Some(role.as_str()),
-                _ => None,
+/// Find every `hasGameFlag("FLAG")` and whether it is logically negated (the
+/// nearest non-space char before `gd.hasGameFlag` is `!`).
+fn find_hasgameflag(src: &str) -> Vec<(String, bool)> {
+    const NEEDLE: &str = "hasGameFlag(";
+    let bytes = src.as_bytes();
+    let mut out = Vec::new();
+    for (idx, _) in src.match_indices(NEEDLE) {
+        if let Some(flag) = string_arg_at(src, idx + NEEDLE.len()) {
+            // Walk back past `gd.hasGameFlag` to the receiver start, then skip
+            // whitespace; a leading `!` (possibly with spaces) means negated.
+            let mut j = idx;
+            // step back over "gd." or any "recv."
+            while j > 0
+                && (bytes[j - 1].is_ascii_alphanumeric()
+                    || bytes[j - 1] == b'.'
+                    || bytes[j - 1] == b'_')
+            {
+                j -= 1;
             }
+            while j > 0 && bytes[j - 1].is_ascii_whitespace() {
+                j -= 1;
+            }
+            let negated = j > 0 && bytes[j - 1] == b'!';
+            out.push((flag, negated));
         }
-        _ => None,
     }
+    out
 }
 
-fn extract_string_lit(expr: &Expr) -> Option<&str> {
-    match expr {
-        Expr::Lit(Value::Str(value)) => Some(value.as_str()),
-        _ => None,
+/// Find `method("ARG") == "VALUE"` (and the reversed `"VALUE" == method("ARG")`)
+/// occurrences, returning `(arg, value)` pairs.
+fn find_eq_call(src: &str, method: &str) -> Vec<(String, String)> {
+    let needle = format!("{method}(");
+    let bytes = src.as_bytes();
+    let mut out = Vec::new();
+    for (idx, _) in src.match_indices(&needle) {
+        let arg_start = idx + needle.len();
+        let Some(arg) = string_arg_at(src, arg_start) else {
+            continue;
+        };
+        // advance past the call's closing ')'
+        let mut k = arg_start;
+        while k < bytes.len() && bytes[k] != b')' {
+            k += 1;
+        }
+        k += 1; // past ')'
+                // method-first order: `) == "value"`
+        if let Some(value) = eq_string_after(src, k) {
+            out.push((arg.clone(), value));
+            continue;
+        }
+        // value-first order: `"value" == method(...)` — look before the receiver.
+        if let Some(value) = eq_string_before(src, idx) {
+            out.push((arg, value));
+        }
     }
+    out
+}
+
+/// If `src[from..]` begins (after optional whitespace) with a `"..."` literal,
+/// return its contents.
+fn string_arg_at(src: &str, from: usize) -> Option<String> {
+    let s = &src[from..];
+    let s = s.trim_start();
+    let rest = s.strip_prefix('"')?;
+    let end = rest.find('"')?;
+    Some(rest[..end].to_string())
+}
+
+/// After position `from`, expect `== "value"` (whitespace-tolerant); return value.
+fn eq_string_after(src: &str, from: usize) -> Option<String> {
+    let s = src.get(from..)?.trim_start();
+    let s = s.strip_prefix("==")?.trim_start();
+    let rest = s.strip_prefix('"')?;
+    let end = rest.find('"')?;
+    Some(rest[..end].to_string())
+}
+
+/// Before position `to`, expect `"value" ==` (whitespace-tolerant); return value.
+fn eq_string_before(src: &str, to: usize) -> Option<String> {
+    let s = src.get(..to)?.trim_end();
+    let s = s.strip_suffix("==")?.trim_end();
+    let inner = s.strip_suffix('"')?;
+    let start = inner.rfind('"')?;
+    Some(inner[start + 1..].to_string())
 }
 
 fn push_warning(
@@ -252,6 +231,10 @@ mod tests {
     use crate::types::{Action, NextBranch, SceneDefinition};
 
     use super::*;
+
+    fn cond(src: &str) -> CompiledScript {
+        crate::script::compile_condition(src, &undone_packs::PackRegistry::new(), "test").unwrap()
+    }
 
     fn scene_with_effect(effect: EffectDef) -> Arc<SceneDefinition> {
         Arc::new(SceneDefinition {
@@ -285,7 +268,7 @@ mod tests {
         let warnings = check_reachability(
             &[(
                 "slot 'free_time', scene 'base::jake_first_date'".to_string(),
-                undone_expr::parse("gd.hasGameFlag('JAKE_MET')").unwrap(),
+                cond(r#"gd.hasGameFlag("JAKE_MET")"#),
             )],
             &HashMap::new(),
         );
@@ -301,7 +284,7 @@ mod tests {
         let warnings = check_reachability(
             &[(
                 "slot 'free_time', scene 'base::jake_first_date'".to_string(),
-                undone_expr::parse("!gd.hasGameFlag('JAKE_REJECTED')").unwrap(),
+                cond(r#"!gd.hasGameFlag("JAKE_REJECTED")"#),
             )],
             &HashMap::new(),
         );
@@ -324,7 +307,7 @@ mod tests {
         let warnings = check_reachability(
             &[(
                 "slot 'free_time', scene 'base::jake_first_date'".to_string(),
-                undone_expr::parse("gd.hasGameFlag('JAKE_MET')").unwrap(),
+                cond(r#"gd.hasGameFlag("JAKE_MET")"#),
             )],
             &scenes,
         );
@@ -345,7 +328,7 @@ mod tests {
         let warnings = check_reachability(
             &[(
                 "slot 'free_time', scene 'base::jake_first_date'".to_string(),
-                undone_expr::parse("gd.npcLiking('ROLE_JAKE') == 'Like'").unwrap(),
+                cond(r#"gd.npcLiking("ROLE_JAKE") == "Like""#),
             )],
             &scenes,
         );

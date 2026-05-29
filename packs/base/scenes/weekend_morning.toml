@@ -21,7 +21,7 @@ No meeting. No commute. No one expects you anywhere. The ceiling has a water sta
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('ROMANTIC')"
+condition = 'w.hasTrait("ROMANTIC")'
 prose = """
 Saturday. The light through the curtains is golden and warm and unhurried, and you lie there in it for a minute without opening your eyes. No alarm. The city is doing something quiet outside. The sheets are warm. The pillow is exactly right.
 
@@ -33,7 +33,7 @@ No one expects you anywhere. The water stain on the ceiling is shaped like a com
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose     = "Saturday. No alarm. The ceiling. The radiator clicking. That's the whole situation and there's nowhere to be."
 

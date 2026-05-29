@@ -13,7 +13,7 @@ You send back: "Sure — give me a bit." He doesn't reply. He just expected you'
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The Slack notification lands at 2:07 PM: Marcus, with a link and a single line. "Hey — got 10 minutes to look at something?"
 

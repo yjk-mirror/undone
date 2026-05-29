@@ -43,20 +43,37 @@ pub(crate) enum IdKind {
 
 /// What a single authored method call is allowed to look like.
 struct MethodSpec {
-    /// Exact argument count.
+    /// Minimum argument count.
     arity: usize,
+    /// Maximum argument count (== `arity` unless the method is overloaded).
+    arity_max: usize,
     /// `(arg_index, kind)` for an argument that must be a registry content-id
     /// string literal.
     id_arg: Option<(usize, IdKind)>,
+    /// Argument indices that must be an integer literal (legacy typed-arg check).
+    int_args: &'static [usize],
     /// Argument indices that the legacy `EffectDef` stored as `i8` and so must
-    /// fit in `i8` range.
+    /// be an integer literal in `i8` range.
     i8_args: &'static [usize],
 }
 
 const fn spec(arity: usize) -> MethodSpec {
     MethodSpec {
         arity,
+        arity_max: arity,
         id_arg: None,
+        int_args: &[],
+        i8_args: &[],
+    }
+}
+
+/// A method whose arg count may range `min..=max` (overloaded arity).
+const fn spec_arity(min: usize, max: usize) -> MethodSpec {
+    MethodSpec {
+        arity: min,
+        arity_max: max,
+        id_arg: None,
+        int_args: &[],
         i8_args: &[],
     }
 }
@@ -64,15 +81,36 @@ const fn spec(arity: usize) -> MethodSpec {
 const fn spec_id(arity: usize, idx: usize, kind: IdKind) -> MethodSpec {
     MethodSpec {
         arity,
+        arity_max: arity,
         id_arg: Some((idx, kind)),
+        int_args: &[],
         i8_args: &[],
+    }
+}
+
+const fn spec_id_int(arity: usize, idx: usize, kind: IdKind, int_idx: usize) -> MethodSpec {
+    MethodSpec {
+        arity,
+        arity_max: arity,
+        id_arg: Some((idx, kind)),
+        int_args: int_idx_slice(int_idx),
+        i8_args: &[],
+    }
+}
+
+const fn int_idx_slice(idx: usize) -> &'static [usize] {
+    match idx {
+        1 => &[1],
+        _ => &[0],
     }
 }
 
 const fn spec_i8(arity: usize, i8_args: &'static [usize]) -> MethodSpec {
     MethodSpec {
         arity,
+        arity_max: arity,
         id_arg: None,
+        int_args: &[],
         i8_args,
     }
 }
@@ -140,7 +178,7 @@ fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
         ("w", "getSkill") => Some(spec_id(1, 0, IdKind::Skill)),
         // hasStuff id is intentionally NOT registry-validated (legacy: missing = can't have it).
         ("w", "hasStuff") => Some(spec(1)),
-        ("w", "checkSkill" | "checkSkillRed") => Some(spec_id(2, 0, IdKind::Skill)),
+        ("w", "checkSkill" | "checkSkillRed") => Some(spec_id_int(2, 0, IdKind::Skill, 1)),
 
         // ── m (active male) ───────────────────────────────────────────────────
         (
@@ -210,12 +248,8 @@ fn write_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
         ("w", "addTrait" | "removeTrait") => Some(spec_id(1, 0, IdKind::Trait)),
         // stuff is not registry-validated at load (legacy validate_effects skips it).
         ("w", "addStuff" | "removeStuff") => Some(spec(1)),
-        ("w", "setVirgin") => Some(MethodSpec {
-            arity: 1,
-            id_arg: None,
-            i8_args: &[],
-        }),
-        ("w", "setVirginTyped") => Some(spec(2)), // not authored directly; setVirgin overloads
+        // setVirgin(value) or setVirgin(value, "type") — overloaded arity.
+        ("w", "setVirgin") => Some(spec_arity(1, 2)),
         ("w", "setPartner" | "addFriend") => Some(spec(1)),
 
         // ── gd (game data) ────────────────────────────────────────────────────
@@ -541,7 +575,12 @@ fn validate_call(
         ));
     };
 
-    if call.args.len() != spec.arity {
+    if call.args.len() < spec.arity || call.args.len() > spec.arity_max {
+        let expect = if spec.arity == spec.arity_max {
+            format!("{}", spec.arity)
+        } else {
+            format!("{}..={}", spec.arity, spec.arity_max)
+        };
         return Err(compile_err(
             context,
             src,
@@ -549,7 +588,7 @@ fn validate_call(
                 "method '{}.{}' expects {} arg(s), got {}",
                 receiver,
                 call.method,
-                spec.arity,
+                expect,
                 call.args.len()
             ),
         ));
@@ -572,10 +611,27 @@ fn validate_call(
         resolve_id(kind, id, call, registry, context, src)?;
     }
 
-    // i8-range checks for legacy `i8` step deltas.
+    // Plain integer-literal args (legacy typed-arg check).
+    for &idx in spec.int_args {
+        if !matches!(call.args.get(idx), Some(Arg::Int(_))) {
+            return Err(compile_err(
+                context,
+                src,
+                format!(
+                    "method '{}.{}' arg {} must be an integer literal",
+                    receiver,
+                    call.method,
+                    idx + 1
+                ),
+            ));
+        }
+    }
+
+    // i8-range checks for legacy `i8` step deltas — must be an integer in range.
     for &idx in spec.i8_args {
-        if let Some(Arg::Int(n)) = call.args.get(idx) {
-            if *n < i8::MIN as i64 || *n > i8::MAX as i64 {
+        match call.args.get(idx) {
+            Some(Arg::Int(n)) if *n >= i8::MIN as i64 && *n <= i8::MAX as i64 => {}
+            Some(Arg::Int(n)) => {
                 return Err(compile_err(
                     context,
                     src,
@@ -585,6 +641,18 @@ fn validate_call(
                         call.method,
                         idx + 1,
                         n
+                    ),
+                ));
+            }
+            _ => {
+                return Err(compile_err(
+                    context,
+                    src,
+                    format!(
+                        "method '{}.{}' arg {} must be an integer literal",
+                        receiver,
+                        call.method,
+                        idx + 1
                     ),
                 ));
             }
@@ -659,4 +727,44 @@ fn compile_err(context: &str, src: &str, message: String) -> ScriptError {
         message,
         source_text: src.into(),
     }
+}
+
+// ---------------------------------------------------------------------------
+// Source-scan helpers reused by the migrated static-analysis tooling
+// (`Scheduler::references_game_flag`, `validate-pack` persistent-mutation lint,
+// reachability). These reconstruct the legacy `Expr`/`EffectDef` walks over the
+// authored Rhai source — sound because content-id/flag args are string literals.
+// ---------------------------------------------------------------------------
+
+/// True if the condition source calls `gd.hasGameFlag("<flag>")` for this flag.
+/// Reconstructs the legacy `expr_references_game_flag` walk.
+pub fn source_references_game_flag(src: &str, flag: &str) -> bool {
+    let Ok(toks) = tokenize(src) else {
+        return false;
+    };
+    extract_calls(&toks).iter().any(|c| {
+        c.method == "hasGameFlag" && matches!(c.args.first(), Some(Arg::Str(s)) if s == flag)
+    })
+}
+
+/// True if the effect source mutates persistent world state — i.e. contains any
+/// effect call OTHER than the scene-local `scene.setFlag`/`scene.removeFlag`
+/// (and the `npc(ref)` constructor, which on its own mutates nothing).
+/// Reconstructs `EffectDef::mutates_persistent_world` over the call-list source.
+pub fn source_has_persistent_mutation(src: &str) -> bool {
+    let Ok(toks) = tokenize(src) else {
+        return false;
+    };
+    extract_calls(&toks).iter().any(|c| {
+        let m = c.method.as_str();
+        // The constructor and the two scene-local mutators are not persistent.
+        if m == "npc"
+            || (c.receiver.as_deref() == Some("scene") && (m == "setFlag" || m == "removeFlag"))
+        {
+            return false;
+        }
+        // Any other recognised write mutator is persistent.
+        write_spec(c.receiver.as_deref().unwrap_or(""), m).is_some()
+            || (c.receiver.as_deref() == Some("npc") && write_spec("npc", m).is_some())
+    })
 }

@@ -25,7 +25,7 @@ He looks at the photo. He looks at you. He looks at the photo again.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 style     = "observation"
 prose = """
 {% if w.hasTrait("ANALYTICAL") %}
@@ -178,7 +178,7 @@ You thank him and take the stairs.
 id        = "frank_radiator"
 label     = "His wife calls down about the radiator"
 weight    = 8
-condition = "!scene.hasFlag('frank_called')"
+condition = '!scene.hasFlag("frank_called")'
 prose = """
 From upstairs: "Frank." A pause. "The radiator."
 

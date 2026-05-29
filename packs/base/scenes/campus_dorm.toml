@@ -17,7 +17,7 @@ The laughing down the hall goes quiet. The building settles. Your body is still 
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 style     = "anxiety"
 prose = """
 There's warmth between your hips that has nothing to do with the blanket. You pull the covers up anyway. The ceiling is a rectangle of faint grey where light comes in around the curtains. You stare at it. The warmth doesn't go anywhere.

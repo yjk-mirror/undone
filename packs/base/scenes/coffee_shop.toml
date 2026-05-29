@@ -40,7 +40,7 @@ allow_npc_actions = true
 id        = "say_something"
 label     = "Say something"
 detail    = "He turned around. Might as well."
-condition = "!scene.hasFlag('talked')"
+condition = '!scene.hasFlag("talked")'
 prose     = """
 {% if w.hasTrait("SHY") %}
 "Busy today." You say it toward the counter rather than at him. A beat passes. He half-turns.
@@ -80,7 +80,7 @@ The line moves.
 id        = "order_and_leave"
 label     = "Order and go"
 detail    = "You came here for coffee, not conversation."
-condition = "scene.hasFlag('reached_counter')"
+condition = 'scene.hasFlag("reached_counter")'
 prose     = """
 {% if w.hasTrait("POSH") %}
 "Cortado, please." The barista nods and writes nothing on the cup. You tap your card, leave a dollar in the jar, and collect your drink at the end of the counter.
@@ -116,7 +116,7 @@ You push through the door. The cold comes back. The coffee is already cooling.
 id        = "sit_with_him"
 label     = "Sit with him"
 detail    = "He gestured at the empty chair. Why not."
-condition = "scene.hasFlag('invited')"
+condition = 'scene.hasFlag("invited")'
 prose     = """
 You take the chair across from him. Small table — knees nearly touching, both of you adjusted for it without discussion.
 
@@ -171,7 +171,7 @@ His hand is warm and your fingers disappear in his grip for a second before he l
 
 [[npc_actions]]
 id        = "he_orders"
-condition = "!scene.hasFlag('reached_counter')"
+condition = '!scene.hasFlag("reached_counter")'
 weight    = 8
 prose     = """
 The line moves. He steps up to the counter and orders without hesitation — medium black, no room, no sugar. The barista doesn't write anything on the cup, which means he's been here before.
@@ -185,7 +185,7 @@ He steps aside to wait, and now it's your turn.
 
 [[npc_actions]]
 id        = "he_chats"
-condition = "scene.hasFlag('talked') && !scene.hasFlag('invited')"
+condition = 'scene.hasFlag("talked") && !scene.hasFlag("invited")'
 weight    = 10
 prose     = """
 He's sitting at a table by the window now, coffee in hand. He catches your eye and tips his cup slightly — the coffee equivalent of a wave.
@@ -205,7 +205,7 @@ He says it with the careful lightness of someone who has made a small decision. 
 
 [[npc_actions]]
 id        = "background_noise"
-condition = "!scene.hasFlag('reached_counter')"
+condition = '!scene.hasFlag("reached_counter")'
 weight    = 4
 prose     = """
 Someone's laptop makes the FaceTime ring at full volume. The entire shop turns. The guy with the laptop mouths *sorry* with the expression of a man who is not sorry, and a woman at the next table puts her headphones in with pointed finality.

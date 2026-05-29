@@ -5,12 +5,13 @@ use std::{
 
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use undone_domain::{FemaleNpcKey, MaleNpcKey};
-use undone_expr::{eval, SceneCtx, SceneNpcRef};
+use undone_expr::{SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
 use crate::{
     effects::apply_effect,
+    script::{eval_bool, CompiledScript},
     template_ctx::render_prose,
     types::{Action, NarratorVariant, NextBranch, SceneDefinition, Thought},
 };
@@ -366,7 +367,7 @@ impl SceneEngine {
 
     /// Evaluate a condition expression, logging errors and defaulting to false.
     fn eval_condition(
-        expr: &undone_expr::parser::Expr,
+        expr: &CompiledScript,
         world: &World,
         ctx: &SceneCtx,
         registry: &PackRegistry,
@@ -374,7 +375,7 @@ impl SceneEngine {
         context: &str,
         events: Option<&mut VecDeque<EngineEvent>>,
     ) -> bool {
-        match eval(expr, world, ctx, registry) {
+        match eval_bool(expr, world, ctx, registry) {
             Ok(val) => val,
             Err(e) => {
                 let msg = format!(
@@ -1112,10 +1113,13 @@ mod tests {
 
     #[test]
     fn condition_filters_actions() {
-        use undone_expr::parse;
-
         // Build a scene with a conditional action
-        let cond_expr = parse("scene.hasFlag('special')").unwrap();
+        let cond_expr = crate::script::compile_condition(
+            r#"scene.hasFlag("special")"#,
+            &PackRegistry::new(),
+            "test",
+        )
+        .unwrap();
         let scene = SceneDefinition {
             id: "test::conditional".into(),
             pack: "test".into(),
@@ -1747,7 +1751,9 @@ mod tests {
 
     #[test]
     fn action_condition_error_emits_error_occurred_and_hides_action() {
-        let cond = undone_expr::parse("m.hasFlag('READY')").unwrap();
+        let cond =
+            crate::script::compile_condition(r#"m.hasFlag("READY")"#, &PackRegistry::new(), "test")
+                .unwrap();
         let scene = SceneDefinition {
             id: "test::condition_error".into(),
             pack: "test".into(),

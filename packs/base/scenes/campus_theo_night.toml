@@ -23,7 +23,7 @@ He says something about the next problem set, due Thursday. You say something ba
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Theo's room. Single. Quiet. You've been here an hour and the problem set is done and you're still here.
 
@@ -33,7 +33,7 @@ His forearm is resting on the desk. You've looked at it three times. You don't k
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 50"
+condition = 'w.getSkill("FEMININITY") < 50'
 style     = "observation"
 prose = """
 The lamp catches the angle of his jaw. His hands when he reached across to point at your notes — the size of them against the page. Your notebook is still open where he touched it.

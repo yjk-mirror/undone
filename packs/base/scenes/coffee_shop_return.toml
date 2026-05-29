@@ -9,7 +9,7 @@ The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The coffee shop on Union and Third. Same mismatched chairs, same chalkboard menu. You didn't come here for Jake — you came for coffee. But he's at the second table from the door, laptop open, not looking up.
 
@@ -56,7 +56,7 @@ Your face is warm for the next half-block. The coffee is still good.
 id        = "sit_near_him"
 label     = "Take the table next to his"
 detail    = "You've already met. This isn't a thing."
-condition = "gd.npcLikingAtLeast('ROLE_JAKE', 'Ok')"
+condition = 'gd.npcLikingAtLeast("ROLE_JAKE", "Ok")'
 prose = """
 You take the table next to his — the one by the window, which happens to also be the good table — and open your own laptop.
 

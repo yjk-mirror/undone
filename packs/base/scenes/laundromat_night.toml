@@ -30,7 +30,7 @@ The laundromat hums. You go back to your book.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose     = """Laundry. 10 PM. Fluorescent light overhead and a man picking a machine two rows over."""
 
@@ -139,7 +139,7 @@ His height. The way he leans against the machine with his arms crossed. His voic
 id        = "sit_closer"
 label     = "Sit closer"
 detail    = "The bench has room. You choose proximity."
-condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 35"
+condition = 'w.hasTrait("FLIRTY") || w.getSkill("FEMININITY") > 35'
 prose     = """
 Your dryer finishes. His is still running. Instead of the folding table, you take the chair one over from his.
 

@@ -247,426 +247,65 @@ pub(crate) fn parse_condition_checked(
     expr_str: &str,
     registry: &PackRegistry,
     scene_id: &str,
-) -> Result<undone_expr::parser::Expr, SceneLoadError> {
-    let expr = undone_expr::parse(expr_str).map_err(|e| SceneLoadError::BadCondition {
-        scene_id: scene_id.to_string(),
-        expr: expr_str.to_string(),
-        message: e.to_string(),
-    })?;
-    validate_condition_semantics(&expr, scene_id, expr_str)?;
-    validate_condition_ids(&expr, registry, scene_id)?;
-    Ok(expr)
+) -> Result<crate::script::CompiledScript, SceneLoadError> {
+    crate::script::compile_condition(expr_str, registry, scene_id)
+        .map_err(|e| map_script_error(e, scene_id, expr_str))
 }
 
-#[derive(Clone, Copy)]
-enum ArgType {
-    Str,
-    Int,
-}
-
-impl ArgType {
-    fn label(self) -> &'static str {
-        match self {
-            Self::Str => "string",
-            Self::Int => "int",
-        }
-    }
-}
-
-fn value_type_label(v: &undone_expr::parser::Value) -> &'static str {
-    use undone_expr::parser::Value;
-    match v {
-        Value::Str(_) => "string",
-        Value::Int(_) => "int",
-        Value::Bool(_) => "bool",
-    }
-}
-
-fn bad_condition(scene_id: &str, expr: &str, message: impl Into<String>) -> SceneLoadError {
-    SceneLoadError::BadCondition {
-        scene_id: scene_id.to_string(),
-        expr: expr.to_string(),
-        message: message.into(),
-    }
-}
-
-fn expect_args(
-    call: &undone_expr::parser::Call,
-    expected: &[ArgType],
+/// Map a `ScriptError` from the load-time gate onto the loader's error taxonomy,
+/// preserving the legacy variant for known content-id kinds so existing callers
+/// and messages stay stable.
+pub(crate) fn map_script_error(
+    err: crate::script::ScriptError,
     scene_id: &str,
     expr_str: &str,
-) -> Result<(), SceneLoadError> {
-    if call.args.len() != expected.len() {
-        let expected_sig = if expected.is_empty() {
-            "()".to_string()
-        } else {
-            format!(
-                "({})",
-                expected
-                    .iter()
-                    .map(|t| t.label())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        };
-        let got_sig = if call.args.is_empty() {
-            "()".to_string()
-        } else {
-            format!(
-                "({})",
-                call.args
-                    .iter()
-                    .map(value_type_label)
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        };
-        return Err(bad_condition(
-            scene_id,
-            expr_str,
-            format!(
-                "method {:?}.{} expects {}, got {}",
-                call.receiver, call.method, expected_sig, got_sig
-            ),
-        ));
-    }
-
-    for (idx, (arg, expected_ty)) in call.args.iter().zip(expected.iter()).enumerate() {
-        let got = value_type_label(arg);
-        if got != expected_ty.label() {
-            return Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!(
-                    "method {:?}.{} arg {} expects {}, got {}",
-                    call.receiver,
-                    call.method,
-                    idx + 1,
-                    expected_ty.label(),
-                    got
-                ),
-            ));
-        }
-    }
-
-    Ok(())
-}
-
-fn validate_call_signature(
-    call: &undone_expr::parser::Call,
-    scene_id: &str,
-    expr_str: &str,
-) -> Result<(), SceneLoadError> {
-    use undone_expr::parser::Receiver;
-
-    match call.receiver {
-        Receiver::Player => {
-            let method = call.method.as_str();
-            if matches!(
-                method,
-                "isVirgin"
-                    | "isAnalVirgin"
-                    | "isDrunk"
-                    | "isVeryDrunk"
-                    | "isMaxDrunk"
-                    | "isSingle"
-                    | "isOnPill"
-                    | "isPregnant"
-                    | "alwaysFemale"
-                    | "wasMale"
-                    | "wasTransformed"
-                    | "hasSmoothLegs"
-                    | "getMoney"
-                    | "getStress"
-                    | "getAnxiety"
-                    | "pcOrigin"
-                    | "beforeName"
-                    | "beforeRace"
-                    | "beforeAge"
-                    | "beforeSexuality"
-                    | "getName"
-                    | "getRace"
-                    | "getAge"
-                    | "getArousal"
-                    | "getAlcohol"
-                    | "getHeight"
-                    | "getFigure"
-                    | "getBreasts"
-                    | "getButt"
-                    | "getWaist"
-                    | "getLips"
-                    | "getHairColour"
-                    | "getHairLength"
-                    | "getEyeColour"
-                    | "getSkinTone"
-                    | "getComplexion"
-                    | "getAppearance"
-                    | "getNippleSensitivity"
-                    | "getClitSensitivity"
-                    | "getPubicHair"
-                    | "getNaturalPubicHair"
-                    | "getInnerLabia"
-                    | "getWetness"
-                    | "beforeVoice"
-                    | "beforeHeight"
-                    | "beforeHairColour"
-                    | "beforeEyeColour"
-                    | "beforeSkinTone"
-                    | "beforePenisSize"
-                    | "beforeFigure"
-            ) {
-                return expect_args(call, &[], scene_id, expr_str);
-            }
-
-            if matches!(
-                method,
-                "hasTrait"
-                    | "hadTraitBefore"
-                    | "inCategory"
-                    | "beforeInCategory"
-                    | "hasStuff"
-                    | "getSkill"
-            ) {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-
-            if matches!(method, "checkSkill" | "checkSkillRed") {
-                return expect_args(call, &[ArgType::Str, ArgType::Int], scene_id, expr_str);
-            }
-
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'w.{}'", call.method),
-            ))
-        }
-        Receiver::MaleNpc => {
-            let method = call.method.as_str();
-            if matches!(
-                method,
-                "isPartner"
-                    | "isFriend"
-                    | "isCohabiting"
-                    | "isContactable"
-                    | "hadOrgasm"
-                    | "isNpcAttractionOk"
-                    | "isNpcAttractionLust"
-                    | "isWAttractionOk"
-                    | "isNpcLoveCrush"
-                    | "isNpcLoveSome"
-                    | "isWLoveCrush"
-                    | "getLiking"
-                    | "getLove"
-                    | "getAttraction"
-                    | "getBehaviour"
-            ) {
-                return expect_args(call, &[], scene_id, expr_str);
-            }
-
-            if matches!(method, "hasTrait" | "hasFlag" | "hasRole") {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'm.{}'", call.method),
-            ))
-        }
-        Receiver::FemaleNpc => {
-            let method = call.method.as_str();
-            if matches!(
-                method,
-                "isPartner"
-                    | "isFriend"
-                    | "isPregnant"
-                    | "isVirgin"
-                    | "getLiking"
-                    | "getLove"
-                    | "getAttraction"
-                    | "getBehaviour"
-            ) {
-                return expect_args(call, &[], scene_id, expr_str);
-            }
-
-            if matches!(method, "hasFlag" | "hasRole") {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'f.{}'", call.method),
-            ))
-        }
-        Receiver::Scene => {
-            if call.method == "hasFlag" {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'scene.{}'", call.method),
-            ))
-        }
-        Receiver::GameData => {
-            let method = call.method.as_str();
-            if matches!(
-                method,
-                "isWeekday" | "isWeekend" | "week" | "day" | "timeSlot" | "getJobTitle"
-            ) {
-                return expect_args(call, &[], scene_id, expr_str);
-            }
-
-            if matches!(
-                method,
-                "hasGameFlag" | "arcStarted" | "getStat" | "arcState" | "npcLiking"
-            ) {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-
-            if method == "npcLikingAtLeast" {
-                return expect_args(call, &[ArgType::Str, ArgType::Str], scene_id, expr_str);
-            }
-
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'gd.{}'", call.method),
-            ))
-        }
-        Receiver::RoleLookup => {
-            let method = call.method.as_str();
-            if matches!(
-                method,
-                "isPartner"
-                    | "isFriend"
-                    | "isContactable"
-                    | "isPregnant"
-                    | "isVirgin"
-                    | "hadOrgasm"
-                    | "getName"
-                    | "getLiking"
-                    | "getLove"
-                    | "getAttraction"
-                    | "getBehaviour"
-            ) {
-                return expect_args(call, &[ArgType::Str], scene_id, expr_str);
-            }
-
-            if matches!(method, "hasFlag" | "hasRole") {
-                return expect_args(call, &[ArgType::Str, ArgType::Str], scene_id, expr_str);
-            }
-
-            Err(bad_condition(
-                scene_id,
-                expr_str,
-                format!("unknown method 'role.{}'", call.method),
-            ))
-        }
-    }
-}
-
-fn validate_condition_semantics(
-    expr: &undone_expr::parser::Expr,
-    scene_id: &str,
-    expr_str: &str,
-) -> Result<(), SceneLoadError> {
-    use undone_expr::parser::Expr;
-
-    match expr {
-        Expr::Call(call) => validate_call_signature(call, scene_id, expr_str)?,
-        Expr::Not(e) => validate_condition_semantics(e, scene_id, expr_str)?,
-        Expr::And(l, r)
-        | Expr::Or(l, r)
-        | Expr::Eq(l, r)
-        | Expr::Ne(l, r)
-        | Expr::Lt(l, r)
-        | Expr::Gt(l, r)
-        | Expr::Le(l, r)
-        | Expr::Ge(l, r) => {
-            validate_condition_semantics(l, scene_id, expr_str)?;
-            validate_condition_semantics(r, scene_id, expr_str)?;
-        }
-        Expr::Lit(_) => {}
-    }
-
-    Ok(())
-}
-
-/// Walk a parsed `Expr` tree and validate that any content IDs referenced in
-/// method calls (trait names, skill names, category IDs) are known to the registry.
-fn validate_condition_ids(
-    expr: &undone_expr::parser::Expr,
-    registry: &PackRegistry,
-    scene_id: &str,
-) -> Result<(), SceneLoadError> {
-    use undone_expr::parser::{Expr, Receiver, Value};
-
-    match expr {
-        Expr::Call(call) => match call.receiver {
-            Receiver::Player => match call.method.as_str() {
-                "hasTrait" | "hadTraitBefore" => {
-                    if let Some(Value::Str(id)) = call.args.first() {
-                        registry
-                            .resolve_trait(id)
-                            .map_err(|_| SceneLoadError::UnknownTrait {
-                                scene_id: scene_id.to_string(),
-                                id: id.clone(),
-                            })?;
-                    }
-                }
-                "getSkill" | "checkSkill" | "checkSkillRed" => {
-                    if let Some(Value::Str(id)) = call.args.first() {
-                        registry
-                            .resolve_skill(id)
-                            .map_err(|_| SceneLoadError::UnknownSkill {
-                                scene_id: scene_id.to_string(),
-                                id: id.clone(),
-                            })?;
-                    }
-                }
-                "inCategory" | "beforeInCategory" => {
-                    if let Some(Value::Str(id)) = call.args.first() {
-                        if registry.get_category(id).is_none() {
-                            return Err(SceneLoadError::UnknownCategory {
-                                scene_id: scene_id.to_string(),
-                                id: id.clone(),
-                            });
-                        }
-                    }
-                }
-                _ => {}
+) -> SceneLoadError {
+    use crate::script::ScriptError;
+    match err {
+        ScriptError::UnknownId { kind, id, .. } => match kind.as_str() {
+            "trait" | "npc_trait" => SceneLoadError::UnknownTrait {
+                scene_id: scene_id.to_string(),
+                id,
             },
-            Receiver::MaleNpc | Receiver::FemaleNpc => {
-                if call.method.as_str() == "hasTrait" {
-                    if let Some(Value::Str(id)) = call.args.first() {
-                        registry.resolve_npc_trait(id).map_err(|_| {
-                            SceneLoadError::UnknownTrait {
-                                scene_id: scene_id.to_string(),
-                                id: id.clone(),
-                            }
-                        })?;
-                    }
+            "skill" => SceneLoadError::UnknownSkill {
+                scene_id: scene_id.to_string(),
+                id,
+            },
+            "category" => SceneLoadError::UnknownCategory {
+                scene_id: scene_id.to_string(),
+                id,
+            },
+            "stat" => SceneLoadError::UnknownStat {
+                scene_id: scene_id.to_string(),
+                id,
+            },
+            "arc" => SceneLoadError::UnknownArc {
+                scene_id: scene_id.to_string(),
+                id,
+            },
+            "arc_state" => {
+                // id is "arc -> state"; split for a precise message.
+                let (arc, state) = id.split_once(" -> ").unwrap_or((id.as_str(), ""));
+                SceneLoadError::UnknownArcState {
+                    scene_id: scene_id.to_string(),
+                    arc: arc.to_string(),
+                    state: state.to_string(),
                 }
             }
-            _ => {}
+            _ => SceneLoadError::BadCondition {
+                scene_id: scene_id.to_string(),
+                expr: expr_str.to_string(),
+                message: format!("unknown {kind} id '{id}'"),
+            },
         },
-        Expr::Not(e) => validate_condition_ids(e, registry, scene_id)?,
-        Expr::And(l, r)
-        | Expr::Or(l, r)
-        | Expr::Eq(l, r)
-        | Expr::Ne(l, r)
-        | Expr::Lt(l, r)
-        | Expr::Gt(l, r)
-        | Expr::Le(l, r)
-        | Expr::Ge(l, r) => {
-            validate_condition_ids(l, registry, scene_id)?;
-            validate_condition_ids(r, registry, scene_id)?;
+        ScriptError::Compile { message, .. } | ScriptError::Runtime { message, .. } => {
+            SceneLoadError::BadCondition {
+                scene_id: scene_id.to_string(),
+                expr: expr_str.to_string(),
+                message,
+            }
         }
-        Expr::Lit(_) => {}
     }
-    Ok(())
 }
 
 fn resolve_action(
@@ -1094,8 +733,11 @@ condition = "true"
     #[test]
     fn validate_condition_rejects_unknown_category() {
         let registry = undone_packs::PackRegistry::new(); // no categories registered
-        let result =
-            parse_condition_checked("w.inCategory('NONEXISTENT_CAT')", &registry, "test::scene");
+        let result = parse_condition_checked(
+            r#"w.inCategory("NONEXISTENT_CAT")"#,
+            &registry,
+            "test::scene",
+        );
         assert!(
             matches!(result, Err(SceneLoadError::UnknownCategory { .. })),
             "expected UnknownCategory error, got: {:?}",
@@ -1106,8 +748,11 @@ condition = "true"
     #[test]
     fn validate_condition_rejects_unknown_trait_in_has_trait() {
         let registry = undone_packs::PackRegistry::new(); // no traits registered
-        let result =
-            parse_condition_checked("w.hasTrait('NONEXISTENT_TRAIT')", &registry, "test::scene");
+        let result = parse_condition_checked(
+            r#"w.hasTrait("NONEXISTENT_TRAIT")"#,
+            &registry,
+            "test::scene",
+        );
         assert!(
             matches!(result, Err(SceneLoadError::UnknownTrait { .. })),
             "expected UnknownTrait error, got: {:?}",
@@ -1119,7 +764,7 @@ condition = "true"
     fn validate_condition_rejects_unknown_skill_in_get_skill() {
         let registry = undone_packs::PackRegistry::new(); // no skills registered
         let result = parse_condition_checked(
-            "w.getSkill('NONEXISTENT_SKILL') > 50",
+            r#"w.getSkill("NONEXISTENT_SKILL") > 50"#,
             &registry,
             "test::scene",
         );
@@ -1155,7 +800,7 @@ condition = "true"
             members: vec!["LateTeen".into()],
         }]);
         let result = parse_condition_checked(
-            "w.hasTrait('SHY') && w.getSkill('FEMININITY') < 50 && w.inCategory('AGE_YOUNG')",
+            r#"w.hasTrait("SHY") && w.getSkill("FEMININITY") < 50 && w.inCategory("AGE_YOUNG")"#,
             &registry,
             "test::scene",
         );
@@ -1176,7 +821,8 @@ condition = "true"
     #[test]
     fn validate_condition_rejects_bad_arity() {
         let registry = undone_packs::PackRegistry::new();
-        let result = parse_condition_checked("w.hasTrait('SHY', 'POSH')", &registry, "test::scene");
+        let result =
+            parse_condition_checked(r#"w.hasTrait("SHY", "POSH")"#, &registry, "test::scene");
         assert!(
             matches!(result, Err(SceneLoadError::BadCondition { .. })),
             "expected BadCondition error, got: {:?}",
@@ -1186,9 +832,20 @@ condition = "true"
 
     #[test]
     fn validate_condition_rejects_bad_arg_type() {
-        let registry = undone_packs::PackRegistry::new();
-        let result =
-            parse_condition_checked("w.checkSkill('FEMININITY', '50')", &registry, "test::scene");
+        let mut registry = undone_packs::PackRegistry::new();
+        registry.register_skills(vec![undone_packs::data::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "...".into(),
+            min: 0,
+            max: 100,
+        }]);
+        // checkSkill's 2nd arg must be an int; a string there is a load error.
+        let result = parse_condition_checked(
+            r#"w.checkSkill("FEMININITY", "50")"#,
+            &registry,
+            "test::scene",
+        );
         assert!(
             matches!(result, Err(SceneLoadError::BadCondition { .. })),
             "expected BadCondition error, got: {:?}",
@@ -1200,7 +857,7 @@ condition = "true"
     fn validate_condition_accepts_gd_npc_liking_signature() {
         let registry = undone_packs::PackRegistry::new();
         let result = parse_condition_checked(
-            "gd.npcLiking('ROLE_BARISTA') == 'Ok'",
+            r#"gd.npcLiking("ROLE_BARISTA") == "Ok""#,
             &registry,
             "test::scene",
         );

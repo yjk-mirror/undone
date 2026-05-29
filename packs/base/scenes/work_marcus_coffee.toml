@@ -15,7 +15,7 @@ Not *how did the presentation go*. Not *any feedback on the Q&A*. He waits. No p
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 10:30, and the break room smells like burnt coffee from the first pot someone made at seven and forgot about. You're making your second cup. The machine grinds through its cycle.
 
@@ -27,7 +27,7 @@ He's looking directly at you. The machine clicks off behind you. He doesn't qual
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style = "observation"
 prose = "The break room is quiet. Your hands are still on the mug. Marcus is waiting for an answer."
 

@@ -51,7 +51,7 @@ Dan finishes the explanation and looks at you.
 """
 
 [[thoughts]]
-condition = "w.wasTransformed() && w.getSkill('FEMININITY') < 20"
+condition = 'w.wasTransformed() && w.getSkill("FEMININITY") < 20'
 style     = "observation"
 prose = "Ten years. A visitor badge on a lanyard. The handshake that adjusted on the way out."
 
@@ -61,7 +61,7 @@ prose = "Ten years. A visitor badge on a lanyard. The handshake that adjusted on
 id        = "assert_expertise"
 label     = "\"I wrote that spec.\""
 detail    = "Set the record straight. Once."
-condition = "!scene.hasFlag('dan_done') && (w.hasTrait('AMBITIOUS') || w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY'))"
+condition = '!scene.hasFlag("dan_done") && (w.hasTrait("AMBITIOUS") || w.hasTrait("CONFIDENT") || w.hasTrait("BITCHY"))'
 prose = """
 {% if w.hasTrait("BITCHY") %}
 "The spec for that is in the repo," you say. "The one I wrote." You smile just enough to keep it civil. Dan stops mid-sentence.
@@ -90,7 +90,7 @@ Matt, from the standup, glances your way four times in the next hour. Not at you
 id        = "let_it_go"
 label     = "\"Thanks. I'll dig into it.\""
 detail    = "Let your work do the talking."
-condition = "!scene.hasFlag('dan_done')"
+condition = '!scene.hasFlag("dan_done")'
 prose = """
 "Thanks, I'll take a look," you say. Dan walks away.
 
@@ -123,7 +123,7 @@ Matt glances your direction twice before lunch. Quick and automatic, same as the
 id        = "redirect_to_work"
 label     = "\"Let's look at the repo.\""
 detail    = "Skip the status negotiation. Move straight to the code."
-condition = "!scene.hasFlag('dan_done') && (w.hasTrait('ANALYTICAL') || w.hasTrait('DOWN_TO_EARTH') || w.hasTrait('CONFIDENT'))"
+condition = '!scene.hasFlag("dan_done") && (w.hasTrait("ANALYTICAL") || w.hasTrait("DOWN_TO_EARTH") || w.hasTrait("CONFIDENT"))'
 prose = """
 "Let's look at the repo," you say, and you swivel the laptop toward Dan before he can continue.
 
@@ -154,7 +154,7 @@ When Dan goes back to his desk, he sends you a Slack message three minutes later
 id        = "lunch_at_desk"
 label     = "Eat at your desk"
 detail    = "You've got momentum. Keep it."
-condition = "scene.hasFlag('dan_done')"
+condition = 'scene.hasFlag("dan_done")'
 prose = """
 The team starts filtering out for lunch around noon. Someone stops by your desk.
 
@@ -198,7 +198,7 @@ By five you've pushed two more commits. Nobody has asked how old you are since t
 id        = "lunch_with_group"
 label     = "Join the group for lunch"
 detail    = "Six people. A sandwich place two blocks away."
-condition = "scene.hasFlag('dan_done') && !w.hasTrait('SHY')"
+condition = 'scene.hasFlag("dan_done") && !w.hasTrait("SHY")'
 prose = """
 Six of you walk to a place two blocks away that someone describes as "fine, it's fine." Sandwiches. Bright lighting. Tables designed for people who want calories and then to get back upstairs.
 
@@ -246,7 +246,7 @@ The afternoon is code. By five you've pushed your first commit.
 id        = "lunch_alone"
 label     = "Slip out on your own"
 detail    = "The group is still deciding where to go. You already know."
-condition = "scene.hasFlag('dan_done')"
+condition = 'scene.hasFlag("dan_done")'
 prose = """
 You leave while the group is still debating restaurants. The financial district around the building is sandwich shops, a Starbucks, polished lobby entrances, a narrow park wedged between two towers.
 

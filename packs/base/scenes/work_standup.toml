@@ -15,7 +15,7 @@ Marcus nods once. Kevin doesn't look up from his phone.
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('ANALYTICAL')"
+condition = 'w.hasTrait("ANALYTICAL")'
 prose = """
 The standup circle forms at 9:05. Seven people. You clock the room before anyone's said anything — Carter checking Slack while nodding at Priya's update, Devin with his arms crossed in a way that reads bored rather than hostile, Marcus genuinely listening. Kevin is running a count in his head, you can tell, just waiting for his turn.
 
@@ -27,7 +27,7 @@ Marcus nods. Kevin looks up briefly, then back at his phone.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The standup circle forms at 9:05. Seven people. You're still calibrating where to stand in a circle of colleagues — not conspicuously, just the small adjustments that happen when the geometry is new. You end up two steps farther from the center than you need to be.
 
@@ -39,7 +39,7 @@ Marcus nods once. Kevin doesn't look up from his phone.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose = """
 Your elbows are in. You're two steps farther back than the geometry needs.

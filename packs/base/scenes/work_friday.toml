@@ -11,7 +11,7 @@ The cursor blinks on the Slack channel. The office is still going around you —
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The Slack message lands at 4:07 from someone in DevRel you've seen twice, maybe three times. Drinks at Corrigan's, 5pm, all welcome. Friday ritual.
 
@@ -19,7 +19,7 @@ You've been here a month. The message sits there. Your finger is over the reply 
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose = """The Slack thread has three thumbs-up reactions already. The message is four minutes old."""
 
@@ -75,7 +75,7 @@ The office quiets out over the next forty minutes as people leave. By 5:30 it's 
 id        = "go_with_marcus"
 label     = "Walk over with Marcus"
 detail    = "He's going anyway. You end up leaving at the same time."
-condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok')"
+condition = 'gd.hasGameFlag("FIRST_MEETING_DONE") && gd.npcLikingAtLeast("ROLE_MARCUS", "Ok")'
 prose     = """
 Marcus mentions he's going in the way people mention things when they're not inviting you but aren't not inviting you either — it's information, offered without expectation. You end up leaving the building at the same time because that's how it works when two people reach the elevator at 4:52.
 

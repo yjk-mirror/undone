@@ -15,7 +15,7 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The bookstore on Garfield Ave. You go because you want to look at books without anyone wanting anything from you. No agenda. No transaction until you decide there is one.
 
@@ -27,7 +27,7 @@ The clerk glances up when the door opens. "Back again," he says, then goes back 
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose     = """The clerk said miss. You're two shelves deeper into the store and still standing in the same spot."""
 
@@ -91,7 +91,7 @@ You leave an hour later without having bought anything, which was always the pla
 id        = "talk_to_the_clerk"
 label     = "Get into it with the clerk about memoirs"
 detail    = "He has opinions. Strong ones."
-condition = "!gd.hasGameFlag('BOOKSTORE_VISITED')"
+condition = '!gd.hasGameFlag("BOOKSTORE_VISITED")'
 prose = """
 You ask about the biography section — whether there's anything recent worth reading. He looks up for the first time.
 

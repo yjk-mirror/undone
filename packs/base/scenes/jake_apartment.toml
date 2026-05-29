@@ -280,7 +280,7 @@ He takes his time. So do you.
 id        = "show_him"
 label     = "Show him what you want"
 detail    = "Guide his hands. Even if the map is still being drawn."
-condition = "w.hasTrait('CONFIDENT') || w.getSkill('FEMININITY') > 30"
+condition = 'w.hasTrait("CONFIDENT") || w.getSkill("FEMININITY") > 30'
 prose     = """
 You take his hand.
 

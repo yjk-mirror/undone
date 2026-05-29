@@ -140,7 +140,7 @@ The ride home: the city through the window, the driver not talking, the specific
 id        = "tell_him"
 label     = "Tell him"
 detail    = "Name it. Leave."
-condition = "w.hasTrait('CONFIDENT') || w.hasTrait('BITCHY') || w.getSkill('FEMININITY') >= 50"
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("BITCHY") || w.getSkill("FEMININITY") >= 50'
 prose     = """
 He's in the middle of telling you something about his ex — the third or fourth time she's come up, same shape to the story, same unspoken conclusion — and you set your glass down.
 

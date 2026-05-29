@@ -27,7 +27,7 @@ Theo doesn't wake up.
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('HOMOPHOBIC') && w.getSkill('FEMININITY') < 40"
+condition = 'w.hasTrait("HOMOPHOBIC") && w.getSkill("FEMININITY") < 40'
 prose = """
 Gray light. The window. Someone's alarm through the wall.
 
@@ -41,7 +41,7 @@ You've been awake for a while. You haven't moved.
 """
 
 [[thoughts]]
-condition = "w.hasTrait('HOMOPHOBIC')"
+condition = 'w.hasTrait("HOMOPHOBIC")'
 style     = "observation"
 prose = """
 His arm across your stomach. The hair on it, darker near the wrist. His breathing against your back.

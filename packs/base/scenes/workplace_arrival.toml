@@ -57,7 +57,7 @@ The exit checkpoint agent scans your ID, checks the name, and waves you through 
 id        = "id_preempt"
 label     = "\"I know. I just look young.\""
 detail    = "Get ahead of it."
-condition = "!scene.hasFlag('id_done') && w.wasTransformed()"
+condition = '!scene.hasFlag("id_done") && w.wasTransformed()'
 prose = """
 You say it before he can figure out the question.
 
@@ -86,7 +86,7 @@ He waves you through.
 id        = "id_wait"
 label     = "Wait for him to work it out"
 detail    = "It's your ID. He'll get there."
-condition = "!scene.hasFlag('id_done') && w.wasTransformed()"
+condition = '!scene.hasFlag("id_done") && w.wasTransformed()'
 prose = """
 He turns the card over, checks the back as if the answer might be there, then studies the photo again. You can watch the math happen: the name, the jawline, the age, the mismatch that doesn't sort itself out.
 
@@ -117,7 +117,7 @@ He studies the card one more time. Waves you through.
 id        = "take_subway"
 label     = "Take the subway"
 detail    = "Platform B. Transfer at Central. The app says twenty-two minutes."
-condition = "scene.hasFlag('id_done') || !w.wasTransformed()"
+condition = 'scene.hasFlag("id_done") || !w.wasTransformed()'
 prose = """
 The platform is underground and colder than the terminal by a clean ten degrees. A transit map on the wall confirms what your phone already told you: Platform B, transfer at Central, eleven stops.
 
@@ -167,7 +167,7 @@ You stand outside for one full second with your bag, your keys, and the cold air
 id        = "call_a_cab"
 label     = "Call a cab"
 detail    = "Skip the subway. Forty dollars."
-condition = "scene.hasFlag('id_done') || !w.wasTransformed()"
+condition = 'scene.hasFlag("id_done") || !w.wasTransformed()'
 prose = """
 You open your phone and request a ride. Forty dollars. You've been awake for thirty-one hours and you're not navigating a transit map right now.
 

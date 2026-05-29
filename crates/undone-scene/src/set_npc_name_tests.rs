@@ -119,7 +119,11 @@ label = "Meet"
             .expect("TOML with type = \"set_npc_name\" should deserialize without error");
 
         let meet = raw.actions.iter().find(|a| a.id == "meet").unwrap();
-        assert_eq!(meet.effects.len(), 1, "action should have exactly one effect");
+        assert_eq!(
+            meet.effects.len(),
+            1,
+            "action should have exactly one effect"
+        );
 
         match &meet.effects[0] {
             EffectDef::SetNpcName { npc, name } => {
@@ -259,7 +263,9 @@ label = "Meet"
     fn m_get_name_returns_display_name_in_prose_template() {
         let registry = PackRegistry::new();
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         world.male_npcs[npc_key].core.display_name = Some("Jake".to_string());
 
         let mut ctx = SceneCtx::new();
@@ -287,7 +293,9 @@ label = "Meet"
     fn m_get_name_returns_spawn_name_before_override() {
         let registry = PackRegistry::new();
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name("OriginalName"));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name("OriginalName"));
         // No display_name set
 
         let mut ctx = SceneCtx::new();
@@ -316,7 +324,9 @@ label = "Meet"
 
         let registry = PackRegistry::new();
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         world.male_npcs[npc_key].core.display_name = Some("Theo".to_string());
 
         let mut ctx = SceneCtx::new();
@@ -347,7 +357,9 @@ label = "Meet"
     #[test]
     fn set_npc_name_effect_preserves_spawn_name() {
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
@@ -380,7 +392,9 @@ label = "Meet"
     #[test]
     fn set_npc_role_does_not_set_display_name() {
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
@@ -411,7 +425,9 @@ label = "Meet"
     #[test]
     fn set_npc_name_does_not_set_npc_role() {
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
@@ -435,7 +451,9 @@ label = "Meet"
     #[test]
     fn set_npc_role_and_set_npc_name_combined_are_independent() {
         let mut world = make_test_world();
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(npc_key);
         let registry = PackRegistry::new();
@@ -468,11 +486,7 @@ label = "Meet"
             Some("Jake"),
             "display_name must be set"
         );
-        assert_eq!(
-            npc.core.name,
-            spawn_name(),
-            "spawn name must be preserved"
-        );
+        assert_eq!(npc.core.name, spawn_name(), "spawn name must be preserved");
     }
 
     // -----------------------------------------------------------------------
@@ -523,11 +537,11 @@ label = "Meet"
         let mut npc = make_male_npc_with_spawn_name(spawn_name());
         npc.core.display_name = Some("Jake".to_string());
 
-        let json = serde_json::to_string(&npc.core)
-            .expect("NpcCore with display_name must serialize");
+        let json =
+            serde_json::to_string(&npc.core).expect("NpcCore with display_name must serialize");
 
-        let restored: undone_domain::NpcCore = serde_json::from_str(&json)
-            .expect("NpcCore with display_name must deserialize");
+        let restored: undone_domain::NpcCore =
+            serde_json::from_str(&json).expect("NpcCore with display_name must deserialize");
 
         assert_eq!(
             restored.display_name.as_deref(),
@@ -546,14 +560,16 @@ label = "Meet"
     /// display_name somewhere in the serialization chain.
     #[test]
     fn display_name_survives_full_save_load_cycle() {
-        use undone_save::{load_game, save_game};
         use undone_packs::load_packs;
+        use undone_save::{load_game, save_game};
 
         let (mut registry, _) = load_packs(&packs_dir()).unwrap();
         let mut world = make_test_world();
 
         // Give the male NPC a display name override
-        let npc_key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let npc_key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         world.male_npcs[npc_key].core.display_name = Some("Jake".to_string());
 
         let dir = std::env::temp_dir().join("undone_set_npc_name_acceptance");
@@ -564,7 +580,10 @@ label = "Meet"
         let loaded = load_game(&path, &mut registry).expect("load must succeed");
 
         // Find the NPC we inserted (by position — there's only one male NPC)
-        let loaded_npc = loaded.male_npcs.values().next()
+        let loaded_npc = loaded
+            .male_npcs
+            .values()
+            .next()
             .expect("loaded world must contain the male NPC");
 
         assert_eq!(
@@ -599,7 +618,10 @@ label = "Meet"
         };
         let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
 
-        assert!(result.is_err(), "must return Err when no active male NPC is set");
+        assert!(
+            result.is_err(),
+            "must return Err when no active male NPC is set"
+        );
         assert!(
             matches!(result, Err(EffectError::NoActiveMale)),
             "error must be NoActiveMale, got: {:?}",
@@ -621,7 +643,10 @@ label = "Meet"
         };
         let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
 
-        assert!(result.is_err(), "must return Err when no active female NPC is set");
+        assert!(
+            result.is_err(),
+            "must return Err when no active female NPC is set"
+        );
         assert!(
             matches!(result, Err(EffectError::NoActiveFemale)),
             "error must be NoActiveFemale, got: {:?}",
@@ -644,7 +669,10 @@ label = "Meet"
         };
         let result = apply_effect(&effect, &mut world, &mut ctx, &registry);
 
-        assert!(result.is_err(), "must return Err for an unbound role reference");
+        assert!(
+            result.is_err(),
+            "must return Err for an unbound role reference"
+        );
         assert!(
             matches!(result, Err(EffectError::BadNpcRef(_))),
             "error must be BadNpcRef for unknown role, got: {:?}",
@@ -660,13 +688,12 @@ label = "Meet"
     /// meaning Jake's name is never bound to his NPC record in the sidebar/prose.
     #[test]
     fn coffee_shop_scene_contains_set_npc_name_for_jake() {
-        use undone_packs::load_packs;
         use crate::loader::load_scenes;
+        use undone_packs::load_packs;
 
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, &registry)
-            .expect("scenes must load without error");
+        let scenes = load_scenes(&scenes_dir, &registry).expect("scenes must load without error");
 
         let scene = scenes
             .get("base::coffee_shop")
@@ -690,13 +717,12 @@ label = "Meet"
     /// for "Marcus", meaning Marcus's name is never bound to his NPC record.
     #[test]
     fn workplace_work_meeting_scene_contains_set_npc_name_for_marcus() {
-        use undone_packs::load_packs;
         use crate::loader::load_scenes;
+        use undone_packs::load_packs;
 
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, &registry)
-            .expect("scenes must load without error");
+        let scenes = load_scenes(&scenes_dir, &registry).expect("scenes must load without error");
 
         let scene = scenes
             .get("base::workplace_work_meeting")
@@ -718,13 +744,12 @@ label = "Meet"
     /// BREAKS IF: campus_library.toml does not contain a `set_npc_name` effect for "Theo".
     #[test]
     fn campus_library_scene_contains_set_npc_name_for_theo() {
-        use undone_packs::load_packs;
         use crate::loader::load_scenes;
+        use undone_packs::load_packs;
 
         let (registry, _) = load_packs(&packs_dir()).unwrap();
         let scenes_dir = packs_dir().join("base").join("scenes");
-        let scenes = load_scenes(&scenes_dir, &registry)
-            .expect("scenes must load without error");
+        let scenes = load_scenes(&scenes_dir, &registry).expect("scenes must load without error");
 
         let scene = scenes
             .get("base::campus_library")
@@ -772,7 +797,9 @@ label = "Meet"
     #[test]
     fn apply_effect_set_npc_name_mutates_world_not_a_copy() {
         let mut world = make_test_world();
-        let key = world.male_npcs.insert(make_male_npc_with_spawn_name(spawn_name()));
+        let key = world
+            .male_npcs
+            .insert(make_male_npc_with_spawn_name(spawn_name()));
         let mut ctx = SceneCtx::new();
         ctx.active_male = Some(key);
         let registry = PackRegistry::new();
@@ -800,9 +827,7 @@ label = "Meet"
     /// NPCs cannot be renamed even though the spec covers them.
     #[test]
     fn apply_effect_set_npc_name_works_for_female_via_f_ref() {
-        use undone_domain::{
-            BreastSize, CharTypeId, FemaleClothing, FemaleNpc, PlayerFigure,
-        };
+        use undone_domain::{BreastSize, CharTypeId, FemaleClothing, FemaleNpc, PlayerFigure};
 
         let mut world = make_test_world();
         let female_npc = FemaleNpc {
@@ -862,8 +887,7 @@ label = "Meet"
             "set_npc_name via 'f' reference must set display_name on the female NPC"
         );
         assert_eq!(
-            world.female_npcs[key].core.name,
-            "SomeSpawnName",
+            world.female_npcs[key].core.name, "SomeSpawnName",
             "spawn name must be preserved on the female NPC"
         );
     }

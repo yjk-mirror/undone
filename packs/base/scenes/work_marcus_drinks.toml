@@ -21,7 +21,7 @@ His glass comes up. He looks at you over the rim.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style = "observation"
 prose = "Two drinks deep. Marcus's forearm is resting on the back of the booth behind you."
 
@@ -174,7 +174,7 @@ At some point you both notice it's late. Outside he says, "We should do this aga
 id        = "touch_his_hand"
 label     = "Touch his hand"
 detail    = "On the table. A signal. See what he does with it."
-condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 35"
+condition = 'w.hasTrait("FLIRTY") || w.getSkill("FEMININITY") > 35'
 prose     = """
 Your hand moves before anything is decided. On the table, over his — not grabbing, just there.
 

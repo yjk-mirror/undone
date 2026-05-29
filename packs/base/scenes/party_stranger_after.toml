@@ -33,7 +33,7 @@ Your skin still has the room on it: warmth, sweat at the back of your neck, the 
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose     = "The door closed and the party went behind glass and he's still right there."
 

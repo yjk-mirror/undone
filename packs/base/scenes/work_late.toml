@@ -9,7 +9,7 @@ prose = """
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 6:15 PM. The ceiling lights have shifted to efficiency mode — still on, but dimmer, the building's way of informing you that you are officially outside normal business hours. Most desks are dark. The HVAC cycles differently when it's only cooling the room rather than a roomful of people.
 
@@ -17,7 +17,7 @@ The empty floor hums. Your reflection in the dark monitor across the aisle is a 
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose = """The overhead light above your desk is one of maybe four still running at full brightness. The rest of the floor is on half-power."""
 
@@ -72,7 +72,7 @@ Outside it's colder than when you came in this morning. The responsible choice, 
 id        = "someone_is_still_here"
 label     = "Marcus is still here"
 detail    = "Pass his desk on the way to the elevator. It would be strange not to acknowledge it."
-condition = "gd.hasGameFlag('FIRST_MEETING_DONE')"
+condition = 'gd.hasGameFlag("FIRST_MEETING_DONE")'
 prose     = """
 Marcus is at his desk. You clock him on the way to the elevator — the overhead fixture above his workstation is one of the few still lit at full brightness, and he's leaning into a monitor with the posture of someone who has stopped noticing the time.
 

@@ -28,7 +28,7 @@ The ceiling has a crack in it. His apartment, then. You don't recognize the ceil
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('ROMANTIC')"
+condition = 'w.hasTrait("ROMANTIC")'
 prose = """
 You wake up slowly.
 

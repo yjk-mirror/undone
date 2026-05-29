@@ -162,7 +162,7 @@ You reach for your towel and your hands are shaking a little and it's not from c
 id        = "older_woman_comment"
 label     = "The older woman at the mirror speaks"
 weight    = 8
-condition = "!scene.hasFlag('older_woman_spoken')"
+condition = '!scene.hasFlag("older_woman_spoken")'
 prose = """
 The older woman turns the blow dryer off. She catches your eye in the mirror.
 
@@ -190,7 +190,7 @@ She doesn't look for a response. The dryer comes back on.
 id        = "college_women_glance"
 label     = "The two younger women notice her"
 weight    = 5
-condition = "!scene.hasFlag('women_glanced')"
+condition = '!scene.hasFlag("women_glanced")'
 prose = """
 One of the college women stops mid-sentence. The other follows her gaze.
 

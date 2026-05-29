@@ -39,7 +39,7 @@ The card table is right there. So is the kitchen. So is the dancing.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style     = "observation"
 prose     = "Forty people. The nearest cluster is already moving."
 
@@ -106,7 +106,7 @@ The kitchen counter is the right height to rest your arms on. The living room ha
 id        = "dance"
 label     = "Dance"
 detail    = "The living room has turned into a floor. The music is loud enough that it doesn't require conversation."
-condition = "w.hasTrait('OUTGOING') || w.hasTrait('CONFIDENT') || w.getSkill('FEMININITY') > 30"
+condition = 'w.hasTrait("OUTGOING") || w.hasTrait("CONFIDENT") || w.getSkill("FEMININITY") > 30'
 prose = """
 The living room gap isn't big, but it's enough. Three or four people already in it with drinks held loosely.
 

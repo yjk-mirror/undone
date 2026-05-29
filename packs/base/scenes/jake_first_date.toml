@@ -21,7 +21,7 @@ The menu is in your hands. He's watching you read it when he thinks you're readi
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose     = "The menu is in your hands. The candle is lit. Jake is across the table."
 
@@ -133,7 +133,7 @@ At some point he leans in to explain a thing, elbows on the table, close enough 
 id        = "touch_his_hand"
 label     = "Put your hand on his"
 detail    = "Across the table. Deliberate."
-condition = "w.hasTrait('FLIRTY') || w.getSkill('FEMININITY') > 30"
+condition = 'w.hasTrait("FLIRTY") || w.getSkill("FEMININITY") > 30'
 prose     = """
 He's saying something — a story, mid-sentence — and you put your hand on his.
 

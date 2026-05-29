@@ -21,7 +21,7 @@ You say the name. The junior types it, finds it, hands over a lanyard and a camp
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 15"
+condition = 'w.getSkill("FEMININITY") < 15'
 prose = """
 Move-in day. The check-in table. The junior asks for a name, types it, and a lanyard slides across with a campus map. "Welcome!" she says, and means it, in the way someone means something they've said forty times today.
 
@@ -31,7 +31,7 @@ The smile lasts a second. Then she's back to reading a map with her daughter.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 50"
+condition = 'w.getSkill("FEMININITY") < 50'
 style     = "observation"
 prose = """
 The junior didn't pause. Didn't double-check the photo on the ID, didn't do the small recalibration you've clocked on faces before. Just typed, found it, handed it over.

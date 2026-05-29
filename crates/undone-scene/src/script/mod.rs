@@ -15,4 +15,7 @@ pub mod validate;
 pub mod write_api;
 
 pub use compiled::{compile_condition, compile_effect, CompiledScript, ScriptError};
-pub use engine::{build_engines, ScriptEngines};
+pub use engine::{
+    apply_effect_script, build_engines, eval_bool, eval_int, eval_string, ScriptEngines,
+};
+pub use validate::{source_has_persistent_mutation, source_references_game_flag};

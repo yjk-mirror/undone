@@ -11,7 +11,7 @@ You wait a beat to see which way the current goes before committing.
 """
 
 [[intro_variants]]
-condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_DESK')"
+condition = 'gd.hasGameFlag("FIRST_DAY_LUNCH_DESK")'
 prose = """
 12:15. The office energy shifts. This is not the first time.
 
@@ -19,7 +19,7 @@ On the first day you stayed at your desk. Keyboard going, takeout arriving, the 
 """
 
 [[intro_variants]]
-condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_GROUP')"
+condition = 'gd.hasGameFlag("FIRST_DAY_LUNCH_GROUP")'
 prose = """
 12:15. The office energy shifts and this time the clusters already have names.
 
@@ -27,7 +27,7 @@ On the first day you went with the group and let the room read you over lunch. T
 """
 
 [[intro_variants]]
-condition = "gd.hasGameFlag('FIRST_DAY_LUNCH_ALONE')"
+condition = 'gd.hasGameFlag("FIRST_DAY_LUNCH_ALONE")'
 prose = """
 12:15. The office energy shifts.
 
@@ -35,7 +35,7 @@ On the first day you went out alone. You know the route now — sandwich place t
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 12:15. The office energy shifts and you're still learning what it means.
 
@@ -45,7 +45,7 @@ You don't know the lunch patterns yet. You watch which clusters form and which d
 # ── Thoughts ──────────────────────────────────────────────────────────
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose = "The chairs are rolling back. A few people already have their coats."
 
@@ -129,7 +129,7 @@ The conversation is about a project you're tangentially connected to. You nod at
 id        = "ask_marcus"
 label     = "Catch Marcus in the kitchen"
 detail    = "Ask if he's going out. Real conversation, not performance."
-condition = "gd.hasGameFlag('FIRST_MEETING_DONE') && !gd.hasGameFlag('LUNCH_WITH_MARCUS')"
+condition = 'gd.hasGameFlag("FIRST_MEETING_DONE") && !gd.hasGameFlag("LUNCH_WITH_MARCUS")'
 prose     = """
 You catch Marcus in the kitchen, one hand on the coffee machine, coat still over his arm. Ask if he's going out. He says sure, like it wasn't a question — not casual exactly, just no friction.
 

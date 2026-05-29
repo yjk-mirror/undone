@@ -48,7 +48,7 @@ Your jacket hangs lower on you than it should. The sleeves cover your hands. You
 id        = "leave"
 label     = "Make a run for it"
 detail    = "Three blocks. You'll survive."
-condition = "!scene.hasFlag('umbrella_offered')"
+condition = '!scene.hasFlag("umbrella_offered")'
 prose     = """
 {% if w.hasTrait("SHY") %}
 You step back into the rain. The shelter is too small, the silence too close. The rain hits your face and you walk fast, shoulders up.
@@ -72,7 +72,7 @@ By the time you reach your building, you're soaked through. Your shoes leave pri
 id        = "accept_umbrella"
 label     = "Share his umbrella"
 detail    = "He offered. You're deciding."
-condition = "scene.hasFlag('umbrella_offered')"
+condition = 'scene.hasFlag("umbrella_offered")'
 prose     = """
 {% if w.hasTrait("SHY") %}
 "Thanks." You step under. The umbrella is small enough that your shoulders almost touch. He smells like whatever detergent he uses. You look at the rain. He looks at the rain.
@@ -107,7 +107,7 @@ He's close enough that you can feel warmth coming off his arm. The top of your h
 id        = "decline_umbrella"
 label     = "Decline politely"
 detail    = "Generous, but no."
-condition = "scene.hasFlag('umbrella_offered')"
+condition = 'scene.hasFlag("umbrella_offered")'
 prose     = """
 {% if w.hasTrait("SHY") %}
 "I'm okay, thanks." It comes out quiet. He nods once, puts the umbrella back at his side.
@@ -131,7 +131,7 @@ The rain fills the silence. Eventually it eases to something survivable and you 
 
 [[npc_actions]]
 id        = "umbrella_offer"
-condition = "!scene.hasFlag('umbrella_offered')"
+condition = '!scene.hasFlag("umbrella_offered")'
 weight    = 12
 prose     = """
 He looks at the rain. Then at you. Then at the umbrella leaning against the bench.
@@ -151,7 +151,7 @@ It takes him a beat to commit to the ask.
 
 [[npc_actions]]
 id        = "small_talk"
-condition = "scene.hasFlag('umbrella_offered')"
+condition = 'scene.hasFlag("umbrella_offered")'
 weight    = 5
 prose     = """
 "You live around here?" He says it the way people in this city ask — filling air, not expecting much.

@@ -25,7 +25,7 @@ During the day this floor has eleven people on it. Right now it has two.
 """
 
 [[intro_variants]]
-condition = "w.hasTrait('AMBITIOUS')"
+condition = 'w.hasTrait("AMBITIOUS")'
 prose = """
 8 PM, and the floor is mostly dark.
 
@@ -47,7 +47,7 @@ During the day this floor has eleven people and their noise. Right now it has tw
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style = "observation"
 prose = "The floor is empty. Marcus's voice carries differently without the daytime noise."
 

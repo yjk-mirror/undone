@@ -15,7 +15,7 @@ The evening is yours.
 """
 
 [[intro_variants]]
-condition = "gd.hasGameFlag('MARCUS_INTIMATE') && !gd.hasGameFlag('MARCUS_APARTMENT') && w.getSkill('FEMININITY') < 35"
+condition = 'gd.hasGameFlag("MARCUS_INTIMATE") && !gd.hasGameFlag("MARCUS_APARTMENT") && w.getSkill("FEMININITY") < 35'
 prose = """
 Seven in the evening. The apartment is quiet. Your apartment. Not the office. Not the conference room with the cold stripe of hallway light.
 
@@ -27,7 +27,7 @@ The evening is yours. What that means has shifted.
 """
 
 [[intro_variants]]
-condition = "(gd.hasGameFlag('JAKE_INTIMATE') || gd.hasGameFlag('BAR_STRANGER_SLEPT') || gd.hasGameFlag('PARTY_STRANGER_SLEPT')) && w.getSkill('FEMININITY') < 30"
+condition = '(gd.hasGameFlag("JAKE_INTIMATE") || gd.hasGameFlag("BAR_STRANGER_SLEPT") || gd.hasGameFlag("PARTY_STRANGER_SLEPT")) && w.getSkill("FEMININITY") < 30'
 prose = """
 Seven in the evening. The apartment is quiet, and the quiet is a different shape now.
 
@@ -39,7 +39,7 @@ The evening is yours.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Seven in the evening and nobody expects anything. The apartment is yours for the night.
 
@@ -49,7 +49,7 @@ You've got the time. You'll figure out what to do with it.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") < 40'
 style     = "observation"
 prose     = "The couch is already where you end up. The tea is already on. The window is where you look next. The order of things has sorted itself out."
 
@@ -147,7 +147,7 @@ You know what you like now. You know how to get there. An hour passes without be
 id        = "text_jake"
 label     = "Text Jake"
 detail    = "The phone. His name. The cursor."
-condition = "gd.hasGameFlag('JAKE_INTIMATE')"
+condition = 'gd.hasGameFlag("JAKE_INTIMATE")'
 prose = """
 The phone. His name in the contacts. The cursor blinking in the empty text field.
 
@@ -193,7 +193,7 @@ A man's name on your phone. On your nightstand. In your apartment. The ordinarin
 id        = "take_a_bath"
 label     = "Run a bath"
 detail    = "Hot water. Quiet. Just you."
-condition = "gd.hasGameFlag('JAKE_INTIMATE') || gd.hasGameFlag('MARCUS_INTIMATE') || gd.hasGameFlag('BAR_STRANGER_SLEPT')"
+condition = 'gd.hasGameFlag("JAKE_INTIMATE") || gd.hasGameFlag("MARCUS_INTIMATE") || gd.hasGameFlag("BAR_STRANGER_SLEPT")'
 prose = """
 The bath takes four minutes to fill and the bathroom fills with steam. The mirror fogs over. Good. You don't want the mirror right now.
 

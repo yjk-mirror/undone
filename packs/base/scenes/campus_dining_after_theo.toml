@@ -17,7 +17,7 @@ He hasn't seen you yet.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 The dining hall at noon on a Tuesday. Trays, voices, the steam from the pasta station, a hundred and fifty people doing what they do.
 
@@ -33,7 +33,7 @@ He hasn't seen you yet.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') >= 20 && w.getSkill('FEMININITY') < 40"
+condition = 'w.getSkill("FEMININITY") >= 20 && w.getSkill("FEMININITY") < 40'
 prose = """
 The dining hall. Noon on a Tuesday. You're at the salad bar, tray in hand, when you see him across the room.
 

@@ -17,7 +17,7 @@ Your pen stops moving.
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Thursday. The library. You've been here forty minutes and it's going fine.
 
@@ -29,7 +29,7 @@ You go back to the notes. Your handwriting for the next two lines is slightly di
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 50"
+condition = 'w.getSkill("FEMININITY") < 50'
 style     = "observation"
 prose = """
 You'd thought about this in the abstract for a week. The abstract didn't have a face or a jaw or the specific way someone's hands move when they're opening a textbook.
@@ -59,7 +59,7 @@ You close your laptop and gather your things.
 id    = "say_something"
 label = "Say something. You have an excuse."
 detail = "Same problem set. It's a natural opening."
-condition = "!scene.hasFlag('talked')"
+condition = '!scene.hasFlag("talked")'
 prose = """
 You wait until there's a natural pause in whatever he's doing and say: "Are you in 201? I'm stuck on problem four."
 
@@ -104,7 +104,7 @@ When you go back to your problem set your cheeks are warm.
 id     = "theo_looks_up"
 label  = "He looks up from his work"
 weight = 6
-condition = "!scene.hasFlag('talked') && !scene.hasFlag('noticed')"
+condition = '!scene.hasFlag("talked") && !scene.hasFlag("noticed")'
 prose = """
 He looks up — maybe you moved, maybe he just needed a break from the problem set — and you make eye contact for about a second.
 

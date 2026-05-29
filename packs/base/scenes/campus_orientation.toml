@@ -25,7 +25,7 @@ Adam asks what you're studying. He nods like it's interesting, which it probably
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 15"
+condition = 'w.getSkill("FEMININITY") < 15'
 prose = """
 Freshman orientation. The assigned table. The icebreaker card says *Share something.*
 
@@ -37,7 +37,7 @@ Orientation continues.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 50"
+condition = 'w.getSkill("FEMININITY") < 50'
 style     = "observation"
 prose = """
 At break you get coffee at the table in the back and a junior introduces himself and asks if you're enjoying orientation, and you say yes, and he recommends two clubs, and you nod, and he says *nice to meet you* and means it in the specific way that a junior means it to a freshman woman he thinks is attractive.
@@ -98,7 +98,7 @@ One of them looks over. You don't slow down.
 id        = "adam_talks"
 label     = "Adam keeps the conversation going"
 weight    = 7
-condition = "!scene.hasFlag('adam_done')"
+condition = '!scene.hasFlag("adam_done")'
 prose = """
 After the morning session Adam materializes next to you at the coffee table with the ease of someone who is used to materializing next to people at coffee tables.
 

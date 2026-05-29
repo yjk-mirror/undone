@@ -37,7 +37,7 @@ The coaster is waiting. The bartender is waiting.
 id        = "order_a_drink"
 label     = "Order a drink"
 detail    = "Something simple."
-condition = "!scene.hasFlag('has_drink')"
+condition = '!scene.hasFlag("has_drink")'
 prose = """
 {% if w.hasTrait("CONFIDENT") %}
 "Whiskey neat." She pours it and sets it down without comment. The glass is cold.
@@ -64,7 +64,7 @@ The glass sits differently in your hand. Wider than your grip wants it to be. Yo
 id        = "sit_and_settle"
 label     = "Take a seat. No rush."
 detail    = "You're not here for the drink. You're here to be somewhere that isn't your apartment."
-condition = "!scene.hasFlag('has_drink')"
+condition = '!scene.hasFlag("has_drink")'
 prose = """
 You settle onto the stool and put your jacket on the one next to you. The bartender gives you a look — not impatient, just checking. "Whenever you're ready," she says, and goes back to what she was doing.
 
@@ -89,7 +89,7 @@ After a minute, you flag her down and order. She pours it. The glass is cold. Th
 id                = "nurse_your_drink"
 label             = "Nurse your drink. See how the evening goes."
 detail            = "The bar is doing its thing. You're part of it now."
-condition         = "scene.hasFlag('has_drink') && !scene.hasFlag('drink_offered')"
+condition = 'scene.hasFlag("has_drink") && !scene.hasFlag("drink_offered")'
 allow_npc_actions = true
 prose = """
 You drink. The bar moves around you in the way bars do when you're not trying to make anything happen — someone orders, someone leaves, the game on TV goes to commercial and nobody notices.
@@ -103,7 +103,7 @@ You're aware of your posture on the stool. Feet don't quite reach the crossbar. 
 id        = "talk_to_bartender"
 label     = "Ask the bartender about the bottle on the top shelf"
 detail    = "The one with the hand-applied label."
-condition = "scene.hasFlag('has_drink')"
+condition = 'scene.hasFlag("has_drink")'
 prose = """
 There's a bottle on the top shelf — short and wide, hand-applied label, something you don't recognize. You ask about it.
 
@@ -136,7 +136,7 @@ You don't know her name by the end of it and she doesn't know yours, which feels
 id        = "leave_early"
 label     = "Finish your drink and go"
 detail    = "The apartment is two blocks away."
-condition = "scene.hasFlag('has_drink')"
+condition = 'scene.hasFlag("has_drink")'
 prose = """
 You finish what's in front of you. The bartender nods when you put cash on the bar — enough for the drink and enough to be decent about it.
 
@@ -160,7 +160,7 @@ The cold hits you outside. Two blocks. The apartment is dark and quiet and yours
 id        = "accept_the_drink"
 label     = "Accept the drink"
 detail    = "He's offering. You're deciding."
-condition = "scene.hasFlag('drink_offered')"
+condition = 'scene.hasFlag("drink_offered")'
 prose = """
 {% if w.hasTrait("SHY") %}
 "Oh — thanks." You take the glass and look at it instead of at him. The drink is cold. That's something to hold. You hold it.
@@ -209,7 +209,7 @@ You walk home. The air is cold and the drink is warm in your chest and the eveni
 id        = "decline_the_drink"
 label     = "\"I'm good, thanks.\""
 detail    = "Not tonight."
-condition = "scene.hasFlag('drink_offered')"
+condition = 'scene.hasFlag("drink_offered")'
 prose = """
 {% if w.hasTrait("SHY") %}
 "I'm good, thanks." Said to your glass more than to him, which isn't ideal. But the words come out even.
@@ -247,7 +247,7 @@ The walk home is two blocks and the cold feels good.
 
 [[npc_actions]]
 id        = "man_offers_drink"
-condition = "scene.hasFlag('has_drink') && !scene.hasFlag('drink_offered')"
+condition = 'scene.hasFlag("has_drink") && !scene.hasFlag("drink_offered")'
 weight    = 10
 prose = """
 A man two stools down — mid-thirties, decent-looking, the kind of confidence that comes from this working for him before — catches your eye and holds it a beat.

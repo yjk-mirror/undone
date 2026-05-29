@@ -7,10 +7,11 @@ use std::{
 use rand::Rng;
 use serde::Deserialize;
 use thiserror::Error;
-use undone_expr::{eval, Expr, Receiver, SceneCtx, Value};
+use undone_expr::SceneCtx;
 use undone_packs::{LoadedPackMeta, PackRegistry};
 use undone_world::World;
 
+use crate::script::{eval_bool, source_references_game_flag, CompiledScript};
 use crate::{loader::parse_condition_checked, types::SceneDefinition};
 
 // ---------------------------------------------------------------------------
@@ -76,10 +77,10 @@ fn default_weight() -> u32 {
 #[derive(Clone)]
 pub(crate) struct ScheduleEvent {
     pub(crate) scene: String,
-    pub(crate) condition: Option<Expr>,
+    pub(crate) condition: Option<CompiledScript>,
     pub(crate) weight: u32,
     pub(crate) once_only: bool,
-    pub(crate) trigger: Option<Expr>,
+    pub(crate) trigger: Option<CompiledScript>,
     pub(crate) npc_role: Option<String>,
 }
 
@@ -142,15 +143,15 @@ impl Scheduler {
                 event
                     .condition
                     .as_ref()
-                    .is_some_and(|expr| expr_references_game_flag(expr, flag))
+                    .is_some_and(|s| source_references_game_flag(&s.source, flag))
                     || event
                         .trigger
                         .as_ref()
-                        .is_some_and(|expr| expr_references_game_flag(expr, flag))
+                        .is_some_and(|s| source_references_game_flag(&s.source, flag))
             })
     }
 
-    pub fn all_conditions(&self) -> Vec<(String, Expr)> {
+    pub fn all_conditions(&self) -> Vec<(String, CompiledScript)> {
         let mut result = Vec::new();
         for slot in self.slots.values() {
             for event in &slot.events {
@@ -219,7 +220,7 @@ impl Scheduler {
                 e.weight > 0
                     && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.condition {
-                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
                                 log::warn!(
@@ -279,7 +280,7 @@ impl Scheduler {
             .find(|e| {
                 !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.trigger {
-                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
                                 log::warn!(
@@ -337,7 +338,7 @@ impl Scheduler {
                     events.iter().find(|e| {
                         !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                             && match &e.trigger {
-                                Some(expr) => match eval(expr, world, &ctx, registry) {
+                                Some(expr) => match eval_bool(expr, world, &ctx, registry) {
                                     Ok(val) => val,
                                     Err(err) => {
                                         log::warn!(
@@ -371,7 +372,7 @@ impl Scheduler {
                 e.weight > 0
                     && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
                     && match &e.condition {
-                        Some(expr) => match eval(expr, world, &ctx, registry) {
+                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
                             Ok(val) => val,
                             Err(err) => {
                                 log::warn!(
@@ -428,28 +429,6 @@ impl Scheduler {
         }
 
         Ok(())
-    }
-}
-
-fn expr_references_game_flag(expr: &Expr, flag: &str) -> bool {
-    match expr {
-        Expr::Call(call) => {
-            call.receiver == Receiver::GameData
-                && call.method == "hasGameFlag"
-                && matches!(call.args.first(), Some(Value::Str(candidate)) if candidate == flag)
-        }
-        Expr::Not(inner) => expr_references_game_flag(inner, flag),
-        Expr::And(left, right)
-        | Expr::Or(left, right)
-        | Expr::Eq(left, right)
-        | Expr::Ne(left, right)
-        | Expr::Lt(left, right)
-        | Expr::Gt(left, right)
-        | Expr::Le(left, right)
-        | Expr::Ge(left, right) => {
-            expr_references_game_flag(left, flag) || expr_references_game_flag(right, flag)
-        }
-        Expr::Lit(_) => false,
     }
 }
 
@@ -579,6 +558,11 @@ mod tests {
     use rand::SeedableRng;
 
     use super::*;
+
+    /// Compile a condition for tests (empty registry — only flags/true/false used).
+    fn cond(src: &str) -> CompiledScript {
+        crate::script::compile_condition(src, &PackRegistry::new(), "test").unwrap()
+    }
     use undone_packs::{PackContent, PackManifest, PackMeta};
     use undone_world::test_helpers::make_test_world as make_world;
 
@@ -996,7 +980,7 @@ mod tests {
     fn check_triggers_returns_scene_when_condition_true() {
         let registry = PackRegistry::new();
         // trigger on "true" — always fires
-        let trigger_expr = undone_expr::parse("true").unwrap();
+        let trigger_expr = cond("true");
         let event = ScheduleEvent {
             scene: "test::triggered_scene".into(),
             condition: None,
@@ -1022,7 +1006,7 @@ mod tests {
     fn check_triggers_returns_none_when_condition_false() {
         let registry = PackRegistry::new();
         // trigger on "false" — never fires
-        let trigger_expr = undone_expr::parse("false").unwrap();
+        let trigger_expr = cond("false");
         let event = ScheduleEvent {
             scene: "test::triggered_scene".into(),
             condition: None,
@@ -1047,7 +1031,7 @@ mod tests {
     fn check_triggers_filtered_by_once_only_flag() {
         let registry = PackRegistry::new();
         // trigger on "true" — would fire, but once_only and flag already set
-        let trigger_expr = undone_expr::parse("true").unwrap();
+        let trigger_expr = cond("true");
         let event = ScheduleEvent {
             scene: "test::once_trigger_scene".into(),
             condition: None,
@@ -1149,7 +1133,7 @@ mod tests {
     #[test]
     fn pick_next_trigger_fires_before_weighted_pick() {
         let registry = PackRegistry::new();
-        let trigger_expr = undone_expr::parse("true").unwrap();
+        let trigger_expr = cond("true");
         let triggered_event = ScheduleEvent {
             scene: "test::triggered".into(),
             condition: None,
@@ -1221,7 +1205,7 @@ mod tests {
             trigger: None,
             npc_role: None,
         };
-        let route_condition = undone_expr::parse("gd.hasGameFlag('ROUTE_WORKPLACE')").unwrap();
+        let route_condition = cond(r#"gd.hasGameFlag("ROUTE_WORKPLACE")"#);
         let arc_event = ScheduleEvent {
             scene: "test::robin_scene".into(),
             condition: Some(route_condition),
@@ -1408,7 +1392,7 @@ mod tests {
     fn references_game_flag_detects_condition_reference() {
         let event = ScheduleEvent {
             scene: "test::scene".into(),
-            condition: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_WORKPLACE')").unwrap()),
+            condition: Some(cond(r#"gd.hasGameFlag("ROUTE_WORKPLACE")"#)),
             weight: 1,
             once_only: false,
             trigger: None,
@@ -1427,7 +1411,7 @@ mod tests {
             condition: None,
             weight: 1,
             once_only: false,
-            trigger: Some(undone_expr::parse("gd.hasGameFlag('ROUTE_CAMPUS')").unwrap()),
+            trigger: Some(cond(r#"gd.hasGameFlag("ROUTE_CAMPUS")"#)),
             npc_role: None,
         };
         let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));

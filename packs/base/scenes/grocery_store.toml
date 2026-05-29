@@ -9,7 +9,7 @@ Thursday evening, the grocery store two blocks from your apartment. You have a l
 """
 
 [[intro_variants]]
-condition = "w.getSkill('FEMININITY') < 20"
+condition = 'w.getSkill("FEMININITY") < 20'
 prose = """
 Thursday evening, the grocery store two blocks from your apartment. You have a list.
 
@@ -17,7 +17,7 @@ The basket handle sits differently in your hand — smaller grip, different angl
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style = "observation"
 prose = "Produce section. The long way around the cart in the middle of the aisle, not through it. You didn't plan that route."
 

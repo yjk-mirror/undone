@@ -282,30 +282,30 @@ impl EffectDef {
 // Resolved runtime types (after TOML structs)
 // ---------------------------------------------------------------------------
 
-use undone_expr::parser::Expr;
+use crate::script::CompiledScript;
 
-/// Resolved thought — condition pre-parsed, ready for runtime evaluation.
+/// Resolved thought — condition compiled, ready for runtime evaluation.
 #[derive(Debug, Clone)]
 pub struct Thought {
-    pub condition: Option<Expr>,
+    pub condition: Option<CompiledScript>,
     pub prose: String,
     pub style: String,
 }
 
-/// Resolved narrator variant — condition pre-parsed.
+/// Resolved narrator variant — condition compiled.
 #[derive(Debug, Clone)]
 pub struct NarratorVariant {
-    pub condition: Expr,
+    pub condition: CompiledScript,
     pub prose: String,
 }
 
-/// Resolved action — conditions parsed, ready for runtime evaluation.
+/// Resolved action — conditions compiled, ready for runtime evaluation.
 #[derive(Debug, Clone)]
 pub struct Action {
     pub id: String,
     pub label: String,
     pub detail: String,
-    pub condition: Option<Expr>,
+    pub condition: Option<CompiledScript>,
     pub prose: String,
     pub allow_npc_actions: bool,
     pub effects: Vec<EffectDef>,
@@ -316,7 +316,7 @@ pub struct Action {
 
 #[derive(Debug, Clone)]
 pub struct NextBranch {
-    pub condition: Option<Expr>,
+    pub condition: Option<CompiledScript>,
     pub goto: Option<String>,
     pub slot: Option<String>,
     pub finish: bool,
@@ -325,7 +325,7 @@ pub struct NextBranch {
 #[derive(Debug, Clone)]
 pub struct NpcAction {
     pub id: String,
-    pub condition: Option<Expr>,
+    pub condition: Option<CompiledScript>,
     pub prose: String,
     pub weight: u32,
     pub effects: Vec<EffectDef>,

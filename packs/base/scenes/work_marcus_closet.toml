@@ -23,7 +23,7 @@ The hallway light cuts across the floor between you.
 """
 
 [[thoughts]]
-condition = "w.getSkill('FEMININITY') < 35"
+condition = 'w.getSkill("FEMININITY") < 35'
 style = "observation"
 prose = "The floor is empty. Just the two of you and the hallway light."
 
