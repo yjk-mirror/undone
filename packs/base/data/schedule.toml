@@ -19,7 +19,7 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::coffee_shop"
   weight    = 0
-  trigger   = "gd.week() >= 2 && !gd.hasGameFlag('ONCE_base::coffee_shop')"
+  trigger   = "gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('ONCE_base::coffee_shop')"
   once_only = true
 
   [[slot.events]]
@@ -82,33 +82,33 @@ consumes_time = true
   [[slot.events]]
   scene     = "base::coffee_shop_return"
   weight    = 9
-  condition = "gd.week() >= 2 && gd.hasGameFlag('MET_JAKE')"
+  condition = "gd.hasGameFlag('MET_JAKE')"
 
   [[slot.events]]
   scene     = "base::jake_outside"
   weight    = 7
-  condition = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE')"
+  condition = "gd.hasGameFlag('MET_JAKE')"
   npc_role  = "ROLE_JAKE"
 
   # Jake romance arc — gated by progressive flags
   [[slot.events]]
   scene     = "base::jake_first_date"
   weight    = 0
-  trigger   = "gd.week() >= 3 && gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && gd.npcLikingAtLeast('ROLE_JAKE', 'Like')"
+  trigger   = "gd.hasGameFlag('MET_JAKE') && !gd.hasGameFlag('JAKE_FIRST_DATE') && gd.npcLikingAtLeast('ROLE_JAKE', 'Like')"
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_second_date"
   weight    = 0
-  trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
+  trigger   = "gd.hasGameFlag('JAKE_FIRST_DATE') && !gd.hasGameFlag('JAKE_SECOND_DATE')"
   once_only = true
   npc_role  = "ROLE_JAKE"
 
   [[slot.events]]
   scene     = "base::jake_apartment"
   weight    = 0
-  trigger   = "gd.week() >= 4 && gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
+  trigger   = "gd.hasGameFlag('JAKE_SECOND_DATE') && !gd.hasGameFlag('JAKE_INTIMATE')"
   once_only = true
   npc_role  = "ROLE_JAKE"
 
@@ -145,8 +145,8 @@ consumes_time = true
   # Stranger encounters
   [[slot.events]]
   scene     = "base::bar_closing_time"
-  weight    = 6
-  condition = "gd.week() >= 3 && !gd.hasGameFlag('BAR_STRANGER_INVITED')"
+  weight    = 12
+  condition = "gd.arcState('base::workplace_opening') == 'settled' && !gd.hasGameFlag('BAR_STRANGER_INVITED')"
 
   [[slot.events]]
   scene     = "base::party_invitation"
