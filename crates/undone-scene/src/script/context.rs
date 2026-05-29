@@ -112,17 +112,107 @@ pub(crate) fn unknown_id_err(kind: &str, id: &str) -> Box<rhai::EvalAltResult> {
 pub(crate) fn with_read_ctx<R>(
     f: impl FnOnce(&World, &PackRegistry, &SceneCtx) -> Result<R, Box<rhai::EvalAltResult>>,
 ) -> Result<R, Box<rhai::EvalAltResult>> {
-    let ptrs = READ_CTX
-        .with(|c| c.get())
-        .ok_or_else(|| -> Box<rhai::EvalAltResult> {
-            "script evaluated with no read context installed".into()
-        })?;
-    // SAFETY: see module-level invariant. The guard that set these pointers is
-    // still on the stack for the duration of this eval call.
-    let world = unsafe { &*ptrs.world };
+    // During condition eval a ReadCtx is installed. During effect eval only a
+    // WriteCtx is installed (a single &mut World borrow); read methods on the
+    // effect engine fall back to reading through it. Exactly one is ever present.
+    if let Some(ptrs) = READ_CTX.with(|c| c.get()) {
+        // SAFETY: see module-level invariant. The guard that set these pointers
+        // is still on the stack for the duration of this eval call.
+        let world = unsafe { &*ptrs.world };
+        let registry = unsafe { &*ptrs.registry };
+        let ctx = unsafe { &*ptrs.ctx };
+        return f(world, registry, ctx);
+    }
+    if let Some(ptrs) = WRITE_CTX.with(|c| c.get()) {
+        // SAFETY: same invariant; reborrow the write context's mut pointers as
+        // shared. Statements run sequentially on one thread, so no read overlaps
+        // a write.
+        let world = unsafe { &*ptrs.world };
+        let registry = unsafe { &*ptrs.registry };
+        let ctx = unsafe { &*ptrs.ctx };
+        return f(world, registry, ctx);
+    }
+    Err("script evaluated with no evaluation context installed".into())
+}
+
+// ---------------------------------------------------------------------------
+// Write context — installed during effect eval (effect engine only).
+// ---------------------------------------------------------------------------
+
+/// Raw, lifetime-erased pointers to the mutable state one effect call-list
+/// touches, plus an error sink for continue-on-error semantics.
+#[derive(Clone, Copy)]
+pub(crate) struct WriteCtx {
+    pub(crate) world: *mut World,
+    pub(crate) ctx: *mut SceneCtx,
+    pub(crate) registry: *const PackRegistry,
+    pub(crate) errors: *mut Vec<String>,
+}
+
+thread_local! {
+    static WRITE_CTX: Cell<Option<WriteCtx>> = const { Cell::new(None) };
+}
+
+/// RAII guard installing a [`WriteCtx`] for one effect-eval call.
+pub(crate) struct WriteCtxGuard {
+    prev: Option<WriteCtx>,
+}
+
+impl WriteCtxGuard {
+    /// # Safety
+    /// The caller must keep all four borrows live (and not move them) for the
+    /// whole `eval_ast_with_scope` call — i.e. the lifetime of the guard.
+    pub(crate) fn install(
+        world: &mut World,
+        ctx: &mut SceneCtx,
+        registry: &PackRegistry,
+        errors: &mut Vec<String>,
+    ) -> Self {
+        let new = WriteCtx {
+            world: world as *mut World,
+            ctx: ctx as *mut SceneCtx,
+            registry: registry as *const PackRegistry,
+            errors: errors as *mut Vec<String>,
+        };
+        let prev = WRITE_CTX.with(|c| c.replace(Some(new)));
+        WriteCtxGuard { prev }
+    }
+}
+
+impl Drop for WriteCtxGuard {
+    fn drop(&mut self) {
+        WRITE_CTX.with(|c| c.set(self.prev));
+    }
+}
+
+/// Run an effect mutator `f` against the installed write context.
+///
+/// Preserves the engine's best-effort *continue-on-error* semantics: a mutator
+/// that fails records its error in the shared sink and the call-list keeps
+/// running (the mutator returns to Rhai as a no-op success). Mirrors the
+/// pre-Rhai `apply_effect` loop that collected `effect_errors` and emitted one
+/// `ErrorOccurred` per failure without aborting the remaining effects.
+///
+/// # Safety
+/// Relies on the [`WriteCtxGuard`] invariant; the &mut borrows are exclusive for
+/// the duration of one sequential eval call.
+pub(crate) fn with_write_ctx(
+    f: impl FnOnce(&mut World, &mut SceneCtx, &PackRegistry) -> Result<(), crate::effects::EffectError>,
+) {
+    let Some(ptrs) = WRITE_CTX.with(|c| c.get()) else {
+        // No write context: a write mutator ran on a non-effect engine. This is a
+        // programming error; record nothing actionable here (the load-time gate
+        // prevents write calls in conditions).
+        return;
+    };
+    // SAFETY: see invariant. Sequential single-threaded eval — no aliasing.
+    let world = unsafe { &mut *ptrs.world };
+    let ctx = unsafe { &mut *ptrs.ctx };
     let registry = unsafe { &*ptrs.registry };
-    let ctx = unsafe { &*ptrs.ctx };
-    f(world, registry, ctx)
+    if let Err(e) = f(world, ctx, registry) {
+        let errors = unsafe { &mut *ptrs.errors };
+        errors.push(format!("[scene-engine] effect error: {e}"));
+    }
 }
 
 /// Candidate A (rejected) — pointer carried inside the scope-injected handle.

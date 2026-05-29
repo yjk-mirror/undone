@@ -43,7 +43,7 @@ pub enum EffectError {
 // Step helpers
 // ---------------------------------------------------------------------------
 
-fn step_liking(current: LikingLevel, delta: i8) -> LikingLevel {
+pub(crate) fn step_liking(current: LikingLevel, delta: i8) -> LikingLevel {
     const LEVELS: [LikingLevel; 4] = [
         LikingLevel::Neutral,
         LikingLevel::Ok,
@@ -54,7 +54,7 @@ fn step_liking(current: LikingLevel, delta: i8) -> LikingLevel {
     LEVELS[(idx + delta as i32).clamp(0, 3) as usize]
 }
 
-fn step_love(current: LoveLevel, delta: i8) -> LoveLevel {
+pub(crate) fn step_love(current: LoveLevel, delta: i8) -> LoveLevel {
     const LEVELS: [LoveLevel; 5] = [
         LoveLevel::None,
         LoveLevel::Some,
@@ -66,7 +66,7 @@ fn step_love(current: LoveLevel, delta: i8) -> LoveLevel {
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
 }
 
-fn step_arousal(current: ArousalLevel, delta: i8) -> ArousalLevel {
+pub(crate) fn step_arousal(current: ArousalLevel, delta: i8) -> ArousalLevel {
     const LEVELS: [ArousalLevel; 5] = [
         ArousalLevel::Discomfort,
         ArousalLevel::Comfort,
@@ -78,7 +78,7 @@ fn step_arousal(current: ArousalLevel, delta: i8) -> ArousalLevel {
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
 }
 
-fn step_attraction(current: AttractionLevel, delta: i8) -> AttractionLevel {
+pub(crate) fn step_attraction(current: AttractionLevel, delta: i8) -> AttractionLevel {
     const LEVELS: [AttractionLevel; 4] = [
         AttractionLevel::Unattracted,
         AttractionLevel::Ok,
@@ -89,7 +89,7 @@ fn step_attraction(current: AttractionLevel, delta: i8) -> AttractionLevel {
     LEVELS[(idx + delta as i32).clamp(0, 3) as usize]
 }
 
-fn step_alcohol(current: AlcoholLevel, delta: i8) -> AlcoholLevel {
+pub(crate) fn step_alcohol(current: AlcoholLevel, delta: i8) -> AlcoholLevel {
     const LEVELS: [AlcoholLevel; 5] = [
         AlcoholLevel::Sober,
         AlcoholLevel::Tipsy,
@@ -101,7 +101,7 @@ fn step_alcohol(current: AlcoholLevel, delta: i8) -> AlcoholLevel {
     LEVELS[(idx + delta as i32).clamp(0, 4) as usize]
 }
 
-fn parse_relationship_status(s: &str) -> Option<RelationshipStatus> {
+pub(crate) fn parse_relationship_status(s: &str) -> Option<RelationshipStatus> {
     match s {
         "Stranger" => Some(RelationshipStatus::Stranger),
         "Acquaintance" => Some(RelationshipStatus::Acquaintance),
@@ -114,7 +114,7 @@ fn parse_relationship_status(s: &str) -> Option<RelationshipStatus> {
     }
 }
 
-fn parse_behaviour(s: &str) -> Option<Behaviour> {
+pub(crate) fn parse_behaviour(s: &str) -> Option<Behaviour> {
     match s {
         "Neutral" => Some(Behaviour::Neutral),
         "Romantic" => Some(Behaviour::Romantic),
@@ -411,12 +411,12 @@ pub fn apply_effect(
     Ok(())
 }
 
-enum NpcRef {
+pub(crate) enum NpcRef {
     Male(MaleNpcKey),
     Female(FemaleNpcKey),
 }
 
-fn resolve_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<NpcRef, EffectError> {
+pub(crate) fn resolve_npc_ref(npc: &str, ctx: &SceneCtx) -> Result<NpcRef, EffectError> {
     match npc {
         "m" => ctx
             .active_male

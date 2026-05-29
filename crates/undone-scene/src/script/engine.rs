@@ -5,7 +5,7 @@ use undone_packs::PackRegistry;
 use undone_world::World;
 
 use crate::script::compiled::{CompiledScript, ScriptError};
-use crate::script::context::ReadCtxGuard;
+use crate::script::context::{ReadCtxGuard, WriteCtxGuard};
 use crate::script::read_api::female_npc::F;
 use crate::script::read_api::game_data::Gd;
 use crate::script::read_api::male_npc::M;
@@ -124,6 +124,32 @@ pub fn eval_string(
             context: script.source.clone(),
             message: e.to_string(),
         })
+}
+
+/// Run a compiled effect call-list against the effect `engine`, mutating the
+/// world. Returns the list of error messages collected from any failing mutator
+/// (continue-on-error: the whole list runs regardless), to be surfaced as
+/// `ErrorOccurred` events by the caller — matching the pre-Rhai `apply_effect`
+/// loop's best-effort semantics.
+pub fn apply_effect_script(
+    script: &CompiledScript,
+    engine: &rhai::Engine,
+    world: &mut World,
+    ctx: &mut SceneCtx,
+    registry: &PackRegistry,
+) -> Vec<String> {
+    let mut errors = Vec::new();
+    let result = {
+        let _guard = WriteCtxGuard::install(world, ctx, registry, &mut errors);
+        let mut scope = read_scope();
+        engine.eval_ast_with_scope::<()>(&mut scope, &script.ast)
+    };
+    if let Err(e) = result {
+        // A hard Rhai error (e.g. bounds exceeded, or a fatal call) — distinct
+        // from the per-mutator soft errors collected via with_write_ctx.
+        errors.push(format!("[scene-engine] effect script error: {e}"));
+    }
+    errors
 }
 
 #[cfg(test)]
@@ -338,22 +364,78 @@ mod tests {
     }
 
     /// The read/write split: a mutating call resolves on the effect engine but
-    /// not on the condition engine. Note Rhai resolves functions at *runtime*,
-    /// so this is an EVAL-time difference, not a `compile()` difference — which
-    /// is exactly what the Task-6 dry-run gate turns into a load error.
-    ///
-    /// `#[ignore]` until Task 5 registers `addArousal`; un-ignored there.
+    /// not on the condition engine. Rhai resolves functions at *runtime*, so this
+    /// is an EVAL-time difference, not a `compile()` difference — which is exactly
+    /// what the Task-6 dry-run gate turns into a load error.
     #[test]
-    #[ignore = "un-ignore in Task 5 once addArousal is registered on the write API"]
     fn write_call_resolves_on_effect_engine_only() {
-        let engines = super::build_engines();
-        // Compiles on both (Rhai defers fn resolution to runtime)...
-        let on_cond = engines.cond.compile("w.addArousal(1)");
-        let on_effect = engines.effect.compile("w.addArousal(1)");
-        assert!(on_cond.is_ok() && on_effect.is_ok());
+        use std::sync::Arc;
 
-        // ...but only the effect engine can *resolve* the call at eval time.
-        // (A full eval needs a context installed; Task 5 wires that up. Here we
-        // assert the registration difference via the engine's known fns.)
+        use crate::script::compiled::CompiledScript;
+
+        let engines = super::build_engines();
+        let reg = undone_packs::PackRegistry::new();
+        let mut world = make_test_world();
+        let mut ctx = undone_expr::SceneCtx::new();
+
+        let src = "w.addArousal(1)";
+        // Compiles on both engines (Rhai defers fn resolution to runtime).
+        let ast = engines
+            .effect
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+
+        // Effect engine: resolves + applies, no errors.
+        let errors =
+            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        assert!(
+            errors.is_empty(),
+            "effect engine should apply cleanly: {errors:?}"
+        );
+
+        // Condition engine: the same script fails to resolve `addArousal` (not
+        // registered there) — surfaced as a hard error.
+        let errors_cond =
+            super::apply_effect_script(&script, &engines.cond, &mut world, &mut ctx, &reg);
+        assert!(
+            !errors_cond.is_empty(),
+            "addArousal must NOT resolve on the condition engine"
+        );
+    }
+
+    #[test]
+    fn rhai_effect_applies_player_mutations() {
+        use std::sync::Arc;
+
+        use crate::script::compiled::CompiledScript;
+
+        let engines = super::build_engines();
+        let reg = undone_packs::PackRegistry::new();
+        let mut world = make_test_world();
+        let mut ctx = undone_expr::SceneCtx::new();
+
+        let start_money = world.player.money;
+        assert!(world.player.virgin);
+
+        let src = r#"w.addArousal(1); w.changeMoney(-30); w.setVirgin(false);"#;
+        let ast = engines
+            .effect
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+        let errors =
+            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        assert!(errors.is_empty(), "no errors expected: {errors:?}");
+
+        assert_eq!(world.player.money, start_money - 30);
+        assert!(!world.player.virgin);
+        assert_eq!(world.player.arousal, undone_domain::ArousalLevel::Enjoy);
     }
 }
