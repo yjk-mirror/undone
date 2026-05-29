@@ -41,6 +41,9 @@ fn new_bounded_engine() -> rhai::Engine {
 }
 
 /// Build the condition + effect engines with their bounds and API surfaces.
+///
+/// Used by the per-thread [`with_engines`] cache and by the rhai-mcp-server
+/// (authoring-time validation against the identical surface).
 pub fn build_engines() -> ScriptEngines {
     let mut cond = new_bounded_engine();
     register_read_api(&mut cond);
@@ -50,6 +53,23 @@ pub fn build_engines() -> ScriptEngines {
     register_write_api(&mut effect);
 
     ScriptEngines { cond, effect }
+}
+
+thread_local! {
+    /// One stateless engine pair per thread. The engines hold only the fixed
+    /// registered API + bounds — no pack/world state (that flows through the
+    /// eval context), so a single shared pair serves every session. This is the
+    /// direct analog of the old global `undone_expr::eval()` free function;
+    /// `rhai::Engine` is `!Sync` (no `sync` feature — single-threaded UI), hence
+    /// thread-local rather than a global. Compiled `Arc<AST>`s are portable
+    /// across engine instances, so an AST compiled on one thread evaluates fine
+    /// on another's engine.
+    static ENGINES: ScriptEngines = build_engines();
+}
+
+/// Run `f` with the current thread's shared engine pair.
+pub fn with_engines<R>(f: impl FnOnce(&ScriptEngines) -> R) -> R {
+    ENGINES.with(f)
 }
 
 /// Push the six read-receiver handles into a fresh scope under the names the
@@ -70,83 +90,89 @@ pub(crate) fn read_scope() -> rhai::Scope<'static> {
     scope
 }
 
-/// Evaluate a compiled condition to `bool`, installing the read context for the
-/// duration of the call. The `engine` should be the `cond` engine (or `effect`
-/// for an effect script's internal reads).
+/// Evaluate a compiled condition to `bool` against the thread's condition engine,
+/// installing the read context for the duration of the call.
 pub fn eval_bool(
     script: &CompiledScript,
-    engine: &rhai::Engine,
     world: &World,
     ctx: &SceneCtx,
     registry: &PackRegistry,
 ) -> Result<bool, ScriptError> {
     let _guard = ReadCtxGuard::install(world, registry, ctx);
-    let mut scope = read_scope();
-    engine
-        .eval_ast_with_scope::<bool>(&mut scope, &script.ast)
-        .map_err(|e| ScriptError::Runtime {
-            context: script.source.clone(),
-            message: e.to_string(),
-        })
+    with_engines(|engines| {
+        let mut scope = read_scope();
+        engines
+            .cond
+            .eval_ast_with_scope::<bool>(&mut scope, &script.ast)
+            .map_err(|e| ScriptError::Runtime {
+                context: script.source.clone(),
+                message: e.to_string(),
+            })
+    })
 }
 
-/// Evaluate a compiled script to `i64` (used by the dry-run gate / tests).
+/// Evaluate a compiled condition to `i64` (tests / odds helpers).
 pub fn eval_int(
     script: &CompiledScript,
-    engine: &rhai::Engine,
     world: &World,
     ctx: &SceneCtx,
     registry: &PackRegistry,
 ) -> Result<i64, ScriptError> {
     let _guard = ReadCtxGuard::install(world, registry, ctx);
-    let mut scope = read_scope();
-    engine
-        .eval_ast_with_scope::<i64>(&mut scope, &script.ast)
-        .map_err(|e| ScriptError::Runtime {
-            context: script.source.clone(),
-            message: e.to_string(),
-        })
+    with_engines(|engines| {
+        let mut scope = read_scope();
+        engines
+            .cond
+            .eval_ast_with_scope::<i64>(&mut scope, &script.ast)
+            .map_err(|e| ScriptError::Runtime {
+                context: script.source.clone(),
+                message: e.to_string(),
+            })
+    })
 }
 
-/// Evaluate a compiled script to `String` (used by the dry-run gate / tests).
+/// Evaluate a compiled condition to `String` (tests).
 pub fn eval_string(
     script: &CompiledScript,
-    engine: &rhai::Engine,
     world: &World,
     ctx: &SceneCtx,
     registry: &PackRegistry,
 ) -> Result<String, ScriptError> {
     let _guard = ReadCtxGuard::install(world, registry, ctx);
-    let mut scope = read_scope();
-    engine
-        .eval_ast_with_scope::<String>(&mut scope, &script.ast)
-        .map_err(|e| ScriptError::Runtime {
-            context: script.source.clone(),
-            message: e.to_string(),
-        })
+    with_engines(|engines| {
+        let mut scope = read_scope();
+        engines
+            .cond
+            .eval_ast_with_scope::<String>(&mut scope, &script.ast)
+            .map_err(|e| ScriptError::Runtime {
+                context: script.source.clone(),
+                message: e.to_string(),
+            })
+    })
 }
 
-/// Run a compiled effect call-list against the effect `engine`, mutating the
-/// world. Returns the list of error messages collected from any failing mutator
-/// (continue-on-error: the whole list runs regardless), to be surfaced as
+/// Run a compiled effect call-list against the thread's effect engine, mutating
+/// the world. Returns error messages collected from any failing mutator
+/// (continue-on-error: the whole list runs regardless), surfaced as
 /// `ErrorOccurred` events by the caller — matching the pre-Rhai `apply_effect`
 /// loop's best-effort semantics.
 pub fn apply_effect_script(
     script: &CompiledScript,
-    engine: &rhai::Engine,
     world: &mut World,
     ctx: &mut SceneCtx,
     registry: &PackRegistry,
 ) -> Vec<String> {
     let mut errors = Vec::new();
-    let result = {
+    let result = with_engines(|engines| {
         let _guard = WriteCtxGuard::install(world, ctx, registry, &mut errors);
         let mut scope = read_scope();
-        engine.eval_ast_with_scope::<()>(&mut scope, &script.ast)
-    };
+        engines
+            .effect
+            .eval_ast_with_scope::<()>(&mut scope, &script.ast)
+    });
     if let Err(e) = result {
-        // A hard Rhai error (e.g. bounds exceeded, or a fatal call) — distinct
-        // from the per-mutator soft errors collected via with_write_ctx.
+        // A hard Rhai error (e.g. bounds exceeded) — distinct from the per-mutator
+        // soft errors collected via with_write_ctx.
         errors.push(format!("[scene-engine] effect script error: {e}"));
     }
     errors
@@ -281,7 +307,7 @@ mod tests {
             source: src.into(),
         };
 
-        let got = super::eval_bool(&script, &engines.cond, &world, &ctx, &reg).unwrap();
+        let got = super::eval_bool(&script, &world, &ctx, &reg).unwrap();
         assert!(got, "SHY + FEMININITY 12 (<15) should be true");
     }
 
@@ -323,7 +349,7 @@ mod tests {
                 ast: Arc::new(ast),
                 source: src.into(),
             };
-            super::eval_bool(&script, &engines.cond, world, ctx, reg).unwrap()
+            super::eval_bool(&script, world, ctx, reg).unwrap()
         };
 
         assert!(check_bool(
@@ -359,53 +385,13 @@ mod tests {
             ast: Arc::new(ast),
             source: src.into(),
         };
-        let name = super::eval_string(&script, &engines.cond, &world, &ctx, &reg).unwrap();
+        let name = super::eval_string(&script, &world, &ctx, &reg).unwrap();
         assert_eq!(name, "Jake");
     }
 
-    /// The read/write split: a mutating call resolves on the effect engine but
-    /// not on the condition engine. Rhai resolves functions at *runtime*, so this
-    /// is an EVAL-time difference, not a `compile()` difference — which is exactly
-    /// what the Task-6 dry-run gate turns into a load error.
-    #[test]
-    fn write_call_resolves_on_effect_engine_only() {
-        use std::sync::Arc;
-
-        use crate::script::compiled::CompiledScript;
-
-        let engines = super::build_engines();
-        let reg = undone_packs::PackRegistry::new();
-        let mut world = make_test_world();
-        let mut ctx = undone_expr::SceneCtx::new();
-
-        let src = "w.addArousal(1)";
-        // Compiles on both engines (Rhai defers fn resolution to runtime).
-        let ast = engines
-            .effect
-            .compile_with_scope(&super::read_scope(), src)
-            .unwrap();
-        let script = CompiledScript {
-            ast: Arc::new(ast),
-            source: src.into(),
-        };
-
-        // Effect engine: resolves + applies, no errors.
-        let errors =
-            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
-        assert!(
-            errors.is_empty(),
-            "effect engine should apply cleanly: {errors:?}"
-        );
-
-        // Condition engine: the same script fails to resolve `addArousal` (not
-        // registered there) — surfaced as a hard error.
-        let errors_cond =
-            super::apply_effect_script(&script, &engines.cond, &mut world, &mut ctx, &reg);
-        assert!(
-            !errors_cond.is_empty(),
-            "addArousal must NOT resolve on the condition engine"
-        );
-    }
+    // The read/write split is enforced at LOAD by the gate (an effect mutator in
+    // a condition fails `compile_condition`) — see
+    // `script::compiled::tests::effect_mutator_in_condition_is_rejected`.
 
     #[test]
     fn rhai_effect_applies_player_mutations() {
@@ -430,8 +416,7 @@ mod tests {
             ast: Arc::new(ast),
             source: src.into(),
         };
-        let errors =
-            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        let errors = super::apply_effect_script(&script, &mut world, &mut ctx, &reg);
         assert!(errors.is_empty(), "no errors expected: {errors:?}");
 
         assert_eq!(world.player.money, start_money - 30);
@@ -473,8 +458,7 @@ mod tests {
             ast: Arc::new(ast),
             source: src.into(),
         };
-        let errors =
-            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        let errors = super::apply_effect_script(&script, &mut world, &mut ctx, &reg);
         assert!(errors.is_empty(), "no errors expected: {errors:?}");
 
         assert!(world.game_data.has_flag("DONE"));
@@ -510,8 +494,7 @@ mod tests {
             ast: Arc::new(ast),
             source: src.into(),
         };
-        let errors =
-            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        let errors = super::apply_effect_script(&script, &mut world, &mut ctx, &reg);
         assert_eq!(errors.len(), 1, "one collected error expected: {errors:?}");
         assert!(
             world.game_data.has_flag("AFTER"),

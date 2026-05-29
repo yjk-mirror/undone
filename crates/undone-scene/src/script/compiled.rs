@@ -5,7 +5,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use undone_packs::PackRegistry;
 
-use crate::script::engine::read_scope;
+use crate::script::engine::{read_scope, with_engines};
 use crate::script::validate;
 
 #[derive(Debug, Error)]
@@ -44,17 +44,16 @@ pub struct CompiledScript {
 ///    READ methods are valid; an effect mutator in a condition fails here.
 pub fn compile_condition(
     src: &str,
-    engine: &rhai::Engine,
     registry: &PackRegistry,
     context: &str,
 ) -> Result<CompiledScript, ScriptError> {
-    let ast = engine
-        .compile_with_scope(&read_scope(), src)
-        .map_err(|e| ScriptError::Compile {
+    let ast = with_engines(|engines| engines.cond.compile_with_scope(&read_scope(), src)).map_err(
+        |e| ScriptError::Compile {
             context: context.into(),
             message: e.to_string(),
             source_text: src.into(),
-        })?;
+        },
+    )?;
     validate::validate_condition_source(src, registry, context)?;
     Ok(CompiledScript {
         ast: Arc::new(ast),
@@ -67,12 +66,10 @@ pub fn compile_condition(
 /// the effect engine).
 pub fn compile_effect(
     src: &str,
-    engine: &rhai::Engine,
     registry: &PackRegistry,
     context: &str,
 ) -> Result<CompiledScript, ScriptError> {
-    let ast = engine
-        .compile_with_scope(&read_scope(), src)
+    let ast = with_engines(|engines| engines.effect.compile_with_scope(&read_scope(), src))
         .map_err(|e| ScriptError::Compile {
             context: context.into(),
             message: e.to_string(),
@@ -88,7 +85,6 @@ pub fn compile_effect(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::script::engine::build_engines;
 
     fn base_registry() -> PackRegistry {
         let mut reg = PackRegistry::new();
@@ -112,15 +108,9 @@ mod tests {
 
     #[test]
     fn typo_trait_id_fails_at_compile_not_runtime() {
-        let engines = build_engines();
         let reg = base_registry();
-        let err = compile_condition(
-            r#"w.hasTrait("TYPpO_NOT_A_TRAIT")"#,
-            &engines.cond,
-            &reg,
-            "test",
-        )
-        .unwrap_err();
+        let err =
+            compile_condition(r#"w.hasTrait("TYPpO_NOT_A_TRAIT")"#, &reg, "test").unwrap_err();
         assert!(
             matches!(err, ScriptError::UnknownId { .. }),
             "unknown trait id must fail at LOAD, got: {err:?}"
@@ -129,12 +119,10 @@ mod tests {
 
     #[test]
     fn valid_condition_compiles() {
-        let engines = build_engines();
         let reg = base_registry();
-        assert!(compile_condition(r#"w.hasTrait("SHY")"#, &engines.cond, &reg, "test").is_ok());
+        assert!(compile_condition(r#"w.hasTrait("SHY")"#, &reg, "test").is_ok());
         assert!(compile_condition(
             r#"w.hasTrait("SHY") && w.getSkill("FEMININITY") < 15"#,
-            &engines.cond,
             &reg,
             "test"
         )
@@ -143,10 +131,8 @@ mod tests {
 
     #[test]
     fn typo_skill_in_get_skill_fails_at_load() {
-        let engines = build_engines();
         let reg = base_registry();
-        let err = compile_condition(r#"w.getSkill("NOPE") > 5"#, &engines.cond, &reg, "test")
-            .unwrap_err();
+        let err = compile_condition(r#"w.getSkill("NOPE") > 5"#, &reg, "test").unwrap_err();
         assert!(matches!(err, ScriptError::UnknownId { kind, .. } if kind == "skill"));
     }
 
@@ -154,24 +140,15 @@ mod tests {
     fn typo_id_in_short_circuited_branch_still_fails() {
         // The branch never executes (false && ...), but the static scan still
         // catches the typo — the all-branch guarantee a runtime dry-run lacks.
-        let engines = build_engines();
         let reg = base_registry();
-        let err = compile_condition(
-            r#"false && w.hasTrait("TYPO")"#,
-            &engines.cond,
-            &reg,
-            "test",
-        )
-        .unwrap_err();
+        let err = compile_condition(r#"false && w.hasTrait("TYPO")"#, &reg, "test").unwrap_err();
         assert!(matches!(err, ScriptError::UnknownId { .. }));
     }
 
     #[test]
     fn unknown_method_fails_at_load() {
-        let engines = build_engines();
         let reg = base_registry();
-        let err =
-            compile_condition(r#"w.notARealMethod()"#, &engines.cond, &reg, "test").unwrap_err();
+        let err = compile_condition(r#"w.notARealMethod()"#, &reg, "test").unwrap_err();
         assert!(matches!(err, ScriptError::Compile { .. }));
     }
 
@@ -179,19 +156,16 @@ mod tests {
     fn effect_mutator_in_condition_is_rejected() {
         // Read/write split enforced at LOAD: an effect call in a condition is
         // unknown on the condition surface.
-        let engines = build_engines();
         let reg = base_registry();
-        let err = compile_condition(r#"w.addArousal(1)"#, &engines.cond, &reg, "test").unwrap_err();
+        let err = compile_condition(r#"w.addArousal(1)"#, &reg, "test").unwrap_err();
         assert!(matches!(err, ScriptError::Compile { .. }));
     }
 
     #[test]
     fn valid_effect_compiles() {
-        let engines = build_engines();
         let reg = base_registry();
         assert!(compile_effect(
             r#"w.addArousal(1); gd.setGameFlag("X"); npc("m").addLiking(2);"#,
-            &engines.effect,
             &reg,
             "test"
         )
@@ -202,10 +176,8 @@ mod tests {
     fn out_of_range_delta_fails_at_load() {
         // Legacy EffectDef stored i8; an out-of-range delta wrapped silently with
         // the i64 Rhai arg, so the gate rejects it (review finding #2).
-        let engines = build_engines();
         let reg = base_registry();
-        let err =
-            compile_effect(r#"w.addArousal(200)"#, &engines.effect, &reg, "test").unwrap_err();
+        let err = compile_effect(r#"w.addArousal(200)"#, &reg, "test").unwrap_err();
         assert!(
             matches!(err, ScriptError::Compile { ref message, .. } if message.contains("i8")),
             "got: {err:?}"
@@ -214,15 +186,8 @@ mod tests {
 
     #[test]
     fn effect_unknown_skill_fails_at_load() {
-        let engines = build_engines();
         let reg = base_registry();
-        let err = compile_effect(
-            r#"w.skillIncrease("NOPE", 5)"#,
-            &engines.effect,
-            &reg,
-            "test",
-        )
-        .unwrap_err();
+        let err = compile_effect(r#"w.skillIncrease("NOPE", 5)"#, &reg, "test").unwrap_err();
         assert!(matches!(err, ScriptError::UnknownId { kind, .. } if kind == "skill"));
     }
 }
