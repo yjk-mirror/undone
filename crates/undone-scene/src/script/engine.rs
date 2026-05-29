@@ -438,4 +438,84 @@ mod tests {
         assert!(!world.player.virgin);
         assert_eq!(world.player.arousal, undone_domain::ArousalLevel::Enjoy);
     }
+
+    #[test]
+    fn rhai_effect_applies_gd_scene_npc_mutations() {
+        use std::sync::Arc;
+
+        use crate::script::compiled::CompiledScript;
+        use undone_expr::SceneCtx;
+        use undone_world::test_helpers::make_test_male_npc;
+
+        let engines = super::build_engines();
+        let mut reg = undone_packs::PackRegistry::new();
+        let personality = reg.intern_personality("ROMANTIC");
+
+        let mut world = make_test_world();
+        let key = world.male_npcs.insert(make_test_male_npc(personality));
+        let mut ctx = SceneCtx::new();
+        ctx.active_male = Some(key);
+        ctx.scene_id = Some("test::scene".into());
+
+        let src = r#"
+            gd.setGameFlag("DONE");
+            gd.advanceArc("base::jake", "met");
+            scene.setFlag("local");
+            npc("m").addLiking(2);
+            npc("m").setName("Jake");
+            npc("m").setRole("ROLE_X");
+        "#;
+        let ast = engines
+            .effect
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+        let errors =
+            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        assert!(errors.is_empty(), "no errors expected: {errors:?}");
+
+        assert!(world.game_data.has_flag("DONE"));
+        assert_eq!(world.game_data.arc_state("base::jake"), Some("met"));
+        assert!(ctx.has_flag("local"));
+        let npc = world.male_npcs.get(key).unwrap();
+        assert_eq!(npc.core.pc_liking, undone_domain::LikingLevel::Like);
+        assert_eq!(npc.core.effective_name(), "Jake");
+        assert!(npc.core.roles.contains("ROLE_X"));
+    }
+
+    /// continue-on-error: a failing mutator records an error but the rest of the
+    /// call-list still applies.
+    #[test]
+    fn rhai_effect_continues_after_error() {
+        use std::sync::Arc;
+
+        use crate::script::compiled::CompiledScript;
+        use undone_expr::SceneCtx;
+
+        let engines = super::build_engines();
+        let reg = undone_packs::PackRegistry::new(); // no stats registered
+        let mut world = make_test_world();
+        let mut ctx = SceneCtx::new();
+
+        // First call fails (unknown stat), second still applies.
+        let src = r#"gd.addStat("NOPE", 1); gd.setGameFlag("AFTER");"#;
+        let ast = engines
+            .effect
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+        let errors =
+            super::apply_effect_script(&script, &engines.effect, &mut world, &mut ctx, &reg);
+        assert_eq!(errors.len(), 1, "one collected error expected: {errors:?}");
+        assert!(
+            world.game_data.has_flag("AFTER"),
+            "call-list must continue after a failing mutator"
+        );
+    }
 }
