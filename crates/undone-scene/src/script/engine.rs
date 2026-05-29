@@ -1,8 +1,18 @@
 //! `ScriptEngines` (two-engine scaffold) + `build_engines()` + eval helpers.
-//!
-//! The eval helpers (`eval_bool` / `eval_int` / `eval_string`) land in Task 4.
 
+use undone_expr::SceneCtx;
+use undone_packs::PackRegistry;
+use undone_world::World;
+
+use crate::script::compiled::{CompiledScript, ScriptError};
+use crate::script::context::ReadCtxGuard;
+use crate::script::read_api::female_npc::F;
+use crate::script::read_api::game_data::Gd;
+use crate::script::read_api::male_npc::M;
+use crate::script::read_api::player::W;
 use crate::script::read_api::register_read_api;
+use crate::script::read_api::role::Role;
+use crate::script::read_api::scene::Scene;
 use crate::script::write_api::register_write_api;
 
 /// The two Rhai engines a session uses.
@@ -40,6 +50,80 @@ pub fn build_engines() -> ScriptEngines {
     register_write_api(&mut effect);
 
     ScriptEngines { cond, effect }
+}
+
+/// Push the six read-receiver handles into a fresh scope under the names the
+/// authored condition syntax uses (`w`, `gd`, `m`, `f`, `role`, `scene`).
+///
+/// With `strict_variables(true)`, scripts must be compiled with these variables
+/// in scope (`compile_with_scope(&read_scope(), src)`) or `w`/`gd`/… are rejected
+/// as undefined at compile time. The same scope shape serves both engines —
+/// write methods add registered functions, not new scope variables.
+pub(crate) fn read_scope() -> rhai::Scope<'static> {
+    let mut scope = rhai::Scope::new();
+    scope.push("w", W);
+    scope.push("gd", Gd);
+    scope.push("m", M);
+    scope.push("f", F);
+    scope.push("role", Role);
+    scope.push("scene", Scene);
+    scope
+}
+
+/// Evaluate a compiled condition to `bool`, installing the read context for the
+/// duration of the call. The `engine` should be the `cond` engine (or `effect`
+/// for an effect script's internal reads).
+pub fn eval_bool(
+    script: &CompiledScript,
+    engine: &rhai::Engine,
+    world: &World,
+    ctx: &SceneCtx,
+    registry: &PackRegistry,
+) -> Result<bool, ScriptError> {
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
+    let mut scope = read_scope();
+    engine
+        .eval_ast_with_scope::<bool>(&mut scope, &script.ast)
+        .map_err(|e| ScriptError::Runtime {
+            context: script.source.clone(),
+            message: e.to_string(),
+        })
+}
+
+/// Evaluate a compiled script to `i64` (used by the dry-run gate / tests).
+pub fn eval_int(
+    script: &CompiledScript,
+    engine: &rhai::Engine,
+    world: &World,
+    ctx: &SceneCtx,
+    registry: &PackRegistry,
+) -> Result<i64, ScriptError> {
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
+    let mut scope = read_scope();
+    engine
+        .eval_ast_with_scope::<i64>(&mut scope, &script.ast)
+        .map_err(|e| ScriptError::Runtime {
+            context: script.source.clone(),
+            message: e.to_string(),
+        })
+}
+
+/// Evaluate a compiled script to `String` (used by the dry-run gate / tests).
+pub fn eval_string(
+    script: &CompiledScript,
+    engine: &rhai::Engine,
+    world: &World,
+    ctx: &SceneCtx,
+    registry: &PackRegistry,
+) -> Result<String, ScriptError> {
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
+    let mut scope = read_scope();
+    engine
+        .eval_ast_with_scope::<String>(&mut scope, &script.ast)
+        .map_err(|e| ScriptError::Runtime {
+            context: script.source.clone(),
+            message: e.to_string(),
+        })
 }
 
 #[cfg(test)]
@@ -121,6 +205,58 @@ mod tests {
     #[test]
     fn build_engines_succeeds() {
         let _engines = super::build_engines();
+    }
+
+    #[test]
+    fn rhai_condition_reads_trait_and_skill() {
+        use std::sync::Arc;
+
+        use crate::script::compiled::CompiledScript;
+
+        let engines = super::build_engines();
+
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_traits(vec![undone_packs::TraitDef {
+            id: "SHY".into(),
+            name: "Shy".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        reg.register_skills(vec![undone_packs::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: "...".into(),
+            min: 0,
+            max: 100,
+        }]);
+        let shy = reg.resolve_trait("SHY").unwrap();
+        let fem = reg.resolve_skill("FEMININITY").unwrap();
+
+        let mut world = make_test_world();
+        world.player.traits.insert(shy);
+        world.player.skills.insert(
+            fem,
+            undone_domain::SkillValue {
+                value: 12,
+                modifier: 0,
+            },
+        );
+        let ctx = undone_expr::SceneCtx::new();
+
+        let src = r#"w.hasTrait("SHY") && w.getSkill("FEMININITY") < 15"#;
+        let ast = engines
+            .cond
+            .compile_with_scope(&super::read_scope(), src)
+            .unwrap();
+        let script = CompiledScript {
+            ast: Arc::new(ast),
+            source: src.into(),
+        };
+
+        let got = super::eval_bool(&script, &engines.cond, &world, &ctx, &reg).unwrap();
+        assert!(got, "SHY + FEMININITY 12 (<15) should be true");
     }
 
     /// The read/write split: a mutating call resolves on the effect engine but
