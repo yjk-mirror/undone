@@ -1,7 +1,7 @@
 # Rhai + Fragment Architecture — Design
 
 > **Date:** 2026-05-29
-> **Status:** Design approved in principle; awaiting written-spec review before plan decomposition.
+> **Status:** Design approved (2026-05-29). Decomposing into phase implementation plans.
 > **Scope:** Replace `undone-expr` and the `EffectDef` enum with Rhai; pivot content to a
 > Disco-Elysium-style fragment model with passive/active/check fragments and a global pool.
 > **Source-of-truth order:** live code > CLAUDE.md > creative-direction.md > this file.
