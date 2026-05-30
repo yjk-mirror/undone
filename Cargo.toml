@@ -3,7 +3,6 @@ members = [
     "crates/undone-domain",
     "crates/undone-world",
     "crates/undone-packs",
-    "crates/undone-expr",
     "crates/undone-scene",
     "crates/undone-save",
     "crates/undone-ui",
@@ -68,7 +67,6 @@ toml          = { workspace = true }
 fs4           = "0.13"
 
 [dev-dependencies]
-undone-expr   = { path = "crates/undone-expr" }
 undone-world  = { path = "crates/undone-world", features = ["test-helpers"] }
 undone-domain = { path = "crates/undone-domain" }
 undone-packs  = { path = "crates/undone-packs" }

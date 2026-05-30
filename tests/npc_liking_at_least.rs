@@ -20,9 +20,10 @@ fn eval_bool(
     world: &undone_world::World,
     reg: &undone_packs::PackRegistry,
 ) -> bool {
-    let expr = undone_expr::parse(expr_str).expect("parse should succeed");
-    let ctx = undone_expr::SceneCtx::new();
-    undone_expr::eval(&expr, world, &ctx, reg).expect("eval should succeed")
+    let script =
+        undone_scene::compile_condition(expr_str, reg, "test").expect("compile should succeed");
+    let ctx = undone_scene::SceneCtx::new();
+    undone_scene::eval_bool(&script, world, &ctx, reg).expect("eval should succeed")
 }
 
 /// Build a minimal MaleNpc with a given role and pc_liking level.
@@ -129,22 +130,22 @@ fn npc_at_neutral_passes_neutral_fails_all_higher() {
     world.male_npcs.insert(npc);
 
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_HANK', 'Neutral')",
+        r#"gd.npcLikingAtLeast("ROLE_HANK", "Neutral")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_HANK', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_HANK", "Ok")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_HANK', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_HANK", "Like")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_HANK', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_HANK", "Close")"#,
         &world,
         &reg
     ));
@@ -160,22 +161,22 @@ fn npc_at_ok_passes_neutral_and_ok_fails_higher() {
     world.male_npcs.insert(npc);
 
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_SAM', 'Neutral')",
+        r#"gd.npcLikingAtLeast("ROLE_SAM", "Neutral")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_SAM', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_SAM", "Ok")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_SAM', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_SAM", "Like")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_SAM', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_SAM", "Close")"#,
         &world,
         &reg
     ));
@@ -195,22 +196,22 @@ fn npc_at_like_passes_neutral_ok_like_fails_close() {
     world.male_npcs.insert(npc);
 
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_TIM', 'Neutral')",
+        r#"gd.npcLikingAtLeast("ROLE_TIM", "Neutral")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_TIM', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_TIM", "Ok")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_TIM', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_TIM", "Like")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_TIM', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_TIM", "Close")"#,
         &world,
         &reg
     ));
@@ -230,22 +231,22 @@ fn npc_at_close_passes_all_levels() {
     world.male_npcs.insert(npc);
 
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_VAL', 'Neutral')",
+        r#"gd.npcLikingAtLeast("ROLE_VAL", "Neutral")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_VAL', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_VAL", "Ok")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_VAL', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_VAL", "Like")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_VAL', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_VAL", "Close")"#,
         &world,
         &reg
     ));
@@ -262,25 +263,25 @@ fn missing_role_defaults_to_neutral() {
 
     // Neutral >= Neutral is true
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_GHOST', 'Neutral')",
+        r#"gd.npcLikingAtLeast("ROLE_GHOST", "Neutral")"#,
         &world,
         &reg
     ));
     // Neutral >= Ok is false
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_GHOST', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_GHOST", "Ok")"#,
         &world,
         &reg
     ));
     // Neutral >= Like is false
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_GHOST', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_GHOST", "Like")"#,
         &world,
         &reg
     ));
     // Neutral >= Close is false
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_GHOST', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_GHOST", "Close")"#,
         &world,
         &reg
     ));
@@ -302,17 +303,17 @@ fn female_npc_role_is_found_by_npc_liking_at_least() {
     world.female_npcs.insert(npc);
 
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_LISA', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_LISA", "Ok")"#,
         &world,
         &reg
     ));
     assert!(eval_bool(
-        "gd.npcLikingAtLeast('ROLE_LISA', 'Like')",
+        r#"gd.npcLikingAtLeast("ROLE_LISA", "Like")"#,
         &world,
         &reg
     ));
     assert!(!eval_bool(
-        "gd.npcLikingAtLeast('ROLE_LISA', 'Close')",
+        r#"gd.npcLikingAtLeast("ROLE_LISA", "Close")"#,
         &world,
         &reg
     ));
@@ -325,19 +326,26 @@ fn female_npc_role_is_found_by_npc_liking_at_least() {
 fn invalid_liking_level_returns_error() {
     let reg = undone_packs::PackRegistry::new();
     let world = undone_world::test_helpers::make_test_world();
-    let ctx = undone_expr::SceneCtx::new();
+    let ctx = undone_scene::SceneCtx::new();
 
     // "close" lowercase should fail — only "Close" is valid
-    let expr = undone_expr::parse("gd.npcLikingAtLeast('ROLE_X', 'close')").unwrap();
-    let result = undone_expr::eval(&expr, &world, &ctx, &reg);
+    let script =
+        undone_scene::compile_condition(r#"gd.npcLikingAtLeast("ROLE_X", "close")"#, &reg, "test")
+            .unwrap();
+    let result = undone_scene::eval_bool(&script, &world, &ctx, &reg);
     assert!(
         result.is_err(),
         "lowercase 'close' should be rejected as an invalid liking level"
     );
 
     // Completely bogus level
-    let expr2 = undone_expr::parse("gd.npcLikingAtLeast('ROLE_X', 'BestFriends')").unwrap();
-    let result2 = undone_expr::eval(&expr2, &world, &ctx, &reg);
+    let script2 = undone_scene::compile_condition(
+        r#"gd.npcLikingAtLeast("ROLE_X", "BestFriends")"#,
+        &reg,
+        "test",
+    )
+    .unwrap();
+    let result2 = undone_scene::eval_bool(&script2, &world, &ctx, &reg);
     assert!(
         result2.is_err(),
         "'BestFriends' should be rejected as an invalid liking level"
@@ -349,10 +357,12 @@ fn invalid_liking_level_returns_error() {
 fn empty_liking_level_returns_error() {
     let reg = undone_packs::PackRegistry::new();
     let world = undone_world::test_helpers::make_test_world();
-    let ctx = undone_expr::SceneCtx::new();
+    let ctx = undone_scene::SceneCtx::new();
 
-    let expr = undone_expr::parse("gd.npcLikingAtLeast('ROLE_X', '')").unwrap();
-    let result = undone_expr::eval(&expr, &world, &ctx, &reg);
+    let script =
+        undone_scene::compile_condition(r#"gd.npcLikingAtLeast("ROLE_X", "")"#, &reg, "test")
+            .unwrap();
+    let result = undone_scene::eval_bool(&script, &world, &ctx, &reg);
     assert!(
         result.is_err(),
         "empty string should be rejected as an invalid liking level"
@@ -390,7 +400,7 @@ prose = "Test prose."
 [[actions]]
 id = "act"
 label = "Do something"
-condition = "{condition}"
+condition = '{condition}'
 prose = "You do it."
 "#
     );
@@ -406,7 +416,7 @@ fn validator_accepts_npc_liking_at_least_with_two_string_args() {
         &dir,
         "test::valid_2args",
         "valid_2args",
-        "gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok')",
+        r#"gd.npcLikingAtLeast("ROLE_MARCUS", "Ok")"#,
     );
 
     let result = undone_scene::load_scenes(&dir, &registry);
@@ -449,7 +459,7 @@ fn validator_rejects_npc_liking_at_least_with_one_arg() {
         &dir,
         "test::invalid_1",
         "invalid_1",
-        "gd.npcLikingAtLeast('ROLE_MARCUS')",
+        r#"gd.npcLikingAtLeast("ROLE_MARCUS")"#,
     );
 
     let result = undone_scene::load_scenes(&dir, &registry);
@@ -470,7 +480,7 @@ fn validator_rejects_npc_liking_at_least_with_three_args() {
         &dir,
         "test::invalid_3",
         "invalid_3",
-        "gd.npcLikingAtLeast('ROLE_MARCUS', 'Ok', 'extra')",
+        r#"gd.npcLikingAtLeast("ROLE_MARCUS", "Ok", "extra")"#,
     );
 
     let result = undone_scene::load_scenes(&dir, &registry);
@@ -606,22 +616,22 @@ fn schedule_uses_npc_liking_at_least_for_marcus_and_jake() {
         .join("schedule.toml");
     let schedule_text = fs::read_to_string(&schedule_path).expect("schedule.toml should exist");
 
-    // work_marcus_favor and work_marcus_late should use npcLikingAtLeast('ROLE_MARCUS', 'Ok')
+    // work_marcus_favor and work_marcus_late should use npcLikingAtLeast("ROLE_MARCUS", "Ok")
     assert!(
-        schedule_text.contains("npcLikingAtLeast('ROLE_MARCUS', 'Ok')"),
-        "schedule should contain npcLikingAtLeast('ROLE_MARCUS', 'Ok') for Marcus favor/late scenes"
+        schedule_text.contains(r#"npcLikingAtLeast("ROLE_MARCUS", "Ok")"#),
+        "schedule should contain npcLikingAtLeast(\"ROLE_MARCUS\", \"Ok\") for Marcus favor/late scenes"
     );
 
-    // work_marcus_drinks should use npcLikingAtLeast('ROLE_MARCUS', 'Like')
+    // work_marcus_drinks should use npcLikingAtLeast("ROLE_MARCUS", "Like")
     assert!(
-        schedule_text.contains("npcLikingAtLeast('ROLE_MARCUS', 'Like')"),
-        "schedule should contain npcLikingAtLeast('ROLE_MARCUS', 'Like') for Marcus drinks scene"
+        schedule_text.contains(r#"npcLikingAtLeast("ROLE_MARCUS", "Like")"#),
+        "schedule should contain npcLikingAtLeast(\"ROLE_MARCUS\", \"Like\") for Marcus drinks scene"
     );
 
-    // jake_first_date should use npcLikingAtLeast('ROLE_JAKE', 'Like')
+    // jake_first_date should use npcLikingAtLeast("ROLE_JAKE", "Like")
     assert!(
-        schedule_text.contains("npcLikingAtLeast('ROLE_JAKE', 'Like')"),
-        "schedule should contain npcLikingAtLeast('ROLE_JAKE', 'Like') for Jake first date"
+        schedule_text.contains(r#"npcLikingAtLeast("ROLE_JAKE", "Like")"#),
+        "schedule should contain npcLikingAtLeast(\"ROLE_JAKE\", \"Like\") for Jake first date"
     );
 }
 
@@ -635,17 +645,17 @@ fn schedule_does_not_use_exact_equality_for_npc_liking() {
         .join("schedule.toml");
     let schedule_text = fs::read_to_string(&schedule_path).expect("schedule.toml should exist");
 
-    // Check that old patterns like npcLiking('ROLE_MARCUS') == 'Ok' are not present.
-    // The npcLiking('role') function still exists for equality checks, but schedule
+    // Check that old patterns like npcLiking("ROLE_MARCUS") == "Ok" are not present.
+    // The npcLiking("role") function still exists for equality checks, but schedule
     // conditions that gate on minimum liking should use npcLikingAtLeast instead.
-    let has_old_marcus_equality = schedule_text.contains("npcLiking('ROLE_MARCUS') == 'Ok'")
-        || schedule_text.contains("npcLiking('ROLE_MARCUS') == 'Like'");
+    let has_old_marcus_equality = schedule_text.contains(r#"npcLiking("ROLE_MARCUS") == "Ok""#)
+        || schedule_text.contains(r#"npcLiking("ROLE_MARCUS") == "Like""#);
     assert!(
         !has_old_marcus_equality,
         "schedule should not have old-style npcLiking() == equality checks for Marcus"
     );
 
-    let has_old_jake_equality = schedule_text.contains("npcLiking('ROLE_JAKE') == 'Like'");
+    let has_old_jake_equality = schedule_text.contains(r#"npcLiking("ROLE_JAKE") == "Like""#);
     assert!(
         !has_old_jake_equality,
         "schedule should not have old-style npcLiking() == equality checks for Jake"

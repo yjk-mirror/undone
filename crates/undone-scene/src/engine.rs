@@ -3,9 +3,9 @@ use std::{
     sync::Arc,
 };
 
+use crate::scene_ctx::{SceneCtx, SceneNpcRef};
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use undone_domain::{FemaleNpcKey, MaleNpcKey};
-use undone_expr::{SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 

@@ -1,9 +1,9 @@
+use crate::scene_ctx::{SceneCtx, SceneNpcRef};
 use thiserror::Error;
 use undone_domain::{
     AlcoholLevel, ArousalLevel, AttractionLevel, Behaviour, FemaleNpcKey, LikingLevel, LoveLevel,
     MaleNpcKey, RelationshipStatus,
 };
-use undone_expr::{SceneCtx, SceneNpcRef};
 
 #[derive(Debug, Error)]
 pub enum EffectError {

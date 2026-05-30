@@ -7,7 +7,6 @@ edition = "2021"
 undone-domain = { path = "../undone-domain" }
 undone-world  = { path = "../undone-world" }
 undone-packs  = { path = "../undone-packs" }
-undone-expr   = { path = "../undone-expr" }
 rhai          = { version = "1", features = ["metadata"] }
 log           = { workspace = true }
 serde         = { workspace = true }

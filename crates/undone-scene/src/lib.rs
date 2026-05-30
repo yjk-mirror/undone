@@ -2,6 +2,7 @@ pub mod effects;
 pub mod engine;
 pub mod loader;
 pub mod reachability;
+pub mod scene_ctx;
 pub mod scheduler;
 pub mod script;
 pub mod simulator;
@@ -14,12 +15,14 @@ mod set_npc_name_tests;
 pub use effects::EffectError;
 pub use engine::{ActionView, EngineCommand, EngineEvent, NpcActivatedData, SceneEngine};
 pub use loader::{load_scenes, validate_cross_references, SceneLoadError};
+pub use scene_ctx::{SceneCtx, SceneNpcRef};
 pub use scheduler::{
     load_schedule, validate_entry_scene_references, PickResult, Scheduler, SchedulerError,
 };
-pub use script::{apply_effect_script, compile_condition, compile_effect, CompiledScript};
+pub use script::{
+    apply_effect_script, compile_condition, compile_effect, eval_bool, CompiledScript,
+};
 pub use types::{Action, NextBranch, NpcAction, SceneDefinition, SceneMeta, SceneToml};
-pub use undone_expr::{SceneCtx, SceneNpcRef};
 
 #[cfg(test)]
 mod integration_tests {
@@ -515,7 +518,8 @@ mod integration_tests {
 
     #[test]
     fn gd_npc_liking_returns_liking_for_npc_with_role() {
-        use undone_expr::{eval, parser::parse, SceneCtx};
+        use crate::script::{compile_condition, eval_bool};
+        use crate::SceneCtx;
         let (registry, _metas) = undone_packs::load_packs(&packs_dir()).unwrap();
         let mut world = make_world_with_shy(&registry);
         let ctx = SceneCtx::new();
@@ -528,8 +532,9 @@ mod integration_tests {
             .roles
             .insert("ROLE_TEST".to_string());
 
-        let expr = parse("gd.npcLiking('ROLE_TEST') == 'Ok'").unwrap();
-        assert!(eval(&expr, &world, &ctx, &registry).unwrap());
+        let script =
+            compile_condition(r#"gd.npcLiking("ROLE_TEST") == "Ok""#, &registry, "test").unwrap();
+        assert!(eval_bool(&script, &world, &ctx, &registry).unwrap());
     }
 
     #[test]

@@ -40,7 +40,7 @@
 
 use std::cell::Cell;
 
-use undone_expr::SceneCtx;
+use crate::scene_ctx::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
 

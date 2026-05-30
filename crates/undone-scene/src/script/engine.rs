@@ -1,6 +1,6 @@
 //! `ScriptEngines` (two-engine scaffold) + `build_engines()` + eval helpers.
 
-use undone_expr::SceneCtx;
+use crate::scene_ctx::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
 
@@ -202,7 +202,7 @@ mod tests {
         let mut world = make_test_world();
         world.game_data.week = 1;
         let registry = undone_packs::PackRegistry::new();
-        let ctx = undone_expr::SceneCtx::new();
+        let ctx = crate::scene_ctx::SceneCtx::new();
 
         // ── Candidate A: pointer carried inside the scope-injected handle ──
         let mut engine_a = rhai::Engine::new();
@@ -295,7 +295,7 @@ mod tests {
                 modifier: 0,
             },
         );
-        let ctx = undone_expr::SceneCtx::new();
+        let ctx = crate::scene_ctx::SceneCtx::new();
 
         let src = r#"w.hasTrait("SHY") && w.getSkill("FEMININITY") < 15"#;
         let ast = engines
@@ -318,8 +318,8 @@ mod tests {
     fn rhai_receivers_smoke() {
         use std::sync::Arc;
 
+        use crate::scene_ctx::{SceneCtx, SceneNpcRef};
         use crate::script::compiled::CompiledScript;
-        use undone_expr::{SceneCtx, SceneNpcRef};
         use undone_world::test_helpers::make_test_male_npc;
 
         let engines = super::build_engines();
@@ -402,7 +402,7 @@ mod tests {
         let engines = super::build_engines();
         let reg = undone_packs::PackRegistry::new();
         let mut world = make_test_world();
-        let mut ctx = undone_expr::SceneCtx::new();
+        let mut ctx = crate::scene_ctx::SceneCtx::new();
 
         let start_money = world.player.money;
         assert!(world.player.virgin);
@@ -428,8 +428,8 @@ mod tests {
     fn rhai_effect_applies_gd_scene_npc_mutations() {
         use std::sync::Arc;
 
+        use crate::scene_ctx::SceneCtx;
         use crate::script::compiled::CompiledScript;
-        use undone_expr::SceneCtx;
         use undone_world::test_helpers::make_test_male_npc;
 
         let engines = super::build_engines();
@@ -476,8 +476,8 @@ mod tests {
     fn rhai_effect_continues_after_error() {
         use std::sync::Arc;
 
+        use crate::scene_ctx::SceneCtx;
         use crate::script::compiled::CompiledScript;
-        use undone_expr::SceneCtx;
 
         let engines = super::build_engines();
         let reg = undone_packs::PackRegistry::new(); // no stats registered

@@ -6,7 +6,7 @@
 //! (`eval_call_bool` / `eval_call_string`), preserving the exact method name and
 //! argument shape so existing condition strings work verbatim.
 
-use undone_expr::SceneNpcRef;
+use crate::scene_ctx::SceneNpcRef;
 use undone_world::World;
 
 use crate::script::context::with_read_ctx;
@@ -31,7 +31,7 @@ enum ResolvedRoleNpc<'a> {
 fn resolve_role_npc<'a>(
     role: &str,
     world: &'a World,
-    ctx: &undone_expr::SceneCtx,
+    ctx: &crate::scene_ctx::SceneCtx,
 ) -> RhaiResult<ResolvedRoleNpc<'a>> {
     match ctx
         .role_binding(role)

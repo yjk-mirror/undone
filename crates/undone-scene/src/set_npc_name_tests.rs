@@ -21,12 +21,12 @@ mod set_npc_name_acceptance_tests {
     use std::collections::{HashMap, HashSet};
     use std::path::PathBuf;
 
+    use crate::scene_ctx::SceneCtx;
     use lasso::Key;
     use undone_domain::{
         Age, AlcoholLevel, ArousalLevel, AttractionLevel, Behaviour, LikingLevel, LoveLevel,
         MaleClothing, MaleFigure, MaleNpc, NpcCore, PersonalityId, RelationshipStatus,
     };
-    use undone_expr::SceneCtx;
     use undone_packs::PackRegistry;
     use undone_world::test_helpers::make_test_world;
 
@@ -307,7 +307,7 @@ effect = 'npc("ROLE_THEO").setName("Theo");'
     /// so `role.getName("ROLE_THEO")` in campus_library prose returns "Kevin" not "Theo".
     #[test]
     fn role_get_name_returns_display_name_for_role_bound_npc() {
-        use undone_expr::SceneNpcRef;
+        use crate::scene_ctx::SceneNpcRef;
 
         let registry = PackRegistry::new();
         let mut world = make_test_world();

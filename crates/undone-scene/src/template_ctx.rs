@@ -4,12 +4,12 @@ use std::{
     sync::Arc,
 };
 
+use crate::scene_ctx::{SceneCtx, SceneNpcRef};
 use minijinja::{
     value::{Object, ObjectRepr, Value},
     Error, ErrorKind, State,
 };
 use undone_domain::PcOrigin;
-use undone_expr::{SceneCtx, SceneNpcRef};
 use undone_packs::PackRegistry;
 use undone_world::World;
 
