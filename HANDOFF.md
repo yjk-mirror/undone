@@ -2,6 +2,40 @@
 
 ## Current State
 
+**Latest session (2026-05-30, god-file refactor — char_creation.rs split, MERGED):**
+Split the 2636-LOC `crates/undone-ui/src/char_creation.rs` god-file into 6 focused
+submodules under `crates/undone-ui/src/char_creation/` (parent now **925 LOC**, holding
+only the public-entry-point views + the test module). Submodules: `contracts.rs`
+(validate_registry/runtime/startup_contract), `config.rs` (preset/config building,
+resolve_starting_traits, fem_form_defaults, robin_quick_config), `signals.rs`
+(BeforeFormSignals/FemFormSignals + init-error IO), `sections.rs` (BeforeCreation form
+sections), `buttons.rs` (build_next_button/build_begin_button), `widgets.rs` (shared
+themed widgets). **Behavior-preserving** — extraction was verbatim (verified byte-identical
+bodies + prose modulo rustfmt signature reflow). Parent kept as `char_creation.rs` (Rust
+2018 allows `foo.rs` + `foo/` dir), so the cross-crate public API path
+(`undone_ui::char_creation::{validate_*_contract, robin_quick_config, resolve_starting_traits}`,
+consumed by `src/validate_pack.rs` + `tests/preset_integration.rs`) is unchanged via
+`pub use` re-exports; internal items are `pub(crate)`. Test-only imports (Appearance,
+BeforeSexuality) live inside `mod tests` to keep the lib-only clippy gate clean.
+
+**Verification (all gates passed):** full workspace `cargo test` green (107 undone-ui +
+all crates, 0 failed), `cargo clippy --workspace` clean for the changed files (6 pre-existing
+`arc_with_non_send_sync`/`sort_by_key` warnings elsewhere are untouched), `cargo fmt --check`
+clean for the changed files, validate-pack clean ("All checks passed. 62 scenes."). **Code
+review PASS** (independent multiset body-comparison confirmed 54 functions both sides, no
+logic/prose drift, visibility correctly scoped). **Playtester PASS** — full char-creation
+flow (Robin/Raul presets + Custom form with all dropdowns/checkboxes/chips, all 5 FemCreation
+discovery beats, Begin→InGame transition) renders and functions with no regressions.
+Merged fast-forward to master (6 commits, `5266ba8`); worktree + branch cleaned up.
+
+**Next refactor candidate unchanged:** `engine.rs` is still ~1863 LOC but ~1020 of that is
+the test module (production is one cohesive `impl SceneEngine`); the clean win there is
+extracting the test module to its own file. Lower value than char_creation was.
+**Still blocked (session-restart):** rhai-mcp-server binary swap — source compiles clean,
+but `tools/target/release/rhai-mcp-server.exe` is locked by the live MCP process (`os error 5`);
+run `cd tools && cargo build --release -p rhai-mcp-server` after a session restart.
+Harmless leftover: an empty `.claude/worktrees/` dir (gitignored; transient handle lock).
+
 **Latest session (2026-05-29, maintenance + gap-closing pass):**
 Janitorial + one engineering gap closed. Working tree cleaned: 17 throwaway
 playtester screenshots moved to `~/.claude/trash/undone-screenshots-2026-05-29`;
@@ -220,8 +254,9 @@ Use `scene-writer` agent for drafts, `writing-reviewer` for the pass.
   validate-pack `filler_action` warning. One-line rewrite.
 
 ### C. Tech debt — bigger refactors (not session-end work)
-- **`char_creation.rs` is 2636 LOC.** Form sections, signal plumbing,
-  preset rendering, and trait pickers could each move to their own module.
+- ~~**`char_creation.rs` is 2636 LOC.**~~ — Done 2026-05-30 (commit `5266ba8`).
+  Split into 6 submodules (contracts/config/signals/sections/buttons/widgets);
+  parent now 925 LOC (views + tests). Behavior-preserving, all gates passed.
 - **`engine.rs` is ~1860 LOC.** The test module is a large chunk; the
   production code is also doing scene start / action dispatch / NPC binding /
   next-evaluation / NPC actions in one file.
