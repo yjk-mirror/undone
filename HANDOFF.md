@@ -2,6 +2,30 @@
 
 ## Current State
 
+**Latest session (2026-05-29, maintenance + gap-closing pass):**
+Janitorial + one engineering gap closed. Working tree cleaned: 17 throwaway
+playtester screenshots moved to `~/.claude/trash/undone-screenshots-2026-05-29`;
+`.gitignore` hardened so session artifacts never recur (`/​*.png` at root, `.codex/`,
+`.claude/scheduled_tasks.lock`, the synced `.claude/skills/desloppify/` — the last
+three placed *after* the `!.claude/**` negation so they actually take effect).
+**Reachability false-positive fixed:** `check_reachability` now takes the set of
+preset `starting_flags`, so a `hasGameFlag` gate on a flag a preset seeds (e.g.
+`ROUTE_CAMPUS` from the Camila preset) no longer reads as unreachable. This cleared
+all 11 `ROUTE_CAMPUS` warnings — **validate-pack reachability is now completely clean**
+(only the 27 prose-heuristic warnings remain: 20 player_action_in_intro + 6
+player_speech_in_intro + 1 filler_action — all content-side, creative-gated). New
+unit test `flag_satisfied_by_preset_starting_flag_passes`. Verification: undone-scene
+165 tests pass, validate_pack_simulation + all integration suites pass, full
+`cargo test` exit 0, validate-pack exits 0 "All checks passed. 62 scenes." Two
+commits: `c900cca` (gitignore) + `b11dd1a` (reachability fix; docs updated per
+principle 10). **Known follow-up unchanged from last session:** rebuilding
+`rhai-mcp-server` to pick up the new condition/effect validation tools is still
+blocked by the live MCP process holding a lock on `tools/target/release/rhai-mcp-server.exe`
+— the source compiles clean (`cargo check` green); the binary swap will succeed on
+the next session restart (run `cd tools && cargo build --release -p rhai-mcp-server`).
+The local `.claude/settings.local.json` MCP-toggle diff (rust server off) is an
+intentional machine-local change, left uncommitted.
+
 **Latest session (2026-05-29, Phase 1 Rhai foundation — COMPLETE, all 11 tasks shipped):**
 Replaced the custom `undone-expr` condition parser AND the closed `EffectDef` enum with
 embedded **Rhai**, invisibly to players. Executed `docs/plans/2026-05-29-phase1-rhai-foundation.md`
