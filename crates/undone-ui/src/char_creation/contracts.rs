@@ -3,7 +3,7 @@ use undone_domain::PcOrigin;
 use undone_packs::PackRegistry;
 use undone_scene::scheduler::Scheduler;
 
-use super::*;
+use super::config::CUSTOM_STARTING_TRAIT_IDS;
 
 pub fn validate_registry_contract(registry: &PackRegistry) -> Vec<String> {
     let mut errors = Vec::new();
