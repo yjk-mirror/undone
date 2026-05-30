@@ -885,6 +885,196 @@ mod tests {
         assert!(signals.story.get().contains("template error"));
     }
 
+    fn fem_zero_id() -> SkillId {
+        SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap())
+    }
+
+    fn known_npc_data() -> undone_scene::engine::NpcActivatedData {
+        undone_scene::engine::NpcActivatedData {
+            name: "Jake".into(),
+            age: Age::MidLateTwenties,
+            personality: "Warm".into(),
+            relationship: RelationshipStatus::Acquaintance,
+            pc_liking: LikingLevel::Like,
+            pc_attraction: AttractionLevel::Attracted,
+        }
+    }
+
+    fn stranger_npc_data() -> undone_scene::engine::NpcActivatedData {
+        undone_scene::engine::NpcActivatedData {
+            name: "Someone".into(),
+            age: Age::MidLateTwenties,
+            personality: "Calm".into(),
+            relationship: RelationshipStatus::Stranger,
+            pc_liking: LikingLevel::Neutral,
+            pc_attraction: AttractionLevel::Unattracted,
+        }
+    }
+
+    #[test]
+    fn process_events_prose_added_appends_to_story() {
+        let signals = AppSignals::new();
+        let world = test_world();
+        let finished = process_events(
+            vec![EngineEvent::ProseAdded("Hello there.".into())],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        assert!(!finished);
+        assert_eq!(signals.story.get(), "Hello there.");
+    }
+
+    #[test]
+    fn process_events_thought_added_appends_to_story() {
+        let signals = AppSignals::new();
+        let world = test_world();
+        process_events(
+            vec![EngineEvent::ThoughtAdded {
+                text: "A quiet thought.".into(),
+                style: "inner_voice".into(),
+            }],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        assert_eq!(signals.story.get(), "A quiet thought.");
+    }
+
+    #[test]
+    fn process_events_actions_available_sets_action_views() {
+        let signals = AppSignals::new();
+        let world = test_world();
+        process_events(
+            vec![EngineEvent::ActionsAvailable(vec![ActionView {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: "do it".into(),
+            }])],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        let actions = signals.actions.get();
+        assert_eq!(actions.len(), 1);
+        assert_eq!(actions[0].id, "go");
+    }
+
+    #[test]
+    fn process_events_scene_finished_clears_actions_and_returns_true() {
+        let signals = AppSignals::new();
+        signals.actions.set(vec![ActionView {
+            id: "stale".into(),
+            label: "Stale".into(),
+            detail: String::new(),
+        }]);
+        let world = test_world();
+        let finished = process_events(
+            vec![EngineEvent::SceneFinished],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        assert!(finished, "SceneFinished must report the scene as finished");
+        assert!(signals.actions.get().is_empty());
+    }
+
+    #[test]
+    fn process_events_npc_activated_some_sets_active_npc() {
+        let signals = AppSignals::new();
+        let world = test_world();
+        process_events(
+            vec![EngineEvent::NpcActivated(Some(known_npc_data()))],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        let npc = signals.active_npc.get().expect("active npc should be set");
+        assert_eq!(npc.name, "Jake");
+        assert_eq!(npc.relationship, RelationshipStatus::Acquaintance);
+    }
+
+    #[test]
+    fn process_events_npc_activated_none_clears_active_npc() {
+        let signals = AppSignals::new();
+        signals.active_npc.set(Some(NpcSnapshot {
+            name: "Old".into(),
+            age: "Twenty".into(),
+            personality: "Warm".into(),
+            relationship: RelationshipStatus::Acquaintance,
+            pc_liking: LikingLevel::Like,
+            pc_attraction: AttractionLevel::Attracted,
+        }));
+        let world = test_world();
+        process_events(
+            vec![EngineEvent::NpcActivated(None)],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        assert!(signals.active_npc.get().is_none());
+    }
+
+    #[test]
+    fn process_events_npc_activated_keeps_known_npc_over_later_placeholder_stranger() {
+        // A known NPC followed by a placeholder stranger activation in the same
+        // event burst must NOT lose the meaningful context (engine.rs merge guard).
+        let signals = AppSignals::new();
+        let world = test_world();
+        process_events(
+            vec![
+                EngineEvent::NpcActivated(Some(known_npc_data())),
+                EngineEvent::NpcActivated(Some(stranger_npc_data())),
+            ],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        let npc = signals.active_npc.get().expect("npc retained");
+        assert_eq!(
+            npc.name, "Jake",
+            "known NPC must survive a trailing placeholder stranger"
+        );
+        assert_eq!(npc.relationship, RelationshipStatus::Acquaintance);
+    }
+
+    #[test]
+    fn process_events_npc_activated_replaces_stranger_with_known() {
+        // The inverse of the merge guard: a placeholder stranger is overwritten
+        // when a known NPC activates after it.
+        let signals = AppSignals::new();
+        let world = test_world();
+        process_events(
+            vec![
+                EngineEvent::NpcActivated(Some(stranger_npc_data())),
+                EngineEvent::NpcActivated(Some(known_npc_data())),
+            ],
+            signals,
+            &world,
+            fem_zero_id(),
+        );
+        let npc = signals.active_npc.get().expect("npc set");
+        assert_eq!(npc.name, "Jake");
+        assert_eq!(npc.relationship, RelationshipStatus::Acquaintance);
+    }
+
+    #[test]
+    fn process_events_updates_player_snapshot_from_world() {
+        let signals = AppSignals::new();
+        let fem_id = fem_zero_id();
+        let mut world = test_world();
+        world.player.skills.insert(
+            fem_id,
+            undone_domain::SkillValue {
+                value: 42,
+                modifier: 0,
+            },
+        );
+        // Even with no story/action events, the player snapshot is refreshed.
+        process_events(vec![], signals, &world, fem_id);
+        assert_eq!(signals.player.get().femininity, 42);
+    }
+
     #[test]
     fn start_scene_binds_first_male_for_followup_action_effects() {
         let scene = SceneDefinition {
