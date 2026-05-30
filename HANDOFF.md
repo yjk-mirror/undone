@@ -2,41 +2,42 @@
 
 ## Current State
 
-**IN-FLIGHT (branch `phase1-rhai`, worktree `~/.config/ops/worktrees/undone/phase1-rhai`):
-Phase 1 Rhai foundation — Tasks 1–7 of 11 done & green, Task 8 in progress.**
-Executing `docs/plans/2026-05-29-phase1-rhai-foundation.md`. Set
-`CARGO_TARGET_DIR=<repo>/target` when building in the worktree.
+**Latest session (2026-05-29, Phase 1 Rhai foundation — COMPLETE, all 11 tasks shipped):**
+Replaced the custom `undone-expr` condition parser AND the closed `EffectDef` enum with
+embedded **Rhai**, invisibly to players. Executed `docs/plans/2026-05-29-phase1-rhai-foundation.md`
+end to end (~14 commits on branch `phase1-rhai`, merged to master).
 
-Done (committed): the whole new `crates/undone-scene/src/script/` Rhai layer —
-two engines (read-only `cond` + read/write `effect`), thread-local engine cache,
-full read API (6 receivers, ~80 methods ported from `undone-expr::eval`), full
-write API (gd/scene/npc/player mutators ported from `effects.rs`, continue-on-error),
-and the load-time fail-fast **source-scan gate** (`script/validate.rs`) that
-reconstructs `validate_call_signature` + `validate_condition_ids` + `validate_effects`
-across ALL branches (catches typos in short-circuited branches a dry-run misses).
-**Task 7 (conditions) cut over:** `Option<Expr>` → `Option<CompiledScript>` on
-Action/NextBranch/Thought/NarratorVariant/ScheduleEvent; eval via `eval_bool`;
-`reachability` + `references_game_flag` migrated to source scans (full parity).
-Scene+schedule **condition** strings migrated single→double quote (Rhai single-quotes
-are CHAR literals — the design's "near-verbatim" claim was wrong). undone-scene 184
-+ undone-ui 98 tests pass; validate-pack loads 62 scenes clean (35 reachability
-warnings = parity, no errors).
+New `crates/undone-scene/src/script/` layer: two engines (read-only `cond` + read/write
+`effect`) cached per-thread; full read API (6 receivers `w/gd/m/f/role/scene`, ~80 methods);
+full write API (`w.*` player, `gd.*` game-data, `scene.setFlag/removeFlag`,
+`npc("m"|"f"|role).*`) with **continue-on-error** semantics; and a load-time fail-fast
+**source-scan gate** (`script/validate.rs`) that reconstructs the legacy
+`validate_call_signature` + `validate_condition_ids` + `validate_effects` across ALL
+branches (catches a typo'd id even in a short-circuited branch — stronger than a runtime
+dry-run). Conditions → `Option<CompiledScript>`; effects → `Option<CompiledScript>` (single
+`effect = '…'` Rhai call-list per action). `reachability`, `references_game_flag`, and
+`has_persistent_world_mutation` migrated to source scans (full parity). `undone-expr`
+**deleted**; `SceneCtx`/`SceneNpcRef` moved into `undone-scene::scene_ctx`. rhai-mcp-server
+realigned: new `rhai_validate_condition`/`rhai_validate_effect` tools run the real gate.
 
-Key resolved decisions (this session): borrow-bridge = thread-local raw-ptr context
-(bench-justified); static analysis = **source-string scan** (not Rhai `internals`);
-effect errors = **continue-on-error** (collector); effect vocabulary = `w.*` player,
-`gd.*` game-data, `scene.setFlag/removeFlag`, `npc("m"|"f"|role).*`.
+**Resolved decisions:** borrow-bridge = thread-local raw-ptr eval context (bench-justified,
+within ~2% of the alternative); static analysis = **source-string scan** (not Rhai
+`internals`); Rhai **single-quotes are CHAR literals** so all condition strings migrated
+single→double quote (the design's "near-verbatim" claim was wrong — scene+schedule TOML
+migrated, effects via `tools/migrate-effects.py`).
 
-**NEXT — Task 8 (effects cutover):** `ActionDef/NpcActionDef.effects: Vec<EffectDef>`
-→ `effect: Option<String>`; resolved `Action/NpcAction.effects` → `Option<CompiledScript>`
-(compiled via `compile_effect`); `engine.rs` apply sites → `apply_effect_script`;
-delete `EffectDef` + `apply_effect` (keep `EffectError` + step helpers + `resolve_npc_ref`,
-used by write_api); `reachability::collect_effect_facts` + `has_persistent_world_mutation`
-+ `set_npc_name_tests` → source scans (helper `source_has_persistent_mutation` already
-added). **Migrate all 62 scene TOML `[[…effects]]` tables → `effect = '…'` call-list
-strings** (mapping in write_api docs; `transition` is a dead no-op → drop). Then Task 9
-(delete `undone-expr`, move `SceneCtx`/`SceneNpcRef` into undone-scene), Task 10
-(rhai-mcp-server realign to `build_engines()`), Task 11 (acceptance test + playtester).
+**Verification (all green):** full workspace `cargo test` = 420 passing, 0 failed;
+`validate-pack` loads 62 scenes clean (35 reachability warnings = parity, no errors) and
+rejects a typo'd content id at LOAD (acceptance test `crates/undone-scene/tests/rhai_parity.rs`);
+rhai-mcp-server 10 tests; **playtester confirmed complete behavioral parity** — 13-scene
+Robin→Jake playthrough (opening arc → settled → coffee_shop → jake_apartment explicit chain),
+every effect landed (femininity 10→46, money/arousal/flags/arc-states/NPC-liking/relationship,
+Jake naming in sidebar), explicit content rendered, zero error text. The game plays identically.
+
+**Follow-ups (not blockers):** the running rhai-mcp-server uses the pre-built binary at
+`tools/target/release/`; rebuild it (`cd tools && cargo build --release -p rhai-mcp-server`)
+to pick up the new condition/effect validation tools. Phase 2 (vertical-slice explicit scene
+with a fluid-composure resist check) is BLOCKED on a creative scene spec from the user.
 
 ---
 
