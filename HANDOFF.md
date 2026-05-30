@@ -26,6 +26,17 @@ the next session restart (run `cd tools && cargo build --release -p rhai-mcp-ser
 The local `.claude/settings.local.json` MCP-toggle diff (rust server off) is an
 intentional machine-local change, left uncommitted.
 
+*Tech-debt sweep (same session):* Closed the two "small engineering" items.
+**Audit I11 (cache FEMININITY SkillId)** was already done — `GameState.femininity_id`
+is the cache; no hot string lookup exists (stale HANDOFF entry, now marked).
+**Audit I13 (process_events test coverage)** shipped as commit `b2dacca`: 9 unit
+tests covering every `EngineEvent` arm, the `scene_finished` return, the NPC
+known-context merge guard (both directions — proven non-vacuous by temporarily
+mutating the production guard and watching the test fail, then restoring), and the
+player-snapshot refresh. undone-ui suite 97→107, all green. Production code untouched
+(190-line pure test addition). Remaining small item: the lone `work_marcus_drinks:55`
+filler_action prose nit (creative, rule-11-gated).
+
 **Latest session (2026-05-29, Phase 1 Rhai foundation — COMPLETE, all 11 tasks shipped):**
 Replaced the custom `undone-expr` condition parser AND the closed `EffectDef` enum with
 embedded **Rhai**, invisibly to players. Executed `docs/plans/2026-05-29-phase1-rhai-foundation.md`
@@ -194,10 +205,17 @@ Use `scene-writer` agent for drafts, `writing-reviewer` for the pass.
 - Emotion-announcement "warm and low has settled in your stomach" (intro, FEMININITY<25).
 
 ### B. Tech debt — small engineering
-- **Cache `FEMININITY` SkillId in `GameState`** (audit I11) — eliminates 4 hot
-  string lookups per snapshot. Low leverage but trivial.
-- **UI test coverage for `process_events` / paragraph cap / `AppPhase`
-  transitions** (audit I13) — the harness exists; only the tests are missing.
+- ~~**Cache `FEMININITY` SkillId in `GameState`** (audit I11)~~ — Already done.
+  `GameState.femininity_id: SkillId` is resolved once at construction; every hot
+  path (`from_player`, `process_events`, snapshot refresh) reads the cached field.
+  No per-snapshot string lookup exists. (Entry was stale.)
+- ~~**UI test coverage for `process_events`** (audit I13)~~ — Done 2026-05-29
+  (commit `b2dacca`). 9 tests cover every `EngineEvent` arm, the `scene_finished`
+  return, the NPC known-context merge guard (both directions, mutation-verified),
+  and the end-of-burst player-snapshot refresh. Paragraph cap was already covered
+  (`append_story_paragraph_*`); `AppPhase`/scene-epoch invariants are covered by the
+  `reset_scene_ui_state_*` tests. The deferred scroll-to-bottom bump (`exec_after`)
+  is inherently runtime-bound, not unit-observable — left to runtime/playtester.
 - **`work_marcus_drinks` line 55 "check your phone"** — last remaining
   validate-pack `filler_action` warning. One-line rewrite.
 
