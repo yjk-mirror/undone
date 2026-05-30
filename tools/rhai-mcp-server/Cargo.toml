@@ -8,6 +8,10 @@ name = "rhai-mcp-server"
 path = "src/main.rs"
 
 [dependencies]
+# Validate against the REAL game engine surface (same build_engines + registry +
+# load-time gate as the loader), so authoring-time validation matches load-time.
+undone-scene = { path = "../../crates/undone-scene" }
+undone-packs = { path = "../../crates/undone-packs" }
 rmcp = { version = "0.8", features = ["server", "transport-io"] }
 rhai = { version = "1", features = ["sync", "metadata"] }
 tokio = { version = "1", features = ["full"] }

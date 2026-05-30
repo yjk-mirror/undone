@@ -26,6 +26,10 @@ pub struct FilePathInput {
 pub struct RhaiServer {
     tool_router: ToolRouter<Self>,
     engine: Arc<Engine>,
+    /// Probe registry loaded from the base pack, so condition/effect validation
+    /// resolves the same content ids the game loader does. Empty if the pack
+    /// can't be found (validation then degrades to syntax + method checks).
+    registry: Arc<undone_packs::PackRegistry>,
 }
 
 #[tool_router]
@@ -37,6 +41,7 @@ impl RhaiServer {
         Self {
             tool_router: Self::tool_router(),
             engine: Arc::new(engine),
+            registry: Arc::new(load_probe_registry()),
         }
     }
 
@@ -81,6 +86,32 @@ impl RhaiServer {
     }
 
     #[tool(
+        description = "Validate a game CONDITION string against the real engine + base-pack registry — exactly the load-time gate the game loader runs. Catches syntax errors, unknown methods, unknown content ids (e.g. a typo'd trait/skill), and effect mutators used in a condition. Returns a JSON array of diagnostics; empty means valid."
+    )]
+    async fn rhai_validate_condition(
+        &self,
+        params: Parameters<SourceInput>,
+    ) -> Result<CallToolResult, McpError> {
+        let diags = validator::validate_game_condition(&params.0.source, &self.registry);
+        let json = serde_json::to_string_pretty(&diags)
+            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        Ok(CallToolResult::success(vec![Content::text(json)]))
+    }
+
+    #[tool(
+        description = "Validate a game EFFECT call-list string against the real engine + base-pack registry — the same load-time gate the game loader runs. Catches syntax errors, unknown mutators, unknown content ids, and out-of-range step deltas. Returns a JSON array of diagnostics; empty means valid."
+    )]
+    async fn rhai_validate_effect(
+        &self,
+        params: Parameters<SourceInput>,
+    ) -> Result<CallToolResult, McpError> {
+        let diags = validator::validate_game_effect(&params.0.source, &self.registry);
+        let json = serde_json::to_string_pretty(&diags)
+            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        Ok(CallToolResult::success(vec![Content::text(json)]))
+    }
+
+    #[tool(
         description = "List all functions registered in the Rhai engine, including built-ins. Returns a JSON array of function signatures. Use this to check what functions are available before calling them in a script."
     )]
     async fn rhai_list_registered_api(&self) -> Result<CallToolResult, McpError> {
@@ -88,6 +119,26 @@ impl RhaiServer {
         let json = serde_json::to_string_pretty(&fns)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
+    }
+}
+
+/// Load the base-pack registry for content-id validation. Tries `$UNDONE_PACKS_DIR`
+/// then `./packs` (the server is launched from the repo root). On any failure,
+/// returns an empty registry so the server still starts (id validation degrades).
+fn load_probe_registry() -> undone_packs::PackRegistry {
+    let candidate = std::env::var("UNDONE_PACKS_DIR")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::path::PathBuf::from("packs"));
+    match undone_packs::load_packs(&candidate) {
+        Ok((registry, _metas)) => registry,
+        Err(e) => {
+            tracing::warn!(
+                "rhai-mcp-server: could not load probe pack from {}: {e}; \
+                 content-id validation will be limited",
+                candidate.display()
+            );
+            undone_packs::PackRegistry::new()
+        }
     }
 }
 

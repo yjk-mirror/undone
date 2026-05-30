@@ -60,6 +60,46 @@ pub fn validate_file(path: &Path) -> Vec<Diagnostic> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Game-engine validation — matches the loader's fail-fast gate exactly.
+//
+// These run the authored source through the SAME `compile_condition` /
+// `compile_effect` gate the game loader uses (syntax + strict-variables + the
+// source-scan that resolves content ids and rejects unknown methods / effect
+// mutators in conditions), against a probe registry loaded from the pack.
+// ---------------------------------------------------------------------------
+
+/// Validate a condition string against the real condition engine + registry.
+pub fn validate_game_condition(
+    source: &str,
+    registry: &undone_packs::PackRegistry,
+) -> Vec<Diagnostic> {
+    match undone_scene::compile_condition(source, registry, "mcp") {
+        Ok(_) => vec![],
+        Err(e) => vec![script_error_to_diagnostic(&e)],
+    }
+}
+
+/// Validate an effect call-list string against the real effect engine + registry.
+pub fn validate_game_effect(
+    source: &str,
+    registry: &undone_packs::PackRegistry,
+) -> Vec<Diagnostic> {
+    match undone_scene::compile_effect(source, registry, "mcp") {
+        Ok(_) => vec![],
+        Err(e) => vec![script_error_to_diagnostic(&e)],
+    }
+}
+
+fn script_error_to_diagnostic(e: &undone_scene::script::ScriptError) -> Diagnostic {
+    Diagnostic {
+        line: None,
+        column: None,
+        message: e.to_string(),
+        severity: DiagnosticSeverity::Error,
+    }
+}
+
 fn parse_error_to_diagnostic(e: &ParseError) -> Diagnostic {
     let pos = e.1;
     Diagnostic {
@@ -123,6 +163,52 @@ mod tests {
         let engine = Engine::new();
         let fns = list_registered_functions(&engine);
         assert!(!fns.is_empty(), "engine should have built-in functions");
+    }
+
+    fn registry_with_shy() -> undone_packs::PackRegistry {
+        let mut reg = undone_packs::PackRegistry::new();
+        reg.register_traits(vec![undone_packs::TraitDef {
+            id: "SHY".into(),
+            name: "Shy".into(),
+            description: "...".into(),
+            hidden: false,
+            group: None,
+            conflicts: vec![],
+        }]);
+        reg
+    }
+
+    #[test]
+    fn game_condition_rejects_unknown_trait_id() {
+        let reg = registry_with_shy();
+        let diags = validate_game_condition(r#"w.hasTrait("NOPE")"#, &reg);
+        assert!(!diags.is_empty(), "unknown trait id must be rejected");
+        assert!(diags[0].message.contains("NOPE"));
+    }
+
+    #[test]
+    fn game_condition_accepts_known_trait_id() {
+        let reg = registry_with_shy();
+        let diags = validate_game_condition(r#"w.hasTrait("SHY")"#, &reg);
+        assert!(diags.is_empty(), "known trait should validate: {diags:?}");
+    }
+
+    #[test]
+    fn game_condition_rejects_effect_mutator() {
+        // w.addArousal is a WRITE mutator — not allowed in a condition.
+        let reg = registry_with_shy();
+        let diags = validate_game_condition(r#"w.addArousal(1)"#, &reg);
+        assert!(
+            !diags.is_empty(),
+            "effect mutator in a condition must be rejected"
+        );
+    }
+
+    #[test]
+    fn game_effect_accepts_known_mutator() {
+        let reg = registry_with_shy();
+        let diags = validate_game_effect(r#"w.addArousal(1); gd.setGameFlag("X");"#, &reg);
+        assert!(diags.is_empty(), "valid effect should validate: {diags:?}");
     }
 
     #[test]
