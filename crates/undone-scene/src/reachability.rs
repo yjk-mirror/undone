@@ -22,8 +22,16 @@ struct EffectFacts {
 pub fn check_reachability(
     schedule_conditions: &[(String, CompiledScript)],
     scenes: &HashMap<String, Arc<SceneDefinition>>,
+    preset_starting_flags: &HashSet<String>,
 ) -> Vec<ReachabilityWarning> {
-    let facts = collect_effect_facts(scenes);
+    let mut facts = collect_effect_facts(scenes);
+    // A flag a preset declares as a starting flag is present from game start, so
+    // a `hasGameFlag` gate on it is reachable even if no scene effect sets it
+    // (e.g. ROUTE_CAMPUS, seeded by the Camila preset). Fold them into the
+    // "can be present" set so they don't read as unreachable.
+    facts
+        .set_game_flags
+        .extend(preset_starting_flags.iter().cloned());
     let mut warnings = Vec::new();
     let mut seen = HashSet::new();
 
@@ -270,10 +278,31 @@ mod tests {
                 cond(r#"gd.hasGameFlag("JAKE_MET")"#),
             )],
             &HashMap::new(),
+            &HashSet::new(),
         );
 
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].message.contains("JAKE_MET"));
+    }
+
+    #[test]
+    fn flag_satisfied_by_preset_starting_flag_passes() {
+        // ROUTE_CAMPUS is set by no scene effect — only the Camila preset declares
+        // it as a starting flag. The campus gates must NOT read as unreachable.
+        let starting: HashSet<String> = ["ROUTE_CAMPUS".to_string()].into();
+        let warnings = check_reachability(
+            &[(
+                "slot 'campus_opening', scene 'base::campus_library'".to_string(),
+                cond(r#"gd.hasGameFlag("ROUTE_CAMPUS")"#),
+            )],
+            &HashMap::new(),
+            &starting,
+        );
+
+        assert!(
+            warnings.is_empty(),
+            "preset starting flag should satisfy reachability: {warnings:?}"
+        );
     }
 
     #[test]
@@ -286,6 +315,7 @@ mod tests {
                 cond(r#"!gd.hasGameFlag("JAKE_REJECTED")"#),
             )],
             &HashMap::new(),
+            &HashSet::new(),
         );
 
         assert!(
@@ -307,6 +337,7 @@ mod tests {
                 cond(r#"gd.hasGameFlag("JAKE_MET")"#),
             )],
             &scenes,
+            &HashSet::new(),
         );
 
         assert!(warnings.is_empty());
@@ -325,6 +356,7 @@ mod tests {
                 cond(r#"gd.npcLiking("ROLE_JAKE") == "Like""#),
             )],
             &scenes,
+            &HashSet::new(),
         );
 
         assert_eq!(warnings.len(), 1);

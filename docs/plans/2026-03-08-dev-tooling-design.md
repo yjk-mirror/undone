@@ -140,7 +140,9 @@ but liking overflowed to `Close`. The checker would see: effects can produce
 
 This is heuristic, not a full theorem prover. It catches:
 
-- Flags referenced in conditions but never set by any effect
+- Flags referenced in conditions but never set by any effect *and* not declared
+  as a preset `starting_flag` (a starting flag is present from game start, so a
+  gate on it is reachable — e.g. `ROUTE_CAMPUS`, seeded by the Camila preset)
 - Liking/love level exact-equality checks where effects can overshoot
 - Arc states referenced in conditions but never advanced to
 

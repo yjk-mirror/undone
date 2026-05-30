@@ -382,11 +382,24 @@ fn collect_validation(
             .push(format!("ERROR cross-reference: {error}"));
     }
 
+    // A flag a preset declares as a starting flag (e.g. ROUTE_CAMPUS via the Camila
+    // preset) is present from game start — gates on it are reachable even though no
+    // scene effect sets it. Collect them so reachability doesn't false-positive.
+    let mut preset_starting_flags = std::collections::HashSet::new();
+    for meta in &pack_metas {
+        if let Ok(presets) = undone_packs::preset::load_presets(&meta.pack_dir) {
+            for preset in presets {
+                preset_starting_flags.extend(preset.starting_flags);
+            }
+        }
+    }
+
     let scheduler = load_scheduler_report(&registry, &pack_metas, &all_scenes, &mut report);
     if let Some(ref scheduler) = scheduler {
         let warnings = undone_scene::reachability::check_reachability(
             &scheduler.all_conditions(),
             &all_scenes,
+            &preset_starting_flags,
         );
         report.warnings.extend(
             warnings
