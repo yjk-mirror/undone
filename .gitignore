@@ -8,7 +8,6 @@ Thumbs.db
 opencode.json
 .serena/
 .desloppify/
-scorecard.png
 tmp/
 /.worktrees/
 
@@ -19,3 +18,14 @@ tmp/
 !.claude/**
 !.cargo/
 !.cargo/**
+
+# Re-exclude transient / machine-synced files inside the tracked .claude dir
+# (these must come AFTER the !.claude/** negation above or it re-includes them)
+.claude/scheduled_tasks.lock
+.claude/skills/desloppify/
+
+# Machine-specific synced agent MCP config (absolute paths, per-machine)
+.codex/
+
+# Throwaway screenshots at repo root (playtester / session artifacts)
+/*.png
