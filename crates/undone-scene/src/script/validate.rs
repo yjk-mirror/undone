@@ -214,9 +214,10 @@ fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
         ("scene", "hasFlag") => Some(spec(1)),
 
         // ── gd (game data) ────────────────────────────────────────────────────
-        ("gd", "isWeekday" | "isWeekend" | "week" | "day" | "timeSlot" | "getJobTitle") => {
-            Some(spec(0))
-        }
+        (
+            "gd",
+            "isWeekday" | "isWeekend" | "week" | "day" | "desire" | "timeSlot" | "getJobTitle",
+        ) => Some(spec(0)),
         // getStat / hasGameFlag / arcStarted / arcState / npcLiking ids are not
         // registry-validated in the legacy condition pass.
         ("gd", "hasGameFlag" | "arcStarted" | "getStat" | "arcState" | "npcLiking") => {
@@ -256,6 +257,7 @@ fn write_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
         ("gd", "setGameFlag" | "removeGameFlag") => Some(spec(1)),
         ("gd", "addStat" | "setStat") => Some(spec_id(2, 0, IdKind::Stat)),
         ("gd", "setJobTitle") => Some(spec(1)),
+        ("gd", "addDesire" | "setDesire") => Some(spec(1)),
         ("gd", "advanceTime") => Some(spec(1)),
         ("gd", "advanceArc") => Some(spec_id(2, 0, IdKind::Arc)),
         ("gd", "failRedCheck") => Some(spec_id(1, 0, IdKind::Skill)),

@@ -82,6 +82,10 @@ impl Gd {
         with_read_ctx(|world, _reg, _ctx| Ok(world.game_data.day as i64))
     }
 
+    fn desire(&mut self) -> RhaiResult<i64> {
+        with_read_ctx(|world, _reg, _ctx| Ok(world.game_data.desire() as i64))
+    }
+
     fn get_stat(&mut self, id: &str) -> RhaiResult<i64> {
         with_read_ctx(|world, reg, _ctx| match reg.get_stat(id) {
             Some(stat_id) => Ok(world.game_data.get_stat(stat_id) as i64),
@@ -139,6 +143,7 @@ pub fn register(engine: &mut rhai::Engine) {
         // int
         .register_fn("week", Gd::week)
         .register_fn("day", Gd::day)
+        .register_fn("desire", Gd::desire)
         .register_fn("getStat", Gd::get_stat)
         // string
         .register_fn("timeSlot", Gd::time_slot)

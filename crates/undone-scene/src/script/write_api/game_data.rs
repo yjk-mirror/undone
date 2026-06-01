@@ -51,6 +51,20 @@ impl Gd {
         });
     }
 
+    fn add_desire(&mut self, delta: i64) {
+        with_write_ctx(|world, _ctx, _reg| {
+            world.game_data.add_desire(delta as i32);
+            Ok(())
+        });
+    }
+
+    fn set_desire(&mut self, value: i64) {
+        with_write_ctx(|world, _ctx, _reg| {
+            world.game_data.set_desire(value as i32);
+            Ok(())
+        });
+    }
+
     fn advance_time(&mut self, slots: i64) {
         with_write_ctx(|world, _ctx, _reg| {
             for _ in 0..slots {
@@ -84,6 +98,8 @@ pub fn register(engine: &mut rhai::Engine) {
         .register_fn("addStat", Gd::add_stat)
         .register_fn("setStat", Gd::set_stat)
         .register_fn("setJobTitle", Gd::set_job_title)
+        .register_fn("addDesire", Gd::add_desire)
+        .register_fn("setDesire", Gd::set_desire)
         .register_fn("advanceTime", Gd::advance_time)
         .register_fn("advanceArc", Gd::advance_arc)
         .register_fn("failRedCheck", Gd::fail_red_check);

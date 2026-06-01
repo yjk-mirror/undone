@@ -59,6 +59,10 @@ pub struct CharCreationConfig {
 /// Create a brand-new World from character creation choices.
 ///
 /// Builds the Player, spawns the NPC pool, and returns a World ready for week 1.
+/// Starting COMPOSURE for a new game. She begins composed; giving in to desire
+/// in the looping-adult layer erodes this (the loss-of-control spiral).
+const STARTING_COMPOSURE: i32 = 60;
+
 pub fn new_game<R: Rng>(
     config: CharCreationConfig,
     registry: &mut PackRegistry,
@@ -123,6 +127,20 @@ pub fn new_game<R: Rng>(
         femininity_skill,
         SkillValue {
             value: starting_femininity,
+            modifier: 0,
+        },
+    );
+
+    // Seed COMPOSURE — she starts composed. The looping-adult layer lowers it
+    // when she gives in to desire (loss-of-control spiral). Structural skill,
+    // validated at pack load.
+    let composure_skill = registry
+        .composure_skill()
+        .expect("COMPOSURE skill must be registered by base pack");
+    player.skills.insert(
+        composure_skill,
+        SkillValue {
+            value: STARTING_COMPOSURE,
             modifier: 0,
         },
     );

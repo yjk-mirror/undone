@@ -78,6 +78,12 @@ fn validate_required_ids(registry: &PackRegistry) -> Result<(), PackLoadError> {
             id: "FEMININITY",
         })?;
     registry
+        .composure_skill()
+        .map_err(|_| PackLoadError::MissingRequiredId {
+            kind: "skill",
+            id: "COMPOSURE",
+        })?;
+    registry
         .trans_woman_trait()
         .map_err(|_| PackLoadError::MissingRequiredId {
             kind: "trait",
@@ -362,13 +368,22 @@ mod tests {
     #[test]
     fn required_data_validation_fails_when_names_and_races_missing() {
         let mut registry = PackRegistry::new();
-        registry.register_skills(vec![crate::data::SkillDef {
-            id: "FEMININITY".into(),
-            name: "Femininity".into(),
-            description: "".into(),
-            min: 0,
-            max: 100,
-        }]);
+        registry.register_skills(vec![
+            crate::data::SkillDef {
+                id: "FEMININITY".into(),
+                name: "Femininity".into(),
+                description: "".into(),
+                min: 0,
+                max: 100,
+            },
+            crate::data::SkillDef {
+                id: "COMPOSURE".into(),
+                name: "Composure".into(),
+                description: "".into(),
+                min: 0,
+                max: 100,
+            },
+        ]);
         registry.register_traits(vec![
             crate::data::TraitDef {
                 id: "TRANS_WOMAN".into(),
