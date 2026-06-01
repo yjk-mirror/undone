@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -175,33 +175,57 @@ fn schedule_poll(signals: AppSignals, gs: Rc<RefCell<GameState>>) {
 
 fn poll_once(gs: &mut GameState, signals: AppSignals) -> bool {
     let command_path = command_file_path();
+    let result_path = result_file_path();
+    poll_once_paths(gs, signals, &command_path, &result_path)
+}
+
+fn poll_once_paths(
+    gs: &mut GameState,
+    signals: AppSignals,
+    command_path: &Path,
+    result_path: &Path,
+) -> bool {
     if !command_path.exists() {
         return false;
     }
 
-    let result_path = result_file_path();
     let response = match std::fs::read_to_string(&command_path) {
-        Ok(raw) => {
-            let _ = std::fs::remove_file(&command_path);
-            match serde_json::from_str::<DevCommand>(&raw) {
-                Ok(command) => execute_command(gs, signals, command),
-                Err(err) => DevCommandResponse {
-                    success: false,
-                    message: format!("Invalid dev command: {err}"),
-                    data: None,
-                },
-            }
-        }
-        Err(err) => {
-            let _ = std::fs::remove_file(&command_path);
-            DevCommandResponse {
+        Ok(raw) => match serde_json::from_str::<DevCommand>(&raw) {
+            Ok(command) => execute_command(gs, signals, command),
+            Err(err) => DevCommandResponse {
                 success: false,
-                message: format!("Failed to read dev command: {err}"),
+                message: format!("Invalid dev command: {err}"),
                 data: None,
-            }
-        }
+            },
+        },
+        Err(err) => DevCommandResponse {
+            success: false,
+            message: format!("Failed to read dev command: {err}"),
+            data: None,
+        },
     };
 
+    if let Err(err) = write_dev_result(result_path, &response) {
+        log::warn!(
+            "[dev-ipc] failed to write result '{}': {}",
+            result_path.display(),
+            err
+        );
+        return false;
+    }
+
+    if let Err(err) = std::fs::remove_file(command_path) {
+        log::warn!(
+            "[dev-ipc] failed to remove command '{}': {}",
+            command_path.display(),
+            err
+        );
+    }
+
+    response.success
+}
+
+fn write_dev_result(result_path: &Path, response: &DevCommandResponse) -> Result<(), String> {
     let payload = serde_json::to_string(&response).unwrap_or_else(|err| {
         format!(
             r#"{{"success":false,"message":"Failed to serialize dev response: {}"}}"#,
@@ -209,11 +233,32 @@ fn poll_once(gs: &mut GameState, signals: AppSignals) -> bool {
         )
     });
     let tmp_path = result_path.with_extension("tmp");
-    if std::fs::write(&tmp_path, &payload).is_ok() {
-        let _ = std::fs::rename(&tmp_path, &result_path);
-    }
+    std::fs::write(&tmp_path, &payload)
+        .map_err(|err| format!("write temp '{}': {err}", tmp_path.display()))?;
 
-    response.success
+    match std::fs::rename(&tmp_path, result_path) {
+        Ok(()) => Ok(()),
+        Err(first_err) if result_path.exists() => {
+            std::fs::remove_file(result_path).map_err(|err| {
+                format!(
+                    "replace existing '{}' after rename failed ({first_err}): {err}",
+                    result_path.display()
+                )
+            })?;
+            std::fs::rename(&tmp_path, result_path).map_err(|err| {
+                format!(
+                    "rename temp '{}' to '{}' after removing old result (initial rename failed: {first_err}): {err}",
+                    tmp_path.display(),
+                    result_path.display()
+                )
+            })
+        }
+        Err(err) => Err(format!(
+            "rename temp '{}' to '{}': {err}",
+            tmp_path.display(),
+            result_path.display()
+        )),
+    }
 }
 
 fn jump_to_scene(gs: &mut GameState, signals: AppSignals, scene_id: &str) -> DevCommandResponse {
@@ -644,6 +689,7 @@ mod tests {
     use crate::runtime_controller::RuntimeController;
     use floem::prelude::SignalGet;
     use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     fn packs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -664,9 +710,66 @@ mod tests {
         start_game(pre, config, true)
     }
 
+    fn temp_dev_ipc_dir(name: &str) -> PathBuf {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!(
+            "undone_dev_ipc_{name}_{}_{}",
+            std::process::id(),
+            unique
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
     fn boot_runtime(gs: &mut GameState, signals: AppSignals) {
         let mut controller = RuntimeController::new(gs, signals);
         controller.continue_flow().unwrap();
+    }
+
+    #[test]
+    fn poll_once_writes_invalid_command_response_before_removing_command() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        let dir = temp_dev_ipc_dir("invalid_command");
+        let command_path = dir.join("cmd.json");
+        let result_path = dir.join("result.json");
+        std::fs::write(&command_path, r#"{"command":"not_real"}"#).unwrap();
+
+        let tick = poll_once_paths(&mut gs, signals, &command_path, &result_path);
+
+        assert!(!tick);
+        assert!(!command_path.exists());
+        let response: DevCommandResponse =
+            serde_json::from_str(&std::fs::read_to_string(&result_path).unwrap()).unwrap();
+        assert!(!response.success);
+        assert!(response.message.contains("Invalid dev command"));
+
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn poll_once_keeps_command_when_result_cannot_be_written() {
+        let mut gs = test_game_state();
+        let signals = AppSignals::new();
+        let dir = temp_dev_ipc_dir("result_failure");
+        let command_path = dir.join("cmd.json");
+        let result_path = dir.join("result.json");
+        std::fs::write(&command_path, r#"{"command":"get_state"}"#).unwrap();
+        std::fs::create_dir(&result_path).unwrap();
+
+        let tick = poll_once_paths(&mut gs, signals, &command_path, &result_path);
+
+        assert!(!tick);
+        assert!(
+            command_path.exists(),
+            "command input should remain available for retry/debug when result persistence fails"
+        );
+        assert!(result_path.is_dir());
+
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

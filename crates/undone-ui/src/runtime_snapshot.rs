@@ -43,13 +43,8 @@ pub struct ActiveNpcSnapshot {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BoundActiveNpcSnapshot {
     pub binding: String,
-    pub name: String,
-    pub age: String,
-    pub personality: String,
-    pub relationship: String,
-    pub pc_liking: String,
-    pub pc_attraction: String,
-    pub known: bool,
+    #[serde(flatten)]
+    pub npc: ActiveNpcSnapshot,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
@@ -151,33 +146,46 @@ fn story_paragraphs(story: &str) -> Vec<String> {
 }
 
 fn active_npc_snapshot(npc: NpcSnapshot) -> ActiveNpcSnapshot {
-    let known = is_known_npc(&npc.relationship, &npc.pc_liking, &npc.pc_attraction);
-    ActiveNpcSnapshot {
-        name: npc.name,
-        age: npc.age,
-        personality: npc.personality,
-        relationship: format!("{:?}", npc.relationship),
-        pc_liking: format!("{:?}", npc.pc_liking),
-        pc_attraction: format!("{:?}", npc.pc_attraction),
-        known,
-    }
+    npc_display_snapshot(
+        npc.name,
+        npc.age,
+        npc.personality,
+        &npc.relationship,
+        &npc.pc_liking,
+        &npc.pc_attraction,
+    )
 }
 
 fn bound_npc_snapshot(bound: BoundNpcData) -> BoundActiveNpcSnapshot {
-    let known = is_known_npc(
-        &bound.npc.relationship,
-        &bound.npc.pc_liking,
-        &bound.npc.pc_attraction,
-    );
     BoundActiveNpcSnapshot {
         binding: bound.binding,
-        name: bound.npc.name,
-        age: format!("{:?}", bound.npc.age),
-        personality: bound.npc.personality,
-        relationship: format!("{:?}", bound.npc.relationship),
-        pc_liking: format!("{:?}", bound.npc.pc_liking),
-        pc_attraction: format!("{:?}", bound.npc.pc_attraction),
-        known,
+        npc: npc_display_snapshot(
+            bound.npc.name,
+            format!("{:?}", bound.npc.age),
+            bound.npc.personality,
+            &bound.npc.relationship,
+            &bound.npc.pc_liking,
+            &bound.npc.pc_attraction,
+        ),
+    }
+}
+
+fn npc_display_snapshot(
+    name: String,
+    age: String,
+    personality: String,
+    relationship: &undone_domain::RelationshipStatus,
+    pc_liking: &undone_domain::LikingLevel,
+    pc_attraction: &undone_domain::AttractionLevel,
+) -> ActiveNpcSnapshot {
+    ActiveNpcSnapshot {
+        name,
+        age,
+        personality,
+        relationship: format!("{relationship:?}"),
+        pc_liking: format!("{pc_liking:?}"),
+        pc_attraction: format!("{pc_attraction:?}"),
+        known: is_known_npc(relationship, pc_liking, pc_attraction),
     }
 }
 
@@ -414,23 +422,27 @@ mod tests {
             vec![
                 BoundActiveNpcSnapshot {
                     binding: "ROLE_DESIGNER".into(),
-                    name: "Mia".into(),
-                    age: "MidLateTwenties".into(),
-                    personality: "CALM".into(),
-                    relationship: "Friend".into(),
-                    pc_liking: "Like".into(),
-                    pc_attraction: "Unattracted".into(),
-                    known: true,
+                    npc: ActiveNpcSnapshot {
+                        name: "Mia".into(),
+                        age: "MidLateTwenties".into(),
+                        personality: "CALM".into(),
+                        relationship: "Friend".into(),
+                        pc_liking: "Like".into(),
+                        pc_attraction: "Unattracted".into(),
+                        known: true,
+                    },
                 },
                 BoundActiveNpcSnapshot {
                     binding: "ROLE_TEAM_LEAD".into(),
-                    name: "Jake".into(),
-                    age: "MidLateTwenties".into(),
-                    personality: "ROMANTIC".into(),
-                    relationship: "Acquaintance".into(),
-                    pc_liking: "Like".into(),
-                    pc_attraction: "Attracted".into(),
-                    known: true,
+                    npc: ActiveNpcSnapshot {
+                        name: "Jake".into(),
+                        age: "MidLateTwenties".into(),
+                        personality: "ROMANTIC".into(),
+                        relationship: "Acquaintance".into(),
+                        pc_liking: "Like".into(),
+                        pc_attraction: "Attracted".into(),
+                        known: true,
+                    },
                 }
             ]
         );

@@ -31,7 +31,7 @@ The main gaps are:
 
 1. One writer-facing contract mismatch around `m` / `f` in prose templates
 2. Large duplicated prompt mass across `CLAUDE.md`, the agent files, and `docs/writing-guide.md`
-3. No repo-neutral dispatch doc for non-Claude orchestrators
+3. Repo-neutral dispatch doc for non-Claude orchestrators ✅ Added in `docs/writing-delegation.md`
 4. No cache observability or prompt-budget guardrails in `tools/deepseek-helper.mjs`
 
 ## Current State
@@ -104,7 +104,7 @@ But it lacks several things that would matter before a serious writing sprint:
 
 - prompt cache hit/miss reporting ✅ Already implemented in deepseek-helper.mjs (stderr output: cache_hit / cache_miss)
 - oversized prompt warnings ✅ Implemented in pack-prompt.mjs (warns on prompts > 48KB)
-- retry/backoff behavior
+- retry/backoff behavior ✅ Implemented in deepseek-helper.mjs (3 attempts, exponential backoff for transient HTTP/network failures)
 - a standard prompt skeleton that keeps stable prefixes stable
 - any local dedupe layer for identical prompt files
 
@@ -125,16 +125,16 @@ These are intentionally ordered by leverage, not by implementation difficulty.
 - ✅ `writing-reviewer.md` reduced from ~288 lines to ~40 lines (references review-core.md)
 - ✅ Duplicated rules extracted into `docs/writer-core.md` and `docs/review-core.md`
 
-### Priority 3: add a repo-neutral writing delegation doc
+### Priority 3: add a repo-neutral writing delegation doc ✅ RESOLVED
 
-Add one stable doc that explains:
+✅ Added `docs/writing-delegation.md`, a stable doc that explains:
 
 - what the writer agent needs as input
 - what the reviewer agent needs as input
 - what must never be sent to DeepSeek
 - what validations must run after draft generation
 
-That doc should not assume Claude-specific `subagent_type` mechanics.
+It does not assume Claude-specific `subagent_type` mechanics.
 
 ### Priority 4: instrument the DeepSeek helper
 
@@ -143,6 +143,7 @@ Before the next writing sprint, strongly consider:
 - printing `prompt_cache_hit_tokens` ✅ Already implemented in deepseek-helper.mjs
 - printing `prompt_cache_miss_tokens` ✅ Already implemented in deepseek-helper.mjs
 - warning on prompt files above a configurable size threshold ✅ Implemented in pack-prompt.mjs (48KB threshold)
+- retry/backoff behavior ✅ Implemented in deepseek-helper.mjs
 - optional canonical prompt wrappers for `draft` and `review`
 
 ### Priority 5: move toward retrieval-style context packing ✅ RESOLVED

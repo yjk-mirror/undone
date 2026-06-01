@@ -242,11 +242,7 @@ pub fn start_game_checked(
         init_error,
     } = pre;
     let opening_scene = registry.opening_scene().map(|s| s.to_owned());
-    let femininity_id = registry
-        .femininity_skill()
-        .map_err(|_| {
-            "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
-        })?;
+    let femininity_id = required_femininity_skill(&registry)?;
     let world = new_game(config, &mut registry, &mut rng);
     Ok(GameState {
         world,
@@ -277,9 +273,7 @@ pub fn build_throwaway_game_state(
     }
 
     let opening_scene = pre.registry.opening_scene().map(|s| s.to_owned());
-    let femininity_id = pre.registry.femininity_skill().map_err(|_| {
-        "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
-    })?;
+    let femininity_id = required_femininity_skill(&pre.registry)?;
     let world = new_game(config, &mut pre.registry, &mut pre.rng);
     Ok(GameState {
         world,
@@ -317,6 +311,14 @@ fn extend_scenes_checked(
 /// `opening_scene` is intentionally `None` so resuming from save does not replay
 /// the new-game opening scene.
 pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> GameState {
+    start_loaded_game_checked(pre, world, dev_mode).unwrap_or_else(|message| panic!("{message}"))
+}
+
+pub fn start_loaded_game_checked(
+    pre: PreGameState,
+    world: World,
+    dev_mode: bool,
+) -> Result<GameState, String> {
     let PreGameState {
         registry,
         scenes,
@@ -324,11 +326,9 @@ pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> Gam
         rng,
         init_error,
     } = pre;
-    let femininity_id = registry
-        .femininity_skill()
-        .expect("PackRegistry must include required skill id FEMININITY");
+    let femininity_id = required_femininity_skill(&registry)?;
     let engine = SceneEngine::new(scenes);
-    GameState {
+    Ok(GameState {
         world,
         registry,
         engine,
@@ -339,7 +339,7 @@ pub fn start_loaded_game(pre: PreGameState, world: World, dev_mode: bool) -> Gam
         opening_scene: None,
         femininity_id,
         current_scene_time_anchor: None,
-    }
+    })
 }
 
 /// Validate and load a save file into a full `GameState`.
@@ -350,7 +350,13 @@ pub fn load_game_state_from_save(
 ) -> Result<GameState, String> {
     let loaded_world = undone_save::load_game(save_path, &mut pre.registry)
         .map_err(|e| format!("Load failed: {e}"))?;
-    Ok(start_loaded_game(pre, loaded_world, dev_mode))
+    start_loaded_game_checked(pre, loaded_world, dev_mode)
+}
+
+fn required_femininity_skill(registry: &PackRegistry) -> Result<SkillId, String> {
+    registry.femininity_skill().map_err(|_| {
+        "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
+    })
 }
 
 /// Reset transient runtime state, then resume from the current persisted world.
@@ -560,6 +566,15 @@ mod tests {
     fn start_game_reports_missing_femininity_skill_as_init_error() {
         let pre = malformed_pre_state_without_femininity();
         let result = start_game_checked(pre, workplace_config(), false);
+
+        assert!(matches!(result, Err(message) if message.contains("FEMININITY")));
+    }
+
+    #[test]
+    fn start_loaded_game_reports_missing_femininity_skill_as_error() {
+        let source = start_game(test_pre_state(), workplace_config(), false);
+        let pre = malformed_pre_state_without_femininity();
+        let result = start_loaded_game_checked(pre, source.world.clone(), false);
 
         assert!(matches!(result, Err(message) if message.contains("FEMININITY")));
     }

@@ -107,6 +107,12 @@ pub struct PickResult {
     pub npc_role: Option<String>,
 }
 
+#[derive(Clone, Copy)]
+struct ScheduleCandidate<'a> {
+    slot: &'a ScheduleSlot,
+    event: &'a ScheduleEvent,
+}
+
 // ---------------------------------------------------------------------------
 // Scheduler
 // ---------------------------------------------------------------------------
@@ -209,57 +215,13 @@ impl Scheduler {
         rng: &mut impl Rng,
     ) -> Option<PickResult> {
         let slot = self.slots.get(slot_name)?;
-        let events = &slot.events;
-
-        // Empty SceneCtx — scheduler conditions have no scene-local state.
         let ctx = SceneCtx::new();
 
-        let eligible: Vec<&ScheduleEvent> = events
-            .iter()
-            .filter(|e| {
-                e.weight > 0
-                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
-                    && match &e.condition {
-                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
-                            Ok(val) => val,
-                            Err(err) => {
-                                log::warn!(
-                                    "[scheduler] condition error in slot '{}', scene '{}': {}",
-                                    slot_name,
-                                    e.scene,
-                                    err
-                                );
-                                false
-                            }
-                        },
-                        None => true,
-                    }
-            })
+        let eligible: Vec<_> = Self::candidates_for_slot(slot)
+            .filter(|candidate| Self::is_weighted_candidate(*candidate, world, &ctx, registry))
             .collect();
 
-        if eligible.is_empty() {
-            return None;
-        }
-
-        let total: u32 = eligible.iter().map(|e| e.weight).sum();
-        let mut roll = rng.gen_range(0..total);
-        eligible
-            .iter()
-            .find(|e| {
-                if roll < e.weight {
-                    true
-                } else {
-                    roll -= e.weight;
-                    false
-                }
-            })
-            .map(|e| PickResult {
-                scene_id: e.scene.clone(),
-                once_only: e.once_only,
-                slot_name: slot.name.clone(),
-                consumes_time: slot.consumes_time,
-                npc_role: e.npc_role.clone(),
-            })
+        Self::pick_weighted_candidate(&eligible, rng).map(Self::pick_result)
     }
 
     /// Find the first triggered event in `slot_name` whose trigger condition evaluates to true.
@@ -272,36 +234,11 @@ impl Scheduler {
         registry: &PackRegistry,
     ) -> Option<PickResult> {
         let slot = self.slots.get(slot_name)?;
-        let events = &slot.events;
         let ctx = SceneCtx::new();
 
-        events
-            .iter()
-            .find(|e| {
-                !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
-                    && match &e.trigger {
-                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
-                            Ok(val) => val,
-                            Err(err) => {
-                                log::warn!(
-                                    "[scheduler] trigger error in slot '{}', scene '{}': {}",
-                                    slot_name,
-                                    e.scene,
-                                    err
-                                );
-                                false
-                            }
-                        },
-                        None => false,
-                    }
-            })
-            .map(|e| PickResult {
-                scene_id: e.scene.clone(),
-                once_only: e.once_only,
-                slot_name: slot.name.clone(),
-                consumes_time: slot.consumes_time,
-                npc_role: e.npc_role.clone(),
-            })
+        Self::candidates_for_slot(slot)
+            .find(|candidate| Self::is_triggered_candidate(*candidate, world, &ctx, registry))
+            .map(Self::pick_result)
     }
 
     /// Pick the next scene considering ALL slots.
@@ -326,91 +263,128 @@ impl Scheduler {
     ) -> Option<PickResult> {
         let ctx = SceneCtx::new();
 
-        // Sort slot names for deterministic trigger evaluation order.
-        let mut slot_names: Vec<&str> = self.slots.keys().map(|s| s.as_str()).collect();
-        slot_names.sort_unstable();
+        let slots = self.sorted_slots();
 
         // 1. Triggers — first active trigger across all slots wins.
-        for slot_name in &slot_names {
-            if let Some(slot) = self.slots.get(*slot_name) {
-                let events = &slot.events;
-                if let Some(e) =
-                    events.iter().find(|e| {
-                        !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
-                            && match &e.trigger {
-                                Some(expr) => match eval_bool(expr, world, &ctx, registry) {
-                                    Ok(val) => val,
-                                    Err(err) => {
-                                        log::warn!(
-                                        "[scheduler] trigger error in slot '{}', scene '{}': {}",
-                                        slot_name, e.scene, err
-                                    );
-                                        false
-                                    }
-                                },
-                                None => false,
-                            }
-                    })
-                {
-                    return Some(PickResult {
-                        scene_id: e.scene.clone(),
-                        once_only: e.once_only,
-                        slot_name: slot.name.clone(),
-                        consumes_time: slot.consumes_time,
-                        npc_role: e.npc_role.clone(),
-                    });
-                }
+        for slot in &slots {
+            if let Some(candidate) = Self::candidates_for_slot(slot)
+                .find(|candidate| Self::is_triggered_candidate(*candidate, world, &ctx, registry))
+            {
+                return Some(Self::pick_result(candidate));
             }
         }
 
         // 2. Weighted pick across all eligible events from all slots.
-        let eligible: Vec<(&ScheduleSlot, &ScheduleEvent)> = slot_names
+        let eligible: Vec<_> = slots
             .iter()
-            .filter_map(|name| self.slots.get(*name))
-            .flat_map(|slot| slot.events.iter().map(move |event| (slot, event)))
-            .filter(|(_, e)| {
-                e.weight > 0
-                    && !(e.once_only && world.game_data.has_flag(&format!("ONCE_{}", e.scene)))
-                    && match &e.condition {
-                        Some(expr) => match eval_bool(expr, world, &ctx, registry) {
-                            Ok(val) => val,
-                            Err(err) => {
-                                log::warn!(
-                                    "[scheduler] condition error in scene '{}': {}",
-                                    e.scene,
-                                    err
-                                );
-                                false
-                            }
-                        },
-                        None => true,
-                    }
-            })
+            .flat_map(|slot| Self::candidates_for_slot(slot))
+            .filter(|candidate| Self::is_weighted_candidate(*candidate, world, &ctx, registry))
             .collect();
 
-        if eligible.is_empty() {
+        Self::pick_weighted_candidate(&eligible, rng).map(Self::pick_result)
+    }
+
+    fn sorted_slots(&self) -> Vec<&ScheduleSlot> {
+        let mut slots: Vec<_> = self.slots.values().collect();
+        slots.sort_unstable_by(|left, right| left.name.cmp(&right.name));
+        slots
+    }
+
+    fn candidates_for_slot(slot: &ScheduleSlot) -> impl Iterator<Item = ScheduleCandidate<'_>> {
+        slot.events
+            .iter()
+            .map(move |event| ScheduleCandidate { slot, event })
+    }
+
+    fn is_weighted_candidate(
+        candidate: ScheduleCandidate<'_>,
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+    ) -> bool {
+        candidate.event.weight > 0
+            && !Self::already_fired(candidate.event, world)
+            && match &candidate.event.condition {
+                Some(expr) => {
+                    Self::eval_event_expr("condition", candidate, expr, world, ctx, registry)
+                }
+                None => true,
+            }
+    }
+
+    fn is_triggered_candidate(
+        candidate: ScheduleCandidate<'_>,
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+    ) -> bool {
+        !Self::already_fired(candidate.event, world)
+            && match &candidate.event.trigger {
+                Some(expr) => {
+                    Self::eval_event_expr("trigger", candidate, expr, world, ctx, registry)
+                }
+                None => false,
+            }
+    }
+
+    fn already_fired(event: &ScheduleEvent, world: &World) -> bool {
+        event.once_only && world.game_data.has_flag(&format!("ONCE_{}", event.scene))
+    }
+
+    fn eval_event_expr(
+        kind: &str,
+        candidate: ScheduleCandidate<'_>,
+        expr: &CompiledScript,
+        world: &World,
+        ctx: &SceneCtx,
+        registry: &PackRegistry,
+    ) -> bool {
+        match eval_bool(expr, world, ctx, registry) {
+            Ok(value) => value,
+            Err(err) => {
+                log::warn!(
+                    "[scheduler] {} error in slot '{}', scene '{}': {}",
+                    kind,
+                    candidate.slot.name,
+                    candidate.event.scene,
+                    err
+                );
+                false
+            }
+        }
+    }
+
+    fn pick_weighted_candidate<'a>(
+        eligible: &[ScheduleCandidate<'a>],
+        rng: &mut impl Rng,
+    ) -> Option<ScheduleCandidate<'a>> {
+        let total: u32 = eligible
+            .iter()
+            .map(|candidate| candidate.event.weight)
+            .sum();
+        if total == 0 {
             return None;
         }
 
-        let total: u32 = eligible.iter().map(|(_, e)| e.weight).sum();
         let mut roll = rng.gen_range(0..total);
-        eligible
-            .iter()
-            .find(|(_, e)| {
-                if roll < e.weight {
-                    true
-                } else {
-                    roll -= e.weight;
-                    false
-                }
-            })
-            .map(|(slot, e)| PickResult {
-                scene_id: e.scene.clone(),
-                once_only: e.once_only,
-                slot_name: slot.name.clone(),
-                consumes_time: slot.consumes_time,
-                npc_role: e.npc_role.clone(),
-            })
+        eligible.iter().copied().find(|candidate| {
+            if roll < candidate.event.weight {
+                true
+            } else {
+                roll -= candidate.event.weight;
+                false
+            }
+        })
+    }
+
+    fn pick_result(candidate: ScheduleCandidate<'_>) -> PickResult {
+        PickResult {
+            scene_id: candidate.event.scene.clone(),
+            once_only: candidate.event.once_only,
+            slot_name: candidate.slot.name.clone(),
+            consumes_time: candidate.slot.consumes_time,
+            npc_role: candidate.event.npc_role.clone(),
+        }
     }
 
     pub fn validate_scene_references(

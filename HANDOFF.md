@@ -2,6 +2,86 @@
 
 ## Current State
 
+**Latest session (2026-05-31, queued engineering cleanup continued):**
+Read the live handoff first; `AGENTS.md` was not present at the repo root, so the
+instructions supplied in the session prompt were followed. Ran the requested queue
+commands: `desloppify status`, `desloppify next`, and
+`desloppify show review --status open --no-budget`. Completed two concrete review
+fixes and resolved both exact plan items:
+
+1. `scheduler_duplicate_pick_logic` — refactored `crates/undone-scene/src/scheduler.rs`
+   so `pick()`, `check_triggers()`, and `pick_next()` share `ScheduleCandidate`
+   helpers for once-only filtering, condition/trigger evaluation with slot-aware
+   warning context, weighted selection, and `PickResult` construction. This keeps
+   single-slot and global scheduling from drifting.
+2. `runtime_slot_start_panics` — made requested-slot starts fallible in
+   `crates/undone-ui/src/runtime_controller.rs`, removed the `expect()`, routed
+   scheduled starts through one helper shared by `pick_next`, and added a regression
+   test proving a scheduler/content mismatch returns an `Unknown scene` command error
+   from `choose_action` instead of silently succeeding through engine error prose.
+
+**Verification:** `cargo fmt --check --all`, `cargo test -p undone-scene`, and
+`cargo test -p undone-ui` passed (undone-ui now 111 tests). `desloppify next` now
+points at subjective re-review/score refresh rather than a concrete fix. Remaining
+open concrete subjective review items are `registry_mutation_api_too_broad` and
+`dev_ipc_mixes_transport_and_commands`; both are broader refactors and were left
+queued rather than forced as low-risk cleanup. The Rhai MCP release rebuild was not
+attempted; prior lock warning still stands unless a session restart has released
+`tools/target/release/rhai-mcp-server.exe`.
+
+**Latest session (2026-05-31, subjective review pass + first fixes):**
+Ran the queued subjective review workflow. `desloppify review --prepare` succeeded, but
+`desloppify review --run-batches --runner codex --parallel` is currently blocked by the
+local Codex runner emitting an invalid quoted config value for `model_reasoning_effort`
+(`\"low\``). Imported a manual, evidence-backed subjective review from the blind packet
+instead; scores are explicitly **manual/provisional** and will reset on the next scan unless
+replaced by a trusted review run. Current strict score after the pass/fixes is **82.4/100**
+(objective **79.1/100**), with four open subjective review items remaining:
+`scheduler_duplicate_pick_logic`, `runtime_slot_start_panics`,
+`registry_mutation_api_too_broad`, and `dev_ipc_mixes_transport_and_commands`.
+
+Fixed three subjective review items:
+1. `runtime_snapshot_duplicate_npc_shapes` — `BoundActiveNpcSnapshot` now flattens the
+   shared `ActiveNpcSnapshot`, preserving the JSON shape while removing duplicated NPC
+   display fields and routing bound/unbound NPC conversion through one helper.
+2. `dev_ipc_silent_result_failures` — dev IPC now writes/replaces the result before
+   command cleanup, logs pathful persistence failures, and keeps command input available
+   when result persistence fails; added two poll-path tests.
+3. `loaded_game_missing_femininity_panics` — added `start_loaded_game_checked()`, routed
+   save loading through it, and shared the required `FEMININITY` lookup with new-game paths.
+
+**Verification:** `cargo fmt --check --all` passed. `cargo test -p undone-ui` passed
+(110 tests, 0 failed). Earlier in this same session, `cargo test -p undone-scene`,
+`node --test tools/deepseek-helper.test.mjs`, `node tools/deepseek-helper.mjs --help`,
+and `cargo run --bin validate-pack` also passed. The `rhai-mcp-server` release rebuild is
+still blocked by the live process locking `tools/target/release/rhai-mcp-server.exe`.
+
+**Latest session (2026-05-31, straightforward queued cleanup):**
+Tried the queued `rhai-mcp-server` release rebuild first, but the binary swap is still
+blocked by the live MCP process holding `tools/target/release/rhai-mcp-server.exe`
+(`os error 5`). No forceful process cleanup was attempted. Completed the next clean
+engineering follow-up instead: extracted the large inline `engine.rs` test module into
+`crates/undone-scene/src/engine/tests.rs`, leaving production `SceneEngine` code in
+`crates/undone-scene/src/engine.rs` (now **768 LOC**) with only `#[cfg(test)] mod tests;`
+at the bottom. Behavior-preserving module split; test code remains under
+`engine::tests` with `use super::*`.
+
+Added retry/backoff to `tools/deepseek-helper.mjs` (3 attempts, exponential
+backoff for transient HTTP/network failures) with a Node built-in test covering
+429→500→success behavior; the CLI remains side-effect-free when imported and
+still supports `--help`. Added `docs/writing-delegation.md`, a repo-neutral
+writer/reviewer dispatch contract, closing the last concrete writing-agent
+tooling audit item; only optional prompt-wrapper/local-dedupe polish remains.
+
+**Verification:** `cargo fmt --all`, `cargo fmt --check --all`, and
+`cargo test -p undone-scene` passed (150 unit tests plus the related
+integration/doc-test groups, 0 failed). The two Rhai acceptance test files
+received rustfmt-only formatting changes. `node --test tools/deepseek-helper.test.mjs`
+and `node tools/deepseek-helper.mjs --help` passed. `cargo run --bin validate-pack`
+passed with the known prose warnings still present. **Still blocked:** rebuild
+`rhai-mcp-server` after a session restart with
+`cd tools && cargo build --release -p rhai-mcp-server`.
+
 **Latest session (2026-05-30, god-file refactor — char_creation.rs split, MERGED):**
 Split the 2636-LOC `crates/undone-ui/src/char_creation.rs` god-file into 6 focused
 submodules under `crates/undone-ui/src/char_creation/` (parent now **925 LOC**, holding
@@ -28,9 +108,6 @@ flow (Robin/Raul presets + Custom form with all dropdowns/checkboxes/chips, all 
 discovery beats, Begin→InGame transition) renders and functions with no regressions.
 Merged fast-forward to master (6 commits, `5266ba8`); worktree + branch cleaned up.
 
-**Next refactor candidate unchanged:** `engine.rs` is still ~1863 LOC but ~1020 of that is
-the test module (production is one cohesive `impl SceneEngine`); the clean win there is
-extracting the test module to its own file. Lower value than char_creation was.
 **Still blocked (session-restart):** rhai-mcp-server binary swap — source compiles clean,
 but `tools/target/release/rhai-mcp-server.exe` is locked by the live MCP process (`os error 5`);
 run `cd tools && cargo build --release -p rhai-mcp-server` after a session restart.
@@ -257,9 +334,9 @@ Use `scene-writer` agent for drafts, `writing-reviewer` for the pass.
 - ~~**`char_creation.rs` is 2636 LOC.**~~ — Done 2026-05-30 (commit `5266ba8`).
   Split into 6 submodules (contracts/config/signals/sections/buttons/widgets);
   parent now 925 LOC (views + tests). Behavior-preserving, all gates passed.
-- **`engine.rs` is ~1860 LOC.** The test module is a large chunk; the
-  production code is also doing scene start / action dispatch / NPC binding /
-  next-evaluation / NPC actions in one file.
+- ~~**`engine.rs` is ~1860 LOC.**~~ Test module extracted 2026-05-31;
+  parent is now 768 LOC. Any further production split should be a deliberate
+  design pass, not a session-end cleanup.
 - **20 desloppify subjective dimensions** are still unscored.
 
 ### D. Open verifications
@@ -349,7 +426,7 @@ Use `scene-writer` agent for drafts, `writing-reviewer` for the pass.
 7. ~~**Content volume**~~ — SIGNIFICANTLY IMPROVED. 16 new scenes. Free_time has 20 events (was 12). Work has 12 events (was 8). Post-arc rotation is now rich.
 
 ### Remaining open items (post-Sprint 3)
-- **Writing-agent/tooling cleanup** — ✅ MOSTLY RESOLVED. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation added. Remaining: repo-neutral dispatch doc (Priority 3 in audit), retry/backoff in deepseek-helper (Priority 4). See annotated `docs/audits/2026-03-07-writing-agent-tooling-audit.md`.
+- **Writing-agent/tooling cleanup** — ✅ RESOLVED for concrete queued items. Contract mismatch fixed, agents thinned, prompt packer built, cache instrumentation and retry/backoff added, and repo-neutral dispatch documented in `docs/writing-delegation.md`. Optional future polish only: canonical prompt wrappers / local dedupe.
 - **Post-arc content void** — Sprint 3 expanded free_time from 3→8 scenes and added 7 work slot scenes (settled state). Remaining gap: campus arc has no post-arc slot equivalent. → Sprint 4+.
 - **Prose polish pass** — Workplace arc prose is mostly clean after Sprint 2–3 audit passes. Campus arc has ~20 open Critical/Important writing findings from the 2026-02-25 audit. → Sprint 4+.
 - **Free_time expansion** — more universal scenes needed. → Sprint 4.

@@ -167,6 +167,63 @@ function truncate(text, maxLen) {
   return text.length <= maxLen ? text : `${text.slice(0, maxLen)}...`;
 }
 
+function shouldRetryStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function requestChatCompletion({
+  apiKey,
+  body,
+  fetchImpl = fetch,
+  sleep: sleepImpl = sleep,
+  maxAttempts = 3,
+  initialBackoffMs = 500,
+}) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let response;
+    try {
+      response = await fetchImpl("https://api.deepseek.com/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (error) {
+      lastError = error;
+      if (attempt >= maxAttempts) {
+        throw error;
+      }
+      await sleepImpl(initialBackoffMs * 2 ** (attempt - 1));
+      continue;
+    }
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    const errorText = await response.text();
+    lastError = new Error(
+      `DeepSeek request failed (${response.status}): ${truncate(errorText, 500)}`,
+    );
+
+    if (attempt >= maxAttempts || !shouldRetryStatus(response.status)) {
+      throw lastError;
+    }
+
+    await sleepImpl(initialBackoffMs * 2 ** (attempt - 1));
+  }
+
+  throw lastError ?? new Error("DeepSeek request failed");
+}
+
 async function main() {
   const { mode, options } = parseArgs(process.argv.slice(2));
   if (options.help || !mode) {
@@ -210,23 +267,7 @@ async function main() {
     body.max_tokens = maxTokens;
   }
 
-  const response = await fetch("https://api.deepseek.com/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `DeepSeek request failed (${response.status}): ${truncate(errorText, 500)}`,
-    );
-  }
-
-  const payload = await response.json();
+  const payload = await requestChatCompletion({ apiKey, body });
   const content = payload?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || content.trim().length === 0) {
     throw new Error("DeepSeek response did not contain assistant text");
@@ -267,7 +308,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  process.stderr.write(`[deepseek-helper] ${error.message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    process.stderr.write(`[deepseek-helper] ${error.message}\n`);
+    process.exitCode = 1;
+  });
+}

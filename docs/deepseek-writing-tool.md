@@ -21,6 +21,8 @@ It calls the DeepSeek chat completions API and supports two workflows:
 - `draft`: first-pass drafting, expansion, alternative phrasings
 - `review`: second-opinion critique before the orchestrating model writes the final review
 
+Transient HTTP/network failures are retried up to three total attempts with exponential backoff.
+
 ## Auth
 
 The helper reads `DEEPSEEK_API_KEY` from:

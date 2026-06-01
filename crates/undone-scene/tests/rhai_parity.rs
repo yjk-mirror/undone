@@ -30,7 +30,11 @@ fn base_pack_loads_through_rhai() {
     let (registry, _metas) = load_packs(&packs_dir()).unwrap();
     let scenes_dir = packs_dir().join("base").join("scenes");
     let scenes = load_scenes(&scenes_dir, &registry).expect("base pack must load through Rhai");
-    assert!(scenes.len() >= 60, "expected the full base pack, got {}", scenes.len());
+    assert!(
+        scenes.len() >= 60,
+        "expected the full base pack, got {}",
+        scenes.len()
+    );
     assert!(scenes.contains_key("base::coffee_shop"));
 }
 
@@ -113,7 +117,10 @@ condition = 'w.hasTrait("TYPO_NONEXISTENT_TRAIT")'
     std::fs::remove_dir_all(&dir).ok();
 
     assert!(
-        matches!(result, Err(undone_scene::SceneLoadError::UnknownTrait { .. })),
+        matches!(
+            result,
+            Err(undone_scene::SceneLoadError::UnknownTrait { .. })
+        ),
         "a typo'd trait id must fail at LOAD, got: {result:?}"
     );
 }
@@ -153,7 +160,10 @@ effect = 'w.skillIncrease("NONEXISTENT_SKILL", 5);'
     std::fs::remove_dir_all(&dir).ok();
 
     assert!(
-        matches!(result, Err(undone_scene::SceneLoadError::UnknownSkill { .. })),
+        matches!(
+            result,
+            Err(undone_scene::SceneLoadError::UnknownSkill { .. })
+        ),
         "a typo'd skill id in an effect must fail at LOAD, got: {result:?}"
     );
 }

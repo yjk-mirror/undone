@@ -18,7 +18,7 @@ use std::path::PathBuf;
 
 use undone_packs::{load_packs, PackRegistry, SkillDef, TraitDef};
 use undone_scene::{
-    apply_effect_script, compile_condition, compile_effect, eval_bool, load_schedule, load_scenes,
+    apply_effect_script, compile_condition, compile_effect, eval_bool, load_scenes, load_schedule,
     SceneCtx, SceneLoadError,
 };
 use undone_world::test_helpers::make_test_world;

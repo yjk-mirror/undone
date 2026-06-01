@@ -563,13 +563,15 @@ mod tests {
             }),
             active_npcs: vec![BoundActiveNpcSnapshot {
                 binding: "ROLE_TEAM_LEAD".into(),
-                name: "Jake".into(),
-                age: "MidLateTwenties".into(),
-                personality: "Romantic".into(),
-                relationship: "Acquaintance".into(),
-                pc_liking: "Like".into(),
-                pc_attraction: "Attracted".into(),
-                known: true,
+                npc: ActiveNpcSnapshot {
+                    name: "Jake".into(),
+                    age: "MidLateTwenties".into(),
+                    personality: "Romantic".into(),
+                    relationship: "Acquaintance".into(),
+                    pc_liking: "Like".into(),
+                    pc_attraction: "Attracted".into(),
+                    known: true,
+                },
             }],
             player: PlayerSummarySnapshot {
                 name: "Robin".into(),
