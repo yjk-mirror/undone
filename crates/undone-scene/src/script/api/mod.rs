@@ -13,6 +13,7 @@ use crate::effects::EffectError;
 use crate::scene_ctx::SceneCtx;
 use crate::script::validate::IdKind;
 
+pub mod read;
 pub mod table;
 
 /// A value produced by a read accessor, convertible to both script backends.
@@ -76,10 +77,22 @@ impl<'a> ApiArg<'a> {
 /// Minijinja error so the two adapters share one error vocabulary.
 #[derive(Clone, Debug)]
 pub enum ApiError {
-    UnknownId { kind: &'static str, id: String },
-    NoActiveNpc { sex: &'static str },
-    UnboundRole { role: String },
-    BadArgs { method: &'static str },
+    UnknownId {
+        kind: &'static str,
+        id: String,
+    },
+    NoActiveNpc {
+        sex: &'static str,
+    },
+    /// The active/bound key resolved to no NPC (stale slotmap key). Defensive — the
+    /// faithful counterpart of the Rhai accessors' "NPC key not found in world".
+    NpcNotFound,
+    UnboundRole {
+        role: String,
+    },
+    BadArgs {
+        method: &'static str,
+    },
 }
 
 impl ApiError {
@@ -87,6 +100,7 @@ impl ApiError {
         match self {
             ApiError::UnknownId { kind, id } => format!("unknown {kind} '{id}'"),
             ApiError::NoActiveNpc { sex } => format!("no active {sex} NPC in scene context"),
+            ApiError::NpcNotFound => "NPC key not found in world".to_string(),
             ApiError::UnboundRole { role } => format!("no NPC bound to role '{role}'"),
             ApiError::BadArgs { method } => format!("bad arguments to '{method}'"),
         }
