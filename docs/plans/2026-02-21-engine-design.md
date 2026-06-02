@@ -367,6 +367,21 @@ The scheduler evaluates conditions against `&World`, weights eligible scenes,
 picks one. Community packs inject scenes by adding entries to slots.
 See `pick_next()` below for the full selection algorithm.
 
+### Looping-Adult Need-State Layer (DESIRE / COMPOSURE)
+
+A desire-driven loop makes adult content recur and escalate instead of terminating:
+
+- **DESIRE** — `GameData.desire: BoundedStat` (0–100). Accrues `+8` each consumed time-slot
+  in `advance_time_slot` (the body's passive wanting); discharged by release scenes
+  (`gd.setDesire(0)`). Read `gd.desire()`; write `gd.addDesire(n)` / `gd.setDesire(n)`.
+- **COMPOSURE** — a structural skill (registry constant + load validation, like FEMININITY),
+  seeded to 60 at new-game. Giving in to desire lowers it (`w.changeComposure(-n)`); content
+  gates reckless/submissive variants on low composure, producing a loss-of-control spiral.
+- **Desire → scheduler bias** — a per-event `desire_scaled = true` flag scales that event's
+  weight by `1.0×..4.0×` across desire 0..100 (`effective_weight` / `desire_multiplier` in
+  `scheduler.rs`). Data-driven: the engine never decides what counts as "adult".
+- Both surface in the dev-IPC snapshots. Save format bumped v6 → v7 (`desire` serde-defaults).
+
 ---
 
 ## Scene Format

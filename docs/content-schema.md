@@ -156,12 +156,20 @@ Slots group related events. Current slots: `free_time`, `robin_opening`, `camila
 
 ```toml
   [[slot.events]]
-  scene     = "base::rain_shelter"     # target scene ID
-  condition = "gd.week() > 0"         # eligibility gate (expression)
-  weight    = 10                       # probability weight (0 = trigger-only)
-  once_only = false                    # if true, fires at most once
-  trigger   = "..."                    # deterministic fire condition
+  scene         = "base::rain_shelter" # target scene ID
+  condition     = "gd.week() > 0"      # eligibility gate (expression)
+  weight        = 10                   # probability weight (0 = trigger-only)
+  once_only     = false                # if true, fires at most once
+  trigger       = "..."                # deterministic fire condition
+  npc_role      = "ROLE_JAKE"          # optional: bind this role's NPC before the scene
+  desire_scaled = false                # optional: scale weight by player DESIRE (see below)
 ```
+
+**`desire_scaled`** (default `false`): when `true`, this event's effective weight in the
+weighted pick is multiplied by a desire factor that ramps from `1.0×` at desire 0 to `4.0×`
+at desire 100. The schedule data opts a scene into the desire bias; the engine never decides
+what counts as "adult". Used so the looping-adult scenes surface harder as the player's DESIRE
+need-state climbs.
 
 ### How `pick_next()` works
 
@@ -279,9 +287,20 @@ prose = """...result prose..."""
 | `next` | list | `[]` | Navigation after effects |
 | `thoughts` | list | `[]` | Post-action inner monologue |
 
-### Effects (`[[actions.effects]]`)
+### Effects (`effect = '...'` Rhai call-list)
 
-Tagged by `type`:
+> **Current format:** effects are a single **Rhai** call-list string on the action, e.g.
+> `effect = 'gd.setGameFlag("X"); w.skillIncrease("FEMININITY", 1);'`. String literals use
+> **double** quotes (single quotes are Rhai char literals); wrap the whole field in single
+> quotes. Conditional effects use Rhai `if cond { ...; } else { ...; }` blocks — never minijinja
+> `{% %}` (that is prose-only). The tagged `[[actions.effects]]` table below is a **legacy
+> reference** for the available operations; the live syntax is the Rhai method calls.
+>
+> **Looping-adult need-state effects:** `gd.addDesire(n)` / `gd.setDesire(n)` (DESIRE 0–100;
+> `setDesire(0)` discharges on a satisfying release), and `w.changeComposure(n)` (COMPOSURE
+> skill; negative = giving in lowers it). Read with `gd.desire()` and `w.composure()`.
+
+Tagged by `type` (legacy operation reference):
 
 **PC state**
 
@@ -453,8 +472,8 @@ All `condition`, `trigger`, and `if` fields use the custom expression parser.
 
 | Object | Key methods |
 |--------|-------------|
-| `w.` | `hasTrait("ID")`, `getSkill("ID")`, `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()`, plus all physical attribute accessors (`getHeight()`, `getFigure()`, `getBreasts()`, etc.) and before-life accessors (`beforeHeight()`, `beforeFigure()`, etc.) — see [Physical Attribute Accessors](#physical-attribute-accessors) above |
-| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `timeSlot()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE")`, `npcLikingAtLeast("ROLE", "LEVEL")` |
+| `w.` | `hasTrait("ID")`, `getSkill("ID")`, `composure()` (= `getSkill("COMPOSURE")`), `getMoney()`, `getStress()`, `alwaysFemale()`, `isVirgin()`, `isSingle()`, plus all physical attribute accessors (`getHeight()`, `getFigure()`, `getBreasts()`, etc.) and before-life accessors (`beforeHeight()`, `beforeFigure()`, etc.) — see [Physical Attribute Accessors](#physical-attribute-accessors) above |
+| `gd.` | `hasGameFlag("FLAG")`, `week()`, `day()`, `desire()` (0–100 need-state), `timeSlot()`, `arcState("arc_id")`, `arcStarted("arc_id")`, `isWeekday()`, `isWeekend()`, `npcLiking("ROLE")`, `npcLikingAtLeast("ROLE", "LEVEL")` |
 | `scene.` | `hasFlag("FLAG")` |
 | `m.` | `hasTrait("ID")`, `isPartner()`, `isFriend()`, `getLiking()`, `getLove()`, `getAttraction()`, `getBehaviour()`, `hasFlag("FLAG")`, `hasRole("ROLE")`, `hadOrgasm()` (male NPC receiver) |
 | `f.` | `isPartner()`, `isFriend()`, `isPregnant()`, `isVirgin()`, `hasFlag("FLAG")`, `hasRole("ROLE")` (female NPC receiver) |
