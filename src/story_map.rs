@@ -293,6 +293,260 @@ pub(crate) fn parse_roadmap(toml_src: &str) -> Result<Roadmap, String> {
     toml::from_str(toml_src).map_err(|e| format!("roadmap.toml parse error: {e}"))
 }
 
+/// Strip the `pack::` prefix from a full scene id.
+fn short_id(full: &str) -> &str {
+    full.split_once("::").map(|(_, s)| s).unwrap_or(full)
+}
+
+/// Does a signal token belong to a thread's flag prefix? Arc tokens look like
+/// `arc=state`; the prefix matches the flag/arc head.
+fn matches_prefix(signal: &str, prefix: &str) -> bool {
+    signal.starts_with(prefix)
+}
+
+/// Reconcile derived facts against the roadmap into the final map.
+///
+/// - `facts` keyed by full `pack::id`.
+/// - `existing` = set of short ids that exist as scene files.
+pub(crate) fn reconcile(
+    facts: &HashMap<String, SceneFacts>,
+    roadmap: &Roadmap,
+    existing: &HashSet<String>,
+) -> StoryMap {
+    // Global "consumed" set: every signal required by any scene gate.
+    let mut consumed: HashSet<String> = HashSet::new();
+    for f in facts.values() {
+        consumed.extend(f.requires.iter().cloned());
+    }
+    // Global "producible" set: every signal produced by any scene.
+    let mut producible: HashSet<String> = HashSet::new();
+    for f in facts.values() {
+        producible.extend(f.produces.iter().cloned());
+    }
+
+    // Assign each scene to the first thread (roadmap order) that claims it.
+    let mut claimed: HashSet<String> = HashSet::new();
+    let mut threads: Vec<Thread> = Vec::new();
+
+    for rt in &roadmap.threads {
+        let mut members: Vec<(String, &SceneFacts)> = Vec::new();
+        for (full, f) in facts {
+            let sid = short_id(full).to_string();
+            if claimed.contains(&sid) {
+                continue;
+            }
+            let by_list = rt.scenes.iter().any(|s| s == &sid);
+            let by_prefix = rt.flag_prefix.as_deref().is_some_and(|p| {
+                f.produces
+                    .iter()
+                    .chain(f.requires.iter())
+                    .any(|sig| matches_prefix(sig, p))
+            });
+            if by_list || by_prefix {
+                claimed.insert(sid.clone());
+                members.push((full.clone(), f));
+            }
+        }
+
+        // Order members by signal dependency (Kahn-ish, id-stable tiebreak).
+        members.sort_by(|a, b| short_id(&a.0).cmp(short_id(&b.0)));
+        let ordered = order_by_dependency(members);
+
+        // Thread findings.
+        let mut dangling: Vec<DanglingSignal> = Vec::new();
+        let mut broken: Vec<BrokenGate> = Vec::new();
+        let mut nodes: Vec<SceneNode> = Vec::new();
+        for (full, f) in &ordered {
+            let sid = short_id(full).to_string();
+            for sig in &f.produces {
+                if !consumed.contains(sig) {
+                    dangling.push(DanglingSignal {
+                        signal: sig.clone(),
+                        set_by: sid.clone(),
+                    });
+                }
+            }
+            for sig in &f.requires {
+                if !producible.contains(sig) {
+                    broken.push(BrokenGate {
+                        scene: sid.clone(),
+                        missing: sig.clone(),
+                    });
+                }
+            }
+            nodes.push(SceneNode {
+                id: sid,
+                produces: f.produces.clone(),
+                requires: f.requires.clone(),
+                status: f.status.clone(),
+                binding: f.binding.clone(),
+                repeatable: f.repeatable,
+            });
+        }
+
+        let planned: Vec<String> = rt
+            .planned
+            .iter()
+            .filter(|p| !existing.contains(*p))
+            .cloned()
+            .collect();
+
+        threads.push(Thread {
+            name: rt.name.clone(),
+            note: rt.note.clone(),
+            scenes: nodes,
+            dangling,
+            broken,
+            planned,
+        });
+    }
+
+    // Orphans: existing scenes claimed by no thread.
+    let mut orphans: Vec<String> = facts
+        .keys()
+        .map(|full| short_id(full).to_string())
+        .filter(|sid| !claimed.contains(sid))
+        .collect();
+    orphans.sort();
+
+    // Drift: planned ids that now exist.
+    let mut drift: Vec<Drift> = Vec::new();
+    for rt in &roadmap.threads {
+        for p in &rt.planned {
+            if existing.contains(p) {
+                drift.push(Drift {
+                    kind: "planned_now_exists".into(),
+                    thread: rt.name.clone(),
+                    detail: format!("planned scene '{p}' now exists — promote it to `scenes`"),
+                });
+            }
+        }
+        if let Some(prefix) = &rt.flag_prefix {
+            let has_member = threads
+                .iter()
+                .find(|t| t.name == rt.name)
+                .is_some_and(|t| !t.scenes.is_empty());
+            let prefix_used = producible
+                .iter()
+                .chain(consumed.iter())
+                .any(|s| matches_prefix(s, prefix));
+            if !has_member && !prefix_used {
+                drift.push(Drift {
+                    kind: "empty_prefix".into(),
+                    thread: rt.name.clone(),
+                    detail: format!("flag_prefix '{prefix}' matches no scene signals yet"),
+                });
+            }
+        }
+    }
+
+    // Write-next digest, priority order.
+    let mut write_next: Vec<WriteNext> = Vec::new();
+    for t in &threads {
+        for d in &t.dangling {
+            write_next.push(WriteNext {
+                priority: 1,
+                kind: "dangling".into(),
+                thread: t.name.clone(),
+                detail: format!(
+                    "'{}' set by {} — no scene consumes it (write a follow-up)",
+                    d.signal, d.set_by
+                ),
+            });
+        }
+    }
+    for t in &threads {
+        for b in &t.broken {
+            write_next.push(WriteNext {
+                priority: 2,
+                kind: "broken".into(),
+                thread: t.name.clone(),
+                detail: format!(
+                    "{} gates on '{}' which no scene produces (fix gate or write producer)",
+                    b.scene, b.missing
+                ),
+            });
+        }
+    }
+    for t in &threads {
+        for p in &t.planned {
+            write_next.push(WriteNext {
+                priority: 3,
+                kind: "planned".into(),
+                thread: t.name.clone(),
+                detail: format!("planned, not yet written: {p}"),
+            });
+        }
+    }
+    write_next.sort_by_key(|w| w.priority);
+
+    StoryMap {
+        threads,
+        orphans,
+        drift,
+        write_next,
+    }
+}
+
+/// Order scenes so a scene requiring signal X follows the scene that produces X.
+/// Kahn-style; remaining (cyclic) nodes appended in their incoming id order.
+fn order_by_dependency(members: Vec<(String, &SceneFacts)>) -> Vec<(String, SceneFacts)> {
+    let owned: Vec<(String, SceneFacts)> =
+        members.into_iter().map(|(id, f)| (id, f.clone())).collect();
+
+    // produced signal -> indices that produce it
+    let mut produced_by: HashMap<String, Vec<usize>> = HashMap::new();
+    for (i, (_, f)) in owned.iter().enumerate() {
+        for sig in &f.produces {
+            produced_by.entry(sig.clone()).or_default().push(i);
+        }
+    }
+    let n = owned.len();
+    let mut indeg = vec![0usize; n];
+    let mut edges: Vec<Vec<usize>> = vec![Vec::new(); n];
+    for (i, (_, f)) in owned.iter().enumerate() {
+        for sig in &f.requires {
+            if let Some(producers) = produced_by.get(sig) {
+                for &p in producers {
+                    if p != i {
+                        edges[p].push(i);
+                        indeg[i] += 1;
+                    }
+                }
+            }
+        }
+    }
+    let mut queue: Vec<usize> = (0..n).filter(|&i| indeg[i] == 0).collect();
+    queue.sort_by(|&a, &b| short_id(&owned[a].0).cmp(short_id(&owned[b].0)));
+    let mut order: Vec<usize> = Vec::new();
+    let mut placed = vec![false; n];
+    while let Some(i) = queue.first().copied() {
+        queue.remove(0);
+        if placed[i] {
+            continue;
+        }
+        placed[i] = true;
+        order.push(i);
+        let mut newly: Vec<usize> = Vec::new();
+        for &j in &edges[i] {
+            indeg[j] -= 1;
+            if indeg[j] == 0 {
+                newly.push(j);
+            }
+        }
+        newly.sort_by(|&a, &b| short_id(&owned[a].0).cmp(short_id(&owned[b].0)));
+        queue.extend(newly);
+        queue.sort_by(|&a, &b| short_id(&owned[a].0).cmp(short_id(&owned[b].0)));
+    }
+    // Append any cyclic leftovers in id order.
+    for i in 0..n {
+        if !placed[i] {
+            order.push(i);
+        }
+    }
+    order.into_iter().map(|i| owned[i].clone()).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -406,5 +660,91 @@ note = "Recurring affair."
         assert_eq!(t.flag_prefix.as_deref(), Some("MARCUS_"));
         assert_eq!(t.scenes, vec!["marcus_repeat_office".to_string()]);
         assert_eq!(t.planned, vec!["marcus_reconcile".to_string()]);
+    }
+
+    #[test]
+    fn reconcile_assigns_threads_and_flags_dangling() {
+        // BREAKS IF: a produced-but-unconsumed signal stops surfacing as a write-next hook.
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        scenes.insert(
+            "base::marcus_leverage".into(),
+            scene(
+                "base::marcus_leverage",
+                r#"gd.setGameFlag("MARCUS_AFFAIR_COOLING");"#,
+            ),
+        );
+        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+
+        let roadmap = parse_roadmap(
+            r#"
+[[thread]]
+name = "Marcus affair"
+flag_prefix = "MARCUS_"
+"#,
+        )
+        .unwrap();
+
+        let existing: HashSet<String> = ["marcus_leverage".to_string()].into_iter().collect();
+        let map = reconcile(&facts, &roadmap, &existing);
+
+        let marcus = map
+            .threads
+            .iter()
+            .find(|t| t.name == "Marcus affair")
+            .unwrap();
+        assert!(marcus.scenes.iter().any(|s| s.id == "marcus_leverage"));
+        assert!(marcus
+            .dangling
+            .iter()
+            .any(|d| d.signal == "MARCUS_AFFAIR_COOLING"));
+        assert!(map
+            .write_next
+            .iter()
+            .any(|w| w.kind == "dangling" && w.detail.contains("MARCUS_AFFAIR_COOLING")));
+        assert!(map.orphans.is_empty());
+    }
+
+    #[test]
+    fn reconcile_reports_orphan_for_unclaimed_scene() {
+        // BREAKS IF: a scene matching no thread silently disappears from the map.
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        scenes.insert(
+            "base::lonely".into(),
+            scene("base::lonely", r#"w.changeStress(1);"#),
+        );
+        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let roadmap = parse_roadmap(
+            r#"
+[[thread]]
+name = "Jake romance"
+flag_prefix = "JAKE_"
+"#,
+        )
+        .unwrap();
+        let existing: HashSet<String> = ["lonely".to_string()].into_iter().collect();
+        let map = reconcile(&facts, &roadmap, &existing);
+        assert_eq!(map.orphans, vec!["lonely".to_string()]);
+    }
+
+    #[test]
+    fn reconcile_flags_planned_now_exists_drift() {
+        // BREAKS IF: a planned scene that now exists stops being promoted as drift.
+        let scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let roadmap = parse_roadmap(
+            r#"
+[[thread]]
+name = "Cal / gym"
+flag_prefix = "GYM_"
+planned = ["gym_regular_first"]
+"#,
+        )
+        .unwrap();
+        let existing: HashSet<String> = ["gym_regular_first".to_string()].into_iter().collect();
+        let map = reconcile(&facts, &roadmap, &existing);
+        assert!(map
+            .drift
+            .iter()
+            .any(|d| d.kind == "planned_now_exists" && d.detail.contains("gym_regular_first")));
     }
 }
