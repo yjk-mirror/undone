@@ -75,7 +75,11 @@ fn criterion1_valid_trait_read_passes() {
     // ASSERTS: an author writing `{% if w.hasTrait("SHY") %}` against a registry that
     // has SHY loads without error (the gate does not false-reject legitimate prose).
     let r = registry_with(&["SHY"], &[]);
-    let result = validate_prose(r#"{% if w.hasTrait("SHY") %}x{% endif %}"#, &r, "criterion1");
+    let result = validate_prose(
+        r#"{% if w.hasTrait("SHY") %}x{% endif %}"#,
+        &r,
+        "criterion1",
+    );
     assert!(
         result.is_ok(),
         "valid hasTrait read must pass the gate, got: {result:?}"
@@ -120,7 +124,11 @@ fn criterion2_unknown_content_id_fails() {
     // ASSERTS: a real method with a string-literal id that is NOT in the registry
     // (`w.hasTrait("NOPE")`) fails the gate — content-id resolution is enforced.
     let r = registry_with(&["SHY"], &[]);
-    let result = validate_prose(r#"{% if w.hasTrait("NOPE") %}x{% endif %}"#, &r, "criterion2");
+    let result = validate_prose(
+        r#"{% if w.hasTrait("NOPE") %}x{% endif %}"#,
+        &r,
+        "criterion2",
+    );
     assert!(
         result.is_err(),
         "unknown trait id NOPE must be rejected, got Ok"
@@ -235,8 +243,7 @@ fn criterion6_base_pack_loads_cleanly_with_full_scene_set() {
         packs.display()
     );
 
-    let (registry, _meta) =
-        undone_packs::load_packs(&packs).expect("base pack registry must load");
+    let (registry, _meta) = undone_packs::load_packs(&packs).expect("base pack registry must load");
 
     let scenes_dir = packs.join("base").join("scenes");
     let scenes = undone_scene::loader::load_scenes(&scenes_dir, &registry)
