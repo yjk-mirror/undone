@@ -1,0 +1,447 @@
+[scene]
+id          = "base::gym_regular_deepens"
+pack        = "base"
+description = "The ongoing thing with Cal. He keeps initiating. The question is how much she gives over this time."
+
+[intro]
+prose = """
+{% if gd.desire() >= 65 %}
+You came to the gym at seven on a Wednesday and the honest answer — the one you haven't said out loud — is that the workout is secondary.
+
+Cal is in the stretching area, pulling a towel off the rack when you push through the door. He looks up. He already knew you were coming in; you can tell by the lack of surprise. He's like that — not psychic, just attentive in a way that makes surprise irrelevant.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+Your chest is doing the thing it does here. That low-level awareness that runs under everything the moment you're in the same room as him. You haven't gotten used to it, which you thought you would by now.
+
+He crosses toward you. Not fast. No pretense of being on his way somewhere else.
+{% else %}
+You take your time getting to your station. He watches you do it. You can feel the watching the same way you can feel weather — ambient, total, undeniable.
+
+He comes off the rack wall.
+{% endif %}
+
+He stops two feet away.
+
+"Later," he says. Not a question. Not flirting. Just reporting something that's going to happen and waiting for you to tell him otherwise.
+{% elif gd.desire() >= 35 %}
+The gym is Thursday-quiet. Half the cardio floor empty. You're on the cables when he comes out of the free weights section and stops nearby — not close enough to crowd, close enough to mean it.
+
+{% if not gd.hasGameFlag("GYM_ACT_HANDS") %}
+This is still the version where you tell yourself you're not sure. You're not completely wrong. But he's been here the same hours every time and so have you, and at some point coincidence stops being a reasonable explanation.
+{% else %}
+You know what this is. You've known what this is since before you can say when, and he certainly has. He sets his towel over the peg on the wall and stays there.
+{% endif %}
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+The cable machine has a weight setting you haven't changed in four visits because adjusting it means looking away from him for ten full seconds and your hands haven't been reliable for that.
+{% endif %}
+
+He's watching you work. Not hiding it. After a minute he steps back toward the corridor that leads to the equipment storage — the dead end past the locker hall, where nobody goes during a session.
+
+He looks back once.
+{% else %}
+Tuesday. The gym runs on the usual rhythm — cables, machines, the flat-white glare off the rubber floor. You're twenty minutes in when Cal finishes his last set and racks the bar.
+
+He's been here the same hours you have. That's just how it is now.
+
+{% if gd.hasGameFlag("GYM_ACT_FULL") %}
+He comes over. No preamble — a hand at your lower back, flat, through the fabric of your shirt. The suggestion in it is not a suggestion.
+{% elif gd.hasGameFlag("GYM_ACT_HANDS") %}
+He leans against the cable frame. "Done?"
+
+The word lands with two meanings and you both know it.
+{% else %}
+He comes over. Clocks your grip on the cable handles. "You're favoring the right side."
+
+He's right. That's almost not the point.
+{% endif %}
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+Something in your lower back has been tracking his position on the floor since he walked in. That's just information. You have it.
+{% endif %}
+{% endif %}
+"""
+
+# ── Action 1: Give over ───────────────────────────────────────────────────────
+
+[[actions]]
+id     = "give_over"
+label  = "Give over"
+detail = "Stop managing it. Let it happen on his terms."
+prose  = """
+{% if gd.desire() >= 65 %}
+"Okay," you say.
+
+One word. He nods once — filed, same expression — and turns back toward the corridor.
+
+The equipment storage past the locker hall. A door that locks from the inside with a thumb latch — you learn this when he closes it behind you. No windows. The overhead fluorescent, the smell of rubber and chalk and old sweat. Not romantic. The anonymity of a utility room. His hands are on your hips before your eyes have adjusted to the light.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+He turns you around. Hands at your hips, walking you back to the wall — not hard, just certain, like the direction was already decided and he's completing a plan. The wall is cold through your shirt.
+{% else %}
+You're facing each other. He doesn't fill the silence. He just looks at you with that particular patient attention, and the patience is more effective than any move would be.
+{% endif %}
+
+{% if not gd.hasGameFlag("GYM_ACT_HANDS") %}
+His hand goes under your waistband. Flat, purposeful, not asking.
+
+{% if w.hasTrait("EASILY_WET") %}
+He finds what's there — soaked already, long before this room, soaked since he said *later* at the door — and his hand goes still for one beat, registering it. Then his grip adjusts and his fingers slide in properly and the wall is behind you and that's good because the wall is load-bearing right now.
+{% else %}
+His fingers find the right place and hold there and you feel the breath come out of you faster than you were ready for.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His other hand gets under your shirt. Thumb across your nipple through the sports bra. The sensation drops straight down and your hips push forward before you've decided to push them.
+{% endif %}
+
+He doesn't rush. He's got time and he's using it and the fluorescent hums overhead and somewhere out there is the cable floor and all the Tuesday gym regulars and none of that is real right now.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast — embarrassingly, inevitably fast, his fingers still moving when the orgasm drops through you and your shoulder hits the shelving and you make a sound he hears clearly. He keeps going. He's filing what he learned.
+{% else %}
+He works you up to the edge and holds you there — not cruel, not hurried, just that same patience, reading you with the attention of someone who's found something worth understanding.
+
+When he lets you come, you come loud into the back of your own wrist.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing fills the room. He can hear it. He uses it like a dial.
+{% endif %}
+{% else %}
+His hands already know you. The waistband, the grip, the fingers sliding in without finding their way first — they just go, and your body opens up for them before you've caught up with what's happening. That's what the second time is. That's what the fifth time is. Every time has been the same — the room, the lock, his hands moving with the assurance of someone who learned you and isn't pretending he didn't.
+
+{% if not gd.hasGameFlag("GYM_ACT_FULL") %}
+You're against the wall, three fingers in, his thumb working the right place, and he's watching your face with that level attention, and something in you is trying to fold toward him.
+
+"Closer," you say.
+
+He looks at you. Reading the word. You don't say it again. You don't need to.
+
+{% if w.hasTrait("EASILY_WET") %}
+He pulls his hand out and takes a moment — registering what's there on his fingers — and then his hands are at your waistband, pulling down, and it happens right there, standing, your shoulders against the shelving. The sound you make when he pushes in is the kind you'd have been embarrassed about two months ago.
+{% else %}
+He pulls back and repositions you — your back to him, facing the metal shelves — and then he's there, pushing in slow, taking it at the pace he wants, and your hands find the edge of the shelf and you hold on.
+{% endif %}
+
+You come on him. Loud. He feels it and keeps going.
+
+{% else %}
+He turns you around, your back to him, your palms flat on the shelving — same arrangement as before — and slides in from behind in one even push, unhurried, at the pace he always sets. Your grip on the shelf tightens.
+
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs want to close. There's nowhere for them to go. He fills the space they'd close around and they stay open and that's its own sensation.
+{% endif %}
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the vertical until your shoulder blades find his chest.
+{% endif %}
+
+The session lasts as long as it lasts. He doesn't watch the clock. Neither do you. By the end there's sweat on the metal shelf from your palms and the fluorescent is still humming and he straightens his shorts with the same efficiency he racks weight.
+{% endif %}
+{% endif %}
+
+After: he unlocks the door. You straighten your shirt. The cable floor is right there — the machines, the other regulars, the 7pm crowd. Ordinary light.
+
+He goes back to his session. You go back to yours.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+Your legs are functional. That's the bar you're clearing right now.
+{% elif w.getSkill("FEMININITY") < 30 %}
+The grip of the cable handles feels different — your hands are slightly unsteady and you're aware of each finger separately for a full minute.
+{% endif %}
+{% elif gd.desire() >= 35 %}
+You follow him into the corridor.
+
+The equipment storage is a dead end with a thumb latch and one fluorescent tube. He closes the door. The ordinary gym noise — the machines, the ventilation — drops to a murmur through concrete.
+
+{% if not gd.hasGameFlag("GYM_ACT_HANDS") %}
+His hand goes to the back of your neck first. Flat, easy, the kind of grip that says *I'm going to hold this*. Your head tips back against the wall and his mouth goes to the corner of your jaw — not kissing, just there, pressure — and his other hand slides between your legs from the outside of your leggings.
+
+{% if w.hasTrait("EASILY_WET") %}
+He can feel you through the fabric. He pauses there, his hand still, long enough for you to know he knows. Then his fingers press in.
+{% else %}
+He works through two layers of fabric for long enough that your hands find the door behind him and grip it. Then he gets a hand inside.
+{% endif %}
+
+He doesn't ask what you want. He moves like a man who already has the information — slow, deliberate, adjusting to what he finds. You try to keep your breathing manageable. You fail around the three-minute mark.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm comes before you're ready for it — drops through your whole lower body while his fingers are still moving and you make a sound against his shoulder that the concrete walls probably kept to themselves.
+{% else %}
+You come hard enough that your knee bends and he has to catch you with his other arm, flat across your back, unperturbed, still moving.
+{% endif %}
+{% else %}
+He's done this before. His hands already know the sequence — waistband, the inside of your thigh, the grip that gets your hips to angle right. You're past the part where it's new and into the part where your body answers each step before the step is finished, and that's a different thing entirely.
+
+{% if not gd.hasGameFlag("GYM_ACT_FULL") %}
+His fingers are inside you and his thumb is where it needs to be and the wall is cold and your hands are fists at his shirt and he's watching your face with that specific attention — the same look he gives a bar that's at a weight worth examining.
+
+"Tell me," he says.
+
+Not asking permission. Asking what he's working with.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+You tell him. You say it out loud, in the equipment room, with the gym humming twenty feet away, and his expression doesn't change but something in his grip does.
+{% else %}
+You tell him anyway. You don't decide to — it's just out, low, specific, the kind of thing you'd never say in a lit room with anyone else.
+{% endif %}
+
+He gives you what you said.
+{% else %}
+By now the sequence is almost ordinary — almost — and nothing about it actually is. He positions you and comes in from behind and the pace is his and you're holding the shelving and working with it because working with it feels better than not.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come twice. The second one catches you mid-sentence — you'd been thinking something — and the thought dissolves.
+{% else %}
+You come once. Completely.
+{% endif %}
+{% endif %}
+{% endif %}
+
+He straightens his shirt. Unlocks the door. Nods at the floor.
+
+You go back out.
+{% else %}
+You put the cable down and follow him.
+
+{% if not gd.hasGameFlag("GYM_ACT_HANDS") %}
+The storage room is a utility space — shelving, stacked mats, the backup towel bins. He closes the door with that same unhurried economy and turns around and looks at you.
+
+"This okay?" he says.
+
+The asking doesn't seem like asking. More like verifying a fact.
+
+{% if w.hasTrait("SHY") %}
+You don't say anything. He reads it correctly — reads the body, not the silence — and steps in.
+
+His hands are at your hips. One moves down, inside the waistband, and you make a sound against your own closed lips.
+{% else %}
+"Yes," you say.
+
+He doesn't wait after that.
+{% endif %}
+
+His fingers find what they find. Your shoulder is against the shelving and your eyes are closed and his hand moves with a precision that makes thinking something that happens to other people.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast and say his name when you do, which you register after the fact.
+{% else %}
+The orgasm builds right and lands clean and your hands are fists in his shirt through most of it.
+{% endif %}
+{% else %}
+He closes the door. You're already past the part where you're pretending to think about it.
+
+His hands on you — knowing, efficient, none of the tentativeness of early on. His fingers inside you and the heel of his hand working and your forehead going forward to his shoulder.
+
+{% if not gd.hasGameFlag("GYM_ACT_FULL") %}
+He brings you up slow and holds you there — and you hear yourself, in the equipment room with the gym humming through the wall, saying *more*, and he gives you the more.
+{% else %}
+He turns you around. Hands at your hips, walking you to the mat stack, and you know the shape of this now — you bend forward over the edge of it and he comes in from behind and the pace starts where it always starts, which is exactly his.
+
+Your fingers grip the mat edge. He takes his time and you give him all of it.
+{% endif %}
+
+When you're done he steps back. One breath. Adjusts.
+{% endif %}
+
+You go back to the floor first. He follows thirty seconds later.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The cable handles are familiar under your hands. The workout is still here. So is everything else.
+{% endif %}
+{% endif %}
+"""
+
+  effect = '''
+if !gd.hasGameFlag("GYM_ACT_FULL") && gd.hasGameFlag("GYM_ACT_HANDS") && gd.desire() >= 35 {
+    gd.setGameFlag("GYM_ACT_FULL"); gd.addStat("TIMES_HAD_SEX",1); gd.addStat("TOTAL_ORGASMS",1); w.skillIncrease("RIDING",2); w.skillIncrease("COMPOSURE",-8); gd.setDesire(15); npc("m").addLiking(1); npc("m").addSexualActivity("vaginal");
+} else if !gd.hasGameFlag("GYM_ACT_HANDS") {
+    gd.setGameFlag("GYM_ACT_HANDS"); gd.addStat("TOTAL_ORGASMS",1); w.skillIncrease("ORAL_SKILL",1); w.skillIncrease("COMPOSURE",-6); gd.setDesire(20); npc("m").addLiking(1);
+} else {
+    gd.addStat("TIMES_HAD_SEX",1); gd.addStat("TOTAL_ORGASMS",1); w.skillIncrease("RIDING",2); w.skillIncrease("COMPOSURE",-8); gd.setDesire(15); npc("m").addLiking(1); npc("m").addSexualActivity("vaginal");
+}
+'''
+
+  [[actions.next]]
+  finish = true
+
+# ── Action 2: Hold something back ────────────────────────────────────────────
+
+[[actions]]
+id     = "hold_back"
+label  = "Not all the way"
+detail = "Go so far. Not further. The line is still there."
+prose  = """
+{% if gd.desire() >= 65 %}
+"Not here," you say.
+
+He looks at you. Takes the word.
+
+"Where," he says. Not a question — more like he's placing the constraint and examining it.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Same place. Later." You hold his eyes. "Not in the middle of a session."
+
+He tips his chin — registered. "Tomorrow."
+
+You don't say yes exactly. But you don't say no.
+{% else %}
+You don't answer. He reads you for a moment — not annoyed, just calibrating — and then he takes a half-step back.
+
+"Tomorrow," he says.
+
+It lands like something settled.
+{% endif %}
+
+He's twelve feet away for the next forty minutes, working his program, completely normal, and the knowledge of tomorrow sits warm in your sternum the entire time.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+Your form is off for three sets and you don't bother correcting it.
+{% endif %}
+{% elif gd.desire() >= 35 %}
+You follow him to the corridor but stop at the door.
+
+He looks back. He doesn't push — he never pushes, and that's half the problem.
+
+"Just — hands," you say. Your voice comes out level enough to be mortifying.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You've identified the line. A line that's further in than any previous line. You're tracking the progression with one part of your head and giving in with the rest of it.
+{% endif %}
+
+He opens the door. Inside, his hands go to your hips — no further, not yet, reading what you said — and then one hand slides down and you have about thirty seconds before the thing you said stops mattering.
+
+{% if w.hasTrait("EASILY_WET") %}
+His fingers find you through the fabric and pause. He makes a small sound — not a word, just the breath of someone who's found confirmation. His thumb starts moving.
+{% else %}
+He works through your leggings and then inside them, slow, and you have your hands on his shoulders and your head back against the wall.
+{% endif %}
+
+You come without crossing your own line, which feels like discipline and doesn't feel like discipline at all.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+When his hand stills you're aware of how much further he could go. That you didn't let him go there. That you're going to think about that.
+{% endif %}
+{% else %}
+He moves toward the corridor. You don't follow immediately.
+
+He stops. Looks back.
+
+{% if w.hasTrait("SHY") %}
+"I can't," you say. Which isn't quite true. "Not today."
+
+He studies you for a moment. Something in that look — patient, unhurried — settles around you like weather.
+
+"Okay," he says.
+
+He goes back to the free weights. Doesn't make anything of it. The session continues and his attention is still there, ambient, and you're aware of every minute of the remaining forty.
+{% elif w.hasTrait("CONFIDENT") %}
+"Different day," you say. Meeting his eyes.
+
+He nods once. The nod of someone who's adding it to a schedule.
+
+You go back to your station. He goes back to his. The workout continues and nothing is resolved and everything is decided.
+{% else %}
+"Not today," you say.
+
+He looks at you without any visible disappointment — the particular self-possession of someone who is not running on urgency.
+
+"Alright," he says.
+
+He goes back to his program. You go back to yours. The space between your stations is the same fifteen feet it's always been and feels like less.
+{% endif %}
+{% endif %}
+"""
+
+  effect = '''
+if gd.desire() >= 35 {
+    gd.addStat("TOTAL_ORGASMS",1); w.skillIncrease("COMPOSURE",-4); gd.setDesire(35); npc("m").addLiking(1); w.addArousal(2);
+} else {
+    gd.addDesire(8); w.addArousal(2); w.skillIncrease("COMPOSURE",-2); npc("m").addLiking(1);
+}
+'''
+
+  [[actions.next]]
+  finish = true
+
+# ── Action 3: Leave ────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "leave_now"
+label  = "Not this time"
+detail = "Pack your bag. Go before it tips."
+prose  = """
+{% if gd.desire() >= 65 %}
+"No," you say. The word comes out steadier than it has any right to.
+
+He looks at you. No pressure. No argument. He just holds the look for one beat — assessing, not judging — and then his expression settles back to neutral.
+
+"Okay," he says.
+
+He goes back to his station. Picks up his towel and gets back to work.
+
+You finish the next twenty minutes. He runs his program and doesn't glance over again, and that restraint — that complete absence of punishment for the answer you gave — is almost harder to manage than the alternative would have been.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+Outside: cold air, the train platform, the regular city. Your body is still running the conversation from twelve minutes ago.
+{% elif w.hasTrait("ANALYTICAL") %}
+On the train home you run the accounting. You said no at sixty-eight on the dial and you meant it and there will be a next time. This is information about the dial.
+{% else %}
+The gym is behind you and he is and the wanting is doing something else entirely.
+{% endif %}
+{% elif gd.desire() >= 35 %}
+You stay at your station.
+
+He waits. Not hovering — just there, his body angled toward the corridor, leaving the geometry of it intact. Available if you decide to walk through it.
+
+You pick up your cable and start the set.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+His reflection is in the mirror at the top of your eye line. Forearms. The unhurried set of his shoulders. The gaze that has been running on you since you walked in, patient and unperformed. Your grip tightens on the cable handle.
+
+You finish the set. You do the next one.
+{% elif w.hasTrait("SUBMISSIVE") %}
+The set takes two minutes. He's still there at the end of it. The corridor is still open. You rack the cable and move to your next exercise and feel the shape of the thing you're not doing for the full remainder of the session.
+{% else %}
+You finish your program. He does his. The corridor stays where it is — there and unchosen.
+
+At the end of the session he gathers his gear. He passes your station on the way out.
+
+"Next time," he says.
+
+Statement. Not a question.
+{% endif %}
+{% else %}
+You pick up your bag.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You've identified what's building here and elected not to continue. That's the word: elected. You have a full accounting of the geometry — the locker room, the corridor, the last several visits — and you know where it leads.
+
+The rational branch is the one where you leave.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+On the train home you run the accounting twice and the conclusions are the same and your hands aren't entirely still.
+{% endif %}
+{% elif w.hasTrait("SHY") %}
+You take your bag off the peg. He's watching — you can feel it — but when you look up he's not watching, or not visibly. Just at his station, at the end of his last set, winding down.
+
+"See you," you say to the room in general.
+
+He doesn't respond. But at the door, leaving, there's the awareness of being watched until you're through it, and the awareness of knowing you'll come back.
+{% else %}
+You wipe down the machine. Take your things. The session was forty minutes and that's what it needed to be.
+
+He's at the water fountain when you pass. He doesn't stop you.
+
+"Next week," he says. To the room. To you. It's not clear it needs to be both.
+
+The street outside is cold.
+{% endif %}
+{% endif %}
+"""
+
+  effect = 'gd.addDesire(10); w.addArousal(2); w.skillIncrease("COMPOSURE",3); npc("m").addLiking(1);'
+
+  [[actions.next]]
+  finish = true

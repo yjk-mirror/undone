@@ -1,0 +1,261 @@
+[scene]
+id          = "base::gym_regular_intro"
+pack        = "base"
+description = "The gym. A man who has been watching you since you walked in. He doesn't perform about it."
+
+[intro]
+prose = """
+Third set on the cable row. The gym runs on its own rhythms — the clank of plates, the
+hiss of the cable pulleys, the particular ventilated heat of a room full of people working.
+
+There's a man across the floor. Late thirties, maybe forty. He's been at the free weights
+the whole time you've been on this machine — unhurried, not performing for anyone, the
+weights moving at a pace he decided on for reasons that have nothing to do with being
+watched. He's been there since before you came in.
+
+You know when you got checked out. You've been learning that — the exact texture of male
+attention running across the back of your neck, the instinct that makes you glance toward
+the door without deciding to.
+
+He's not hiding it. That's the part. He clocks the fact that you noticed him noticing and
+he doesn't look away. He just sets the bar down and rests, forearms over his knees, and
+watches you with the particular ease of someone who has nowhere else to be.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Something fires in you that runs on old circuitry. The forearms. The set of the shoulders.
+The way he's resting, not performing rest. Your gaze does the thing it used to do — inventory,
+quick, automatic. Hip-to-shoulder ratio. The casual confidence in his stillness.
+
+It runs all the way back to you. He is doing exactly what you would have done. The same
+patience. The same unbothered certainty. The same willingness to let the distance do the work.
+
+Your hands are on the cable handles. Your workout bra is damp at the back. The inventory
+already ran and came back filed somewhere warm.
+{% elif w.hasTrait("ANALYTICAL") %}
+You clock the full picture in about four seconds. How long he's been there relative to
+when you arrived. The weight he's resting between sets — nothing he needs to recover from,
+just an excuse to be still. The angle of his body: oriented toward the machine you're on.
+The fact that he's not looking away now that you've noticed.
+
+This is a legible strategy. You can read the whole trajectory from here.
+
+Something low in your stomach doesn't care about the trajectory.
+{% elif w.hasTrait("SHY") %}
+Your eyes went to him without deciding to and now you're looking at the cable tension
+because looking back at him requires something you don't have ready. He's still there.
+You can feel the direction of it on your left side.
+
+He's not smiling. He's not performing anything. He's just watching, like the watching
+is enough — like he has all the time in the world to wait for you to look again.
+{% else %}
+His attention has a quality to it that's hard to calibrate. Not aggressive. Not performing.
+Just present and certain — a man in no hurry who knows it.
+
+Your next rep is going to be slightly off and you already know it.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+The cable machine frame is cold when your hand finds it. Your workout shirt is too loose —
+bought before you understood your proportions, hanging off one shoulder. You are aware of
+both of these things with unusual precision.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You've been looked at before. You've learned the flavor of it, the different textures —
+street, bar, office. This one isn't any of those.
+{% endif %}
+
+He hasn't moved from the bench.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "finish_set_leave"
+label  = "Finish the set. Go."
+detail = "Complete the rep. Pack up. Get out before the charge has time to settle."
+prose  = """
+You run the last four reps clean and set the cable down and bend to pick up your towel.
+
+He watches you pack your bag. You can feel the direction of it the entire time you're at
+the water fountain, the entire walk to the locker room. You don't look back.
+
+{% if w.hasTrait("SHY") %}
+You're out the door and halfway down the block before anything catches up. The air is cold.
+Your workout clothes are still damp and the cold finds the dampness immediately. You walk
+faster. The weight of it — the held certainty — follows you anyway.
+You're already thinking about whether you'll come back this time next week and hating
+that you're thinking about it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You know what you just did. You left before the situation developed. This is the rational
+move — the branch with the least downstream cost. You replay the face on the bench, the
+forearms, the unbothered patience of it, and your stomach does something annoying.
+
+You'll be back. You know that too. You went here before he was a variable and you're not
+changing your schedule because some man at the free weights has good posture and nowhere
+to be.
+{% elif w.hasTrait("OBJECTIFYING") %}
+The old read on yourself: you just got checked out at the gym and left. That's a thing that
+happened. The inventory you ran on him — unbidden, specific, inconvenient — is already filed.
+
+On the sidewalk you become aware that your jaw was slightly tight the whole walk out.
+*Huh.*
+{% else %}
+Outside, the air is colder than you remembered. You walk the half block to the train
+without checking your phone. The gym stays on the back of your neck for a while.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MET_GYM_REGULAR"); npc("m").setRole("ROLE_GYM"); npc("m").setName("Cal"); npc("m").addLiking(1); w.skillIncrease("FEMININITY", 2); gd.addStat("TIMES_CHECKED_OUT", 1); gd.addDesire(6);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "hold_his_look"
+label  = "Look back"
+detail = "Meet it. Don't look away first."
+prose  = """
+You hold the cable handles and look back at him.
+
+He doesn't move. He doesn't smile in a way that claims the moment. He just holds the
+eye contact with the ease of someone who expected you'd get there eventually.
+
+{% if w.hasTrait("CONFIDENT") %}
+You hold it for a beat longer than he probably expected and then you go back to your set.
+Two more reps. You can feel that his attention didn't move.
+
+When you rack the cable, you hear the weight shift on his end of the floor — finally
+standing, coming upright, like your looking back was the thing he was waiting for before
+he had somewhere to be. He picks up his towel.
+
+He doesn't approach. He doesn't have to. The acknowledgment was the whole of it.
+{% elif w.hasTrait("OBJECTIFYING") %}
+Something calibrates in the second that passes between you. He looks at you. You look at
+him. Your body runs the old math on his — forearms, jaw, the particular relaxed certainty
+in his stillness — and your body runs it automatically and completely before you're done
+deciding whether to stop it.
+
+He drops his chin, barely — an acknowledgment, not a performance. Then he goes back to his
+weights.
+
+Your next rep is off.
+{% elif w.hasTrait("SHY") %}
+You hold it for one beat and then your eyes go back to the cable and your face is warm.
+
+He doesn't press it. He just goes back to his weights like the exchange was completed to
+his satisfaction and he has other things to do. The casual certainty of it is what gets you.
+
+You finish the set badly.
+{% else %}
+A second passes. Two. He tips his chin — the smallest nod, like he's filed something.
+Then he turns back to the bench.
+
+You finish the set. Your grip was slightly different on the last few reps. You don't
+immediately know why.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+Something warm and low that doesn't have a clean category. You know the feeling from the
+outside. From this side, it's faster than you'd expect.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MET_GYM_REGULAR"); npc("m").setRole("ROLE_GYM"); npc("m").setName("Cal"); npc("m").addLiking(2); w.skillIncrease("FEMININITY", 2); gd.addStat("TIMES_CHECKED_OUT", 1); gd.addDesire(10);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "keep_working"
+label  = "Keep going"
+detail = "Don't acknowledge it. Put the next set on."
+prose  = """
+You put your eyes back on the cable machine. Set your grip. Go.
+
+The set takes two minutes. He's still there when you finish — you can see him in the
+mirror over the free weights without looking directly, which is not nothing. He's in no
+hurry. He has nowhere specific to be. The certainty in his stillness has the particular
+quality of someone who is accustomed to waiting for things to happen at their own pace.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You've been cataloguing without meaning to: how long he rests between sets (long), whether
+he adjusts when you adjusted your position (he did, slightly), whether the fact that you
+didn't look back changed anything about his posture (it didn't). You have more data on this
+man than you wanted fifteen minutes ago.
+
+You go to the stretching area. His reflection is still visible from the mat.
+{% elif w.hasTrait("SUBMISSIVE") %}
+The ignoring-it costs more than it should. His attention has a weight to it — patient,
+undemanding, just there. You're aware of your side of the room from his angle in a way
+that makes the next set harder to think about properly.
+
+You switch to a different machine. He doesn't follow. He doesn't have to — he's still
+in your line of sight from the new position. You chose the new machine. You're aware of that.
+{% elif w.hasTrait("OBJECTIFYING") %}
+You switch machines. Put more floor between you, more equipment. The inventory doesn't stop
+just because you're not looking directly. Peripheral. The set of his shoulders when he stands.
+The economy of how he moves to his next exercise, no wasted effort.
+
+Your next set is fine. You finish it. He's still there.
+{% else %}
+Another set. Another. The workout runs. He does his workout across the floor. At some
+point — you aren't tracking when exactly — the frequency of catching him in your peripheral
+vision goes from uncomfortable to just present. He's part of the room.
+
+You're going to be here next week. He's probably going to be here too. That's a thing
+that's true now.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MET_GYM_REGULAR"); npc("m").setRole("ROLE_GYM"); npc("m").setName("Cal"); npc("m").addLiking(1); w.skillIncrease("FEMININITY", 1); gd.addStat("TIMES_CHECKED_OUT", 1); gd.addDesire(8);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "say_something"
+label  = "Say something back"
+detail = "He made an observation. You have one too."
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("OUTGOING")'
+prose  = """
+You set the cable down and cross the floor toward where he's sitting.
+
+He doesn't move. Doesn't stand, doesn't shift to make room. He just watches you
+come over with the ease of someone who expected this too.
+
+{% if w.hasTrait("CONFIDENT") %}
+"You've been watching me since warm-ups," you say. Matter-of-fact. Establishing the count.
+
+"Yeah," he says.
+
+That's all. No apology, no deflection, no attempt to reframe it into something more innocent.
+He says it like the watching was a reasonable thing to do and he'd do it again.
+
+It lands differently than it was supposed to. You were going to make a point. The point is
+still technically there. His forearms are right at eye level.
+
+You go back to your machine.
+{% elif w.hasTrait("OUTGOING") %}
+"Third set or fourth?" you say, nodding at the bench behind him.
+
+He looks at you. Takes a half second.
+
+"Fourth," he says.
+
+"Thought so." You keep moving toward the water fountain. You can feel his eyes follow.
+
+When you look back over your shoulder — once, at the fountain — he's still watching.
+He raises an eyebrow, barely. An acknowledgment. Then he picks up the bar.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 25 %}
+His voice is low and unhurried and your stomach runs a response to it before the word
+has finished registering.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The conversation was twelve words. You are aware of every one of them.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MET_GYM_REGULAR"); npc("m").setRole("ROLE_GYM"); npc("m").setName("Cal"); npc("m").addLiking(3); w.skillIncrease("FEMININITY", 2); gd.addStat("TIMES_CHECKED_OUT", 1); gd.addDesire(12);'
+
+  [[actions.next]]
+  finish = true
