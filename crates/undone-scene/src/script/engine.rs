@@ -151,6 +151,47 @@ pub fn eval_string(
     })
 }
 
+/// Test-only: evaluate an expression to its string form via the condition engine,
+/// installing a read context. Mirrors how prose method results stringify so the
+/// read/prose equivalence harness can compare apples to apples (a bool renders as
+/// `true`/`false`, an int as its decimal, a string as itself — exactly minijinja's
+/// default rendering of the corresponding `Value`).
+#[doc(hidden)]
+pub fn eval_string_for_test(
+    expr: &str,
+    world: &World,
+    ctx: &SceneCtx,
+    registry: &PackRegistry,
+) -> Result<String, String> {
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
+    with_engines(|engines| {
+        let mut scope = read_scope();
+        let ast = engines
+            .cond
+            .compile_with_scope(&scope, expr)
+            .map_err(|e| e.to_string())?;
+        let value: rhai::Dynamic = engines
+            .cond
+            .eval_ast_with_scope(&mut scope, &ast)
+            .map_err(|e| e.to_string())?;
+        Ok(format_dynamic(value))
+    })
+}
+
+/// Format a `Dynamic` to match minijinja's default `Value` rendering.
+fn format_dynamic(value: rhai::Dynamic) -> String {
+    if let Ok(b) = value.as_bool() {
+        return b.to_string();
+    }
+    if let Ok(i) = value.as_int() {
+        return i.to_string();
+    }
+    if let Ok(s) = value.clone().into_string() {
+        return s;
+    }
+    value.to_string()
+}
+
 /// Run a compiled effect call-list against the thread's effect engine, mutating
 /// the world. Returns error messages collected from any failing mutator
 /// (continue-on-error: the whole list runs regardless), surfaced as
