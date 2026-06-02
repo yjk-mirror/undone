@@ -131,6 +131,21 @@ pub struct PickResult {
     pub npc_role: Option<String>,
 }
 
+/// A read-only projection of one scheduled event's binding metadata, for
+/// authoring tools (story-map). Carries the raw gate sources so callers can
+/// source-scan them without re-parsing the schedule.
+#[derive(Debug, Clone)]
+pub struct SceneBinding {
+    pub scene: String,
+    pub slot: String,
+    pub weight: u32,
+    pub once_only: bool,
+    pub npc_role: Option<String>,
+    pub desire_scaled: bool,
+    pub condition_source: Option<String>,
+    pub trigger_source: Option<String>,
+}
+
 #[derive(Clone, Copy)]
 struct ScheduleCandidate<'a> {
     slot: &'a ScheduleSlot,
@@ -195,6 +210,28 @@ impl Scheduler {
             }
         }
         result
+    }
+
+    /// Project every scheduled event's binding metadata for authoring tools.
+    /// One entry per (slot, event); a scene bound in multiple slots yields
+    /// multiple entries.
+    pub fn bindings(&self) -> Vec<SceneBinding> {
+        let mut out = Vec::new();
+        for slot in self.slots.values() {
+            for event in &slot.events {
+                out.push(SceneBinding {
+                    scene: event.scene.clone(),
+                    slot: slot.name.clone(),
+                    weight: event.weight,
+                    once_only: event.once_only,
+                    npc_role: event.npc_role.clone(),
+                    desire_scaled: event.desire_scaled,
+                    condition_source: event.condition.as_ref().map(|s| s.source.clone()),
+                    trigger_source: event.trigger.as_ref().map(|s| s.source.clone()),
+                });
+            }
+        }
+        out
     }
 
     pub fn all_scene_ids(&self) -> Vec<String> {
@@ -582,6 +619,33 @@ mod tests {
             npc_role: None,
             desire_scaled,
         }
+    }
+
+    #[test]
+    fn bindings_projects_event_metadata() {
+        // BREAKS IF: the public binding projection drops a field story-map needs.
+        let event = ScheduleEvent {
+            scene: "base::coffee_shop".to_string(),
+            condition: None,
+            weight: 0,
+            once_only: true,
+            trigger: Some(cond(r#"gd.week() >= 2"#)),
+            npc_role: Some("ROLE_JAKE".to_string()),
+            desire_scaled: false,
+        };
+        let mut slots = HashMap::new();
+        slots.insert("free_time".to_string(), vec![event]);
+        let scheduler = Scheduler::from_slots_for_tests(slots);
+
+        let bindings = scheduler.bindings();
+        assert_eq!(bindings.len(), 1);
+        let b = &bindings[0];
+        assert_eq!(b.scene, "base::coffee_shop");
+        assert_eq!(b.slot, "free_time");
+        assert!(b.once_only);
+        assert_eq!(b.npc_role.as_deref(), Some("ROLE_JAKE"));
+        assert_eq!(b.trigger_source.as_deref(), Some("gd.week() >= 2"));
+        assert_eq!(b.condition_source, None);
     }
 
     #[test]

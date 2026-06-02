@@ -50,6 +50,11 @@ that, please.*" These are the narrator analyzing or thinking for the player.
 
 ## Workflow
 
+- **Ground the scene in the story map.** Read `docs/story-map.json`. Prefer scenes that
+  resolve a `write_next` item for the target thread — especially `dangling` signals (an
+  existing scene opened a thread nobody followed) and `planned` entries. State which
+  `write_next` item the new scene addresses.
+
 ### Pipeline v2 (preferred — uses DeepSeek with voice sample calibration)
 
 1. Read `docs/creative-direction.md` and `docs/writing-guide.md` if not read this session

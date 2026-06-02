@@ -125,6 +125,19 @@ fn inspect_source(
     }
 }
 
+/// All `hasGameFlag("FLAG")` references in a condition source, each paired with
+/// whether it is logically negated (`!gd.hasGameFlag(...)`). A negated reference
+/// is an anti-requirement (the flag must be ABSENT), not a dependency.
+pub fn required_game_flags(src: &str) -> Vec<(String, bool)> {
+    find_hasgameflag(src)
+}
+
+/// All `arcState("ARC") == "STATE"` equality references in a condition source,
+/// returned as `(arc, state)` pairs.
+pub fn arc_state_eqs(src: &str) -> Vec<(String, String)> {
+    find_eq_call(src, "arcState")
+}
+
 /// Find every `hasGameFlag("FLAG")` and whether it is logically negated (the
 /// nearest non-space char before `gd.hasGameFlag` is `!`).
 fn find_hasgameflag(src: &str) -> Vec<(String, bool)> {
@@ -238,6 +251,25 @@ mod tests {
 
     fn cond(src: &str) -> CompiledScript {
         crate::script::compile_condition(src, &undone_packs::PackRegistry::new(), "test").unwrap()
+    }
+
+    #[test]
+    fn required_game_flags_reports_flag_and_negation() {
+        // BREAKS IF: positive vs negated flag refs stop being distinguished —
+        // story-map would treat `!hasGameFlag` as a dependency.
+        let got = required_game_flags(r#"gd.hasGameFlag("A") && !gd.hasGameFlag("B")"#);
+        assert!(got.contains(&("A".to_string(), false)));
+        assert!(got.contains(&("B".to_string(), true)));
+    }
+
+    #[test]
+    fn arc_state_eqs_reports_arc_and_state() {
+        // BREAKS IF: arcState equality extraction breaks — story-map loses arc edges.
+        let got = arc_state_eqs(r#"gd.arcState("base::workplace_opening") == "settled""#);
+        assert_eq!(
+            got,
+            vec![("base::workplace_opening".to_string(), "settled".to_string())]
+        );
     }
 
     fn scene_with_effect(effect_src: &str) -> Arc<SceneDefinition> {

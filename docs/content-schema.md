@@ -19,6 +19,18 @@ Pack (pack.toml)
 
 ---
 
+## Story map (authoring tool)
+
+`cargo run --bin story-map` regenerates `docs/story-map.{md,json}` — a writer-facing
+map of every scene, its thread, its flag/arc dependencies, and **what to write next**
+(dangling threads, broken gates, planned scenes). Threads are declared in
+`packs/base/roadmap.toml` (authoring-only; the engine never loads it). Run it after
+any content change; `cargo run --bin story-map -- --check` fails if the committed map
+is stale. The JSON sidecar's `write_next` array is the `scene-writer` agent's input
+for self-selecting work.
+
+---
+
 ## Pack Manifest (`pack.toml`)
 
 ```toml

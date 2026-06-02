@@ -2,7 +2,38 @@
 
 ## Current State
 
-**Latest session (2026-06-02, looping-adult REVIEW + improvements — fan-out review, then full improvement pass):**
+**Latest session (2026-06-02, story-map authoring tool — SHIPPED):**
+Built the `story-map` CLI per `docs/plans/2026-06-02-story-map-tool.md` (branch `story-map`).
+It derives the scene-connectivity graph from base-pack data, reconciles it against an
+authored `packs/base/roadmap.toml`, and emits `docs/story-map.{md,json}` — a writer-facing
+map answering "what exists, what connects, what to write next."
+
+- **New:** `src/story_map.rs` (logic), `src/bin/story_map.rs` (CLI), `packs/base/roadmap.toml`
+  (7 threads, all 74 shipping scenes claimed — 0 orphans), `tests/story_map_acceptance.rs`,
+  `.gitattributes` (forces LF on the generated docs so `--check` is stable under
+  `core.autocrlf=true`).
+- **Engine touch-ups:** `reachability::{required_game_flags, arc_state_eqs}` pub scan
+  wrappers; `Scheduler::bindings()` + `SceneBinding` projection for authoring tools.
+- **Model:** flags and `ARC=STATE` are uniform *signals*. A scene *produces* (effects) and
+  *requires* (gates) signals. Dangling = produced-but-never-required (open door, write a
+  follow-up); broken = required-but-never-produced (unreachable gate). The `write_next`
+  digest ranks dangling > broken > planned.
+- **Story-map tool** (`cargo run --bin story-map`) — regenerate after any content change.
+  `cargo run --bin story-map -- --check` guards staleness (exit 1 if the committed map is
+  stale). First run: 7 threads, 84 write-next items, 0 orphans.
+- **Verification:** 11 story_map unit + 8 acceptance + 10 independent-acceptance tests green
+  (29 total); `--check` clean; validate-pack still "All checks passed (74 scenes)". Independent
+  blind code-review found 3 real defects (action-condition gates unscanned → false dangling;
+  preset starting flags ignored → false broken gates; explicit thread lists stolen by
+  flag_prefix) — all fixed + locked with tests, re-review PASS. Independent QA (CLI) PASS.
+  scene-writer agent wired to read `docs/story-map.json` and pick `write_next` items.
+- **Known minors (non-blocking, optional follow-ups):** (1) a flag set and read only via a
+  negated within-scene self-guard (e.g. `LUNCH_WITH_MARCUS`) shows as dangling — technically
+  correct under the flags+arcs signal model, mildly noisy as a "write a follow-up" hint.
+  (2) Orphan scenes' internal dangling/broken findings aren't computed until the scene is
+  assigned to a thread (the orphan itself is loudly reported with a fix hint first).
+
+**Previous session (2026-06-02, looping-adult REVIEW + improvements — fan-out review, then full improvement pass):**
 Reviewed the just-merged looping-adult layer with a 4-agent fan-out (3 writing-reviewers on the
 6 un-reviewed scenes + 1 engineering code-review of the desire/composure engine), then executed a
 full improvement pass on branch `looping-adult-polish` (merged to master). Playtester-verified.
@@ -700,6 +731,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-06-02 | Story-map authoring tool shipped (plan `docs/plans/2026-06-02-story-map-tool.md`, branch `story-map`). New `src/story_map.rs` + `src/bin/story_map.rs` derive the scene-connectivity graph from base-pack data, reconcile against authored `packs/base/roadmap.toml` (7 threads, all 74 scenes claimed, 0 orphans), and emit `docs/story-map.{md,json}` with a ranked `write_next` digest (dangling > broken > planned). Flags and `ARC=STATE` treated as uniform signals: produced (effects) vs required (gates); dangling = produced-never-required, broken = required-never-produced. Engine touch-ups: `reachability::{required_game_flags, arc_state_eqs}` pub wrappers + `Scheduler::bindings()`/`SceneBinding` projection. Added `.gitattributes` forcing LF on the generated docs so `--check` is stable under `core.autocrlf=true`. Two plan-test bugs fixed during TDD (the plan's tests used `gd.changeStress`→`w.changeStress` and an unregistered `base::arc` that `compile_effect` rejects — test helper now registers it). Verification: 8 story_map unit tests + 5 acceptance tests green; `cargo run --bin story-map -- --check` clean; `scene-writer` agent + `docs/content-schema.md` wired to the tool. |
 | 2026-05-17 | Prose surgery — scale-anchor repetition. `gym_changing_room`, `marcus_apartment`, `jake_stays_over` all shared a "scale of him vs you" body-observation anchor in their FEMININITY-gated branches. `gym_changing_room` owns it structurally (women's-only locker room); `marcus_apartment` re-anchored on visibility/deliberateness/lit-room (3 FEMININITY<25 branches: intro, stay_for_the_wine bedroom, cut_to_it bedroom); `jake_stays_over` re-anchored on territorial integration (2 FEMININITY<30 branches: intro, make_coffee closer). writing-reviewer audit caught one rhythm-echo I introduced + four minor closing-sentence issues, three fixed in-pass and the echo fixed post-playtester. Playtester launched the release binary in --dev --quick with Robin preset (FEMININITY 10), used jump_to_scene + choose_action to play each affected branch, took screenshots of rendered prose, and reported all four passages render correctly with no template breakage or UI jank. Two pre-existing prose issues in marcus_apartment (narrator body-analysis on "the body has already filed all of this", emotion-announcement on "warm and low has settled in your stomach") surfaced during audit but were not introduced by this surgery — logged in Next Action for a future content pass. Also committed a stray `crates/undone-scene/Cargo.toml` dev-deps pin left uncommitted by the prior test-author session — `set_npc_name_tests` needs `undone-save` + `serde_json` as dev-deps to compile. cargo test --workspace = 498 passing; validate-pack clean. Commits `49de362` (dev-deps pin) and `e8eef70` (prose surgery). |
 | 2026-05-17 | Cleanup + feedback triage + display-name feature. Audited every open audit/HANDOFF feedback item against actual code — most engineering Criticals/Importants resolved silently in prior sessions. 7 commits: (1) finalized the in-progress cleanup pass — pruned 9 dead rust-mcp stub tools (~1500 LOC), `UI_FONT_FAMILY` constant, deduped `make_test_male_npc`, dropped unused `anyhow`/`slotmap`. (2) Fixed `ROLE_THEO` scheduler routing (npc_role missing on Theo schedule entries) + dropped redundant `set_game_flag ROUTE_*` in arrival scenes (audit I18). (3) Fixed `ThoughtAdded`/`ErrorOccurred` scroll-to-bottom violating the new-scene-top invariant (audit I8). (4) `validate-pack` now skips underscore-prefixed scene subdirs. (5) **Feature**: `NpcCore.display_name` + `SetNpcName` effect — root-cause fix for sidebar showing random spawn names instead of story names. Decoupled from `set_npc_role`; save v5→v6 (no-op JSON, `#[serde(default)]`); wired into `coffee_shop`/`workplace_work_meeting`/`campus_library`. (6) Independent acceptance suite via `ops:test-author`: 27 tests, each with `// BREAKS IF` comment. (7) Playtester verified live on scheduler-driven `coffee_shop` at week 2 — sidebar reads "Jake". 470 → 498 tests passing; validate-pack clean. |
 | 2026-03-12 | Engineering + creative cleanup. Implemented `docs/plans/2026-03-12-engineering-creative-cleanup.md`: shared UI runtime bootstrap, recoverable startup/content-contract errors, reusable `validate-pack` library API, prose-audit coverage, targeted campus-scene POV/register cleanup, and filler/fine-test cleanup for core scenes. Post-implementation audit found one live-flow bug (init failures stayed in landing flow); fixed by forcing visible error-phase startup when `pre.init_error` exists. Verification: `cargo fmt`, `cargo test -p undone-ui --lib`, `cargo test --test validate_pack_simulation -- --nocapture`, `cargo test --test prose_audit -- --nocapture`, `cargo run --bin validate-pack`, plus fresh `cargo run --bin undone -- --dev --quick` runtime launch. Non-blocking repo-wide prose warnings remain outside the touched slice. |

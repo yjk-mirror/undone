@@ -1,0 +1,2000 @@
+{
+  "threads": [
+    {
+      "name": "Opening / first weeks",
+      "note": "Arrival, the workplace-opening arc, settling in, the first callbacks.",
+      "scenes": [
+        {
+          "id": "morning_routine",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "plan_your_day",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "rain_shelter",
+          "produces": [
+            "RAIN_SHELTER_MET"
+          ],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "transformation_intro",
+          "produces": [
+            "TRANSFORMATION_WITNESSED"
+          ],
+          "requires": [],
+          "status": "reachable",
+          "binding": null,
+          "repeatable": false
+        },
+        {
+          "id": "work_standup",
+          "produces": [
+            "MARCUS_DIALOGUE_1"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "workplace_arrival",
+          "produces": [
+            "OPENING_ID_PREEMPTED",
+            "OPENING_ID_WAITED_OUT",
+            "base::workplace_opening=arrived"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "workplace_first_night",
+          "produces": [
+            "FIRST_NIGHT_CRASHED",
+            "base::workplace_opening=week_one",
+            "FIRST_NIGHT_RESEARCHED",
+            "FIRST_NIGHT_CALLED_BACK_HOME",
+            "FIRST_NIGHT_STAGED_TOMORROW"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=arrived"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "opening_callback_first_week_solitude",
+          "produces": [
+            "OPENING_CALLBACK_FIRST_WEEK_SOLITUDE"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "FIRST_NIGHT_CRASHED",
+            "FIRST_NIGHT_RESEARCHED",
+            "FIRST_NIGHT_STAGED_TOMORROW",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "workplace_first_clothes",
+          "produces": [
+            "FIRST_CLOTHES_FUNCTIONAL",
+            "base::workplace_opening=clothes_done",
+            "FIRST_CLOTHES_MIRROR",
+            "FIRST_CLOTHES_ASKED_HELP",
+            "FIRST_CLOTHES_MINIMUM"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=week_one"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "opening_callback_mirror_afterglow",
+          "produces": [
+            "OPENING_CALLBACK_MIRROR_AFTERGLOW"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "FIRST_CLOTHES_MIRROR",
+            "FIRST_CLOTHES_ASKED_HELP",
+            "FIRST_CLOTHES_FUNCTIONAL",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "workplace_first_day",
+          "produces": [
+            "FIRST_DAY_ASSERTED_STATUS",
+            "FIRST_DAY_DEFERRED_STATUS",
+            "FIRST_DAY_REDIRECTED_STATUS",
+            "FIRST_DAY_LUNCH_DESK",
+            "STARTED_JOB",
+            "base::workplace_opening=working",
+            "FIRST_DAY_LUNCH_GROUP",
+            "FIRST_DAY_LUNCH_ALONE"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=clothes_done"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "opening_callback_status_assertion",
+          "produces": [
+            "OPENING_CALLBACK_STATUS_ASSERTION"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "FIRST_DAY_ASSERTED_STATUS",
+            "FIRST_DAY_REDIRECTED_STATUS",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "workplace_landlord",
+          "produces": [
+            "MET_LANDLORD",
+            "LANDLORD_WAITED_HIM_OUT",
+            "LANDLORD_EXPLAINED_BRIEFLY",
+            "LANDLORD_KEPT_TRANSACTIONAL"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=arrived"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "landlord_repair",
+          "produces": [
+            "LANDLORD_REPAIR"
+          ],
+          "requires": [
+            "MET_LANDLORD"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 5,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "opening_callback_transactional_defense",
+          "produces": [
+            "OPENING_CALLBACK_TRANSACTIONAL_DEFENSE"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "LANDLORD_KEPT_TRANSACTIONAL",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 5,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "RAIN_SHELTER_MET",
+          "set_by": "rain_shelter"
+        },
+        {
+          "signal": "TRANSFORMATION_WITNESSED",
+          "set_by": "transformation_intro"
+        },
+        {
+          "signal": "MARCUS_DIALOGUE_1",
+          "set_by": "work_standup"
+        },
+        {
+          "signal": "OPENING_ID_PREEMPTED",
+          "set_by": "workplace_arrival"
+        },
+        {
+          "signal": "OPENING_ID_WAITED_OUT",
+          "set_by": "workplace_arrival"
+        },
+        {
+          "signal": "FIRST_NIGHT_CALLED_BACK_HOME",
+          "set_by": "workplace_first_night"
+        },
+        {
+          "signal": "OPENING_CALLBACK_FIRST_WEEK_SOLITUDE",
+          "set_by": "opening_callback_first_week_solitude"
+        },
+        {
+          "signal": "FIRST_CLOTHES_MINIMUM",
+          "set_by": "workplace_first_clothes"
+        },
+        {
+          "signal": "OPENING_CALLBACK_MIRROR_AFTERGLOW",
+          "set_by": "opening_callback_mirror_afterglow"
+        },
+        {
+          "signal": "FIRST_DAY_DEFERRED_STATUS",
+          "set_by": "workplace_first_day"
+        },
+        {
+          "signal": "OPENING_CALLBACK_STATUS_ASSERTION",
+          "set_by": "opening_callback_status_assertion"
+        },
+        {
+          "signal": "LANDLORD_WAITED_HIM_OUT",
+          "set_by": "workplace_landlord"
+        },
+        {
+          "signal": "LANDLORD_EXPLAINED_BRIEFLY",
+          "set_by": "workplace_landlord"
+        },
+        {
+          "signal": "LANDLORD_REPAIR",
+          "set_by": "landlord_repair"
+        },
+        {
+          "signal": "OPENING_CALLBACK_TRANSACTIONAL_DEFENSE",
+          "set_by": "opening_callback_transactional_defense"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Jake romance",
+      "note": "Met at the coffee shop -> dating -> intimacy -> domesticity -> she-seeks.",
+      "scenes": [
+        {
+          "id": "coffee_shop",
+          "produces": [
+            "COFFEE_SHOP_VISITED",
+            "MET_JAKE"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "coffee_shop_return",
+          "produces": [
+            "COFFEE_SHOP_SECOND_VISIT"
+          ],
+          "requires": [
+            "MET_JAKE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 9,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "jake_first_date",
+          "produces": [
+            "JAKE_FIRST_DATE"
+          ],
+          "requires": [
+            "MET_JAKE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "jake_outside",
+          "produces": [
+            "MET_JAKE_OUTSIDE",
+            "JAKE_COFFEE_PLANNED"
+          ],
+          "requires": [
+            "MET_JAKE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 7,
+            "once_only": false,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "jake_second_date",
+          "produces": [
+            "JAKE_SECOND_DATE",
+            "JAKE_KISSED"
+          ],
+          "requires": [
+            "JAKE_FIRST_DATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "jake_apartment",
+          "produces": [
+            "JAKE_INTIMATE"
+          ],
+          "requires": [
+            "JAKE_SECOND_DATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "jake_morning_after",
+          "produces": [
+            "JAKE_MORNING_AFTER"
+          ],
+          "requires": [
+            "JAKE_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "jake_morning_quick",
+          "produces": [],
+          "requires": [
+            "JAKE_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": false,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "jake_repeat_night",
+          "produces": [],
+          "requires": [
+            "JAKE_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "jake_seeks_more",
+          "produces": [
+            "JAKE_ACT_RIDE",
+            "JAKE_ACT_DIRTY_TALK",
+            "JAKE_ACT_TIED",
+            "JAKE_ACT_TEASE"
+          ],
+          "requires": [
+            "JAKE_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": false,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "jake_stays_over",
+          "produces": [
+            "JAKE_STAYS_OVER"
+          ],
+          "requires": [
+            "JAKE_MORNING_AFTER"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 5,
+            "once_only": true,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "jake_text_messages",
+          "produces": [],
+          "requires": [
+            "JAKE_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 5,
+            "once_only": false,
+            "npc_role": "ROLE_JAKE",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "COFFEE_SHOP_VISITED",
+          "set_by": "coffee_shop"
+        },
+        {
+          "signal": "COFFEE_SHOP_SECOND_VISIT",
+          "set_by": "coffee_shop_return"
+        },
+        {
+          "signal": "MET_JAKE_OUTSIDE",
+          "set_by": "jake_outside"
+        },
+        {
+          "signal": "JAKE_COFFEE_PLANNED",
+          "set_by": "jake_outside"
+        },
+        {
+          "signal": "JAKE_KISSED",
+          "set_by": "jake_second_date"
+        },
+        {
+          "signal": "JAKE_ACT_RIDE",
+          "set_by": "jake_seeks_more"
+        },
+        {
+          "signal": "JAKE_ACT_DIRTY_TALK",
+          "set_by": "jake_seeks_more"
+        },
+        {
+          "signal": "JAKE_ACT_TIED",
+          "set_by": "jake_seeks_more"
+        },
+        {
+          "signal": "JAKE_ACT_TEASE",
+          "set_by": "jake_seeks_more"
+        },
+        {
+          "signal": "JAKE_STAYS_OVER",
+          "set_by": "jake_stays_over"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Marcus affair",
+      "note": "Workplace tension -> affair -> escalation -> leverage cost -> cooling.",
+      "scenes": [
+        {
+          "id": "marcus_apartment",
+          "produces": [
+            "MARCUS_APARTMENT",
+            "MARCUS_REJECTED"
+          ],
+          "requires": [
+            "MARCUS_AFTERMATH",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "marcus_monday_rejected",
+          "produces": [
+            "MARCUS_REJECTION_MONDAY",
+            "MARCUS_TALKED"
+          ],
+          "requires": [
+            "MARCUS_REJECTED",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "marcus_pushes",
+          "produces": [
+            "MARCUS_ACT_USED",
+            "MARCUS_ACT_ORAL"
+          ],
+          "requires": [
+            "MARCUS_INTIMATE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 7,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "marcus_repeat_office",
+          "produces": [
+            "MARCUS_REPEAT_USED_CONF",
+            "MARCUS_REPEAT_USED_STAIR",
+            "MARCUS_REPEAT_USED_OFFICE"
+          ],
+          "requires": [
+            "MARCUS_INTIMATE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "marcus_leverage",
+          "produces": [
+            "MARCUS_LEVERAGE",
+            "MARCUS_TERMS_HERS",
+            "MARCUS_TERMS_HIS",
+            "MARCUS_AFFAIR_COOLING"
+          ],
+          "requires": [
+            "MARCUS_INTIMATE",
+            "MARCUS_REPEAT_USED_CONF",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 5,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "MARCUS_APARTMENT",
+          "set_by": "marcus_apartment"
+        },
+        {
+          "signal": "MARCUS_REJECTION_MONDAY",
+          "set_by": "marcus_monday_rejected"
+        },
+        {
+          "signal": "MARCUS_TALKED",
+          "set_by": "marcus_monday_rejected"
+        },
+        {
+          "signal": "MARCUS_ACT_USED",
+          "set_by": "marcus_pushes"
+        },
+        {
+          "signal": "MARCUS_ACT_ORAL",
+          "set_by": "marcus_pushes"
+        },
+        {
+          "signal": "MARCUS_REPEAT_USED_STAIR",
+          "set_by": "marcus_repeat_office"
+        },
+        {
+          "signal": "MARCUS_REPEAT_USED_OFFICE",
+          "set_by": "marcus_repeat_office"
+        },
+        {
+          "signal": "MARCUS_LEVERAGE",
+          "set_by": "marcus_leverage"
+        },
+        {
+          "signal": "MARCUS_TERMS_HERS",
+          "set_by": "marcus_leverage"
+        },
+        {
+          "signal": "MARCUS_TERMS_HIS",
+          "set_by": "marcus_leverage"
+        },
+        {
+          "signal": "MARCUS_AFFAIR_COOLING",
+          "set_by": "marcus_leverage"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Cal / gym",
+      "note": "Gym-regular power-inversion + submission ladder.",
+      "scenes": [
+        {
+          "id": "gym_regular_intro",
+          "produces": [
+            "MET_GYM_REGULAR"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 7,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "gym_regular_first",
+          "produces": [
+            "GYM_INTIMATE",
+            "GYM_FIRST_REJECTED"
+          ],
+          "requires": [
+            "MET_GYM_REGULAR"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": "ROLE_GYM",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "gym_regular_deepens",
+          "produces": [
+            "GYM_ACT_FULL",
+            "GYM_ACT_HANDS"
+          ],
+          "requires": [
+            "GYM_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_GYM",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "gym_regular_recurs",
+          "produces": [],
+          "requires": [
+            "MET_GYM_REGULAR"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_GYM",
+            "desire_scaled": true
+          },
+          "repeatable": true
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "GYM_FIRST_REJECTED",
+          "set_by": "gym_regular_first"
+        },
+        {
+          "signal": "GYM_ACT_FULL",
+          "set_by": "gym_regular_deepens"
+        },
+        {
+          "signal": "GYM_ACT_HANDS",
+          "set_by": "gym_regular_deepens"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Theo / campus",
+      "note": "Campus route: orientation -> Theo -> morning-after -> public visibility.",
+      "scenes": [
+        {
+          "id": "campus_arrival",
+          "produces": [
+            "base::campus_opening=arrived"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_dorm",
+          "produces": [
+            "base::campus_opening=orientation"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "base::campus_opening=arrived"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_orientation",
+          "produces": [
+            "base::campus_opening=dorm_life"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "base::campus_opening=orientation"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_call_home",
+          "produces": [
+            "CALL_HOME_DONE"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "base::campus_opening=dorm_life"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 8,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_library",
+          "produces": [
+            "MET_THEO"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "base::campus_opening=dorm_life"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 10,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_study_session",
+          "produces": [
+            "STUDY_SESSION_DONE"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "base::campus_opening=dorm_life"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 10,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_dining_hall",
+          "produces": [
+            "base::campus_opening=first_week"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "STUDY_SESSION_DONE",
+            "base::campus_opening=dorm_life"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_theo_night",
+          "produces": [
+            "THEO_INTIMATE"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "MET_THEO",
+            "base::campus_opening=first_week"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_THEO",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_theo_morning",
+          "produces": [
+            "THEO_MORNING_AFTER"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "THEO_INTIMATE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_THEO",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "campus_dining_after_theo",
+          "produces": [
+            "DINING_AFTER_THEO"
+          ],
+          "requires": [
+            "ROUTE_CAMPUS",
+            "THEO_MORNING_AFTER"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "campus_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_THEO",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "CALL_HOME_DONE",
+          "set_by": "campus_call_home"
+        },
+        {
+          "signal": "DINING_AFTER_THEO",
+          "set_by": "campus_dining_after_theo"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Desire / looping adult",
+      "note": "The recurring need-state: release valves and ambushes.",
+      "scenes": [
+        {
+          "id": "desire_ambush",
+          "produces": [],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 6,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": true
+          },
+          "repeatable": true
+        },
+        {
+          "id": "desire_solo_night",
+          "produces": [],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": true
+          },
+          "repeatable": true
+        }
+      ],
+      "dangling": [],
+      "broken": [],
+      "planned": []
+    },
+    {
+      "name": "Ambient life",
+      "note": "Texture scenes not owned by a single arc. Reassign to a thread as arcs grow.",
+      "scenes": [
+        {
+          "id": "bad_date",
+          "produces": [
+            "BAD_DATE",
+            "BAD_DATE_DIRECT"
+          ],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 4,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "bookstore",
+          "produces": [
+            "BOOKSTORE_VISITED"
+          ],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "evening_home",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 12,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "grocery_store",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 9,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "laundromat_night",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "neighborhood_bar",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "park_walk",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "party_invitation",
+          "produces": [
+            "PARTY_ATTENDED",
+            "PARTY_DANCED",
+            "PARTY_STRANGER_OUTSIDE"
+          ],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 5,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "party_stranger_after",
+          "produces": [
+            "PARTY_STRANGER_SLEPT"
+          ],
+          "requires": [
+            "PARTY_STRANGER_OUTSIDE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "shopping_mall",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 7,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "weekend_morning",
+          "produces": [],
+          "requires": [],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "workplace_work_meeting",
+          "produces": [
+            "FIRST_MEETING_DONE"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=working"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "workplace_evening",
+          "produces": [
+            "base::workplace_opening=settled"
+          ],
+          "requires": [
+            "ROUTE_WORKPLACE",
+            "base::workplace_opening=working",
+            "FIRST_MEETING_DONE"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "workplace_opening",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "bar_closing_time",
+          "produces": [
+            "BAR_STRANGER_WALKED",
+            "BAR_STRANGER_INVITED",
+            "BAR_STRANGER_MET"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 12,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "bar_stranger_night",
+          "produces": [
+            "BAR_STRANGER_SLEPT"
+          ],
+          "requires": [
+            "BAR_STRANGER_INVITED"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "gym_changing_room",
+          "produces": [
+            "GYM_CHANGING_ROOM"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "work_corridor",
+          "produces": [],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 12,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_friday",
+          "produces": [
+            "DRINKS_WITH_MARCUS"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_late",
+          "produces": [
+            "LATE_OFFICE_MARCUS"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_lunch",
+          "produces": [
+            "LUNCH_WITH_MARCUS"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 10,
+            "once_only": false,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_marcus_coffee",
+          "produces": [
+            "MARCUS_REAL_CONVERSATION"
+          ],
+          "requires": [
+            "FIRST_MEETING_DONE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 9,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_marcus_favor",
+          "produces": [
+            "REVIEWED_MARCUS_SPEC",
+            "DECLINED_MARCUS_SPEC"
+          ],
+          "requires": [
+            "FIRST_MEETING_DONE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 7,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_marcus_late",
+          "produces": [
+            "MARCUS_LATE_NIGHT"
+          ],
+          "requires": [
+            "FIRST_MEETING_DONE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_marcus_drinks",
+          "produces": [
+            "MARCUS_DRINKS",
+            "MARCUS_TOUCHED"
+          ],
+          "requires": [
+            "MARCUS_LATE_NIGHT",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "work_marcus_closet",
+          "produces": [
+            "MARCUS_INTIMATE",
+            "MARCUS_ALMOST"
+          ],
+          "requires": [
+            "MARCUS_DRINKS",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "work_marcus_aftermath",
+          "produces": [
+            "MARCUS_AFTERMATH"
+          ],
+          "requires": [
+            "MARCUS_INTIMATE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        }
+      ],
+      "dangling": [
+        {
+          "signal": "BAD_DATE",
+          "set_by": "bad_date"
+        },
+        {
+          "signal": "BAD_DATE_DIRECT",
+          "set_by": "bad_date"
+        },
+        {
+          "signal": "BOOKSTORE_VISITED",
+          "set_by": "bookstore"
+        },
+        {
+          "signal": "PARTY_ATTENDED",
+          "set_by": "party_invitation"
+        },
+        {
+          "signal": "PARTY_DANCED",
+          "set_by": "party_invitation"
+        },
+        {
+          "signal": "BAR_STRANGER_WALKED",
+          "set_by": "bar_closing_time"
+        },
+        {
+          "signal": "BAR_STRANGER_MET",
+          "set_by": "bar_closing_time"
+        },
+        {
+          "signal": "GYM_CHANGING_ROOM",
+          "set_by": "gym_changing_room"
+        },
+        {
+          "signal": "DRINKS_WITH_MARCUS",
+          "set_by": "work_friday"
+        },
+        {
+          "signal": "LATE_OFFICE_MARCUS",
+          "set_by": "work_late"
+        },
+        {
+          "signal": "LUNCH_WITH_MARCUS",
+          "set_by": "work_lunch"
+        },
+        {
+          "signal": "MARCUS_REAL_CONVERSATION",
+          "set_by": "work_marcus_coffee"
+        },
+        {
+          "signal": "REVIEWED_MARCUS_SPEC",
+          "set_by": "work_marcus_favor"
+        },
+        {
+          "signal": "DECLINED_MARCUS_SPEC",
+          "set_by": "work_marcus_favor"
+        },
+        {
+          "signal": "MARCUS_TOUCHED",
+          "set_by": "work_marcus_drinks"
+        },
+        {
+          "signal": "MARCUS_ALMOST",
+          "set_by": "work_marcus_closet"
+        }
+      ],
+      "broken": [],
+      "planned": []
+    }
+  ],
+  "orphans": [],
+  "drift": [],
+  "write_next": [
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'RAIN_SHELTER_MET' set by rain_shelter — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'TRANSFORMATION_WITNESSED' set by transformation_intro — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'MARCUS_DIALOGUE_1' set by work_standup — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_ID_PREEMPTED' set by workplace_arrival — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_ID_WAITED_OUT' set by workplace_arrival — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'FIRST_NIGHT_CALLED_BACK_HOME' set by workplace_first_night — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_CALLBACK_FIRST_WEEK_SOLITUDE' set by opening_callback_first_week_solitude — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'FIRST_CLOTHES_MINIMUM' set by workplace_first_clothes — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_CALLBACK_MIRROR_AFTERGLOW' set by opening_callback_mirror_afterglow — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'FIRST_DAY_DEFERRED_STATUS' set by workplace_first_day — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_CALLBACK_STATUS_ASSERTION' set by opening_callback_status_assertion — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'LANDLORD_WAITED_HIM_OUT' set by workplace_landlord — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'LANDLORD_EXPLAINED_BRIEFLY' set by workplace_landlord — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'LANDLORD_REPAIR' set by landlord_repair — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Opening / first weeks",
+      "detail": "'OPENING_CALLBACK_TRANSACTIONAL_DEFENSE' set by opening_callback_transactional_defense — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'COFFEE_SHOP_VISITED' set by coffee_shop — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'COFFEE_SHOP_SECOND_VISIT' set by coffee_shop_return — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'MET_JAKE_OUTSIDE' set by jake_outside — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_COFFEE_PLANNED' set by jake_outside — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_KISSED' set by jake_second_date — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_ACT_RIDE' set by jake_seeks_more — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_ACT_DIRTY_TALK' set by jake_seeks_more — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_ACT_TIED' set by jake_seeks_more — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_ACT_TEASE' set by jake_seeks_more — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Jake romance",
+      "detail": "'JAKE_STAYS_OVER' set by jake_stays_over — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_APARTMENT' set by marcus_apartment — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_REJECTION_MONDAY' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_TALKED' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_ACT_USED' set by marcus_pushes — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_ACT_ORAL' set by marcus_pushes — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_REPEAT_USED_STAIR' set by marcus_repeat_office — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_REPEAT_USED_OFFICE' set by marcus_repeat_office — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_LEVERAGE' set by marcus_leverage — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_TERMS_HERS' set by marcus_leverage — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_TERMS_HIS' set by marcus_leverage — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Marcus affair",
+      "detail": "'MARCUS_AFFAIR_COOLING' set by marcus_leverage — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Cal / gym",
+      "detail": "'GYM_FIRST_REJECTED' set by gym_regular_first — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Cal / gym",
+      "detail": "'GYM_ACT_FULL' set by gym_regular_deepens — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Cal / gym",
+      "detail": "'GYM_ACT_HANDS' set by gym_regular_deepens — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Theo / campus",
+      "detail": "'CALL_HOME_DONE' set by campus_call_home — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Theo / campus",
+      "detail": "'DINING_AFTER_THEO' set by campus_dining_after_theo — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'BAD_DATE' set by bad_date — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'BAD_DATE_DIRECT' set by bad_date — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'BOOKSTORE_VISITED' set by bookstore — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'PARTY_ATTENDED' set by party_invitation — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'PARTY_DANCED' set by party_invitation — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'BAR_STRANGER_WALKED' set by bar_closing_time — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'BAR_STRANGER_MET' set by bar_closing_time — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'GYM_CHANGING_ROOM' set by gym_changing_room — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'DRINKS_WITH_MARCUS' set by work_friday — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'LATE_OFFICE_MARCUS' set by work_late — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'LUNCH_WITH_MARCUS' set by work_lunch — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'MARCUS_REAL_CONVERSATION' set by work_marcus_coffee — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'REVIEWED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'DECLINED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'MARCUS_TOUCHED' set by work_marcus_drinks — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
+      "detail": "'MARCUS_ALMOST' set by work_marcus_closet — no scene consumes it (write a follow-up)"
+    }
+  ]
+}
