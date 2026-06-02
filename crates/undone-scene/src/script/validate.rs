@@ -115,172 +115,48 @@ const fn spec_i8(arity: usize, i8_args: &'static [usize]) -> MethodSpec {
     }
 }
 
-/// Look up the READ method surface (valid in conditions AND effects).
-/// `receiver` is the handle token (`w`/`gd`/`m`/`f`/`role`/`scene`).
+/// Look up the READ method surface (valid in conditions). Derived from the
+/// single-source-of-truth `REGISTRY`: a `(receiver, method)` is a "read method" for
+/// the gate iff its descriptor is valid in the condition context.
 fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
-    match (receiver, method) {
-        // ── w (player) ───────────────────────────────────────────────────────
-        (
-            "w",
-            "isVirgin"
-            | "isAnalVirgin"
-            | "isDrunk"
-            | "isVeryDrunk"
-            | "isMaxDrunk"
-            | "isSingle"
-            | "isOnPill"
-            | "isPregnant"
-            | "alwaysFemale"
-            | "wasMale"
-            | "wasTransformed"
-            | "hasSmoothLegs"
-            | "getMoney"
-            | "getStress"
-            | "getAnxiety"
-            | "pcOrigin"
-            | "beforeName"
-            | "beforeRace"
-            | "beforeAge"
-            | "beforeSexuality"
-            | "getName"
-            | "getRace"
-            | "getAge"
-            | "getArousal"
-            | "getAlcohol"
-            | "getHeight"
-            | "getFigure"
-            | "getBreasts"
-            | "getButt"
-            | "getWaist"
-            | "getLips"
-            | "getHairColour"
-            | "getHairLength"
-            | "getEyeColour"
-            | "getSkinTone"
-            | "getComplexion"
-            | "getAppearance"
-            | "getNippleSensitivity"
-            | "getClitSensitivity"
-            | "getPubicHair"
-            | "getNaturalPubicHair"
-            | "getInnerLabia"
-            | "getWetness"
-            | "beforeVoice"
-            | "beforeHeight"
-            | "beforeHairColour"
-            | "beforeEyeColour"
-            | "beforeSkinTone"
-            | "beforePenisSize"
-            | "beforeFigure",
-        ) => Some(spec(0)),
-        ("w", "hasTrait" | "hadTraitBefore") => Some(spec_id(1, 0, IdKind::Trait)),
-        ("w", "inCategory" | "beforeInCategory") => Some(spec_id(1, 0, IdKind::Category)),
-        ("w", "getSkill") => Some(spec_id(1, 0, IdKind::Skill)),
-        ("w", "composure") => Some(spec(0)),
-        // hasStuff id is intentionally NOT registry-validated (legacy: missing = can't have it).
-        ("w", "hasStuff") => Some(spec(1)),
-        ("w", "checkSkill" | "checkSkillRed") => Some(spec_id_int(2, 0, IdKind::Skill, 1)),
-
-        // ── m (active male) ───────────────────────────────────────────────────
-        (
-            "m",
-            "isPartner"
-            | "isFriend"
-            | "isCohabiting"
-            | "isContactable"
-            | "hadOrgasm"
-            | "isNpcAttractionOk"
-            | "isNpcAttractionLust"
-            | "isWAttractionOk"
-            | "isNpcLoveCrush"
-            | "isNpcLoveSome"
-            | "isWLoveCrush"
-            | "getLiking"
-            | "getLove"
-            | "getAttraction"
-            | "getBehaviour",
-        ) => Some(spec(0)),
-        ("m", "hasTrait") => Some(spec_id(1, 0, IdKind::NpcTrait)),
-        ("m", "hasFlag" | "hasRole") => Some(spec(1)),
-
-        // ── f (active female) ─────────────────────────────────────────────────
-        (
-            "f",
-            "isPartner" | "isFriend" | "isPregnant" | "isVirgin" | "getLiking" | "getLove"
-            | "getAttraction" | "getBehaviour",
-        ) => Some(spec(0)),
-        ("f", "hasFlag" | "hasRole") => Some(spec(1)),
-
-        // ── scene ─────────────────────────────────────────────────────────────
-        ("scene", "hasFlag") => Some(spec(1)),
-
-        // ── gd (game data) ────────────────────────────────────────────────────
-        (
-            "gd",
-            "isWeekday" | "isWeekend" | "week" | "day" | "desire" | "timeSlot" | "getJobTitle",
-        ) => Some(spec(0)),
-        // getStat / hasGameFlag / arcStarted / arcState / npcLiking ids are not
-        // registry-validated in the legacy condition pass.
-        ("gd", "hasGameFlag" | "arcStarted" | "getStat" | "arcState" | "npcLiking") => {
-            Some(spec(1))
-        }
-        ("gd", "npcLikingAtLeast") => Some(spec(2)),
-
-        // ── role ──────────────────────────────────────────────────────────────
-        (
-            "role",
-            "isPartner" | "isFriend" | "isContactable" | "isPregnant" | "isVirgin" | "hadOrgasm"
-            | "getName" | "getLiking" | "getLove" | "getAttraction" | "getBehaviour",
-        ) => Some(spec(1)),
-        ("role", "hasFlag" | "hasRole") => Some(spec(2)),
-
-        _ => None,
+    let recv = crate::script::api::receiver_from_token(receiver)?;
+    let d = crate::script::api::lookup(recv, method)?;
+    if !d.contexts.condition {
+        return None;
     }
+    Some(method_spec_from_argshape(d.args))
 }
 
-/// Look up the WRITE (effect-mutator) surface. `receiver` is `w`/`gd`/`scene`, or
-/// `npc` for a `npc("m"|"f"|role).method(...)` chained call, or the bare `npc(ref)`
-/// free call (receiver `npc`, method `npc`).
+/// Look up the WRITE (effect-mutator) surface, derived from `REGISTRY`.
 fn write_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
-    match (receiver, method) {
-        // ── w (player) ───────────────────────────────────────────────────────
-        ("w", "changeStress" | "changeMoney" | "changeAnxiety" | "changeComposure") => {
-            Some(spec(1))
-        }
-        ("w", "addArousal" | "changeAlcohol") => Some(spec_i8(1, &[0])),
-        ("w", "skillIncrease") => Some(spec_id(2, 0, IdKind::Skill)),
-        ("w", "addTrait" | "removeTrait") => Some(spec_id(1, 0, IdKind::Trait)),
-        // stuff is not registry-validated at load (legacy validate_effects skips it).
-        ("w", "addStuff" | "removeStuff") => Some(spec(1)),
-        // setVirgin(value) or setVirgin(value, "type") — overloaded arity.
-        ("w", "setVirgin") => Some(spec_arity(1, 2)),
-        ("w", "setPartner" | "addFriend") => Some(spec(1)),
+    let recv = crate::script::api::receiver_from_token(receiver)?;
+    let d = crate::script::api::lookup(recv, method)?;
+    if !d.contexts.effect {
+        return None;
+    }
+    Some(method_spec_from_argshape(d.args))
+}
 
-        // ── gd (game data) ────────────────────────────────────────────────────
-        ("gd", "setGameFlag" | "removeGameFlag") => Some(spec(1)),
-        ("gd", "addStat" | "setStat") => Some(spec_id(2, 0, IdKind::Stat)),
-        ("gd", "setJobTitle") => Some(spec(1)),
-        ("gd", "addDesire" | "setDesire") => Some(spec(1)),
-        ("gd", "advanceTime") => Some(spec(1)),
-        ("gd", "advanceArc") => Some(spec_id(2, 0, IdKind::Arc)),
-        ("gd", "failRedCheck") => Some(spec_id(1, 0, IdKind::Skill)),
-
-        // ── scene ─────────────────────────────────────────────────────────────
-        ("scene", "setFlag" | "removeFlag") => Some(spec(1)),
-
-        // ── npc(ref).* ────────────────────────────────────────────────────────
-        ("npc", "addLiking" | "addLove" | "addWLiking" | "setAttraction") => Some(spec_i8(1, &[0])),
-        (
-            "npc",
-            "setFlag" | "setRelationship" | "setBehaviour" | "addSexualActivity" | "setRole"
-            | "setName",
-        ) => Some(spec(1)),
-        ("npc", "addTrait") => Some(spec_id(1, 0, IdKind::NpcTrait)),
-        ("npc", "setContactable") => Some(spec(1)),
-        // the free `npc(ref)` constructor.
-        ("npc", "npc") => Some(spec(1)),
-
-        _ => None,
+/// Derive the gate's `MethodSpec` (arity, id-kind, int/i8 constraints) from a
+/// descriptor's declarative `ArgShape` — the inverse of the old hand-written table,
+/// now driven from the registry. NOTE: `IdInt` int-checks arg 1, so `skillIncrease`/
+/// `addStat`/`setStat` are slightly stricter than the legacy `spec_id(2,..)` (which
+/// did not). Live content passes either way (all call them with integer literals).
+fn method_spec_from_argshape(args: crate::script::api::ArgShape) -> MethodSpec {
+    use crate::script::api::ArgShape;
+    match args {
+        ArgShape::None => spec(0),
+        // advanceArc(arc, state) — the only 2-source-arg Id (state validated at idx 1).
+        ArgShape::Id(IdKind::Arc) => spec_id(2, 0, IdKind::Arc),
+        ArgShape::Id(kind) => spec_id(1, 0, kind),
+        ArgShape::IdInt(kind) => spec_id_int(2, 0, kind, 1),
+        ArgShape::Int { i8_range: true } => spec_i8(1, &[0]),
+        ArgShape::Int { i8_range: false } => spec(1),
+        ArgShape::Str => spec(1),
+        ArgShape::Bool => spec(1),
+        ArgShape::StrInt => spec(2),
+        ArgShape::StrStr => spec(2),
+        ArgShape::StrOpt => spec_arity(1, 2),
     }
 }
 
@@ -814,4 +690,61 @@ pub fn source_has_persistent_mutation(src: &str) -> bool {
         write_spec(c.receiver.as_deref().unwrap_or(""), m).is_some()
             || (c.receiver.as_deref() == Some("npc") && write_spec("npc", m).is_some())
     })
+}
+
+// ---------------------------------------------------------------------------
+// Negative-surface tests — the per-receiver / per-context sets the registry
+// keys must NOT union (design §2, §9). These must STAY unknown methods.
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod surface_tests {
+    use super::*;
+
+    #[test]
+    fn f_has_trait_is_unknown_method() {
+        // `f` deliberately lacks hasTrait (only `m` has it).
+        assert!(read_spec("f", "hasTrait").is_none());
+    }
+
+    #[test]
+    fn m_is_pregnant_is_unknown_method() {
+        // isPregnant is on `f`/`role`, never `m`.
+        assert!(read_spec("m", "isPregnant").is_none());
+    }
+
+    #[test]
+    fn m_is_virgin_is_unknown_method() {
+        assert!(read_spec("m", "isVirgin").is_none());
+    }
+
+    #[test]
+    fn f_had_orgasm_is_unknown_method() {
+        assert!(read_spec("f", "hadOrgasm").is_none());
+    }
+
+    #[test]
+    fn write_in_condition_is_unknown() {
+        // A write mutator is not a read method (read_spec gates on contexts.condition).
+        assert!(read_spec("w", "changeMoney").is_none());
+        assert!(read_spec("gd", "setGameFlag").is_none());
+    }
+
+    #[test]
+    fn read_in_effect_still_resolves() {
+        // Reads remain valid in effect call-lists (effects branch on reads).
+        assert!(write_spec("w", "isVirgin").is_none()); // not a write…
+        assert!(read_spec("w", "isVirgin").is_some()); // …but a read.
+    }
+
+    #[test]
+    fn known_methods_resolve_with_expected_arity() {
+        // Spot-check the argshape→spec derivation against the legacy specs.
+        assert_eq!(read_spec("w", "hasTrait").unwrap().arity, 1);
+        assert_eq!(read_spec("gd", "npcLikingAtLeast").unwrap().arity, 2);
+        assert_eq!(read_spec("role", "getName").unwrap().arity, 1);
+        assert_eq!(write_spec("gd", "advanceArc").unwrap().arity, 2);
+        let sv = write_spec("w", "setVirgin").unwrap();
+        assert_eq!((sv.arity, sv.arity_max), (1, 2));
+    }
 }
