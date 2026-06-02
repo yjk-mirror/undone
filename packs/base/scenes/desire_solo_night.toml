@@ -1,0 +1,314 @@
+[scene]
+id          = "base::desire_solo_night"
+pack        = "base"
+description = "High desire, no partner, no relief — the body demands and she gives in to herself. The release valve of the desire loop."
+
+[intro]
+prose = """
+{% if gd.desire() >= 75 %}
+Late. The apartment is dark except for the streetlight coming through the blinds in stripes. You've been lying here for forty minutes not sleeping.
+
+The wanting is not new — it's been building all day, surfacing wrong, going back under. A man on the train this afternoon. Your own reflection in the window after. The particular weight of an evening with nowhere to put it. You got through all of that.
+
+You're not getting through this.
+
+The sheets are warm from your body. Your hand is already resting on your stomach.
+
+{% if w.composure() < 35 %}
+There's no deliberating at this point, no performance of considering whether you want to. The body has been running the argument since the subway and it's already won.
+{% else %}
+The wanting and the giving in to it are two different things. The wanting is already present. The giving in is something you're doing now.
+{% endif %}
+
+{% elif gd.desire() >= 55 %}
+Past midnight, or close to it. You've been trying to read but the same paragraph has been sitting there for ten minutes.
+
+The ache isn't sharp — it's been quiet all evening, manageable, the kind of thing you can usually redirect. You've tried. Dinner. A show. The shower half an hour ago, which helped nothing.
+
+You're in bed now. The phone is face-down on the nightstand. The city is doing its late-night thing outside — a car, the neighbor's television through the wall, the particular silence that fills in between.
+
+Your thighs are pressed together without deciding to.
+
+{% else %}
+You woke up from a half-sleep and it was there.
+
+Not sharp — just present, low and insistent, the body wanting something the sleep had interrupted. The room is dark. The building creaks somewhere. Your hands don't know what to do with themselves.
+
+It's been a while. Or the day was something, or this body just wants what it wants on its own schedule.
+{% endif %}
+"""
+
+[[intro_variants]]
+condition = 'gd.desire() >= 80'
+prose = """
+Late. Dark apartment. The wanting has been building since this morning and you've done everything you're supposed to do about it — worked, ate, occupied yourself, gone to bed — and none of it has mattered.
+
+Your body is awake in a way that has nothing to do with the time.
+
+{% if w.composure() < 30 %}
+The sheets. Your own warmth in them. The pressure of your thighs together that you stopped pretending not to notice twenty minutes ago.
+{% else %}
+You've been lying here with your hands flat at your sides, not giving in to it, which has been about as effective as anything else today.
+{% endif %}
+
+The apartment is just the apartment. The streetlight makes its stripe on the ceiling. Somewhere below you, someone's TV is still on.
+
+The body, though. The body has been making a case all day and it's not stopping.
+"""
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id     = "give_in_slow"
+label  = "Take your time with it"
+detail = "No hurry. Let the wanting do what it does."
+prose  = """
+{% if gd.desire() >= 65 %}
+Your hands move. Stomach first — the skin there, warm from the sheets. Lower.
+
+{% if w.getNippleSensitivity() == "High" or w.getNippleSensitivity() == "Extreme" %}
+You pull your shirt up and your fingers find your nipples and the jolt of it goes straight down. Your back arches off the mattress — immediate, embarrassing, exactly what you needed. You stay there for a moment just doing this, because the shortcut exists and there's no reason not to use it.
+{% elif w.hasTrait("NIPPLE_GETTER") %}
+Your fingers find your nipples and the heat drops immediately to between your legs. You work them slow, drawing it out, and the wanting sharpens and spreads.
+{% else %}
+Your hands travel with the wanting, no agenda, just tracing what responds.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+Your underwear is already damp when you reach between your legs. Wet for hours — since the train, since whatever started this, your body running ahead of the evening without asking.
+{% elif w.getWetness() == "High" %}
+Your fingers find slickness already waiting. Not as immediate as sometimes, but enough. Your hips shift toward your hand.
+{% else %}
+You take your time getting there — your fingers working in slow circles, building, the wanting climbing with each pass.
+{% endif %}
+
+{% if w.getClitSensitivity() == "Extreme" %}
+One finger, barely pressing, and the sensation is almost too much — your hips jump and you have to be careful, deliberate, easing into it rather than rushing. The care you have to take is its own strange thing.
+{% elif w.getClitSensitivity() == "High" %}
+Your fingers find the right place and the pleasure is immediate and precise. You work it in slow circles, not racing toward anything, just riding the build.
+{% else %}
+Your fingers settle into what works. The rhythm establishes itself without having to think about it. Your other hand wanders somewhere useful.
+{% endif %}
+
+{% if w.composure() < 30 %}
+The holding-back you've been doing all day finally has somewhere to go. Your hips roll against your hand and you don't try to be quiet about the sound that comes out of you.
+{% elif w.composure() < 50 %}
+You're not performing restraint anymore. The sounds you make go where they go. You let them.
+{% else %}
+You take it in stages, easing back when it gets close, letting the pressure build again. Control, but the pleasurable kind — using the patience to make the thing better, not to deny it.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives before you've really built to it — your hips bucking up, the pleasure sharp and fast and completely unambiguous. Your hand stills. The dark apartment. The streetlight stripe on the ceiling.
+
+*Huh.*
+
+Your hand starts moving again.
+{% elif w.hasTrait("MULTI_ORGASMIC") %}
+The first orgasm rolls through — full, clear, your thighs clenching around your hand. You breathe through it.
+
+The second one is already forming underneath. You keep going, slower, and let it build on the warm aftermath of the first.
+
+This one is deeper. You press into it and make a sound into the pillow.
+{% else %}
+The orgasm comes from below and moves up through your whole body — your back arching, your toes curling into the sheets, a sound that goes up and then falls.
+
+You hold very still for a moment after, your hand resting, the ceiling and the dark.
+{% endif %}
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+The sheets. You take stock of this without judgment. You knew this could happen. It still catches you somewhere just past surprise — this body's particular signature, its way of being unambiguous about what it wants.
+{% endif %}
+
+Your heartbeat settles. The wanting has gone quiet, finally — replaced by the warmth of having given it what it needed.
+
+{% else %}
+You take your time. The room is dark and warm and nobody is here and nobody expects anything. Your hands do what they do.
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+You find out again that your nipples are the fastest route to everything else. Your shirt comes off. Your fingers work in slow circles and the heat spreads low and you let it go where it goes.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+You're wet before you've done much of anything — the body already decided, already running ahead of you. It still surprises you, sometimes, that it's that simple.
+{% else %}
+The body takes a moment, coming up from its evening, loosening into the attention.
+{% endif %}
+
+{% if w.getClitSensitivity() == "High" or w.getClitSensitivity() == "Extreme" %}
+Your fingers find the right spot and the pleasure is clear and immediate — you know this map now, know where the shortcuts are, know how to read what the body is telling you.
+{% else %}
+Your fingers work in slow patient circles, the wanting building in layers — warmth becoming heat, the attention of your own hand something you can't quite keep clinical about.
+{% endif %}
+
+{% if w.composure() < 40 %}
+You stop performing patience about five minutes in. Your hips roll against your hand and what you want is just what you want and the room doesn't need an explanation.
+{% else %}
+The giving-in is deliberate — each move chosen, no rush, letting it build because the building is its own thing.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives suddenly and sharply. Your back arches and you gasp and it's done before you were ready for it to be done. Your body pulses with it for a moment after.
+
+Your hand is still moving. There's more.
+{% elif w.hasTrait("MULTI_ORGASMIC") %}
+The first one comes quietly, a clean wave — your toes curling, a sound through your nose. The second builds on the warmth it leaves behind. That one's longer and you ride it with your hips until it's done.
+{% else %}
+The orgasm comes up slowly and then all at once — your hips working into your hand, a sound you didn't plan, the ceiling and the dark and your own warmth.
+{% endif %}
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+You've made a mess. You don't mind. This is what this body does when it gets what it needs.
+{% endif %}
+
+The dark room. Your own breathing. The wanting, which had been impossible and loud, is quiet now.
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_MASTURBATED",1); gd.addStat("TOTAL_ORGASMS",1); if w.hasTrait("MULTI_ORGASMIC") { gd.addStat("TOTAL_ORGASMS",1); } gd.setDesire(12); w.changeComposure(-3); w.addArousal(-3);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "get_off_fast"
+label     = "Just get it done"
+detail    = "No time for patience. The wanting is too loud."
+condition = 'gd.desire() >= 60'
+prose     = """
+Your hand goes straight there. No working up to it. The wanting is not subtle and you're done being subtle about it.
+
+{% if w.hasTrait("EASILY_WET") %}
+You're wet enough that the friction is immediate and good. You've been wet since whatever set this off and the relief of finally using it makes you exhale hard.
+{% elif w.getWetness() == "High" %}
+You're ready enough. No patience required.
+{% else %}
+You work fast, and the body catches up fast, the wanting doing half the job already.
+{% endif %}
+
+{% if w.getClitSensitivity() == "Extreme" %}
+Two fingers, direct, and the sensation is blinding. You have to ease back — this body's sensitivity a thing that demands some respect even now, even when you're trying to rush.
+{% elif w.getClitSensitivity() == "High" %}
+Your fingers find the spot in about ten seconds and stay there. The pressure builds immediately. This body knows how to be efficient about what it wants.
+{% else %}
+Fast, focused, not decorating it — just the wanting, running.
+{% endif %}
+
+{% if w.composure() < 30 %}
+You're not quiet. You're not trying to be. The apartment is yours and the wanting has been this loud since morning and it can sound as loud as it sounds.
+{% elif w.composure() < 50 %}
+You stop caring about being quiet somewhere in the middle of it.
+{% else %}
+You keep enough composure to not wake anyone, probably. You're not sure you succeed.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+Your other hand goes to your chest because the urgency wants every input at once — and the jolt of it through your nipples hits between your legs hard enough that you make a noise you weren't planning to make.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm slams in fast — your whole body contracting, your hips driving up off the mattress, the built pressure of the whole day releasing in about ninety seconds.
+
+You stare at the ceiling.
+
+*Okay.*
+
+Your hand is still there. The need hasn't completely gone. You do it again.
+
+The second one is slower, better, the urgency discharged and replaced with something you can actually enjoy.
+{% elif w.hasTrait("MULTI_ORGASMIC") %}
+The first comes fast and hard — your hips working into your hand, the sound sharp and involuntary, the tension of the whole day cracking open. You stay with it, keep going, and the second builds from the warmth almost immediately.
+
+That one you let happen slower. The urgency is gone and the second one gets to be different.
+{% else %}
+It builds fast. The wanting doing what it's been trying to do all day, finally with permission.
+
+The orgasm comes hard — your back off the mattress, a sound into the pillow, the release so complete it almost hurts. You stay with the aftershocks until your body stops insisting.
+{% endif %}
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+The mess is significant. You lie in it for a moment, breathing.
+{% endif %}
+
+The quiet after. Your heart rate coming down. Your body loose and empty of whatever had been filling it.
+
+The wanting, which has been a problem since this morning, is not a problem anymore.
+"""
+
+  effect = 'gd.addStat("TIMES_MASTURBATED",1); gd.addStat("TOTAL_ORGASMS",1); if w.hasTrait("MULTI_ORGASMIC") { gd.addStat("TOTAL_ORGASMS",1); } gd.setDesire(8); w.changeComposure(-4); w.addArousal(-4);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "use_the_shower"
+label  = "Take a shower"
+detail = "The hot water. The pressure. A different kind of solution."
+prose  = """
+The shower runs hot. You stand under it and let the heat do what it can — shoulders, the back of your neck, the tension that's been sitting there all evening loosening, somewhat.
+
+Then you adjust the showerhead.
+
+{% if w.composure() < 40 %}
+You've done this before. Your body knows what the pressure does to it now. You angle the showerhead and let the water go where you need it and your forehead goes against the tile.
+{% else %}
+You take a moment — considering, not quite committing — and then you do it. Angle the spray. Position yourself.
+{% endif %}
+
+The pressure is immediate and direct and better than you remembered.
+
+{% if w.getClitSensitivity() == "Extreme" %}
+Almost too much — your whole body reacting to it, your thighs shaking, one hand braced against the wall. You have to adjust the angle twice to keep it from being too direct, too overwhelming. You find the threshold and stay there.
+{% elif w.getClitSensitivity() == "High" %}
+The pressure hits exactly right. Your hand braced against the tiles. You work the angle until your hips are pushing toward the spray on their own.
+{% else %}
+The warmth and the pressure together. You take a minute finding the right spot and then you stay there.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+The wet is meaningless in the shower — everything is wet — but you notice it anyway: the particular slickness of your body under the spray, the water and your own arousal running together.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+The hot water on your chest. Your nipples are peaked already from the tension of the evening and the hot water over them pulls hard at everything south. You're not being patient about anything.
+{% endif %}
+
+{% if w.composure() < 30 %}
+You're not quiet in the shower either. The water covers most of it. Your other hand goes to the tile and your hips work into the spray and you don't care how long this takes, you're getting there.
+{% else %}
+The shower has a quality of permission — the heat and the steam and the white noise cover everything. You let the sounds happen.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm comes fast — the build accelerating, your thighs tightening, and then it breaks and you have to stay on your feet through it. Your hand on the wall. The water still running. You're panting.
+
+Your body wants more. You stay where you are.
+{% elif w.hasTrait("MULTI_ORGASMIC") %}
+The first one comes with your forehead pressed to the tile — a long, pulsing wave that takes the worst of the tension with it. You stay under the spray. The second one comes quieter, spreading out from the first, your hips still working the angle.
+
+You have to turn the water off eventually or you'll stay here all night.
+{% else %}
+The orgasm comes in a long wave — you grip the towel bar and let it go through you, your hips working into the pressure until the last of it passes.
+
+The water on your back. Your breathing. The shower still running.
+{% endif %}
+
+{% if w.hasTrait("HEAVY_SQUIRTER") %}
+The shower made that a non-issue, at least. You stand in the spray for a few more seconds, satisfied with the logistics.
+{% endif %}
+
+You turn the water off. Stand in the steam for a moment. Wrap yourself in a towel.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The mirror is fogged over. Good. You towel off without bothering to clear it.
+{% else %}
+The mirror is fogged. You wipe it with your palm and look at yourself — hair damp, face flushed from the steam.
+{% endif %}
+
+The wanting is gone. The apartment is quiet and the bed is waiting and you've handled it.
+"""
+
+  effect = 'gd.addStat("TIMES_MASTURBATED",1); gd.addStat("TOTAL_ORGASMS",1); if w.hasTrait("MULTI_ORGASMIC") { gd.addStat("TOTAL_ORGASMS",1); } gd.setDesire(15); w.changeComposure(-2); w.addArousal(-2); w.changeStress(-3);'
+
+  [[actions.next]]
+  finish = true

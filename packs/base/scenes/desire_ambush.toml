@@ -1,0 +1,159 @@
+[scene]
+id          = "base::desire_ambush"
+pack        = "base"
+description = "The body picking the worst possible moment — desk, afternoon, nowhere to go."
+
+[intro]
+prose = """
+Mid-afternoon at the office. The AC cycling, keyboards, someone's phone on silent vibrating against a hard desk somewhere down the corridor. Normal Thursday. The kind of day that asks nothing of you except to keep outputting until five.
+
+Then the heat just — arrives.
+
+Low. Particular. The kind that starts between the hips and doesn't ask. You're sitting at your desk, or standing at the printer, or waiting for a build to finish, and your body decides this is when. Not tonight when you could do something about it. Now.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Marcus walked past five minutes ago. You clocked his forearms when he reached across your desk — sleeve rolled up, the muscle there — and something logged it before you did and hasn't stopped.
+{% elif w.hasTrait("ANALYTICAL") %}
+There's no single trigger. You run it back: the afternoon slump, the warmth, the fact that the chair's been pushing against the wrong places for the last hour. None of that is sufficient cause. And yet.
+{% else %}
+Someone's voice from the kitchen — not words, just the low register of it — and the body responded. That fast.
+{% endif %}
+
+The desk hasn't changed. The screen is still there, the spreadsheet still open to the same cell.
+
+You're wet, a little. Sitting in a building full of your colleagues.
+"""
+
+[[intro_variants]]
+condition = 'gd.desire() < 70'
+prose = """
+Mid-afternoon at the office. The AC cycling, keyboards, someone down the hall taking a Teams call too loud. Thursday, an ordinary pull of a day.
+
+Then it surfaces — not urgently, just persistently. A low warmth below the navel, a particular ache that has no business being here at 2:45 on a Thursday.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Tariq from the platform team walked past the door — good shoulders, the kind of walk that knows it's good — and something ran the math before you could stop it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You can actually trace the causal chain, which is almost worse: bad sleep, the stress spike from the morning standup, your body trying to bleed off tension sideways.
+{% else %}
+A man laughed in the kitchen. That's it. That's the whole reason.
+{% endif %}
+
+Not overwhelming. Just present. Just badly timed, in the most inconvenient way.
+"""
+
+# ── Player Actions ─────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "ride_it_out"
+label  = "Keep working. Don't move."
+detail = "Head down. Outlast it."
+prose  = """
+You put your hands back on the keyboard and you don't move.
+
+{% if w.hasTrait("ANALYTICAL") %}
+Attention is a resource. You redirect it: the ticket queue, the open PR, the build that still hasn't passed on staging. The wanting is still there — it doesn't care that you've allocated your focus elsewhere — but your fingers are moving and the words on the screen are real and the afternoon is finite. You know what you're doing. It doesn't stop what you're doing from costing something.
+{% elif w.hasTrait("SHY") %}
+You don't look up. This is the thing: you cannot look up, because your face will tell anyone who looks what is happening, and you can't make it not do that, and the open-plan floor is right there. Head down. Type. The cursor moves. That helps, a little — having something to track. You type the same function signature twice.
+{% else %}
+Screen, keyboard, the task. You type. The wanting doesn't go anywhere — it just has to wait — and waiting is what it does, patient and low and impossible to mistake for anything else. At some point the afternoon continues around you. Slack notifications. The printer. Life.
+{% endif %}
+
+Ten minutes. Your composure is intact. Mostly. The afternoon keeps going.
+"""
+
+  effect = 'w.changeComposure(-3); gd.addDesire(5); w.changeStress(3);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "bathroom_break"
+label  = "Excuse yourself. The bathroom."
+detail = "Two minutes. Just enough to get through the afternoon."
+prose  = """
+You stand up from your desk at normal speed. You don't hurry. The walk to the bathroom is forty feet and you don't look at anyone.
+
+The lock clicks. One stall, just you.
+
+{% if w.hasTrait("SHY") %}
+You lean your back against the cold of the stall door and stay very still. Your hands are unsteady in a way you dislike. This is mortifying — you are in a bathroom stall at work because your own body staged a coup — and the mortification coexists with the wanting without canceling it out. You breathe through it. The fluorescent hum of the room. The wanting does not go away, just goes quieter.
+{% elif w.hasTrait("ANALYTICAL") %}
+Two minutes. You know what this buys: enough reduction to get to five o'clock without it being visible on your face. You lean against the wall and let your hand go between your thighs through your skirt — not much, just pressure, just enough — and clock the biofeedback. The edge comes off. Not solved. Edge off.
+{% else %}
+Two minutes, hand pressed flat against the tile while the other handles things briefly and quietly. The restroom smells like the industrial soap from the dispenser. The florescent light flickers once. None of this is romantic.
+
+You're not looking for romance. You're looking to make it to five o'clock.
+{% endif %}
+
+You flush, wash your hands, fix your face in the mirror. Walk back out at normal speed.
+
+The wanting is still there. Just — further back. Enough.
+"""
+
+  effect = 'w.changeComposure(-4); gd.addDesire(-15); w.addArousal(1);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "walk_it_off"
+label     = "Get up. Coffee, water, anything."
+detail    = "Movement. Break the feedback loop."
+condition = 'w.hasTrait("ANALYTICAL") || w.hasTrait("CONFIDENT") || w.hasTrait("AMBITIOUS")'
+prose     = """
+You push back from the desk and stand.
+
+{% if w.hasTrait("ANALYTICAL") %}
+Movement recalibrates the system — you know this. Change of input, change of output. You walk the long way to the kitchen: down the back hall, past the stairwell, past the row of meeting rooms with the glass walls. You clock the variables as you go: heart rate, temperature, the quality of this wanting (high, badly timed, not going anywhere). By the kitchen you've mapped it well enough to know it isn't going anywhere just because you walked. But mapping it is something.
+
+You pour water from the filter jug. Someone in the corner is microwaving lunch. Normal Tuesday. You hold the cold glass and drink slowly and by the time you're done the edge is still there but you're looking at it from the other side of the glass wall now, which is something.
+{% elif w.hasTrait("CONFIDENT") %}
+You pour yourself water in the kitchen, lean against the counter, and drink it like you're here for the water. Marcus is coming out of the meeting room down the hall with his laptop under his arm. You watch him walk. The body does what the body does with that information. You finish the glass.
+
+Your composure is not cracked. You would like that acknowledged, at least internally.
+{% else %}
+There's a conference room at the end of the hall with the blinds down. You put your coffee in the microwave and stand there watching the timer count. Forty-five seconds. The door to the room is open a crack. Nobody's in there.
+
+The microwave beeps. You take your coffee back to your desk.
+{% endif %}
+
+The afternoon continues. You got through it. The wanting stays where it is.
+"""
+
+  effect = 'w.changeComposure(-2); gd.addDesire(3); w.changeStress(2);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "endure_and_sink"
+label     = "Press your thighs together and wait."
+detail    = "Not the first time. Won't be the last."
+condition = 'gd.desire() >= 70'
+prose     = """
+You shift in your chair and press your knees together and wait for the afternoon to end.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+There's something in the not-doing that has its own texture — you know this about yourself now, have filed it away with the other new knowledge that accrues quietly in this body. Wanting that can't be acted on doesn't sit still; it builds.
+
+Your thighs press together and the desk is exactly where it was and the spreadsheet is exactly where it was and you're somewhere below the surface of all of it, just — present with this. Waiting.
+{% elif w.hasTrait("SHY") %}
+Do not let your face do anything. That's the whole job for the next forty-five minutes — maintain the surface. It's a resource management problem: how much does staying still cost, versus moving and having someone look at you. Staying still costs less.
+
+You are very still. Your breath is shallow. Three rows over someone is talking about a merge conflict. The world is exactly as mundane as it always is. Your body is not listening to the world.
+{% else %}
+The chair is a bad place for this. You know that and you do it anyway — knees together, weight shifted, the pressure of it just barely doing anything useful. You're at work. There's nowhere to go and nothing to do with this.
+
+The clock at the corner of your screen reads 3:18.
+
+The afternoon has quite a ways to go.
+{% endif %}
+
+When you finally move it's almost five. You stood up and the room was the same room. Your composure held. You were the only one who knew it cost anything.
+"""
+
+  effect = 'w.changeComposure(-5); gd.addDesire(8); w.addArousal(1); w.changeAnxiety(3);'
+
+  [[actions.next]]
+  finish = true
