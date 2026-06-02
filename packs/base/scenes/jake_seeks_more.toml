@@ -15,10 +15,10 @@ The wanting surfaced somewhere in the cab ride over and hasn't gone quiet since.
 He's close. His arm against yours, the evening easy, settled. And then there's a wanting, low and specific, that's been there longer than tonight.
 {% endif %}
 
-It's not the wanting you've felt before. It's something the other side of that — the wanting to try a *particular* thing. To say the particular thing out loud.
+It's not the wanting you've felt before. There's a specific thing you want to do tonight. You've known it for days, and you haven't said it.
 
 {% if w.getSkill("COMPOSURE") < 30 %}
-The gap between wanting it and saying it used to feel like a cliff. Right now it feels like a step.
+The words are already there, closer to the surface than usual. Right now the gap between wanting it and saying it feels like a step.
 {% else %}
 The gap between wanting it and saying it still has a size to it. The wanting has been outgrowing it for days.
 {% endif %}
@@ -55,7 +55,7 @@ His hands tighten at your waist.
 
 "Like that," he says. Quiet. Not telling — confirming.
 
-You keep going. The rhythm takes a minute to learn and then you have it, and having it feels like having something that's yours. Your body doing a thing it figured out. His face below you, watching you, and the watching doesn't embarrass you the way it might have — it pulls you forward. Makes the wanting sharper.
+You keep going. The rhythm takes a minute to learn and then you have it, and having it feels like having something that's yours. Your body doing a thing it figured out. His face below you, watching you. The watching pulls you forward. Makes the wanting sharper.
 
 {% if w.hasTrait("EASILY_WET") %}
 When the orgasm comes you're slick enough that you can hear it and you drop forward against his chest, hips still moving through it. He holds you there until they stop.
@@ -107,7 +107,7 @@ You're not sure you've asked for this before. You're not sure you've known, befo
 
 He starts talking. Low. His voice is even, almost ordinary, saying not-ordinary things — what he thinks about, where he wants to touch, what he's going to do — and your breathing changes before the first sentence is finished.
 {% elif w.hasTrait("ANALYTICAL") %}
-You've thought about this. The wanting arrived before you had context for it — the voice thing, his in particular, the register he uses when he's focused. Your brain catalogued it. Your body voted before the catalogue was complete.
+You've thought about this. The wanting arrived before you had context for it — the voice thing, his in particular, the register he uses when he's focused. Your brain catalogued it. The catalogue wasn't finished yet.
 
 He starts talking. Specific things. Practical and exact. His hands are moving as he talks, action following description, and you can't tell which part of it is working on you faster — the words or the hands.
 {% else %}
@@ -120,7 +120,7 @@ His voice drops a half-step. Not performing — just close. He says what he want
 When he describes your neck — what he's going to do to it, exactly — his mouth finds it at the same moment, and the combination of the word and the sensation drops through you all at once.
 {% endif %}
 
-The particular thing about his voice is that it's his. Not a performance of what this is supposed to sound like. Just him, saying the true thing.
+His voice is his — not a performance of what this is supposed to sound like, just him.
 
 {% if w.getSkill("DIRTY_TALK") < 10 %}
 You try to respond in kind — once, the words climbing up your throat and then coming out. Not smooth. A little unsteady. But they come out, and his breath changes when they do, and that's enough to make you say the next one.
@@ -163,7 +163,7 @@ A beat. He pulls back just enough to look at your face.
 He takes both your wrists in one hand. His grip is firm without being hard — you could pull free; the point is that you're not going to. He holds them above your head against the pillow and looks down at you.
 
 {% if w.getSkill("COMPOSURE") < 35 %}
-Something in you drops immediately. The part that's usually deciding things, moving, redirecting — it steps back and the wanting comes up to fill the space. Your hips shift upward without your approval.
+Something in you drops immediately. Your hips shift upward without your approval.
 {% else %}
 For a second you inventory it — what you're feeling, what you want the grip to do. Your brain running the map. And then his weight settles and the map stops mattering.
 {% endif %}

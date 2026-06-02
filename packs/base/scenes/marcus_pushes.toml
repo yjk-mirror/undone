@@ -12,7 +12,7 @@ Not your shoulder. The back of your neck.
 His thumb is at the base of your skull. The pressure is light. It's been there for maybe thirty seconds.
 
 {% if w.getSkill("FEMININITY") < 30 %}
-The rollout spec is still on the screen. His thumb is at the top of your spine and you are extremely aware that the pressure there is different from a hand on a shoulder in a way that did not require conscious analysis to register.
+The rollout spec is still on the screen. His thumb is at the top of your spine, and the pressure there is different from a hand on a shoulder.
 {% elif w.getSkill("FEMININITY") < 50 %}
 The rollout spec is still on the screen. His thumb is not moving. Neither are you.
 {% else %}
@@ -63,7 +63,7 @@ A beat. The HVAC hums above you. The rollout spec is still open.
 {% if w.hasTrait("AMBITIOUS") %}
 The accounting: what you didn't let happen, the thing still running under everything. You pick up your notebook.
 {% elif w.hasTrait("ANALYTICAL") %}
-You've marked the limit. He received it. You make a note in the margin of the spec — something about the staging window — and it has nothing to do with any of this.
+You've marked the limit. He received it. You make a note in the margin of the spec — the staging window — and it has nothing to do with any of this.
 {% else %}
 You pull the keyboard toward you. The cursor is blinking where you left it.
 {% endif %}
@@ -143,7 +143,7 @@ Your back arches off the chair. The monitor wobbles on the desk.
 After: the chair. The rollout spec still open on the screen. Marcus stands up and straightens his collar. His expression is level — same as it is in any meeting — and you cannot currently say the same about yours.
 
 {% if w.hasTrait("SUBMISSIVE") %}
-His hand at your neck. You, staying. The order of those things.
+His hand at your neck. You, staying.
 {% elif w.getSkill("FEMININITY") < 30 %}
 The meeting is still on the calendar. Neither of those facts is reconciling right now.
 {% elif w.getSkill("FEMININITY") < 50 %}
