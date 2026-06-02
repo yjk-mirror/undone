@@ -7,6 +7,7 @@
 //! `role`, `scene` for reads; `w.*`/`npc(x).*`/`scene.*` mutators for effects) —
 //! never by exposing `World` directly.
 
+pub mod api;
 pub mod compiled;
 pub mod context;
 pub mod engine;
