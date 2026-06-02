@@ -41,10 +41,13 @@ zero errors at both FEM levels, cum spelling correct in-game. Dropped one false 
 "duplicated Marcus simile" that didn't actually exist in marcus_leverage).
 
 **Follow-ups (not blockers):**
-- **Suspected em-dash → "??" rendering artifact** in prose (playtester noted "his arm loose across
-  your waist ??the weight"). NOT touched this session (no render/font/loader changes) — almost
-  certainly pre-existing; needs confirmation (could be a screenshot-capture artifact vs a real font/
-  encoding bug). If real, it affects ALL prose (em-dashes are everywhere) and is worth a dedicated fix.
+- ~~Suspected em-dash → "??" rendering artifact~~ **INVESTIGATED — false finding, no bug.** Source is
+  U+2014 (`E2 80 94`); the data path is UTF-8 end-to-end with no transcode (`markdown_to_text_layout`
+  passes text through unchanged); the prose font chain ("Literata, Palatino, Georgia, serif") resolves
+  to Georgia, which is installed and has the glyph; and a screenshot viewed directly shows clean
+  em-dashes. The "??" was the original playtester's vision model misreading its own screenshot, and the
+  `?` in dev-IPC/console output is a cp949 (Korean Windows) console-codepage artifact — neither reflects
+  what the game renders. Nothing to fix.
 - **Dev `set_stat` can't set `desire`/`composure`** (only money/stress/anxiety/femininity) — a
   playtest-tooling gap; adding them to `dev_ipc.rs set_stat` (desire → game_data, composure → skill)
   would make future playtesting of this layer far easier.
