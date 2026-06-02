@@ -2,7 +2,63 @@
 
 ## Current State
 
-**Latest session (2026-05-31, queued engineering cleanup continued):**
+**Latest session (2026-06-01, LOOPING-ADULT LAYER — engine + 12 scenes, director-driven fan-out):**
+Shipped the looping-adult content layer on branch `looping-adult-layer` (design spec:
+`docs/plans/2026-06-01-looping-adult-layer-design.md`). The adult side was all terminating
+one-shots; this makes desire recur and escalate.
+
+**Engine (TDD, all green):**
+- **DESIRE** need-state: `GameData.desire: BoundedStat` (0–100), accrues +8/consumed-slot in
+  `advance_time_slot`, discharged by release scenes. Rhai: `gd.desire()` read, `gd.addDesire`/
+  `gd.setDesire` writes (+ minijinja template ctx + load-validation gate).
+- **COMPOSURE** promoted to a structural skill (registry const `composure_skill()` + load
+  validation, like FEMININITY), seeded 60 at new-game; `w.composure()` / `w.changeComposure(n)`
+  (giving in lowers it). Spiral is content-gated (low composure unlocks reckless variants).
+- **Scheduler desire bias**: per-event `desire_scaled = true` scales weight 1×..4× by desire
+  (`effective_weight`/`desire_multiplier`). Data-driven — engine never decides what's "adult".
+- Save **v6 → v7** (no-op migration; `desire` serde-defaults). Desire+composure surfaced in
+  both dev-IPC snapshots (`GameStateSnapshot`, `RuntimeSnapshot`).
+
+**Content (12 scenes, parallel scene-writer fan-out, all pass load gate):**
+- **Cal / gym-regular** (NEW NPC `ROLE_GYM`, `docs/characters/cal.md`): `gym_regular_intro`
+  (hook) → `_recurs` (repeatable) → `_first` (done-to-her) → `_deepens` (repeatable, GYM_ACT_*
+  ladder). Power-inversion + submission.
+- **Jake** repeatables: `jake_repeat_night`, `jake_morning_quick`, `jake_seeks_more` (she-seeks,
+  JAKE_ACT_* unlocks).
+- **Marcus** affair: `marcus_repeat_office`, `marcus_pushes` (MARCUS_ACT_* escalation),
+  `marcus_leverage` (cost — MARCUS_TERMS_HERS/HIS/AFFAIR_COOLING outcomes).
+- **Desire**: `desire_solo_night` (release valve, discharges), `desire_ambush` (no discharge).
+- All wired into `schedule.toml` free_time/work slots with desire_scaled + npc_role bindings.
+
+**Verification (all gates passed):** full workspace `cargo test` green; `validate-pack` clean
+(74 scenes). **Render regression test** added (`all_scene_intros_render_without_missing_methods`)
+— the playtester caught 8/12 scenes crashing at render because `gd.desire()`/`w.composure()`
+were in the Rhai API but NOT the minijinja template context (validate-pack doesn't render prose);
+fixed + guarded. **Independent test-author** (ops:test-author, did NOT see implementation
+reasoning) wrote 19 acceptance tests across `desire_composure_acceptance.rs` /
+`desire_save_compat.rs` / `composure_required_id.rs` covering all 10 criteria (desire accrual/
+clamp, composure seed/clamp, scheduler desire-bias over seeded iterations against the REAL
+schedule, Rhai+minijinja accessor parity, v6→v7 save back-compat, COMPOSURE required-id) — all
+PASS. **Writing-reviewer** ran on Cal thread + marcus_pushes/jake_seeks_more — CRITICAL
+narrated-power-inversion ("you've done this / used to feel like a cliff") and narrated-interiority
+fixes applied (show the body, never explain). **Focused playtester re-run CONFIRMED in-game:**
+all 7 previously-broken scenes render clean, repeatable scenes genuinely vary by desire (12 vs
+100 = different psychological states, not word-swaps), give-in lowers composure and release
+discharges desire (verified before/after via dev-IPC), explicit prose "delivers." Docs updated
+per rule 10 (content-schema, engine-design). Merged to master.
+
+**Deferred (not blockers):**
+- **Player-facing sidebar meter** for desire/composure — only in dev-IPC snapshots so far; add
+  Desire/Composure rows to `right_panel.rs` `stats_panel` + `PlayerSnapshot` (needs a cached
+  `composure_id` on GameState like `femininity_id`, and desire from `world.game_data`).
+- **Writing-review** the remaining 8 scenes (only Cal + 2 reviewed); same writers/brief, but
+  watch for the narrated-interiority pattern that recurred.
+- **DUBCON content-level / BLOCK_ROUGH** judgment call on `gym_regular_first` "stay" +
+  `marcus_pushes` "let_him" (reviewer flagged; needs user direction on tagging).
+- **jake_seeks_more** escalation actions gate on built sexual skills the player may not have —
+  consider lowering gates or adding skill-building paths.
+
+**Previous session (2026-05-31, queued engineering cleanup continued):**
 Read the live handoff first; `AGENTS.md` was not present at the repo root, so the
 instructions supplied in the session prompt were followed. Ran the requested queue
 commands: `desloppify status`, `desloppify next`, and
