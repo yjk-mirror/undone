@@ -86,7 +86,7 @@
           "requires": [
             "ROUTE_WORKPLACE"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -109,7 +109,7 @@
             "ROUTE_WORKPLACE",
             "base::workplace_opening=arrived"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -131,7 +131,7 @@
             "FIRST_NIGHT_STAGED_TOMORROW",
             "base::workplace_opening=settled"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "free_time",
             "weight": 6,
@@ -154,7 +154,7 @@
             "ROUTE_WORKPLACE",
             "base::workplace_opening=week_one"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -176,7 +176,7 @@
             "FIRST_CLOTHES_FUNCTIONAL",
             "base::workplace_opening=settled"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "free_time",
             "weight": 6,
@@ -202,7 +202,7 @@
             "ROUTE_WORKPLACE",
             "base::workplace_opening=clothes_done"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -223,7 +223,7 @@
             "FIRST_DAY_REDIRECTED_STATUS",
             "base::workplace_opening=settled"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "free_time",
             "weight": 0,
@@ -245,7 +245,7 @@
             "ROUTE_WORKPLACE",
             "base::workplace_opening=arrived"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -283,7 +283,7 @@
             "LANDLORD_KEPT_TRANSACTIONAL",
             "base::workplace_opening=settled"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "free_time",
             "weight": 5,
@@ -336,22 +336,6 @@
           "set_by": "workplace_first_day"
         },
         {
-          "signal": "FIRST_DAY_LUNCH_DESK",
-          "set_by": "workplace_first_day"
-        },
-        {
-          "signal": "STARTED_JOB",
-          "set_by": "workplace_first_day"
-        },
-        {
-          "signal": "FIRST_DAY_LUNCH_GROUP",
-          "set_by": "workplace_first_day"
-        },
-        {
-          "signal": "FIRST_DAY_LUNCH_ALONE",
-          "set_by": "workplace_first_day"
-        },
-        {
           "signal": "OPENING_CALLBACK_STATUS_ASSERTION",
           "set_by": "opening_callback_status_assertion"
         },
@@ -372,44 +356,7 @@
           "set_by": "opening_callback_transactional_defense"
         }
       ],
-      "broken": [
-        {
-          "scene": "workplace_arrival",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "workplace_first_night",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "opening_callback_first_week_solitude",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "workplace_first_clothes",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "opening_callback_mirror_afterglow",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "workplace_first_day",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "opening_callback_status_assertion",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "workplace_landlord",
-          "missing": "ROUTE_WORKPLACE"
-        },
-        {
-          "scene": "opening_callback_transactional_defense",
-          "missing": "ROUTE_WORKPLACE"
-        }
-      ],
+      "broken": [],
       "planned": []
     },
     {
@@ -683,51 +630,13 @@
       "note": "Workplace tension -> affair -> escalation -> leverage cost -> cooling.",
       "scenes": [
         {
-          "id": "work_marcus_coffee",
+          "id": "marcus_apartment",
           "produces": [
-            "MARCUS_REAL_CONVERSATION"
+            "MARCUS_APARTMENT",
+            "MARCUS_REJECTED"
           ],
           "requires": [
-            "FIRST_MEETING_DONE",
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "work",
-            "weight": 9,
-            "once_only": false,
-            "npc_role": "ROLE_MARCUS",
-            "desire_scaled": false
-          },
-          "repeatable": true
-        },
-        {
-          "id": "work_marcus_late",
-          "produces": [
-            "MARCUS_LATE_NIGHT"
-          ],
-          "requires": [
-            "FIRST_MEETING_DONE",
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "work",
-            "weight": 8,
-            "once_only": false,
-            "npc_role": "ROLE_MARCUS",
-            "desire_scaled": false
-          },
-          "repeatable": true
-        },
-        {
-          "id": "work_marcus_drinks",
-          "produces": [
-            "MARCUS_DRINKS",
-            "MARCUS_TOUCHED"
-          ],
-          "requires": [
-            "MARCUS_LATE_NIGHT",
+            "MARCUS_AFTERMATH",
             "base::workplace_opening=settled"
           ],
           "status": "reachable",
@@ -741,13 +650,13 @@
           "repeatable": false
         },
         {
-          "id": "work_marcus_closet",
+          "id": "marcus_monday_rejected",
           "produces": [
-            "MARCUS_INTIMATE",
-            "MARCUS_ALMOST"
+            "MARCUS_REJECTION_MONDAY",
+            "MARCUS_TALKED"
           ],
           "requires": [
-            "MARCUS_DRINKS",
+            "MARCUS_REJECTED",
             "base::workplace_opening=settled"
           ],
           "status": "reachable",
@@ -823,79 +732,20 @@
             "desire_scaled": false
           },
           "repeatable": true
-        },
-        {
-          "id": "work_marcus_aftermath",
-          "produces": [
-            "MARCUS_AFTERMATH"
-          ],
-          "requires": [
-            "MARCUS_INTIMATE",
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "work",
-            "weight": 0,
-            "once_only": true,
-            "npc_role": "ROLE_MARCUS",
-            "desire_scaled": false
-          },
-          "repeatable": false
-        },
-        {
-          "id": "marcus_apartment",
-          "produces": [
-            "MARCUS_APARTMENT",
-            "MARCUS_REJECTED"
-          ],
-          "requires": [
-            "MARCUS_AFTERMATH",
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "work",
-            "weight": 0,
-            "once_only": true,
-            "npc_role": "ROLE_MARCUS",
-            "desire_scaled": false
-          },
-          "repeatable": false
-        },
-        {
-          "id": "marcus_monday_rejected",
-          "produces": [
-            "MARCUS_REJECTION_MONDAY",
-            "MARCUS_TALKED"
-          ],
-          "requires": [
-            "MARCUS_REJECTED",
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "work",
-            "weight": 0,
-            "once_only": true,
-            "npc_role": "ROLE_MARCUS",
-            "desire_scaled": false
-          },
-          "repeatable": false
         }
       ],
       "dangling": [
         {
-          "signal": "MARCUS_REAL_CONVERSATION",
-          "set_by": "work_marcus_coffee"
+          "signal": "MARCUS_APARTMENT",
+          "set_by": "marcus_apartment"
         },
         {
-          "signal": "MARCUS_TOUCHED",
-          "set_by": "work_marcus_drinks"
+          "signal": "MARCUS_REJECTION_MONDAY",
+          "set_by": "marcus_monday_rejected"
         },
         {
-          "signal": "MARCUS_ALMOST",
-          "set_by": "work_marcus_closet"
+          "signal": "MARCUS_TALKED",
+          "set_by": "marcus_monday_rejected"
         },
         {
           "signal": "MARCUS_ACT_USED",
@@ -928,18 +778,6 @@
         {
           "signal": "MARCUS_AFFAIR_COOLING",
           "set_by": "marcus_leverage"
-        },
-        {
-          "signal": "MARCUS_APARTMENT",
-          "set_by": "marcus_apartment"
-        },
-        {
-          "signal": "MARCUS_REJECTION_MONDAY",
-          "set_by": "marcus_monday_rejected"
-        },
-        {
-          "signal": "MARCUS_TALKED",
-          "set_by": "marcus_monday_rejected"
         }
       ],
       "broken": [],
@@ -949,24 +787,6 @@
       "name": "Cal / gym",
       "note": "Gym-regular power-inversion + submission ladder.",
       "scenes": [
-        {
-          "id": "gym_changing_room",
-          "produces": [
-            "GYM_CHANGING_ROOM"
-          ],
-          "requires": [
-            "base::workplace_opening=settled"
-          ],
-          "status": "reachable",
-          "binding": {
-            "slot": "free_time",
-            "weight": 6,
-            "once_only": true,
-            "npc_role": null,
-            "desire_scaled": false
-          },
-          "repeatable": false
-        },
         {
           "id": "gym_regular_intro",
           "produces": [
@@ -1042,10 +862,6 @@
       ],
       "dangling": [
         {
-          "signal": "GYM_CHANGING_ROOM",
-          "set_by": "gym_changing_room"
-        },
-        {
           "signal": "GYM_FIRST_REJECTED",
           "set_by": "gym_regular_first"
         },
@@ -1073,7 +889,7 @@
           "requires": [
             "ROUTE_CAMPUS"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1092,7 +908,7 @@
             "ROUTE_CAMPUS",
             "base::campus_opening=arrived"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1111,7 +927,7 @@
             "ROUTE_CAMPUS",
             "base::campus_opening=orientation"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1130,7 +946,7 @@
             "ROUTE_CAMPUS",
             "base::campus_opening=dorm_life"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 8,
@@ -1149,7 +965,7 @@
             "ROUTE_CAMPUS",
             "base::campus_opening=dorm_life"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 10,
@@ -1168,7 +984,7 @@
             "ROUTE_CAMPUS",
             "base::campus_opening=dorm_life"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 10,
@@ -1188,7 +1004,7 @@
             "STUDY_SESSION_DONE",
             "base::campus_opening=dorm_life"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1208,7 +1024,7 @@
             "MET_THEO",
             "base::campus_opening=first_week"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1227,7 +1043,7 @@
             "ROUTE_CAMPUS",
             "THEO_INTIMATE"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1246,7 +1062,7 @@
             "ROUTE_CAMPUS",
             "THEO_MORNING_AFTER"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "campus_opening",
             "weight": 0,
@@ -1267,48 +1083,7 @@
           "set_by": "campus_dining_after_theo"
         }
       ],
-      "broken": [
-        {
-          "scene": "campus_arrival",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_dorm",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_orientation",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_call_home",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_library",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_study_session",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_dining_hall",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_theo_night",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_theo_morning",
-          "missing": "ROUTE_CAMPUS"
-        },
-        {
-          "scene": "campus_dining_after_theo",
-          "missing": "ROUTE_CAMPUS"
-        }
-      ],
+      "broken": [],
       "planned": []
     },
     {
@@ -1532,7 +1307,7 @@
             "ROUTE_WORKPLACE",
             "base::workplace_opening=working"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -1552,7 +1327,7 @@
             "base::workplace_opening=working",
             "FIRST_MEETING_DONE"
           ],
-          "status": "broken_gate",
+          "status": "reachable",
           "binding": {
             "slot": "workplace_opening",
             "weight": 0,
@@ -1594,6 +1369,24 @@
           "binding": {
             "slot": "free_time",
             "weight": 0,
+            "once_only": true,
+            "npc_role": null,
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "gym_changing_room",
+          "produces": [
+            "GYM_CHANGING_ROOM"
+          ],
+          "requires": [
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "free_time",
+            "weight": 6,
             "once_only": true,
             "npc_role": null,
             "desire_scaled": false
@@ -1671,6 +1464,25 @@
           "repeatable": true
         },
         {
+          "id": "work_marcus_coffee",
+          "produces": [
+            "MARCUS_REAL_CONVERSATION"
+          ],
+          "requires": [
+            "FIRST_MEETING_DONE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 9,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
           "id": "work_marcus_favor",
           "produces": [
             "REVIEWED_MARCUS_SPEC",
@@ -1689,6 +1501,84 @@
             "desire_scaled": false
           },
           "repeatable": true
+        },
+        {
+          "id": "work_marcus_late",
+          "produces": [
+            "MARCUS_LATE_NIGHT"
+          ],
+          "requires": [
+            "FIRST_MEETING_DONE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 8,
+            "once_only": false,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": true
+        },
+        {
+          "id": "work_marcus_drinks",
+          "produces": [
+            "MARCUS_DRINKS",
+            "MARCUS_TOUCHED"
+          ],
+          "requires": [
+            "MARCUS_LATE_NIGHT",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "work_marcus_closet",
+          "produces": [
+            "MARCUS_INTIMATE",
+            "MARCUS_ALMOST"
+          ],
+          "requires": [
+            "MARCUS_DRINKS",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
+        },
+        {
+          "id": "work_marcus_aftermath",
+          "produces": [
+            "MARCUS_AFTERMATH"
+          ],
+          "requires": [
+            "MARCUS_INTIMATE",
+            "base::workplace_opening=settled"
+          ],
+          "status": "reachable",
+          "binding": {
+            "slot": "work",
+            "weight": 0,
+            "once_only": true,
+            "npc_role": "ROLE_MARCUS",
+            "desire_scaled": false
+          },
+          "repeatable": false
         }
       ],
       "dangling": [
@@ -1713,10 +1603,6 @@
           "set_by": "party_invitation"
         },
         {
-          "signal": "PARTY_STRANGER_SLEPT",
-          "set_by": "party_stranger_after"
-        },
-        {
           "signal": "BAR_STRANGER_WALKED",
           "set_by": "bar_closing_time"
         },
@@ -1725,8 +1611,8 @@
           "set_by": "bar_closing_time"
         },
         {
-          "signal": "BAR_STRANGER_SLEPT",
-          "set_by": "bar_stranger_night"
+          "signal": "GYM_CHANGING_ROOM",
+          "set_by": "gym_changing_room"
         },
         {
           "signal": "DRINKS_WITH_MARCUS",
@@ -1741,24 +1627,27 @@
           "set_by": "work_lunch"
         },
         {
+          "signal": "MARCUS_REAL_CONVERSATION",
+          "set_by": "work_marcus_coffee"
+        },
+        {
           "signal": "REVIEWED_MARCUS_SPEC",
           "set_by": "work_marcus_favor"
         },
         {
           "signal": "DECLINED_MARCUS_SPEC",
           "set_by": "work_marcus_favor"
-        }
-      ],
-      "broken": [
-        {
-          "scene": "workplace_work_meeting",
-          "missing": "ROUTE_WORKPLACE"
         },
         {
-          "scene": "workplace_evening",
-          "missing": "ROUTE_WORKPLACE"
+          "signal": "MARCUS_TOUCHED",
+          "set_by": "work_marcus_drinks"
+        },
+        {
+          "signal": "MARCUS_ALMOST",
+          "set_by": "work_marcus_closet"
         }
       ],
+      "broken": [],
       "planned": []
     }
   ],
@@ -1824,30 +1713,6 @@
       "kind": "dangling",
       "thread": "Opening / first weeks",
       "detail": "'FIRST_DAY_DEFERRED_STATUS' set by workplace_first_day — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Opening / first weeks",
-      "detail": "'FIRST_DAY_LUNCH_DESK' set by workplace_first_day — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Opening / first weeks",
-      "detail": "'STARTED_JOB' set by workplace_first_day — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Opening / first weeks",
-      "detail": "'FIRST_DAY_LUNCH_GROUP' set by workplace_first_day — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Opening / first weeks",
-      "detail": "'FIRST_DAY_LUNCH_ALONE' set by workplace_first_day — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
@@ -1943,19 +1808,19 @@
       "priority": 1,
       "kind": "dangling",
       "thread": "Marcus affair",
-      "detail": "'MARCUS_REAL_CONVERSATION' set by work_marcus_coffee — no scene consumes it (write a follow-up)"
+      "detail": "'MARCUS_APARTMENT' set by marcus_apartment — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
       "kind": "dangling",
       "thread": "Marcus affair",
-      "detail": "'MARCUS_TOUCHED' set by work_marcus_drinks — no scene consumes it (write a follow-up)"
+      "detail": "'MARCUS_REJECTION_MONDAY' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
       "kind": "dangling",
       "thread": "Marcus affair",
-      "detail": "'MARCUS_ALMOST' set by work_marcus_closet — no scene consumes it (write a follow-up)"
+      "detail": "'MARCUS_TALKED' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
@@ -2004,30 +1869,6 @@
       "kind": "dangling",
       "thread": "Marcus affair",
       "detail": "'MARCUS_AFFAIR_COOLING' set by marcus_leverage — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Marcus affair",
-      "detail": "'MARCUS_APARTMENT' set by marcus_apartment — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Marcus affair",
-      "detail": "'MARCUS_REJECTION_MONDAY' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Marcus affair",
-      "detail": "'MARCUS_TALKED' set by marcus_monday_rejected — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Cal / gym",
-      "detail": "'GYM_CHANGING_ROOM' set by gym_changing_room — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
@@ -2093,12 +1934,6 @@
       "priority": 1,
       "kind": "dangling",
       "thread": "Ambient life",
-      "detail": "'PARTY_STRANGER_SLEPT' set by party_stranger_after — no scene consumes it (write a follow-up)"
-    },
-    {
-      "priority": 1,
-      "kind": "dangling",
-      "thread": "Ambient life",
       "detail": "'BAR_STRANGER_WALKED' set by bar_closing_time — no scene consumes it (write a follow-up)"
     },
     {
@@ -2111,7 +1946,7 @@
       "priority": 1,
       "kind": "dangling",
       "thread": "Ambient life",
-      "detail": "'BAR_STRANGER_SLEPT' set by bar_stranger_night — no scene consumes it (write a follow-up)"
+      "detail": "'GYM_CHANGING_ROOM' set by gym_changing_room — no scene consumes it (write a follow-up)"
     },
     {
       "priority": 1,
@@ -2135,6 +1970,12 @@
       "priority": 1,
       "kind": "dangling",
       "thread": "Ambient life",
+      "detail": "'MARCUS_REAL_CONVERSATION' set by work_marcus_coffee — no scene consumes it (write a follow-up)"
+    },
+    {
+      "priority": 1,
+      "kind": "dangling",
+      "thread": "Ambient life",
       "detail": "'REVIEWED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)"
     },
     {
@@ -2144,130 +1985,16 @@
       "detail": "'DECLINED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)"
     },
     {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "workplace_arrival gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "workplace_first_night gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "opening_callback_first_week_solitude gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "workplace_first_clothes gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "opening_callback_mirror_afterglow gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "workplace_first_day gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "opening_callback_status_assertion gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "workplace_landlord gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Opening / first weeks",
-      "detail": "opening_callback_transactional_defense gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_arrival gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_dorm gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_orientation gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_call_home gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_library gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_study_session gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_dining_hall gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_theo_night gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_theo_morning gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
-      "thread": "Theo / campus",
-      "detail": "campus_dining_after_theo gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)"
-    },
-    {
-      "priority": 2,
-      "kind": "broken",
+      "priority": 1,
+      "kind": "dangling",
       "thread": "Ambient life",
-      "detail": "workplace_work_meeting gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
+      "detail": "'MARCUS_TOUCHED' set by work_marcus_drinks — no scene consumes it (write a follow-up)"
     },
     {
-      "priority": 2,
-      "kind": "broken",
+      "priority": 1,
+      "kind": "dangling",
       "thread": "Ambient life",
-      "detail": "workplace_evening gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)"
+      "detail": "'MARCUS_ALMOST' set by work_marcus_closet — no scene consumes it (write a follow-up)"
     }
   ]
 }

@@ -51,6 +51,57 @@ fn json_sidecar_roundtrips() {
 }
 
 #[test]
+fn consumed_by_action_condition_is_not_dangling() {
+    // BREAKS IF: action-level condition gates stop being counted as consumers.
+    // STARTED_JOB is set by workplace_first_day and read only by plan_your_day's
+    // action condition — it must NOT appear as a dangling write-next item.
+    let map = build_story_map(&packs_dir()).unwrap();
+    for thread in &map.threads {
+        assert!(
+            !thread.dangling.iter().any(|d| d.signal == "STARTED_JOB"),
+            "STARTED_JOB is consumed by an action condition and must not be dangling"
+        );
+    }
+}
+
+#[test]
+fn preset_route_flags_are_not_broken_gates() {
+    // BREAKS IF: preset starting flags stop being treated as producible. ROUTE_*
+    // flags are seeded by presets and set by no scene effect, so gates on them
+    // are reachable and must never appear as broken gates.
+    let map = build_story_map(&packs_dir()).unwrap();
+    for thread in &map.threads {
+        for b in &thread.broken {
+            assert!(
+                !b.missing.starts_with("ROUTE_"),
+                "preset-seeded gate '{}' (scene {}) wrongly reported broken",
+                b.missing,
+                b.scene
+            );
+        }
+    }
+}
+
+#[test]
+fn explicitly_listed_scene_lands_in_its_declared_thread() {
+    // BREAKS IF: flag_prefix inference overrides an explicit `scenes` list.
+    // gym_changing_room sets GYM_CHANGING_ROOM (Cal/gym prefix) but is listed
+    // under Ambient life — it must land in Ambient life, not Cal / gym.
+    let map = build_story_map(&packs_dir()).unwrap();
+    let owning: Vec<&str> = map
+        .threads
+        .iter()
+        .filter(|t| t.scenes.iter().any(|s| s.id == "gym_changing_room"))
+        .map(|t| t.name.as_str())
+        .collect();
+    assert_eq!(
+        owning,
+        vec!["Ambient life"],
+        "gym_changing_room should be claimed only by its declared thread (Ambient life)"
+    );
+}
+
+#[test]
 fn committed_map_is_up_to_date() {
     // BREAKS IF: docs/story-map.{md,json} drift from the content. FIX: rerun
     // `cargo run --bin story-map` and commit.

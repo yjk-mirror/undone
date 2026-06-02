@@ -148,7 +148,26 @@ pub fn build_story_map(packs_dir: &Path) -> Result<StoryMap, String> {
         entry_scenes.insert(transformation.to_string());
     }
 
-    let facts = collect_scene_facts(&scenes, &HashMap::new(), &bindings, &entry_scenes);
+    // Preset starting flags are seeded at game start and set by no scene effect,
+    // so gates on them are reachable (mirrors the engine's reachability check).
+    // Fail loud on a preset-load error — silently degrading would flood the map
+    // with false broken-gate findings.
+    let mut starting_flags: HashSet<String> = HashSet::new();
+    for meta in &pack_metas {
+        let presets = undone_packs::preset::load_presets(&meta.pack_dir)
+            .map_err(|e| format!("preset load failed for '{}': {e}", meta.manifest.pack.id))?;
+        for preset in presets {
+            starting_flags.extend(preset.starting_flags);
+        }
+    }
+
+    let facts = collect_scene_facts(
+        &scenes,
+        &HashMap::new(),
+        &bindings,
+        &entry_scenes,
+        &starting_flags,
+    );
 
     // Roadmap (one per pack; base pack is the only one for now). Concatenate any
     // that exist so additional packs extend the thread list.
@@ -164,7 +183,7 @@ pub fn build_story_map(packs_dir: &Path) -> Result<StoryMap, String> {
     }
 
     let existing_set: HashSet<String> = existing.into_iter().collect();
-    Ok(reconcile(&facts, &roadmap, &existing_set))
+    Ok(reconcile(&facts, &roadmap, &existing_set, &starting_flags))
 }
 
 /// Regenerate both outputs into memory and compare against the committed files.
@@ -182,11 +201,61 @@ pub fn is_up_to_date(packs_dir: &Path, md_path: &Path, json_path: &Path) -> Resu
 #[derive(Debug, Clone, Default)]
 pub(crate) struct SceneFacts {
     pub produces: Vec<String>,
+    /// Signals gating scene ENTRY (schedule binding condition/trigger). Drives
+    /// `status` and the per-thread broken-gate findings.
     pub requires: Vec<String>,
+    /// Every signal required ANYWHERE in the scene — entry gate plus
+    /// action/npc-action/next-branch/intro-variant/thought conditions. Used to
+    /// build the global "consumed" set so a flag read only by an action choice
+    /// is not mis-reported as dangling.
+    pub consumes: Vec<String>,
     pub goto_targets: Vec<String>,
     pub status: SceneStatus,
     pub binding: Option<Binding>,
     pub repeatable: bool,
+}
+
+/// Every condition source in a scene that gates a CHOICE or narrator variant
+/// (as opposed to scene entry): action conditions and their next-branch + thought
+/// conditions, npc-action conditions and their next branches, and intro
+/// variant/thought conditions. These are *consumers* of signals — a flag read
+/// here is genuinely consumed even though it does not gate scene entry.
+fn scene_internal_condition_srcs(scene: &SceneDefinition) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for a in &scene.actions {
+        if let Some(c) = &a.condition {
+            out.push(c.source.clone());
+        }
+        for nb in &a.next {
+            if let Some(c) = &nb.condition {
+                out.push(c.source.clone());
+            }
+        }
+        for t in &a.thoughts {
+            if let Some(c) = &t.condition {
+                out.push(c.source.clone());
+            }
+        }
+    }
+    for na in &scene.npc_actions {
+        if let Some(c) = &na.condition {
+            out.push(c.source.clone());
+        }
+        for nb in &na.next {
+            if let Some(c) = &nb.condition {
+                out.push(c.source.clone());
+            }
+        }
+    }
+    for v in &scene.intro_variants {
+        out.push(v.condition.source.clone());
+    }
+    for t in &scene.intro_thoughts {
+        if let Some(c) = &t.condition {
+            out.push(c.source.clone());
+        }
+    }
+    out
 }
 
 /// Turn an effect source into the signal tokens it produces (flags + ARC=STATE).
@@ -218,11 +287,15 @@ fn required_signals(cond_src: &str) -> Vec<String> {
 ///   production pass an empty map; gates come from `bindings`.
 /// - `bindings`: schedule bindings (slot/once_only/gate sources) from `Scheduler::bindings`.
 /// - `entry_scenes`: ids reachable without a binding (opening + transformation scenes).
+/// - `starting_flags`: flags seeded by presets at game start. These are producible
+///   without any scene effect, so a gate on one is reachable (mirrors the engine's
+///   reachability check) — folded into the producible set for the status pass.
 pub(crate) fn collect_scene_facts(
     scenes: &HashMap<String, Arc<SceneDefinition>>,
     gate_sources: &HashMap<String, Vec<String>>,
     bindings: &[SceneBinding],
     entry_scenes: &HashSet<String>,
+    starting_flags: &HashSet<String>,
 ) -> HashMap<String, SceneFacts> {
     // 1. Per-scene binding + gate signal sets (from schedule).
     let mut binding_for: HashMap<String, Binding> = HashMap::new();
@@ -278,7 +351,18 @@ pub(crate) fn collect_scene_facts(
             f.requires.extend(g.iter().cloned());
         }
 
-        // Goto targets (normalised to full ids below by the caller's id set).
+        // `consumes` = the entry gate PLUS every internal choice/variant
+        // condition, so a flag read only inside an action is still counted as
+        // consumed (otherwise it would mis-report as dangling).
+        f.consumes.extend(f.requires.iter().cloned());
+        for src in scene_internal_condition_srcs(scene) {
+            f.consumes.extend(required_signals(&src));
+        }
+
+        // Goto targets are matched as-is against the full `pack::id` scene keys,
+        // mirroring the engine (`SceneEngine::start_scene` looks up the raw goto
+        // string in its scene map). Bare intra-scene targets therefore correctly
+        // resolve to nothing and never mark a scene reachable.
         for action in &scene.actions {
             for nb in &action.next {
                 if let Some(goto) = &nb.goto {
@@ -296,6 +380,7 @@ pub(crate) fn collect_scene_facts(
 
         dedup(&mut f.produces);
         dedup(&mut f.requires);
+        dedup(&mut f.consumes);
         dedup(&mut f.goto_targets);
 
         f.binding = binding_for.get(id).cloned();
@@ -306,8 +391,10 @@ pub(crate) fn collect_scene_facts(
         facts.insert(id.clone(), f);
     }
 
-    // 3. Status pass (needs the global produced set + goto set).
-    let producible: HashSet<String> = all_produced;
+    // 3. Status pass (needs the global produced set + goto set). Preset starting
+    // flags are producible without any scene effect, so gates on them are reachable.
+    let mut producible: HashSet<String> = all_produced;
+    producible.extend(starting_flags.iter().cloned());
     for (id, f) in facts.iter_mut() {
         let bound = f.binding.is_some();
         let is_entry = entry_scenes.contains(id);
@@ -369,45 +456,75 @@ fn matches_prefix(signal: &str, prefix: &str) -> bool {
 ///
 /// - `facts` keyed by full `pack::id`.
 /// - `existing` = set of short ids that exist as scene files.
+/// - `starting_flags` = preset-seeded flags; producible without any scene effect,
+///   so a gate on one is not "broken".
 pub(crate) fn reconcile(
     facts: &HashMap<String, SceneFacts>,
     roadmap: &Roadmap,
     existing: &HashSet<String>,
+    starting_flags: &HashSet<String>,
 ) -> StoryMap {
-    // Global "consumed" set: every signal required by any scene gate.
+    // Global "consumed" set: every signal required ANYWHERE (entry gate or an
+    // action/variant condition), so a flag read only inside a choice is not
+    // mis-reported as dangling.
     let mut consumed: HashSet<String> = HashSet::new();
     for f in facts.values() {
-        consumed.extend(f.requires.iter().cloned());
+        consumed.extend(f.consumes.iter().cloned());
     }
-    // Global "producible" set: every signal produced by any scene.
+    // Global "producible" set: every signal produced by any scene, plus the
+    // preset-seeded starting flags (producible without any scene effect).
     let mut producible: HashSet<String> = HashSet::new();
     for f in facts.values() {
         producible.extend(f.produces.iter().cloned());
     }
+    producible.extend(starting_flags.iter().cloned());
 
-    // Assign each scene to the first thread (roadmap order) that claims it.
-    let mut claimed: HashSet<String> = HashSet::new();
-    let mut threads: Vec<Thread> = Vec::new();
-
-    for rt in &roadmap.threads {
-        let mut members: Vec<(String, &SceneFacts)> = Vec::new();
-        for (full, f) in facts {
+    // Assign each scene to a thread. Two passes so explicit `scenes`-list
+    // membership (direct authorial intent) always wins over `flag_prefix`
+    // inference — otherwise an earlier thread's prefix could steal a scene a
+    // later thread lists by name. Within each pass, roadmap order breaks ties.
+    let mut owner: HashMap<String, usize> = HashMap::new();
+    // Pass 1: explicit scenes-list membership.
+    for (ti, rt) in roadmap.threads.iter().enumerate() {
+        for full in facts.keys() {
             let sid = short_id(full).to_string();
-            if claimed.contains(&sid) {
+            if owner.contains_key(&sid) {
                 continue;
             }
-            let by_list = rt.scenes.iter().any(|s| s == &sid);
-            let by_prefix = rt.flag_prefix.as_deref().is_some_and(|p| {
-                f.produces
-                    .iter()
-                    .chain(f.requires.iter())
-                    .any(|sig| matches_prefix(sig, p))
-            });
-            if by_list || by_prefix {
-                claimed.insert(sid.clone());
-                members.push((full.clone(), f));
+            if rt.scenes.iter().any(|s| s == &sid) {
+                owner.insert(sid, ti);
             }
         }
+    }
+    // Pass 2: flag_prefix inference over whatever remains.
+    for (ti, rt) in roadmap.threads.iter().enumerate() {
+        let Some(prefix) = rt.flag_prefix.as_deref() else {
+            continue;
+        };
+        for (full, f) in facts {
+            let sid = short_id(full).to_string();
+            if owner.contains_key(&sid) {
+                continue;
+            }
+            let hit = f
+                .produces
+                .iter()
+                .chain(f.requires.iter())
+                .any(|sig| matches_prefix(sig, prefix));
+            if hit {
+                owner.insert(sid, ti);
+            }
+        }
+    }
+    let claimed: HashSet<String> = owner.keys().cloned().collect();
+
+    let mut threads: Vec<Thread> = Vec::new();
+    for (ti, rt) in roadmap.threads.iter().enumerate() {
+        let mut members: Vec<(String, &SceneFacts)> = facts
+            .iter()
+            .filter(|(full, _)| owner.get(short_id(full)) == Some(&ti))
+            .map(|(full, f)| (full.clone(), f))
+            .collect();
 
         // Order members by signal dependency (Kahn-ish, id-stable tiebreak).
         members.sort_by(|a, b| short_id(&a.0).cmp(short_id(&b.0)));
@@ -623,6 +740,14 @@ pub fn render_markdown(map: &StoryMap) -> String {
     );
     let _ = writeln!(s, "> `packs/base/roadmap.toml`.");
     let _ = writeln!(s);
+    let _ = writeln!(
+        s,
+        "> **Signal model:** connectivity is tracked through game flags and `arc=state` \
+         pairs only. Gates on NPC liking, skills, stats, or arousal are NOT modeled, so a \
+         scene whose only prerequisite is such a gate will show an empty `requires`. Preset \
+         starting flags count as producible."
+    );
+    let _ = writeln!(s);
 
     // Write Next digest.
     let _ = writeln!(s, "## Write Next");
@@ -739,6 +864,39 @@ mod tests {
         undone_scene::script::compile_effect(src, &test_registry(), "test").unwrap()
     }
 
+    fn compile_cond(src: &str) -> undone_scene::script::CompiledScript {
+        undone_scene::script::compile_condition(src, &test_registry(), "test").unwrap()
+    }
+
+    /// A scene whose single action is gated on `action_cond` (no effect). Used to
+    /// prove action-level conditions are counted as consumers.
+    fn scene_with_action_condition(id: &str, action_cond: &str) -> Arc<SceneDefinition> {
+        Arc::new(SceneDefinition {
+            id: id.to_string(),
+            pack: "base".into(),
+            intro_prose: "Intro.".into(),
+            intro_variants: vec![],
+            intro_thoughts: vec![],
+            actions: vec![Action {
+                id: "go".into(),
+                label: "Go".into(),
+                detail: String::new(),
+                condition: Some(compile_cond(action_cond)),
+                prose: String::new(),
+                allow_npc_actions: false,
+                effect: None,
+                next: vec![NextBranch {
+                    condition: None,
+                    goto: None,
+                    slot: None,
+                    finish: true,
+                }],
+                thoughts: vec![],
+            }],
+            npc_actions: vec![],
+        })
+    }
+
     fn scene(id: &str, effect: &str) -> Arc<SceneDefinition> {
         Arc::new(SceneDefinition {
             id: id.to_string(),
@@ -777,7 +935,13 @@ mod tests {
                 r#"gd.setGameFlag("JAKE_MET"); gd.advanceArc("base::arc", "settled");"#,
             ),
         );
-        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
         let a = facts.get("base::a").unwrap();
         assert!(a.produces.contains(&"JAKE_MET".to_string()));
         assert!(a.produces.contains(&"base::arc=settled".to_string()));
@@ -803,7 +967,13 @@ mod tests {
             condition_source: None,
             trigger_source: Some(r#"gd.hasGameFlag("NEVER_SET")"#.into()),
         }];
-        let facts = collect_scene_facts(&scenes, &gates, &bindings, &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &gates,
+            &bindings,
+            &Default::default(),
+            &HashSet::new(),
+        );
         assert_eq!(
             facts.get("base::b").unwrap().status,
             SceneStatus::BrokenGate
@@ -841,7 +1011,13 @@ note = "Recurring affair."
                 r#"gd.setGameFlag("MARCUS_AFFAIR_COOLING");"#,
             ),
         );
-        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
 
         let roadmap = parse_roadmap(
             r#"
@@ -853,7 +1029,7 @@ flag_prefix = "MARCUS_"
         .unwrap();
 
         let existing: HashSet<String> = ["marcus_leverage".to_string()].into_iter().collect();
-        let map = reconcile(&facts, &roadmap, &existing);
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
 
         let marcus = map
             .threads
@@ -880,7 +1056,13 @@ flag_prefix = "MARCUS_"
             "base::lonely".into(),
             scene("base::lonely", r#"w.changeStress(1);"#),
         );
-        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
         let roadmap = parse_roadmap(
             r#"
 [[thread]]
@@ -890,7 +1072,7 @@ flag_prefix = "JAKE_"
         )
         .unwrap();
         let existing: HashSet<String> = ["lonely".to_string()].into_iter().collect();
-        let map = reconcile(&facts, &roadmap, &existing);
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
         assert_eq!(map.orphans, vec!["lonely".to_string()]);
     }
 
@@ -898,7 +1080,13 @@ flag_prefix = "JAKE_"
     fn reconcile_flags_planned_now_exists_drift() {
         // BREAKS IF: a planned scene that now exists stops being promoted as drift.
         let scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
-        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
         let roadmap = parse_roadmap(
             r#"
 [[thread]]
@@ -909,7 +1097,7 @@ planned = ["gym_regular_first"]
         )
         .unwrap();
         let existing: HashSet<String> = ["gym_regular_first".to_string()].into_iter().collect();
-        let map = reconcile(&facts, &roadmap, &existing);
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
         assert!(map
             .drift
             .iter()
@@ -927,12 +1115,18 @@ planned = ["gym_regular_first"]
                 r#"gd.setGameFlag("MARCUS_AFFAIR_COOLING");"#,
             ),
         );
-        let facts = collect_scene_facts(&scenes, &HashMap::new(), &[], &Default::default());
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
         let roadmap =
             parse_roadmap("[[thread]]\nname = \"Marcus affair\"\nflag_prefix = \"MARCUS_\"\n")
                 .unwrap();
         let existing: HashSet<String> = ["marcus_leverage".to_string()].into_iter().collect();
-        let map = reconcile(&facts, &roadmap, &existing);
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
 
         let md = render_markdown(&map);
         assert!(md.contains("# Story Map"));
@@ -960,5 +1154,123 @@ planned = ["gym_regular_first"]
         let json = render_json(&map).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed["threads"][0]["name"], "Jake romance");
+    }
+
+    #[test]
+    fn action_condition_consumes_so_flag_not_dangling() {
+        // BREAKS IF (C1): a flag read only by an action-level condition is
+        // mis-reported as dangling because only entry gates were scanned.
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        scenes.insert(
+            "base::producer".into(),
+            scene("base::producer", r#"gd.setGameFlag("DOOR_OPENED");"#),
+        );
+        scenes.insert(
+            "base::consumer".into(),
+            scene_with_action_condition("base::consumer", r#"gd.hasGameFlag("DOOR_OPENED")"#),
+        );
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
+        assert!(
+            facts
+                .get("base::consumer")
+                .unwrap()
+                .consumes
+                .contains(&"DOOR_OPENED".to_string()),
+            "action-level condition must be recorded in `consumes`"
+        );
+        let roadmap =
+            parse_roadmap("[[thread]]\nname = \"T\"\nscenes = [\"producer\", \"consumer\"]\n")
+                .unwrap();
+        let existing: HashSet<String> = ["producer".to_string(), "consumer".to_string()]
+            .into_iter()
+            .collect();
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
+        assert!(
+            !map.threads[0]
+                .dangling
+                .iter()
+                .any(|d| d.signal == "DOOR_OPENED"),
+            "flag consumed by an action condition must not be dangling"
+        );
+    }
+
+    #[test]
+    fn preset_starting_flag_satisfies_gate_not_broken() {
+        // BREAKS IF (C2): a gate on a preset-seeded flag reads as broken/unreachable
+        // because preset starting flags were not folded into the producible set.
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        scenes.insert(
+            "base::routed".into(),
+            scene("base::routed", r#"w.changeStress(1);"#),
+        );
+        let bindings = vec![undone_scene::scheduler::SceneBinding {
+            scene: "base::routed".into(),
+            slot: "free_time".into(),
+            weight: 1,
+            once_only: false,
+            npc_role: None,
+            desire_scaled: false,
+            condition_source: None,
+            trigger_source: Some(r#"gd.hasGameFlag("ROUTE_X")"#.into()),
+        }];
+        let starting: HashSet<String> = ["ROUTE_X".to_string()].into_iter().collect();
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &bindings,
+            &Default::default(),
+            &starting,
+        );
+        assert_eq!(
+            facts.get("base::routed").unwrap().status,
+            SceneStatus::Reachable
+        );
+        let roadmap = parse_roadmap("[[thread]]\nname = \"T\"\nscenes = [\"routed\"]\n").unwrap();
+        let existing: HashSet<String> = ["routed".to_string()].into_iter().collect();
+        let map = reconcile(&facts, &roadmap, &existing, &starting);
+        assert!(
+            map.threads[0].broken.is_empty(),
+            "gate on a preset starting flag must not be broken"
+        );
+    }
+
+    #[test]
+    fn explicit_scenes_list_beats_earlier_prefix_claim() {
+        // BREAKS IF (I1): an explicitly-listed scene is stolen by an earlier
+        // thread's flag_prefix instead of honoring the author's `scenes` list.
+        let mut scenes: HashMap<String, Arc<SceneDefinition>> = HashMap::new();
+        scenes.insert(
+            "base::locker".into(),
+            scene("base::locker", r#"gd.setGameFlag("GYM_LOCKER");"#),
+        );
+        let facts = collect_scene_facts(
+            &scenes,
+            &HashMap::new(),
+            &[],
+            &Default::default(),
+            &HashSet::new(),
+        );
+        let roadmap = parse_roadmap(
+            "[[thread]]\nname = \"Gym\"\nflag_prefix = \"GYM_\"\n\n[[thread]]\nname = \"Ambient\"\nscenes = [\"locker\"]\n",
+        )
+        .unwrap();
+        let existing: HashSet<String> = ["locker".to_string()].into_iter().collect();
+        let map = reconcile(&facts, &roadmap, &existing, &HashSet::new());
+        let gym = map.threads.iter().find(|t| t.name == "Gym").unwrap();
+        let ambient = map.threads.iter().find(|t| t.name == "Ambient").unwrap();
+        assert!(
+            !gym.scenes.iter().any(|s| s.id == "locker"),
+            "explicit list in a later thread must not be stolen by GYM_ prefix"
+        );
+        assert!(
+            ambient.scenes.iter().any(|s| s.id == "locker"),
+            "explicitly-listed scene must land in its declared thread"
+        );
     }
 }

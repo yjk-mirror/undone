@@ -4,6 +4,8 @@
 > regenerate after content changes. Threads are declared in
 > `packs/base/roadmap.toml`.
 
+> **Signal model:** connectivity is tracked through game flags and `arc=state` pairs only. Gates on NPC liking, skills, stats, or arousal are NOT modeled, so a scene whose only prerequisite is such a gate will show an empty `requires`. Preset starting flags count as producible.
+
 ## Write Next
 
 - **[dangling]** _Opening / first weeks_ — 'RAIN_SHELTER_MET' set by rain_shelter — no scene consumes it (write a follow-up)
@@ -16,10 +18,6 @@
 - **[dangling]** _Opening / first weeks_ — 'FIRST_CLOTHES_MINIMUM' set by workplace_first_clothes — no scene consumes it (write a follow-up)
 - **[dangling]** _Opening / first weeks_ — 'OPENING_CALLBACK_MIRROR_AFTERGLOW' set by opening_callback_mirror_afterglow — no scene consumes it (write a follow-up)
 - **[dangling]** _Opening / first weeks_ — 'FIRST_DAY_DEFERRED_STATUS' set by workplace_first_day — no scene consumes it (write a follow-up)
-- **[dangling]** _Opening / first weeks_ — 'FIRST_DAY_LUNCH_DESK' set by workplace_first_day — no scene consumes it (write a follow-up)
-- **[dangling]** _Opening / first weeks_ — 'STARTED_JOB' set by workplace_first_day — no scene consumes it (write a follow-up)
-- **[dangling]** _Opening / first weeks_ — 'FIRST_DAY_LUNCH_GROUP' set by workplace_first_day — no scene consumes it (write a follow-up)
-- **[dangling]** _Opening / first weeks_ — 'FIRST_DAY_LUNCH_ALONE' set by workplace_first_day — no scene consumes it (write a follow-up)
 - **[dangling]** _Opening / first weeks_ — 'OPENING_CALLBACK_STATUS_ASSERTION' set by opening_callback_status_assertion — no scene consumes it (write a follow-up)
 - **[dangling]** _Opening / first weeks_ — 'LANDLORD_WAITED_HIM_OUT' set by workplace_landlord — no scene consumes it (write a follow-up)
 - **[dangling]** _Opening / first weeks_ — 'LANDLORD_EXPLAINED_BRIEFLY' set by workplace_landlord — no scene consumes it (write a follow-up)
@@ -35,9 +33,9 @@
 - **[dangling]** _Jake romance_ — 'JAKE_ACT_TIED' set by jake_seeks_more — no scene consumes it (write a follow-up)
 - **[dangling]** _Jake romance_ — 'JAKE_ACT_TEASE' set by jake_seeks_more — no scene consumes it (write a follow-up)
 - **[dangling]** _Jake romance_ — 'JAKE_STAYS_OVER' set by jake_stays_over — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_REAL_CONVERSATION' set by work_marcus_coffee — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_TOUCHED' set by work_marcus_drinks — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_ALMOST' set by work_marcus_closet — no scene consumes it (write a follow-up)
+- **[dangling]** _Marcus affair_ — 'MARCUS_APARTMENT' set by marcus_apartment — no scene consumes it (write a follow-up)
+- **[dangling]** _Marcus affair_ — 'MARCUS_REJECTION_MONDAY' set by marcus_monday_rejected — no scene consumes it (write a follow-up)
+- **[dangling]** _Marcus affair_ — 'MARCUS_TALKED' set by marcus_monday_rejected — no scene consumes it (write a follow-up)
 - **[dangling]** _Marcus affair_ — 'MARCUS_ACT_USED' set by marcus_pushes — no scene consumes it (write a follow-up)
 - **[dangling]** _Marcus affair_ — 'MARCUS_ACT_ORAL' set by marcus_pushes — no scene consumes it (write a follow-up)
 - **[dangling]** _Marcus affair_ — 'MARCUS_REPEAT_USED_STAIR' set by marcus_repeat_office — no scene consumes it (write a follow-up)
@@ -46,10 +44,6 @@
 - **[dangling]** _Marcus affair_ — 'MARCUS_TERMS_HERS' set by marcus_leverage — no scene consumes it (write a follow-up)
 - **[dangling]** _Marcus affair_ — 'MARCUS_TERMS_HIS' set by marcus_leverage — no scene consumes it (write a follow-up)
 - **[dangling]** _Marcus affair_ — 'MARCUS_AFFAIR_COOLING' set by marcus_leverage — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_APARTMENT' set by marcus_apartment — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_REJECTION_MONDAY' set by marcus_monday_rejected — no scene consumes it (write a follow-up)
-- **[dangling]** _Marcus affair_ — 'MARCUS_TALKED' set by marcus_monday_rejected — no scene consumes it (write a follow-up)
-- **[dangling]** _Cal / gym_ — 'GYM_CHANGING_ROOM' set by gym_changing_room — no scene consumes it (write a follow-up)
 - **[dangling]** _Cal / gym_ — 'GYM_FIRST_REJECTED' set by gym_regular_first — no scene consumes it (write a follow-up)
 - **[dangling]** _Cal / gym_ — 'GYM_ACT_FULL' set by gym_regular_deepens — no scene consumes it (write a follow-up)
 - **[dangling]** _Cal / gym_ — 'GYM_ACT_HANDS' set by gym_regular_deepens — no scene consumes it (write a follow-up)
@@ -60,36 +54,17 @@
 - **[dangling]** _Ambient life_ — 'BOOKSTORE_VISITED' set by bookstore — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'PARTY_ATTENDED' set by party_invitation — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'PARTY_DANCED' set by party_invitation — no scene consumes it (write a follow-up)
-- **[dangling]** _Ambient life_ — 'PARTY_STRANGER_SLEPT' set by party_stranger_after — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'BAR_STRANGER_WALKED' set by bar_closing_time — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'BAR_STRANGER_MET' set by bar_closing_time — no scene consumes it (write a follow-up)
-- **[dangling]** _Ambient life_ — 'BAR_STRANGER_SLEPT' set by bar_stranger_night — no scene consumes it (write a follow-up)
+- **[dangling]** _Ambient life_ — 'GYM_CHANGING_ROOM' set by gym_changing_room — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'DRINKS_WITH_MARCUS' set by work_friday — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'LATE_OFFICE_MARCUS' set by work_late — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'LUNCH_WITH_MARCUS' set by work_lunch — no scene consumes it (write a follow-up)
+- **[dangling]** _Ambient life_ — 'MARCUS_REAL_CONVERSATION' set by work_marcus_coffee — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'REVIEWED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)
 - **[dangling]** _Ambient life_ — 'DECLINED_MARCUS_SPEC' set by work_marcus_favor — no scene consumes it (write a follow-up)
-- **[broken]** _Opening / first weeks_ — workplace_arrival gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — workplace_first_night gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — opening_callback_first_week_solitude gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — workplace_first_clothes gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — opening_callback_mirror_afterglow gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — workplace_first_day gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — opening_callback_status_assertion gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — workplace_landlord gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Opening / first weeks_ — opening_callback_transactional_defense gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_arrival gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_dorm gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_orientation gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_call_home gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_library gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_study_session gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_dining_hall gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_theo_night gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_theo_morning gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Theo / campus_ — campus_dining_after_theo gates on 'ROUTE_CAMPUS' which no scene produces (fix gate or write producer)
-- **[broken]** _Ambient life_ — workplace_work_meeting gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
-- **[broken]** _Ambient life_ — workplace_evening gates on 'ROUTE_WORKPLACE' which no scene produces (fix gate or write producer)
+- **[dangling]** _Ambient life_ — 'MARCUS_TOUCHED' set by work_marcus_drinks — no scene consumes it (write a follow-up)
+- **[dangling]** _Ambient life_ — 'MARCUS_ALMOST' set by work_marcus_closet — no scene consumes it (write a follow-up)
 
 ## Opening / first weeks (15 scenes)
 _Arrival, the workplace-opening arc, settling in, the first callbacks._
@@ -103,34 +78,34 @@ _Arrival, the workplace-opening arc, settling in, the first callbacks._
 - `work_standup` [work · repeatable]
   - ← requires: base::workplace_opening=settled
   - → sets: MARCUS_DIALOGUE_1
-- `workplace_arrival` [workplace_opening · once] ⚠ broken-gate
+- `workplace_arrival` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE
   - → sets: OPENING_ID_PREEMPTED, OPENING_ID_WAITED_OUT, base::workplace_opening=arrived
-- `workplace_first_night` [workplace_opening · once] ⚠ broken-gate
+- `workplace_first_night` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=arrived
   - → sets: FIRST_NIGHT_CRASHED, base::workplace_opening=week_one, FIRST_NIGHT_RESEARCHED, FIRST_NIGHT_CALLED_BACK_HOME, FIRST_NIGHT_STAGED_TOMORROW
-- `opening_callback_first_week_solitude` [free_time · once] ⚠ broken-gate
+- `opening_callback_first_week_solitude` [free_time · once]
   - ← requires: ROUTE_WORKPLACE, FIRST_NIGHT_CRASHED, FIRST_NIGHT_RESEARCHED, FIRST_NIGHT_STAGED_TOMORROW, base::workplace_opening=settled
   - → sets: OPENING_CALLBACK_FIRST_WEEK_SOLITUDE
-- `workplace_first_clothes` [workplace_opening · once] ⚠ broken-gate
+- `workplace_first_clothes` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=week_one
   - → sets: FIRST_CLOTHES_FUNCTIONAL, base::workplace_opening=clothes_done, FIRST_CLOTHES_MIRROR, FIRST_CLOTHES_ASKED_HELP, FIRST_CLOTHES_MINIMUM
-- `opening_callback_mirror_afterglow` [free_time · once] ⚠ broken-gate
+- `opening_callback_mirror_afterglow` [free_time · once]
   - ← requires: ROUTE_WORKPLACE, FIRST_CLOTHES_MIRROR, FIRST_CLOTHES_ASKED_HELP, FIRST_CLOTHES_FUNCTIONAL, base::workplace_opening=settled
   - → sets: OPENING_CALLBACK_MIRROR_AFTERGLOW
-- `workplace_first_day` [workplace_opening · once] ⚠ broken-gate
+- `workplace_first_day` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=clothes_done
   - → sets: FIRST_DAY_ASSERTED_STATUS, FIRST_DAY_DEFERRED_STATUS, FIRST_DAY_REDIRECTED_STATUS, FIRST_DAY_LUNCH_DESK, STARTED_JOB, base::workplace_opening=working, FIRST_DAY_LUNCH_GROUP, FIRST_DAY_LUNCH_ALONE
-- `opening_callback_status_assertion` [free_time · once] ⚠ broken-gate
+- `opening_callback_status_assertion` [free_time · once]
   - ← requires: ROUTE_WORKPLACE, FIRST_DAY_ASSERTED_STATUS, FIRST_DAY_REDIRECTED_STATUS, base::workplace_opening=settled
   - → sets: OPENING_CALLBACK_STATUS_ASSERTION
-- `workplace_landlord` [workplace_opening · once] ⚠ broken-gate
+- `workplace_landlord` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=arrived
   - → sets: MET_LANDLORD, LANDLORD_WAITED_HIM_OUT, LANDLORD_EXPLAINED_BRIEFLY, LANDLORD_KEPT_TRANSACTIONAL
 - `landlord_repair` [free_time · once]
   - ← requires: MET_LANDLORD
   - → sets: LANDLORD_REPAIR
-- `opening_callback_transactional_defense` [free_time · once] ⚠ broken-gate
+- `opening_callback_transactional_defense` [free_time · once]
   - ← requires: ROUTE_WORKPLACE, LANDLORD_KEPT_TRANSACTIONAL, base::workplace_opening=settled
   - → sets: OPENING_CALLBACK_TRANSACTIONAL_DEFENSE
 - ⚠ **dangling (write-next):**
@@ -144,25 +119,11 @@ _Arrival, the workplace-opening arc, settling in, the first callbacks._
   - `FIRST_CLOTHES_MINIMUM` set by `workplace_first_clothes`, consumed by nothing
   - `OPENING_CALLBACK_MIRROR_AFTERGLOW` set by `opening_callback_mirror_afterglow`, consumed by nothing
   - `FIRST_DAY_DEFERRED_STATUS` set by `workplace_first_day`, consumed by nothing
-  - `FIRST_DAY_LUNCH_DESK` set by `workplace_first_day`, consumed by nothing
-  - `STARTED_JOB` set by `workplace_first_day`, consumed by nothing
-  - `FIRST_DAY_LUNCH_GROUP` set by `workplace_first_day`, consumed by nothing
-  - `FIRST_DAY_LUNCH_ALONE` set by `workplace_first_day`, consumed by nothing
   - `OPENING_CALLBACK_STATUS_ASSERTION` set by `opening_callback_status_assertion`, consumed by nothing
   - `LANDLORD_WAITED_HIM_OUT` set by `workplace_landlord`, consumed by nothing
   - `LANDLORD_EXPLAINED_BRIEFLY` set by `workplace_landlord`, consumed by nothing
   - `LANDLORD_REPAIR` set by `landlord_repair`, consumed by nothing
   - `OPENING_CALLBACK_TRANSACTIONAL_DEFENSE` set by `opening_callback_transactional_defense`, consumed by nothing
-- ⚠ **broken gates:**
-  - `workplace_arrival` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `workplace_first_night` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `opening_callback_first_week_solitude` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `workplace_first_clothes` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `opening_callback_mirror_afterglow` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `workplace_first_day` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `opening_callback_status_assertion` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `workplace_landlord` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `opening_callback_transactional_defense` gates on `ROUTE_WORKPLACE` (produced by nothing)
 
 ## Jake romance (12 scenes)
 _Met at the coffee shop -> dating -> intimacy -> domesticity -> she-seeks._
@@ -212,21 +173,15 @@ _Met at the coffee shop -> dating -> intimacy -> domesticity -> she-seeks._
   - `JAKE_ACT_TEASE` set by `jake_seeks_more`, consumed by nothing
   - `JAKE_STAYS_OVER` set by `jake_stays_over`, consumed by nothing
 
-## Marcus affair (10 scenes)
+## Marcus affair (5 scenes)
 _Workplace tension -> affair -> escalation -> leverage cost -> cooling._
 
-- `work_marcus_coffee` [work · repeatable]
-  - ← requires: FIRST_MEETING_DONE, base::workplace_opening=settled
-  - → sets: MARCUS_REAL_CONVERSATION
-- `work_marcus_late` [work · repeatable]
-  - ← requires: FIRST_MEETING_DONE, base::workplace_opening=settled
-  - → sets: MARCUS_LATE_NIGHT
-- `work_marcus_drinks` [work · once]
-  - ← requires: MARCUS_LATE_NIGHT, base::workplace_opening=settled
-  - → sets: MARCUS_DRINKS, MARCUS_TOUCHED
-- `work_marcus_closet` [work · once]
-  - ← requires: MARCUS_DRINKS, base::workplace_opening=settled
-  - → sets: MARCUS_INTIMATE, MARCUS_ALMOST
+- `marcus_apartment` [work · once]
+  - ← requires: MARCUS_AFTERMATH, base::workplace_opening=settled
+  - → sets: MARCUS_APARTMENT, MARCUS_REJECTED
+- `marcus_monday_rejected` [work · once]
+  - ← requires: MARCUS_REJECTED, base::workplace_opening=settled
+  - → sets: MARCUS_REJECTION_MONDAY, MARCUS_TALKED
 - `marcus_pushes` [work · repeatable]
   - ← requires: MARCUS_INTIMATE, base::workplace_opening=settled
   - → sets: MARCUS_ACT_USED, MARCUS_ACT_ORAL
@@ -236,19 +191,10 @@ _Workplace tension -> affair -> escalation -> leverage cost -> cooling._
 - `marcus_leverage` [work · repeatable]
   - ← requires: MARCUS_INTIMATE, MARCUS_REPEAT_USED_CONF, base::workplace_opening=settled
   - → sets: MARCUS_LEVERAGE, MARCUS_TERMS_HERS, MARCUS_TERMS_HIS, MARCUS_AFFAIR_COOLING
-- `work_marcus_aftermath` [work · once]
-  - ← requires: MARCUS_INTIMATE, base::workplace_opening=settled
-  - → sets: MARCUS_AFTERMATH
-- `marcus_apartment` [work · once]
-  - ← requires: MARCUS_AFTERMATH, base::workplace_opening=settled
-  - → sets: MARCUS_APARTMENT, MARCUS_REJECTED
-- `marcus_monday_rejected` [work · once]
-  - ← requires: MARCUS_REJECTED, base::workplace_opening=settled
-  - → sets: MARCUS_REJECTION_MONDAY, MARCUS_TALKED
 - ⚠ **dangling (write-next):**
-  - `MARCUS_REAL_CONVERSATION` set by `work_marcus_coffee`, consumed by nothing
-  - `MARCUS_TOUCHED` set by `work_marcus_drinks`, consumed by nothing
-  - `MARCUS_ALMOST` set by `work_marcus_closet`, consumed by nothing
+  - `MARCUS_APARTMENT` set by `marcus_apartment`, consumed by nothing
+  - `MARCUS_REJECTION_MONDAY` set by `marcus_monday_rejected`, consumed by nothing
+  - `MARCUS_TALKED` set by `marcus_monday_rejected`, consumed by nothing
   - `MARCUS_ACT_USED` set by `marcus_pushes`, consumed by nothing
   - `MARCUS_ACT_ORAL` set by `marcus_pushes`, consumed by nothing
   - `MARCUS_REPEAT_USED_STAIR` set by `marcus_repeat_office`, consumed by nothing
@@ -257,16 +203,10 @@ _Workplace tension -> affair -> escalation -> leverage cost -> cooling._
   - `MARCUS_TERMS_HERS` set by `marcus_leverage`, consumed by nothing
   - `MARCUS_TERMS_HIS` set by `marcus_leverage`, consumed by nothing
   - `MARCUS_AFFAIR_COOLING` set by `marcus_leverage`, consumed by nothing
-  - `MARCUS_APARTMENT` set by `marcus_apartment`, consumed by nothing
-  - `MARCUS_REJECTION_MONDAY` set by `marcus_monday_rejected`, consumed by nothing
-  - `MARCUS_TALKED` set by `marcus_monday_rejected`, consumed by nothing
 
-## Cal / gym (5 scenes)
+## Cal / gym (4 scenes)
 _Gym-regular power-inversion + submission ladder._
 
-- `gym_changing_room` [free_time · once]
-  - ← requires: base::workplace_opening=settled
-  - → sets: GYM_CHANGING_ROOM
 - `gym_regular_intro` [free_time · once]
   - ← requires: base::workplace_opening=settled
   - → sets: MET_GYM_REGULAR
@@ -279,7 +219,6 @@ _Gym-regular power-inversion + submission ladder._
 - `gym_regular_recurs` [free_time · repeatable]
   - ← requires: MET_GYM_REGULAR
 - ⚠ **dangling (write-next):**
-  - `GYM_CHANGING_ROOM` set by `gym_changing_room`, consumed by nothing
   - `GYM_FIRST_REJECTED` set by `gym_regular_first`, consumed by nothing
   - `GYM_ACT_FULL` set by `gym_regular_deepens`, consumed by nothing
   - `GYM_ACT_HANDS` set by `gym_regular_deepens`, consumed by nothing
@@ -287,50 +226,39 @@ _Gym-regular power-inversion + submission ladder._
 ## Theo / campus (10 scenes)
 _Campus route: orientation -> Theo -> morning-after -> public visibility._
 
-- `campus_arrival` [campus_opening · once] ⚠ broken-gate
+- `campus_arrival` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS
   - → sets: base::campus_opening=arrived
-- `campus_dorm` [campus_opening · once] ⚠ broken-gate
+- `campus_dorm` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, base::campus_opening=arrived
   - → sets: base::campus_opening=orientation
-- `campus_orientation` [campus_opening · once] ⚠ broken-gate
+- `campus_orientation` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, base::campus_opening=orientation
   - → sets: base::campus_opening=dorm_life
-- `campus_call_home` [campus_opening · once] ⚠ broken-gate
+- `campus_call_home` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, base::campus_opening=dorm_life
   - → sets: CALL_HOME_DONE
-- `campus_library` [campus_opening · once] ⚠ broken-gate
+- `campus_library` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, base::campus_opening=dorm_life
   - → sets: MET_THEO
-- `campus_study_session` [campus_opening · once] ⚠ broken-gate
+- `campus_study_session` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, base::campus_opening=dorm_life
   - → sets: STUDY_SESSION_DONE
-- `campus_dining_hall` [campus_opening · once] ⚠ broken-gate
+- `campus_dining_hall` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, STUDY_SESSION_DONE, base::campus_opening=dorm_life
   - → sets: base::campus_opening=first_week
-- `campus_theo_night` [campus_opening · once] ⚠ broken-gate
+- `campus_theo_night` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, MET_THEO, base::campus_opening=first_week
   - → sets: THEO_INTIMATE
-- `campus_theo_morning` [campus_opening · once] ⚠ broken-gate
+- `campus_theo_morning` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, THEO_INTIMATE
   - → sets: THEO_MORNING_AFTER
-- `campus_dining_after_theo` [campus_opening · once] ⚠ broken-gate
+- `campus_dining_after_theo` [campus_opening · once]
   - ← requires: ROUTE_CAMPUS, THEO_MORNING_AFTER
   - → sets: DINING_AFTER_THEO
 - ⚠ **dangling (write-next):**
   - `CALL_HOME_DONE` set by `campus_call_home`, consumed by nothing
   - `DINING_AFTER_THEO` set by `campus_dining_after_theo`, consumed by nothing
-- ⚠ **broken gates:**
-  - `campus_arrival` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_dorm` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_orientation` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_call_home` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_library` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_study_session` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_dining_hall` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_theo_night` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_theo_morning` gates on `ROUTE_CAMPUS` (produced by nothing)
-  - `campus_dining_after_theo` gates on `ROUTE_CAMPUS` (produced by nothing)
 
 ## Desire / looping adult (2 scenes)
 _The recurring need-state: release valves and ambushes._
@@ -340,7 +268,7 @@ _The recurring need-state: release valves and ambushes._
 - `desire_solo_night` [free_time · repeatable]
   - ← requires: base::workplace_opening=settled
 
-## Ambient life (20 scenes)
+## Ambient life (26 scenes)
 _Texture scenes not owned by a single arc. Reassign to a thread as arcs grow._
 
 - `bad_date` [free_time · once]
@@ -359,10 +287,10 @@ _Texture scenes not owned by a single arc. Reassign to a thread as arcs grow._
   - → sets: PARTY_STRANGER_SLEPT
 - `shopping_mall` [free_time · repeatable]
 - `weekend_morning` [free_time · repeatable]
-- `workplace_work_meeting` [workplace_opening · once] ⚠ broken-gate
+- `workplace_work_meeting` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=working
   - → sets: FIRST_MEETING_DONE
-- `workplace_evening` [workplace_opening · once] ⚠ broken-gate
+- `workplace_evening` [workplace_opening · once]
   - ← requires: ROUTE_WORKPLACE, base::workplace_opening=working, FIRST_MEETING_DONE
   - → sets: base::workplace_opening=settled
 - `bar_closing_time` [free_time · repeatable]
@@ -371,6 +299,9 @@ _Texture scenes not owned by a single arc. Reassign to a thread as arcs grow._
 - `bar_stranger_night` [free_time · once]
   - ← requires: BAR_STRANGER_INVITED
   - → sets: BAR_STRANGER_SLEPT
+- `gym_changing_room` [free_time · once]
+  - ← requires: base::workplace_opening=settled
+  - → sets: GYM_CHANGING_ROOM
 - `work_corridor` [work · repeatable]
   - ← requires: base::workplace_opening=settled
 - `work_friday` [work · repeatable]
@@ -382,25 +313,39 @@ _Texture scenes not owned by a single arc. Reassign to a thread as arcs grow._
 - `work_lunch` [work · repeatable]
   - ← requires: base::workplace_opening=settled
   - → sets: LUNCH_WITH_MARCUS
+- `work_marcus_coffee` [work · repeatable]
+  - ← requires: FIRST_MEETING_DONE, base::workplace_opening=settled
+  - → sets: MARCUS_REAL_CONVERSATION
 - `work_marcus_favor` [work · repeatable]
   - ← requires: FIRST_MEETING_DONE, base::workplace_opening=settled
   - → sets: REVIEWED_MARCUS_SPEC, DECLINED_MARCUS_SPEC
+- `work_marcus_late` [work · repeatable]
+  - ← requires: FIRST_MEETING_DONE, base::workplace_opening=settled
+  - → sets: MARCUS_LATE_NIGHT
+- `work_marcus_drinks` [work · once]
+  - ← requires: MARCUS_LATE_NIGHT, base::workplace_opening=settled
+  - → sets: MARCUS_DRINKS, MARCUS_TOUCHED
+- `work_marcus_closet` [work · once]
+  - ← requires: MARCUS_DRINKS, base::workplace_opening=settled
+  - → sets: MARCUS_INTIMATE, MARCUS_ALMOST
+- `work_marcus_aftermath` [work · once]
+  - ← requires: MARCUS_INTIMATE, base::workplace_opening=settled
+  - → sets: MARCUS_AFTERMATH
 - ⚠ **dangling (write-next):**
   - `BAD_DATE` set by `bad_date`, consumed by nothing
   - `BAD_DATE_DIRECT` set by `bad_date`, consumed by nothing
   - `BOOKSTORE_VISITED` set by `bookstore`, consumed by nothing
   - `PARTY_ATTENDED` set by `party_invitation`, consumed by nothing
   - `PARTY_DANCED` set by `party_invitation`, consumed by nothing
-  - `PARTY_STRANGER_SLEPT` set by `party_stranger_after`, consumed by nothing
   - `BAR_STRANGER_WALKED` set by `bar_closing_time`, consumed by nothing
   - `BAR_STRANGER_MET` set by `bar_closing_time`, consumed by nothing
-  - `BAR_STRANGER_SLEPT` set by `bar_stranger_night`, consumed by nothing
+  - `GYM_CHANGING_ROOM` set by `gym_changing_room`, consumed by nothing
   - `DRINKS_WITH_MARCUS` set by `work_friday`, consumed by nothing
   - `LATE_OFFICE_MARCUS` set by `work_late`, consumed by nothing
   - `LUNCH_WITH_MARCUS` set by `work_lunch`, consumed by nothing
+  - `MARCUS_REAL_CONVERSATION` set by `work_marcus_coffee`, consumed by nothing
   - `REVIEWED_MARCUS_SPEC` set by `work_marcus_favor`, consumed by nothing
   - `DECLINED_MARCUS_SPEC` set by `work_marcus_favor`, consumed by nothing
-- ⚠ **broken gates:**
-  - `workplace_work_meeting` gates on `ROUTE_WORKPLACE` (produced by nothing)
-  - `workplace_evening` gates on `ROUTE_WORKPLACE` (produced by nothing)
+  - `MARCUS_TOUCHED` set by `work_marcus_drinks`, consumed by nothing
+  - `MARCUS_ALMOST` set by `work_marcus_closet`, consumed by nothing
 
