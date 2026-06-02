@@ -14,7 +14,7 @@
 use super::ArgShape as Arg;
 use super::Contexts;
 use super::Receiver::{self as R};
-use super::{read, Accessor, MethodDescriptor, ReadFn};
+use super::{read, write, Accessor, MethodDescriptor, ReadFn, WriteFn};
 use crate::script::validate::IdKind;
 
 /// Compact read-row constructor.
@@ -34,8 +34,21 @@ const fn rd(
     }
 }
 
+/// Compact write-row constructor (always `Contexts::WRITE`).
+const fn wr(receiver: R, name: &'static str, args: Arg, f: WriteFn) -> MethodDescriptor {
+    MethodDescriptor {
+        receiver,
+        name,
+        args,
+        contexts: Contexts::WRITE,
+        accessor: Accessor::Write(f),
+    }
+}
+
 const READ: Contexts = Contexts::READ;
 const COND: Contexts = Contexts::COND;
+const INT: Arg = Arg::Int { i8_range: false };
+const INT8: Arg = Arg::Int { i8_range: true };
 
 pub static REGISTRY: &[MethodDescriptor] = &[
     // ── w (player) reads ──────────────────────────────────────────────────────
@@ -566,5 +579,125 @@ pub static REGISTRY: &[MethodDescriptor] = &[
     ),
     // ── scene (scene-local flags) reads ───────────────────────────────────────
     rd(R::Scene, "hasFlag", Arg::Str, READ, read::scene::has_flag),
-    // Write rows added in Phase D.
+    // ── w (player) writes ─────────────────────────────────────────────────────
+    wr(R::W, "changeStress", INT, write::player::change_stress),
+    wr(R::W, "changeMoney", INT, write::player::change_money),
+    wr(R::W, "changeAnxiety", INT, write::player::change_anxiety),
+    wr(
+        R::W,
+        "changeComposure",
+        INT,
+        write::player::change_composure,
+    ),
+    wr(R::W, "addArousal", INT8, write::player::add_arousal),
+    wr(R::W, "changeAlcohol", INT8, write::player::change_alcohol),
+    wr(
+        R::W,
+        "skillIncrease",
+        Arg::IdInt(IdKind::Skill),
+        write::player::skill_increase,
+    ),
+    wr(
+        R::W,
+        "addTrait",
+        Arg::Id(IdKind::Trait),
+        write::player::add_trait,
+    ),
+    wr(
+        R::W,
+        "removeTrait",
+        Arg::Id(IdKind::Trait),
+        write::player::remove_trait,
+    ),
+    wr(R::W, "addStuff", Arg::Str, write::player::add_stuff),
+    wr(R::W, "removeStuff", Arg::Str, write::player::remove_stuff),
+    wr(R::W, "setVirgin", Arg::StrOpt, write::player::set_virgin),
+    wr(R::W, "setPartner", Arg::Str, write::player::set_partner),
+    wr(R::W, "addFriend", Arg::Str, write::player::add_friend),
+    // ── gd (game data) writes ─────────────────────────────────────────────────
+    wr(
+        R::Gd,
+        "setGameFlag",
+        Arg::Str,
+        write::game_data::set_game_flag,
+    ),
+    wr(
+        R::Gd,
+        "removeGameFlag",
+        Arg::Str,
+        write::game_data::remove_game_flag,
+    ),
+    wr(
+        R::Gd,
+        "addStat",
+        Arg::IdInt(IdKind::Stat),
+        write::game_data::add_stat,
+    ),
+    wr(
+        R::Gd,
+        "setStat",
+        Arg::IdInt(IdKind::Stat),
+        write::game_data::set_stat,
+    ),
+    wr(
+        R::Gd,
+        "setJobTitle",
+        Arg::Str,
+        write::game_data::set_job_title,
+    ),
+    wr(R::Gd, "addDesire", INT, write::game_data::add_desire),
+    wr(R::Gd, "setDesire", INT, write::game_data::set_desire),
+    wr(R::Gd, "advanceTime", INT, write::game_data::advance_time),
+    // advanceArc(arc, state) — Id(Arc) is the only 2-source-arg Id (state validated).
+    wr(
+        R::Gd,
+        "advanceArc",
+        Arg::Id(IdKind::Arc),
+        write::game_data::advance_arc,
+    ),
+    wr(
+        R::Gd,
+        "failRedCheck",
+        Arg::Id(IdKind::Skill),
+        write::game_data::fail_red_check,
+    ),
+    // ── scene (scene-local flags) writes ──────────────────────────────────────
+    wr(R::Scene, "setFlag", Arg::Str, write::scene::set_flag),
+    wr(R::Scene, "removeFlag", Arg::Str, write::scene::remove_flag),
+    // ── npc(ref).* writes — ref injected as ApiArg index 0 by the adapter ──────
+    // The constructor `npc(ref)` is gate-visible here but handled specially by the
+    // Rhai adapter (no-op accessor; see write::npc::npc_ctor).
+    wr(R::Npc, "npc", Arg::Str, write::npc::npc_ctor),
+    wr(R::Npc, "addLiking", INT8, write::npc::add_liking),
+    wr(R::Npc, "addLove", INT8, write::npc::add_love),
+    wr(R::Npc, "addWLiking", INT8, write::npc::add_w_liking),
+    wr(R::Npc, "setAttraction", INT8, write::npc::set_attraction),
+    wr(R::Npc, "setFlag", Arg::Str, write::npc::set_flag),
+    wr(
+        R::Npc,
+        "addTrait",
+        Arg::Id(IdKind::NpcTrait),
+        write::npc::add_trait,
+    ),
+    wr(
+        R::Npc,
+        "setRelationship",
+        Arg::Str,
+        write::npc::set_relationship,
+    ),
+    wr(R::Npc, "setBehaviour", Arg::Str, write::npc::set_behaviour),
+    wr(
+        R::Npc,
+        "setContactable",
+        Arg::Bool,
+        write::npc::set_contactable,
+    ),
+    wr(
+        R::Npc,
+        "addSexualActivity",
+        Arg::Str,
+        write::npc::add_sexual_activity,
+    ),
+    wr(R::Npc, "setRole", Arg::Str, write::npc::set_role),
+    wr(R::Npc, "setName", Arg::Str, write::npc::set_name),
 ];

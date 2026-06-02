@@ -15,6 +15,7 @@ use crate::script::validate::IdKind;
 
 pub mod read;
 pub mod table;
+pub mod write;
 
 /// A value produced by a read accessor, convertible to both script backends.
 #[derive(Clone, Debug, PartialEq)]
