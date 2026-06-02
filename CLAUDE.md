@@ -158,6 +158,13 @@ them directly (Windows `.exe` paths) — there's a `tools/mcp-launcher.sh` cross
 wrapper for non-Windows use, but the checked-in config uses direct paths. The game
 workspace and the devtools workspace share nothing at the Cargo level.
 
+> **MCP servers failed to connect after a break?** `tools/target/release/` is a Cargo
+> build-artifact dir. Anything that wipes `target/` removes the MCP binaries and the
+> failure is silent (servers just won't connect). The usual culprit is the
+> `DevClean-WeeklyScan` scheduled task, which auto-deletes `target/` dirs in projects
+> idle >7 days. To restore: run `pwsh tools/rebuild-mcp.ps1` (builds + verifies all 5
+> binaries), then **restart the Claude Code session** so the servers reconnect.
+
 ## Design Philosophy
 
 - **Platform, not product.** The engine is setting-agnostic. All content — traits,
