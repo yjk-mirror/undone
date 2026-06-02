@@ -308,6 +308,22 @@ prose = """...result prose..."""
 > need-state — intended (time passing = wanting builds), but factor it in when authoring a
 > scene that jumps the clock and then reads `gd.desire()`.
 
+> **Method surface = one source of truth.** Every content-facing method —
+> `w`/`gd`/`m`/`f`/`role`/`scene` reads and `w.*`/`gd.*`/`scene.*`/`npc(ref).*` effect
+> mutators — is declared once in `crates/undone-scene/src/script/api/table.rs`
+> (`static REGISTRY`). The Rhai engines, the load-time static gate, the Minijinja prose
+> views, and the prose load gate are all driven from that table, so the surface can
+> never drift between conditions, effects, and prose. Adding a method = one `REGISTRY`
+> row + its accessor fn.
+>
+> **Prose is gated at load too.** Prose templates (intro/variant/thought/action/
+> npc-action prose, and preset discovery beats) are scanned at pack load: every
+> `receiver.method(...)` call-site must be a known, **prose-callable** method with
+> resolvable string-literal content ids (single- AND double-quoted ids accepted). An
+> unknown/mis-contexted method or bad id fails at load, not when a player reaches that
+> branch. `checkSkill`/`checkSkillRed` are **condition-only** (they roll RNG) and are
+> rejected in prose; write mutators are rejected in both conditions and prose.
+
 Tagged by `type` (legacy operation reference):
 
 **PC state**

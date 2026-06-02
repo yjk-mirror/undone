@@ -112,7 +112,7 @@ export CARGO_TARGET_DIR=/path/to/undone/target
 | Language | Rust (workspace, 7 crates) |
 | GUI | floem (reactive, Lapce team, single binary) |
 | Template rendering | minijinja (Jinja2 syntax) |
-| Scene conditions | Custom recursive descent parser (validated at load time) |
+| Scene conditions & effects | Embedded Rhai (load-time static gate; one `REGISTRY` is the method-surface source of truth) |
 | Serialisation | serde + serde_json + toml |
 | NPC storage | slotmap (stable typed keys) |
 | String interning | lasso (TraitId/SkillId/etc as u32) |
@@ -127,8 +127,7 @@ undone/
 │   ├── undone-domain/       # pure types — no IO, no game logic
 │   ├── undone-world/        # World struct, all mutable game state
 │   ├── undone-packs/        # pack loading, manifest parsing, content registry
-│   ├── undone-expr/         # custom expression parser & evaluator
-│   ├── undone-scene/        # scene execution engine
+│   ├── undone-scene/        # scene execution engine (Rhai scripting + api::REGISTRY)
 │   ├── undone-save/         # serde save / load
 │   └── undone-ui/           # floem views and widgets
 ├── packs/
@@ -485,9 +484,11 @@ undone-domain
     ↑
 undone-world ← undone-packs
     ↑               ↑
-undone-expr    undone-save
-    ↑
-undone-scene
-    ↑
-undone-ui
+undone-save     undone-scene
+                    ↑
+                undone-ui
 ```
+
+(`undone-scene` depends on `undone-world`, `undone-packs`, and `undone-save`.
+Conditions/effects are embedded **Rhai**, validated at load by the static gate in
+`undone-scene::script::validate`; the legacy `undone-expr` crate is deleted.)
