@@ -51,6 +51,8 @@ pub struct BoundActiveNpcSnapshot {
 pub struct PlayerSummarySnapshot {
     pub name: String,
     pub femininity: i32,
+    pub composure: i32,
+    pub desire: i32,
     pub money: i32,
     pub stress: i32,
     pub anxiety: i32,
@@ -120,6 +122,12 @@ pub fn snapshot_runtime(signals: AppSignals, gs: &GameState) -> RuntimeSnapshot 
         player: PlayerSummarySnapshot {
             name: player.name,
             femininity: player.femininity,
+            composure: gs
+                .registry
+                .composure_skill()
+                .map(|id| gs.world.player.skill(id))
+                .unwrap_or(0),
+            desire: gs.world.game_data.desire(),
             money: player.money,
             stress: player.stress,
             anxiety: player.anxiety,
