@@ -95,7 +95,7 @@ The shower is long and hot and you don't rush it. The shampoo, the conditioner, 
 
 You stay in until the water starts to cool. The mirror is fogged when you step out. Towel. The fog clears in streaks and you stand there for a second, dripping, and the woman in the mirror stands there too.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 The mirror clears and she's there. Wet hair, flushed skin, the particular look of someone who just had a very good shower. You hold your own gaze for a moment. The woman looking back is not performing. She's just looking.
 {% endif %}
 """

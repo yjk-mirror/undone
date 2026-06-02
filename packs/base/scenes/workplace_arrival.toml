@@ -29,7 +29,7 @@ Jet bridge. Terminal. Then the concourse — big, bright, the kind of institutio
 
 Your carry-on rolls behind you on its wheels. At least that part is the same size.
 
-{% if w.hasTrait("BEAUTIFUL") or w.hasTrait("OBJECTIFYING") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") or w.hasTrait("OBJECTIFYING") %}
 By the time you reach the midpoint of the concourse a man coming the other way has tracked you for three full seconds. Not stopping. Not doing anything. Just the slow pan of his attention moving across you as he passes.
 
 {% if w.hasTrait("OBJECTIFYING") %}
@@ -113,7 +113,7 @@ The train arrives with a screech and a slap of displaced air. You board into a h
 
 You take a seat near the door. The bag stays in your lap because you are not reaching for the overhead rack in public unless you have to.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 A man across the aisle looks up when you sit down. Two seconds, maybe less. A quick scan that moves from your face to your chest and back. Then he's on his phone again.
 {% endif %}
 

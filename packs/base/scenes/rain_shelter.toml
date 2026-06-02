@@ -14,7 +14,7 @@ The sky opened up three blocks from your apartment. Not a drizzle — the kind o
 
 The bus shelter on Clement Ave is the nearest cover. Glass walls, metal bench, an ad for a personal injury lawyer peeling off the back panel. A man is already in there — mid-twenties, decent jacket, one of those compact umbrellas people in this city carry.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He looks up when you step in. Holds the look a beat longer than he needs to.
 {% else %}
 He glances up when you step in. Quick read, back to his phone.
@@ -127,9 +127,9 @@ He looks at the rain. Then at you. Then at the umbrella leaning against the benc
 
 "Rain's not letting up. I've got this, if you want."
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He says it like the offer was already decided before he opened his mouth.
-{% elif w.hasTrait("PLAIN") %}
+{% elif w.getAppearance() == "Plain" %}
 It takes him a beat to commit to the ask.
 {% endif %}
 """

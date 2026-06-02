@@ -13,7 +13,7 @@ The man ahead of you turns around. Just the half-turn, enough to see you. He's m
 
 {% if w.hasTrait("SHY") %}
 You look at the menu board. You already know what you want, but the menu board is there and it's easier than whatever this is.
-{% elif w.hasTrait("BEAUTIFUL") %}
+{% elif (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He clocks you in that way — the quick take, the small pause, something shifting behind his eyes. He looks away first. You face forward.
 {% elif w.hasTrait("BITCHY") %}
 He looks you over, a beat too long. You look back with the flat expression of someone who has been looked at before and isn't performing a reaction about it.
@@ -152,9 +152,9 @@ He's sitting at a table by the window now, coffee in hand. He catches your eye a
 
 "You should sit," he says. Not a demand. Not a question, either. The empty chair across from him is already pulled out, like he planned this or like he's just optimistic.
 
-{% if w.hasTrait("PLAIN") %}
+{% if w.getAppearance() == "Plain" %}
 He says it the way people say things — easy, no particular weight behind it. Friendly. The empty chair is just a chair.
-{% elif w.hasTrait("BEAUTIFUL") %}
+{% elif (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He says it with the careful lightness of someone who has made a small decision. His eyes hold on yours a beat past the question.
 {% endif %}
 """

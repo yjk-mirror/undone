@@ -238,7 +238,7 @@ His eyes stay on you. Not grabbing — just following. Waiting. The patience of 
 
 The shirt. Then the rest of it. Slow enough that he has time to want what's coming. Slow enough that you can see him wanting it.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He says something quiet that you don't catch. Not for you — just something that came out.
 {% else %}
 He's very still.
