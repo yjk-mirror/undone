@@ -96,7 +96,7 @@ Your chest is pink down to your sternum. He can see it in the lamp light. He doe
 Your toes curl against the back of his thigh. He keeps moving.
 {% endif %}
 {% if w.hasTrait("BACK_ARCHER") %}
-Your back arches off the mattress when you come. He holds your hips down and keeps going.
+Your back arches off the mattress when you cum. He holds your hips down and keeps going.
 {% endif %}
 {% elif w.getSkill("FEMININITY") < 50 %}
 {% if w.hasTrait("EASILY_WET") %}
@@ -125,13 +125,13 @@ Your body takes him and you move with him, angling your hips, finding the rhythm
 {% if w.hasTrait("BREATH_CHANGER") %}
 Your breathing is loud in the room. You don't quiet it.
 {% endif %}
-You come before he does, a sound you don't suppress.
+You cum before he does, a sound you don't suppress.
 {% if w.hasTrait("BACK_ARCHER") %}
 Your back bows hard off the mattress when it happens. He braces against the headboard.
 {% endif %}
 {% endif %}
 
-He comes with a grunt, his hips stuttering. He stays there for a few seconds, breathing. Then he rolls off.
+He cums with a grunt, his hips stuttering. He stays there for a few seconds, breathing. Then he rolls off.
 
 The space beside you is warm. He dresses in the dark — not quickly, not apologetically, just doing it. Kisses your forehead. The front door clicks shut. You lie in the quiet.
 
@@ -188,9 +188,9 @@ Your thighs close around his head without deciding to. He presses them back open
 {% elif w.hasTrait("FLIRTY") %}
 You gasp and your hand goes to his hair before he's even started. He works you open, his mouth wet and determined, and you hold on. Your hips are moving without you deciding to move them.
 {% if w.hasTrait("THIGH_CLENCHER") %}
-Your thighs clamp around his ears when you come. He doesn't stop. You come against his face with your legs shaking.
+Your thighs clamp around his ears when you cum. He doesn't stop. You cum against his face with your legs shaking.
 {% else %}
-You come against his face with your thighs clamped around his ears.
+You cum against his face with your thighs clamped around his ears.
 {% endif %}
 {% elif w.hasTrait("ANALYTICAL") %}
 Living room floor. Your chair. That detail catches for half a second and then his tongue finds a rhythm and the clarity drops. The wet pressure of his mouth. The tension building low, tightening.
@@ -201,15 +201,15 @@ You cry out and grip the arms of the chair.
 {% elif w.hasTrait("SHY") %}
 His mouth is on you. You grip the chair arms. You can't look. The pleasure comes in waves and you're holding your breath against each one.
 {% if w.hasTrait("LIP_BITER") %}
-Your lip is between your teeth. You bite down when you come.
+Your lip is between your teeth. You bite down when you cum.
 {% endif %}
-You come quietly, your legs shaking, and then he's standing up.
+You cum quietly, your legs shaking, and then he's standing up.
 {% else %}
 His mouth is on you. Your head falls back. You moan into the empty apartment.
 {% if w.hasTrait("THIGH_CLENCHER") %}
 Your thighs clamp around his head. He holds them open.
 {% endif %}
-When you come, his name isn't there — just the fact of it, sharp and immediate.
+When you cum, his name isn't there — just the fact of it, sharp and immediate.
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
@@ -221,24 +221,24 @@ He stands, jeans already open. He turns you around in the chair and you let him,
 {% if w.getSkill("FEMININITY") < 25 %}
 He pushes into you from behind. Each thrust rocks you forward, your hands sliding on the upholstery. The position is exposed. You grip the chair and take it.
 {% if w.hasTrait("MULTI_ORGASMIC") %}
-You come again before he does — a second orgasm, harder than the first, your knuckles white on the chair arm. He doesn't slow down.
+You cum again before he does — a second orgasm, harder than the first, your knuckles white on the chair arm. He doesn't slow down.
 {% endif %}
 {% if w.hasTrait("BACK_ARCHER") %}
 Your back arches sharply when it hits. He puts a hand between your shoulder blades and presses you back down.
 {% endif %}
-When he comes, he bites down on your shoulder — not hard, but enough to leave the memory.
+When he cums, he bites down on your shoulder — not hard, but enough to leave the memory.
 {% elif w.getSkill("FEMININITY") < 50 %}
 He enters you and sets a hard, fast pace. The chair creaks. You push back against him, matching it.
 {% if w.hasTrait("MULTI_ORGASMIC") %}
 The second orgasm comes from the angle — different from the first, lower, slower to build and then sudden. You press your forehead to the chair arm and let it happen.
 {% endif %}
-His hips stutter when he comes and you feel the heat of it.
+His hips stutter when he cums and you feel the heat of it.
 {% else %}
 He fucks you over the chair arm. Raw, direct, no ceremony about it.
 {% if w.hasTrait("MULTI_ORGASMIC") %}
-You come again. He's surprised. You can feel it in the way he goes still for half a second, then keeps moving.
+You cum again. He's surprised. You can feel it in the way he goes still for half a second, then keeps moving.
 {% endif %}
-He comes with a short groan. You feel it.
+He cums with a short groan. You feel it.
 {% endif %}
 
 {% if w.hasTrait("HEAVY_SQUIRTER") %}

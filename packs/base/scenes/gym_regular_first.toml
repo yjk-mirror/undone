@@ -125,9 +125,9 @@ He moves. His hands on your thighs, your back against the lockers, the rhythm bu
 {% endif %}
 
 {% if w.hasTrait("LOUD") %}
-The sound you make when you come is not quiet. It fills the corridor, bounces off every hard surface. He doesn't stop.
+The sound you make when you cum is not quiet. It fills the corridor, bounces off every hard surface. He doesn't stop.
 {% elif w.hasTrait("QUIET_COMER") %}
-When you come you go silent — completely, suddenly silent. He registers it. His grip tightens on your thighs.
+When you cum you go silent — completely, suddenly silent. He registers it. His grip tightens on your thighs.
 {% else %}
 When the orgasm comes you make a sound you couldn't have predicted. The empty gym has nothing to absorb it.
 {% endif %}
@@ -155,7 +155,7 @@ The flush has spread from your chest up your throat. He can see it in the fluore
 {% endif %}
 
 {% if w.hasTrait("CRIER") %}
-Your eyes are wet when you come. Not from anything except the intensity of it.
+Your eyes are wet when you cum. Not from anything except the intensity of it.
 {% endif %}
 
 After. His hands lower you. Your legs are not entirely reliable. The bench is right there and you sit on it and the gym is quiet and the fluorescent buzzes and your gym bag is right there next to you and the whole evening is right there next to you.

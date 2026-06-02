@@ -90,7 +90,7 @@ He says, close: "Good." Just that word. Direct, like his questions. It hits some
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-He's barely started when you come — fast, embarrassingly fast, his fingers just finding the right place when the orgasm drops through you. Your sound is not quiet. The apartment swallows it.
+He's barely started when you cum — fast, embarrassingly fast, his fingers just finding the right place when the orgasm drops through you. Your sound is not quiet. The apartment swallows it.
 
 He goes still. His eyes are on your face. The expression is not surprise — it's that particular focused attention.
 
@@ -120,7 +120,7 @@ When he's on his back, the wanting to have him in your mouth is specific and imm
 He keeps his eyes on you the whole time. Even at the end.
 
 {% if w.hasTrait("MULTI_ORGASMIC") %}
-You come twice. His sheets are going to need washing. He doesn't mention it.
+You cum twice. His sheets are going to need washing. He doesn't mention it.
 {% if w.hasTrait("HEAVY_SQUIRTER") %}
 The wet spot is significant. He just moves you to the dry side of the bed, smooth, no commentary.
 {% endif %}
@@ -207,7 +207,7 @@ He told you what he wanted. He's getting it. In his space, on his furniture, on 
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-You come fast — his fingers barely there before it arrives, sudden and total. He notices. His expression is that focused stillness again. He files it and starts over.
+You cum fast — his fingers barely there before it arrives, sudden and total. He notices. His expression is that focused stillness again. He files it and starts over.
 {% if w.hasTrait("PRAISE_KINK") %}
 "Good," he says, quiet. Just the one word. Your hips are still moving.
 {% endif %}
@@ -233,7 +233,7 @@ The second orgasm arrives before you've finished processing the first. Your body
 {% elif w.getSkill("FEMININITY") < 50 %}
 The second one builds off the back of the first while he's still moving and you make a sound you've never made and hold on.
 {% else %}
-You come twice. His bed, his sheets, his expression when he looks at you — completely level even through all of it.
+You cum twice. His bed, his sheets, his expression when he looks at you — completely level even through all of it.
 {% endif %}
 {% endif %}
 

@@ -110,7 +110,7 @@ At some point your brain is very quiet. There is Theo's weight and Theo's hands 
 
 The orgasm when it comes is long and rolls through you in waves and you make sounds that echo in the small room, and afterward you lie there with his arm around you and you are wet and warm and thoroughly satisfied and the part of you that had something to say about men is still quiet.
 {% else %}
-When you come it rolls through you in waves, long and deep, and afterward the room comes back slowly. His arm around you. The lamp still on.
+When you cum it rolls through you in waves, long and deep, and afterward the room comes back slowly. His arm around you. The lamp still on.
 {% endif %}
 
 {% elif w.getSkill('FEMININITY') < 50 %}
@@ -135,7 +135,7 @@ Your body keeps going. Your hips keep moving.
 
 The orgasm takes the thought with it.
 {% else %}
-When you come a second time he feels it and slows down, watching your face, staying with you until you stop shaking.
+When you cum a second time he feels it and slows down, watching your face, staying with you until you stop shaking.
 {% endif %}
 
 Afterward, the lamp. His arm. The room settling back around you.
@@ -210,9 +210,9 @@ Somewhere in there your brain surfaces for approximately two seconds. You are ha
 
 Your hips keep moving. Your body answers him. The thought goes back under.
 
-When you come the second time it rolls through you long and deep and you hold onto his shoulders and your body keeps responding past the point where you thought it would stop.
+When you cum the second time it rolls through you long and deep and you hold onto his shoulders and your body keeps responding past the point where you thought it would stop.
 {% else %}
-When you come it rolls through you long and deep, wave after wave, and he holds you through it and keeps moving until you're done.
+When you cum it rolls through you long and deep, wave after wave, and he holds you through it and keeps moving until you're done.
 {% endif %}
 
 Afterward. His arm around you. The lamp in the corner. The problem set on the desk.
@@ -228,9 +228,9 @@ Then he's inside you. His weight. His rhythm. The sounds in the room.
 {% if w.hasTrait("HOMOPHOBIC") %}
 Your body is doing what bodies do and it doesn't care what you thought about anything. His hands on your hips and your hips pushing up to meet him and the sounds coming out of you that you didn't plan.
 
-When you come it takes everything with it. Thought, context, all of it, for about thirty seconds of pure physical fact.
+When you cum it takes everything with it. Thought, context, all of it, for about thirty seconds of pure physical fact.
 {% else %}
-You come a second time, holding onto his shoulders, and afterward the room settles back around you.
+You cum a second time, holding onto his shoulders, and afterward the room settles back around you.
 {% endif %}
 
 His arm. The quiet. The lamp still on.

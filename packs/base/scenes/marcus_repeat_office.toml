@@ -107,7 +107,7 @@ You know this. His hand, the pressure and the angle of it, the wanting sharpenin
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-You come fast — his hand barely settled into rhythm before you do, sudden and not quiet, the sound bouncing off whatever wall is nearest. Marcus holds still through it, watching your face. Then: "Okay," he says. Flat. Like a data point received. He starts again.
+You cum fast — his hand barely settled into rhythm before you do, sudden and not quiet, the sound bouncing off whatever wall is nearest. Marcus holds still through it, watching your face. Then: "Okay," he says. Flat. Like a data point received. He starts again.
 {% endif %}
 
 {% if w.hasTrait("THIGH_CLENCHER") %}
@@ -209,7 +209,7 @@ When he gets his hands on your chest the sound you make is not quiet and he does
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-His fingers and you're already close and then you come, fast and not subtle, the sound echoing off glass or concrete depending on which room this is. He stills and watches you, completely still, reading it. "Okay," he says. He keeps going.
+His fingers and you're already close and then you cum, fast and not subtle, the sound echoing off glass or concrete depending on which room this is. He stills and watches you, completely still, reading it. "Okay," he says. He keeps going.
 {% if w.hasTrait("PRAISE_KINK") %}
 "Good," he says. One syllable. Your hips push up into nothing.
 {% endif %}

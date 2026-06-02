@@ -313,7 +313,7 @@ Flush spreading across your chest. He watches it happen with an expression you'r
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-You come fast and he knows you will and slows down on the other side to let you have it. Patient. Warm.
+You cum fast and he knows you will and slows down on the other side to let you have it. Patient. Warm.
 {% endif %}
 
 {% if w.hasTrait("SUBMISSIVE") or w.hasTrait("PRAISE_KINK") %}
