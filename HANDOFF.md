@@ -21,8 +21,17 @@ map answering "what exists, what connects, what to write next."
 - **Story-map tool** (`cargo run --bin story-map`) — regenerate after any content change.
   `cargo run --bin story-map -- --check` guards staleness (exit 1 if the committed map is
   stale). First run: 7 threads, 84 write-next items, 0 orphans.
-- **Verification:** 8 story_map unit tests + 5 acceptance tests green; `--check` clean;
+- **Verification:** 11 story_map unit + 8 acceptance + 10 independent-acceptance tests green
+  (29 total); `--check` clean; validate-pack still "All checks passed (74 scenes)". Independent
+  blind code-review found 3 real defects (action-condition gates unscanned → false dangling;
+  preset starting flags ignored → false broken gates; explicit thread lists stolen by
+  flag_prefix) — all fixed + locked with tests, re-review PASS. Independent QA (CLI) PASS.
   scene-writer agent wired to read `docs/story-map.json` and pick `write_next` items.
+- **Known minors (non-blocking, optional follow-ups):** (1) a flag set and read only via a
+  negated within-scene self-guard (e.g. `LUNCH_WITH_MARCUS`) shows as dangling — technically
+  correct under the flags+arcs signal model, mildly noisy as a "write a follow-up" hint.
+  (2) Orphan scenes' internal dangling/broken findings aren't computed until the scene is
+  assigned to a thread (the orphan itself is loudly reported with a fix hint first).
 
 **Previous session (2026-06-02, looping-adult REVIEW + improvements — fan-out review, then full improvement pass):**
 Reviewed the just-merged looping-adult layer with a 4-agent fan-out (3 writing-reviewers on the
