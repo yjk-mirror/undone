@@ -9,7 +9,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use undone_scene::reachability::{arc_state_eqs, required_game_flags};
 use undone_scene::scheduler::SceneBinding;
 use undone_scene::script::validate::{source_advance_arcs, source_set_game_flags};
@@ -268,6 +268,31 @@ fn dedup(v: &mut Vec<String>) {
     v.retain(|s| seen.insert(s.clone()));
 }
 
+/// The authored roadmap: thread declarations. Authoring-only; the engine never
+/// loads this. Parsed from `packs/<pack>/roadmap.toml`.
+#[derive(Debug, Clone, Deserialize, Default)]
+pub(crate) struct Roadmap {
+    #[serde(default, rename = "thread")]
+    pub threads: Vec<RoadmapThread>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub(crate) struct RoadmapThread {
+    pub name: String,
+    #[serde(default)]
+    pub flag_prefix: Option<String>,
+    #[serde(default)]
+    pub scenes: Vec<String>,
+    #[serde(default)]
+    pub planned: Vec<String>,
+    #[serde(default)]
+    pub note: String,
+}
+
+pub(crate) fn parse_roadmap(toml_src: &str) -> Result<Roadmap, String> {
+    toml::from_str(toml_src).map_err(|e| format!("roadmap.toml parse error: {e}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -361,5 +386,25 @@ mod tests {
             facts.get("base::b").unwrap().status,
             SceneStatus::BrokenGate
         );
+    }
+
+    #[test]
+    fn roadmap_parses_threads() {
+        // BREAKS IF: roadmap schema changes shape and the parser silently drops fields.
+        let toml = r#"
+[[thread]]
+name = "Marcus affair"
+flag_prefix = "MARCUS_"
+scenes = ["marcus_repeat_office"]
+planned = ["marcus_reconcile"]
+note = "Recurring affair."
+"#;
+        let rm = parse_roadmap(toml).unwrap();
+        assert_eq!(rm.threads.len(), 1);
+        let t = &rm.threads[0];
+        assert_eq!(t.name, "Marcus affair");
+        assert_eq!(t.flag_prefix.as_deref(), Some("MARCUS_"));
+        assert_eq!(t.scenes, vec!["marcus_repeat_office".to_string()]);
+        assert_eq!(t.planned, vec!["marcus_reconcile".to_string()]);
     }
 }

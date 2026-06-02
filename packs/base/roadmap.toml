@@ -1,0 +1,74 @@
+# Story roadmap for the base pack. AUTHORING-ONLY — the engine never loads this
+# file; only the `story-map` tool reads it. Declares the narrative threads scenes
+# are grouped into. A scene is claimed by a thread if any flag it sets/requires
+# starts with `flag_prefix`, OR its short id is in `scenes`. Any scene claimed by
+# no thread is reported as an orphan. `planned` lists intended, not-yet-written ids.
+#
+# Regenerate the map after editing this file: `cargo run --bin story-map`.
+
+[[thread]]
+name = "Opening / first weeks"
+note = "Arrival, the workplace-opening arc, settling in, the first callbacks."
+scenes = [
+  "transformation_intro", "rain_shelter", "morning_routine", "plan_your_day",
+  "landlord_repair",
+  "opening_callback_status_assertion", "opening_callback_first_week_solitude",
+  "opening_callback_mirror_afterglow", "opening_callback_transactional_defense",
+  "workplace_arrival", "workplace_first_day", "workplace_first_clothes",
+  "workplace_first_night", "workplace_landlord", "work_standup",
+]
+
+[[thread]]
+name = "Jake romance"
+flag_prefix = "JAKE_"
+scenes = [
+  "coffee_shop", "coffee_shop_return", "jake_outside", "jake_first_date",
+  "jake_second_date", "jake_apartment", "jake_morning_after", "jake_stays_over",
+  "jake_text_messages", "jake_repeat_night", "jake_morning_quick", "jake_seeks_more",
+]
+note = "Met at the coffee shop -> dating -> intimacy -> domesticity -> she-seeks."
+
+[[thread]]
+name = "Marcus affair"
+flag_prefix = "MARCUS_"
+scenes = [
+  "marcus_repeat_office", "marcus_pushes", "marcus_apartment", "marcus_leverage",
+  "marcus_monday_rejected",
+]
+note = "Workplace tension -> affair -> escalation -> leverage cost -> cooling."
+
+[[thread]]
+name = "Cal / gym"
+flag_prefix = "GYM_"
+scenes = [
+  "gym_regular_intro", "gym_regular_recurs", "gym_regular_first", "gym_regular_deepens",
+]
+note = "Gym-regular power-inversion + submission ladder."
+
+[[thread]]
+name = "Theo / campus"
+scenes = [
+  "campus_arrival", "campus_dorm", "campus_orientation", "campus_library",
+  "campus_call_home", "campus_study_session", "campus_dining_hall",
+  "campus_theo_night", "campus_theo_morning", "campus_dining_after_theo",
+]
+note = "Campus route: orientation -> Theo -> morning-after -> public visibility."
+
+[[thread]]
+name = "Desire / looping adult"
+flag_prefix = "DESIRE_"
+scenes = ["desire_solo_night", "desire_ambush"]
+note = "The recurring need-state: release valves and ambushes."
+
+[[thread]]
+name = "Ambient life"
+scenes = [
+  "bookstore", "park_walk", "grocery_store", "evening_home", "neighborhood_bar",
+  "laundromat_night", "shopping_mall", "weekend_morning", "bad_date",
+  "bar_closing_time", "bar_stranger_night", "gym_changing_room", "party_invitation",
+  "party_stranger_after", "work_corridor", "work_friday", "work_late", "work_lunch",
+  "work_marcus_aftermath", "work_marcus_coffee", "work_marcus_drinks",
+  "work_marcus_favor", "work_marcus_closet", "work_marcus_late",
+  "workplace_work_meeting", "workplace_evening",
+]
+note = "Texture scenes not owned by a single arc. Reassign to a thread as arcs grow."
