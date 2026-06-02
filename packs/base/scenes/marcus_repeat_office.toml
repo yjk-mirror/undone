@@ -108,8 +108,6 @@ You come fast — his hand barely settled into rhythm before you do, sudden and 
 Your thighs close around him. He goes deeper. You hear yourself.
 {% endif %}
 
-When he finishes inside you his forehead drops to yours and his breathing is not entirely even and yours is not either. Outside someone has put on a sweater and gone home, and another keyboard somewhere is the only sound left.
-
 {% if w.hasTrait("BACK_ARCHER") %}
 Your back arches and doesn't come back down until it's over, and his arm is under you the whole time.
 {% endif %}
@@ -121,6 +119,8 @@ Your toes curl hard inside your shoes. Later your feet will be sore and you'll r
 {% if w.hasTrait("FLUSHER") %}
 The flush on your chest and throat is visible in the office light. He looks at you like he's checking the work. You don't cover it.
 {% endif %}
+
+When he finishes inside you his forehead drops to yours and his breathing is not entirely even and yours is not either. Outside someone has put on a sweater and gone home, and another keyboard somewhere is the only sound left.
 
 {% if w.getSkill("COMPOSURE") < 35 %}
 You don't bother trying to reconstruct the professional self immediately. She'll be back. She always comes back. Just slightly thinner than before.

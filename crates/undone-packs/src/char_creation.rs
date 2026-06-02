@@ -61,7 +61,10 @@ pub struct CharCreationConfig {
 /// Builds the Player, spawns the NPC pool, and returns a World ready for week 1.
 /// Starting COMPOSURE for a new game. She begins composed; giving in to desire
 /// in the looping-adult layer erodes this (the loss-of-control spiral).
-const STARTING_COMPOSURE: i32 = 60;
+///
+/// Public so the save-load path can backfill this structural skill into saves
+/// written before COMPOSURE existed (see `start_loaded_game_checked`).
+pub const STARTING_COMPOSURE: i32 = 60;
 
 pub fn new_game<R: Rng>(
     config: CharCreationConfig,

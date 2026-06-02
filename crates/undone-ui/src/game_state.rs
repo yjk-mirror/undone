@@ -2,7 +2,7 @@ use rand::{rngs::SmallRng, SeedableRng};
 use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
-use undone_domain::{SkillId, TimeSlot};
+use undone_domain::{SkillId, SkillValue, TimeSlot};
 
 use undone_packs::{
     char_creation::{new_game, CharCreationConfig},
@@ -327,6 +327,28 @@ pub fn start_loaded_game_checked(
         init_error,
     } = pre;
     let femininity_id = required_femininity_skill(&registry)?;
+
+    // Structural-skill backfill for saves written before a structural skill
+    // existed. COMPOSURE was promoted to a structural skill in the looping-adult
+    // layer (save v7). A save predating it has no COMPOSURE entry, which would
+    // read as composure 0 (maximum loss-of-control) rather than the intended
+    // starting value — silently unlocking the reckless/spiral content gates. The
+    // value lives in one place (`char_creation::STARTING_COMPOSURE`). New games
+    // seed COMPOSURE during character creation and never reach this path.
+    let mut world = world;
+    if let Ok(composure_id) = registry.composure_skill() {
+        if !world.player.skills.contains_key(&composure_id) {
+            log::info!("backfilling missing COMPOSURE skill into loaded save");
+            world.player.skills.insert(
+                composure_id,
+                SkillValue {
+                    value: undone_packs::char_creation::STARTING_COMPOSURE,
+                    modifier: 0,
+                },
+            );
+        }
+    }
+
     let engine = SceneEngine::new(scenes);
     Ok(GameState {
         world,
@@ -577,6 +599,30 @@ mod tests {
         let result = start_loaded_game_checked(pre, source.world.clone(), false);
 
         assert!(matches!(result, Err(message) if message.contains("FEMININITY")));
+    }
+
+    #[test]
+    fn loaded_save_missing_composure_skill_is_backfilled_to_starting_value() {
+        // BREAKS IF: a save written before COMPOSURE became a structural skill
+        // (pre-v7) loads with composure 0 instead of the starting value, silently
+        // unlocking the low-composure "reckless" content gates.
+        let mut source = start_game(test_pre_state(), workplace_config(), false);
+        let composure_id = source.registry.composure_skill().unwrap();
+        source.world.player.skills.remove(&composure_id);
+        assert!(
+            !source.world.player.skills.contains_key(&composure_id),
+            "precondition: COMPOSURE removed to simulate a pre-v7 save"
+        );
+
+        let gs = start_loaded_game_checked(test_pre_state(), source.world.clone(), false)
+            .expect("loading a pre-COMPOSURE save should succeed");
+
+        let composure_id = gs.registry.composure_skill().unwrap();
+        assert_eq!(
+            gs.world.player.skills.get(&composure_id).map(|s| s.value),
+            Some(undone_packs::char_creation::STARTING_COMPOSURE),
+            "missing COMPOSURE must be backfilled to the starting value, not left at 0"
+        );
     }
 
     #[test]

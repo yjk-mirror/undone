@@ -169,7 +169,9 @@ Slots group related events. Current slots: `free_time`, `robin_opening`, `camila
 weighted pick is multiplied by a desire factor that ramps from `1.0×` at desire 0 to `4.0×`
 at desire 100. The schedule data opts a scene into the desire bias; the engine never decides
 what counts as "adult". Used so the looping-adult scenes surface harder as the player's DESIRE
-need-state climbs.
+need-state climbs. Note the factor **multiplies** an authored weight — it does not grant one,
+so `desire_scaled = true` with `weight = 0` still never enters the weighted pool at any desire
+level (`0 × factor = 0`). Give the event a non-zero base weight for the scaling to do anything.
 
 ### How `pick_next()` works
 
@@ -299,6 +301,12 @@ prose = """...result prose..."""
 > **Looping-adult need-state effects:** `gd.addDesire(n)` / `gd.setDesire(n)` (DESIRE 0–100;
 > `setDesire(0)` discharges on a satisfying release), and `w.changeComposure(n)` (COMPOSURE
 > skill; negative = giving in lowers it). Read with `gd.desire()` and `w.composure()`.
+>
+> **Time-passing accrues desire.** `gd.advanceTime(n)` advances the clock by `n` slots and
+> each consumed slot adds the standard per-slot DESIRE gain (the same accrual the scheduler
+> applies between scenes). Fast-forwarding time in a scene therefore also builds the desire
+> need-state — intended (time passing = wanting builds), but factor it in when authoring a
+> scene that jumps the clock and then reads `gd.desire()`.
 
 Tagged by `type` (legacy operation reference):
 

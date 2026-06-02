@@ -36,7 +36,6 @@
   "enabledMcpjsonServers": [
     "rhai",
     "minijinja",
-    "rust",
     "screenshot",
     "game-input"
   ]
