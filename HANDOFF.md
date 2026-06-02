@@ -2,7 +2,57 @@
 
 ## Current State
 
-**Latest session (2026-06-01, LOOPING-ADULT LAYER — engine + 12 scenes, director-driven fan-out):**
+**Latest session (2026-06-02, looping-adult REVIEW + improvements — fan-out review, then full improvement pass):**
+Reviewed the just-merged looping-adult layer with a 4-agent fan-out (3 writing-reviewers on the
+6 un-reviewed scenes + 1 engineering code-review of the desire/composure engine), then executed a
+full improvement pass on branch `looping-adult-polish` (merged to master). Playtester-verified.
+
+**Engineering:**
+- Code-review verdict **PASS** — no correctness defects. Fixed the one real latent bug it found:
+  COMPOSURE (a v7 structural skill) was absent from pre-v7 saves → loaded as composure **0** (max
+  loss-of-control), silently unlocking the reckless content gates. `start_loaded_game_checked` now
+  backfills missing COMPOSURE to `STARTING_COMPOSURE` (the const made `pub` for single-source);
+  new test `loaded_save_missing_composure_skill_is_backfilled_to_starting_value`.
+- **Player-facing Desire + Composure sidebar meters** (was dev-IPC-only — the layer's whole point
+  is a *felt* need-state). `PlayerSnapshot` gained `desire`/`composure`; composure via a new cached
+  `GameState.composure_id` (mirrors `femininity_id`), desire from `game_data`; Composure row under
+  Femininity, Desire under Arousal in `right_panel`. Test covers the snapshot refresh.
+- `marcus_repeat_office` BACK_ARCHER ordering bug (trait climax-response fired *after* the finish
+  line) reordered to match `give_in_he_moves`. Doc notes (rule 10): `advanceTime` accrues desire;
+  `desire_scaled` weight-0 footgun.
+
+**Content:**
+- **6 scene revisions** (scene-writer fan-out + line-by-line diff review): cut narrated-interiority/
+  body-analysis, staccato closers, over-naming; added FEMININITY-calibration branches across
+  jake_repeat_night, jake_morning_quick, marcus_repeat_office, marcus_leverage, desire_solo_night,
+  desire_ambush. Playtester confirmed low-FEM vs high-FEM read genuinely different in-game.
+- **Orgasm-verb spelling sweep (come → cum)** across all explicit scenes — 70 replacements in 14
+  files (climax sense only; `came` and the orgasm-as-subject "the orgasm comes" preserved, as do
+  all motion/arrival uses). New permanent house-style rule.
+
+**Tooling (after-writing-audit feedback):** writing-guide + scene-writer + writing-reviewer get the
+`cum` rule; `prose-lint` gains an `orgasm_spelling` check + the recurring interiority tells
+(internal-faculty naming, "the body makes a case", "noted and filed"). prose-lint self-test 18/18.
+
+**Verification:** full workspace `cargo test` green; undone-ui 112 tests; validate-pack clean (74
+scenes); intro render-regression green; cum-sweep diff reviewed line-by-line; **playtester PASS** —
+meters present + updating live (Desire 0→100, Composure 60→20), all 6 revised scenes render with
+zero errors at both FEM levels, cum spelling correct in-game. Dropped one false review finding (a
+"duplicated Marcus simile" that didn't actually exist in marcus_leverage).
+
+**Follow-ups (not blockers):**
+- **Suspected em-dash → "??" rendering artifact** in prose (playtester noted "his arm loose across
+  your waist ??the weight"). NOT touched this session (no render/font/loader changes) — almost
+  certainly pre-existing; needs confirmation (could be a screenshot-capture artifact vs a real font/
+  encoding bug). If real, it affects ALL prose (em-dashes are everywhere) and is worth a dedicated fix.
+- **Dev `set_stat` can't set `desire`/`composure`** (only money/stress/anxiety/femininity) — a
+  playtest-tooling gap; adding them to `dev_ipc.rs set_stat` (desire → game_data, composure → skill)
+  would make future playtesting of this layer far easier.
+- The prior session's deferred **sidebar meters** and **writing-review of the remaining scenes** are
+  now both DONE. Still open from that list: DUBCON/BLOCK_ROUGH tagging judgment call on
+  `gym_regular_first` "stay" + `marcus_pushes` "let_him"; `jake_seeks_more` gates on built skills.
+
+**Previous session (2026-06-01, LOOPING-ADULT LAYER — engine + 12 scenes, director-driven fan-out):**
 Shipped the looping-adult content layer on branch `looping-adult-layer` (design spec:
 `docs/plans/2026-06-01-looping-adult-layer-design.md`). The adult side was all terminating
 one-shots; this makes desire recur and escalate.
