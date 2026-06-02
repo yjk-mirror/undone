@@ -193,6 +193,66 @@ consumes_time = true
   once_only = true
   npc_role  = "ROLE_JAKE"
 
+  # ── Looping adult layer — Cal / gym-regular thread ──────────────────────
+
+  [[slot.events]]
+  scene     = "base::gym_regular_intro"
+  weight    = 7
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.week() >= 3 && !gd.hasGameFlag("MET_GYM_REGULAR")'
+  once_only = true
+
+  [[slot.events]]
+  scene         = "base::gym_regular_recurs"
+  weight        = 8
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("MET_GYM_REGULAR") && !gd.hasGameFlag("GYM_INTIMATE")'
+  npc_role      = "ROLE_GYM"
+
+  [[slot.events]]
+  scene         = "base::gym_regular_first"
+  weight        = 10
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("MET_GYM_REGULAR") && !gd.hasGameFlag("GYM_INTIMATE") && gd.npcLikingAtLeast("ROLE_GYM", "Like")'
+  npc_role      = "ROLE_GYM"
+
+  [[slot.events]]
+  scene         = "base::gym_regular_deepens"
+  weight        = 8
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("GYM_INTIMATE")'
+  npc_role      = "ROLE_GYM"
+
+  # ── Looping adult layer — Jake repeatable intimacy (post JAKE_INTIMATE) ──
+
+  [[slot.events]]
+  scene         = "base::jake_repeat_night"
+  weight        = 8
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("JAKE_INTIMATE")'
+  npc_role      = "ROLE_JAKE"
+
+  [[slot.events]]
+  scene         = "base::jake_morning_quick"
+  weight        = 6
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("JAKE_INTIMATE") && gd.timeSlot() == "Morning"'
+  npc_role      = "ROLE_JAKE"
+
+  [[slot.events]]
+  scene         = "base::jake_seeks_more"
+  weight        = 6
+  desire_scaled = true
+  condition     = 'gd.hasGameFlag("JAKE_INTIMATE") && gd.desire() >= 45 && (!gd.hasGameFlag("JAKE_ACT_RIDE") || !gd.hasGameFlag("JAKE_ACT_DIRTY_TALK") || !gd.hasGameFlag("JAKE_ACT_TIED") || !gd.hasGameFlag("JAKE_ACT_TEASE"))'
+  npc_role      = "ROLE_JAKE"
+
+  # ── Looping adult layer — desire release valve (solo) ───────────────────
+
+  [[slot.events]]
+  scene         = "base::desire_solo_night"
+  weight        = 8
+  desire_scaled = true
+  condition     = 'gd.arcState("base::workplace_opening") == "settled" && gd.desire() >= 55'
+
 # ── Workplace opening arc ────────────────────────────────────────────────
 
 [[slot]]
@@ -334,6 +394,34 @@ consumes_time = true
   trigger = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_REJECTED") && !gd.hasGameFlag("MARCUS_REJECTION_MONDAY")'
   once_only = true
   npc_role  = "ROLE_MARCUS"
+
+  # ── Looping adult layer — Marcus ongoing affair + desk ambush ───────────
+
+  [[slot.events]]
+  scene         = "base::marcus_repeat_office"
+  weight        = 8
+  desire_scaled = true
+  condition     = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_INTIMATE") && gd.isWeekday()'
+  npc_role      = "ROLE_MARCUS"
+
+  [[slot.events]]
+  scene         = "base::marcus_pushes"
+  weight        = 7
+  desire_scaled = true
+  condition     = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_INTIMATE") && !gd.hasGameFlag("MARCUS_ACT_ORAL")'
+  npc_role      = "ROLE_MARCUS"
+
+  [[slot.events]]
+  scene     = "base::marcus_leverage"
+  weight    = 5
+  condition = 'gd.arcState("base::workplace_opening") == "settled" && gd.hasGameFlag("MARCUS_INTIMATE") && gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") && !gd.hasGameFlag("MARCUS_LEVERAGE")'
+  npc_role  = "ROLE_MARCUS"
+
+  [[slot.events]]
+  scene         = "base::desire_ambush"
+  weight        = 6
+  desire_scaled = true
+  condition     = 'gd.arcState("base::workplace_opening") == "settled" && gd.isWeekday() && gd.desire() >= 60'
 
 # ── Campus opening arc ────────────────────────────────────────────────
 
