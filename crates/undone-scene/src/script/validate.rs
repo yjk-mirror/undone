@@ -29,8 +29,8 @@ use crate::script::compiled::ScriptError;
 // Method spec table
 // ---------------------------------------------------------------------------
 
-#[derive(Clone, Copy, PartialEq)]
-pub(crate) enum IdKind {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum IdKind {
     Trait,
     NpcTrait,
     Skill,
