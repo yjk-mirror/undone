@@ -2,7 +2,33 @@
 
 ## Current State
 
-**Latest session (2026-06-02, SCRIPT API REGISTRY — single source of truth, COMPLETE, on branch `script-api-registry`, NOT yet merged):**
+**Latest session (2026-06-02, MERGE CONFIRM + PUSH — registry is on master, remote synced):**
+The `script-api-registry` work was already merged to master in a prior session (`e046ffe merge:
+script-api-registry`) — the branch is gone and the populated `REGISTRY`
+(`crates/undone-scene/src/script/api/table.rs`, ~95 reads + ~37 writes) is live on the main tree.
+This session confirmed that and **pushed master to `origin/master`** (was 134 commits ahead;
+`f35e4b2..0a20a15`). The registry consolidation plus all content/tooling work since are now on the
+remote. The "NOT yet merged" / "Merge → master" notes in the entry below are **superseded**.
+
+**Strategic posture (user-confirmed):** the engine has converged on *scripting as the content layer*.
+New scenes that recombine existing verbs are pure Rhai + minijinja + TOML (no Rust); new
+traits/skills/stats/NPCs are TOML data; only a genuinely new *mechanic/system* (e.g. the
+DESIRE/COMPOSURE need-state) or a genuinely new *verb* needs Rust — and the registry made adding a
+verb a single row + accessor that propagates to Rhai/gate/prose/prose-gate. Content-first from here.
+
+**Open from here:**
+- **Marcus terms-fork implementation** — design + phased plan committed (`dcea56a`, `0a20a15`:
+  `docs/plans/2026-06-02-marcus-terms-fork-*`); fan-out execution pending.
+- **Rebuild MCP binaries** (if not already done on this machine): `pwsh tools/rebuild-mcp.ps1`. The
+  registry worktree built its own `tools/target`; the live `.mcp.json` points at the MAIN repo's
+  `tools/target/release/`. The `minijinja-mcp-server` `jinja_validate_prose` tool only appears after
+  that + a session restart.
+- **INFRA (still an open decision, NOT done):** subagent MCP-server orphaning — see the registry
+  entry below for the full description and proposed fix.
+
+---
+
+**Prior session (2026-06-02, SCRIPT API REGISTRY — single source of truth, COMPLETE, MERGED to master `e046ffe`):**
 Executed `docs/plans/2026-06-02-script-api-registry.md` end-to-end (Phases A–K). Replaced the three
 independently-maintained copies of the content-facing method surface (Rhai `read_api/`+`write_api/`,
 the `validate.rs` spec tables, the Minijinja `template_ctx.rs` snapshot) with ONE declarative
@@ -40,12 +66,12 @@ acceptance tests (ops:test-author). **Code-reviewer PASS** on accessor-lift fide
 PASS** — 18 scenes, prose renders correctly, NPC names resolve to display name ("Jake" not spawn),
 Stunning appearance branch fires, zero prose errors / zero raw-template leaks.
 
-**NOT DONE — next session:**
-- **Merge `script-api-registry` → master** (K1 / finishing-a-development-branch). All gates passed; the
-  branch is ready. Held back because the session wound down (PC resource pressure, see below).
+**NOT DONE — next session:** _(superseded — see the top entry; merge + push are now DONE)_
+- ~~**Merge `script-api-registry` → master**~~ — DONE (`e046ffe`), pushed to origin 2026-06-02.
 - **Rebuild MCP binaries after merge + session restart:** `pwsh tools/rebuild-mcp.ps1` (the worktree
   built its own `tools/target`; the live `.mcp.json` points at the MAIN repo's `tools/target/release/`).
-  The new `minijinja-mcp-server` `jinja_validate_prose` tool only appears after that + restart.
+  The new `minijinja-mcp-server` `jinja_validate_prose` tool only appears after that + restart. _(still
+  open unless already run this machine)_
 
 **INFRA ISSUE (flagged by user):** dispatching subagents (ops:code-reviewer, ops:test-author,
 playtester) each spawned a FULL MCP server set including rust-analyzer; on subagent exit those
@@ -786,6 +812,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-06-02 | Merge-confirm + push + handoff refresh. Confirmed `script-api-registry` was already merged to master (`e046ffe`) — branch gone, `REGISTRY` live in `crates/undone-scene/src/script/api/table.rs` (~95 reads + ~37 writes). Pushed master to `origin/master` (was 134 commits ahead; `f35e4b2..0a20a15`) — registry + all content/tooling/Marcus-terms-fork-plan work now on remote. Refreshed HANDOFF: prepended current-state entry, marked the stale "NOT yet merged" / "Merge → master" notes superseded, recorded the content-first strategic posture (scripting is the content layer; only new mechanics/verbs need Rust). No code changes. Still open: Marcus terms-fork implementation (`dcea56a`/`0a20a15` plan docs), MCP-binary rebuild on this machine, subagent MCP-orphaning infra decision. |
 | 2026-06-02 | Story-map authoring tool shipped (plan `docs/plans/2026-06-02-story-map-tool.md`, branch `story-map`). New `src/story_map.rs` + `src/bin/story_map.rs` derive the scene-connectivity graph from base-pack data, reconcile against authored `packs/base/roadmap.toml` (7 threads, all 74 scenes claimed, 0 orphans), and emit `docs/story-map.{md,json}` with a ranked `write_next` digest (dangling > broken > planned). Flags and `ARC=STATE` treated as uniform signals: produced (effects) vs required (gates); dangling = produced-never-required, broken = required-never-produced. Engine touch-ups: `reachability::{required_game_flags, arc_state_eqs}` pub wrappers + `Scheduler::bindings()`/`SceneBinding` projection. Added `.gitattributes` forcing LF on the generated docs so `--check` is stable under `core.autocrlf=true`. Two plan-test bugs fixed during TDD (the plan's tests used `gd.changeStress`→`w.changeStress` and an unregistered `base::arc` that `compile_effect` rejects — test helper now registers it). Verification: 8 story_map unit tests + 5 acceptance tests green; `cargo run --bin story-map -- --check` clean; `scene-writer` agent + `docs/content-schema.md` wired to the tool. |
 | 2026-05-17 | Prose surgery — scale-anchor repetition. `gym_changing_room`, `marcus_apartment`, `jake_stays_over` all shared a "scale of him vs you" body-observation anchor in their FEMININITY-gated branches. `gym_changing_room` owns it structurally (women's-only locker room); `marcus_apartment` re-anchored on visibility/deliberateness/lit-room (3 FEMININITY<25 branches: intro, stay_for_the_wine bedroom, cut_to_it bedroom); `jake_stays_over` re-anchored on territorial integration (2 FEMININITY<30 branches: intro, make_coffee closer). writing-reviewer audit caught one rhythm-echo I introduced + four minor closing-sentence issues, three fixed in-pass and the echo fixed post-playtester. Playtester launched the release binary in --dev --quick with Robin preset (FEMININITY 10), used jump_to_scene + choose_action to play each affected branch, took screenshots of rendered prose, and reported all four passages render correctly with no template breakage or UI jank. Two pre-existing prose issues in marcus_apartment (narrator body-analysis on "the body has already filed all of this", emotion-announcement on "warm and low has settled in your stomach") surfaced during audit but were not introduced by this surgery — logged in Next Action for a future content pass. Also committed a stray `crates/undone-scene/Cargo.toml` dev-deps pin left uncommitted by the prior test-author session — `set_npc_name_tests` needs `undone-save` + `serde_json` as dev-deps to compile. cargo test --workspace = 498 passing; validate-pack clean. Commits `49de362` (dev-deps pin) and `e8eef70` (prose surgery). |
 | 2026-05-17 | Cleanup + feedback triage + display-name feature. Audited every open audit/HANDOFF feedback item against actual code — most engineering Criticals/Importants resolved silently in prior sessions. 7 commits: (1) finalized the in-progress cleanup pass — pruned 9 dead rust-mcp stub tools (~1500 LOC), `UI_FONT_FAMILY` constant, deduped `make_test_male_npc`, dropped unused `anyhow`/`slotmap`. (2) Fixed `ROLE_THEO` scheduler routing (npc_role missing on Theo schedule entries) + dropped redundant `set_game_flag ROUTE_*` in arrival scenes (audit I18). (3) Fixed `ThoughtAdded`/`ErrorOccurred` scroll-to-bottom violating the new-scene-top invariant (audit I8). (4) `validate-pack` now skips underscore-prefixed scene subdirs. (5) **Feature**: `NpcCore.display_name` + `SetNpcName` effect — root-cause fix for sidebar showing random spawn names instead of story names. Decoupled from `set_npc_role`; save v5→v6 (no-op JSON, `#[serde(default)]`); wired into `coffee_shop`/`workplace_work_meeting`/`campus_library`. (6) Independent acceptance suite via `ops:test-author`: 27 tests, each with `// BREAKS IF` comment. (7) Playtester verified live on scheduler-driven `coffee_shop` at week 2 — sidebar reads "Jake". 470 → 498 tests passing; validate-pack clean. |
