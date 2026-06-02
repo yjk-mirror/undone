@@ -85,6 +85,7 @@ calibrated prose. If empty, use `--skip-lint` flag or write prose manually.
 - Every scene needs an inciting situation, genuine choices, lasting consequences
 - Do not write scenes without a creative spec from the user
 - Adult content: write boldly and explicitly when the spec calls for it
+- Orgasm verb is **cum / cums / cumming** ("you cum hard," "he cums," "you're cumming"); past tense stays **came**. Only the climax sense — leave motion/arrival "come" alone, and keep "the orgasm comes" (the orgasm arrives; you cum, *it* comes)
 
 ## DeepSeek Safety
 

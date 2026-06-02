@@ -81,6 +81,28 @@ The city has good public transit and a distinctly Northeastern class geography.
 
 ---
 
+## Explicit Spelling: the orgasm verb is "cum"
+
+When "come" means a person (or their body) reaching orgasm — the climax verb — spell it
+**cum / cums / cumming**. This is the house style for the sexual act.
+
+| Use | Not |
+|-----|-----|
+| you cum, you cum hard, when you cum | you come, you come hard |
+| he cums, he cums with a grunt | he comes |
+| you're cumming | you're coming |
+| make you cum, let you cum | make you come |
+
+**Past tense stays "came."** ("You came before he did.")
+
+**Only the climax sense changes.** Leave "come" alone everywhere else — motion and arrival
+("he comes over," "come in," "your back comes off the bed," "a sound comes out of you"), and
+crucially when the **orgasm itself is the subject arriving**: "the orgasm comes," "the orgasm
+comes up from below," "when it comes," "the first one comes quietly." You cum; *the orgasm
+comes*. Never "the orgasm cums."
+
+---
+
 ## Markdown in Prose
 
 The game renders markdown in all prose fields. Use it deliberately and sparingly.

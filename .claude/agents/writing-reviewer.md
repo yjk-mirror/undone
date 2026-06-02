@@ -56,6 +56,7 @@ Read `docs/review-core.md` for the complete detection checklist. The key severit
 - Emotion announcements, heart/pulse clichés
 - British English, missing FEMININITY calibration
 - Preachy transformation narration ("you used to do this")
+- Orgasm verb spelled "come" instead of **cum** ("you come hard" → "you cum hard"; "he comes" → "he cums"; "you're coming" → "cumming"). Past tense "came" is correct. Do NOT flag motion/arrival "come" or "the orgasm comes" (the orgasm arrives — only a person *cums*)
 
 **Minor** — polish:
 - Sentence starter variety, weak NPC dialogue, missed branching opportunities

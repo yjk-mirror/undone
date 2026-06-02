@@ -31,6 +31,27 @@ const BANNED_PHRASES = [
   { pattern: /your body is making them/gi, message: "Narrator analyzing body" },
   { pattern: /you'?re just watching it work/gi, message: "Narrator analyzing body" },
   { pattern: /none of this is conscious/gi, message: "Narrator analyzing body/transformation" },
+  // Recurring interiority tells caught in the looping-adult review (2026-06):
+  // naming an internal faculty then reporting it suppressed, or the body as a
+  // deliberating agent. Show the body; never narrate the mental process.
+  { pattern: /the part of you that (takes notes|takes stock|might object|could object|keeps a hand|usually keeps)/gi, message: "Naming an internal faculty then reporting it suppressed (interiority)" },
+  { pattern: /the (?:part|version) of you that (?:takes notes|is not available)/gi, message: "Naming an internal faculty (interiority)" },
+  { pattern: /the body (?:has been |is |had been )?(?:making (?:a|its) case|running the argument|making an argument|making its case)/gi, message: "Narrator analyzing body ('the body makes a case')" },
+  { pattern: /(?:cognitive )?dissonance is noted(?: and filed)?/gi, message: "Narrator analyzing a mental state ('noted and filed')" },
+  { pattern: /noted and filed/gi, message: "Narrator analyzing a mental state ('noted and filed')" },
+];
+
+// ─── Orgasm spelling: "cum" not "come" (Important) ───────────────────────────
+// House style: the climax verb is "cum"/"cums"/"cumming". Past tense stays
+// "came". Only the person/body-climaxing sense — motion ("come in", "comes
+// out") and the orgasm/it ARRIVING ("the orgasm comes") stay "come".
+
+const ORGASM_SPELLING = [
+  { pattern: /\b(?:make|makes|making|let|lets|letting)\s+(?:you|her|him|me)\s+come\b/gi },
+  { pattern: /\b(?:going to|about to|gonna)\s+come\b/gi },
+  { pattern: /\bcome\s+(?:hard|fast|first|again|twice|quietly|loud(?:ly)?|already|on (?:his|her|your)|against (?:his|her|your)|around (?:his|her|your))/gi },
+  { pattern: /\b(?:you|he|she)\s+comes?\s+(?:hard|fast|first|again|twice|quietly|loud(?:ly)?|on (?:his|her|your)|against (?:his|her|your)|around (?:his|her|your)|before (?:he|she|you)|with a (?:grunt|groan|moan))/gi },
+  { pattern: /\b(?:you'?re|he'?s|she'?s|i'?m)\s+coming\b(?!\s+(?:over|in|out|up|down|back|to|home|with|along|through|around|here|apart|undone|for|after|toward|with you))/gi },
 ];
 
 // ─── AI erotic clichés (Critical) ────────────────────────────────────────────
@@ -279,6 +300,15 @@ function lint(text) {
     let m;
     while ((m = pattern.exec(cleanText)) !== null) {
       add("critical", "ai_prose_tell", lineForOffset(cleanText, m.index), m[0], message);
+    }
+  }
+
+  // 3b. Orgasm spelling — climax verb should be "cum", not "come"
+  for (const { pattern } of ORGASM_SPELLING) {
+    pattern.lastIndex = 0;
+    let m;
+    while ((m = pattern.exec(cleanText)) !== null) {
+      add("important", "orgasm_spelling", lineForOffset(cleanText, m.index), m[0], "Use 'cum'/'cums'/'cumming' for the orgasm sense (not 'come'); 'came' stays");
     }
   }
 
@@ -535,6 +565,24 @@ function selfTest() {
       expectPass: true,
     },
     {
+      name: "orgasm 'come' flagged",
+      input: `ACTION: x\nYou come hard around his fingers and he keeps going.\n`,
+      expectPass: true, // orgasm_spelling is "important", not critical
+      expectFinding: "orgasm_spelling",
+    },
+    {
+      name: "motion 'come' not flagged as orgasm",
+      input: `INTRO:\nHe comes over and sits down. The bartender looks up when you come in.\n\n{% if w.hasTrait("SHY") %}\nYou wait quietly because that is the kind of thing a shy person does at a bar on a slow Tuesday night.\n{% endif %}\n\nACTION: leave\nYou step back outside into the cold night air.\n`,
+      expectPass: true,
+      expectNotFinding: "orgasm_spelling",
+    },
+    {
+      name: "interiority 'noted and filed' flagged",
+      input: `ACTION: x\nThe cognitive dissonance is noted and filed.\n`,
+      expectPass: false,
+      expectRule: "banned_phrase",
+    },
+    {
       name: "em-dash reveal caught",
       input: `ACTION: look\nNot danger, exactly — more like being placed.\n`,
       expectPass: false,
@@ -601,6 +649,11 @@ function selfTest() {
     if (tc.expectFinding && !result.findings.some((f) => f.rule === tc.expectFinding)) {
       ok = false;
       process.stderr.write(`FAIL: ${tc.name} — expected finding ${tc.expectFinding} not found\n`);
+    }
+
+    if (tc.expectNotFinding && result.findings.some((f) => f.rule === tc.expectNotFinding)) {
+      ok = false;
+      process.stderr.write(`FAIL: ${tc.name} — unexpected finding ${tc.expectNotFinding} present\n`);
     }
 
     if (ok) {
