@@ -25,22 +25,28 @@ pub struct FilePathInput {
 #[derive(Clone)]
 pub struct RhaiServer {
     tool_router: ToolRouter<Self>,
-    engine: Arc<Engine>,
     /// Probe registry loaded from the base pack, so condition/effect validation
     /// resolves the same content ids the game loader does. Empty if the pack
     /// can't be found (validation then degrades to syntax + method checks).
     registry: Arc<undone_packs::PackRegistry>,
 }
 
+/// A bounded validation engine, built fresh per call. NOT stored on the handler:
+/// the handler must stay Send+Sync for rmcp, but rhai is built here without the
+/// `sync` feature (see Cargo.toml), so an `Engine` is not Send+Sync. Construction
+/// is cheap and these are infrequent authoring-time calls.
+fn validation_engine() -> Engine {
+    let mut engine = Engine::new();
+    // Prevent infinite-loop DoS on rhai_get_diagnostics — generous but bounded.
+    engine.set_max_operations(500_000);
+    engine
+}
+
 #[tool_router]
 impl RhaiServer {
     pub fn new() -> Self {
-        let mut engine = Engine::new();
-        // Prevent infinite-loop DoS on rhai_get_diagnostics — generous but bounded.
-        engine.set_max_operations(500_000);
         Self {
             tool_router: Self::tool_router(),
-            engine: Arc::new(engine),
             registry: Arc::new(load_probe_registry()),
         }
     }
@@ -79,7 +85,7 @@ impl RhaiServer {
         &self,
         params: Parameters<SourceInput>,
     ) -> Result<CallToolResult, McpError> {
-        let diags = validator::validate_with_engine(&params.0.source, &self.engine);
+        let diags = validator::validate_with_engine(&params.0.source, &validation_engine());
         let json = serde_json::to_string_pretty(&diags)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
@@ -115,7 +121,7 @@ impl RhaiServer {
         description = "List all functions registered in the Rhai engine, including built-ins. Returns a JSON array of function signatures. Use this to check what functions are available before calling them in a script."
     )]
     async fn rhai_list_registered_api(&self) -> Result<CallToolResult, McpError> {
-        let fns = validator::list_registered_functions(&self.engine);
+        let fns = validator::list_registered_functions(&validation_engine());
         let json = serde_json::to_string_pretty(&fns)
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
         Ok(CallToolResult::success(vec![Content::text(json)]))

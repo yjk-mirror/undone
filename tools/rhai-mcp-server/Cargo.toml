@@ -13,7 +13,13 @@ path = "src/main.rs"
 undone-scene = { path = "../../crates/undone-scene" }
 undone-packs = { path = "../../crates/undone-packs" }
 rmcp = { version = "0.8", features = ["server", "transport-io"] }
-rhai = { version = "1", features = ["sync", "metadata"] }
+# NOTE: no "sync" feature. This crate shares the tools workspace with undone-scene,
+# whose Rhai eval closures capture a thread-local raw-ptr borrow bridge and are
+# deliberately NOT Send+Sync. Cargo unifies features across the workspace, so
+# enabling rhai/sync here would force it onto undone-scene and break its
+# register_fn/register_type calls. The server therefore must not hold a rhai
+# Engine in its (Send+Sync) handler — it builds one per validation call instead.
+rhai = { version = "1", features = ["metadata"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

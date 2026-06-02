@@ -49,6 +49,10 @@ impl RustAnalyzerClient {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
+            // Kill rust-analyzer when this Child handle drops (clean server exit
+            // on stdin EOF). Without this, tokio leaves the OS process running and
+            // it is reparented — the orphan that accumulated multi-GB instances.
+            .kill_on_drop(true)
             .spawn()?;
 
         self.process = Some(child);
@@ -61,7 +65,12 @@ impl RustAnalyzerClient {
         let root_uri = format!("file://{}", current_dir.display());
 
         let init_params = json!({
-            "processId": null,
+            // Our own PID. Per the LSP spec, when the process identified by
+            // processId is no longer alive the server must exit. This is the
+            // backstop for a hard-killed rust-mcp (where kill_on_drop never runs):
+            // rust-analyzer notices our PID is gone and shuts itself down instead
+            // of becoming an orphan.
+            "processId": std::process::id(),
             "clientInfo": { "name": "rust-mcp-server", "version": "0.1.0" },
             "rootUri": root_uri,
             "capabilities": {
