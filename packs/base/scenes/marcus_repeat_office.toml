@@ -1,0 +1,289 @@
+[scene]
+id          = "base::marcus_repeat_office"
+pack        = "base"
+description = "The affair, recurring. Stolen, secret, somewhere on this floor. He sets the terms. The charge is the risk of being seen and the gap between the woman she is at her desk and what she's doing right now."
+
+[intro]
+prose = """
+{% if gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") and not gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") %}
+The stairwell at the east end of the floor. A door that swings inward, fire-rated, no handle on the hallway side once it closes. Whoever holds it open has to make a decision.
+{% elif gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") and gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") %}
+His office. Door closed. Blinds angled down, city light coming in horizontal strips across the carpet. His desk between him and the door is a technicality and they both know it.
+{% else %}
+The conference room again. Different time of day, which means different quality of light through the blinds and the same empty floor around it. The company calendar had this room booked at six; at six-fifteen it was clearly not happening. At six-twenty Marcus closed the door.
+{% endif %}
+
+{% if gd.desire() < 40 %}
+You've been doing fine. Two weeks, three weeks — whatever it's been since the last time. The work was real, the deadlines were real, the professional distance held because you made it hold. And then his hand steadied a printout on your desk this morning and the distance ran a deficit.
+{% elif gd.desire() < 70 %}
+The last three days have been wrong in a way that's hard to file. Not distracted — you're never not able to work. Just aware, underneath everything, of a low-frequency pull toward the east wing of the floor and whatever Marcus is doing in it. You've been very professional about not acting on this, which is not the same as not feeling it.
+{% else %}
+The composure has been costing more than usual. The presentations land fine, the code reviews are sharp, the Slack messages are brief and professional — and underneath all of it the wanting has been running at a temperature that makes the professional surface feel thin. Paper over a radiator.
+{% endif %}
+
+Marcus is on his side of the room. He's looking at you like he looks at a spec before he pushes back — not confrontational, just reading.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+The facade is already thin. You've been maintaining it at work for weeks and it gets cheaper every time this happens — a few hours of being two colleagues, then a door closes and the filing system for *who you are at this desk* gets looser. You can feel it.
+{% elif w.getSkill("COMPOSURE") < 60 %}
+You have a version of yourself that functions well in this building. She has opinions about sprint planning and can run a retro and she does not think about Marcus in the way you are currently thinking about Marcus.
+{% else %}
+You are a senior engineer who delivers on time and doesn't create HR situations. That is the fact you are currently holding.
+{% endif %}
+
+The floor outside is quiet. Not empty — there are always a few people in the far pods on the other side — but quiet enough that neither of you is talking yet.
+"""
+
+[[thoughts]]
+condition = 'w.getSkill("COMPOSURE") < 35'
+style = "inner_voice"
+prose = "*Thinner.*"
+
+[[thoughts]]
+condition = 'w.getSkill("COMPOSURE") >= 60 && gd.desire() >= 70'
+style = "inner_voice"
+prose = "*Paper. Over a radiator.*"
+
+# ── ACTIONS ──────────────────────────────────────────────────────────────────
+
+[[actions]]
+id        = "give_in_she_moves"
+label     = "Cross the room"
+detail    = "She closes the distance. The professional mask drops first."
+condition = 'gd.desire() >= 40 || w.getSkill("COMPOSURE") < 45'
+prose     = """
+You cover the distance. Not fast — fast would be something else. Steady.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+There's no ceremony to it. Your composure has been unravelling in small, unremarkable increments since the last time and the not-last-time before that, and at some point the thread you've been holding ran out. You reach him. He doesn't look surprised — just ready.
+{% elif w.getSkill("COMPOSURE") < 60 %}
+You feel the professional self observing this — the part that runs retrospectives and keeps her inbox under thirty and has built something real in this building. She observes and she doesn't stop you.
+{% else %}
+You are the kind of person who doesn't do this, and you are doing this. The cognitive dissonance is noted and filed.
+{% endif %}
+
+{% if gd.desire() >= 70 %}
+When you reach him you don't say anything. His hands come to your hips and your hands go to his lapels and for a moment you're just standing in the gravity of it, both of you aware of the floor outside.
+{% elif gd.desire() >= 40 %}
+He puts his hand at your jaw — that angle, familiar by now — and tilts your face up. The wanting has been a particular pitch all day and now it's just here, concrete, his hands and the room and the distant sound of someone's keyboard through the wall.
+{% else %}
+He reads the move correctly. His hand comes up to your jaw and you let him tip your face toward his and his mouth is on yours before either of you has said a word.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+You're wet before he's touched you properly — just the decision to cross the room did it, the want turned so literal it embarrasses you. His fingers find this immediately and his attention sharpens.
+{% endif %}
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth goes to your neck and the professional calculus drops out of the room entirely. The quarterly numbers, the retro next Thursday, the three people who sit between your desks. Gone.
+{% endif %}
+
+{% if not gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") %}
+The conference table is behind you. He lifts you onto it — same table, same height, this is a thing you know now — and steps between your knees. His jacket is rough under your palms and the blinds are angled wrong for the street and neither of you is fixing that.
+{% elif not gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") %}
+The stairwell is utilitarian, concrete, not a comfortable surface. That's part of it. His hand is at the small of your back pressing you into the wall and the cold of the concrete through your shirt is still there on the train home, hours later, a faint reminder.
+{% else %}
+His desk at one edge, his chair at another, the closed blind and the horizontal city light. He works you back until the desk is behind you. He lifts you onto it like it's the right answer to a question, because it is.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+His desk. His office. His hands directing which way you turn. The part of you that usually keeps a hand on the wheel has fully, completely let go, and the thing you feel about that is not what you'd expect.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing goes audible. He can hear it — the room's small enough that it's obvious — and uses the information without commenting on it.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+When he gets his hand under your shirt your nipples are already hard before he touches them. He registers this with that particular focused pause and his attention does not waver.
+{% endif %}
+
+His fingers find the right place and your hips move without being asked.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast — his hand barely settled into rhythm before you do, sudden and not quiet, the sound bouncing off whatever wall is nearest. Marcus holds still through it, watching your face. Then: "Okay," he says. Flat. Like a data point received. He starts again.
+{% endif %}
+
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs close around him. He goes deeper. You hear yourself.
+{% endif %}
+
+When he finishes inside you his forehead drops to yours and his breathing is not entirely even and yours is not either. Outside someone has put on a sweater and gone home, and another keyboard somewhere is the only sound left.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches and doesn't come back down until it's over, and his arm is under you the whole time.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl hard inside your shoes. Later your feet will be sore and you'll remember why.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush on your chest and throat is visible in the office light. He looks at you like he's checking the work. You don't cover it.
+{% endif %}
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+You don't bother trying to reconstruct the professional self immediately. She'll be back. She always comes back. Just slightly thinner than before.
+{% elif w.getSkill("COMPOSURE") < 60 %}
+You straighten your shirt. Pull yourself back into the shape of the woman who works here. It takes a beat longer than it used to.
+{% else %}
+You straighten your clothes. The professional version of yourself slots back into place — close enough to look right from anyone else's angle.
+{% endif %}
+
+Neither of you says anything about tomorrow.
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX", 1); gd.addStat("TIMES_PUBLIC_SEX", 1); gd.addStat("TOTAL_ORGASMS", 1); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); w.skillIncrease("COMPOSURE", -8); w.skillIncrease("FEMININITY", 2); w.changeStress(3); w.addArousal(-3); gd.setDesire(12); if !gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") { gd.setGameFlag("MARCUS_REPEAT_USED_CONF"); } else if !gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") { gd.setGameFlag("MARCUS_REPEAT_USED_STAIR"); } else { gd.setGameFlag("MARCUS_REPEAT_USED_OFFICE"); }'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "give_in_he_moves"
+label  = "Let him"
+detail = "He reads the room. She doesn't tell him no."
+prose  = """
+You stay where you are.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+He's been watching you not decide for sixty seconds and he knows how it ends. He crosses the room without waiting for permission he already has.
+{% elif w.getSkill("COMPOSURE") < 60 %}
+He reads your stillness correctly — the not-leaving, the not-talking. He steps forward.
+{% else %}
+He looks at you for a moment. Something in your posture gave it away, or the fact that you're still here. He steps forward.
+{% endif %}
+
+{% if gd.desire() >= 70 %}
+No preamble. His hands find your hips and your body goes toward him before you've done anything about it.
+{% elif gd.desire() >= 40 %}
+"Tell me to stop," he says. Low. Not a real question.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+Direct. No management. Like he actually wants the answer. It lands somewhere below your sternum.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've logged every exchange in this building for weeks. You know where this started. The telling-to-stop would be accurate and it's not coming.
+{% else %}
+You don't tell him to stop.
+{% endif %}
+{% else %}
+He reaches back and closes the door without looking at it. The office goes darker by one stripe of hallway light.
+{% endif %}
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth at your neck, not your mouth — knows the routing by now. Your hands go to his shoulders before you've decided to put them there.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+His hands under your skirt and the evidence is already there, through the fabric and then past it, and he pauses one beat. He doesn't comment. His pace accelerates.
+{% endif %}
+
+{% if w.hasTrait("PRAISE_KINK") %}
+"Good girl," he says. Quiet. Economical. A data point confirmed.
+Your hips move.
+{% endif %}
+
+{% if not gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") %}
+Conference table. The architecture of this situation. He lifts you onto it and steps between your knees and his jacket is rough under your hands and the room doesn't have any better surfaces.
+{% elif not gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") %}
+Concrete wall at your back. His hand keeping you there. The stairwell light is motion-activated and has gone off and neither of you trips it again, which means this is happening in the dark with the fire door cracked two inches against someone going home late.
+{% else %}
+His desk. His weight between you and the door. The horizontal stripes of city light across the ceiling above you.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+He's running this entirely. The rhythm, the angle, where he puts your hands. In another context you'd have a note about the power dynamic. Right now the part of you that takes notes is not available.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing fills the room. He registers it as real-time information and adjusts.
+{% endif %}
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+When he gets his hands on your chest the sound you make is not quiet and he doesn't slow down.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers and you're already close and then you come, fast and not subtle, the sound echoing off glass or concrete depending on which room this is. He stills and watches you and his expression is that particular focused attention. "Okay," he says. He keeps going.
+{% if w.hasTrait("PRAISE_KINK") %}
+"Good," he says. One syllable. Your hips push up into nothing.
+{% endif %}
+{% endif %}
+
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs around him. He registers it and goes deeper.
+{% endif %}
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off whatever surface is behind you. His arm comes under you and holds.
+{% endif %}
+
+{% if w.hasTrait("TOE_CURLER") %}
+Your toes curl inside your shoes. Your heels press into the backs of his legs.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush on your throat and chest — he can see it. He looks at you like he's been paying attention.
+{% endif %}
+
+When it's over: the room is the room. Office, stairwell, conference table — same floor, same company, same Monday-through-Friday. He tucks his shirt in. You pull your skirt to where it belongs.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+The professional version of yourself is still there when you need her. She just costs more to sustain than she used to.
+{% elif w.getSkill("COMPOSURE") < 60 %}
+You take an extra thirty seconds. Reset the face, reset the posture, confirm it in the dark of your phone screen. You go out first.
+{% else %}
+You leave separately. He waits two minutes, which is the right call, which you note automatically and wish you hadn't.
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX", 1); gd.addStat("TIMES_PUBLIC_SEX", 1); gd.addStat("TOTAL_ORGASMS", 1); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(1); w.skillIncrease("COMPOSURE", -10); w.skillIncrease("FEMININITY", 2); w.changeStress(3); w.addArousal(-3); gd.setDesire(8); if !gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") { gd.setGameFlag("MARCUS_REPEAT_USED_CONF"); } else if !gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") { gd.setGameFlag("MARCUS_REPEAT_USED_STAIR"); } else { gd.setGameFlag("MARCUS_REPEAT_USED_OFFICE"); }'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "not_today"
+label  = "Not today"
+detail = "The professional self holds. The want doesn't go anywhere."
+prose  = """
+{% if w.getSkill("COMPOSURE") >= 60 %}
+You are a senior engineer who delivers on time. You have a stand-up in the morning and a code review that went long yesterday and four hundred unread threads on Slack that are someone else's problem. You have a life that functions well. You pick up the folder — the actual reason you had to stay late, genuinely — and you hold it between you and the room.
+
+"I need to get this uploaded before I leave."
+
+{% elif w.getSkill("COMPOSURE") < 35 %}
+It takes more than it should. The word *no* is a structural decision right now, not a reflex. You reach for the professional self — the one who runs retrospectives and doesn't create HR situations — and she's there, thinner than she was six months ago but present.
+
+"I can't tonight."
+
+{% else %}
+You breathe out.
+
+The wanting is real. His eyes on you from across the room are real. The empty floor and the closed door and the knowledge of exactly what happens next — all of it completely real. You pick up whatever's nearest and you look at it instead of him.
+
+"Not today," you say.
+{% endif %}
+
+{% if w.hasTrait("AMBITIOUS") %}
+The career is real. The open floor plan is real. You built something in this building that does not belong in a closed conference room or a stairwell. You hold that.
+{% elif w.hasTrait("ANALYTICAL") %}
+You can see the version where you stay. You can see it completely clearly from here, right down to tomorrow morning and the desk between you at the stand-up. You take the other branch.
+{% endif %}
+
+Marcus doesn't push. He watches you with his hands loose at his sides — not hurt, not performing patience.
+
+"Okay," he says.
+
+{% if gd.desire() >= 70 %}
+The wanting doesn't leave just because you did. It's still there on the train, low and present, and you sit with it because that's the thing you chose.
+{% elif gd.desire() >= 40 %}
+On the train home the pull is still present in the background, a low hum. Not discharged. Not going anywhere.
+{% else %}
+The hall is bright. You blink against it. The floor outside is quiet and the elevator is waiting and this was the right call and you know it and you go.
+{% endif %}
+"""
+
+  effect = 'w.skillIncrease("COMPOSURE", 4); w.changeStress(2); w.addArousal(2); gd.addDesire(10);'
+
+  [[actions.next]]
+  finish = true

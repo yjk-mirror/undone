@@ -193,6 +193,17 @@ impl W {
         })
     }
 
+    /// Convenience read of the structural COMPOSURE skill (the loss-of-control
+    /// axis). Equivalent to `w.getSkill("COMPOSURE")`.
+    fn composure(&mut self) -> RhaiResult<i64> {
+        with_read_ctx(|world, reg, _ctx| {
+            let skill_id = reg
+                .composure_skill()
+                .map_err(|_| unknown_id_err("skill", "COMPOSURE"))?;
+            Ok(world.player.skill(skill_id) as i64)
+        })
+    }
+
     // ── string methods (eval_call_string, Receiver::Player) ──────────────────
 
     fn pc_origin(&mut self) -> RhaiResult<String> {
@@ -456,6 +467,7 @@ pub fn register(engine: &mut rhai::Engine) {
         .register_fn("getStress", W::get_stress)
         .register_fn("getAnxiety", W::get_anxiety)
         .register_fn("getSkill", W::get_skill)
+        .register_fn("composure", W::composure)
         // string
         .register_fn("pcOrigin", W::pc_origin)
         .register_fn("beforeName", W::before_name)

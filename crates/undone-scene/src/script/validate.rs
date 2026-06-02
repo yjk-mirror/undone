@@ -176,6 +176,7 @@ fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
         ("w", "hasTrait" | "hadTraitBefore") => Some(spec_id(1, 0, IdKind::Trait)),
         ("w", "inCategory" | "beforeInCategory") => Some(spec_id(1, 0, IdKind::Category)),
         ("w", "getSkill") => Some(spec_id(1, 0, IdKind::Skill)),
+        ("w", "composure") => Some(spec(0)),
         // hasStuff id is intentionally NOT registry-validated (legacy: missing = can't have it).
         ("w", "hasStuff") => Some(spec(1)),
         ("w", "checkSkill" | "checkSkillRed") => Some(spec_id_int(2, 0, IdKind::Skill, 1)),
@@ -243,7 +244,9 @@ fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
 fn write_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
     match (receiver, method) {
         // ── w (player) ───────────────────────────────────────────────────────
-        ("w", "changeStress" | "changeMoney" | "changeAnxiety") => Some(spec(1)),
+        ("w", "changeStress" | "changeMoney" | "changeAnxiety" | "changeComposure") => {
+            Some(spec(1))
+        }
         ("w", "addArousal" | "changeAlcohol") => Some(spec_i8(1, &[0])),
         ("w", "skillIncrease") => Some(spec_id(2, 0, IdKind::Skill)),
         ("w", "addTrait" | "removeTrait") => Some(spec_id(1, 0, IdKind::Trait)),

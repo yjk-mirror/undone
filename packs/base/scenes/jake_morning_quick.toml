@@ -1,0 +1,278 @@
+[scene]
+id          = "base::jake_morning_quick"
+pack        = "base"
+description = "Morning. Jake. The alarm is already a problem or will be soon. A body that knows what it wants and a man who reads the signal before it's fully sent."
+
+# Repeatable quickie variant — the FAMILIARITY device.
+# Distinct from jake_morning_after (tender/first-time discovery) and
+# jake_stays_over (domestic coffee/routine morning).
+# The device here: practiced ease. Her body already knows his. No discovery,
+# no uncertainty — the shorthand of people who have done this. Compressed
+# and urgent by circumstance but easy in execution.
+# Two structural axes:
+#   1. gd.desire() — waking up already charged vs drifting in half-asleep
+#   2. gd.isWeekday() — time pressure (has to leave) vs lazy weekend shape
+# Content level: SEXUAL
+
+[intro]
+prose = """
+{% if gd.isWeekday() %}
+The alarm hasn't gone off yet but it will — your phone on the nightstand says 6:48. Jake is warm against your back, the weight of him a wall of heat, his arm loose across your waist.
+
+{% if gd.desire() >= 50 %}
+You were already awake before him. Have been awake for a while, actually — lying there, his body along yours, and your body having opinions about this you haven't done anything about yet. His hips are against you. His breathing slow. He's still asleep and you are not.
+
+{% else %}
+You surface slowly, from sleep into the dark and the warm and his arm across you. His hips against the small of your back. A weight you know now, distributed against you in a pattern you've mapped.
+
+{% endif %}
+
+Somewhere in the building a door slams, and in the hall the radiator kicks on and settles.
+
+{% else %}
+No alarm. Sunday morning, or Saturday — it doesn't matter which, only that it doesn't matter. Jake is behind you, his arm loose across your hip, his breathing slow. Light coming through the curtain edge in a stripe across the wall.
+
+{% if gd.desire() >= 50 %}
+You've been awake. His body against yours, the warmth of him, and you've been lying here running out of reasons not to do something about it. His cock is half-hard against the back of your thigh. You don't think that's your imagination.
+
+{% else %}
+You float up from sleep in pieces — the warmth first, then his arm, then the particular quiet of a morning with nowhere to be. His hips settle against you and your body registers it, slow and simple, the familiar heat of him.
+
+{% endif %}
+{% endif %}
+
+He's awake, or close. The breathing shifted.
+"""
+
+# ── Player Actions ─────────────────────────────────────────────────────────────
+
+[[actions]]
+id     = "push_back_into_him"
+label  = "Push back into him"
+detail = "No words needed. He'll get it."
+prose  = """
+You shift back — not much, just enough — and his arm tightens immediately.
+
+"Hey," he says. Voice thick with sleep.
+
+You don't say anything. He reads the absence of words correctly. His hand moves from your waist to your hip and stays there, feeling where you are.
+
+{% if gd.isWeekday() %}
+{% if gd.desire() >= 50 %}
+You're already wet when his hand moves between your thighs, and he makes a low sound against the back of your neck when he finds out. Not surprised. Satisfied.
+
+"We have time?" he asks.
+
+"Make it fast," you say.
+
+He does. His hand works until you're pushing back harder and making sounds you'd be embarrassed about if you had the bandwidth for embarrassment, and then he's inside you from behind, his arm holding you close, and the pace is efficient and easy — not mechanical, nothing like that, just the rhythm of people who know exactly where the edges are. His hips roll into yours, unhurried even in the hurry, and his mouth is on the back of your neck where he's learned you want it and you grip the pillow and let it happen.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come fast — before you expected, before he expected — a quick bright clench that makes your whole body curl forward. He keeps moving through it, his arm tightening, and when you're done shaking he slows and finishes and presses himself against you for a moment, both of you still.
+{% elif w.hasTrait("EASILY_WET") %}
+You were so wet it was almost embarrassing. He knew before he moved his hand. The noise when he pushed in was its own kind of evidence, and you felt the flush go up your chest and didn't care.
+{% else %}
+It doesn't take long. The orgasm rolls through you warm and efficient, and when you reach back and pull his hip forward he reads the cue and finishes with a low exhale against your shoulder.
+{% endif %}
+
+"Okay," he says, after. Still breathing.
+
+"Yeah."
+
+The alarm goes off two minutes later. You're already out of bed.
+
+{% else %}
+His hand moves slow. Not rushed — unhurried even though there's a clock on the situation — his fingers reading what you need, finding the rhythm you've found before.
+
+"Morning," he says.
+
+You push back again instead of answering.
+
+He shifts, pulling you closer, and then he's inside you and you exhale through your nose and your hand finds his arm and holds on. The pace is easy. Not the urgent driving press of a new thing — the comfortable depth of knowing each other, of a body that already knows the right angle. He takes his time even though he shouldn't. You let him.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth on the back of your neck. His breath warm there, and then his lips, slow — one press then another — and the heat of it runs down your spine and you arch back against him.
+{% elif w.hasTrait("NIPPLE_GETTER") %}
+His hand moves up from your hip to your breast, thumb brushing across your nipple, and the sensation is a straight line downward. You press his hand there to keep it.
+{% elif w.hasTrait("PRAISE_KINK") %}
+"There," he says, low, against your ear. "Like that."
+
+The words land somewhere you didn't tell them to.
+{% else %}
+His hands know you well enough now. They don't wander — they go where they're useful, and they stay there.
+{% endif %}
+
+When you come it's warm and open, the kind that unwinds rather than spikes, and you close around him and he finishes with you, his arm tight across your waist.
+
+The alarm goes off three minutes later. You shower first.
+
+{% endif %}
+
+{% else %}
+{% if gd.desire() >= 50 %}
+He's awake. You both know it. His arm pulls you tighter and his hips press forward and he's hard against you and that's settled.
+
+"Morning," he says.
+
+You reach back and find his hip and pull.
+
+"Right," he says. Like he's answering a question.
+
+He moves your underwear to the side and pushes in slow, from behind, and the sound you make is involuntary and quiet and he hears it. His arm across your chest, holding you back against him, his hips rolling forward at the same unhurried pace as always — Jake is never in a hurry even when he is — and the light through the curtain is doing something warm to the wall and you close your eyes and feel where he is.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm finds you fast — it always does in the morning when you've been wanting — and it's a long rolling thing, not sharp, and you grip his arm and go still in the middle of it and he slows and waits and then keeps going. Patient.
+{% elif w.hasTrait("SUBMISSIVE") %}
+His arm holds you in place. Not deliberately — just there, because you're pressed together — but the held feeling does something and you stop moving and let him set the rhythm and that's its own particular good.
+{% else %}
+You rock back into him, finding the angle, and he adjusts without being asked. Your hand on his hip pulling him where you want. He lets you have it.
+{% endif %}
+
+He finishes and you both stay like that, the light climbing the wall, nowhere to be.
+
+{% else %}
+His hips shift forward and the warmth of him registers along your whole back. His hand on your hip, easy and exploratory — awake now, interested.
+
+"Yeah?" he says.
+
+A simple word. The shorthand of people who don't need to explain themselves anymore.
+
+{% if w.hasTrait("FLIRTY") %}
+"Probably," you say.
+
+He makes a sound that's almost a laugh. Then his hands start to make the case.
+
+{% elif w.hasTrait("SHY") %}
+You don't say anything. You shift your hips back, which is the whole answer.
+
+{% elif w.hasTrait("CONFIDENT") %}
+"When you're ready," you say.
+
+"I'm ready."
+
+"Then."
+
+{% else %}
+"Mm," you say. Which is enough.
+
+{% endif %}
+
+He knows what he's doing in the morning. Slower than other times, more patient, the pace of people who have nowhere they have to be and are using the fact — his hands moving over you until your breathing changes and then his cock where you want it, from behind, the angle you've established over weeks of this, and you grip the pillow and press back and let it go.
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His hand moves to your breast and stays there and you put your own hand over his to keep it.
+{% elif w.hasTrait("EASILY_WET") %}
+When his hand moves between your thighs, you're already there. He lets out a breath against your neck. "Every time," he says.
+{% endif %}
+
+No urgency. No performance. He brings you off at his pace, warm and easy, and then finishes himself, and his arm finds your waist after and stays, and neither of you moves for a while, the morning happening outside without either of you in it.
+
+{% endif %}
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX", 1); gd.addStat("TOTAL_ORGASMS", 1); npc("m").addLiking(1); npc("m").addSexualActivity("vaginal"); w.skillIncrease("FEMININITY", 1); if gd.isWeekday() { gd.setDesire(10); } else { gd.setDesire(5); }'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "mouth_first"
+label  = "Mouth first"
+detail = "You want to. He'll let you. You've learned you like this."
+prose  = """
+You turn over. He's blinking awake — half-gone still, the loose jaw of someone who hasn't fully arrived — and you slide down under the sheets without asking.
+
+His hand finds the back of your head in the dark under the covers, loose, not directing. Just there.
+
+{% if w.getSkill("ORAL_SKILL") >= 30 %}
+You know what you're doing now. Took a while — there's a learning curve you couldn't have imagined before this body — but you know how to read the sounds he makes, when his hand tightens or loosens in your hair, when to slow and when to push. You work him with the ease of practice and the small specific pleasure of knowing it works.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+His hand tightens in your hair — not pulling, just present — and the held weight of it sends something warm through your whole chest while you're still working.
+{% elif w.hasTrait("PRAISE_KINK") %}
+"God," he says. Quiet. Like he means it.
+
+The word gets into your hips somehow.
+{% else %}
+He makes a sound that you've learned to like. The private sounds, the ones he only makes with you. You file it.
+{% endif %}
+
+{% else %}
+Still learning. But you know his signals well enough now — the small hitch in his breathing, his hips fighting the reflex to move — and you follow them. Less about technique and more about attention. Jake is patient. He always has been.
+
+{% endif %}
+
+{% if gd.isWeekday() %}
+You don't take long — no time for long — and when you judge by his breathing that he's close you pull off and move up, and he helps you slot into place with the wordless efficiency of repetition, his hands on your hips knowing where they go.
+
+He's inside you for maybe four minutes before you both finish, you first, tight and fast, him right after with his hands gripping your waist. You climb off him. The alarm is probably about to go off.
+
+"Good morning," he says.
+
+"Excellent morning," you say. Straightening your underwear.
+
+{% else %}
+You're in no hurry. He can tell. His breathing stays controlled even as it gets harder, and when you finally pull off and move up his hands find your hips and you sink down and the quiet sound you make is pleasure and also relief and also something that doesn't have a name.
+
+Lazy. Warm. His hands on your hips not directing, just there — ballast. You set the pace, slow, and the morning keeps moving outside and in here it doesn't matter.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come first, without particularly meaning to, the pressure and the angle combining — it always catches you faster on top when you haven't rushed — and you keep moving through it. He finishes after.
+{% elif w.hasTrait("ROMANTIC") %}
+His face is completely open, looking up at you. No performance. You look back.
+{% else %}
+He finishes with his hands tight on your hips and a long exhale and you stay there for a moment, both still, his hands slowly loosening.
+{% endif %}
+
+You lean down and he wraps his arms around you and you stay like that, tangled, his chest warm under your cheek.
+
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX", 1); gd.addStat("TIMES_GAVE_ORAL", 1); gd.addStat("TOTAL_ORGASMS", 1); npc("m").addLiking(2); npc("m").addSexualActivity("vaginal"); npc("m").addSexualActivity("blowjob"); w.skillIncrease("ORAL_SKILL", 2); w.skillIncrease("RIDING", 2); w.skillIncrease("FEMININITY", 2); gd.setDesire(5);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "let_it_go"
+label  = "Not this morning"
+detail = "The alarm, the day, the logistics. You'll get there tonight."
+prose  = """
+His arm is there, warm, and his hips are against you, and you know exactly where this is going and you're not going to let it.
+
+{% if gd.isWeekday() %}
+The clock says whatever it says and you have a subway to catch.
+
+You pat his arm once — an acknowledgment, a rain check, a word with your hand — and slide out from under it. His breathing doesn't change. He might be asleep again already.
+
+{% if w.hasTrait("ROMANTIC") %}
+You stand at the end of the bed for a second. His shoulder. The slope of his back. You turn away and get dressed.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+Dressed in six minutes. Coffee going before you're out of the bathroom. The morning runs clean, which is its own thing. You text him once you're on the subway: *later.*
+
+{% else %}
+You dress in the half-dark. His breathing stays slow. The apartment is quiet around you, his things in it — jacket on the chair, phone face-down — and you close the door behind you without making it a moment.
+
+{% endif %}
+
+The city is cold and grey and going about its morning. You're going about yours.
+
+{% else %}
+It's a weekend and there's no reason except that you're half-asleep and maybe that's reason enough, maybe you want the morning to be slow and non-transactional, maybe you just want to lie here and not do anything about the warmth.
+
+You put your hand over his — the one across your waist — and squeeze once.
+
+He settles. The breathing stays even. Okay.
+
+The morning is an hour of that: his arm, the light, the city making its Saturday noise outside, neither of you fully asleep or fully awake. Not nothing. Just not that.
+
+{% endif %}
+"""
+
+  effect = 'npc("m").addLiking(1); gd.addDesire(8);'
+
+  [[actions.next]]
+  finish = true
