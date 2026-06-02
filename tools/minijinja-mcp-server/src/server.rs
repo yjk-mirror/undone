@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use rmcp::{
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{CallToolResult, Content, ServerCapabilities, ServerInfo},
@@ -22,9 +24,17 @@ pub struct RenderTemplateInput {
     pub context_json: String,
 }
 
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ValidateProseInput {
+    /// The Minijinja prose template source to validate against the game method surface.
+    pub source: String,
+}
+
 #[derive(Clone)]
 pub struct MiniJinjaServer {
     tool_router: ToolRouter<Self>,
+    /// Base-pack registry, for content-id resolution in the prose method-surface gate.
+    registry: Arc<undone_packs::PackRegistry>,
 }
 
 #[tool_router]
@@ -32,7 +42,21 @@ impl MiniJinjaServer {
     pub fn new() -> Self {
         Self {
             tool_router: Self::tool_router(),
+            registry: Arc::new(load_probe_registry()),
         }
+    }
+
+    #[tool(
+        description = "Validate a game PROSE template against the real method surface — exactly the load-time prose gate the game loader runs. Catches minijinja syntax errors AND unknown/mis-contexted methods (a write mutator or condition-only checkSkill used in prose) and unknown content ids (a typo'd trait/skill). Single- and double-quoted ids are both accepted. Returns a JSON array of diagnostics; empty means valid."
+    )]
+    async fn jinja_validate_prose(
+        &self,
+        params: Parameters<ValidateProseInput>,
+    ) -> Result<CallToolResult, McpError> {
+        let errors = validator::validate_prose(&params.0.source, &self.registry);
+        let json = serde_json::to_string_pretty(&errors)
+            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+        Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
     #[tool(
@@ -80,9 +104,34 @@ impl MiniJinjaServer {
 impl ServerHandler for MiniJinjaServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
-            instructions: Some("Minijinja template validation and preview tools.".into()),
+            instructions: Some(
+                "Minijinja template validation, preview, and prose method-surface (game \
+                 prose gate) tools."
+                    .into(),
+            ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
+        }
+    }
+}
+
+/// Load the base-pack registry for prose content-id validation. Tries
+/// `$UNDONE_PACKS_DIR` then `./packs` (the server is launched from the repo root).
+/// On any failure, returns an empty registry so the server still starts (id
+/// validation degrades, method/context checks still work).
+fn load_probe_registry() -> undone_packs::PackRegistry {
+    let candidate = std::env::var("UNDONE_PACKS_DIR")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::path::PathBuf::from("packs"));
+    match undone_packs::load_packs(&candidate) {
+        Ok((registry, _metas)) => registry,
+        Err(e) => {
+            tracing::warn!(
+                "minijinja-mcp-server: could not load probe pack from {}: {e}; \
+                 prose content-id validation will be limited",
+                candidate.display()
+            );
+            undone_packs::PackRegistry::new()
         }
     }
 }

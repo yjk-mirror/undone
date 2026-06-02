@@ -96,6 +96,24 @@ fn to_template_error(e: &MiniJinjaError) -> TemplateError {
     }
 }
 
+/// Validate a prose template against the game's method surface (the same load-time
+/// prose gate the loader runs). Checks every `receiver.method(...)` call-site is a
+/// known, prose-callable method with resolvable string-literal content ids. Runs the
+/// minijinja syntax check first; only reports method-surface errors when syntax is OK.
+pub fn validate_prose(source: &str, registry: &undone_packs::PackRegistry) -> Vec<TemplateError> {
+    let syntax = validate_template(source);
+    if !syntax.is_empty() {
+        return syntax;
+    }
+    match undone_scene::script::api::prose_validate::validate_prose(source, registry, "mcp") {
+        Ok(()) => vec![],
+        Err(e) => vec![TemplateError {
+            line: None,
+            message: e.to_string(),
+        }],
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -145,5 +163,53 @@ mod tests {
         assert!(result.is_err(), "expected error for invalid JSON context");
         let err = result.unwrap_err();
         assert!(err.message.contains("Invalid JSON context"));
+    }
+
+    fn registry_with_femininity() -> undone_packs::PackRegistry {
+        let mut r = undone_packs::PackRegistry::new();
+        r.register_skills(vec![undone_packs::SkillDef {
+            id: "FEMININITY".into(),
+            name: "Femininity".into(),
+            description: String::new(),
+            min: 0,
+            max: 100,
+        }]);
+        r
+    }
+
+    #[test]
+    fn prose_validate_flags_unknown_method() {
+        let r = registry_with_femininity();
+        assert!(
+            !validate_prose("{{ w.notAReal() }}", &r).is_empty(),
+            "unknown prose method should be reported"
+        );
+    }
+
+    #[test]
+    fn prose_validate_accepts_valid_single_quoted_id() {
+        let r = registry_with_femininity();
+        assert!(
+            validate_prose("{{ w.getSkill('FEMININITY') }}", &r).is_empty(),
+            "valid prose method + registered id should pass"
+        );
+    }
+
+    #[test]
+    fn prose_validate_flags_write_in_prose() {
+        let r = registry_with_femininity();
+        assert!(
+            !validate_prose("{{ w.changeMoney(5) }}", &r).is_empty(),
+            "write mutator should be rejected in prose"
+        );
+    }
+
+    #[test]
+    fn prose_validate_reports_syntax_errors() {
+        let r = registry_with_femininity();
+        assert!(
+            !validate_prose("{{ w.getSkill('FEMININITY'", &r).is_empty(),
+            "malformed template should report syntax error"
+        );
     }
 }
