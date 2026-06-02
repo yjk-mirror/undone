@@ -6,15 +6,18 @@
 //! produced but never required (an open door); broken = required but never
 //! produced (an unreachable gate).
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::fmt::Write as _;
+use std::path::Path;
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
+use undone_packs::load_packs;
 use undone_scene::reachability::{arc_state_eqs, required_game_flags};
 use undone_scene::scheduler::SceneBinding;
 use undone_scene::script::validate::{source_advance_arcs, source_set_game_flags};
 use undone_scene::types::SceneDefinition;
+use undone_scene::{load_scenes, load_schedule};
 
 /// The full reconciled map. Serializes to the JSON sidecar.
 #[derive(Debug, Clone, Serialize, Default)]
@@ -108,9 +111,71 @@ pub struct WriteNext {
     pub detail: String,
 }
 
-/// Build the reconciled story map from a packs directory. Stub for now.
-pub fn build_story_map(_packs_dir: &std::path::Path) -> Result<StoryMap, String> {
-    Ok(StoryMap::default())
+/// Render the agent-facing JSON sidecar (pretty-printed for diff-ability).
+pub fn render_json(map: &StoryMap) -> Result<String, String> {
+    serde_json::to_string_pretty(map).map_err(|e| format!("json serialize error: {e}"))
+}
+
+/// Build the reconciled story map from a packs directory (production path).
+pub fn build_story_map(packs_dir: &Path) -> Result<StoryMap, String> {
+    let (registry, pack_metas) =
+        load_packs(packs_dir).map_err(|e| format!("pack load failed: {e}"))?;
+
+    // Load all scenes across packs.
+    let mut scenes = HashMap::new();
+    let mut existing: BTreeSet<String> = BTreeSet::new();
+    for meta in &pack_metas {
+        let scenes_dir = meta.pack_dir.join(&meta.manifest.content.scenes_dir);
+        let loaded = load_scenes(&scenes_dir, &registry)
+            .map_err(|e| format!("scene load failed for '{}': {e}", meta.manifest.pack.id))?;
+        for (id, scene) in loaded {
+            existing.insert(short_id(&id).to_string());
+            scenes.insert(id, scene);
+        }
+    }
+
+    // Schedule bindings (gate sources + slot metadata).
+    let scheduler =
+        load_schedule(&pack_metas, &registry).map_err(|e| format!("schedule load failed: {e}"))?;
+    let bindings = scheduler.bindings();
+
+    // Entry scenes are reachable without a binding.
+    let mut entry_scenes: HashSet<String> = HashSet::new();
+    if let Some(opening) = registry.opening_scene() {
+        entry_scenes.insert(opening.to_string());
+    }
+    if let Some(transformation) = registry.transformation_scene() {
+        entry_scenes.insert(transformation.to_string());
+    }
+
+    let facts = collect_scene_facts(&scenes, &HashMap::new(), &bindings, &entry_scenes);
+
+    // Roadmap (one per pack; base pack is the only one for now). Concatenate any
+    // that exist so additional packs extend the thread list.
+    let mut roadmap = Roadmap::default();
+    for meta in &pack_metas {
+        let path = meta.pack_dir.join("roadmap.toml");
+        if path.exists() {
+            let text = std::fs::read_to_string(&path)
+                .map_err(|e| format!("read {}: {e}", path.display()))?;
+            let parsed = parse_roadmap(&text)?;
+            roadmap.threads.extend(parsed.threads);
+        }
+    }
+
+    let existing_set: HashSet<String> = existing.into_iter().collect();
+    Ok(reconcile(&facts, &roadmap, &existing_set))
+}
+
+/// Regenerate both outputs into memory and compare against the committed files.
+/// Returns `Ok(true)` if up-to-date, `Ok(false)` if stale.
+pub fn is_up_to_date(packs_dir: &Path, md_path: &Path, json_path: &Path) -> Result<bool, String> {
+    let map = build_story_map(packs_dir)?;
+    let md = render_markdown(&map);
+    let json = render_json(&map)?;
+    let md_current = std::fs::read_to_string(md_path).unwrap_or_default();
+    let json_current = std::fs::read_to_string(json_path).unwrap_or_default();
+    Ok(md_current == md && json_current == json)
 }
 
 /// Derived facts for one scene, keyed by full `pack::id`.
@@ -874,5 +939,26 @@ planned = ["gym_regular_first"]
         assert!(md.contains("## Write Next"));
         assert!(md.contains("MARCUS_AFFAIR_COOLING"));
         assert!(md.contains("## Marcus affair"));
+    }
+
+    #[test]
+    fn json_roundtrips_thread_names() {
+        // BREAKS IF: the JSON sidecar schema breaks and agents can't read threads.
+        let map = StoryMap {
+            threads: vec![Thread {
+                name: "Jake romance".into(),
+                note: String::new(),
+                scenes: vec![],
+                dangling: vec![],
+                broken: vec![],
+                planned: vec![],
+            }],
+            orphans: vec![],
+            drift: vec![],
+            write_next: vec![],
+        };
+        let json = render_json(&map).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed["threads"][0]["name"], "Jake romance");
     }
 }
