@@ -17,7 +17,7 @@ You know when you got checked out. You've been learning that — the exact textu
 attention running across the back of your neck, the instinct that makes you glance toward
 the door without deciding to.
 
-He's not hiding it. That's the part. He clocks the fact that you noticed him noticing and
+He's not hiding it. He clocks the fact that you noticed him noticing and
 he doesn't look away. He just sets the bar down and rests, forearms over his knees, and
 watches you with the particular ease of someone who has nowhere else to be.
 
@@ -26,9 +26,6 @@ Something fires in you that runs on old circuitry. The forearms. The set of the 
 The way he's resting, not performing rest. Your gaze does the thing it used to do — inventory,
 quick, automatic. Hip-to-shoulder ratio. The casual confidence in his stillness.
 
-It runs all the way back to you. He is doing exactly what you would have done. The same
-patience. The same unbothered certainty. The same willingness to let the distance do the work.
-
 Your hands are on the cable handles. Your workout bra is damp at the back. The inventory
 already ran and came back filed somewhere warm.
 {% elif w.hasTrait("ANALYTICAL") %}
@@ -36,8 +33,6 @@ You clock the full picture in about four seconds. How long he's been there relat
 when you arrived. The weight he's resting between sets — nothing he needs to recover from,
 just an excuse to be still. The angle of his body: oriented toward the machine you're on.
 The fact that he's not looking away now that you've noticed.
-
-This is a legible strategy. You can read the whole trajectory from here.
 
 Something low in your stomach doesn't care about the trajectory.
 {% elif w.hasTrait("SHY") %}

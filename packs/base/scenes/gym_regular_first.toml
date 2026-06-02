@@ -50,7 +50,7 @@ His hand comes up and takes the strap of your gym bag off your shoulder. Sets it
 Not a question.
 
 {% if w.hasTrait("OBJECTIFYING") %}
-You've done this. You know the exact feeling from the inside — the way the patience works, the certainty of it, how a man with nothing to prove just waits and lets the waiting be the thing. You're watching it run on you and you know every note of it and your body answers it before you've got anything like an objection.
+The certainty of it is familiar from an angle you don't look at head-on. Your body answers it before you've got anything like an objection. *Huh.*
 {% endif %}
 
 {% if w.hasTrait("SUBMISSIVE") %}
