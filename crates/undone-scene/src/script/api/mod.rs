@@ -13,6 +13,7 @@ use crate::effects::EffectError;
 use crate::scene_ctx::SceneCtx;
 use crate::script::validate::IdKind;
 
+pub mod minijinja_bind;
 pub mod read;
 pub mod rhai_bind;
 pub mod table;
