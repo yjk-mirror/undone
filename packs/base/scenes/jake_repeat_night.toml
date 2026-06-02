@@ -34,9 +34,9 @@ The TV is still going, murmuring under everything.
 {% else %}
 His apartment, or yours — it's gotten to the point where the distinction doesn't sort clearly. The day is behind you. His hand is warm somewhere on your leg and you've been talking about nothing in the easy way you can now.
 
-It's late enough that the city outside has quieted from its working pitch to its other pitch. The lamp is on. His mug is on the table going cold.
+It's late enough that the city outside has quieted from its working pitch to its other pitch. The lamp is on.
 
-The talking has tapered off naturally — you've run through the day and ended up here, in the comfortable fact of each other.
+The talking has tapered off. His mug is cold on the table and neither of you has reached for it.
 {% endif %}
 """
 
@@ -53,7 +53,7 @@ You get up from the chair and he watches you come across the room without saying
 You put your hand on his chest and push him back into the couch cushions and he goes, easy.
 
 {% if w.hasTrait("SUBMISSIVE") %}
-Him letting you — his hands settling at your hips, letting you set the terms — works on you faster than the other way around. You're in his lap with your knees either side of him and the wanting has narrowed to a single point.
+Him letting you — his hands settling at your hips, letting you set the terms — works on you faster than the other way around. You're in his lap with your knees either side of him and you're already wet and the pressure of his lap under you lands like an answer.
 {% elif w.hasTrait("CONFIDENT") %}
 "I've been thinking about this since this morning," you tell him.
 
@@ -62,7 +62,7 @@ Him letting you — his hands settling at your hips, letting you set the terms �
 You don't explain the crossing of the room. You get there and you're in his lap and the explanation becomes irrelevant.
 {% endif %}
 
-His mouth on yours — and the wanting, which was already pointed, sharpens further. His hands move from your hips to under the hem of your shirt, flat on your back, and you roll your hips once, getting the angle.
+His mouth on yours — and your hips press into him before you've decided to. His hands move from your hips to under the hem of your shirt, flat on your back, and you roll again, getting the angle.
 
 {% if w.hasTrait("EASILY_WET") %}
 You're already wet enough that when his hand moves from your back to between your legs he finds it through the fabric and goes still for a half-second. Then his fingers press in and you push into the pressure.
@@ -119,9 +119,9 @@ When his hand slides between your legs he finds the fabric already soaked. He ma
 {% if w.hasTrait("HAIR_TRIGGER") %}
 His fingers barely find the right place before you're coming — sudden, rocking into his hand, his name somewhere in whatever you said when it hit.
 
-He doesn't stop. He finds the spot again, deliberate, and the second orgasm is already forming when he finally moves over you.
+He doesn't stop. His fingers find the same spot and stay there — pressure and rhythm, watching your face — and the second orgasm is already forming when he finally moves over you.
 {% else %}
-He takes his time. The wanting builds in layers — his mouth on your shoulder, his fingers moving, the arc of it familiar and still completely his.
+He takes his time. His mouth on your shoulder, his fingers moving, the arc of it familiar and still completely his.
 {% endif %}
 
 He lines himself up and pushes into you and the fullness is clean and right — familiar now, which has its own charge.
@@ -138,6 +138,14 @@ Your hand on his shoulder. He puts his hand over yours, warm, and looks at you.
 
 "Hey," he says again, quieter this time.
 
+{% if w.getSkill("FEMININITY") < 20 %}
+His hand on yours is larger — his knuckles, his warmth. Something low in your belly tightens, and the tightening is still strange enough that you have to breathe through it instead of just letting it be.
+{% elif w.getSkill("FEMININITY") < 50 %}
+His hand covers yours and the warmth of it lands before anything else does. Your body has learned this — the drop in the stomach, the loosening in the chest — but it's still something that happens to you rather than something you simply are.
+{% else %}
+His hand on yours and the warmth of it is just his warmth, unremarkable in the good way, and your body moves toward him.
+{% endif %}
+
 The slow version is its own thing. His mouth on yours in no hurry. His hands moving over you like he has all evening.
 
 {% if w.hasTrait("SENSITIVE_NECK") %}
@@ -151,7 +159,7 @@ By the time he gets his hand between your legs you're already past ready. He tak
 Into the bedroom, or not. The clothes go. The wanting, which was quiet and persistent under the whole evening, finally has room.
 
 {% if w.hasTrait("SUBMISSIVE") %}
-He moves you exactly where he wants you and the part of you that might object has already gone somewhere warm and unprotesting. His hands and his weight over you and the ease of giving over to it.
+He moves you exactly where he wants you. His hands and his weight over you, and your body goes easy under it — spine loosening, grip releasing, everything in you following where he puts it.
 {% if w.hasTrait("PRAISE_KINK") %}
 He says your name when he enters you — just that, low, like an observation — and your hips push up and your grip on him tightens.
 {% endif %}
@@ -211,7 +219,7 @@ His fingers find the right spot and you're coming before either of you expected 
 
 He tries again. Steadier. The second one takes longer and unravels you more completely.
 {% else %}
-He takes his time because he knows what time does.
+He takes his time. His mouth moves down your throat and his hands are on your ribs and the urgency you walked in with gets stretched and used.
 {% endif %}
 
 When he finally pushes inside you it's with your back still against the wall and your legs around him and the urgency of the last two hours finds its resolution.
@@ -228,7 +236,7 @@ He sets his mug down. Turns toward you on the couch with the full attention he g
 {% if w.hasTrait("ANALYTICAL") %}
 One word. You watch him read your face — the tilt of his head, the particular patience of a man who has learned to read you — and the cataloguing that usually happens in the back of your head just stops.
 {% elif w.hasTrait("ROMANTIC") %}
-The lamp is warm. His hand finds yours.
+One word, and the way he says it — low, open — you read something into it. *Yeah?* Like there's a whole question tucked inside. Maybe there is. His hand finds yours on the cushion before you can decide.
 {% else %}
 He leans in. Slow. He lets you close the last inch.
 {% endif %}
@@ -258,7 +266,7 @@ You come the first time before he's done much of anything, and he uses the infor
 He builds it slowly. His hands and his mouth and his particular attention.
 {% endif %}
 
-When he pushes into you the wanting, which has been ambient all evening, sharpens to something with edges. You pull him down by the back of the neck.
+When he pushes into you the warmth that's been low in you all evening contracts to a point and your hips rise to meet it. You pull him down by the back of the neck.
 
 {% if w.hasTrait("MULTI_ORGASMIC") %}
 The second orgasm arrives while he's still moving. You clutch him and ride through it.
@@ -298,7 +306,7 @@ The fullness of him inside you is still, every time, a fact that needs a moment.
 The second one comes slower, deeper, and you hold on to him through it.
 {% endif %}
 
-He stays close after. The city is out there. In here is quiet.
+He stays close after. His arm is across you and through the window the streetlight is doing its thing on the ceiling.
 {% endif %}
 """
 
@@ -322,7 +330,7 @@ Not stopping — just: slower. He reads it. His mouth curves.
 
 He sits back and opens his arm and you tuck in against his side, your head on his shoulder, his arm around you. The TV still going. His thumb moving in a slow line up and down your arm.
 
-You stay like that long enough that the wanting, which was real and present, starts doing something different — spreading out, warming up into the whole evening instead of contracting to a single point.
+You stay like that long enough that the want starts doing something else — softening, spreading out through your shoulders, through the whole evening instead of sitting low and pointed.
 
 {% if w.hasTrait("ROMANTIC") %}
 The lamp on the wall. His breathing against your hair. The evening already earning itself.
@@ -331,14 +339,14 @@ The lamp on the wall. His breathing against your hair. The evening already earni
 Eventually — ten minutes, or thirty, or somewhere between — he turns his head and his mouth finds your temple. Then your jaw. Then you turn and meet him and the slow catches fire.
 
 {% if w.hasTrait("SENSITIVE_NECK") %}
-His mouth finds your neck and stays. The wanting, which had been warm and diffuse, goes immediate and specific. Your hand goes into his hair.
+His mouth finds your neck and stays. The warmth that had been spread out through you narrows instantly and your hand goes into his hair.
 {% endif %}
 
 {% if w.hasTrait("EASILY_WET") %}
 He gets his hand between your legs and finds you soaking. "Ready," he says, dry. You take his hand and move it.
 {% endif %}
 
-He gets you on the couch — or into the bedroom — slowly, by accretion. Each step is something you agreed to. The slowness means every step arrives with full weight.
+He gets your shirt off first, then stays there — mouth at your collarbone, hands on your ribs — long enough that your skin is asking before he moves to anything else. Then the bedroom. Then the rest.
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
 When he finally gets his fingers inside you, the orgasm comes hard and fast from all the waiting. He stills, lets you through it, then tries again.
@@ -359,7 +367,7 @@ He looks at you. "Okay."
 And he means it — no implication, no patience wearing thin. He just turns back toward the TV and his arm is around you.
 
 {% if w.hasTrait("SHY") %}
-The ease of him. The absence of pressure. You settle into his side and the wanting goes gentle and quiet.
+The ease of him. The absence of pressure. You settle into his side and your shoulders drop.
 {% elif w.hasTrait("ANALYTICAL") %}
 He doesn't recalibrate or recalculate or wait for a sign. He just — pivots. The reliability of him. You file it.
 {% else %}
@@ -368,7 +376,7 @@ The evening carries on at its own pace. His thumb still moving on your shoulder.
 
 The city goes on outside. The TV says something about something. His mug has gone cold on the table.
 
-When the time feels right — and it does feel right, this is the thing about slow evenings — you turn toward him and he turns toward you and his hands know exactly where to go.
+You turn toward him and he turns toward you and his hands know exactly where to go.
 
 {% if w.hasTrait("SENSITIVE_NECK") %}
 He goes to your neck first, because he knows, and the heat drops through you like he poured it.
@@ -390,7 +398,7 @@ When he slides into you the fullness meets the whole warm evening and the wave t
 The second orgasm rolls in while he's still moving. Your hands grip and he stays.
 {% endif %}
 
-Afterward the lamp is on and neither of you is moving and the city is just the city.
+Afterward the lamp is on and neither of you is moving and somewhere outside a truck grinds through a gear change and neither of you moves.
 {% endif %}
 """
 

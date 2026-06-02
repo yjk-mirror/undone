@@ -88,7 +88,7 @@ He does. You can see him do the same accounting you've been running — who Priy
 
 A long pause. He gives you that. "No. It's not."
 
-You walk to your desk. The accounting doesn't close — it just shifts. But it shifts on your terms.
+You walk to your desk.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 40 %}
@@ -129,7 +129,7 @@ He goes back to his desk. You go to yours. The afternoon moves around you like a
 {% if w.getSkill("FEMININITY") < 40 %}
 Priya is at her desk across the floor. Head down. Working. Six years and she keeps her head down and she is very good at her job.
 {% elif w.getSkill("FEMININITY") < 60 %}
-Something has been established. Not by you.
+Priya is at her desk. Marcus is at his. The afternoon is the same afternoon it was an hour ago.
 {% endif %}
 
 The afternoon runs. Marcus doesn't touch you again. The absence of the thing is its own data point.
@@ -188,11 +188,11 @@ He's quiet for a moment. Not defensive — just taking it in. Giving it its full
 
 That's the whole thing. Okay. He doesn't push. He doesn't ask why or offer something better. He just receives it, which is either a mark of good character or evidence that he was never as invested as the elevator suggested.
 
-You go home. The difference between those two things keeps you up until two.
+The difference between those two things keeps you up until two.
 {% endif %}
 
 {% if w.getSkill("FEMININITY") < 45 %}
-Four years of work in this building. The desk, the badge, the meetings, the particular way competence accumulates. All of it still yours. All of it slightly warmer to the touch.
+Four years of work in this building. The desk, the badge, the meetings.
 {% endif %}
 """
 

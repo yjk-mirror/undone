@@ -23,7 +23,13 @@ The alarm hasn't gone off yet but it will — your phone on the nightstand says 
 You were already awake before him. Have been awake for a while, actually — lying there, his body along yours, and your body having opinions about this you haven't done anything about yet. His hips are against you. His breathing slow. He's still asleep and you are not.
 
 {% else %}
-You surface slowly, from sleep into the dark and the warm and his arm across you. His hips against the small of your back. A weight you know now, distributed against you in a pattern you've mapped.
+You surface slowly, from sleep into the dark and the warm and his arm across you. His hips against the small of your back. The familiar weight of him, settled there.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+There's still something slightly odd about waking up already held. Not wrong, just not yet automatic — you notice it every time, the way he fits around you from behind, before it softens into warmth.
+{% else %}
+It's just good. Clean and simple, the kind of morning that doesn't announce itself.
+{% endif %}
 
 {% endif %}
 
@@ -70,7 +76,7 @@ He does. His hand works until you're pushing back harder and making sounds you'd
 {% if w.hasTrait("HAIR_TRIGGER") %}
 You come fast — before you expected, before he expected — a quick bright clench that makes your whole body curl forward. He keeps moving through it, his arm tightening, and when you're done shaking he slows and finishes and presses himself against you for a moment, both of you still.
 {% elif w.hasTrait("EASILY_WET") %}
-You were so wet it was almost embarrassing. He knew before he moved his hand. The noise when he pushed in was its own kind of evidence, and you felt the flush go up your chest and didn't care.
+His hand moves between your thighs and he goes still for a second. Then: "Okay," he says, under his breath — not to you, just to himself. He pushes in and the slick give of it is audible and you bury your face in the pillow and he keeps moving, faster now, like that sound answered something.
 {% else %}
 It doesn't take long. The orgasm rolls through you warm and efficient, and when you reach back and pull his hip forward he reads the cue and finishes with a low exhale against your shoulder.
 {% endif %}
@@ -88,7 +94,7 @@ His hand moves slow. Not rushed — unhurried even though there's a clock on the
 
 You push back again instead of answering.
 
-He shifts, pulling you closer, and then he's inside you and you exhale through your nose and your hand finds his arm and holds on. The pace is easy. Not the urgent driving press of a new thing — the comfortable depth of knowing each other, of a body that already knows the right angle. He takes his time even though he shouldn't. You let him.
+He shifts, pulling you closer, and then he's inside you and you exhale through your nose and your hand finds his arm and holds on. The pace is easy. He angles his hips until you're there — the tilt you've both found — and stays. He takes his time even though he shouldn't. You let him.
 
 {% if w.hasTrait("SENSITIVE_NECK") %}
 His mouth on the back of your neck. His breath warm there, and then his lips, slow — one press then another — and the heat of it runs down your spine and you arch back against him.
@@ -135,8 +141,6 @@ His hips shift forward and the warmth of him registers along your whole back. Hi
 
 "Yeah?" he says.
 
-A simple word. The shorthand of people who don't need to explain themselves anymore.
-
 {% if w.hasTrait("FLIRTY") %}
 "Probably," you say.
 
@@ -165,7 +169,7 @@ His hand moves to your breast and stays there and you put your own hand over his
 When his hand moves between your thighs, you're already there. He lets out a breath against your neck. "Every time," he says.
 {% endif %}
 
-No urgency. No performance. He brings you off at his pace, warm and easy, and then finishes himself, and his arm finds your waist after and stays, and neither of you moves for a while, the morning happening outside without either of you in it.
+He brings you off at his pace, warm and easy, and then finishes himself with a long exhale against your shoulder. His arm finds your waist after and stays. Outside, someone on the floor above walks from one room to the other and stops. Neither of you moves.
 
 {% endif %}
 {% endif %}
@@ -186,7 +190,7 @@ You turn over. He's blinking awake — half-gone still, the loose jaw of someone
 His hand finds the back of your head in the dark under the covers, loose, not directing. Just there.
 
 {% if w.getSkill("ORAL_SKILL") >= 30 %}
-You know what you're doing now. Took a while — there's a learning curve you couldn't have imagined before this body — but you know how to read the sounds he makes, when his hand tightens or loosens in your hair, when to slow and when to push. You work him with the ease of practice and the small specific pleasure of knowing it works.
+You know what you're doing now. Took a while — there's a learning curve — but you know how to read the sounds he makes, when his hand tightens or loosens in your hair, when to slow and when to push. You work him with the ease of practice and the small specific pleasure of knowing it works.
 
 {% if w.hasTrait("SUBMISSIVE") %}
 His hand tightens in your hair — not pulling, just present — and the held weight of it sends something warm through your whole chest while you're still working.
@@ -195,7 +199,7 @@ His hand tightens in your hair — not pulling, just present — and the held we
 
 The word gets into your hips somehow.
 {% else %}
-He makes a sound that you've learned to like. The private sounds, the ones he only makes with you. You file it.
+He makes a sound that you've learned to like. The private sounds, the ones he only makes with you. Your hips press down a little more.
 {% endif %}
 
 {% else %}
@@ -213,7 +217,7 @@ He's inside you for maybe four minutes before you both finish, you first, tight 
 "Excellent morning," you say. Straightening your underwear.
 
 {% else %}
-You're in no hurry. He can tell. His breathing stays controlled even as it gets harder, and when you finally pull off and move up his hands find your hips and you sink down and the quiet sound you make is pleasure and also relief and also something that doesn't have a name.
+You're in no hurry. He can tell. His breathing stays controlled even as it gets harder, and when you finally pull off and move up his hands find your hips and you sink down and the sound that comes out of you is small and open and he hears it and his hands tighten.
 
 Lazy. Warm. His hands on your hips not directing, just there — ballast. You set the pace, slow, and the morning keeps moving outside and in here it doesn't matter.
 

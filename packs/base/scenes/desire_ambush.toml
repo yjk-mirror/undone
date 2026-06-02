@@ -14,7 +14,7 @@ Low. Particular. The kind that starts between the hips and doesn't ask. You're s
 {% if w.hasTrait("OBJECTIFYING") %}
 Marcus walked past five minutes ago. You clocked his forearms when he reached across your desk — sleeve rolled up, the muscle there — and something logged it before you did and hasn't stopped.
 {% elif w.hasTrait("ANALYTICAL") %}
-There's no single trigger. You run it back: the afternoon slump, the warmth, the fact that the chair's been pushing against the wrong places for the last hour. None of that is sufficient cause. And yet.
+There's no single trigger. You run it back: the afternoon slump, the warmth, the fact that the chair's been pushing against the wrong places for the last hour. None of that is sufficient cause, and here you are regardless.
 {% else %}
 Someone's voice from the kitchen — not words, just the low register of it — and the body responded. That fast.
 {% endif %}
@@ -39,7 +39,7 @@ You can actually trace the causal chain, which is almost worse: bad sleep, the s
 A man laughed in the kitchen. That's it. That's the whole reason.
 {% endif %}
 
-Not overwhelming. Just present. Just badly timed, in the most inconvenient way.
+Not overwhelming. Just present. Just badly timed.
 """
 
 # ── Player Actions ─────────────────────────────────────────────────────────────
@@ -52,9 +52,9 @@ prose  = """
 You put your hands back on the keyboard and you don't move.
 
 {% if w.hasTrait("ANALYTICAL") %}
-Attention is a resource. You redirect it: the ticket queue, the open PR, the build that still hasn't passed on staging. The wanting is still there — it doesn't care that you've allocated your focus elsewhere — but your fingers are moving and the words on the screen are real and the afternoon is finite. You know what you're doing. It doesn't stop what you're doing from costing something.
+Attention is a resource. You redirect it: the ticket queue, the open PR, the build that still hasn't passed on staging. The wanting is still there — it doesn't care that you've allocated your focus elsewhere — but your fingers are moving and the words on the screen are real and the afternoon is finite. You know what you're doing. The cursor stops for a second between lines. You restart it. Your mouth is dry.
 {% elif w.hasTrait("SHY") %}
-You don't look up. This is the thing: you cannot look up, because your face will tell anyone who looks what is happening, and you can't make it not do that, and the open-plan floor is right there. Head down. Type. The cursor moves. That helps, a little — having something to track. You type the same function signature twice.
+You don't look up. This is the thing: you cannot look up, because your face will tell anyone who looks what is happening, and the open-plan floor is right there. Head down. Type. The cursor moves. That helps, a little — having something to track. You type the same function signature twice.
 {% else %}
 Screen, keyboard, the task. You type. The wanting doesn't go anywhere — it just has to wait — and waiting is what it does, patient and low and impossible to mistake for anything else. At some point the afternoon continues around you. Slack notifications. The printer. Life.
 {% endif %}
@@ -81,7 +81,7 @@ You lean your back against the cold of the stall door and stay very still. Your 
 {% elif w.hasTrait("ANALYTICAL") %}
 Two minutes. You know what this buys: enough reduction to get to five o'clock without it being visible on your face. You lean against the wall and let your hand go between your thighs through your skirt — not much, just pressure, just enough — and clock the biofeedback. The edge comes off. Not solved. Edge off.
 {% else %}
-Two minutes, hand pressed flat against the tile while the other handles things briefly and quietly. The restroom smells like the industrial soap from the dispenser. The florescent light flickers once. None of this is romantic.
+Two minutes, hand pressed flat against the tile while the other handles things briefly and quietly. The restroom smells like the industrial soap from the dispenser. The fluorescent light flickers once.
 
 You're not looking for romance. You're looking to make it to five o'clock.
 {% endif %}
@@ -111,11 +111,11 @@ You pour water from the filter jug. Someone in the corner is microwaving lunch. 
 {% elif w.hasTrait("CONFIDENT") %}
 You pour yourself water in the kitchen, lean against the counter, and drink it like you're here for the water. Marcus is coming out of the meeting room down the hall with his laptop under his arm. You watch him walk. The body does what the body does with that information. You finish the glass.
 
-Your composure is not cracked. You would like that acknowledged, at least internally.
+Your composure is not cracked. You set the glass down and look at the hallway for a moment before going back in.
 {% else %}
-There's a conference room at the end of the hall with the blinds down. You put your coffee in the microwave and stand there watching the timer count. Forty-five seconds. The door to the room is open a crack. Nobody's in there.
+There's a conference room at the end of the hall with the blinds down, door open a crack, nobody in it. You put your coffee in the microwave and watch the timer count forty-five seconds down, because you needed somewhere to stand that wasn't your desk.
 
-The microwave beeps. You take your coffee back to your desk.
+The microwave beeps and you take your coffee back.
 {% endif %}
 
 The afternoon continues. You got through it. The wanting stays where it is.
@@ -135,9 +135,15 @@ prose     = """
 You shift in your chair and press your knees together and wait for the afternoon to end.
 
 {% if w.hasTrait("SUBMISSIVE") %}
-There's something in the not-doing that has its own texture — you know this about yourself now, have filed it away with the other new knowledge that accrues quietly in this body. Wanting that can't be acted on doesn't sit still; it builds.
+{% if w.getSkill("FEMININITY") < 30 %}
+Your thighs press together and the pressure is strange — this body registers it differently than any pressure you've known before, a bloom of sensation that doesn't resolve, just sits there insisting. The spreadsheet is still open. The cursor blinks where you left it. Your jaw is tight and you don't know when that happened.
 
-Your thighs press together and the desk is exactly where it was and the spreadsheet is exactly where it was and you're somewhere below the surface of all of it, just — present with this. Waiting.
+Wanting that can't be acted on doesn't sit still. It adds weight to the chair.
+{% else %}
+Your thighs press together and the desk is exactly where it was and the spreadsheet is exactly where it was. The wanting doesn't flatten under the stillness — it sharpens against it, the way silence sharpens sound. Your breath comes slower than usual. Your fingers don't move.
+
+Waiting is doing something to you. That's the texture of it.
+{% endif %}
 {% elif w.hasTrait("SHY") %}
 Do not let your face do anything. That's the whole job for the next forty-five minutes — maintain the surface. It's a resource management problem: how much does staying still cost, versus moving and having someone look at you. Staying still costs less.
 

@@ -24,7 +24,7 @@ The composure has been costing more than usual. The presentations land fine, the
 Marcus is on his side of the room. He's looking at you like he looks at a spec before he pushes back — not confrontational, just reading.
 
 {% if w.getSkill("COMPOSURE") < 35 %}
-The facade is already thin. You've been maintaining it at work for weeks and it gets cheaper every time this happens — a few hours of being two colleagues, then a door closes and the filing system for *who you are at this desk* gets looser. You can feel it.
+The facade is already thin. You've been maintaining it at work for weeks and it gets cheaper every time this happens — a few hours of being two colleagues, then a door closes and your hands rest flat on the desk and the silence carries wrong weight, longer than it should. The professional distance is still technically there. You're both just standing in it.
 {% elif w.getSkill("COMPOSURE") < 60 %}
 You have a version of yourself that functions well in this building. She has opinions about sprint planning and can run a retro and she does not think about Marcus in the way you are currently thinking about Marcus.
 {% else %}
@@ -59,13 +59,13 @@ There's no ceremony to it. Your composure has been unravelling in small, unremar
 {% elif w.getSkill("COMPOSURE") < 60 %}
 You feel the professional self observing this — the part that runs retrospectives and keeps her inbox under thirty and has built something real in this building. She observes and she doesn't stop you.
 {% else %}
-You are the kind of person who doesn't do this, and you are doing this. The cognitive dissonance is noted and filed.
+You are the kind of person who doesn't do this, and you are doing this. Your hands go to his lapels before he touches you.
 {% endif %}
 
 {% if gd.desire() >= 70 %}
 When you reach him you don't say anything. His hands come to your hips and your hands go to his lapels and for a moment you're just standing in the gravity of it, both of you aware of the floor outside.
 {% elif gd.desire() >= 40 %}
-He puts his hand at your jaw — that angle, familiar by now — and tilts your face up. The wanting has been a particular pitch all day and now it's just here, concrete, his hands and the room and the distant sound of someone's keyboard through the wall.
+He puts his hand at your jaw — that angle, familiar by now — and tilts your face up. The wanting has been running at one frequency all day and now it's just here, concrete, his hands and the room and the distant sound of someone's keyboard through the wall.
 {% else %}
 He reads the move correctly. His hand comes up to your jaw and you let him tip your face toward his and his mouth is on yours before either of you has said a word.
 {% endif %}
@@ -79,7 +79,7 @@ His mouth goes to your neck and the professional calculus drops out of the room 
 {% endif %}
 
 {% if not gd.hasGameFlag("MARCUS_REPEAT_USED_CONF") %}
-The conference table is behind you. He lifts you onto it — same table, same height, this is a thing you know now — and steps between your knees. His jacket is rough under your palms and the blinds are angled wrong for the street and neither of you is fixing that.
+The conference table is behind you. He lifts you onto it — same table, same height — and steps between your knees. His jacket is rough under your palms and the blinds are angled wrong for the street and neither of you is fixing that.
 {% elif not gd.hasGameFlag("MARCUS_REPEAT_USED_STAIR") %}
 The stairwell is utilitarian, concrete, not a comfortable surface. That's part of it. His hand is at the small of your back pressing you into the wall and the cold of the concrete through your shirt is still there on the train home, hours later, a faint reminder.
 {% else %}
@@ -95,17 +95,23 @@ Your breathing goes audible. He can hear it — the room's small enough that it'
 {% endif %}
 
 {% if w.hasTrait("NIPPLE_GETTER") %}
-When he gets his hand under your shirt your nipples are already hard before he touches them. He registers this with that particular focused pause and his attention does not waver.
+When he gets his hand under your shirt your nipples are already hard before he touches them. He registers this — a full stop, a breath — and his attention does not waver.
 {% endif %}
 
 His fingers find the right place and your hips move without being asked.
+
+{% if w.getSkill("FEMININITY") < 35 %}
+The response comes up through you like something you didn't plan for — fast, whole-body, this body that still catches you off guard with how much it wants. His hand hasn't even settled and you're already past managing it.
+{% else %}
+You know this. His hand, the pressure and the angle of it, the wanting sharpening from ambient to immediate. Your hips move to meet it.
+{% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
 You come fast — his hand barely settled into rhythm before you do, sudden and not quiet, the sound bouncing off whatever wall is nearest. Marcus holds still through it, watching your face. Then: "Okay," he says. Flat. Like a data point received. He starts again.
 {% endif %}
 
 {% if w.hasTrait("THIGH_CLENCHER") %}
-Your thighs close around him. He goes deeper. You hear yourself.
+Your thighs close around him. He goes deeper. The sound you make is sharp and immediate, and it doesn't stop.
 {% endif %}
 
 {% if w.hasTrait("BACK_ARCHER") %}
@@ -191,7 +197,7 @@ His desk. His weight between you and the door. The horizontal stripes of city li
 {% endif %}
 
 {% if w.hasTrait("SUBMISSIVE") %}
-He's running this entirely. The rhythm, the angle, where he puts your hands. In another context you'd have a note about the power dynamic. Right now the part of you that takes notes is not available.
+He's running this entirely. The rhythm, the angle, where he puts your hands.
 {% endif %}
 
 {% if w.hasTrait("BREATH_CHANGER") %}
@@ -203,7 +209,7 @@ When he gets his hands on your chest the sound you make is not quiet and he does
 {% endif %}
 
 {% if w.hasTrait("HAIR_TRIGGER") %}
-His fingers and you're already close and then you come, fast and not subtle, the sound echoing off glass or concrete depending on which room this is. He stills and watches you and his expression is that particular focused attention. "Okay," he says. He keeps going.
+His fingers and you're already close and then you come, fast and not subtle, the sound echoing off glass or concrete depending on which room this is. He stills and watches you, completely still, reading it. "Okay," he says. He keeps going.
 {% if w.hasTrait("PRAISE_KINK") %}
 "Good," he says. One syllable. Your hips push up into nothing.
 {% endif %}
