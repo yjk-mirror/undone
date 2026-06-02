@@ -1,0 +1,202 @@
+[scene]
+id          = "base::marcus_leverage"
+pack        = "base"
+description = "The affair has a cost. Marcus puts his hand at the small of your back in the elevator. Priya saw it."
+
+# Thread B3 — consequence scene. NOT explicit-first.
+# The inciting pressure: Marcus assumes access. A hand at the small of her back,
+# work elevator, Priya in the corner. The look on Priya's face before the doors open.
+# The power asymmetry: what each of them stands to lose is not equal.
+# Fires ONCE. Gate: MARCUS_INTIMATE (the affair is recurring).
+# Three outcomes: push back (CONFIDENT), absorb it / say nothing (SHY-flavored), end it.
+# Sets MARCUS_LEVERAGE + outcome flag on each path.
+
+[intro]
+prose = """
+Wednesday afternoon, three-fifteen. You're waiting at the elevator bank.
+
+Marcus comes up from the direction of the server room — not unusual, nothing anyone would read. He stops beside you, and the button is already lit.
+
+Priya from data is in the elevator when it opens. She's looking at her phone and then she's not.
+
+Marcus puts his hand at the small of your back. Not a push — just there, two seconds, the way you'd steer someone through a doorway. The elevator is four feet wide. There is no doorway.
+
+{% if w.hasTrait("ANALYTICAL") %}
+Priya clocks it. You can see her run the calculation — the slight pause before she looks back at her phone. She's been at this company longer than either of you.
+{% else %}
+Priya looks at her phone again. She doesn't say anything. The number above the door counts up.
+{% endif %}
+
+Fourteen floors. Marcus watches the numbers like it's an interesting problem. When the doors open he's already talking about the Chen deck revision, same cadence as a meeting, as if the three of you were never in a small box with his hand on your spine.
+
+Priya walks to her desk without looking back.
+
+{% if w.getSkill("FEMININITY") < 35 %}
+Your back is still warm where his hand was. The kind of warm that doesn't need to mean anything and means something anyway.
+{% elif w.getSkill("FEMININITY") < 55 %}
+The look on Priya's face before she went back to her phone. Not accusation. Recognition.
+{% else %}
+Priya has been in this company six years. She keeps her head down and she is very good at her job.
+{% endif %}
+
+Marcus is saying something about slide seven.
+"""
+
+[[thoughts]]
+condition = 'w.hasTrait("ANALYTICAL")'
+style     = "observation"
+prose     = "She filed it. That's the only question that matters — what she'll do with it."
+
+[[thoughts]]
+condition = 'w.hasTrait("AMBITIOUS")'
+style     = "observation"
+prose     = "Four years. The work you did before anyone in this building knew your name."
+
+# ── Player Actions ────────────────────────────────────────────────────
+
+[[actions]]
+id        = "push_back"
+label     = "Say something"
+detail    = "Not an accusation. Just the terms, clearly stated."
+condition = 'w.hasTrait("CONFIDENT") || w.hasTrait("ANALYTICAL")'
+prose     = """
+You wait until Priya is at her desk. The floor opens up. Marcus is still talking.
+
+"Hey." Quiet. Even. "Not at work."
+
+He stops. Looks at you the way he looks at a number that contradicts his model.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Priya was right there," you say.
+
+A beat. He's reading you, not disputing it. His face doesn't do much — that's his face — but something in the set of his shoulders shifts. Recalibrates.
+
+"Fair," he says.
+
+Just that. Fair. Like you handed him a corrected dataset. No apology, no performance. He takes it in and adjusts.
+
+"Fair," you say back. Not forgiving anything. Just closing the loop.
+
+{% elif w.hasTrait("ANALYTICAL") %}
+"Priya clocked it," you say. Flat. "You understand what that means."
+
+He does. You can see him do the same accounting you've been running — who Priya talks to, what she keeps to herself, what she does with things she files away. He doesn't insult you by pretending it didn't happen.
+
+"I'll be more careful," he says.
+
+"That's not the same thing."
+
+A long pause. He gives you that. "No. It's not."
+
+You walk to your desk. The accounting doesn't close — it just shifts. But it shifts on your terms.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 40 %}
+The hand. The elevator. The particular social physics of a woman with something to lose and a man who has slightly less to lose and probably doesn't have a number attached to it.
+
+*Huh.*
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MARCUS_LEVERAGE"); gd.setGameFlag("MARCUS_TERMS_HERS"); npc("m").addLiking(-1); w.changeComposure(4); w.changeStress(-3); w.changeAnxiety(-2);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "say_nothing"
+label  = "Let it go"
+detail = "The meeting is still happening. The floor is still watching."
+prose  = """
+Marcus is on slide seven. You pull up the file on your own screen and read the numbers he's reading.
+
+{% if w.hasTrait("SHY") %}
+The right words existed. You know what they were — you composed them in the elevator, in the seconds between his hand and the door opening. They would have been clean. Professional. Inarguable.
+
+You didn't say them. The moment was there and then it wasn't and now Marcus is talking about the Chen deck and the floor is open around you and saying something now would be the thing, not his hand, not Priya's face. That's how it works. You know how it works. You're in it.
+
+{% elif w.hasTrait("ROMANTIC") %}
+He didn't mean it as a claim. Probably. The elevator, the hand, the twelve floors — there's a version of that which is just a person forgetting, briefly, that work is work. You can give him that version.
+
+Priya's face doesn't quite fit. But Priya doesn't know what it is. She made a read. Reads can be wrong.
+
+{% else %}
+The Chen numbers are real numbers. You engage with them. Marcus walks you through the revision. The meeting — such as it is — ends in five minutes, both of you saying things about projections.
+
+He goes back to his desk. You go to yours. The afternoon moves around you like any other Wednesday.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 40 %}
+Priya is at her desk across the floor. Head down. Working. Six years and she keeps her head down and she is very good at her job.
+{% elif w.getSkill("FEMININITY") < 60 %}
+Something has been established. Not by you.
+{% endif %}
+
+The afternoon runs. Marcus doesn't touch you again. The absence of the thing is its own data point.
+"""
+
+  effect = 'gd.setGameFlag("MARCUS_LEVERAGE"); gd.setGameFlag("MARCUS_TERMS_HIS"); npc("m").addLiking(1); w.changeComposure(-3); w.changeStress(5); w.changeAnxiety(4);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "end_it"
+label  = "End it"
+detail = "Not today. But tonight. Before the next elevator."
+prose  = """
+You wait until six. Most of the floor is dark — monitors off, chairs pushed in. His light is still on.
+
+You go to his desk.
+
+{% if w.hasTrait("CONFIDENT") %}
+"I'm out," you say. Quiet. Not asking.
+
+He looks up from his screen. Takes a second. He knows what you mean — Marcus always knows what you mean; it's one of the things.
+
+"Okay," he says.
+
+Not a question. Not a counteroffer. He reads the room the same way he reads data.
+
+"The work doesn't change," you say.
+
+"No," he says. "It doesn't."
+
+You nod. You go. The elevator bank is empty. Going down alone the weight is different — not lighter, but different. Yours.
+
+{% elif w.hasTrait("AMBITIOUS") %}
+"The elevator today," you say. "Priya was right there."
+
+He closes his laptop halfway. "I know."
+
+"I need you to know that I can't — " You stop. Start again. "What we have here can't cost me what I've built here."
+
+He looks at you steadily. He gets it — his face does the thing it does when data changes the model and he adjusts without arguing.
+
+"Okay," he says.
+
+One word. He means it. And it costs him less than it costs you, which is exactly the problem you're naming by being in this conversation at all, and you both know that, and neither of you says so.
+
+You take the elevator down. The light at his desk is still on when the doors close.
+
+{% else %}
+"This is the last time we talk about something other than work," you say.
+
+He's quiet for a moment. Not defensive — just taking it in. Giving it its full weight.
+
+"Okay," he says.
+
+That's the whole thing. Okay. He doesn't push. He doesn't ask why or offer something better. He just receives it, which is either a mark of good character or evidence that he was never as invested as the elevator suggested.
+
+You go home. The difference between those two things keeps you up until two.
+{% endif %}
+
+{% if w.getSkill("FEMININITY") < 45 %}
+Four years of work in this building. The desk, the badge, the meetings, the particular way competence accumulates. All of it still yours. All of it slightly warmer to the touch.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MARCUS_LEVERAGE"); gd.setGameFlag("MARCUS_AFFAIR_COOLING"); npc("m").addLiking(-3); w.changeComposure(6); w.changeStress(4); w.changeAnxiety(-3);'
+
+  [[actions.next]]
+  finish = true

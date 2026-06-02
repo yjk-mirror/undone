@@ -64,10 +64,33 @@ struct ScheduleEventToml {
     trigger: Option<String>,
     #[serde(default)]
     npc_role: Option<String>,
+    /// When true, this event's weight is scaled up by the player's current
+    /// desire (see `desire_multiplier`). The schedule data opts a scene into the
+    /// desire bias; the engine never decides what counts as "adult".
+    #[serde(default)]
+    desire_scaled: bool,
 }
 
 fn default_weight() -> u32 {
     10
+}
+
+/// Multiplier applied to a `desire_scaled` event's weight given current desire
+/// (0–100). Ramps linearly from 1.0× at desire 0 to 4.0× at desire 100, so the
+/// hungrier the player, the more the desire-tagged scenes dominate the pool.
+fn desire_multiplier(desire: i32) -> f32 {
+    let d = desire.clamp(0, 100) as f32;
+    1.0 + 3.0 * (d / 100.0)
+}
+
+/// The weight an event actually contributes to weighted selection. Plain events
+/// use their authored weight; `desire_scaled` events are biased by current desire.
+fn effective_weight(event: &ScheduleEvent, desire: i32) -> u32 {
+    if event.desire_scaled {
+        ((event.weight as f32) * desire_multiplier(desire)).round() as u32
+    } else {
+        event.weight
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -82,6 +105,7 @@ pub(crate) struct ScheduleEvent {
     pub(crate) once_only: bool,
     pub(crate) trigger: Option<CompiledScript>,
     pub(crate) npc_role: Option<String>,
+    pub(crate) desire_scaled: bool,
 }
 
 #[derive(Clone)]
@@ -221,7 +245,8 @@ impl Scheduler {
             .filter(|candidate| Self::is_weighted_candidate(*candidate, world, &ctx, registry))
             .collect();
 
-        Self::pick_weighted_candidate(&eligible, rng).map(Self::pick_result)
+        Self::pick_weighted_candidate(&eligible, world.game_data.desire(), rng)
+            .map(Self::pick_result)
     }
 
     /// Find the first triggered event in `slot_name` whose trigger condition evaluates to true.
@@ -281,7 +306,8 @@ impl Scheduler {
             .filter(|candidate| Self::is_weighted_candidate(*candidate, world, &ctx, registry))
             .collect();
 
-        Self::pick_weighted_candidate(&eligible, rng).map(Self::pick_result)
+        Self::pick_weighted_candidate(&eligible, world.game_data.desire(), rng)
+            .map(Self::pick_result)
     }
 
     fn sorted_slots(&self) -> Vec<&ScheduleSlot> {
@@ -356,22 +382,23 @@ impl Scheduler {
 
     fn pick_weighted_candidate<'a>(
         eligible: &[ScheduleCandidate<'a>],
+        desire: i32,
         rng: &mut impl Rng,
     ) -> Option<ScheduleCandidate<'a>> {
-        let total: u32 = eligible
-            .iter()
-            .map(|candidate| candidate.event.weight)
-            .sum();
+        let weight_of =
+            |candidate: &ScheduleCandidate<'a>| effective_weight(candidate.event, desire);
+        let total: u32 = eligible.iter().map(weight_of).sum();
         if total == 0 {
             return None;
         }
 
         let mut roll = rng.gen_range(0..total);
         eligible.iter().copied().find(|candidate| {
-            if roll < candidate.event.weight {
+            let w = weight_of(candidate);
+            if roll < w {
                 true
             } else {
-                roll -= candidate.event.weight;
+                roll -= w;
                 false
             }
         })
@@ -503,6 +530,7 @@ pub fn load_schedule(
                     once_only: ev.once_only,
                     trigger,
                     npc_role: ev.npc_role,
+                    desire_scaled: ev.desire_scaled,
                 });
             }
         }
@@ -542,6 +570,84 @@ mod tests {
 
     fn scheduler_for_test_slots(slots: HashMap<String, Vec<ScheduleEvent>>) -> Scheduler {
         Scheduler::from_slots_for_tests(slots)
+    }
+
+    fn bare_event(scene: &str, weight: u32, desire_scaled: bool) -> ScheduleEvent {
+        ScheduleEvent {
+            scene: scene.into(),
+            condition: None,
+            weight,
+            once_only: false,
+            trigger: None,
+            npc_role: None,
+            desire_scaled,
+        }
+    }
+
+    #[test]
+    fn desire_multiplier_ramps_one_to_four() {
+        assert_eq!(desire_multiplier(0), 1.0);
+        assert_eq!(desire_multiplier(50), 2.5);
+        assert_eq!(desire_multiplier(100), 4.0);
+        // clamps out-of-range
+        assert_eq!(desire_multiplier(-20), 1.0);
+        assert_eq!(desire_multiplier(200), 4.0);
+    }
+
+    #[test]
+    fn effective_weight_scales_only_tagged_events() {
+        let scaled = bare_event("test::scaled", 10, true);
+        let plain = bare_event("test::plain", 10, false);
+        // plain ignores desire
+        assert_eq!(effective_weight(&plain, 0), 10);
+        assert_eq!(effective_weight(&plain, 100), 10);
+        // scaled is unchanged at desire 0, 4x at desire 100
+        assert_eq!(effective_weight(&scaled, 0), 10);
+        assert_eq!(effective_weight(&scaled, 100), 40);
+    }
+
+    #[test]
+    fn high_desire_makes_scaled_event_dominate_pick() {
+        // A desire-scaled event with weight 10 vs a plain event with weight 20.
+        // At desire 0 the plain event should usually win; at desire 100 the
+        // scaled event (effective weight 40) should usually win.
+        let slots = HashMap::from([(
+            "free_time".to_string(),
+            vec![
+                bare_event("test::scaled", 10, true),
+                bare_event("test::plain", 20, false),
+            ],
+        )]);
+        let scheduler = scheduler_for_test_slots(slots);
+        let registry = PackRegistry::new();
+
+        let count_scaled = |desire: i32, seed: u64| {
+            let mut world = make_world();
+            world.game_data.set_desire(desire);
+            let mut rng = SmallRng::seed_from_u64(seed);
+            let mut scaled_wins = 0;
+            for _ in 0..400 {
+                if let Some(pick) = scheduler.pick("free_time", &world, &registry, &mut rng) {
+                    if pick.scene_id == "test::scaled" {
+                        scaled_wins += 1;
+                    }
+                }
+            }
+            scaled_wins
+        };
+
+        let low = count_scaled(0, 1);
+        let high = count_scaled(100, 1);
+        // At desire 0: scaled weight 10 vs plain 20 → ~1/3 of picks.
+        // At desire 100: scaled effective 40 vs plain 20 → ~2/3 of picks.
+        assert!(
+            low < high,
+            "high desire should favour scaled (low={low}, high={high})"
+        );
+        assert!(
+            high > 200,
+            "scaled should win the majority at desire 100 (high={high})"
+        );
     }
 
     fn packs_dir() -> PathBuf {
@@ -619,6 +725,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let work_event = ScheduleEvent {
             scene: "test::work_scene".into(),
@@ -627,6 +734,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let scheduler = Scheduler {
             slots: HashMap::from([
@@ -826,6 +934,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -852,6 +961,7 @@ mod tests {
                 once_only: false,
                 trigger: None,
                 npc_role: None,
+                desire_scaled: false,
             },
             ScheduleEvent {
                 scene: "test::scene_b".into(),
@@ -860,6 +970,7 @@ mod tests {
                 once_only: false,
                 trigger: None,
                 npc_role: None,
+                desire_scaled: false,
             },
         ];
         let mut slots = HashMap::new();
@@ -897,6 +1008,7 @@ mod tests {
             once_only: true,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -933,6 +1045,7 @@ mod tests {
             once_only: true,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -962,6 +1075,7 @@ mod tests {
             once_only: false,
             trigger: Some(trigger_expr),
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -988,6 +1102,7 @@ mod tests {
             once_only: false,
             trigger: Some(trigger_expr),
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -1013,6 +1128,7 @@ mod tests {
             once_only: true,
             trigger: Some(trigger_expr),
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("test_slot".into(), vec![event]);
@@ -1038,6 +1154,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
@@ -1092,6 +1209,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![event]);
@@ -1115,6 +1233,7 @@ mod tests {
             once_only: false,
             trigger: Some(trigger_expr),
             npc_role: None,
+            desire_scaled: false,
         };
         let weighted_event = ScheduleEvent {
             scene: "test::weighted".into(),
@@ -1123,6 +1242,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         // Put triggered in "a_slot" (sorts first alphabetically) and weighted in "b_slot"
@@ -1178,6 +1298,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let route_condition = cond(r#"gd.hasGameFlag("ROUTE_WORKPLACE")"#);
         let arc_event = ScheduleEvent {
@@ -1187,6 +1308,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let mut slots = HashMap::new();
         slots.insert("free_time".into(), vec![free_event]);
@@ -1371,6 +1493,7 @@ mod tests {
             once_only: false,
             trigger: None,
             npc_role: None,
+            desire_scaled: false,
         };
         let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 
@@ -1387,6 +1510,7 @@ mod tests {
             once_only: false,
             trigger: Some(cond(r#"gd.hasGameFlag("ROUTE_CAMPUS")"#)),
             npc_role: None,
+            desire_scaled: false,
         };
         let scheduler = scheduler_for_test_slots(HashMap::from([("intro".into(), vec![event])]));
 

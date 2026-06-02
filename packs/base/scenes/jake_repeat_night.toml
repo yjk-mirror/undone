@@ -1,0 +1,400 @@
+[scene]
+id          = "base::jake_repeat_night"
+pack        = "base"
+description = "An ordinary evening at his place or yours tips over. The first repeatable Jake night — warm, filthy, she has the most agency here."
+
+[intro]
+prose = """
+{% if gd.desire() >= 65 %}
+You've been in his apartment for forty minutes. Dinner was on the stove. The thing is, you're not really thinking about the dinner.
+
+He's on the couch with his laptop open — working, or pretending to — and you've been sitting across the room knowing the whole time that you're not here for whatever reason you said you were here for. The need has been building since this morning. Maybe before that.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+You've been watching his hands on the keyboard for ten minutes. His forearms. The particular way he leans. Your legs are crossed and the pressure doesn't help and you haven't said anything because saying anything means deciding.
+{% else %}
+He's focused enough that he doesn't look up when you shift on the chair. Which means you're watching him without being watched back, and the watching is doing something.
+{% endif %}
+
+He looks up. Reads the room — or reads you, same thing. He closes the laptop.
+
+"Hey," he says. Like hey covers whatever's in your face.
+{% elif gd.desire() >= 35 %}
+His kitchen light is on. Yours is off. One of you made dinner or ordered it; the plates are in the sink.
+
+The evening has that particular quality of being in the right place — his jacket on the hook by the door, your shoes off next to his on the mat, the city doing its thing two floors down and neither of you needing to be anywhere else.
+
+He's sitting close on the couch. Not performing proximity — just there, warm, his shoulder against yours. You've been watching something neither of you is really watching.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+His thumb has been moving in slow circles on the back of your hand for the last five minutes. You're not sure when that started. The attention of it — the not-going-anywhere — is what's doing it.
+{% endif %}
+
+The TV is still going, murmuring under everything.
+{% else %}
+His apartment, or yours — it's gotten to the point where the distinction doesn't sort clearly. The day is behind you. His hand is warm somewhere on your leg and you've been talking about nothing in the easy way you can now.
+
+It's late enough that the city outside has quieted from its working pitch to its other pitch. The lamp is on. His mug is on the table going cold.
+
+The talking has tapered off naturally — you've run through the day and ended up here, in the comfortable fact of each other.
+{% endif %}
+"""
+
+# ── Player Actions ──────────────────────────────────────────────────────
+
+[[actions]]
+id     = "take_the_lead"
+label  = "Go to him"
+detail = "Cross the room. Close the distance. Your idea, your timing."
+prose  = """
+{% if gd.desire() >= 65 %}
+You get up from the chair and he watches you come across the room without saying anything. His expression is attentive — not smug, not surprised. Just registered.
+
+You put your hand on his chest and push him back into the couch cushions and he goes, easy.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+Him letting you — his hands settling at your hips, letting you set the terms — works on you faster than the other way around. You're in his lap with your knees either side of him and the wanting has narrowed to a single point.
+{% elif w.hasTrait("CONFIDENT") %}
+"I've been thinking about this since this morning," you tell him.
+
+"Yeah." He says it like he knew. His hands find your hips.
+{% else %}
+You don't explain the crossing of the room. You get there and you're in his lap and the explanation becomes irrelevant.
+{% endif %}
+
+His mouth on yours — and the wanting, which was already pointed, sharpens further. His hands move from your hips to under the hem of your shirt, flat on your back, and you roll your hips once, getting the angle.
+
+{% if w.hasTrait("EASILY_WET") %}
+You're already wet enough that when his hand moves from your back to between your legs he finds it through the fabric and goes still for a half-second. Then his fingers press in and you push into the pressure.
+{% elif w.hasTrait("SENSITIVE_NECK") %}
+He tips his head up and his mouth finds the side of your neck. The heat drops through you immediately — chest, belly, between your legs — and your hands go into his hair. You stay on his lap but staying still stops being possible.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+He gets your underwear out of the way and barely touches you before the orgasm arrives. His fingers just found the right place — one or two strokes — and then you're clutching his shoulder and coming, sudden and complete, your hips riding through it.
+
+He stills, watching your face. Then he tries the same thing again.
+
+The second one builds faster than the first.
+{% else %}
+His hands work like he knows the map now — and he does, by now.
+{% endif %}
+
+You get his shirt off. He gets yours. The rest follows on the couch because there's no reason to move somewhere else.
+
+{% if w.hasTrait("NIPPLE_GETTER") %}
+His mouth goes to your chest. His tongue on your nipple and the moan comes out of you before you've decided to make it. He lifts his head, clocks your face, goes back. He does it again slower.
+{% endif %}
+
+When he pulls you down onto him the fullness is everything the last hour was building toward. You set the pace. His hands stay on your hips but they're following, not directing.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come before he does. The second wave builds from there while you're still moving and when it arrives you have to stop for a moment, your forehead against his. He waits.
+{% endif %}
+
+He finishes and you stay in his lap for a while after, the room gone quiet, his chest warm under your cheek.
+{% elif gd.desire() >= 35 %}
+You turn toward him on the couch. He feels the shift and turns too, one arm going along the back cushions.
+
+You lean in and kiss him. He kisses back — unhurried, his hand moving up to your jaw, tilting your chin.
+
+{% if w.hasTrait("SHY") %}
+His thumb traces your jaw and the care of it does something. You push closer, which is the answer you couldn't have said out loud.
+{% elif w.hasTrait("ROMANTIC") %}
+His mouth on yours in the lamplight in the apartment that's starting to know your shape. The evening decides what it's going to be.
+{% else %}
+He reads the kiss correctly. His other hand finds your waist.
+{% endif %}
+
+The couch. His shirt gone, yours. His hands tracing the line of your ribs and you shiver at the cold of his fingers — or not the cold, just his fingers.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth moves to your throat and the sound you make is sharp and immediate, something that drops straight down and pools there.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+When his hand slides between your legs he finds the fabric already soaked. He makes a low sound, not quite a word.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers barely find the right place before you're coming — sudden, rocking into his hand, his name somewhere in whatever you said when it hit.
+
+He doesn't stop. He finds the spot again, deliberate, and the second orgasm is already forming when he finally moves over you.
+{% else %}
+He takes his time. The wanting builds in layers — his mouth on your shoulder, his fingers moving, the arc of it familiar and still completely his.
+{% endif %}
+
+He lines himself up and pushes into you and the fullness is clean and right — familiar now, which has its own charge.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come once while he's moving and the room blurs around it. The second comes before he does and he holds you through both.
+{% endif %}
+
+The lamp is still on when you both stop moving. His chest rises and falls under your hand. The TV is still going in the other room.
+{% else %}
+He turns when you move toward him. No prompt — just the shift in the room when something decides.
+
+Your hand on his shoulder. He puts his hand over yours, warm, and looks at you.
+
+"Hey," he says again, quieter this time.
+
+The slow version is its own thing. His mouth on yours in no hurry. His hands moving over you like he has all evening.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth goes to the side of your neck — he knows by now what that does — and the heat spreads low and you exhale.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+By the time he gets his hand between your legs you're already past ready. He takes his time anyway.
+{% endif %}
+
+Into the bedroom, or not. The clothes go. The wanting, which was quiet and persistent under the whole evening, finally has room.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+He moves you exactly where he wants you and the part of you that might object has already gone somewhere warm and unprotesting. His hands and his weight over you and the ease of giving over to it.
+{% if w.hasTrait("PRAISE_KINK") %}
+He says your name when he enters you — just that, low, like an observation — and your hips push up and your grip on him tightens.
+{% endif %}
+{% else %}
+His hands know your body now — the place at your hip that makes you move, the hollow at your lower back. Two months of evenings like this one.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come early, embarrassingly early, and he knows and doesn't comment, just keeps going.
+{% endif %}
+
+The orgasm comes from below and moves up through everything. He stays close through it.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+The second one starts before you've fully come back from the first.
+{% endif %}
+
+Afterward the room is warm and his arm is heavy across your ribs and neither of you is in any hurry to move.
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX",1); gd.addStat("TOTAL_ORGASMS",1); gd.addStat("TIMES_MADE_HIM_CUM",1); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); npc("m").addLove(1); w.skillIncrease("RIDING", 2); w.skillIncrease("KISSING", 1); w.skillIncrease("FEMININITY", 1); w.changeStress(-8); gd.setDesire(5); w.addArousal(2);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id     = "let_him_come_to_you"
+label  = "Stay where you are"
+detail = "He knows. Let him close the distance."
+prose  = """
+{% if gd.desire() >= 65 %}
+He closes the laptop himself. Stands up.
+
+Comes across the room to you, unhurried, and you hold very still. His hands go to your face first — both of them, tilting your chin up — and he looks at you for a moment before he kisses you.
+
+{% if w.hasTrait("SHY") %}
+The looking is almost too much. You close your eyes before he does and he kisses you anyway, which is its own answer.
+{% elif w.hasTrait("PRAISE_KINK") %}
+"There you are," he says, quiet, looking at your face, and whatever he means by it, your body answers it before you do.
+{% endif %}
+
+He walks you backward until you hit the wall and stays there — his weight against you, his mouth at your throat, not moving you anywhere yet.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth stays on your neck longer because of the sound you made. He knows where to stay now.
+{% endif %}
+
+His hands get your shirt up. He reads your body like a map he's already been through and is checking for updates — what's changed, what's the same. His thumb finds the spot under your hip bone and you make a sound against his shoulder.
+
+{% if w.hasTrait("EASILY_WET") %}
+His hand between your legs finds the fabric soaked. He steps back and looks at you — not surprised, just focused. This information clarifies his priorities.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+His fingers find the right spot and you're coming before either of you expected it, your hands gripping his shirt, the orgasm short and sharp and immediate.
+
+He tries again. Steadier. The second one takes longer and unravels you more completely.
+{% else %}
+He takes his time because he knows what time does.
+{% endif %}
+
+When he finally pushes inside you it's with your back still against the wall and your legs around him and the urgency of the last two hours finds its resolution.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come while he's still moving. He holds you up through it.
+{% endif %}
+
+{% elif gd.desire() >= 35 %}
+He sets his mug down. Turns toward you on the couch with the full attention he gives things when he decides to give it.
+
+"Yeah?" he says.
+
+{% if w.hasTrait("ANALYTICAL") %}
+One word. You watch him read your face — the tilt of his head, the particular patience of a man who has learned to read you — and the cataloguing that usually happens in the back of your head just stops.
+{% elif w.hasTrait("ROMANTIC") %}
+The lamp is warm. His hand finds yours.
+{% else %}
+He leans in. Slow. He lets you close the last inch.
+{% endif %}
+
+His hands are warm against your face. He kisses you like the evening has been leading here and it's exactly right that it has.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+He draws back and kisses down your jaw to your throat and stays there. You tip your head and grab his arm and let him.
+{% endif %}
+
+The clothes go. His bedroom or yours or here — the room sorts itself.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+He's not performing when he takes the lead. He reads what you want and gives you exactly that — being directed, being placed, his weight deciding where you go. Your hands grip and let go and grip again.
+{% if w.hasTrait("PRAISE_KINK") %}
+He says something low and approving when he's inside you — not a speech, just a confirmation — and your whole body answers it.
+{% endif %}
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+He reaches between your legs and finds you already ready. His expression doesn't change much, just sharpens.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come the first time before he's done much of anything, and he uses the information.
+{% else %}
+He builds it slowly. His hands and his mouth and his particular attention.
+{% endif %}
+
+When he pushes into you the wanting, which has been ambient all evening, sharpens to something with edges. You pull him down by the back of the neck.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+The second orgasm arrives while he's still moving. You clutch him and ride through it.
+{% endif %}
+
+Afterward his arm is across you and the lamp is still burning.
+{% else %}
+He turns toward you. His hand comes up and tucks a piece of hair behind your ear, easy, like he's done it a hundred times.
+
+Then he leans in and kisses your temple, your cheek, the corner of your mouth.
+
+{% if w.hasTrait("ROMANTIC") %}
+The patience of him — his unhurriedness as a quality, not a performance, the lamp burning behind him.
+{% endif %}
+
+He takes your hand and stands up, and you follow.
+
+His bedroom. The lamp on low. He undresses you with the same unhurriedness — not performing patience, just moving at the pace of someone who isn't trying to get anywhere in particular.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth goes to your neck and you go liquid. Your hands find his shoulders.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+When he reaches between your legs you're already wet. He makes a quiet, not-quite-sound.
+{% endif %}
+
+He takes his time because you have time. His hands know where the body goes now — the hip, the inner thigh, the hollow at your lower back that makes your spine curve. He leans on this knowledge carefully.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come earlier than expected. He clocks it. Uses it. Brings you back up before he enters you.
+{% endif %}
+
+The fullness of him inside you is still, every time, a fact that needs a moment. Then you find the rhythm and the rhythm is good and the lamp is low and there's nowhere else.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+The second one comes slower, deeper, and you hold on to him through it.
+{% endif %}
+
+He stays close after. The city is out there. In here is quiet.
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX",1); gd.addStat("TOTAL_ORGASMS",1); gd.addStat("TIMES_MADE_HIM_CUM",1); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); npc("m").addLove(1); w.skillIncrease("KISSING", 2); w.skillIncrease("FEMININITY", 1); w.changeStress(-10); gd.setDesire(5); w.addArousal(2);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "slow_it_down"
+label     = "Slow it down"
+detail    = "You want this — but not in a hurry."
+condition = 'gd.desire() < 65'
+prose     = """
+{% if gd.desire() >= 35 %}
+You put your hand on his chest when he leans in.
+
+Not stopping — just: slower. He reads it. His mouth curves.
+
+"Okay," he says.
+
+He sits back and opens his arm and you tuck in against his side, your head on his shoulder, his arm around you. The TV still going. His thumb moving in a slow line up and down your arm.
+
+You stay like that long enough that the wanting, which was real and present, starts doing something different — spreading out, warming up into the whole evening instead of contracting to a single point.
+
+{% if w.hasTrait("ROMANTIC") %}
+The lamp on the wall. His breathing against your hair. The evening already earning itself.
+{% endif %}
+
+Eventually — ten minutes, or thirty, or somewhere between — he turns his head and his mouth finds your temple. Then your jaw. Then you turn and meet him and the slow catches fire.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+His mouth finds your neck and stays. The wanting, which had been warm and diffuse, goes immediate and specific. Your hand goes into his hair.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+He gets his hand between your legs and finds you soaking. "Ready," he says, dry. You take his hand and move it.
+{% endif %}
+
+He gets you on the couch — or into the bedroom — slowly, by accretion. Each step is something you agreed to. The slowness means every step arrives with full weight.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+When he finally gets his fingers inside you, the orgasm comes hard and fast from all the waiting. He stills, lets you through it, then tries again.
+{% endif %}
+
+When he slides into you the fullness hits immediately, clean and complete, and you exhale into his shoulder.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+You come twice. The second one is slower and longer and leaves you boneless.
+{% endif %}
+
+Afterward you're in no hurry to reorganize. His arm is where it should be and the room is warm around you.
+{% else %}
+You put your hand over his. "Not in a rush tonight."
+
+He looks at you. "Okay."
+
+And he means it — no implication, no patience wearing thin. He just turns back toward the TV and his arm is around you.
+
+{% if w.hasTrait("SHY") %}
+The ease of him. The absence of pressure. You settle into his side and the wanting goes gentle and quiet.
+{% elif w.hasTrait("ANALYTICAL") %}
+He doesn't recalibrate or recalculate or wait for a sign. He just — pivots. The reliability of him. You file it.
+{% else %}
+The evening carries on at its own pace. His thumb still moving on your shoulder.
+{% endif %}
+
+The city goes on outside. The TV says something about something. His mug has gone cold on the table.
+
+When the time feels right — and it does feel right, this is the thing about slow evenings — you turn toward him and he turns toward you and his hands know exactly where to go.
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+He goes to your neck first, because he knows, and the heat drops through you like he poured it.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+Slowly, and then not slowly, and then his hand is between your legs and you're ready, have been ready, and when he finds that his expression sharpens to focus.
+{% endif %}
+
+Into the bedroom. The lamp on low. All the time you asked for.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come from his hands alone — two orgasms before he's even inside you, his expression patient and focused the whole time.
+{% endif %}
+
+When he slides into you the fullness meets the whole warm evening and the wave that builds is long and deep. He takes his time. So do you.
+
+{% if w.hasTrait("MULTI_ORGASMIC") %}
+The second orgasm rolls in while he's still moving. Your hands grip and he stays.
+{% endif %}
+
+Afterward the lamp is on and neither of you is moving and the city is just the city.
+{% endif %}
+"""
+
+  effect = 'gd.addStat("TIMES_HAD_SEX",1); gd.addStat("TOTAL_ORGASMS",1); gd.addStat("TIMES_MADE_HIM_CUM",1); npc("m").addSexualActivity("vaginal"); npc("m").addLiking(2); npc("m").addLove(2); w.skillIncrease("KISSING", 1); w.skillIncrease("STAMINA", 1); w.skillIncrease("FEMININITY", 1); w.changeStress(-12); gd.setDesire(0); w.addArousal(1);'
+
+  [[actions.next]]
+  finish = true

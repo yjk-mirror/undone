@@ -114,6 +114,7 @@ impl Object for PlayerCtx {
                 let id = string_arg(method, args, 0)?;
                 Ok(Value::from(*self.skills.get(id.as_str()).unwrap_or(&0)))
             }
+            "composure" => Ok(Value::from(*self.skills.get("COMPOSURE").unwrap_or(&0))),
             "getMoney" => Ok(Value::from(self.money)),
             "getStress" => Ok(Value::from(self.stress)),
             "getAnxiety" => Ok(Value::from(self.anxiety)),
@@ -176,6 +177,7 @@ impl Object for PlayerCtx {
 pub struct GameDataCtx {
     pub week: u32,
     pub day: u8,
+    pub desire: i32,
     pub time_slot: String,
     pub flags: HashSet<String>,
     pub arc_states: HashMap<String, String>,
@@ -201,6 +203,7 @@ impl Object for GameDataCtx {
         match method {
             "week" => Ok(Value::from(self.week)),
             "day" => Ok(Value::from(self.day as i32)),
+            "desire" => Ok(Value::from(self.desire)),
             "timeSlot" => Ok(Value::from(self.time_slot.as_str())),
             "isWeekday" => Ok(Value::from(self.day <= 4)),
             "isWeekend" => Ok(Value::from(self.day >= 5)),
@@ -543,6 +546,7 @@ pub fn render_prose(
     let game_data_ctx = GameDataCtx {
         week: world.game_data.week,
         day: world.game_data.day,
+        desire: world.game_data.desire(),
         time_slot: format!("{:?}", world.game_data.time_slot),
         flags: world.game_data.flags.clone(),
         arc_states: world.game_data.arc_states.clone(),

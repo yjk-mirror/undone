@@ -59,6 +59,8 @@ pub struct GameStateSnapshot {
     pub time_slot: String,
     pub player_name: String,
     pub femininity: i32,
+    pub composure: i32,
+    pub desire: i32,
     pub money: i32,
     pub stress: i32,
     pub anxiety: i32,
@@ -103,6 +105,12 @@ pub fn game_state_snapshot(gs: &GameState) -> GameStateSnapshot {
         time_slot: format!("{:?}", gs.world.game_data.time_slot),
         player_name: player.name,
         femininity: player.femininity,
+        composure: gs
+            .registry
+            .composure_skill()
+            .map(|id| gs.world.player.skill(id))
+            .unwrap_or(0),
+        desire: gs.world.game_data.desire(),
         money: player.money,
         stress: player.stress,
         anxiety: player.anxiety,

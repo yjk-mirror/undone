@@ -1,6 +1,12 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
-use undone_domain::{StatId, TimeSlot};
+use undone_domain::{BoundedStat, StatId, TimeSlot};
+
+/// Desire accrued each time a time slot is consumed without sexual release.
+/// The body's wanting builds passively over idle days; release scenes discharge
+/// it via `gd.setDesire(...)` / `gd.addDesire(...)`. Tuning constant — kept here
+/// so the looping-adult pacing has a single dial.
+pub const DESIRE_GAIN_PER_SLOT: i32 = 8;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct GameData {
@@ -21,6 +27,11 @@ pub struct GameData {
     /// Once a red check fails it is blocked for the rest of the game.
     #[serde(default)]
     pub red_check_failures: HashSet<String>,
+    /// Sexual desire need-state, 0–100. Builds passively as time passes (see
+    /// `advance_time_slot`) and biases the scheduler toward `desire_scaled`
+    /// scenes. Discharged by release scenes. `serde(default)` → old saves load at 0.
+    #[serde(default)]
+    pub desire: BoundedStat,
 }
 
 fn default_time_slot() -> TimeSlot {
@@ -52,8 +63,26 @@ impl GameData {
         self.stats.insert(id, value);
     }
 
+    /// Read the current desire level (0–100).
+    pub fn desire(&self) -> i32 {
+        self.desire.get()
+    }
+
+    /// Add (or subtract) desire, clamped to 0–100.
+    pub fn add_desire(&mut self, delta: i32) {
+        self.desire.apply_delta(delta);
+    }
+
+    /// Set desire to an exact value, clamped to 0–100. Release scenes call this
+    /// (e.g. `gd.setDesire(0)` after a satisfying discharge).
+    pub fn set_desire(&mut self, value: i32) {
+        self.desire = BoundedStat::new(value);
+    }
+
     /// Advance to the next time slot. Returns true if the week rolled over.
+    /// Each consumed slot accrues desire (the body's passive wanting).
     pub fn advance_time_slot(&mut self) -> bool {
+        self.desire.apply_delta(DESIRE_GAIN_PER_SLOT);
         match self.time_slot.next() {
             Some(next) => {
                 self.time_slot = next;
@@ -184,6 +213,40 @@ mod tests {
         gd.advance_arc("base::jake", "acquaintance");
         gd.advance_arc("base::jake", "friend");
         assert_eq!(gd.arc_state("base::jake"), Some("friend"));
+    }
+
+    #[test]
+    fn desire_starts_at_zero() {
+        let gd = GameData::default();
+        assert_eq!(gd.desire(), 0);
+    }
+
+    #[test]
+    fn advancing_time_accrues_desire() {
+        let mut gd = GameData::default();
+        gd.advance_time_slot(); // Morning → Afternoon
+        assert_eq!(gd.desire(), DESIRE_GAIN_PER_SLOT);
+        gd.advance_time_slot(); // Afternoon → Night
+        assert_eq!(gd.desire(), DESIRE_GAIN_PER_SLOT * 2);
+    }
+
+    #[test]
+    fn desire_clamps_at_ceiling() {
+        let mut gd = GameData::default();
+        gd.set_desire(98);
+        gd.advance_time_slot();
+        assert_eq!(gd.desire(), 100); // 98 + 8 clamped to 100
+    }
+
+    #[test]
+    fn set_and_add_desire_clamp() {
+        let mut gd = GameData::default();
+        gd.set_desire(50);
+        assert_eq!(gd.desire(), 50);
+        gd.add_desire(-70);
+        assert_eq!(gd.desire(), 0); // clamped floor
+        gd.set_desire(999);
+        assert_eq!(gd.desire(), 100); // clamped ceiling
     }
 
     #[test]

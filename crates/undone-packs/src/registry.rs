@@ -40,6 +40,7 @@ pub struct PackRegistry {
 
 impl PackRegistry {
     const SKILL_FEMININITY: &'static str = "FEMININITY";
+    const SKILL_COMPOSURE: &'static str = "COMPOSURE";
     const TRAIT_TRANS_WOMAN: &'static str = "TRANS_WOMAN";
     const TRAIT_ALWAYS_FEMALE: &'static str = "ALWAYS_FEMALE";
     const TRAIT_NOT_TRANSFORMED: &'static str = "NOT_TRANSFORMED";
@@ -177,6 +178,13 @@ impl PackRegistry {
 
     pub fn femininity_skill(&self) -> Result<SkillId, RegistryError> {
         self.resolve_skill(Self::SKILL_FEMININITY)
+    }
+
+    /// COMPOSURE — the facade-maintenance skill that the looping-adult layer
+    /// uses as the loss-of-control axis (giving in to desire lowers it). Declared
+    /// structural like FEMININITY; validated at load by `validate_required_ids`.
+    pub fn composure_skill(&self) -> Result<SkillId, RegistryError> {
+        self.resolve_skill(Self::SKILL_COMPOSURE)
     }
 
     pub fn trans_woman_trait(&self) -> Result<TraitId, RegistryError> {

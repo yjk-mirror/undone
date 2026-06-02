@@ -33,6 +33,27 @@ impl W {
         });
     }
 
+    /// Change the structural COMPOSURE skill (giving in to desire lowers it).
+    /// Convenience wrapper over `skillIncrease("COMPOSURE", n)`; clamps to the
+    /// skill's min/max.
+    fn change_composure(&mut self, amount: i64) {
+        with_write_ctx(|world, _ctx, reg| {
+            let sid = reg
+                .composure_skill()
+                .map_err(|_| EffectError::UnknownSkill("COMPOSURE".to_string()))?;
+            let entry = world.player.skills.entry(sid).or_insert(SkillValue {
+                value: 0,
+                modifier: 0,
+            });
+            entry.value += amount as i32;
+            let def = reg
+                .get_skill_def(&sid)
+                .expect("composure skill resolved above — def must exist");
+            entry.value = entry.value.clamp(def.min, def.max);
+            Ok(())
+        });
+    }
+
     fn add_arousal(&mut self, delta: i64) {
         with_write_ctx(|world, _ctx, _reg| {
             world.player.arousal = step_arousal(world.player.arousal, delta as i8);
@@ -164,6 +185,7 @@ pub fn register(engine: &mut rhai::Engine) {
         .register_fn("changeStress", W::change_stress)
         .register_fn("changeMoney", W::change_money)
         .register_fn("changeAnxiety", W::change_anxiety)
+        .register_fn("changeComposure", W::change_composure)
         .register_fn("addArousal", W::add_arousal)
         .register_fn("changeAlcohol", W::change_alcohol)
         .register_fn("skillIncrease", W::skill_increase)

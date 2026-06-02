@@ -576,6 +576,8 @@ mod tests {
             player: PlayerSummarySnapshot {
                 name: "Robin".into(),
                 femininity: 10,
+                composure: 60,
+                desire: 0,
                 money: 500,
                 stress: 0,
                 anxiety: 0,

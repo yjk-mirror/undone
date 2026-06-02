@@ -1,0 +1,289 @@
+[scene]
+id          = "base::gym_regular_recurs"
+pack        = "base"
+description = "He's there again. The pull builds every time she comes back."
+
+[intro]
+prose = """
+{% if gd.desire() < 40 %}
+The gym is a Tuesday routine now. In, forty-five minutes, out. You have a sequence: treadmill, cables, floor work. It works because you don't deviate.
+
+Cal is at the cable station when you come in.
+
+He racks a plate without looking up. The cable adjustment after — deliberate, unhurried. His shirt is damp across the shoulders. He takes the space he wants and the room arranges itself around him.
+
+{% if not gd.hasGameFlag("MET_GYM_REGULAR") %}
+You recognized it the second or third time: same hours, equipment near yours, attention that doesn't perform itself.
+{% else %}
+He's been here the same hours you have for the last several weeks. That's a fact. You have a sequence.
+{% endif %}
+
+You set your bag down at your usual station. The treadmill is two rows back, facing the mirror. He is in the mirror.
+{% elif gd.desire() < 70 %}
+The gym is forty-five minutes and out. You told yourself that getting dressed. You believed it until the elevator opened on the third floor and the smell of the place hit — sweat and rubber and recycled air — and something lower than your stomach shifted.
+
+Cal is on the floor. Deadlifts. The controlled drop of each rep, the chalk on his hands, how he steps back between sets and just stands there, breathing, like he has nowhere else to be.
+
+You hang your bag on the peg and don't look at the mirror.
+
+You look at the mirror.
+
+He's already looking.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+The look lands somewhere between your ribs and holds for half a second longer than it has to. You find a different thing to focus on.
+{% else %}
+You take it as information and start your warm-up.
+{% endif %}
+{% else %}
+You drove to the gym on a Thursday. You don't usually come Thursdays.
+
+You know why. You're not examining it.
+
+Cal is in the free weights section, sitting on the edge of a bench between sets. He's not doing anything. Just there. Forearms resting on his knees, watching the room the way a man watches a room when he's not watching anything in particular. The way that means he's been watching one thing.
+
+The floor is three-quarters empty. Your usual station is open. The equipment near the cables — near him — is also open.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+Your body is already moving toward the cables before you've finished deciding whether to.
+{% else %}
+You stand at the entrance for a moment with your bag on your shoulder.
+{% endif %}
+{% endif %}
+"""
+
+# ── Action 1: Keep to your station ─────────────────────────────────────
+
+[[actions]]
+id     = "keep_to_station"
+label  = "Keep to your station"
+detail = "Your sequence works. Stick to it."
+prose  = """
+{% if gd.desire() < 40 %}
+You start the treadmill. Three and a half miles, same pace. The mirror shows the whole floor — him at the cables, the two men near the free weights, a woman doing kettlebell swings near the door.
+
+He moves through his sets. You move through yours. Forty-three minutes later you wipe down the treadmill handle and pick up your bag.
+
+When you pass the cable station he's done. He's toweling off his hands. He doesn't say anything.
+
+He looks up once, right as you pass, the kind of look that doesn't need anything from you and doesn't apologize for itself. Then he goes back to the towel.
+
+Outside the floor is cold and the elevator takes too long.
+
+{% elif gd.desire() < 70 %}
+You get on the treadmill. Start the sequence.
+
+He finishes his deadlifts and moves to the pull-up bar — ten feet from your treadmill, maybe twelve. His back to you, or mostly; the pull-up bar faces the mirror, and the mirror faces the treadmill.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You clock it after the second set. The geometry isn't accidental. You keep your eyes on the speed display.
+
+For about four minutes.
+{% elif w.hasTrait("SHY") %}
+You look at your phone mounted on the treadmill arm. You look at your feet. You look at a point on the wall somewhere above the water fountain.
+
+The pull-up bar is close enough you can hear the grip, the controlled lower, the exhale between reps.
+{% else %}
+The treadmill hums. His reflection is in the top third of your mirror line regardless of where you aim your eyes. You stop trying to manage it around the twelve-minute mark and just run.
+{% endif %}
+
+He finishes. Towels the bar down. He walks past the treadmill bank on his way to the exit — not close, the normal path.
+
+"Good workout," he says. Not waiting for an answer.
+
+The door closes. You're still on the treadmill.
+{% else %}
+You go to your station. Treadmill. Sequence.
+
+He's fifteen feet away and you feel that fifteen feet like a rope. Low, constant, the fact of being watched without it being performed.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+Your own inventory fires before you tell it to — his forearms at rest, the breadth of his shoulders, the unhurried set of his jaw. The old gaze, now aimed wrong. Your hands tighten on the rails.
+
+The treadmill climbs to your usual pace and something in your lower back is still paying attention.
+{% elif w.hasTrait("CONFIDENT") %}
+You bring your pace up. Your breathing steadies. If he's watching, he can watch.
+
+The next twenty minutes are a better workout than you've had all week.
+{% else %}
+The sequence takes longer than usual. The form suffers a little. You notice, correct it, lose it again.
+
+You're aware of exactly where he is on the floor for the full forty minutes.
+{% endif %}
+
+You leave without looking his way. Or you look once, at the door, to check your exit path. That's a normal thing to check.
+
+The street outside is cold and gray and completely ordinary.
+{% endif %}
+"""
+
+  effect = 'gd.addDesire(4); w.addArousal(1); gd.addStat("TIMES_CHECKED_OUT", 1);'
+
+  [[actions.next]]
+  finish = true
+
+# ── Action 2: Take the equipment near him ──────────────────────────────
+
+[[actions]]
+id     = "equipment_near_him"
+label  = "Use the cables"
+detail = "Your program calls for cables anyway."
+prose  = """
+{% if gd.desire() < 40 %}
+The cable station is free. Your program does call for cables. These are facts.
+
+You set the weight. He's two machines down, working a different angle. Close enough to hear the stack.
+
+After your first set he looks over. Not for long. Takes in your form — the grip, the angle. Nothing prurient. The same assessment you'd give a stranger's squat depth.
+
+"Wrists," he says.
+
+You've been compensating with your wrists and you knew it. You adjust, and the second set is cleaner.
+
+He doesn't say anything else. He finishes his set and moves to the machine next door.
+
+You work through your program. The cables are better than the treadmill for this movement anyway. That's why you came to the cables.
+{% elif gd.desire() < 70 %}
+You set up at the cable station. Second peg from the end — the one with the sight line to the floor, not directly adjacent to where he's working. Pragmatic.
+
+He's finishing a set. The last rep, the controlled lower, the pause before he unclips.
+
+"Add weight," he says. Not looking at you. Reading the stack.
+
+You have too much or too little, it's not clear, and before you've worked that out he reaches past you and adjusts the pin by two plates. His arm passes close enough that you can feel the displacement in the air.
+
+{% if w.hasTrait("SHY") %}
+You don't move. His arm withdraws. Your hands are still on the cable and you're not pulling it.
+
+"Go ahead," he says.
+
+You go ahead.
+{% elif w.hasTrait("SUBMISSIVE") %}
+"Thanks," you say.
+
+He doesn't answer. He moves back to his station and you're already trying to remember what the set was supposed to be.
+{% else %}
+You hadn't asked for his opinion. But when you try the adjusted weight it's right, and the burn runs up your back correctly, and you do the set.
+
+He's already past it.
+{% endif %}
+
+Three more sets. He stays nearby — working his program, not yours, making no overtures. The charge is in the nearness and in the fact of it, in his complete indifference to whether you find it comfortable.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+By the third set the adjustment is not the problem. The problem is that you want him to do something else you haven't named.
+{% endif %}
+{% else %}
+You go to the cables. This is where you're going.
+
+He looks up from the bench, takes you in — the whole quick inventory — and goes back to what he was doing. Which is waiting, and he is very good at waiting.
+
+You set your weight. Start your first set. The form is there even if the attention isn't fully there.
+
+Second set, he stands up and comes over to the adjacent station. Not yours. Adjacent.
+
+"Your left shoulder is dropping," he says.
+
+He's right. You feel it immediately, the slight tilt, the compensation that's been building for two weeks.
+
+{% if w.hasTrait("ANALYTICAL") %}
+You correct it. The set gets harder. You know exactly what's happening and you're doing it anyway, and the part of you that still has opinions watches from somewhere back and up and slightly to the left.
+{% elif w.hasTrait("OBJECTIFYING") %}
+His forearm beside yours at the cable adjustments. The width of his hands. The chalk from earlier still on his right palm.
+
+You finish the set. You're not sure when that happened.
+{% else %}
+You finish the set. The correction holds and the movement is cleaner.
+
+"Better," he says.
+
+He goes back to his bench. Your next set is the best one you've done in a month.
+{% endif %}
+
+He doesn't press. He doesn't lean. He's done, and the space between you holds the shape of what just happened without either of you filling it.
+{% endif %}
+"""
+
+  effect = 'gd.addDesire(7); w.addArousal(2); npc("m").addLiking(1); gd.addStat("TIMES_CHECKED_OUT", 1);'
+
+  [[actions.next]]
+  finish = true
+
+# ── Action 3: Let the spotter's offer land ──────────────────────────────
+# Available at higher desire or when liking is established
+
+[[actions]]
+id        = "accept_spot"
+label     = "Let him spot you"
+detail    = "You're loading for your heavy set. He's right there."
+condition = 'gd.desire() >= 40 || gd.npcLikingAtLeast("ROLE_GYM", "Ok")'
+prose     = """
+You're loading the bar for your heavy set — the one you've been building toward all month — and you're going to need a spot or you're going to sandbag it.
+
+He's three feet away. You've been aware of him being three feet away for the last twenty minutes.
+
+"Spot?" you say.
+
+He gets off the bench and comes around the rack without a word, no performance, like you asked him to hand you something. Stands behind the bar.
+
+{% if gd.desire() < 70 %}
+His hands hover, not touching, close enough to catch. The first rep, his presence is just that — a presence, a safety. By the third rep you're working hard enough that his voice in your ear doesn't startle you.
+
+"Two more."
+
+Statement, not question.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+You do two more. On the second, his hands come forward — not catching, just there, light, the fingertip pressure that means *I've got it if you drop* — and something in your chest locks and you push through it and rack the bar.
+
+He steps back.
+
+"Good," he says.
+
+Your arms are shaking in the good way and also in another way.
+{% else %}
+You do two more. You rack the bar clean. He steps back.
+
+"Solid," he says.
+
+You sit on the bench and breathe. He doesn't hover. He goes back to his station, unhurried, done with the transaction.
+
+The weight was real. So was his hand hovering that close.
+{% endif %}
+{% else %}
+Three reps in and it's going. His hands come forward on the fourth — not catching, steadying, that flat light contact through the bar that transfers into your palms — and you feel it in your shoulders and your lower back and somewhere lower than that.
+
+You rack it. Breathing.
+
+He doesn't move back immediately. He's right there and the bar is between you and his hands are still loose around it, not gripping, just resting.
+
+{% if w.hasTrait("SHY") %}
+You keep your eyes on the ceiling. Your chest is moving too fast.
+
+He steps back. The space rushes back in and you're not sure if it's better or worse.
+{% elif w.hasTrait("SUBMISSIVE") %}
+You look up at him from the bench.
+
+He looks down. Not long. The kind of look that doesn't need to be long.
+
+"Good set," he says, and steps away.
+
+You're still on the bench two minutes later.
+{% else %}
+"Thanks," you say.
+
+"Mm."
+
+He goes back to his station. Your next set doesn't happen — you just sit there for a minute and let your arms stop shaking and pretend you're resting.
+{% endif %}
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+You drive home and you're fine. You're completely fine. You just needed to get out of there.
+{% endif %}
+{% endif %}
+"""
+
+  effect = 'gd.addDesire(10); w.addArousal(3); npc("m").addLiking(2); w.skillIncrease("COMPOSURE", -3); gd.addStat("TIMES_CHECKED_OUT", 1);'
+
+  [[actions.next]]
+  finish = true

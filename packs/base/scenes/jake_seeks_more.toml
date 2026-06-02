@@ -1,0 +1,279 @@
+[scene]
+id          = "base::jake_seeks_more"
+pack        = "base"
+description = "Within the established relationship, when desire runs high enough to be louder than embarrassment, she asks for the new thing. He receives it like a gift."
+
+[intro]
+prose = """
+His place. Or yours. The lamp is on, the city outside doing its own thing, and you've been here long enough that the evening is already past its first stage — past the hello and the drinks and the settling in.
+
+{% if gd.desire() >= 70 %}
+The wanting has been building for days. The wanting is the reason you're here, even if you told yourself it wasn't.
+{% elif gd.desire() >= 50 %}
+The wanting surfaced somewhere in the cab ride over and hasn't gone quiet since. You're aware of his hands. The way he's sitting. The lamp putting light on the side of his face.
+{% else %}
+He's close. His arm against yours, the evening easy, settled. And then there's a wanting, low and specific, that's been there longer than tonight.
+{% endif %}
+
+It's not the wanting you've felt before. There's a specific thing you want to do tonight. You've known it for days, and you haven't said it.
+
+{% if w.getSkill("COMPOSURE") < 30 %}
+The words are already there, closer to the surface than usual. Right now the gap between wanting it and saying it feels like a step.
+{% else %}
+The gap between wanting it and saying it still has a size to it. The wanting has been outgrowing it for days.
+{% endif %}
+
+He looks over at you.
+"""
+
+# ── Player Actions ──────────────────────────────────────────────────────────
+
+[[actions]]
+id        = "ask_to_ride"
+label     = "Get on top of him"
+detail    = "You want to try it that way. You want to be the one moving."
+condition = '!gd.hasGameFlag("JAKE_ACT_RIDE")'
+prose     = """
+"I want—" A pause. The word in your mouth is small and forward and you say it anyway. "I want to try it with me on top."
+
+He looks at you for a second. Then: "Yeah."
+
+Like it's already decided. Like you just told him something he's glad to know.
+
+{% if w.hasTrait("SHY") %}
+Your face is hot by the time he shifts, moves back, makes room for you. You climb over him and the awkwardness of not knowing exactly how to do this yet — where to put your weight, how to angle — is there in the first few seconds and then his hands settle at your hips and the steadiness of them is enough. Not correcting. Just there.
+{% elif w.hasTrait("CONFIDENT") %}
+You move over him and find the position and it takes maybe three adjustments before it clicks — weight forward, hips tilted, and then the angle is right and you feel it. The control of it. His hands go to your hips but lightly, following, not directing.
+{% else %}
+You move over him. There's a learning curve — your body figuring out the physics, what works, where the leverage is. He doesn't rush you. His hands are at your waist, just present.
+{% endif %}
+
+{% if w.getSkill("RIDING") < 10 %}
+The first time you move it's too much too fast and you catch yourself on his chest. He steadies you. His expression is focused and warm in equal measure. You try again, slower, and the second time your hips find the movement on their own and the sensation is immediate — fuller, *different*, from this angle — and a sound comes out of you that's higher than you expected.
+
+His hands tighten at your waist.
+
+"Like that," he says. Quiet. Not telling — confirming.
+
+You keep going. The rhythm takes a minute to learn and then you have it, and having it feels like having something that's yours. Your body doing a thing it figured out. His face below you, watching you. The watching pulls you forward. Makes the wanting sharper.
+
+{% if w.hasTrait("EASILY_WET") %}
+When the orgasm comes you're slick enough that you can hear it and you drop forward against his chest, hips still moving through it. He holds you there until they stop.
+{% elif w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives faster than you were ready for — the angle, the position, something about the particular fullness of this — and your thighs clench around him and you clutch his shoulders and ride it out with your forehead against his.
+{% else %}
+The orgasm builds in layers, each movement adding to the last, and when it arrives it starts in your hips and spreads. You hold onto his shoulders. He holds on too.
+{% endif %}
+{% else %}
+You find the rhythm quickly enough — body already knows the principle, if not this particular geometry. You set the pace and he lets you. His hands stay at your hips, tracking rather than directing.
+
+The sensation is different from below. Fuller, and from this angle it reaches somewhere that makes you go briefly still before you start moving again. Your hips find the angle that works and you commit to it and his eyes are on your face and you don't look away.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+When you come, your back arches and you have to catch yourself with both hands on his chest. He holds your hips steady through it.
+{% else %}
+When you come it rolls up from the base of your spine and your hips don't stop moving through it, chasing the last of it. He stills his hands and lets you.
+{% endif %}
+{% endif %}
+
+Afterward, his hand moves from your hip to the small of your back. Warm.
+
+"Good?" he says.
+
+*Yeah*, you think. *Good.*
+"""
+
+  effect = 'gd.setGameFlag("JAKE_ACT_RIDE"); w.skillIncrease("RIDING", 3); gd.addStat("TIMES_HAD_SEX", 1); npc("m").addLiking(2); npc("m").addLove(1); gd.setDesire(5); w.addArousal(-2); w.changeStress(-3);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "ask_him_to_talk"
+label     = "Ask him to say what he wants"
+detail    = "You want to hear it. What he'd do, what he wants from you. Out loud."
+condition = '!gd.hasGameFlag("JAKE_ACT_DIRTY_TALK") && w.getSkill("SEDUCTION") >= 15'
+prose     = """
+It comes out quieter than you planned. "Talk to me. While we—" The rest of the sentence is obvious. "I want to hear you say it."
+
+He goes still for a moment. Looking at you. Then something shifts in his expression — not surprise, just a recalibration.
+
+"What you want?" he says. "Or what I want?"
+
+*Both*, you think. "Either."
+
+{% if w.hasTrait("SHY") %}
+You're not sure you've asked for this before. You're not sure you've known, before, that you were the kind of person who would want it. His voice, close, saying those particular things — the wanting had already been named in your body before you put words to it and now it's in the air between you and your face is warm and you're very aware of his hands on you.
+
+He starts talking. Low. His voice is even, almost ordinary, saying not-ordinary things — what he thinks about, where he wants to touch, what he's going to do — and your breathing changes before the first sentence is finished.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've thought about this. The wanting arrived before you had context for it — the voice thing, his in particular, the register he uses when he's focused. Your brain catalogued it. The catalogue wasn't finished yet.
+
+He starts talking. Specific things. Practical and exact. His hands are moving as he talks, action following description, and you can't tell which part of it is working on you faster — the words or the hands.
+{% else %}
+He nods, like you asked him to pass the salt. Ordinary. And then he starts talking.
+
+His voice drops a half-step. Not performing — just close. He says what he wants, and his hands go where his voice describes, and the gap between the word and the thing is about two seconds and then no gap at all.
+{% endif %}
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+When he describes your neck — what he's going to do to it, exactly — his mouth finds it at the same moment, and the combination of the word and the sensation drops through you all at once.
+{% endif %}
+
+His voice is his — not a performance of what this is supposed to sound like, just him.
+
+{% if w.getSkill("DIRTY_TALK") < 10 %}
+You try to respond in kind — once, the words climbing up your throat and then coming out. Not smooth. A little unsteady. But they come out, and his breath changes when they do, and that's enough to make you say the next one.
+{% else %}
+Your voice finds its way in. The exchange goes back and forth, his words and yours, and the conversation is doing as much as the touch by the time you're done.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush is all the way up your throat when you come.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives in the middle of something he was saying and your hips clench and he goes quiet and holds you through it. Afterward he asks, "Still with me?" You answer by pulling him back down.
+{% else %}
+The orgasm comes from everywhere at once and when you surface he's watching your face and his expression is the particular kind of careful that means he noticed everything.
+{% endif %}
+
+He doesn't say anything afterward. Neither do you. The quiet is fine.
+"""
+
+  effect = 'gd.setGameFlag("JAKE_ACT_DIRTY_TALK"); w.skillIncrease("DIRTY_TALK", 3); w.skillIncrease("SEDUCTION", 1); gd.addStat("TIMES_HAD_SEX", 1); npc("m").addLiking(2); npc("m").addLove(2); gd.setDesire(5); w.addArousal(-2); w.changeStress(-3);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "ask_to_be_tied"
+label     = "Ask him to hold you down"
+detail    = "Your wrists. Both. You want to find out what it does."
+condition = '!gd.hasGameFlag("JAKE_ACT_TIED") && w.getSkill("SEDUCTION") >= 20'
+prose     = """
+You say it while you're close enough that you don't have to raise your voice. "Hold my wrists. Both of them. Above my head."
+
+A beat. He pulls back just enough to look at your face.
+
+"Yeah?" he says.
+
+"Yeah."
+
+He takes both your wrists in one hand. His grip is firm without being hard — you could pull free; the point is that you're not going to. He holds them above your head against the pillow and looks down at you.
+
+{% if w.getSkill("COMPOSURE") < 35 %}
+Something in you drops immediately. Your hips shift upward without your approval.
+{% else %}
+For a second you inventory it — what you're feeling, what you want the grip to do. Your brain running the map. And then his weight settles and the map stops mattering.
+{% endif %}
+
+{% if w.hasTrait("SUBMISSIVE") %}
+The held-down is the thing. Not the tying, not the restraint itself — the fact of his hand around both of yours, the fact that you asked for it, the fact that right now you're not going anywhere and the wanting doubles because of it. Your hips roll up.
+
+{% if w.hasTrait("PRAISE_KINK") %}
+He says your name once, low, and the grip tightens very slightly at the same moment, and your body answers both at once in a way that's completely out of scale with the input. His expression shifts — he noticed. He says it again.
+{% endif %}
+{% else %}
+The wanting to move your hands is there and you don't. The not-moving is doing its own thing. He watches your face. His free hand moves and the combination of the held-still and the moving is — precise. Your hips push up into it.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+When his fingers find you, the wet is audible and he makes a quiet sound and his grip on your wrists tightens one degree.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breathing goes loud. You can hear yourself. He can hear you.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives faster than it has any business arriving. He's barely started and your wrists pull against his hand — not to get free, just the reflex — and then you're coming, sudden, your hips stuttering up, the grip holding you in place through it.
+
+He stills. Watching. Then: "Again?"
+
+You nod.
+
+He does it again. The second orgasm arrives slower and hits harder.
+{% else %}
+He keeps going. Steady. The grip holding, the other hand working, his eyes on your face the whole time. The orgasm builds from the base of your spine and when it arrives it takes a few seconds to peak and you make a sound into the pillow and your wrists push against his hand and he holds them there until you stop.
+{% endif %}
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the bed and he lets it, his grip rising with you.
+{% endif %}
+
+He lets go of your wrists after. His hand covers both of yours, loosely. You can feel the blood in your fingers.
+
+"Good?" he says. Same as always.
+
+"Yeah." You mean it differently than before.
+"""
+
+  effect = 'gd.setGameFlag("JAKE_ACT_TIED"); w.skillIncrease("BONDAGE_SKILL", 3); w.skillIncrease("TEASE", 1); gd.addStat("TIMES_HAD_SEX", 1); npc("m").addLiking(3); npc("m").addLove(2); gd.setDesire(0); w.addArousal(-2); w.changeStress(-3); w.changeComposure(-5);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "tease_him_first"
+label     = "Make him watch first"
+detail    = "Undress slowly. Make him wait before anything happens."
+condition = '!gd.hasGameFlag("JAKE_ACT_TEASE") && w.getSkill("TEASE") >= 10'
+prose     = """
+You stand up.
+
+He looks up at you. Waiting to see what this is.
+
+You start with your shirt. Slow. Not a performance — or not only a performance. You want to see what it does to him. You want the particular thing of being watched like this, by him, deliberately, on your own terms.
+
+{% if w.hasTrait("SULTRY") %}
+This is terrain you know. Not from memory — from instinct. The particular angle that works, when to look at him and when to look away, the half-second of stillness that's more effective than the movement. Your hands are steady. His are still.
+{% elif w.hasTrait("SHY") %}
+Your hands aren't entirely steady. But you keep going. His expression doesn't change — it just gets more focused, the quiet he does when he's paying attention, and the focused quiet of it is the thing that keeps your hands moving. You made the decision. Finish it.
+{% elif w.hasTrait("ANALYTICAL") %}
+You're running the experiment. Your body in the lamplight, tracking how his attention follows your hands, his jaw tightening when the shirt comes off. Cataloguing and participating at the same time. Both tracks running.
+{% else %}
+His eyes stay on you. Not grabbing — just following. Waiting. The patience of him is doing almost as much as the looking.
+{% endif %}
+
+The shirt. Then the rest of it. Slow enough that he has time to want what's coming. Slow enough that you can see him wanting it.
+
+{% if w.hasTrait("BEAUTIFUL") %}
+He says something quiet that you don't catch. Not for you — just something that came out.
+{% else %}
+He's very still.
+{% endif %}
+
+By the time you're done, his hands are at his sides and his breathing has changed and the wanting is mutual and obvious and you've been the one holding it this whole time.
+
+You cross to him.
+
+{% if w.hasTrait("CONFIDENT") %}
+You take his face in both hands and tilt his chin up and kiss him first. His hands finally move — both of them, to your hips, pulling you in. The patience broke. Good.
+{% else %}
+When you reach him his hands come up to your waist immediately — the restraint of the watching finally done. He pulls you in. The waiting made everything sharper.
+{% endif %}
+
+{% if w.hasTrait("EASILY_WET") %}
+He finds you soaking when his hand gets there and the sound he makes is low and not quite controlled.
+{% endif %}
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+The orgasm arrives before either of you expected — the wanting has been building since you stood up and his hand barely gets there before it's there, sudden and sharp. He holds you through it, both arms, and waits. Then: "More?"
+
+*Yes*, you think. You pull him down for the answer.
+{% elif w.hasTrait("MULTI_ORGASMIC") %}
+The first orgasm comes fast and the second one builds off the back of it before the first is finished and by the time you're done the lamp has moved from one part of the wall to another, which means more time has passed than you tracked.
+{% else %}
+What follows is unhurried. He's been made to wait; he uses the time. The orgasm takes a while to arrive and arrives fully, and afterward the room is warm and quiet and his arm is across your back.
+{% endif %}
+
+He doesn't say anything for a while. Then: "I liked that."
+
+"I know," you say.
+"""
+
+  effect = 'gd.setGameFlag("JAKE_ACT_TEASE"); w.skillIncrease("TEASE", 3); w.skillIncrease("SEDUCTION", 2); gd.addStat("TIMES_HAD_SEX", 1); npc("m").addLiking(3); npc("m").addLove(1); gd.setDesire(5); w.addArousal(-2); w.changeStress(-4);'
+
+  [[actions.next]]
+  finish = true

@@ -38,6 +38,59 @@ fn base_pack_loads_through_rhai() {
     assert!(scenes.contains_key("base::coffee_shop"));
 }
 
+/// Every base-pack scene's intro prose renders without a missing-method error.
+///
+/// Regression guard: the Rhai condition/effect gate (`load_scenes`) does NOT
+/// render minijinja prose, so a prose template calling a method that exists in
+/// the Rhai API but NOT the minijinja template context (`template_ctx.rs`) loads
+/// clean and then crashes at render time. This caught `gd.desire()` / `w.composure()`
+/// being absent from the template context. Intros are `w.`/`gd.`/`scene.`-only
+/// (no NPC binding needed), and `{% if gd.desire() %}` guards call the method
+/// regardless of value — so rendering every intro against one world exercises
+/// every template method an intro can reference. Desire is set high so the
+/// high-desire branch bodies render too.
+#[test]
+fn all_scene_intros_render_without_missing_methods() {
+    use undone_scene::template_ctx::render_prose;
+
+    let (registry, _metas) = load_packs(&packs_dir()).unwrap();
+    let scenes_dir = packs_dir().join("base").join("scenes");
+    let scenes = load_scenes(&scenes_dir, &registry).unwrap();
+
+    let mut world = make_test_world();
+    world.game_data.set_desire(90); // exercise high-desire intro branches
+    let ctx = SceneCtx::new();
+
+    let mut failures = Vec::new();
+    for (id, scene) in &scenes {
+        let mut surfaces = vec![("intro", scene.intro_prose.as_str())];
+        for (i, v) in scene.intro_variants.iter().enumerate() {
+            surfaces.push((
+                Box::leak(format!("intro_variant[{i}]").into_boxed_str()),
+                v.prose.as_str(),
+            ));
+        }
+        for (i, t) in scene.intro_thoughts.iter().enumerate() {
+            surfaces.push((
+                Box::leak(format!("thought[{i}]").into_boxed_str()),
+                t.prose.as_str(),
+            ));
+        }
+        for (label, template) in surfaces {
+            if let Err(e) = render_prose(template, &world, &ctx, &registry) {
+                failures.push(format!("{id} ({label}): {e}"));
+            }
+        }
+    }
+
+    assert!(
+        failures.is_empty(),
+        "scene prose failed to render ({} failures):\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
+}
+
 /// A representative condition evaluates through Rhai with the real registry —
 /// recorded expectation, not inline-constructed to match the implementation.
 #[test]

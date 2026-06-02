@@ -1,0 +1,169 @@
+[scene]
+id          = "base::marcus_pushes"
+pack        = "base"
+description = "His office, the door locked. He introduces an act she didn't ask for. The question is whether she stops him."
+
+[intro]
+prose = """
+The door is already locked. Marcus did it when he came in, the same way he does everything — no ceremony, just the thing done. You've been going over the rollout spec on his screen and his hand is on the back of your neck.
+
+Not your shoulder. The back of your neck.
+
+His thumb is at the base of your skull. The pressure is light. It's been there for maybe thirty seconds.
+
+{% if w.getSkill("FEMININITY") < 30 %}
+The rollout spec is still on the screen. His thumb is at the top of your spine, and the pressure there is different from a hand on a shoulder.
+{% elif w.getSkill("FEMININITY") < 50 %}
+The rollout spec is still on the screen. His thumb is not moving. Neither are you.
+{% else %}
+The rollout spec is on the screen and his thumb is at the back of your neck and you stopped reading it about twenty seconds ago.
+{% endif %}
+
+He's not pulling you anywhere. Not yet. The pressure is just — present. Waiting.
+"""
+
+[[thoughts]]
+condition = 'w.hasTrait("OBJECTIFYING")'
+style = "observation"
+prose = "His thumb at the top of your spine. Waiting. Your stomach has already registered what it's waiting for."
+
+[[thoughts]]
+condition = 'w.hasTrait("ANALYTICAL")'
+style = "observation"
+prose = "Thirty seconds. Not asking. Just establishing."
+
+# ── Actions ──────────────────────────────────────────────────────────────────
+
+[[actions]]
+id        = "stop_him"
+label     = "Stop him"
+detail    = "She names what's happening and ends it. Not a rejection — a boundary."
+condition = 'gd.hasGameFlag("MARCUS_INTIMATE") && !gd.hasGameFlag("MARCUS_ACT_USED")'
+prose     = """
+You put your hand over his.
+
+Not rough — just firm. Fingers over his knuckles until the pressure releases. His hand lifts.
+
+{% if w.hasTrait("CONFIDENT") %}
+"Not that," you say. You don't look at him when you say it. The screen is still there, the rollout numbers still there. You're not running from anything. You're just naming it.
+{% elif w.hasTrait("ANALYTICAL") %}
+"Not where this is going," you say. Specific enough that he knows you saw it coming.
+{% elif w.hasTrait("AMBITIOUS") %}
+"This is already complicated enough," you say. You mean the affair, the floor plan, the four people between your desks. You mean everything. His hand is off your neck.
+{% else %}
+"Not this," you say.
+{% endif %}
+
+Marcus doesn't argue. He pulls his chair back to his own side of the desk. His hands on the arms of the chair.
+
+A beat. The HVAC hums above you. The rollout spec is still open.
+
+"Okay," he says.
+
+{% if w.hasTrait("AMBITIOUS") %}
+The accounting: what you didn't let happen, the thing still running under everything. You pick up your notebook.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've marked the limit. He received it. You make a note in the margin of the spec — the staging window — and it has nothing to do with any of this.
+{% else %}
+You pull the keyboard toward you. The cursor is blinking where you left it.
+{% endif %}
+
+The door's still locked. You both know that.
+"""
+
+  effect = 'w.changeComposure(3); gd.addDesire(8);'
+
+  [[actions.next]]
+  finish = true
+
+[[actions]]
+id        = "let_him"
+label     = "Let him"
+detail    = "She doesn't stop him. He takes that as the answer it is."
+condition = 'gd.hasGameFlag("MARCUS_INTIMATE") && !gd.hasGameFlag("MARCUS_ACT_ORAL")'
+prose     = """
+You don't move his hand.
+
+The rollout spec is still on the screen. The pressure at the back of your neck is still there. You stay where you are, which is — already — the answer.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+The chair isn't moving and neither are you and his thumb at the top of your spine is doing something to the rest of your body that has nothing to do with reasoning about it.
+{% elif w.hasTrait("AMBITIOUS") %}
+The accounting is running: floor plan, three people between your desks, the career you rebuilt in this building. You let it run. You don't stop him.
+{% elif w.hasTrait("ANALYTICAL") %}
+You clocked the move. The progression. The hand, then the direction of it. You saw all of it and you're still here.
+{% elif w.hasTrait("CONFIDENT") %}
+You meet his eyes in the reflection of the dark screen. Neither of you looks away.
+{% else %}
+Your hands are still on the keyboard. The cursor is still blinking.
+{% endif %}
+
+His hand at the back of your neck exerts gentle pressure — not forcing, just — directing. Your head tilts forward.
+
+{% if w.hasTrait("OBJECTIFYING") %}
+His grip. The angle. The way it doesn't ask. Your stomach drops and the drop is not fear.
+{% endif %}
+
+{% if w.hasTrait("BREATH_CHANGER") %}
+Your breath has changed. In the quiet of the locked office it's audible. He can hear it. He doesn't comment.
+{% endif %}
+
+He pushes the keyboard away. Rolls the chair back. And then he's on one knee in front of you, unhooking the waistband of your skirt from the inside, and your hands are gripping the armrests because the chair is still there and his face is between your thighs before you've finished processing that this is what's happening.
+
+{% if w.hasTrait("EASILY_WET") %}
+He finds out immediately what the last thirty seconds did. A sound comes out of you that you didn't plan. His hands tighten on your thighs.
+{% endif %}
+
+{% if w.hasTrait("SENSITIVE_NECK") %}
+The pressure at your neck is gone — both his hands are on your thighs now — but the place where his thumb was is still there. Still registering.
+{% endif %}
+
+His mouth. Not tentative — thorough. Reading what makes your hips shift and then going back to that and then adjusting. The desk edge is at your shoulder blades. The floor outside is dark under the door.
+
+{% if w.hasTrait("HAIR_TRIGGER") %}
+You come faster than you've come for anything — sudden, uncontrolled, a sound you clap your hand over too late. The office walls are thin. Marcus registers it and goes still, then starts again. Slower this time. Like he was just establishing the baseline.
+{% elif w.hasTrait("PRAISE_KINK") %}
+When he brings you close his pace slows and his voice is barely sound — one word, your name, the way he says it in meetings when you've gotten something exactly right. Your hips push into him before you've decided to move them.
+{% endif %}
+
+{% if w.hasTrait("THIGH_CLENCHER") %}
+Your thighs close around him. He holds you open. Matter-of-fact, like he's just continuing to work.
+{% endif %}
+
+{% if w.hasTrait("FLUSHER") %}
+The flush is on your chest and neck and the office lights are on. All of it visible.
+{% endif %}
+
+When it breaks through you the sound you make is not quiet. Your hands find the back of his head without being told to.
+
+{% if w.hasTrait("BACK_ARCHER") %}
+Your back arches off the chair. The monitor wobbles on the desk.
+{% endif %}
+
+After: the chair. The rollout spec still open on the screen. Marcus stands up and straightens his collar. His expression is level — same as it is in any meeting — and you cannot currently say the same about yours.
+
+{% if w.hasTrait("SUBMISSIVE") %}
+His hand at your neck. You, staying.
+{% elif w.getSkill("FEMININITY") < 30 %}
+The meeting is still on the calendar. Neither of those facts is reconciling right now.
+{% elif w.getSkill("FEMININITY") < 50 %}
+You smooth your skirt. The numbers on the screen are the same numbers they were.
+{% endif %}
+
+He doesn't say anything about what just happened. He pulls his chair back to the desk.
+
+"The staging window," he says. "Your call."
+
+{% if w.hasTrait("AMBITIOUS") %}
+The accounting has an extra item now. You run it anyway. You open your notebook.
+{% elif w.hasTrait("ANALYTICAL") %}
+You've confirmed the data point. You pull the keyboard back toward you.
+{% else %}
+You pick up the spec.
+{% endif %}
+"""
+
+  effect = 'gd.setGameFlag("MARCUS_ACT_USED"); gd.setGameFlag("MARCUS_ACT_ORAL"); w.changeComposure(-10); npc("m").addLiking(2); npc("m").addSexualActivity("oral_given"); gd.addStat("TIMES_RECEIVED_ORAL", 1); gd.addStat("TOTAL_ORGASMS", 1); w.skillIncrease("FEMININITY", 2); w.addArousal(1); gd.setDesire(15);'
+
+  [[actions.next]]
+  finish = true
