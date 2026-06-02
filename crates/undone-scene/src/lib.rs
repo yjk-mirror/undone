@@ -150,6 +150,23 @@ mod integration_tests {
             .join("\n")
     }
 
+    /// The prose load gate (design §5.4) runs on every prose field during
+    /// `load_scenes`. A clean load of the whole base pack IS the assertion that the
+    /// entire live corpus passes the method-surface gate — including the 8 live
+    /// single-quoted-id sites, which must NOT be rejected.
+    #[test]
+    fn prose_gate_passes_over_base_pack() {
+        let (registry, _metas) = undone_packs::load_packs(&packs_dir()).unwrap();
+        let scenes_dir = packs_dir().join("base").join("scenes");
+        let scenes = load_scenes(&scenes_dir, &registry)
+            .unwrap_or_else(|e| panic!("base pack prose failed the load gate: {e}"));
+        assert!(
+            scenes.len() >= 70,
+            "expected the full scene set, got {}",
+            scenes.len()
+        );
+    }
+
     #[test]
     fn rain_shelter_full_flow() {
         // 1. Load packs

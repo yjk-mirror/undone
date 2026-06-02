@@ -215,6 +215,37 @@ fn tokenize(src: &str) -> Result<Vec<Tok>, String> {
                 }
                 toks.push(Tok::Str(s));
             }
+            '\'' => {
+                // single-quoted string with \ escapes. Rhai conditions use double
+                // quotes, but Minijinja prose accepts both — the live pack uses
+                // single-quoted ids (e.g. `w.getSkill('FEMININITY')`), so the prose
+                // gate must tokenize them as string literals too (design §5.4).
+                let mut s = String::new();
+                i += 1;
+                loop {
+                    if i >= bytes.len() {
+                        return Err("unterminated string literal".into());
+                    }
+                    match bytes[i] {
+                        '\\' => {
+                            i += 1;
+                            if i < bytes.len() {
+                                s.push(bytes[i]);
+                                i += 1;
+                            }
+                        }
+                        '\'' => {
+                            i += 1;
+                            break;
+                        }
+                        ch => {
+                            s.push(ch);
+                            i += 1;
+                        }
+                    }
+                }
+                toks.push(Tok::Str(s));
+            }
             '.' => {
                 toks.push(Tok::Dot);
                 i += 1;
@@ -690,6 +721,214 @@ pub fn source_has_persistent_mutation(src: &str) -> bool {
         write_spec(c.receiver.as_deref().unwrap_or(""), m).is_some()
             || (c.receiver.as_deref() == Some("npc") && write_spec("npc", m).is_some())
     })
+}
+
+// ---------------------------------------------------------------------------
+// Prose load gate (design §5.4) — validates the method surface of authored prose
+// templates at load. Single-quote-aware (the tokenizer accepts both quote styles).
+// Arity is validated leniently in prose (filters / arithmetic / nested calls defeat
+// the comma splitter); identity (receiver.method exists, is prose-contexted) and
+// string-literal content-id resolution are what's enforced.
+// ---------------------------------------------------------------------------
+
+/// Validate every `receiver.method(...)` call site in a Minijinja prose template
+/// against the registry's prose surface. Surfaced through
+/// `script::api::prose_validate::validate_prose`.
+pub fn validate_prose(
+    template: &str,
+    registry: &PackRegistry,
+    context: &str,
+) -> Result<(), ScriptError> {
+    for region in expression_regions(template) {
+        let toks = tokenize(&region).map_err(|message| ScriptError::Compile {
+            context: context.into(),
+            message,
+            source_text: region.clone(),
+        })?;
+        for call in extract_calls(&toks) {
+            let Some(recv_tok) = call.receiver.as_deref() else {
+                continue; // bare call: a Minijinja filter/function/test — out of scope (§5.4)
+            };
+            let Some(recv) = crate::script::api::receiver_from_token(recv_tok) else {
+                continue; // not one of our receivers — leave to Minijinja
+            };
+            let Some(d) = crate::script::api::lookup(recv, &call.method) else {
+                return Err(compile_err(
+                    context,
+                    &region,
+                    format!("unknown prose method '{}.{}'", recv_tok, call.method),
+                ));
+            };
+            if !d.contexts.prose {
+                return Err(compile_err(
+                    context,
+                    &region,
+                    format!(
+                        "method '{}.{}' is not callable in prose",
+                        recv_tok, call.method
+                    ),
+                ));
+            }
+            validate_prose_id_arg(d.args, &call, registry, context, &region)?;
+        }
+    }
+    Ok(())
+}
+
+/// Validate a prose call's leading string-literal content-id arg, if its shape
+/// carries one. Non-literal ids are left to render-time (lenient, like arity).
+fn validate_prose_id_arg(
+    shape: crate::script::api::ArgShape,
+    call: &Call,
+    registry: &PackRegistry,
+    context: &str,
+    src: &str,
+) -> Result<(), ScriptError> {
+    use crate::script::api::ArgShape;
+    let kind = match shape {
+        ArgShape::Id(k) | ArgShape::IdInt(k) => k,
+        _ => return Ok(()),
+    };
+    if let Some(Arg::Str(id)) = call.args.first() {
+        resolve_id(kind, id, call, registry, context, src)?;
+    }
+    Ok(())
+}
+
+/// Extract the contents of each `{{ … }}` / `{% … %}` region, skipping `{# … #}`
+/// comments and `{% raw %}…{% endraw %}` blocks and stripping whitespace-control
+/// markers (`{%-`, `-%}`, …). The live corpus uses none of the exotic forms, but
+/// the scan must not false-positive on them (design §5.4).
+fn expression_regions(template: &str) -> Vec<String> {
+    let b = template.as_bytes();
+    let n = b.len();
+    let mut regions = Vec::new();
+    let mut i = 0;
+    let mut in_raw = false;
+    while i + 1 < n {
+        if b[i] == b'{' && matches!(b[i + 1], b'{' | b'%' | b'#') {
+            let kind = b[i + 1];
+            let (ca, cb) = match kind {
+                b'{' => (b'}', b'}'),
+                b'%' => (b'%', b'}'),
+                _ => (b'#', b'}'),
+            };
+            let start = i + 2;
+            let mut j = start;
+            while j + 1 < n && !(b[j] == ca && b[j + 1] == cb) {
+                j += 1;
+            }
+            let end = if j + 1 < n { j } else { n };
+            let content = template[start..end]
+                .trim()
+                .trim_start_matches('-')
+                .trim_end_matches('-')
+                .trim()
+                .to_string();
+            i = (end + 2).min(n);
+            match kind {
+                b'#' => {} // comment — skip
+                b'%' => {
+                    let head = content.split_whitespace().next().unwrap_or("");
+                    if head == "raw" {
+                        in_raw = true;
+                    } else if head == "endraw" {
+                        in_raw = false;
+                    } else if !in_raw {
+                        regions.push(content);
+                    }
+                }
+                _ => {
+                    if !in_raw {
+                        regions.push(content);
+                    }
+                }
+            }
+        } else {
+            i += 1;
+        }
+    }
+    regions
+}
+
+#[cfg(test)]
+mod prose_gate_tests {
+    use super::*;
+
+    fn registry_with_skills(ids: &[&str]) -> PackRegistry {
+        let mut r = PackRegistry::new();
+        r.register_skills(
+            ids.iter()
+                .map(|id| undone_packs::SkillDef {
+                    id: (*id).into(),
+                    name: (*id).into(),
+                    description: String::new(),
+                    min: 0,
+                    max: 100,
+                })
+                .collect(),
+        );
+        r
+    }
+
+    #[test]
+    fn prose_gate_accepts_single_quoted_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // single quotes are legal in minijinja and used in the live pack
+        assert!(validate_prose(
+            r#"{% if w.getSkill('FEMININITY') < 20 %}x{% endif %}"#,
+            &r,
+            "test"
+        )
+        .is_ok());
+    }
+
+    #[test]
+    fn prose_gate_accepts_double_quoted_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.getSkill("FEMININITY") }}"#, &r, "test").is_ok());
+    }
+
+    #[test]
+    fn prose_gate_rejects_unknown_method() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.notAReal() }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_write_in_prose() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.changeMoney(5) }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_checkskill_in_prose() {
+        let r = registry_with_skills(&["CHARM"]);
+        // checkSkill is condition-only (RNG side effect) — barred from prose.
+        assert!(validate_prose(
+            r#"{% if w.checkSkill('CHARM', 10) %}x{% endif %}"#,
+            &r,
+            "test"
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_unknown_content_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // CHARM not registered → id resolution fails.
+        assert!(validate_prose(r#"{{ w.getSkill('CHARM') }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_ignores_filters_and_plain_text() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // bare filters/functions and plain prose are not method-surface calls.
+        assert!(validate_prose("Just some plain prose with no calls.", &r, "test").is_ok());
+        assert!(validate_prose(r#"{{ "x" | upper }}"#, &r, "test").is_ok());
+        // comments are skipped, not parsed.
+        assert!(validate_prose(r#"{# w.notAReal() #}plain"#, &r, "test").is_ok());
+    }
 }
 
 // ---------------------------------------------------------------------------

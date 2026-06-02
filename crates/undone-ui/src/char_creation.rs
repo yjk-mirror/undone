@@ -447,13 +447,19 @@ fn fem_creation_discovery_view(
                     .discovery_beats
                     .iter()
                     .map(|beat| {
+                        // Beats are validated at load by the prose gate, so a render
+                        // error here is unexpected — fail VISIBLY (log + safe marker),
+                        // never leak the raw template source to the player (principle #4).
                         undone_scene::template_ctx::render_prose(
                             &beat.prose,
                             &world,
                             &empty_ctx,
                             &reg_clone,
                         )
-                        .unwrap_or_else(|_| beat.prose.clone())
+                        .unwrap_or_else(|e| {
+                            log::error!("[char_creation] discovery beat prose render failed: {e}");
+                            "[prose error — see log]".to_string()
+                        })
                     })
                     .collect()
             } else {

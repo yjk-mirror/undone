@@ -184,6 +184,8 @@ fn resolve_scene(
         },
     )?;
 
+    validate_prose_checked(&raw.intro.prose, registry, scene_id)?;
+
     Ok(SceneDefinition {
         id: raw.scene.id,
         pack: raw.scene.pack,
@@ -224,6 +226,8 @@ fn resolve_thought(
         .map(|s| parse_condition_checked(s, registry, scene_id))
         .transpose()?;
 
+    validate_prose_checked(&raw.prose, registry, scene_id)?;
+
     Ok(Thought {
         condition,
         prose: raw.prose,
@@ -237,6 +241,7 @@ fn resolve_narrator_variant(
     scene_id: &str,
 ) -> Result<NarratorVariant, SceneLoadError> {
     let condition = parse_condition_checked(&raw.condition, registry, scene_id)?;
+    validate_prose_checked(&raw.prose, registry, scene_id)?;
     Ok(NarratorVariant {
         condition,
         prose: raw.prose,
@@ -250,6 +255,18 @@ pub(crate) fn parse_condition_checked(
 ) -> Result<crate::script::CompiledScript, SceneLoadError> {
     crate::script::compile_condition(expr_str, registry, scene_id)
         .map_err(|e| map_script_error(e, scene_id, expr_str))
+}
+
+/// Validate a prose template's method surface through the load-time prose gate —
+/// the fail-fast guarantee for prose (an unknown / mis-contexted method or bad
+/// content id fails at load, not when a player reaches that scene branch).
+pub(crate) fn validate_prose_checked(
+    prose: &str,
+    registry: &PackRegistry,
+    scene_id: &str,
+) -> Result<(), SceneLoadError> {
+    crate::script::api::prose_validate::validate_prose(prose, registry, scene_id)
+        .map_err(|e| map_script_error(e, scene_id, prose))
 }
 
 /// Map a `ScriptError` from the load-time gate onto the loader's error taxonomy,
@@ -331,6 +348,8 @@ fn resolve_action(
         thoughts.push(resolve_thought(t, registry, scene_id)?);
     }
 
+    validate_prose_checked(&raw.prose, registry, scene_id)?;
+
     Ok(Action {
         id: raw.id,
         label: raw.label,
@@ -375,6 +394,8 @@ fn resolve_npc_action(
         .into_iter()
         .map(|n| resolve_next_branch(n, registry, scene_id))
         .collect::<Result<Vec<_>, _>>()?;
+
+    validate_prose_checked(&raw.prose, registry, scene_id)?;
 
     Ok(NpcAction {
         id: raw.id,
