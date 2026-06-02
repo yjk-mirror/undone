@@ -51,7 +51,7 @@ pub struct SceneNode {
     pub repeatable: bool,
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum SceneStatus {
     /// Bound (or an entry/goto target) and all gate signals are producible.
@@ -59,6 +59,7 @@ pub enum SceneStatus {
     /// Bound but a gate signal is produced by nothing.
     BrokenGate,
     /// No schedule binding, not an entry scene, no inbound goto.
+    #[default]
     Unbound,
 }
 
@@ -120,12 +121,6 @@ pub(crate) struct SceneFacts {
     pub status: SceneStatus,
     pub binding: Option<Binding>,
     pub repeatable: bool,
-}
-
-impl Default for SceneStatus {
-    fn default() -> Self {
-        SceneStatus::Unbound
-    }
 }
 
 /// Turn an effect source into the signal tokens it produces (flags + ARC=STATE).
@@ -539,8 +534,8 @@ fn order_by_dependency(members: Vec<(String, &SceneFacts)>) -> Vec<(String, Scen
         queue.sort_by(|&a, &b| short_id(&owned[a].0).cmp(short_id(&owned[b].0)));
     }
     // Append any cyclic leftovers in id order.
-    for i in 0..n {
-        if !placed[i] {
+    for (i, &is_placed) in placed.iter().enumerate() {
+        if !is_placed {
             order.push(i);
         }
     }
