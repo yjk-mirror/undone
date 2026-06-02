@@ -92,15 +92,6 @@ impl Drop for ReadCtxGuard {
     }
 }
 
-/// Build a Rhai runtime error carrying an "unknown &lt;kind&gt; '&lt;id&gt;'" message.
-///
-/// Returned by read methods when a content id fails to resolve at runtime. The
-/// load-time gate normally catches these first (Task 6), but a runtime error
-/// keeps fail-loud behaviour if one slips through.
-pub(crate) fn unknown_id_err(kind: &str, id: &str) -> Box<rhai::EvalAltResult> {
-    format!("unknown {kind} '{id}'").into()
-}
-
 /// Run `f` with shared access to the currently-installed evaluation context.
 ///
 /// Returns a Rhai error if called outside an active eval (a programming bug —

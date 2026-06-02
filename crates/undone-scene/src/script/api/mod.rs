@@ -14,6 +14,7 @@ use crate::scene_ctx::SceneCtx;
 use crate::script::validate::IdKind;
 
 pub mod read;
+pub mod rhai_bind;
 pub mod table;
 pub mod write;
 
