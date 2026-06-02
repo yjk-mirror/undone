@@ -92,15 +92,6 @@ impl Drop for ReadCtxGuard {
     }
 }
 
-/// Build a Rhai runtime error carrying an "unknown &lt;kind&gt; '&lt;id&gt;'" message.
-///
-/// Returned by read methods when a content id fails to resolve at runtime. The
-/// load-time gate normally catches these first (Task 6), but a runtime error
-/// keeps fail-loud behaviour if one slips through.
-pub(crate) fn unknown_id_err(kind: &str, id: &str) -> Box<rhai::EvalAltResult> {
-    format!("unknown {kind} '{id}'").into()
-}
-
 /// Run `f` with shared access to the currently-installed evaluation context.
 ///
 /// Returns a Rhai error if called outside an active eval (a programming bug —
@@ -112,6 +103,26 @@ pub(crate) fn unknown_id_err(kind: &str, id: &str) -> Box<rhai::EvalAltResult> {
 pub(crate) fn with_read_ctx<R>(
     f: impl FnOnce(&World, &PackRegistry, &SceneCtx) -> Result<R, Box<rhai::EvalAltResult>>,
 ) -> Result<R, Box<rhai::EvalAltResult>> {
+    with_read_borrows(f)
+        .unwrap_or_else(|| Err("script evaluated with no evaluation context installed".into()))
+}
+
+/// Lower-level read-borrow access, error-type-agnostic. Runs `f` against the
+/// installed read borrows (condition `ReadCtx` or effect `WriteCtx`, whichever is
+/// present) and returns `Some(f(..))`, or `None` if no context is installed.
+///
+/// This is the shared primitive behind both `with_read_ctx` (Rhai error vocabulary)
+/// and the Minijinja prose views (`api::minijinja_bind`, which carry their own
+/// `minijinja::Error`). Keeping the borrow access separate from the error type lets
+/// one accessor body serve both backends.
+///
+/// # Safety
+/// Relies on the [`ReadCtxGuard`] / [`WriteCtxGuard`] SAFETY invariant: the pointers
+/// are valid for the duration of the synchronous, single-threaded eval/render call,
+/// which is exactly when `f` runs.
+pub(crate) fn with_read_borrows<R>(
+    f: impl FnOnce(&World, &PackRegistry, &SceneCtx) -> R,
+) -> Option<R> {
     // During condition eval a ReadCtx is installed. During effect eval only a
     // WriteCtx is installed (a single &mut World borrow); read methods on the
     // effect engine fall back to reading through it. Exactly one is ever present.
@@ -121,7 +132,7 @@ pub(crate) fn with_read_ctx<R>(
         let world = unsafe { &*ptrs.world };
         let registry = unsafe { &*ptrs.registry };
         let ctx = unsafe { &*ptrs.ctx };
-        return f(world, registry, ctx);
+        return Some(f(world, registry, ctx));
     }
     if let Some(ptrs) = WRITE_CTX.with(|c| c.get()) {
         // SAFETY: same invariant; reborrow the write context's mut pointers as
@@ -130,9 +141,9 @@ pub(crate) fn with_read_ctx<R>(
         let world = unsafe { &*ptrs.world };
         let registry = unsafe { &*ptrs.registry };
         let ctx = unsafe { &*ptrs.ctx };
-        return f(world, registry, ctx);
+        return Some(f(world, registry, ctx));
     }
-    Err("script evaluated with no evaluation context installed".into())
+    None
 }
 
 // ---------------------------------------------------------------------------

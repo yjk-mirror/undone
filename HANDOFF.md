@@ -2,6 +2,61 @@
 
 ## Current State
 
+**Latest session (2026-06-02, SCRIPT API REGISTRY — single source of truth, COMPLETE, on branch `script-api-registry`, NOT yet merged):**
+Executed `docs/plans/2026-06-02-script-api-registry.md` end-to-end (Phases A–K). Replaced the three
+independently-maintained copies of the content-facing method surface (Rhai `read_api/`+`write_api/`,
+the `validate.rs` spec tables, the Minijinja `template_ctx.rs` snapshot) with ONE declarative
+`static REGISTRY` in `crates/undone-scene/src/script/api/table.rs` that drives all four consumers,
+and added a load-time prose gate.
+
+**What shipped (worktree `.worktrees/script-api-registry`, ~13 commits):**
+- `script/api/` module: neutral `ApiValue`/`ApiArg`/`ApiError` types; `MethodDescriptor`/`Receiver`/
+  `ArgShape`/`Contexts`; `REGISTRY` (~95 reads + ~37 writes); pure accessor fns in `api/read/*` +
+  `api/write/*` (mechanical lifts of the old closures, code-reviewer PASS on fidelity).
+- **Rhai** (`api/rhai_bind.rs`) registers cond/effect engines by iterating `REGISTRY`; `read_api/` +
+  `write_api/` DELETED. Full `rhai_parity.rs` golden corpus green.
+- **Static gate** (`validate.rs`) `read_spec`/`write_spec` are now `REGISTRY` lookups + `method_spec_from_argshape`; the 165-line hand-written spec match is gone. Negative-surface tests assert per-receiver sets (`f.hasTrait`/`m.isPregnant` stay unknown).
+- **Minijinja snapshot ELIMINATED** (`api/minijinja_bind.rs`): six ZST `Object` views read live `World`
+  through `with_read_borrows`; `template_ctx.rs` shrunk to npc-presence + guard + render (plain
+  `render` only). The §0 read/prose equivalence harness passes with one shared accessor.
+- **Prose load gate** (`api/prose_validate.rs`, single-quote-aware tokenizer): wired into `loader.rs`
+  (all prose fields) + `validate-pack` (preset beats); `char_creation` discovery-beat render de-masked.
+- **minijinja-mcp-server** gains `jinja_validate_prose` (authoring-time == load-time).
+- **Decisions baked in (design §8 step 0):** `m`/`f`/`role` `getName` → `effective_name()` (display
+  name, not spawn name); `getName` ADDED to `m`/`f`; `checkSkill`/`checkSkillRed` condition-only
+  (barred from prose); `getSkill` unknown id → error.
+
+**CONTENT DECISION (user-approved):** `BEAUTIFUL`/`PLAIN` were referenced in 17 prose sites but never
+registered as traits — the old lenient snapshot silently rendered them `false` (dead else-branches);
+the strict unified accessor surfaced this. **User chose to rewrite** (not register inert traits): all
+17 sites now use graded `w.getAppearance()` checks (BEAUTIFUL → Beautiful/Stunning/Devastating; PLAIN →
+Plain). Prose text unchanged, only the condition expression. NOTE: these branches were DEAD before and
+now FIRE for Beautiful+/Plain PCs — confirm the threshold (exact-vs-graded) matches intent if revisited.
+
+**Verification (all green):** full `cargo test --workspace`; `validate-pack` clean (74 scenes, prose
+gate active); `cargo clippy -p undone-scene` clean except 4 PRE-EXISTING `Arc`/`sort_by_key` lints
+(compiled.rs/simulator.rs/loader.rs:117 — untouched); `cargo fmt --all` clean. 8 independent
+acceptance tests (ops:test-author). **Code-reviewer PASS** on accessor-lift fidelity. **Playtester
+PASS** — 18 scenes, prose renders correctly, NPC names resolve to display name ("Jake" not spawn),
+Stunning appearance branch fires, zero prose errors / zero raw-template leaks.
+
+**NOT DONE — next session:**
+- **Merge `script-api-registry` → master** (K1 / finishing-a-development-branch). All gates passed; the
+  branch is ready. Held back because the session wound down (PC resource pressure, see below).
+- **Rebuild MCP binaries after merge + session restart:** `pwsh tools/rebuild-mcp.ps1` (the worktree
+  built its own `tools/target`; the live `.mcp.json` points at the MAIN repo's `tools/target/release/`).
+  The new `minijinja-mcp-server` `jinja_validate_prose` tool only appears after that + restart.
+
+**INFRA ISSUE (flagged by user):** dispatching subagents (ops:code-reviewer, ops:test-author,
+playtester) each spawned a FULL MCP server set including rust-analyzer; on subagent exit those
+rust-analyzers were ORPHANED. 8 instances accumulated (~8.6 GB) → PC unresponsive. Killed 5; 3 are
+stuck/defunct (parents dead, resist kill — need reboot). **Proposed fix:** restrict subagents' MCP
+servers via agent `mcpServers` frontmatter (as scene-writer/writing-reviewer already do — they only
+connect `minijinja`). The ops:* agents (global plugin) and ad-hoc subagents inherit the project
+`.mcp.json` (all 5 servers). Options: (a) add `mcpServers: []` or a minimal allowlist to the ops agent
+defs; (b) a project setting so spawned subagents don't auto-start MCP servers. Decide deliberately —
+touches global ops config. NOT yet implemented.
+
 **Latest session (2026-06-02, story-map authoring tool — SHIPPED):**
 Built the `story-map` CLI per `docs/plans/2026-06-02-story-map-tool.md` (branch `story-map`).
 It derives the scene-connectivity graph from base-pack data, reconciles it against an

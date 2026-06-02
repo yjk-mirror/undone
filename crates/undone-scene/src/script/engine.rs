@@ -4,16 +4,9 @@ use crate::scene_ctx::SceneCtx;
 use undone_packs::PackRegistry;
 use undone_world::World;
 
+use crate::script::api::rhai_bind::{register_reads, register_writes, Gd, Role, Scene, F, M, W};
 use crate::script::compiled::{CompiledScript, ScriptError};
 use crate::script::context::{ReadCtxGuard, WriteCtxGuard};
-use crate::script::read_api::female_npc::F;
-use crate::script::read_api::game_data::Gd;
-use crate::script::read_api::male_npc::M;
-use crate::script::read_api::player::W;
-use crate::script::read_api::register_read_api;
-use crate::script::read_api::role::Role;
-use crate::script::read_api::scene::Scene;
-use crate::script::write_api::register_write_api;
 
 /// The two Rhai engines a session uses.
 ///
@@ -46,11 +39,11 @@ fn new_bounded_engine() -> rhai::Engine {
 /// (authoring-time validation against the identical surface).
 pub fn build_engines() -> ScriptEngines {
     let mut cond = new_bounded_engine();
-    register_read_api(&mut cond);
+    register_reads(&mut cond);
 
     let mut effect = new_bounded_engine();
-    register_read_api(&mut effect);
-    register_write_api(&mut effect);
+    register_reads(&mut effect);
+    register_writes(&mut effect);
 
     ScriptEngines { cond, effect }
 }
@@ -149,6 +142,47 @@ pub fn eval_string(
                 message: e.to_string(),
             })
     })
+}
+
+/// Test-only: evaluate an expression to its string form via the condition engine,
+/// installing a read context. Mirrors how prose method results stringify so the
+/// read/prose equivalence harness can compare apples to apples (a bool renders as
+/// `true`/`false`, an int as its decimal, a string as itself — exactly minijinja's
+/// default rendering of the corresponding `Value`).
+#[doc(hidden)]
+pub fn eval_string_for_test(
+    expr: &str,
+    world: &World,
+    ctx: &SceneCtx,
+    registry: &PackRegistry,
+) -> Result<String, String> {
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
+    with_engines(|engines| {
+        let mut scope = read_scope();
+        let ast = engines
+            .cond
+            .compile_with_scope(&scope, expr)
+            .map_err(|e| e.to_string())?;
+        let value: rhai::Dynamic = engines
+            .cond
+            .eval_ast_with_scope(&mut scope, &ast)
+            .map_err(|e| e.to_string())?;
+        Ok(format_dynamic(value))
+    })
+}
+
+/// Format a `Dynamic` to match minijinja's default `Value` rendering.
+fn format_dynamic(value: rhai::Dynamic) -> String {
+    if let Ok(b) = value.as_bool() {
+        return b.to_string();
+    }
+    if let Ok(i) = value.as_int() {
+        return i.to_string();
+    }
+    if let Ok(s) = value.clone().into_string() {
+        return s;
+    }
+    value.to_string()
 }
 
 /// Run a compiled effect call-list against the thread's effect engine, mutating

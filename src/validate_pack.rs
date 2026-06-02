@@ -388,7 +388,20 @@ fn collect_validation(
     let mut preset_starting_flags = std::collections::HashSet::new();
     for meta in &pack_metas {
         if let Ok(presets) = undone_packs::preset::load_presets(&meta.pack_dir) {
-            for preset in presets {
+            for (preset_idx, preset) in presets.into_iter().enumerate() {
+                // Gate discovery-beat prose at the authoring path (the DAG forbids
+                // calling the scene-crate gate from undone-packs; validate beats from
+                // here, the consumer, instead — design §5.5).
+                for (beat_idx, beat) in preset.discovery_beats.iter().enumerate() {
+                    let ctx = format!("preset[{preset_idx}] discovery beat[{beat_idx}]");
+                    if let Err(e) = undone_scene::script::api::prose_validate::validate_prose(
+                        &beat.prose,
+                        &registry,
+                        &ctx,
+                    ) {
+                        report.errors.push(format!("[prose-gate] {e}"));
+                    }
+                }
                 preset_starting_flags.extend(preset.starting_flags);
             }
         }

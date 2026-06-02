@@ -20,7 +20,7 @@ The door shuts and the cold drops off you. It's warm in here, warm enough that y
 
 The bartender looks up when you come in — mid-thirties, competent, already reaching for a coaster. She's got it on the bar by the time you reach an open stool.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 One of the guys at the end has stopped watching the game. You can feel it on the side of your face before you look over. His friend follows his eyes to you. Now there are two.
 {% endif %}
 
@@ -227,9 +227,9 @@ A man two stools down — mid-thirties, decent-looking, the kind of confidence t
 
 "Can I get you another one?"
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He says it like the offer was obvious, which for him it was.
-{% elif w.hasTrait("PLAIN") %}
+{% elif w.getAppearance() == "Plain" %}
 It takes him a beat to commit to the ask — the kind of beat you might not notice if you weren't paying attention.
 {% endif %}
 

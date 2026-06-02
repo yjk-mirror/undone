@@ -60,9 +60,9 @@ The green works with your skin. The cut sits where it should. Your reflection is
 You try it on. It fits. You know it fits before you check the mirror — the fabric drapes right, the cut is clean, the color works. The mirror confirms it.
 {% endif %}
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 The dress fits the way clothes fit in magazine editorials — effortlessly, like it was made for you. You stand there a beat longer than you need to.
-{% elif w.hasTrait("PLAIN") %}
+{% elif w.getAppearance() == "Plain" %}
 It fits. The woman in the mirror looks fine. Not striking. Not terrible. The dress is doing what it can. You stand there a second longer than you planned.
 {% endif %}
 

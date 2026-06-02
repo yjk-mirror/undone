@@ -1,654 +1,62 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt,
-    sync::Arc,
-};
+//! Prose rendering.
+//!
+//! The six receiver objects (`w`/`gd`/`scene`/`role`/`m`/`f`) are zero-sized `Object`
+//! views defined in `script::api::minijinja_bind`. They read live `World` through the
+//! thread-local read guard during render — there is NO materialized snapshot. The only
+//! snapshot-era logic that remains is NPC *presence*: `m`/`f` bind to their view when an
+//! NPC of that sex is active, else `Value::UNDEFINED` so `{% if m %}` stays falsy.
 
-use crate::scene_ctx::{SceneCtx, SceneNpcRef};
-use minijinja::{
-    value::{Object, ObjectRepr, Value},
-    Error, ErrorKind, State,
-};
-use undone_domain::PcOrigin;
+use minijinja::value::Value;
 use undone_packs::PackRegistry;
 use undone_world::World;
 
-// ---------------------------------------------------------------------------
-// PlayerCtx — wraps player data with pre-resolved trait strings
-// ---------------------------------------------------------------------------
+use crate::scene_ctx::SceneCtx;
+use crate::script::api::minijinja_bind::{FView, GdView, MView, RoleView, SceneView, WView};
+use crate::script::context::ReadCtxGuard;
 
-#[derive(Debug)]
-pub struct PlayerCtx {
-    pub trait_strings: HashSet<String>,
-    pub has_smooth_legs: bool,
-    pub virgin: bool,
-    pub origin: PcOrigin,
-    pub partner: bool, // true = has partner (i.e. NOT single)
-    pub on_pill: bool,
-    pub pregnant: bool,
-    /// skill_id_string → effective value (base + modifier clamped to range)
-    pub skills: HashMap<String, i32>,
-    pub money: i32,
-    pub stress: i32,
-    pub anxiety: i32,
-    /// Display string for arousal level, e.g. "Comfort"
-    pub arousal: String,
-    /// Display string for alcohol level, e.g. "Sober"
-    pub alcohol: String,
-
-    // Physical attributes (Debug variant names as strings)
-    pub height: String,
-    pub figure: String,
-    pub breasts: String,
-    pub butt: String,
-    pub waist: String,
-    pub lips: String,
-    pub hair_colour: String,
-    pub hair_length: String,
-    pub eye_colour: String,
-    pub skin_tone: String,
-    pub complexion: String,
-    pub appearance: String,
-    pub race: String,
-    pub age: String,
-
-    // Sexual/intimate attributes
-    pub nipple_sensitivity: String,
-    pub clit_sensitivity: String,
-    pub pubic_hair: String,
-    pub natural_pubic_hair: String,
-    pub inner_labia: String,
-    pub wetness: String,
-
-    // Names
-    pub name: String,
-
-    // Before-life attributes (empty string if no before identity)
-    pub before_name: String,
-    pub before_voice: String,
-    pub before_height: String,
-    pub before_hair_colour: String,
-    pub before_eye_colour: String,
-    pub before_skin_tone: String,
-    pub before_penis_size: String,
-    pub before_figure: String,
-}
-
-impl fmt::Display for PlayerCtx {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "PlayerCtx")
-    }
-}
-
-impl Object for PlayerCtx {
-    fn repr(self: &Arc<Self>) -> ObjectRepr {
-        ObjectRepr::Plain
-    }
-
-    fn call_method(
-        self: &Arc<Self>,
-        _state: &State<'_, '_>,
-        method: &str,
-        args: &[Value],
-    ) -> Result<Value, Error> {
-        match method {
-            "hasTrait" => {
-                let id = string_arg(method, args, 0)?;
-                Ok(Value::from(self.trait_strings.contains(id.as_str())))
-            }
-            "isVirgin" => Ok(Value::from(self.virgin)),
-            "alwaysFemale" => Ok(Value::from(self.origin.is_always_female())),
-            "pcOrigin" => {
-                let s = match self.origin {
-                    PcOrigin::CisMaleTransformed => "CisMaleTransformed",
-                    PcOrigin::TransWomanTransformed => "TransWomanTransformed",
-                    PcOrigin::CisFemaleTransformed => "CisFemaleTransformed",
-                    PcOrigin::AlwaysFemale => "AlwaysFemale",
-                };
-                Ok(Value::from(s))
-            }
-            "isSingle" => Ok(Value::from(!self.partner)),
-            "isOnPill" => Ok(Value::from(self.on_pill)),
-            "isPregnant" => Ok(Value::from(self.pregnant)),
-            "getSkill" => {
-                let id = string_arg(method, args, 0)?;
-                Ok(Value::from(*self.skills.get(id.as_str()).unwrap_or(&0)))
-            }
-            "composure" => Ok(Value::from(*self.skills.get("COMPOSURE").unwrap_or(&0))),
-            "getMoney" => Ok(Value::from(self.money)),
-            "getStress" => Ok(Value::from(self.stress)),
-            "getAnxiety" => Ok(Value::from(self.anxiety)),
-            "getArousal" => Ok(Value::from(self.arousal.as_str())),
-            "getAlcohol" => Ok(Value::from(self.alcohol.as_str())),
-            "wasMale" => Ok(Value::from(self.origin.was_male_bodied())),
-            "wasTransformed" => Ok(Value::from(self.origin.was_transformed())),
-
-            // Physical attributes
-            "getHeight" => Ok(Value::from(self.height.as_str())),
-            "getFigure" => Ok(Value::from(self.figure.as_str())),
-            "getBreasts" => Ok(Value::from(self.breasts.as_str())),
-            "getButt" => Ok(Value::from(self.butt.as_str())),
-            "getWaist" => Ok(Value::from(self.waist.as_str())),
-            "getLips" => Ok(Value::from(self.lips.as_str())),
-            "getHairColour" => Ok(Value::from(self.hair_colour.as_str())),
-            "getHairLength" => Ok(Value::from(self.hair_length.as_str())),
-            "getEyeColour" => Ok(Value::from(self.eye_colour.as_str())),
-            "getSkinTone" => Ok(Value::from(self.skin_tone.as_str())),
-            "getComplexion" => Ok(Value::from(self.complexion.as_str())),
-            "getAppearance" => Ok(Value::from(self.appearance.as_str())),
-            "getRace" => Ok(Value::from(self.race.as_str())),
-            "getAge" => Ok(Value::from(self.age.as_str())),
-            "getName" => Ok(Value::from(self.name.as_str())),
-
-            // Sexual/intimate attributes
-            "getNippleSensitivity" => Ok(Value::from(self.nipple_sensitivity.as_str())),
-            "getClitSensitivity" => Ok(Value::from(self.clit_sensitivity.as_str())),
-            "getPubicHair" => Ok(Value::from(self.pubic_hair.as_str())),
-            "getNaturalPubicHair" => Ok(Value::from(self.natural_pubic_hair.as_str())),
-            "getInnerLabia" => Ok(Value::from(self.inner_labia.as_str())),
-            "getWetness" => Ok(Value::from(self.wetness.as_str())),
-
-            // Compound boolean accessors
-            "hasSmoothLegs" => Ok(Value::from(self.has_smooth_legs)),
-
-            // Before-life attributes
-            "beforeName" => Ok(Value::from(self.before_name.as_str())),
-            "beforeVoice" => Ok(Value::from(self.before_voice.as_str())),
-            "beforeHeight" => Ok(Value::from(self.before_height.as_str())),
-            "beforeHairColour" => Ok(Value::from(self.before_hair_colour.as_str())),
-            "beforeEyeColour" => Ok(Value::from(self.before_eye_colour.as_str())),
-            "beforeSkinTone" => Ok(Value::from(self.before_skin_tone.as_str())),
-            "beforePenisSize" => Ok(Value::from(self.before_penis_size.as_str())),
-            "beforeFigure" => Ok(Value::from(self.before_figure.as_str())),
-
-            _ => Err(Error::new(
-                ErrorKind::UnknownMethod,
-                format!("w has no method '{method}'"),
-            )),
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// GameDataCtx
-// ---------------------------------------------------------------------------
-
-#[derive(Debug)]
-pub struct GameDataCtx {
-    pub week: u32,
-    pub day: u8,
-    pub desire: i32,
-    pub time_slot: String,
-    pub flags: HashSet<String>,
-    pub arc_states: HashMap<String, String>,
-}
-
-impl fmt::Display for GameDataCtx {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "GameDataCtx")
-    }
-}
-
-impl Object for GameDataCtx {
-    fn repr(self: &Arc<Self>) -> ObjectRepr {
-        ObjectRepr::Plain
-    }
-
-    fn call_method(
-        self: &Arc<Self>,
-        _state: &State<'_, '_>,
-        method: &str,
-        args: &[Value],
-    ) -> Result<Value, Error> {
-        match method {
-            "week" => Ok(Value::from(self.week)),
-            "day" => Ok(Value::from(self.day as i32)),
-            "desire" => Ok(Value::from(self.desire)),
-            "timeSlot" => Ok(Value::from(self.time_slot.as_str())),
-            "isWeekday" => Ok(Value::from(self.day <= 4)),
-            "isWeekend" => Ok(Value::from(self.day >= 5)),
-            "hasGameFlag" => {
-                let flag = string_arg(method, args, 0)?;
-                Ok(Value::from(self.flags.contains(flag.as_str())))
-            }
-            "arcState" => {
-                let arc_id = string_arg(method, args, 0)?;
-                let state = self
-                    .arc_states
-                    .get(arc_id.as_str())
-                    .map_or("", |s| s.as_str());
-                Ok(Value::from(state))
-            }
-            _ => Err(Error::new(
-                ErrorKind::UnknownMethod,
-                format!("gd has no method '{method}'"),
-            )),
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// SceneCtxView
-// ---------------------------------------------------------------------------
-
-#[derive(Debug)]
-pub struct SceneCtxView {
-    pub flags: HashSet<String>,
-}
-
-impl fmt::Display for SceneCtxView {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "SceneCtxView")
-    }
-}
-
-impl Object for SceneCtxView {
-    fn repr(self: &Arc<Self>) -> ObjectRepr {
-        ObjectRepr::Plain
-    }
-
-    fn call_method(
-        self: &Arc<Self>,
-        _state: &State<'_, '_>,
-        method: &str,
-        args: &[Value],
-    ) -> Result<Value, Error> {
-        match method {
-            "hasFlag" => {
-                let flag = string_arg(method, args, 0)?;
-                Ok(Value::from(self.flags.contains(flag.as_str())))
-            }
-            _ => Err(Error::new(
-                ErrorKind::UnknownMethod,
-                format!("scene has no method '{method}'"),
-            )),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct NpcCtx {
-    pub name: String,
-    pub relationship: undone_domain::RelationshipStatus,
-    pub pc_liking: undone_domain::LikingLevel,
-    pub pc_love: undone_domain::LoveLevel,
-    pub pc_attraction: undone_domain::AttractionLevel,
-    pub behaviour: undone_domain::Behaviour,
-    pub relationship_flags: HashSet<String>,
-    pub roles: HashSet<String>,
-    pub contactable: bool,
-    pub pregnant: bool,
-    pub virgin: bool,
-    pub had_orgasm: bool,
-}
-
-impl fmt::Display for NpcCtx {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "NpcCtx")
-    }
-}
-
-#[derive(Debug)]
-pub struct RoleLookupCtx {
-    pub bindings: HashMap<String, Arc<NpcCtx>>,
-}
-
-impl fmt::Display for RoleLookupCtx {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "RoleLookupCtx")
-    }
-}
-
-impl Object for RoleLookupCtx {
-    fn repr(self: &Arc<Self>) -> ObjectRepr {
-        ObjectRepr::Plain
-    }
-
-    fn call_method(
-        self: &Arc<Self>,
-        _state: &State<'_, '_>,
-        method: &str,
-        args: &[Value],
-    ) -> Result<Value, Error> {
-        let role = string_arg(method, args, 0)?;
-        let npc = self.bindings.get(role.as_str()).ok_or_else(|| {
-            Error::new(
-                ErrorKind::InvalidOperation,
-                format!("role has no bound npc for '{}'", role),
-            )
-        })?;
-
-        match method {
-            "getName" => Ok(Value::from(npc.name.as_str())),
-            "getLiking" => Ok(Value::from(npc.pc_liking.to_string())),
-            "getLove" => Ok(Value::from(format!("{:?}", npc.pc_love))),
-            "getAttraction" => Ok(Value::from(npc.pc_attraction.to_string())),
-            "getBehaviour" => Ok(Value::from(format!("{:?}", npc.behaviour))),
-            "hasFlag" => {
-                let flag = string_arg(method, args, 1)?;
-                Ok(Value::from(npc.relationship_flags.contains(flag.as_str())))
-            }
-            "hasRole" => {
-                let nested_role = string_arg(method, args, 1)?;
-                Ok(Value::from(npc.roles.contains(nested_role.as_str())))
-            }
-            "isPartner" => Ok(Value::from(matches!(
-                npc.relationship,
-                undone_domain::RelationshipStatus::Partner { .. }
-                    | undone_domain::RelationshipStatus::Married
-            ))),
-            "isFriend" => Ok(Value::from(matches!(
-                npc.relationship,
-                undone_domain::RelationshipStatus::Friend
-                    | undone_domain::RelationshipStatus::Partner { .. }
-                    | undone_domain::RelationshipStatus::Married
-            ))),
-            "isContactable" => Ok(Value::from(npc.contactable)),
-            "isPregnant" => Ok(Value::from(npc.pregnant)),
-            "isVirgin" => Ok(Value::from(npc.virgin)),
-            "hadOrgasm" => Ok(Value::from(npc.had_orgasm)),
-            _ => Err(Error::new(
-                ErrorKind::UnknownMethod,
-                format!("role has no method '{method}'"),
-            )),
-        }
-    }
-}
-
-impl Object for NpcCtx {
-    fn repr(self: &Arc<Self>) -> ObjectRepr {
-        ObjectRepr::Plain
-    }
-
-    fn call_method(
-        self: &Arc<Self>,
-        _state: &State<'_, '_>,
-        method: &str,
-        args: &[Value],
-    ) -> Result<Value, Error> {
-        match method {
-            "getName" => Ok(Value::from(self.name.as_str())),
-            "getLiking" => Ok(Value::from(self.pc_liking.to_string())),
-            "getLove" => Ok(Value::from(format!("{:?}", self.pc_love))),
-            "getAttraction" => Ok(Value::from(self.pc_attraction.to_string())),
-            "getBehaviour" => Ok(Value::from(format!("{:?}", self.behaviour))),
-            "hasFlag" => {
-                let flag = string_arg(method, args, 0)?;
-                Ok(Value::from(self.relationship_flags.contains(flag.as_str())))
-            }
-            "hasRole" => {
-                let role = string_arg(method, args, 0)?;
-                Ok(Value::from(self.roles.contains(role.as_str())))
-            }
-            "isPartner" => Ok(Value::from(matches!(
-                self.relationship,
-                undone_domain::RelationshipStatus::Partner { .. }
-                    | undone_domain::RelationshipStatus::Married
-            ))),
-            "isFriend" => Ok(Value::from(matches!(
-                self.relationship,
-                undone_domain::RelationshipStatus::Friend
-                    | undone_domain::RelationshipStatus::Partner { .. }
-                    | undone_domain::RelationshipStatus::Married
-            ))),
-            "isCohabiting" => Ok(Value::from(matches!(
-                self.relationship,
-                undone_domain::RelationshipStatus::Partner { cohabiting: true }
-                    | undone_domain::RelationshipStatus::Married
-            ))),
-            "isContactable" => Ok(Value::from(self.contactable)),
-            "isPregnant" => Ok(Value::from(self.pregnant)),
-            "isVirgin" => Ok(Value::from(self.virgin)),
-            "hadOrgasm" => Ok(Value::from(self.had_orgasm)),
-            _ => Err(Error::new(
-                ErrorKind::UnknownMethod,
-                format!("undefined has no method named {method}"),
-            )),
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Helper
-// ---------------------------------------------------------------------------
-
-fn string_arg(method: &str, args: &[Value], idx: usize) -> Result<String, Error> {
-    match args.get(idx) {
-        Some(v) => match v.as_str() {
-            Some(s) => Ok(s.to_owned()),
-            None => Err(Error::new(
-                ErrorKind::InvalidOperation,
-                format!("'{method}' expects a string argument, got {v:?}"),
-            )),
-        },
-        None => Err(Error::new(
-            ErrorKind::MissingArgument,
-            format!("'{method}' requires a string argument"),
-        )),
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Public render function
-// ---------------------------------------------------------------------------
-
+/// Render a prose template against live game state.
+///
+/// Reads flow through the same registry accessors the Rhai engine uses, so prose and
+/// conditions can never diverge on a value (design §6). The six receivers are bound as
+/// ZST views; `w`/`gd`/`scene`/`role` are always present, `m`/`f` only when an NPC of
+/// that sex is active in `ctx`.
 pub fn render_prose(
     template_str: &str,
     world: &World,
     ctx: &SceneCtx,
     registry: &PackRegistry,
 ) -> Result<String, minijinja::Error> {
-    let trait_strings: HashSet<String> = world
-        .player
-        .traits
-        .iter()
-        .map(|&tid| registry.trait_id_to_str(tid).to_string())
-        .collect();
-
-    let skills: HashMap<String, i32> = world
-        .player
-        .skills
-        .iter()
-        .map(|(&sid, _sv)| {
-            let name = registry.skill_id_to_str(sid).to_string();
-            (name, world.player.skill(sid))
-        })
-        .collect();
-
-    let p = &world.player;
-
-    let (bh, bhc, bec, bst, bps, bf, bn, bv) = match &p.before {
-        Some(b) => (
-            format!("{:?}", b.height),
-            format!("{:?}", b.hair_colour),
-            format!("{:?}", b.eye_colour),
-            format!("{:?}", b.skin_tone),
-            format!("{:?}", b.penis_size),
-            format!("{:?}", b.figure),
-            b.name.clone(),
-            format!("{:?}", b.voice),
-        ),
-        None => (
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-        ),
+    // NPC presence — computed from the owned `ctx` borrow BEFORE installing the guard,
+    // so the guard's "ctx borrowed for the whole call" invariant is unaffected (§6.1).
+    let active_male = if ctx.active_male.is_some() {
+        Value::from_object(MView)
+    } else {
+        Value::UNDEFINED
+    };
+    let active_female = if ctx.active_female.is_some() {
+        Value::from_object(FView)
+    } else {
+        Value::UNDEFINED
     };
 
-    let active_name = match registry.femininity_skill() {
-        Ok(femininity_id) => p.active_name(femininity_id).to_string(),
-        Err(err) => {
-            log::warn!(
-                "[template] required skill FEMININITY missing in registry: {err}; defaulting active name to masculine"
-            );
-            p.name_masc.clone()
-        }
-    };
-
-    let player_ctx = PlayerCtx {
-        trait_strings,
-        has_smooth_legs: registry.player_has_smooth_legs(p).unwrap_or(false),
-        virgin: p.virgin,
-        origin: p.origin,
-        partner: p.partner.is_some(),
-        on_pill: p.on_pill,
-        pregnant: p.pregnancy.is_some(),
-        skills,
-        money: p.money,
-        stress: p.stress.get(),
-        anxiety: p.anxiety.get(),
-        arousal: format!("{:?}", p.arousal),
-        alcohol: format!("{:?}", p.alcohol),
-
-        // Physical attributes
-        height: format!("{:?}", p.height),
-        figure: format!("{:?}", p.figure),
-        breasts: format!("{:?}", p.breasts),
-        butt: format!("{:?}", p.butt),
-        waist: format!("{:?}", p.waist),
-        lips: format!("{:?}", p.lips),
-        hair_colour: format!("{:?}", p.hair_colour),
-        hair_length: format!("{:?}", p.hair_length),
-        eye_colour: format!("{:?}", p.eye_colour),
-        skin_tone: format!("{:?}", p.skin_tone),
-        complexion: format!("{:?}", p.complexion),
-        appearance: format!("{:?}", p.appearance),
-        race: p.race.clone(),
-        age: format!("{:?}", p.age),
-
-        // Sexual/intimate attributes
-        nipple_sensitivity: format!("{:?}", p.nipple_sensitivity),
-        clit_sensitivity: format!("{:?}", p.clit_sensitivity),
-        pubic_hair: format!("{:?}", p.pubic_hair),
-        natural_pubic_hair: format!("{:?}", p.natural_pubic_hair),
-        inner_labia: format!("{:?}", p.inner_labia),
-        wetness: format!("{:?}", p.wetness_baseline),
-
-        // Names
-        name: active_name,
-
-        // Before-life attributes
-        before_name: bn,
-        before_voice: bv,
-        before_height: bh,
-        before_hair_colour: bhc,
-        before_eye_colour: bec,
-        before_skin_tone: bst,
-        before_penis_size: bps,
-        before_figure: bf,
-    };
-
-    let game_data_ctx = GameDataCtx {
-        week: world.game_data.week,
-        day: world.game_data.day,
-        desire: world.game_data.desire(),
-        time_slot: format!("{:?}", world.game_data.time_slot),
-        flags: world.game_data.flags.clone(),
-        arc_states: world.game_data.arc_states.clone(),
-    };
-
-    let scene_view = SceneCtxView {
-        flags: ctx.scene_flags.clone(),
-    };
-    let active_male = ctx
-        .active_male
-        .and_then(|key| world.male_npc(key))
-        .map(|npc| {
-            Value::from_object(NpcCtx {
-                name: npc.core.effective_name().to_string(),
-                relationship: npc.core.relationship.clone(),
-                pc_liking: npc.core.pc_liking,
-                pc_love: npc.core.pc_love,
-                pc_attraction: npc.core.pc_attraction,
-                behaviour: npc.core.behaviour,
-                relationship_flags: npc.core.relationship_flags.clone(),
-                roles: npc.core.roles.clone(),
-                contactable: npc.core.contactable,
-                pregnant: false,
-                virgin: false,
-                had_orgasm: npc.had_orgasm,
-            })
-        })
-        .unwrap_or(Value::UNDEFINED);
-    let active_female = ctx
-        .active_female
-        .and_then(|key| world.female_npc(key))
-        .map(|npc| {
-            Value::from_object(NpcCtx {
-                name: npc.core.effective_name().to_string(),
-                relationship: npc.core.relationship.clone(),
-                pc_liking: npc.core.pc_liking,
-                pc_love: npc.core.pc_love,
-                pc_attraction: npc.core.pc_attraction,
-                behaviour: npc.core.behaviour,
-                relationship_flags: npc.core.relationship_flags.clone(),
-                roles: npc.core.roles.clone(),
-                contactable: npc.core.contactable,
-                pregnant: npc.pregnancy.is_some(),
-                virgin: npc.virgin,
-                had_orgasm: false,
-            })
-        })
-        .unwrap_or(Value::UNDEFINED);
-    let role_lookup = {
-        let mut bindings = HashMap::new();
-        for (role, npc_ref) in &ctx.role_bindings {
-            let npc_ctx = match npc_ref {
-                SceneNpcRef::Male(key) => world.male_npc(*key).map(|npc| NpcCtx {
-                    name: npc.core.effective_name().to_string(),
-                    relationship: npc.core.relationship.clone(),
-                    pc_liking: npc.core.pc_liking,
-                    pc_love: npc.core.pc_love,
-                    pc_attraction: npc.core.pc_attraction,
-                    behaviour: npc.core.behaviour,
-                    relationship_flags: npc.core.relationship_flags.clone(),
-                    roles: npc.core.roles.clone(),
-                    contactable: npc.core.contactable,
-                    pregnant: false,
-                    virgin: false,
-                    had_orgasm: npc.had_orgasm,
-                }),
-                SceneNpcRef::Female(key) => world.female_npc(*key).map(|npc| NpcCtx {
-                    name: npc.core.effective_name().to_string(),
-                    relationship: npc.core.relationship.clone(),
-                    pc_liking: npc.core.pc_liking,
-                    pc_love: npc.core.pc_love,
-                    pc_attraction: npc.core.pc_attraction,
-                    behaviour: npc.core.behaviour,
-                    relationship_flags: npc.core.relationship_flags.clone(),
-                    roles: npc.core.roles.clone(),
-                    contactable: npc.core.contactable,
-                    pregnant: npc.pregnancy.is_some(),
-                    virgin: npc.virgin,
-                    had_orgasm: false,
-                }),
-            };
-            if let Some(npc_ctx) = npc_ctx {
-                bindings.insert(role.clone(), Arc::new(npc_ctx));
-            }
-        }
-        Value::from_object(RoleLookupCtx { bindings })
-    };
+    // SAFETY/INVARIANT: `render` is synchronous and single-threaded; this guard lives
+    // for the entire render call, exactly the invariant the ZST views rely on to read
+    // live `World`. NEVER switch to `render_and_return_state` (design §6): it can retain
+    // the root `Value` (and thus the view objects) past this call, which — combined with
+    // live-context reading — is the one way to invoke a view after the guard drops.
+    let _guard = ReadCtxGuard::install(world, registry, ctx);
 
     let mut env = minijinja::Environment::new();
     env.add_template("prose", template_str)?;
     let tmpl = env.get_template("prose")?;
-
-    let render_ctx = minijinja::context! {
-        w => Value::from_object(player_ctx),
-        gd => Value::from_object(game_data_ctx),
-        scene => Value::from_object(scene_view),
+    tmpl.render(minijinja::context! {
+        w => Value::from_object(WView),
+        gd => Value::from_object(GdView),
+        scene => Value::from_object(SceneView),
+        role => Value::from_object(RoleView),
         m => active_male,
         f => active_female,
-        role => role_lookup,
-    };
-
-    tmpl.render(render_ctx)
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -660,8 +68,10 @@ pub fn render_prose(
 mod tests {
     use super::*;
     use lasso::Key;
+    use std::collections::{HashMap, HashSet};
     use undone_domain::{Appearance, BeforeVoice};
 
+    use crate::scene_ctx::SceneNpcRef;
     use undone_world::test_helpers::make_test_world as make_world;
 
     #[test]
@@ -938,5 +348,69 @@ mod tests {
         let result = render_prose(template, &world, &ctx, &registry).unwrap();
         assert!(result.contains("Dan"));
         assert!(result.contains("Mia"));
+    }
+
+    // ── NPC presence + loud-error acceptance (design §6.1) ────────────────────
+
+    fn male_personality_world() -> (World, undone_domain::MaleNpcKey, undone_packs::PackRegistry) {
+        let mut registry = undone_packs::PackRegistry::new();
+        let personality = registry.intern_personality("ROMANTIC");
+        let mut world = make_world();
+        let key = world
+            .male_npcs
+            .insert(undone_world::test_helpers::make_test_male_npc(personality));
+        (world, key, registry)
+    }
+
+    #[test]
+    fn if_m_truthy_when_male_bound_falsy_when_not() {
+        let (world, key, registry) = male_personality_world();
+        let template = r#"{% if m %}Y{% else %}N{% endif %}"#;
+
+        let mut ctx = SceneCtx::new();
+        assert_eq!(
+            render_prose(template, &world, &ctx, &registry).unwrap(),
+            "N",
+            "no male bound → m is falsy"
+        );
+
+        ctx.active_male = Some(key);
+        assert_eq!(
+            render_prose(template, &world, &ctx, &registry).unwrap(),
+            "Y",
+            "male bound → m is truthy"
+        );
+    }
+
+    #[test]
+    fn m_method_with_no_male_errors_loud() {
+        let registry = undone_packs::PackRegistry::new();
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        // No male bound: m is UNDEFINED, so calling a method on it must error (loud),
+        // not render empty.
+        let err = render_prose(r#"{{ m.getName() }}"#, &world, &ctx, &registry);
+        assert!(
+            err.is_err(),
+            "m.getName() with no male must error, got {err:?}"
+        );
+    }
+
+    #[test]
+    fn unbound_role_lookup_errors() {
+        let registry = undone_packs::PackRegistry::new();
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let err = render_prose(r#"{{ role.getName("NOPE") }}"#, &world, &ctx, &registry);
+        assert!(err.is_err(), "unbound role lookup must error, got {err:?}");
+    }
+
+    #[test]
+    fn unknown_prose_method_errors() {
+        let registry = undone_packs::PackRegistry::new();
+        let world = make_world();
+        let ctx = SceneCtx::new();
+        let err = render_prose(r#"{{ w.notAReal() }}"#, &world, &ctx, &registry);
+        assert!(err.is_err(), "unknown method must error");
     }
 }

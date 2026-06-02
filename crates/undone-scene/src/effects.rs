@@ -33,6 +33,8 @@ pub enum EffectError {
     UnknownVirginType(String),
     #[error("trait conflict: {0}")]
     TraitConflict(String),
+    #[error("bad arguments to '{0}'")]
+    BadArgs(&'static str),
 }
 
 // ---------------------------------------------------------------------------

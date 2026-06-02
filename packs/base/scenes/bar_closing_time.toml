@@ -15,7 +15,7 @@ The tab is settled. A man two stools down settles his at the same moment — thi
 
 The bartender gives a nod — short, final — and goes back to the taps. The door is right there.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 He holds the door. His eyes follow you through it. Not a leer — a slow, assessing look, the kind you could feel coming from two stools away.
 {% else %}
 He holds the door. A courtesy.

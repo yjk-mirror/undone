@@ -17,7 +17,7 @@ Inside: forty people in a space meant for twelve. Music from a speaker in the co
 
 Your coworker who invited you has already vanished into the middle of it.
 
-{% if w.hasTrait("BEAUTIFUL") %}
+{% if (w.getAppearance() == "Beautiful" or w.getAppearance() == "Stunning" or w.getAppearance() == "Devastating") %}
 The nearest cluster of people shifts when you step in. Not dramatically — the way a room adjusts when something changes, the way eyes move before heads do. A man near the kitchen doorway clocks you and then says something to the person beside him without looking away.
 {% endif %}
 

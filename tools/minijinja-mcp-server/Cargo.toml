@@ -8,6 +8,12 @@ name = "minijinja-mcp-server"
 path = "src/main.rs"
 
 [dependencies]
+# Validate authored prose against the REAL method surface (the same REGISTRY-driven
+# prose gate the game loader runs), so authoring-time prose validation matches
+# load-time. undone-scene is GUI-free (undone-ui is above it), so this does not pull
+# the floem dep tree; it's already built for this workspace by rhai-mcp-server.
+undone-scene = { path = "../../crates/undone-scene" }
+undone-packs = { path = "../../crates/undone-packs" }
 rmcp = { version = "0.8", features = ["server", "transport-io"] }
 minijinja = "2"
 serde = { version = "1", features = ["derive"] }

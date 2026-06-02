@@ -29,8 +29,8 @@ use crate::script::compiled::ScriptError;
 // Method spec table
 // ---------------------------------------------------------------------------
 
-#[derive(Clone, Copy, PartialEq)]
-pub(crate) enum IdKind {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum IdKind {
     Trait,
     NpcTrait,
     Skill,
@@ -115,172 +115,48 @@ const fn spec_i8(arity: usize, i8_args: &'static [usize]) -> MethodSpec {
     }
 }
 
-/// Look up the READ method surface (valid in conditions AND effects).
-/// `receiver` is the handle token (`w`/`gd`/`m`/`f`/`role`/`scene`).
+/// Look up the READ method surface (valid in conditions). Derived from the
+/// single-source-of-truth `REGISTRY`: a `(receiver, method)` is a "read method" for
+/// the gate iff its descriptor is valid in the condition context.
 fn read_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
-    match (receiver, method) {
-        // ── w (player) ───────────────────────────────────────────────────────
-        (
-            "w",
-            "isVirgin"
-            | "isAnalVirgin"
-            | "isDrunk"
-            | "isVeryDrunk"
-            | "isMaxDrunk"
-            | "isSingle"
-            | "isOnPill"
-            | "isPregnant"
-            | "alwaysFemale"
-            | "wasMale"
-            | "wasTransformed"
-            | "hasSmoothLegs"
-            | "getMoney"
-            | "getStress"
-            | "getAnxiety"
-            | "pcOrigin"
-            | "beforeName"
-            | "beforeRace"
-            | "beforeAge"
-            | "beforeSexuality"
-            | "getName"
-            | "getRace"
-            | "getAge"
-            | "getArousal"
-            | "getAlcohol"
-            | "getHeight"
-            | "getFigure"
-            | "getBreasts"
-            | "getButt"
-            | "getWaist"
-            | "getLips"
-            | "getHairColour"
-            | "getHairLength"
-            | "getEyeColour"
-            | "getSkinTone"
-            | "getComplexion"
-            | "getAppearance"
-            | "getNippleSensitivity"
-            | "getClitSensitivity"
-            | "getPubicHair"
-            | "getNaturalPubicHair"
-            | "getInnerLabia"
-            | "getWetness"
-            | "beforeVoice"
-            | "beforeHeight"
-            | "beforeHairColour"
-            | "beforeEyeColour"
-            | "beforeSkinTone"
-            | "beforePenisSize"
-            | "beforeFigure",
-        ) => Some(spec(0)),
-        ("w", "hasTrait" | "hadTraitBefore") => Some(spec_id(1, 0, IdKind::Trait)),
-        ("w", "inCategory" | "beforeInCategory") => Some(spec_id(1, 0, IdKind::Category)),
-        ("w", "getSkill") => Some(spec_id(1, 0, IdKind::Skill)),
-        ("w", "composure") => Some(spec(0)),
-        // hasStuff id is intentionally NOT registry-validated (legacy: missing = can't have it).
-        ("w", "hasStuff") => Some(spec(1)),
-        ("w", "checkSkill" | "checkSkillRed") => Some(spec_id_int(2, 0, IdKind::Skill, 1)),
-
-        // ── m (active male) ───────────────────────────────────────────────────
-        (
-            "m",
-            "isPartner"
-            | "isFriend"
-            | "isCohabiting"
-            | "isContactable"
-            | "hadOrgasm"
-            | "isNpcAttractionOk"
-            | "isNpcAttractionLust"
-            | "isWAttractionOk"
-            | "isNpcLoveCrush"
-            | "isNpcLoveSome"
-            | "isWLoveCrush"
-            | "getLiking"
-            | "getLove"
-            | "getAttraction"
-            | "getBehaviour",
-        ) => Some(spec(0)),
-        ("m", "hasTrait") => Some(spec_id(1, 0, IdKind::NpcTrait)),
-        ("m", "hasFlag" | "hasRole") => Some(spec(1)),
-
-        // ── f (active female) ─────────────────────────────────────────────────
-        (
-            "f",
-            "isPartner" | "isFriend" | "isPregnant" | "isVirgin" | "getLiking" | "getLove"
-            | "getAttraction" | "getBehaviour",
-        ) => Some(spec(0)),
-        ("f", "hasFlag" | "hasRole") => Some(spec(1)),
-
-        // ── scene ─────────────────────────────────────────────────────────────
-        ("scene", "hasFlag") => Some(spec(1)),
-
-        // ── gd (game data) ────────────────────────────────────────────────────
-        (
-            "gd",
-            "isWeekday" | "isWeekend" | "week" | "day" | "desire" | "timeSlot" | "getJobTitle",
-        ) => Some(spec(0)),
-        // getStat / hasGameFlag / arcStarted / arcState / npcLiking ids are not
-        // registry-validated in the legacy condition pass.
-        ("gd", "hasGameFlag" | "arcStarted" | "getStat" | "arcState" | "npcLiking") => {
-            Some(spec(1))
-        }
-        ("gd", "npcLikingAtLeast") => Some(spec(2)),
-
-        // ── role ──────────────────────────────────────────────────────────────
-        (
-            "role",
-            "isPartner" | "isFriend" | "isContactable" | "isPregnant" | "isVirgin" | "hadOrgasm"
-            | "getName" | "getLiking" | "getLove" | "getAttraction" | "getBehaviour",
-        ) => Some(spec(1)),
-        ("role", "hasFlag" | "hasRole") => Some(spec(2)),
-
-        _ => None,
+    let recv = crate::script::api::receiver_from_token(receiver)?;
+    let d = crate::script::api::lookup(recv, method)?;
+    if !d.contexts.condition {
+        return None;
     }
+    Some(method_spec_from_argshape(d.args))
 }
 
-/// Look up the WRITE (effect-mutator) surface. `receiver` is `w`/`gd`/`scene`, or
-/// `npc` for a `npc("m"|"f"|role).method(...)` chained call, or the bare `npc(ref)`
-/// free call (receiver `npc`, method `npc`).
+/// Look up the WRITE (effect-mutator) surface, derived from `REGISTRY`.
 fn write_spec(receiver: &str, method: &str) -> Option<MethodSpec> {
-    match (receiver, method) {
-        // ── w (player) ───────────────────────────────────────────────────────
-        ("w", "changeStress" | "changeMoney" | "changeAnxiety" | "changeComposure") => {
-            Some(spec(1))
-        }
-        ("w", "addArousal" | "changeAlcohol") => Some(spec_i8(1, &[0])),
-        ("w", "skillIncrease") => Some(spec_id(2, 0, IdKind::Skill)),
-        ("w", "addTrait" | "removeTrait") => Some(spec_id(1, 0, IdKind::Trait)),
-        // stuff is not registry-validated at load (legacy validate_effects skips it).
-        ("w", "addStuff" | "removeStuff") => Some(spec(1)),
-        // setVirgin(value) or setVirgin(value, "type") — overloaded arity.
-        ("w", "setVirgin") => Some(spec_arity(1, 2)),
-        ("w", "setPartner" | "addFriend") => Some(spec(1)),
+    let recv = crate::script::api::receiver_from_token(receiver)?;
+    let d = crate::script::api::lookup(recv, method)?;
+    if !d.contexts.effect {
+        return None;
+    }
+    Some(method_spec_from_argshape(d.args))
+}
 
-        // ── gd (game data) ────────────────────────────────────────────────────
-        ("gd", "setGameFlag" | "removeGameFlag") => Some(spec(1)),
-        ("gd", "addStat" | "setStat") => Some(spec_id(2, 0, IdKind::Stat)),
-        ("gd", "setJobTitle") => Some(spec(1)),
-        ("gd", "addDesire" | "setDesire") => Some(spec(1)),
-        ("gd", "advanceTime") => Some(spec(1)),
-        ("gd", "advanceArc") => Some(spec_id(2, 0, IdKind::Arc)),
-        ("gd", "failRedCheck") => Some(spec_id(1, 0, IdKind::Skill)),
-
-        // ── scene ─────────────────────────────────────────────────────────────
-        ("scene", "setFlag" | "removeFlag") => Some(spec(1)),
-
-        // ── npc(ref).* ────────────────────────────────────────────────────────
-        ("npc", "addLiking" | "addLove" | "addWLiking" | "setAttraction") => Some(spec_i8(1, &[0])),
-        (
-            "npc",
-            "setFlag" | "setRelationship" | "setBehaviour" | "addSexualActivity" | "setRole"
-            | "setName",
-        ) => Some(spec(1)),
-        ("npc", "addTrait") => Some(spec_id(1, 0, IdKind::NpcTrait)),
-        ("npc", "setContactable") => Some(spec(1)),
-        // the free `npc(ref)` constructor.
-        ("npc", "npc") => Some(spec(1)),
-
-        _ => None,
+/// Derive the gate's `MethodSpec` (arity, id-kind, int/i8 constraints) from a
+/// descriptor's declarative `ArgShape` — the inverse of the old hand-written table,
+/// now driven from the registry. NOTE: `IdInt` int-checks arg 1, so `skillIncrease`/
+/// `addStat`/`setStat` are slightly stricter than the legacy `spec_id(2,..)` (which
+/// did not). Live content passes either way (all call them with integer literals).
+fn method_spec_from_argshape(args: crate::script::api::ArgShape) -> MethodSpec {
+    use crate::script::api::ArgShape;
+    match args {
+        ArgShape::None => spec(0),
+        // advanceArc(arc, state) — the only 2-source-arg Id (state validated at idx 1).
+        ArgShape::Id(IdKind::Arc) => spec_id(2, 0, IdKind::Arc),
+        ArgShape::Id(kind) => spec_id(1, 0, kind),
+        ArgShape::IdInt(kind) => spec_id_int(2, 0, kind, 1),
+        ArgShape::Int { i8_range: true } => spec_i8(1, &[0]),
+        ArgShape::Int { i8_range: false } => spec(1),
+        ArgShape::Str => spec(1),
+        ArgShape::Bool => spec(1),
+        ArgShape::StrInt => spec(2),
+        ArgShape::StrStr => spec(2),
+        ArgShape::StrOpt => spec_arity(1, 2),
     }
 }
 
@@ -328,6 +204,37 @@ fn tokenize(src: &str) -> Result<Vec<Tok>, String> {
                             }
                         }
                         '"' => {
+                            i += 1;
+                            break;
+                        }
+                        ch => {
+                            s.push(ch);
+                            i += 1;
+                        }
+                    }
+                }
+                toks.push(Tok::Str(s));
+            }
+            '\'' => {
+                // single-quoted string with \ escapes. Rhai conditions use double
+                // quotes, but Minijinja prose accepts both — the live pack uses
+                // single-quoted ids (e.g. `w.getSkill('FEMININITY')`), so the prose
+                // gate must tokenize them as string literals too (design §5.4).
+                let mut s = String::new();
+                i += 1;
+                loop {
+                    if i >= bytes.len() {
+                        return Err("unterminated string literal".into());
+                    }
+                    match bytes[i] {
+                        '\\' => {
+                            i += 1;
+                            if i < bytes.len() {
+                                s.push(bytes[i]);
+                                i += 1;
+                            }
+                        }
+                        '\'' => {
                             i += 1;
                             break;
                         }
@@ -814,4 +721,269 @@ pub fn source_has_persistent_mutation(src: &str) -> bool {
         write_spec(c.receiver.as_deref().unwrap_or(""), m).is_some()
             || (c.receiver.as_deref() == Some("npc") && write_spec("npc", m).is_some())
     })
+}
+
+// ---------------------------------------------------------------------------
+// Prose load gate (design §5.4) — validates the method surface of authored prose
+// templates at load. Single-quote-aware (the tokenizer accepts both quote styles).
+// Arity is validated leniently in prose (filters / arithmetic / nested calls defeat
+// the comma splitter); identity (receiver.method exists, is prose-contexted) and
+// string-literal content-id resolution are what's enforced.
+// ---------------------------------------------------------------------------
+
+/// Validate every `receiver.method(...)` call site in a Minijinja prose template
+/// against the registry's prose surface. Surfaced through
+/// `script::api::prose_validate::validate_prose`.
+pub fn validate_prose(
+    template: &str,
+    registry: &PackRegistry,
+    context: &str,
+) -> Result<(), ScriptError> {
+    for region in expression_regions(template) {
+        let toks = tokenize(&region).map_err(|message| ScriptError::Compile {
+            context: context.into(),
+            message,
+            source_text: region.clone(),
+        })?;
+        for call in extract_calls(&toks) {
+            let Some(recv_tok) = call.receiver.as_deref() else {
+                continue; // bare call: a Minijinja filter/function/test — out of scope (§5.4)
+            };
+            let Some(recv) = crate::script::api::receiver_from_token(recv_tok) else {
+                continue; // not one of our receivers — leave to Minijinja
+            };
+            let Some(d) = crate::script::api::lookup(recv, &call.method) else {
+                return Err(compile_err(
+                    context,
+                    &region,
+                    format!("unknown prose method '{}.{}'", recv_tok, call.method),
+                ));
+            };
+            if !d.contexts.prose {
+                return Err(compile_err(
+                    context,
+                    &region,
+                    format!(
+                        "method '{}.{}' is not callable in prose",
+                        recv_tok, call.method
+                    ),
+                ));
+            }
+            validate_prose_id_arg(d.args, &call, registry, context, &region)?;
+        }
+    }
+    Ok(())
+}
+
+/// Validate a prose call's leading string-literal content-id arg, if its shape
+/// carries one. Non-literal ids are left to render-time (lenient, like arity).
+fn validate_prose_id_arg(
+    shape: crate::script::api::ArgShape,
+    call: &Call,
+    registry: &PackRegistry,
+    context: &str,
+    src: &str,
+) -> Result<(), ScriptError> {
+    use crate::script::api::ArgShape;
+    let kind = match shape {
+        ArgShape::Id(k) | ArgShape::IdInt(k) => k,
+        _ => return Ok(()),
+    };
+    if let Some(Arg::Str(id)) = call.args.first() {
+        resolve_id(kind, id, call, registry, context, src)?;
+    }
+    Ok(())
+}
+
+/// Extract the contents of each `{{ … }}` / `{% … %}` region, skipping `{# … #}`
+/// comments and `{% raw %}…{% endraw %}` blocks and stripping whitespace-control
+/// markers (`{%-`, `-%}`, …). The live corpus uses none of the exotic forms, but
+/// the scan must not false-positive on them (design §5.4).
+fn expression_regions(template: &str) -> Vec<String> {
+    let b = template.as_bytes();
+    let n = b.len();
+    let mut regions = Vec::new();
+    let mut i = 0;
+    let mut in_raw = false;
+    while i + 1 < n {
+        if b[i] == b'{' && matches!(b[i + 1], b'{' | b'%' | b'#') {
+            let kind = b[i + 1];
+            let (ca, cb) = match kind {
+                b'{' => (b'}', b'}'),
+                b'%' => (b'%', b'}'),
+                _ => (b'#', b'}'),
+            };
+            let start = i + 2;
+            let mut j = start;
+            while j + 1 < n && !(b[j] == ca && b[j + 1] == cb) {
+                j += 1;
+            }
+            let end = if j + 1 < n { j } else { n };
+            let content = template[start..end]
+                .trim()
+                .trim_start_matches('-')
+                .trim_end_matches('-')
+                .trim()
+                .to_string();
+            i = (end + 2).min(n);
+            match kind {
+                b'#' => {} // comment — skip
+                b'%' => {
+                    let head = content.split_whitespace().next().unwrap_or("");
+                    if head == "raw" {
+                        in_raw = true;
+                    } else if head == "endraw" {
+                        in_raw = false;
+                    } else if !in_raw {
+                        regions.push(content);
+                    }
+                }
+                _ => {
+                    if !in_raw {
+                        regions.push(content);
+                    }
+                }
+            }
+        } else {
+            i += 1;
+        }
+    }
+    regions
+}
+
+#[cfg(test)]
+mod prose_gate_tests {
+    use super::*;
+
+    fn registry_with_skills(ids: &[&str]) -> PackRegistry {
+        let mut r = PackRegistry::new();
+        r.register_skills(
+            ids.iter()
+                .map(|id| undone_packs::SkillDef {
+                    id: (*id).into(),
+                    name: (*id).into(),
+                    description: String::new(),
+                    min: 0,
+                    max: 100,
+                })
+                .collect(),
+        );
+        r
+    }
+
+    #[test]
+    fn prose_gate_accepts_single_quoted_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // single quotes are legal in minijinja and used in the live pack
+        assert!(validate_prose(
+            r#"{% if w.getSkill('FEMININITY') < 20 %}x{% endif %}"#,
+            &r,
+            "test"
+        )
+        .is_ok());
+    }
+
+    #[test]
+    fn prose_gate_accepts_double_quoted_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.getSkill("FEMININITY") }}"#, &r, "test").is_ok());
+    }
+
+    #[test]
+    fn prose_gate_rejects_unknown_method() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.notAReal() }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_write_in_prose() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        assert!(validate_prose(r#"{{ w.changeMoney(5) }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_checkskill_in_prose() {
+        let r = registry_with_skills(&["CHARM"]);
+        // checkSkill is condition-only (RNG side effect) — barred from prose.
+        assert!(validate_prose(
+            r#"{% if w.checkSkill('CHARM', 10) %}x{% endif %}"#,
+            &r,
+            "test"
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn prose_gate_rejects_unknown_content_id() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // CHARM not registered → id resolution fails.
+        assert!(validate_prose(r#"{{ w.getSkill('CHARM') }}"#, &r, "test").is_err());
+    }
+
+    #[test]
+    fn prose_gate_ignores_filters_and_plain_text() {
+        let r = registry_with_skills(&["FEMININITY"]);
+        // bare filters/functions and plain prose are not method-surface calls.
+        assert!(validate_prose("Just some plain prose with no calls.", &r, "test").is_ok());
+        assert!(validate_prose(r#"{{ "x" | upper }}"#, &r, "test").is_ok());
+        // comments are skipped, not parsed.
+        assert!(validate_prose(r#"{# w.notAReal() #}plain"#, &r, "test").is_ok());
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Negative-surface tests — the per-receiver / per-context sets the registry
+// keys must NOT union (design §2, §9). These must STAY unknown methods.
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod surface_tests {
+    use super::*;
+
+    #[test]
+    fn f_has_trait_is_unknown_method() {
+        // `f` deliberately lacks hasTrait (only `m` has it).
+        assert!(read_spec("f", "hasTrait").is_none());
+    }
+
+    #[test]
+    fn m_is_pregnant_is_unknown_method() {
+        // isPregnant is on `f`/`role`, never `m`.
+        assert!(read_spec("m", "isPregnant").is_none());
+    }
+
+    #[test]
+    fn m_is_virgin_is_unknown_method() {
+        assert!(read_spec("m", "isVirgin").is_none());
+    }
+
+    #[test]
+    fn f_had_orgasm_is_unknown_method() {
+        assert!(read_spec("f", "hadOrgasm").is_none());
+    }
+
+    #[test]
+    fn write_in_condition_is_unknown() {
+        // A write mutator is not a read method (read_spec gates on contexts.condition).
+        assert!(read_spec("w", "changeMoney").is_none());
+        assert!(read_spec("gd", "setGameFlag").is_none());
+    }
+
+    #[test]
+    fn read_in_effect_still_resolves() {
+        // Reads remain valid in effect call-lists (effects branch on reads).
+        assert!(write_spec("w", "isVirgin").is_none()); // not a write…
+        assert!(read_spec("w", "isVirgin").is_some()); // …but a read.
+    }
+
+    #[test]
+    fn known_methods_resolve_with_expected_arity() {
+        // Spot-check the argshape→spec derivation against the legacy specs.
+        assert_eq!(read_spec("w", "hasTrait").unwrap().arity, 1);
+        assert_eq!(read_spec("gd", "npcLikingAtLeast").unwrap().arity, 2);
+        assert_eq!(read_spec("role", "getName").unwrap().arity, 1);
+        assert_eq!(write_spec("gd", "advanceArc").unwrap().arity, 2);
+        let sv = write_spec("w", "setVirgin").unwrap();
+        assert_eq!((sv.arity, sv.arity_max), (1, 2));
+    }
 }

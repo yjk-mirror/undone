@@ -46,8 +46,7 @@ undone/
 │   ├── undone-domain/       # pure types — no IO, no game logic
 │   ├── undone-world/        # World struct, all mutable game state
 │   ├── undone-packs/        # pack loading, manifest parsing, content registry
-│   ├── undone-expr/         # custom expression parser & evaluator
-│   ├── undone-scene/        # scene execution engine
+│   ├── undone-scene/        # scene execution engine (Rhai scripting + api::REGISTRY)
 │   ├── undone-save/         # serde save / load
 │   └── undone-ui/           # floem views and widgets
 │
@@ -86,11 +85,9 @@ undone-domain
     ↑
 undone-world ← undone-packs
     ↑               ↑
-undone-expr    undone-save
-    ↑
-undone-scene
-    ↑
-undone-ui
+undone-save     undone-scene
+                    ↑
+                undone-ui
 ```
 
 `undone-domain` has zero internal deps (only `serde`, `slotmap`, `lasso`).
@@ -536,35 +533,48 @@ pub enum EffectDef {
 
 ---
 
-## Expression Parser (`undone-expr`)
+## Scripting (`undone-scene::script`)
 
-Conditions in TOML scene files are strings. Parsed at **pack load time** into a
-typed AST. Invalid expressions reject the entire scene with a clear error.
-Never evaluated as strings at runtime.
+Conditions and effect call-lists in TOML scene files are **Rhai** strings, compiled
+to `Arc<rhai::AST>` once at **pack load time** and evaluated many times at runtime.
+The legacy `undone-expr` recursive-descent crate was replaced by embedded Rhai and is
+deleted.
 
-### Grammar
+Game state is exposed to scripts ONLY through curated receiver methods —
+`w`/`gd`/`m`/`f`/`role`/`scene` (reads) and `w.*`/`gd.*`/`scene.*`/`npc(ref).*`
+(effect mutators) — never by exposing `World` directly.
 
-```
-expr        = or_expr
-or_expr     = and_expr ('||' and_expr)*
-and_expr    = not_expr ('&&' not_expr)*
-not_expr    = '!' not_expr | compare
-compare     = call (('<' | '>' | '==' | '!=' | '<=' | '>=') call)?
-call        = receiver '.' method '(' args? ')'
-receiver    = 'w' | 'm' | 'f' | 'scene' | 'gd'
-args        = value (',' value)*
-value       = string | integer | bool
-```
+### One source of truth: `script::api::REGISTRY`
 
-### Evaluation
+The entire content-facing method surface is declared once, in
+`crates/undone-scene/src/script/api/table.rs`, as a `static REGISTRY:
+&[MethodDescriptor]`. Each descriptor names the receiver, method name, declarative
+`ArgShape` (arity + content-id kind + numeric constraints), the `Contexts` it is
+valid in (`condition` / `effect` / `prose`), and a pure accessor `fn` over borrowed
+state. **All four consumers are driven from this one table:**
 
-```rust
-fn eval(expr: &Expr, world: &World, ctx: &SceneCtx) -> Result<bool, EvalError>
-```
+- **Rhai cond/effect engines** (`api::rhai_bind`) — iterate `REGISTRY`, register typed
+  adapters that marshal Rhai args into the neutral `[ApiArg]` form and call the accessor.
+- **Static load gate** (`script::validate`) — `read_spec`/`write_spec` are registry
+  lookups; `method_spec_from_argshape` derives arity/id/int constraints from `ArgShape`.
+  It checks: every `receiver.method(...)` is known for that receiver and context (a
+  write in a condition is an "unknown method" → the read/write split is enforced at
+  load); content-id string-literal args resolve against the registry; i8 step deltas
+  are in range.
+- **Minijinja prose** (`api::minijinja_bind`) — six zero-sized `Object` views read
+  **live `World`** through the shared read guard and run the *same accessor*. No owned
+  snapshot. NPC presence (`{% if m %}`) is preserved by binding `m`/`f` to their view
+  or `Value::UNDEFINED`. Prose rendering uses plain `render` only — never
+  `render_and_return_state`.
+- **Prose load gate** (`api::prose_validate::validate_prose`) — a static, single-quote-
+  aware scan validates every prose `receiver.method(...)` call-site (method exists, is
+  prose-contexted, string-literal ids resolve) at pack load, wired into `loader.rs` for
+  all prose fields and into `validate-pack` for preset discovery beats.
 
-`SceneCtx` carries: active male NPC key, active female NPC key, scene flags,
-scene weighted map. Adding a new queryable method = one new match arm.
-The compiler enforces exhaustive handling of all receiver/method combinations.
+Adding a content method = ONE new `REGISTRY` row + its accessor fn; every consumer
+picks it up. `(receiver, name)` uniqueness and the read/write split are asserted in
+tests. `checkSkill`/`checkSkillRed` are condition-only (RNG side effect on the per-scene
+roll cache) and barred from prose.
 
 ---
 
