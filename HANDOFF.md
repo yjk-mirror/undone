@@ -16,15 +16,30 @@ traits/skills/stats/NPCs are TOML data; only a genuinely new *mechanic/system* (
 DESIRE/COMPOSURE need-state) or a genuinely new *verb* needs Rust — and the registry made adding a
 verb a single row + accessor that propagates to Rhai/gate/prose/prose-gate. Content-first from here.
 
+**Two latent tools-workspace defects found + FIXED this session** (`9782763`; root-cause fixes, not
+workarounds — supersedes the "proposed allowlist" infra note in the registry entry below):
+- **MCP build was broken since the registry merge** (this was the real "rebuild blocker" — NOT a
+  locked binary). Making the MCP servers depend on `undone-scene` meant `rhai-mcp-server`'s
+  `rhai = ["sync"]` feature unified `rhai/sync` onto `undone-scene`, whose eval closures capture a
+  thread-local raw-ptr borrow bridge and are deliberately non-`Send`/`Sync` → 13 compile errors in
+  `rhai_bind.rs`. Fix: dropped `sync` from `rhai-mcp-server`; it now builds its validation `Engine`
+  per-call instead of storing it on the (Send+Sync) handler. `cd tools && cargo check --release`
+  clean; `rhai-mcp-server` 10/10 tests pass.
+- **rust-analyzer orphaning root-caused + fixed:** `rust-mcp` spawned rust-analyzer with no
+  `kill_on_drop` and `processId: null`, so the child outlived the server. Added `.kill_on_drop(true)`
+  + `processId = std::process::id()` (LSP-spec self-exit if rust-mcp is hard-killed). This is the
+  correct fix — subagents that start rust-mcp no longer leak rust-analyzer, so no agent `mcpServers`
+  allowlist is needed. Cleaned ~1.2 GB of existing orphans this session (only the live session's RA
+  subtree remains).
+
 **Open from here:**
 - **Marcus terms-fork implementation** — design + phased plan committed (`dcea56a`, `0a20a15`:
   `docs/plans/2026-06-02-marcus-terms-fork-*`); fan-out execution pending.
-- **Rebuild MCP binaries** (if not already done on this machine): `pwsh tools/rebuild-mcp.ps1`. The
-  registry worktree built its own `tools/target`; the live `.mcp.json` points at the MAIN repo's
-  `tools/target/release/`. The `minijinja-mcp-server` `jinja_validate_prose` tool only appears after
-  that + a session restart.
-- **INFRA (still an open decision, NOT done):** subagent MCP-server orphaning — see the registry
-  entry below for the full description and proposed fix.
+- **Produce + swap the MCP binaries** — code is fixed and verified-compiling, but the live `.exe`s are
+  locked by the running MCP servers, so the swap must happen with them down: **restart the session,
+  then `pwsh tools/rebuild-mcp.ps1`** (or run it from a session with those servers disabled). Only
+  after that do the new `kill_on_drop`/`processId` behavior and the `minijinja-mcp-server`
+  `jinja_validate_prose` tool go live.
 
 ---
 
@@ -812,6 +827,7 @@ Rewrote from one-shot WGC capture to persistent capture sessions (10fps). First 
 
 | Date | Summary |
 |---|---|
+| 2026-06-02 | MCP tools fixes (`9782763`). Rebuilding the MCP binaries surfaced two latent defects (both root-cause fixed, no workarounds). (1) The tools build had been BROKEN since the registry merge — making the servers depend on `undone-scene` meant `rhai-mcp-server`'s `rhai = ["sync"]` unified `rhai/sync` onto `undone-scene`, whose thread-local raw-ptr eval closures are deliberately non-Send/Sync → 13 compile errors in `rhai_bind.rs`. Fixed by dropping `sync` and building the validation Engine per-call (handler stays Send+Sync; `check_syntax` already did this). (2) rust-analyzer orphaning (the multi-GB pileup): `rust-mcp` spawned RA with no `kill_on_drop` and `processId: null`; added `.kill_on_drop(true)` + own-PID `processId` (LSP-spec self-exit on hard kill) — so subagents that start rust-mcp no longer leak, making the proposed agent-`mcpServers`-allowlist unnecessary. Verified: `cd tools && cargo check --release` clean; `rhai-mcp-server` 10/10 tests pass. Cleaned ~1.2 GB of live orphans (only the active session's RA subtree remains). NOT done: producing + swapping the actual `.exe`s — the running servers lock them, so restart the session then run `pwsh tools/rebuild-mcp.ps1`. |
 | 2026-06-02 | Merge-confirm + push + handoff refresh. Confirmed `script-api-registry` was already merged to master (`e046ffe`) — branch gone, `REGISTRY` live in `crates/undone-scene/src/script/api/table.rs` (~95 reads + ~37 writes). Pushed master to `origin/master` (was 134 commits ahead; `f35e4b2..0a20a15`) — registry + all content/tooling/Marcus-terms-fork-plan work now on remote. Refreshed HANDOFF: prepended current-state entry, marked the stale "NOT yet merged" / "Merge → master" notes superseded, recorded the content-first strategic posture (scripting is the content layer; only new mechanics/verbs need Rust). No code changes. Still open: Marcus terms-fork implementation (`dcea56a`/`0a20a15` plan docs), MCP-binary rebuild on this machine, subagent MCP-orphaning infra decision. |
 | 2026-06-02 | Story-map authoring tool shipped (plan `docs/plans/2026-06-02-story-map-tool.md`, branch `story-map`). New `src/story_map.rs` + `src/bin/story_map.rs` derive the scene-connectivity graph from base-pack data, reconcile against authored `packs/base/roadmap.toml` (7 threads, all 74 scenes claimed, 0 orphans), and emit `docs/story-map.{md,json}` with a ranked `write_next` digest (dangling > broken > planned). Flags and `ARC=STATE` treated as uniform signals: produced (effects) vs required (gates); dangling = produced-never-required, broken = required-never-produced. Engine touch-ups: `reachability::{required_game_flags, arc_state_eqs}` pub wrappers + `Scheduler::bindings()`/`SceneBinding` projection. Added `.gitattributes` forcing LF on the generated docs so `--check` is stable under `core.autocrlf=true`. Two plan-test bugs fixed during TDD (the plan's tests used `gd.changeStress`→`w.changeStress` and an unregistered `base::arc` that `compile_effect` rejects — test helper now registers it). Verification: 8 story_map unit tests + 5 acceptance tests green; `cargo run --bin story-map -- --check` clean; `scene-writer` agent + `docs/content-schema.md` wired to the tool. |
 | 2026-05-17 | Prose surgery — scale-anchor repetition. `gym_changing_room`, `marcus_apartment`, `jake_stays_over` all shared a "scale of him vs you" body-observation anchor in their FEMININITY-gated branches. `gym_changing_room` owns it structurally (women's-only locker room); `marcus_apartment` re-anchored on visibility/deliberateness/lit-room (3 FEMININITY<25 branches: intro, stay_for_the_wine bedroom, cut_to_it bedroom); `jake_stays_over` re-anchored on territorial integration (2 FEMININITY<30 branches: intro, make_coffee closer). writing-reviewer audit caught one rhythm-echo I introduced + four minor closing-sentence issues, three fixed in-pass and the echo fixed post-playtester. Playtester launched the release binary in --dev --quick with Robin preset (FEMININITY 10), used jump_to_scene + choose_action to play each affected branch, took screenshots of rendered prose, and reported all four passages render correctly with no template breakage or UI jank. Two pre-existing prose issues in marcus_apartment (narrator body-analysis on "the body has already filed all of this", emotion-announcement on "warm and low has settled in your stomach") surfaced during audit but were not introduced by this surgery — logged in Next Action for a future content pass. Also committed a stray `crates/undone-scene/Cargo.toml` dev-deps pin left uncommitted by the prior test-author session — `set_npc_name_tests` needs `undone-save` + `serde_json` as dev-deps to compile. cargo test --workspace = 498 passing; validate-pack clean. Commits `49de362` (dev-deps pin) and `e8eef70` (prose surgery). |
