@@ -96,7 +96,7 @@ pub fn game_state_snapshot(gs: &GameState) -> GameStateSnapshot {
         .collect();
     arc_states.sort_by(|a, b| a.0.cmp(&b.0));
 
-    let player = PlayerSnapshot::from_player(&gs.world.player, gs.femininity_id);
+    let player = PlayerSnapshot::from_player(&gs.world, gs.femininity_id, gs.composure_id);
 
     GameStateSnapshot {
         current_scene_id: gs.engine.current_scene_id(),
@@ -381,8 +381,9 @@ fn set_stat(gs: &mut GameState, signals: AppSignals, stat: &str, value: i32) -> 
     }
 
     signals.player.set(PlayerSnapshot::from_player(
-        &gs.world.player,
+        &gs.world,
         gs.femininity_id,
+        gs.composure_id,
     ));
 
     DevCommandResponse {

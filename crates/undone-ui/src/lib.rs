@@ -134,6 +134,8 @@ impl AppSignals {
 pub struct PlayerSnapshot {
     pub name: String,
     pub femininity: i32,
+    pub composure: i32, // 0–100 control skill; low = giving in comes easier
+    pub desire: i32,    // 0–100 need-state; builds as time passes
     pub money: i32,
     pub stress: i32,
     pub anxiety: i32,
@@ -142,11 +144,15 @@ pub struct PlayerSnapshot {
 }
 
 impl PlayerSnapshot {
-    /// Build a display snapshot from the player, reading FEMININITY from the skills map.
-    pub fn from_player(p: &undone_domain::Player, femininity_id: SkillId) -> Self {
+    /// Build a display snapshot from the world: FEMININITY and COMPOSURE from the
+    /// player skills map, DESIRE from the game-data need-state.
+    pub fn from_player(world: &World, femininity_id: SkillId, composure_id: SkillId) -> Self {
+        let p = &world.player;
         Self {
             name: p.active_name(femininity_id).to_owned(),
             femininity: p.skill(femininity_id),
+            composure: p.skill(composure_id),
+            desire: world.game_data.desire(),
             money: p.money,
             stress: p.stress.get(),
             anxiety: p.anxiety.get(),
@@ -597,6 +603,7 @@ pub fn process_events(
     signals: AppSignals,
     world: &World,
     femininity_id: SkillId,
+    composure_id: SkillId,
 ) -> bool {
     let mut scene_finished = false;
     for event in events {
@@ -667,9 +674,11 @@ pub fn process_events(
             }
         }
     }
-    signals
-        .player
-        .set(PlayerSnapshot::from_player(&world.player, femininity_id));
+    signals.player.set(PlayerSnapshot::from_player(
+        world,
+        femininity_id,
+        composure_id,
+    ));
     scene_finished
 }
 
@@ -758,7 +767,7 @@ mod tests {
                 modifier: 0,
             },
         );
-        let snap = PlayerSnapshot::from_player(&world.player, fem_id);
+        let snap = PlayerSnapshot::from_player(&world, fem_id, fem_id);
         assert_eq!(snap.name, "Evan"); // femininity=25 → masc
     }
 
@@ -766,7 +775,7 @@ mod tests {
     fn player_snapshot_captures_money() {
         let fem_id = SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap());
         let world = test_world();
-        let snap = PlayerSnapshot::from_player(&world.player, fem_id);
+        let snap = PlayerSnapshot::from_player(&world, fem_id, fem_id);
         assert_eq!(snap.money, 500);
     }
 
@@ -878,6 +887,7 @@ mod tests {
             signals,
             &world,
             fem_id,
+            fem_id,
         );
 
         assert!(!finished);
@@ -920,6 +930,7 @@ mod tests {
             signals,
             &world,
             fem_zero_id(),
+            fem_zero_id(),
         );
         assert!(!finished);
         assert_eq!(signals.story.get(), "Hello there.");
@@ -937,6 +948,7 @@ mod tests {
             signals,
             &world,
             fem_zero_id(),
+            fem_zero_id(),
         );
         assert_eq!(signals.story.get(), "A quiet thought.");
     }
@@ -953,6 +965,7 @@ mod tests {
             }])],
             signals,
             &world,
+            fem_zero_id(),
             fem_zero_id(),
         );
         let actions = signals.actions.get();
@@ -974,6 +987,7 @@ mod tests {
             signals,
             &world,
             fem_zero_id(),
+            fem_zero_id(),
         );
         assert!(finished, "SceneFinished must report the scene as finished");
         assert!(signals.actions.get().is_empty());
@@ -987,6 +1001,7 @@ mod tests {
             vec![EngineEvent::NpcActivated(Some(known_npc_data()))],
             signals,
             &world,
+            fem_zero_id(),
             fem_zero_id(),
         );
         let npc = signals.active_npc.get().expect("active npc should be set");
@@ -1011,6 +1026,7 @@ mod tests {
             signals,
             &world,
             fem_zero_id(),
+            fem_zero_id(),
         );
         assert!(signals.active_npc.get().is_none());
     }
@@ -1028,6 +1044,7 @@ mod tests {
             ],
             signals,
             &world,
+            fem_zero_id(),
             fem_zero_id(),
         );
         let npc = signals.active_npc.get().expect("npc retained");
@@ -1052,6 +1069,7 @@ mod tests {
             signals,
             &world,
             fem_zero_id(),
+            fem_zero_id(),
         );
         let npc = signals.active_npc.get().expect("npc set");
         assert_eq!(npc.name, "Jake");
@@ -1062,6 +1080,7 @@ mod tests {
     fn process_events_updates_player_snapshot_from_world() {
         let signals = AppSignals::new();
         let fem_id = fem_zero_id();
+        let composure_id = SkillId::from_spur(lasso::Spur::try_from_usize(1).unwrap());
         let mut world = test_world();
         world.player.skills.insert(
             fem_id,
@@ -1070,9 +1089,27 @@ mod tests {
                 modifier: 0,
             },
         );
-        // Even with no story/action events, the player snapshot is refreshed.
-        process_events(vec![], signals, &world, fem_id);
-        assert_eq!(signals.player.get().femininity, 42);
+        world.player.skills.insert(
+            composure_id,
+            undone_domain::SkillValue {
+                value: 55,
+                modifier: 0,
+            },
+        );
+        world.game_data.set_desire(80);
+        // Even with no story/action events, the player snapshot is refreshed —
+        // including the desire/composure meter fields surfaced in the sidebar.
+        process_events(vec![], signals, &world, fem_id, composure_id);
+        let snap = signals.player.get();
+        assert_eq!(snap.femininity, 42);
+        assert_eq!(
+            snap.composure, 55,
+            "composure must surface in the sidebar snapshot"
+        );
+        assert_eq!(
+            snap.desire, 80,
+            "desire must surface in the sidebar snapshot"
+        );
     }
 
     #[test]

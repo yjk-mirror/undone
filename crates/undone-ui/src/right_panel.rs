@@ -63,11 +63,17 @@ fn stats_panel(player: RwSignal<PlayerSnapshot>, signals: AppSignals) -> impl Vi
             move || player.get().femininity.to_string(),
             signals,
         ),
+        stat_row(
+            "Composure",
+            move || player.get().composure.to_string(),
+            signals,
+        ),
         stat_row("Money", move || format!("${}", player.get().money), signals),
         stat_row("Stress", move || player.get().stress.to_string(), signals),
         stat_row("Anxiety", move || player.get().anxiety.to_string(), signals),
         empty().style(|s| s.height(8.0)),
         stat_row("Arousal", move || player.get().arousal.clone(), signals),
+        stat_row("Desire", move || player.get().desire.to_string(), signals),
         stat_row("Alcohol", move || player.get().alcohol.clone(), signals),
     ))
     .style(|s| s.padding(16.0))

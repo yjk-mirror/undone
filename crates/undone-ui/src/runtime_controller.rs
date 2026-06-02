@@ -58,8 +58,13 @@ impl<'a> RuntimeController<'a> {
                 None
             }
         });
-        let scene_finished =
-            process_events(events, self.signals, &self.gs.world, self.gs.femininity_id);
+        let scene_finished = process_events(
+            events,
+            self.signals,
+            &self.gs.world,
+            self.gs.femininity_id,
+            self.gs.composure_id,
+        );
 
         if let Some(slot_name) = requested_slot {
             return self.start_requested_slot(&slot_name);
@@ -126,8 +131,13 @@ impl<'a> RuntimeController<'a> {
             npc_role,
         );
         let events = self.gs.engine.drain();
-        let scene_finished =
-            process_events(events, self.signals, &self.gs.world, self.gs.femininity_id);
+        let scene_finished = process_events(
+            events,
+            self.signals,
+            &self.gs.world,
+            self.gs.femininity_id,
+            self.gs.composure_id,
+        );
         if scene_finished {
             self.signals.awaiting_continue.set(true);
         }
@@ -196,8 +206,9 @@ impl<'a> RuntimeController<'a> {
             .set("[No eligible scene is currently available.]".to_string());
         self.signals.actions.set(vec![]);
         self.signals.player.set(PlayerSnapshot::from_player(
-            &self.gs.world.player,
+            &self.gs.world,
             self.gs.femininity_id,
+            self.gs.composure_id,
         ));
 
         self.outcome(None, false)
@@ -306,6 +317,7 @@ mod tests {
             init_error: None,
             opening_scene: None,
             femininity_id: SkillId::from_spur(lasso::Spur::try_from_usize(0).unwrap()),
+            composure_id: SkillId::from_spur(lasso::Spur::try_from_usize(1).unwrap()),
             current_scene_time_anchor: None,
         }
     }

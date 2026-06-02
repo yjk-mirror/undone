@@ -91,7 +91,7 @@ pub fn snapshot_runtime(signals: AppSignals, gs: &GameState) -> RuntimeSnapshot 
         .collect();
     arc_states.sort_by(|left, right| left.id.cmp(&right.id));
 
-    let player = PlayerSnapshot::from_player(&gs.world.player, gs.femininity_id);
+    let player = PlayerSnapshot::from_player(&gs.world, gs.femininity_id, gs.composure_id);
     let active_npcs = gs
         .engine
         .current_bound_npcs(&gs.world, &gs.registry)

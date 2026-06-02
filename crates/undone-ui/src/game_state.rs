@@ -42,6 +42,7 @@ pub struct GameState {
     pub init_error: Option<String>,
     pub opening_scene: Option<String>,
     pub femininity_id: SkillId,
+    pub composure_id: SkillId,
     pub current_scene_time_anchor: Option<SceneTimeAnchor>,
 }
 
@@ -243,6 +244,7 @@ pub fn start_game_checked(
     } = pre;
     let opening_scene = registry.opening_scene().map(|s| s.to_owned());
     let femininity_id = required_femininity_skill(&registry)?;
+    let composure_id = required_composure_skill(&registry)?;
     let world = new_game(config, &mut registry, &mut rng);
     Ok(GameState {
         world,
@@ -254,6 +256,7 @@ pub fn start_game_checked(
         init_error,
         opening_scene,
         femininity_id,
+        composure_id,
         current_scene_time_anchor: None,
     })
 }
@@ -274,6 +277,7 @@ pub fn build_throwaway_game_state(
 
     let opening_scene = pre.registry.opening_scene().map(|s| s.to_owned());
     let femininity_id = required_femininity_skill(&pre.registry)?;
+    let composure_id = required_composure_skill(&pre.registry)?;
     let world = new_game(config, &mut pre.registry, &mut pre.rng);
     Ok(GameState {
         world,
@@ -285,6 +289,7 @@ pub fn build_throwaway_game_state(
         init_error: pre.init_error.clone(),
         opening_scene,
         femininity_id,
+        composure_id,
         current_scene_time_anchor: None,
     })
 }
@@ -327,6 +332,7 @@ pub fn start_loaded_game_checked(
         init_error,
     } = pre;
     let femininity_id = required_femininity_skill(&registry)?;
+    let composure_id = required_composure_skill(&registry)?;
 
     // Structural-skill backfill for saves written before a structural skill
     // existed. COMPOSURE was promoted to a structural skill in the looping-adult
@@ -336,17 +342,15 @@ pub fn start_loaded_game_checked(
     // value lives in one place (`char_creation::STARTING_COMPOSURE`). New games
     // seed COMPOSURE during character creation and never reach this path.
     let mut world = world;
-    if let Ok(composure_id) = registry.composure_skill() {
-        if !world.player.skills.contains_key(&composure_id) {
-            log::info!("backfilling missing COMPOSURE skill into loaded save");
-            world.player.skills.insert(
-                composure_id,
-                SkillValue {
-                    value: undone_packs::char_creation::STARTING_COMPOSURE,
-                    modifier: 0,
-                },
-            );
-        }
+    if !world.player.skills.contains_key(&composure_id) {
+        log::info!("backfilling missing COMPOSURE skill into loaded save");
+        world.player.skills.insert(
+            composure_id,
+            SkillValue {
+                value: undone_packs::char_creation::STARTING_COMPOSURE,
+                modifier: 0,
+            },
+        );
     }
 
     let engine = SceneEngine::new(scenes);
@@ -360,6 +364,7 @@ pub fn start_loaded_game_checked(
         init_error,
         opening_scene: None,
         femininity_id,
+        composure_id,
         current_scene_time_anchor: None,
     })
 }
@@ -378,6 +383,12 @@ pub fn load_game_state_from_save(
 fn required_femininity_skill(registry: &PackRegistry) -> Result<SkillId, String> {
     registry.femininity_skill().map_err(|_| {
         "Character creation contract error(s):\ncharacter creation requires skill 'FEMININITY', but it is not registered".to_string()
+    })
+}
+
+fn required_composure_skill(registry: &PackRegistry) -> Result<SkillId, String> {
+    registry.composure_skill().map_err(|_| {
+        "Character creation contract error(s):\ncharacter creation requires skill 'COMPOSURE', but it is not registered".to_string()
     })
 }
 

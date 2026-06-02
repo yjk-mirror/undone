@@ -532,6 +532,9 @@ mod tests {
             femininity_id: undone_domain::SkillId::from_spur(
                 lasso::Spur::try_from_usize(0).unwrap(),
             ),
+            composure_id: undone_domain::SkillId::from_spur(
+                lasso::Spur::try_from_usize(1).unwrap(),
+            ),
             current_scene_time_anchor: None,
         };
         let signals = make_test_signals();
